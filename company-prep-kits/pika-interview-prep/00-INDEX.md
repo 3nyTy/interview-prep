@@ -86,7 +86,7 @@ page. Verify any edit by rendering to PNG and measuring ink extents, not by eye.
 ## Transcript export
 
 `tools/export_transcript.py` rebuilds the chat-history deliverable from
-`~/.claude/projects/-Users-akshay-kumar/<session-id>.jsonl`. Idempotent and re-runnable — worth
+`~/.claude/projects/-Users-<you>/<session-id>.jsonl`. Idempotent and re-runnable — worth
 re-running immediately before sending, since a transcript cannot contain its own creation.
 
 It also does necessary privacy work. A raw Claude Code session log contains harness-injected
