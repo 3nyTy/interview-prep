@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<style>
+  @page { size: Letter; margin: 0.42in 0.55in; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 9.6pt; line-height: 1.26; color: #16181d;
+         font-variant-ligatures: none; font-feature-settings: "liga" 0, "clig" 0, "dlig" 0; }
+  h1 { font-size: 19pt; font-weight: 700; letter-spacing: 0.4px; margin-bottom: 3px; }
+  .contact { font-size: 8.9pt; color: #3c4149; margin-bottom: 8px; }
+  .contact a { color: #3c4149; text-decoration: none; }
+  .sep { color: #a8aeb8; padding: 0 5px; }
+  h2 { font-size: 9.3pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1.1px;
+       border-bottom: 1.1px solid #16181d; padding-bottom: 2.4px; margin-top: 8px; margin-bottom: 4.5px; }
+  .summary { text-align: justify; }
+  .skills { display: grid; grid-template-columns: 138px 1fr; row-gap: 2.2px; column-gap: 8px; }
+  .job { margin-bottom: 6px; }
+  .jobhead, .role { break-after: avoid; }
+  .jobhead { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1px; }
+  .co { font-size: 10.5pt; font-weight: 700; }
+  .when { font-size: 8.9pt; color: #4b525c; white-space: nowrap; padding-left: 12px; }
+  .role { font-style: italic; color: #2c3138; margin-bottom: 3.2px; }
+  ul { list-style: none; }
+  li { position: relative; padding-left: 11px; margin-bottom: 2px; break-inside: avoid; }
+  li:before { content: "\25AA"; position: absolute; left: 0; color: #4b525c; font-size: 8pt; }
+  .tag { color: #4b525c; font-style: italic; }
+</style>
+</head>
+<body>
+<h1>Gowri [TODO: last name]</h1>
+<div class="contact">Seattle, WA <span class="sep">|</span> [TODO: email] <span class="sep">|</span> [TODO: phone] <span class="sep">|</span> <a href="[TODO]">linkedin.com/in/[TODO]</a> <span class="sep">|</span> <a href="https://github.com/3nyTy">github.com/3nyTy</a></div>
+
+<h2>Summary</h2>
+{{SUMMARY}}
+
+<h2>Technical Skills</h2>
+{{SKILLS}}
+
+<h2>Experience</h2>
+
+<div class="job">
+<div class="jobhead"><span class="co">Microsoft &mdash; Azure Customer Experience</span><span class="when">[TODO: year] &ndash; Present</span></div>
+<div class="role">Software Engineer II (IC4) &mdash; Seattle, WA</div>
+<ul>
+  <li>Built an <b>LLM evaluation SDK</b> and an evals platform with dashboards that <b>[TODO: N] teams</b> onboarded onto; [TODO: what it measures, and what decision it changed].</li>
+  <li>Own <b>KPI measurement pipelines</b> for AI-driven support, including <b>ticket-deflection metrics</b>, on Azure Synapse, ADX / Kusto and Microsoft Fabric; [TODO: data volume, latency or freshness win].</li>
+  <li>Designed a <b>self-service AI analytics platform</b>: natural-language-to-KQL, a semantic layer, an MCP server and Azure OpenAI inside restricted-tenant constraints; [TODO: users or adoption].</li>
+  <li>Data analysis on new product releases that feeds <b>leadership strategy</b> and the data science team; [TODO: one decision it drove].</li>
+  <li>Applied <b>Responsible AI</b> practice to [TODO: what you reviewed / guarded, and outcome].</li>
+</ul></div>
+
+<div class="job">
+<div class="jobhead"><span class="co">[TODO: Previous company]</span><span class="when">[TODO] &ndash; [TODO]</span></div>
+<div class="role">[TODO: Title] &mdash; [TODO: City]</div>
+<ul>
+  <li>[TODO: biggest system you built, with a number].</li>
+  <li>[TODO: distributed-systems or infrastructure ownership, with a number].</li>
+</ul></div>
+
+<div class="job">
+<div class="jobhead"><span class="co">[TODO: Earlier company]</span><span class="when">[TODO] &ndash; [TODO]</span></div>
+<div class="role">[TODO: Title]</div>
+<ul>
+  <li>[TODO: full-stack work &mdash; frontend, backend and infrastructure &mdash; with a number].</li>
+</ul></div>
+
+<h2>Education</h2>
+<div><b>[TODO: Degree, University]</b> &mdash; [TODO: year].</div>
+</body></html>
