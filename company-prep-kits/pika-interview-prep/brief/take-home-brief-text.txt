@@ -1,0 +1,77 @@
+                                    Take-home System Design
+
+
+System Design Part 1: Pika Creative Platform
+Pika Creative Platform is an extensible platform for AI-driven video and creative media, built around a library of
+pre-defined Apps. Each App is a standalone tool for creating or editing media — for example, Character Creation,
+World Cup Video, and Product Ad Studio.
+
+The platform sits on top of a set of existing creative primitives (video generation APIs, vision models, image editors,
+ffmpeg, etc.), all available as backend APIs.
+
+The goal is to design the system to build this App-based creative platform.
+
+Product Mockups:
+Address these areas:
+
+    ●​ Architecture & data model. How do you represent "Apps" in the system?
+    ●​ Services & components. What are the main components you'd build for a product like this?
+    ●​ Key trade-offs. Justify your major decisions — e.g., sync vs. async execution, state management, and
+       choice of components.
+    ●​ Resiliency. Video generation is expensive and failure-prone. How do you handle long-running jobs, retries,
+       and task-level monitoring?
+    ●​ Scalability. How could a team like Growth marketing team ship a new App without engineering effort?
+
+Deliverables:
+
+    ●​   An architecture document covering core components, data models, and request flows.
+    ●​   A short written or video walk-through of the design.
+    ●​   An estimate of how long the full project would take you to build.
+    ●​   The prompts you'd use to steer a coding agent (Claude/Codex) to implement it.
+
+Agent Chat History Export Options:
+    ●​ Web-based Agents (ChatGPT / Claude): Generate a public Share Link directly from the chat or use Cmd+P to save as a PDF.
+    ●​ IDE-based Agents (Cursor / VS Code): Use extensions like SpecStory or Cursor Chat Exporter to export logs into a single Markdown or PDF file.
+
+
+
+
+Please proceed to Part 2 →
+
+                                                                                                                                                       ​
+​
+System Design Part 2: Agent Experience
+We now want to add an agent experience to the Pika Creative Platform — think of it as a Claude Code- or
+Codex-style agent, but for creative users. Instead of stepping through a pre-defined App, the user describes what
+they want in natural language and the agent iteratively creates and edits media on their behalf, drawing on the same
+set of existing creative primitives that power the Apps.
+
+How would you change your design to fit into these new requirements?
+
+Product Mockups:
+
+
+
+
+Address these areas:
+
+    ●​ Agent harness. How do you design the agent loop? Where does the agent code live, and how does it reuse
+       the primitives and orchestration engine from Part 1?
+    ●​ Cost. Agent loops are open-ended and video generation is expensive. How do you balance output quality
+       against cost? How do you optimize agent LLM cost?
+    ●​ Testing & evaluation. Creative output is subjective and the agent is non-deterministic. How do you evaluate
+       the agent's quality and catch regressions?
+
+Deliverables
+
+    ●​   A modified version of your Part 1 design showing what changes to support the agent and what stays shared.
+    ●​   A short written or video walk-through of the new design.
+    ●​   An estimate of how long the full project would take you to build.
+    ●​   The prompts you'd use to steer a coding agent (Claude/Codex) to implement it.
+            ○​ A shared link or export (PDF/Markdown) of your full chat history with your coding agent (e.g., Claude,
+                ChatGPT, Cursor, or Codex) showing how you prompted and iterated on this design document.
+
+Agent Chat History Export Options:
+    ●​ Web-based Agents (ChatGPT / Claude): Generate a public Share Link directly from the chat or use Cmd+P to save as a PDF.
+    ●​ IDE-based Agents (Cursor / VS Code): Use extensions like SpecStory or Cursor Chat Exporter to export logs into a single Markdown or PDF file.
+
