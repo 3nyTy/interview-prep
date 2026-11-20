@@ -1,0 +1,70 @@
+===H1===
+Friends Of Appropriate Ages
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/friends-of-appropriate-ages
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Friends Of Appropriate Ages
+Given an array of ages, count the number of valid friend requests under the rule that person A will request person B iff B's age is in `(0.5*A + 7, A]`. Bloomberg insists on the `O(σ^2)` bucket-frequency solution over the naive `O(n^2)`.
+SWE
+array
+hashmap
+math
+prefix-sum
+medium
+Frequency
+Single report
+Last asked
+2025-11-22
+Stage
+onsite-coding
+Requirements
+
+Given an integer array ages[], return the total number of friend requests sent. Person A sends a request to person B iff none of the following are true:
+
+age[B] <= 0.5 * age[A] + 7
+
+age[B] > age[A]
+
+age[B] > 100 && age[A] < 100
+
+Note: the third condition is implied by the first two when ages are bounded by [1, 120], so it can usually be dropped.
+
+If A and B are both old enough to request each other, the count is 2; if they are the same person, the request to self does not count.
+
+Function signature:
+
+int numFriendRequests(int[] ages)
+
+Examples
+
+ages = [16,16]      -> 2   (each sends to the other)
+ages = [16,17,18]   -> 2
+ages = [20,30,100,110,120] -> 3
+
+Notes
+
+Naive O(n^2) scans every pair; this is the brute force, not the answer. Bloomberg pushes for the O(σ^2) (where σ = 121 is the age range) solution explicitly.
+
+The bucket approach: count the frequency of each age, then for each pair of ages (a, b) with b in (0.5a + 7, a], add count[a] * count[b]. For a == b, subtract the self-request: contribution is count[a] * (count[a] - 1).
+
+Total complexity: O(n + σ^2). Space: O(σ).
+
+Off-by-one matters: the lower bound is strict (b > 0.5a + 7) and the upper bound is inclusive (b <= a). Botching either direction is the most common bug.
+
+A prefix-sum optimization can drop the inner loop to O(σ) for an O(n + σ) solution. Optional optimization; mention if asked.
+
+Preparation
+
+Derive the rule reduction (third condition is redundant when ages are bounded by 120) on paper before writing code.
+
+Implement once with the brute-force O(n^2) to confirm correctness, then refactor to the bucket-frequency version and verify they agree on random inputs.
+
+Be ready to discuss the prefix-sum optimization without implementing it — it's the most common asked-but-not-required follow-up.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

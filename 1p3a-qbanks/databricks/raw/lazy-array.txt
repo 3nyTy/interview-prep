@@ -1,0 +1,506 @@
+===H1===
+Lazy Array
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/lazy-array
+===BODY===
+Databricks
+Coding·60 minMembers
+Lazy Array
+Implement a lazy array abstraction where transformations are recorded and only evaluated when values are read or iterated. Interviewers often focus on how to test laziness, not just functional output.
+SWE
+MLE
+iterator
+object-design
+testing
+medium
+Frequency
+Medium
+Last asked
+2026-04-13
+Stage
+onsite-coding
+Problem Summary
+
+You need to design a class called LazyArray. This class allows you to change data (like using map), but it must wait to run those changes. The code should only run when you ask for a final result (like using indexOf).
+
+This uses a "lazy evaluation" pattern. It is common in data processing.
+
+The interviewer wants to see three things:
+
+Immutability: You must not change the original object. You must create new ones.
+
+Laziness: You must prove the code waits to execute.
+
+Functional Programming: You understand how to pass functions around.
+
+Class Requirements
+
+You must write these methods for the LazyArray class:
+
+LazyArray(array): The starting point. It takes a list of integers.
+
+map(function): This sets up a change to the data.
+
+It returns a NEW LazyArray object.
+
+It does NOT run the function yet.
+
+It remembers the function for later.
+
+indexOf(target): This looks for a specific number.
+
+This is when the code actually runs.
+
+It applies all the map functions to each number, one by one.
+
+It returns the index of the first match. If not found, it returns -1.
+
+Important Rule: Every time you call map(), you get a new object. The old object stays the same. Chains of operations must not mess each other up.
+
+Usage Examples
+
+# Example 1: One change
+arr = LazyArray([10, 20, 30, 40, 50])
+result = arr.map(lambda x: x * 2).indexOf(40)
+# result = 1
+# Logic: base[1] is 20. 20 * 2 is 40. Found it.
+
+# Example 2: Two changes in a row
+arr = LazyArray([10, 20, 30, 40, 50])
+result = arr.map(lambda x: x * 2).map(lambda x: x * 3).indexOf(240)
+# result = 3
+# Logic: base[3] is 40. 40 * 2 is 80. 80 * 3 is 240.
+
+# Example 3: Separate chains (Must be independent)
+arr = LazyArray([10, 20, 30, 40, 50])
+chain1 = arr.map(lambda x: x * 2)
+chain2 = arr.map(lambda x: x + 5)
+
+chain1.indexOf(40)  # Returns 1 (20 * 2 = 40)
+chain2.indexOf(15)  # Returns 0 (10 + 5 = 15)
+# chain1 and chain2 do not affect each other.
+
+# Example 4: No match found
+arr = LazyArray([10, 20, 30])
+result = arr.map(lambda x: x * 2).indexOf(100)
+# result = -1
+
+# Example 5: branching paths
+arr = LazyArray([1, 2, 3, 4, 5])
+doubled = arr.map(lambda x: x * 2)
+chain1 = doubled.map(lambda x: x + 10)
+chain2 = doubled.map(lambda x: x + 20)
+
+chain1.indexOf(14)  # Returns 1 (base[1]=2, 2 * 2 + 10 = 14)
+chain2.indexOf(24)  # Returns 1 (base[1]=2, 2 * 2 + 20 = 24)
+
+Input Limits and Rules
+
+Array size: Up to 10,000 items (10^4).
+
+Numbers: Between -1 billion and 1 billion (-10^9 to 10^9).
+
+Map calls: Up to 100 chained operations.
+
+Pure Functions: The functions passed in do not change outside variables.
+
+Laziness: Do NOT run the math inside map(). Wait for indexOf().
+
+Immutability: Do NOT change existing lists. Make copies.
+
+Solution 1: Storing a List of Functions (Recommended)
+
+The Logic
+
+We keep a list of "to-do" items (functions). We only do them when asked.
+
+Constructor: Save the starting numbers.
+
+map():
+
+Copy the current list of functions.
+
+Add the new function to the end of the copy.
+
+Return a new LazyArray with this new list.
+
+indexOf():
+
+Loop through the original numbers.
+
+For each number, run all the functions in the list, one after another.
+
+Check if the result matches the target.
+
+Return the index if it matches.
+
+Time Complexity
+
+map(): O(m). Here, m is the number of functions. We copy the list.
+
+indexOf(): O(n × m). Here, n is the array size. We run m functions for each item.
+
+Space Complexity
+
+O(m) per LazyArray. We need space to store the list of functions.
+
+Python Code
+
+class LazyArray:
+    def __init__(self, base, operations=None):
+        """
+        Setup the LazyArray.
+        base: The original list of numbers.
+        operations: The list of functions to run later.
+        """
+        self.base = base
+        # If no operations provided, start with empty list
+        self.operations = operations if operations is not None else []
+
+    def map(self, func):
+        """
+        Add a function to the to-do list.
+        Returns a NEW LazyArray.
+        Does NOT run the function yet.
+        """
+        # Copy the list so we don't change the old one (Immutability)
+        new_operations = self.operations.copy()
+        new_operations.append(func)
+
+        # Return a new object with the updated list
+        return LazyArray(self.base, new_operations)
+
+    def indexOf(self, target):
+        """
+        Find the index.
+        This is where the code actually runs.
+        """
+        for i in range(len(self.base)):
+            # Start with the original number
+            value = self.base[i]
+
+            # Run every function in the list in order
+            for operation in self.operations:
+                value = operation(value)
+
+            # Check if we found the target
+            if value == target:
+                return i
+
+        # Not found
+        return -1
+
+# Test the code
+arr = LazyArray([10, 20, 30, 40, 50])
+
+# Simple test
+print(arr.map(lambda x: x * 2).indexOf(40))  # 1
+
+# Chained test
+print(arr.map(lambda x: x * 2).map(lambda x: x * 3).indexOf(240))  # 3
+
+# Independent chains test
+chain1 = arr.map(lambda x: x * 2)
+chain2 = arr.map(lambda x: x + 5)
+print(chain1.indexOf(40))  # 1
+print(chain2.indexOf(15))  # 0
+
+# Verify branching works
+doubled = arr.map(lambda x: x * 2)
+c1 = doubled.map(lambda x: x + 10)
+c2 = doubled.map(lambda x: x + 20)
+print(c1.indexOf(50))  # (20 * 2) + 10 = 50. Index 1
+print(c2.indexOf(60))  # (20 * 2) + 20 = 60. Index 1
+
+Java Code
+
+import java.util.*;
+import java.util.function.Function;
+
+public class LazyArray {
+    private List<Integer> base;
+    private List<Function<Integer, Integer>> operations;
+
+    public LazyArray(List<Integer> base) {
+        this.base = base;
+        this.operations = new ArrayList<>();
+    }
+
+    private LazyArray(List<Integer> base, List<Function<Integer, Integer>> ops) {
+        this.base = base;
+        this.operations = ops;
+    }
+
+    public LazyArray map(Function<Integer, Integer> func) {
+        // Copy the list to keep the old one safe (Immutability)
+        List<Function<Integer, Integer>> newOps = new ArrayList<>(this.operations);
+        newOps.add(func);
+
+        // Return new object
+        return new LazyArray(this.base, newOps);
+    }
+
+    public int indexOf(int target) {
+        for (int i = 0; i < base.size(); i++) {
+            // Start with base value
+            int value = base.get(i);
+
+            // Apply functions in order
+            for (Function<Integer, Integer> op : operations) {
+                value = op.apply(value);
+            }
+
+            // Check match
+            if (value == target) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    // Test usage
+    public static void main(String[] args) {
+        LazyArray arr = new LazyArray(Arrays.asList(10, 20, 30, 40, 50));
+
+        System.out.println(arr.map(x -> x * 2).indexOf(40));  // 1
+
+        System.out.println(arr.map(x -> x * 2).map(x -> x * 3).indexOf(240));  // 3
+
+        LazyArray chain1 = arr.map(x -> x * 2);
+        LazyArray chain2 = arr.map(x -> x + 5);
+        System.out.println(chain1.indexOf(40));  // 1
+        System.out.println(chain2.indexOf(15));  // 0
+    }
+}
+
+Why do we do it this way?
+
+Why copy the list?
+This keeps every chain separate. Changing one path does not change another. This is "Immutability."
+
+Why wait to run functions?
+This is "Lazy Evaluation." We don't waste time calculating numbers we might not need. We wait until the specific question (indexOf) is asked.
+
+Solution 2: Linked Nodes (Alternative)
+
+The Logic
+
+Instead of copying a list every time, we can link objects together like a chain.
+
+Each LazyArray object holds:
+
+The base data.
+
+A link to its parent (the previous LazyArray).
+
+The one function added at this step.
+
+indexOf(): Climb up the chain to find all functions, put them in a list, and then run them.
+
+Python Code
+
+class LazyArrayChained:
+    def __init__(self, base, parent=None, func=None):
+        self.base = base
+        self.parent = parent
+        self.func = func
+
+    def map(self, func):
+        # Link the new object to the current one (self)
+        return LazyArrayChained(self.base, parent=self, func=func)
+
+    def _collect_functions(self):
+        # Recursively get all functions from parents
+        if self.parent is None:
+            return []
+
+        # Get parent functions, then add mine
+        parent_funcs = self.parent._collect_functions()
+        return parent_funcs + [self.func]
+
+    def indexOf(self, target):
+        # Get the full list of instructions
+        operations = self._collect_functions()
+
+        for i in range(len(self.base)):
+            value = self.base[i]
+            for op in operations:
+                value = op(value)
+            if value == target:
+                return i
+        return -1
+
+Pros and Cons
+
+Good: map() is very fast (O(1)) because it doesn't copy lists.
+
+Bad: indexOf() has to traverse the chain to find the functions.
+
+Verdict: Solution 1 is better here. It is easier to read, and usually, indexOf is called more than map, so simpler logic wins.
+
+Testing: Proving Laziness
+
+Question: How do you prove that map() didn't run the code secretly?
+
+Answer: Use a "Counter." Create a fake function that counts how many times it gets called.
+
+class CallCounter:
+    """Helper to count how many times a function runs."""
+    def __init__(self, func, name="function"):
+        self.func = func
+        self.name = name
+        self.call_count = 0
+
+    def __call__(self, x):
+        self.call_count += 1
+        return self.func(x)
+
+    def reset(self):
+        self.call_count = 0
+
+def test_laziness():
+    arr = LazyArray([1, 2, 3, 4, 5])
+
+    # Wrap the math function with a counter
+    double = CallCounter(lambda x: x * 2, "double")
+    add_ten = CallCounter(lambda x: x + 10, "add_ten")
+
+    # 1. Call map()
+    lazy1 = arr.map(double)
+    # Check: Count should still be 0
+    assert double.call_count == 0, "map() should not call function!"
+
+    lazy2 = lazy1.map(add_ten)
+    # Check: Count should still be 0
+    assert double.call_count == 0, "map() should not call function!"
+    assert add_ten.call_count == 0, "map() should not call function!"
+
+    # 2. Call indexOf() - NOW it should run
+    result = lazy2.indexOf(14)  # (2 * 2) + 10 = 14. This is at index 1.
+
+    # It processes Index 0 (No match) -> Count goes to 1
+    # It processes Index 1 (Match!) -> Count goes to 2
+    assert double.call_count == 2
+    assert add_ten.call_count == 2
+    assert result == 1
+
+    print("✓ Laziness verified!")
+
+test_laziness()
+
+Optimization: Caching Results
+
+Question: If we call indexOf many times on the same object, how do we make it faster?
+
+Answer: Calculate the result once and save it (Cache it).
+
+class LazyArrayWithCache:
+    def __init__(self, base, operations=None):
+        self.base = base
+        self.operations = operations if operations is not None else []
+        self._cached_transformed = None  # Storage for the result
+
+    def map(self, func):
+        new_operations = self.operations.copy()
+        new_operations.append(func)
+        return LazyArrayWithCache(self.base, new_operations)
+
+    def _get_transformed_array(self):
+        """Calculate once, then save."""
+        if self._cached_transformed is not None:
+            return self._cached_transformed
+
+        # Do the math
+        result = []
+        for value in self.base:
+            for op in self.operations:
+                value = op(value)
+            result.append(value)
+
+        # Save result
+        self._cached_transformed = result
+        return result
+
+    def indexOf(self, target):
+        """Use the saved result."""
+        transformed = self._get_transformed_array()
+
+        try:
+            return transformed.index(target)
+        except ValueError:
+            return -1
+
+Trade-offs: This uses more memory (O(n) space) but makes repeated searches much faster.
+
+Optimization: Stopping Early
+
+Question: Can we stop the loop as soon as we find the answer?
+
+Answer: Yes, the loop in indexOf already does this!
+
+def indexOf(self, target):
+    for i in range(len(self.base)):
+        # Calculate...
+        if value == target:
+            return i  # Stops here immediately!
+
+    return -1
+
+This is called "Short-Circuiting." If the first number matches, we never calculate the math for the rest of the array. This saves a lot of time.
+
+Extension: Adding Filter and Reduce
+
+Question: How do we add filter (remove items) or reduce (combine items)?
+
+Answer: We classify operations into two types:
+
+Intermediate (Lazy): Like map and filter. These just add instructions to the list.
+
+Terminal (Active): Like indexOf, toArray, or reduce. These trigger the actual work.
+
+You would need to update the instruction list to handle different types of actions (not just simple math functions).
+
+Concurrency: Thread Safety
+
+Question: Is this safe to use with multiple threads?
+
+Answer: Yes, mostly. Because the LazyArray is Immutable (unchangeable), multiple threads can read from it at the same time without crashing.
+
+However, if you add Caching (from the optimization section), you are changing the object (saving the cache). In that case, you need to use a Lock to prevent errors.
+
+Edge Cases
+
+Make sure your code handles these weird situations:
+
+Empty array: Should return -1.
+
+No map calls: arr.indexOf(5) should just search the raw numbers.
+
+Target not found: Return -1.
+
+Multiple matches: Return the first index found.
+
+Function errors: If the user's function crashes (e.g., divide by zero), the error should bubble up during indexOf.
+
+Summary of Concepts
+
+Lazy Evaluation: Don't work until you have to. It allows "Short-Circuiting" (stopping early).
+
+Immutability: Don't change objects; make new ones. This makes code safer and prevents bugs in complex chains.
+
+Pure Functions: Functions that always give the same output for the same input make testing easy.
+
+Similar Technologies
+
+Java Streams: Uses this exact pattern (.map().filter() is lazy, .collect() triggers the run).
+
+Python Generators: Use yield to wait for the next request.
+
+Spark RDD: Big data tools use lazy evaluation to optimize giant calculations.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

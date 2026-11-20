@@ -1,0 +1,65 @@
+===H1===
+MLE Onsite — Jupyter Pair Programming on Messy Classification Data
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/mle-jupyter-classification
+===BODY===
+Coinbase
+Coding·60 minMembers
+MLE Onsite — Jupyter Pair Programming on Messy Classification Data
+MLE onsite pair-programming round: build a working classification model end-to-end on a messy dataset inside a Jupyter notebook, with the interviewer asking conceptual drive-by questions while you code. The signal is whether you ship a baseline cleanly — over-engineering with full feature stores or gradient-boosted ensembles is the most common time-sink.
+MLE
+classification
+data-cleaning
+scikit-learn
+pandas
+live-review
+medium
+Frequency
+Single report
+Last asked
+2025-12-19
+Stage
+onsite-coding
+Requirements
+
+Open notebook with a deliberately noisy dataset (missing values, inconsistent encodings, mixed-type columns).
+
+Goal: produce a working classification model end-to-end (load → clean → split → train → evaluate).
+
+Interviewer expects you to think out loud and answer questions about your choices as you go.
+
+60 minutes — clock starts on the data import.
+
+Requirements (workflow)
+
+Quick EDA — df.info(), missing-value counts, target-class balance. Do not spend more than 5–7 minutes here.
+
+Pick 2–3 features that obviously carry signal; ignore the rest with a stated reason.
+
+Use the simplest sufficient model — logistic regression or a shallow decision tree. Reserve the last 10 minutes for evaluation; don't run grid search.
+
+Report at minimum: holdout accuracy, a confusion matrix, and one calibrated metric (precision/recall for the minority class if imbalanced).
+
+Notes
+
+The interviewer fixes typos and asks small clarifying questions throughout. Treat this as cooperative, not adversarial — verbalize hypotheses.
+
+Risk-org context: the current Coinbase MLE org runs tree-based risk / fraud models. Framing your choices in terms of interpretability and ease of monitoring lands better than chasing top-line accuracy.
+
+A common pitfall is missing-value imputation: mean-imputing a categorical column or treating an ID column as a feature. Sanity-check the schema before fitting.
+
+Plotting matters less than reasoning about the metrics. A confusion matrix printed to stdout is fine; matplotlib polishing is not graded.
+
+Preparation
+
+Run through one Kaggle-style messy-classification dataset under a 60-minute timer end-to-end. Practice making the modeling cuts (drop, impute, encode) in the first 15 minutes.
+
+Pre-write a snippet that does train_test_split + Pipeline([SimpleImputer, OneHotEncoder, LogisticRegression]) + classification_report so you can drop it in idiomatically.
+
+Be ready for one or two conceptual drive-bys ("why logistic regression here?", "what would you do differently with 10× the data?") — practice 30-second verbal answers.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,60 @@
+===H1===
+Longest Same-Character Run
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/longest-same-character-run
+===BODY===
+Capital One
+Coding·70 minMembers
+Longest Same-Character Run
+Given a lowercase string, find the longest contiguous substring made of one repeated character. If several runs have the same maximum length, return the rightmost run encoded as `<character><length>`.
+SWE
+string
+string-processing
+easy
+oa
+codesignal
+Frequency
+Single report
+Last asked
+2026-05-31
+Stage
+oa
+Requirements
+
+Input: a lowercase English string source.
+
+Find the longest contiguous substring consisting of the same character.
+
+If multiple substrings tie for the same maximum length, choose the rightmost one.
+
+Return a string made of that character concatenated with the run length.
+
+Constraints: 1 <= source.length <= 100.
+
+Examples
+
+source = "bbacccdbbab" -> "c3"
+
+There are two a runs of length 1, three b runs with lengths 2, 2, and 1, and one c run of length 3. The longest run is ccc, so return c3.
+
+source = "bbaacaa" -> "a2"
+
+The maximum run length is 2 for bb, aa, and the final aa; choose the rightmost maximum, so return a2.
+
+Notes
+
+Scan once, tracking the current run character and length. When a run closes, update the best answer if current_len >= best_len; the >= is what implements the rightmost tie-break.
+
+Be careful to process the final run after the loop. A sentinel or a helper commit_run() avoids the common off-by-one.
+
+Preparation
+
+Write the one-pass version from scratch and test three cases: all one character, all unique characters, and a rightmost tie.
+
+Drill the tie-break deliberately: replacing >= with > silently returns the leftmost maximum and fails the second worked example.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

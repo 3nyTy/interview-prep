@@ -1,0 +1,75 @@
+===H1===
+Short-Video Recommendation System
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/short-video-recommendation-system
+===BODY===
+ByteDance / TikTok
+System DesignMembers
+Short-Video Recommendation System
+Design a multi-stage short-video recommendation stack: parallel retrieval produces hundreds to thousands of candidates per route, coarse ranking reduces the pool, fine ranking optimizes several engagement objectives, and reranking enforces diversity and exploration. Deep dives cover cold start, event-time feature correctness, real-time behavior updates, and online evaluation.
+SWE
+recommendation
+ranking
+retrieval
+two-tower
+personalization
+streaming
+ab-testing
+hard
+Frequency
+Low
+Last asked
+2026-08-17
+Stage
+onsite-system-design
+Requirements
+
+Produce a personalized ranked short-video feed.
+
+Run several retrieval routes in parallel: collaborative signals, content tags or embeddings, popularity fallback, followed creators, and cold-start exploration. Each route contributes hundreds to thousands of candidates; merge and deduplicate them.
+
+Use a lightweight coarse-ranking model, such as a two-tower model, to reduce thousands of candidates to hundreds before expensive scoring.
+
+Fine-rank candidates against multiple objectives, including completion, like, comment, and follow-conversion probability, then combine them into one score.
+
+Rerank for constraints outside the core model: avoid too many consecutive videos from one creator, preserve content diversity, and reserve traffic for exploration.
+
+Handle cold-start videos with content features plus controlled early exposure, then update from the first few hundred impressions. Handle new users with coarse profile signals and heavily weighted behavior from their first few dozen videos.
+
+Feed recent user actions through a streaming feature path so the next recommendations can reflect the latest swipes.
+
+Prevent training-serving feature leakage by constructing training features at the event time when a prediction would have been made.
+
+Evaluate offline with ranking metrics, then validate online through A/B tests using consumption time and retention rather than click-through rate alone.
+
+Notes
+
+Central design decisions
+
+Decide how much candidate volume each retrieval path gets and where deduplication happens.
+
+Explain the compute-quality trade-off between coarse and fine ranking.
+
+Defend the weighting of multiple prediction targets as a product decision, an experimentation problem, or a learned multitask objective.
+
+Balance exploitation against the exploration traffic needed to solve creator and video cold start.
+
+Keep online and offline feature timestamps aligned; leaked future information can make offline performance look much better than production performance.
+
+Avoid optimizing only for clicks, which can over-reward sensational content at the expense of longer-term consumption and retention.
+
+Preparation
+
+Draw the retrieval, coarse-ranking, fine-ranking, and reranking stages with candidate counts, latency budgets, and the owner of deduplication at each boundary.
+
+Define one event-time feature contract and trace a swipe from ingestion through the streaming feature store to the next request without training-serving leakage.
+
+Run a cold-start design drill for one new user and one new creator, including exploration allocation, success metrics, and safety guardrails.
+
+Draft an A/B test scorecard with consumption, retention, diversity, creator-health, and latency metrics; state which are objectives versus guardrails.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

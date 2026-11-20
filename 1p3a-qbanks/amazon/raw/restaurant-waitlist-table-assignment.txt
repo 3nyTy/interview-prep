@@ -1,0 +1,50 @@
+===H1===
+Restaurant Waitlist & Table Assignment
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/restaurant-waitlist-table-assignment
+===BODY===
+Amazon
+System DesignMembers
+Restaurant Waitlist & Table Assignment
+AWS phone-screen design-and-code prompt: build a restaurant waitlist where parties queue FIFO but a freed table seats the first party that fits its size (a freed 8-top seats the earliest party of 8 over an earlier party of 2), table inventory must be elicited from the interviewer, and seated parties get an SMS notification. Coding is followed by race-condition and thread-safety follow-ups.
+SWE
+oop-design
+concurrency
+race-condition
+queue
+medium
+Frequency
+Single report
+Last asked
+2026-07-14
+Stage
+phone-screen
+Requirements
+
+Parties join a waitlist and are seated FIFO — except that a freed table goes to the earliest party matching its size (a freed 8-person table seats the first party of 8 even if a party of 2 is ahead in the overall queue).
+
+The restaurant has a bounded table inventory; the number of tables and per-table capacity are not stated — elicit them from the interviewer.
+
+Send an SMS notification to a party when its table is ready.
+
+Working code is expected, not just a class sketch.
+
+Follow-ups after coding: how do you guarantee thread safety, and how do you preserve ordering when two parties join while a table frees concurrently?
+
+Notes
+
+The round opens with leadership questions (work taken on beyond the current role) and moves straight into the design — there is no LeetCode-style algorithm; the signal is data-structure choice (per-size FIFO queues vs. scanning one list) and concurrency reasoning.
+
+The concurrency follow-up is the differentiator: be explicit about what you lock and how FIFO-within-size survives concurrent seat-and-join events.
+
+Preparation
+
+Implement a per-table-size map of FIFO queues with a seat-on-table-freed entry point, then retrofit a lock (or single-writer queue) and narrate the ordering guarantee.
+
+Rehearse eliciting requirements aloud — table count, per-table capacity, and the fit rule (exact fit vs. best fit) are all left for you to surface.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

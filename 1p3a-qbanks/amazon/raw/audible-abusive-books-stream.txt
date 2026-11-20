@@ -1,0 +1,72 @@
+===H1===
+Abusive Books in Reading Event Stream
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/audible-abusive-books-stream
+===BODY===
+Amazon
+Coding·60 minMembers
+Abusive Books in Reading Event Stream
+Stream of `(user, book, position_sec, duration_sec)` reading events. Detect books where more than 20% of users reach the last 5% of the audio without ever passing 10% of the duration. An Audible (Amazon) phone-screen prompt.
+SWE
+streaming
+hashmap
+medium
+Frequency
+Single report
+Last asked
+2026-02-10
+Stage
+phone-screen
+Requirements
+
+Event: readBook(user_id, book_id, current_pos_sec, book_duration_sec).
+
+A user-event for book is abusive if it satisfies both:
+
+current_pos_sec >= 0.95 * book_duration_sec (user is in the last 5%).
+
+The same user never reached 0.10 * book_duration_sec on that book in any prior event (they jumped ahead without listening).
+
+A book is abusive if abusive_events / total_events > 0.20.
+
+Design the data structures and implement the detection logic. Discuss thread safety; lock-level implementation is optional.
+
+Examples
+
+User u1 listens to book b1: position grows from 0 to 60s (book is 120s). No abusive event.
+
+User u2 jumps to 115s on book b1 without ever passing 12s. One abusive event.
+
+If b1 has 5 events total and 2 are abusive, ratio 0.40 > 0.20 — flag b1.
+
+Notes
+
+Suggested state: progress[(user, book)] = max_pos_sec and counts[book] = (abusive_count, total_count). On each event, update progress, check thresholds against book_duration_sec, and update counters atomically.
+
+The scope is binary classification, not ranking — interviewers explicitly cut top-K when candidates volunteer it.
+
+Atomic counters / compare-and-set is the right talking point for concurrency; you do not need to implement locking unless asked.
+
+Recommended state layout for clarity in the 25-minute window: progress: dict[(user, book), float] storing max position observed, and book_counts: dict[book, (abusive, total)]. Both can be plain Python dicts; concurrency talking points sit on top.
+
+The two thresholds are derived per-event from book_duration_sec; do not cache them per book unless durations are immutable.
+
+Concurrency framing graders look for: "book_counts update is a read-modify-write that needs an atomic counter or a per-key lock; progress is monotone so a CAS-on-max loop is enough." You don't need to write the locking — just name the invariant.
+
+Preparation
+
+Practice streaming aggregations with per-key state (LC 359 Logger Rate Limiter, LC 362 Design Hit Counter).
+
+Pre-think your data structure layout and the update flow on paper — implementing in 25 minutes is tight.
+
+Have a short answer ready for "what about repeated events for the same user?" (idempotency / dedupe by (user, book, position) rounded down).
+
+Implement the single-threaded version end-to-end in 15 minutes, then verbalize the concurrency upgrade path: lock striping by book for counts, lock-free CAS-max for progress, and a periodic reporter that snapshots (abusive / total) per book.
+
+Keep the abusive-classification rule in one helper so flipping the thresholds (5% → 10%, 20% → 25%) is a one-line change. Graders sometimes pivot mid-round to test extensibility.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

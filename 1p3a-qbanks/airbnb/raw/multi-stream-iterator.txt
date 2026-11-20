@@ -1,0 +1,52 @@
+===H1===
+Multi-Stream Round-Robin Iterator
+===URL===
+https://www.1point3acres.com/interview/problems/company/airbnb/multi-stream-iterator
+===BODY===
+Airbnb
+Coding·45 minMembers
+Multi-Stream Round-Robin Iterator
+Implement a merging iterator over multiple input streams that yields elements round-robin — one from each stream in turn, skipping exhausted streams. Supports has_next() and next(). The live trap is conforming to a provided base-class interface.
+SWE
+iterator
+object-design
+medium
+Frequency
+Single report
+Last asked
+2026-05-19
+Stage
+onsite-coding
+Requirements
+
+Input: multiple streams / iterators (of bytes or chars), each exposing a sequential read interface.
+
+Implement a combined iterator that reads round-robin: one element from stream 0, one from stream 1, …, then back to stream 0.
+
+When a stream is exhausted, skip it on subsequent rounds.
+
+Expose has_next() and next().
+
+Notes
+
+The core algorithm is simple: keep the live streams in a ring and advance an index, dropping a stream when it reports exhaustion. has_next() is true while any stream still has elements.
+
+The difficulty in the live round was the scaffolding, not the algorithm. The interviewer supplied a base stream class with fixed method signatures and required the solution to subclass it and match those signatures exactly — you cannot invent your own method names. Read the provided interface carefully and conform to it.
+
+Clarify the underlying stream interface up front: how exhaustion is signaled (exception vs sentinel vs a has_next on the stream itself) and the element type.
+
+Edge cases: some streams empty from the start, a single stream, ragged stream lengths.
+
+Preparation
+
+Implement the round-robin merge over a list of iterators with skip-on-exhaustion in under 20 minutes.
+
+Practice conforming to a given base-class interface (subclass + exact signature match) rather than designing your own.
+
+Pre-script clarifying questions about how the input streams signal end-of-stream.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,77 @@
+===H1===
+Transaction Authorizer / Fraud Checks
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/transaction-authorizer-fraud-checks
+===BODY===
+Goldman Sachs
+Coding·60 minMembers
+Transaction Authorizer / Fraud Checks
+Build an in-memory credit-card transaction authorizer. Start with globally blocked MCCs, add per-user blocked MCCs, then implement a rolling one-hour spend velocity limit.
+SWE
+object-design
+hashmap
+sliding-window
+payment
+medium
+Frequency
+Single report
+Last asked
+2026-02-12
+Stage
+phone-screen
+Requirements
+
+A card network calls the service for each attempted purchase. Each transaction has fields like:
+
+{
+  "user_id": "1111",
+  "transaction_id": "0001",
+  "mcc": "9999",
+  "timestamp": 0,
+  "amount": 10.00
+}
+
+Implement an in-memory TransactionAuthorizer with an approve(transaction) method.
+
+Rule 1: reject Merchant Category Code 9999.
+
+Rule 2: support multiple globally rejected MCCs and user-specific rejected MCCs.
+
+Globally rejected: 9999, 0000.
+
+User 1234: reject 1111, 2222.
+
+User 5678: reject 5555, 6666.
+
+Rule 3: implement a velocity limit: if a user's attempted transaction amount exceeds $5000 within a rolling one-hour window, reject further transactions. Timestamps are in seconds.
+
+Examples
+
+timestamp | amount | result
+0         | 500    | approved
+60        | 2000   | approved
+3660      | 3000   | approved
+7260      | 2001   | rejected
+7261      | 3000   | rejected
+
+Notes
+
+Store blocked MCCs as Set<String> values: one global set plus a Map<userId, Set<mcc>>.
+
+For velocity, keep per-user queues of recent attempted transactions and a rolling sum. Remove entries older than one hour before evaluating the new attempt.
+
+Clarify whether rejected attempts count toward future velocity. The prompt says attempted transactions exceed the limit, so a conservative implementation includes attempts unless the interviewer says to count only approved spend.
+
+Use integer cents rather than floating dollars in production-style code.
+
+Preparation
+
+Implement Rules 1 and 2 with table-driven tests; then add the per-user rolling-window state.
+
+Be ready to discuss concurrency: two simultaneous purchases by the same user need per-user locking or an atomic state update.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

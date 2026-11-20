@@ -1,0 +1,61 @@
+===H1===
+Even Digit Count
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/even-digit-count
+===BODY===
+Capital One
+Coding·70 minMembers
+Even Digit Count
+Given an array of positive integers, count how many elements have an even number of decimal digits. This is a CodeSignal Q1-style warm-up where the intended solution can be direct string conversion or digit counting.
+SWE
+array
+easy
+oa
+codesignal
+Frequency
+Single report
+Last asked
+2026-05-31
+Stage
+oa
+Requirements
+
+Input: an array of positive integers numbers.
+
+Count how many elements in numbers have an even number of digits.
+
+Return the count as an integer.
+
+Constraints: 1 <= numbers.length <= 1000, 1 <= numbers[i] <= 10^4.
+
+O(numbers.length^2) is accepted by the stated execution limit, but a linear scan is simpler.
+
+Examples
+
+numbers = [12, 134, 111, 1111, 10]
+
+12   -> 2 digits, even
+134  -> 3 digits, odd
+111  -> 3 digits, odd
+1111 -> 4 digits, even
+10   -> 2 digits, even
+
+Return 3
+
+Notes
+
+String conversion is the shortest implementation: len(str(x)) % 2 == 0. A numeric loop also works, but remember that all inputs are positive, so no 0 special case is needed for this exact prompt.
+
+Do not confuse this with an odd-digit-count variant; the full statement and worked example use even digit length throughout. Solve the even-digit version.
+
+Preparation
+
+Implement both the string and numeric-loop versions once; use the string version in the OA unless the language environment makes it awkward.
+
+Time-box this to under 4 minutes. It is a Q1 warm-up and should mainly preserve time for Q3/Q4.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

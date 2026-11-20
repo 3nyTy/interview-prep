@@ -1,0 +1,51 @@
+===H1===
+Alien Dictionary (LC 269)
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/alien-dictionary
+===BODY===
+Microsoft
+CodingMembers
+Alien Dictionary (LC 269)
+The live-coding prompt was confirmed as LC 269: infer a valid character order from words already sorted in an alien language, return any valid ordering, and return an empty string when the ordering is invalid.
+SWE
+graph
+topological-sort
+cycle-detection
+medium
+Frequency
+Single report
+Last asked
+2026-08-28
+Stage
+phone-screen
+Requirements
+
+Given a list of words already sorted according to an alien language, infer the ordering of the characters in that language.
+
+Input: a list of strings words.
+
+Output: a string representing a valid character order.
+
+If multiple orders satisfy the input, return any one of them.
+
+If the word ordering is invalid, including a cyclic dependency, return the empty string "".
+
+Notes
+
+The L61 Software Engineer live-coding round used the unmodified LC 269 prompt in HackerRank.
+
+Initialize a graph node for every character, including isolated characters. Compare each adjacent pair of words and add one directed edge from the first differing characters, deduplicating edges before incrementing indegree. If the earlier word is longer and completely prefixes the later word, return "" immediately. Run Kahn's topological sort from all zero-indegree characters; a result containing fewer characters than the graph signals a cycle and must also return "". With N total input characters and E distinct precedence edges, the scan and topological traversal take O(N + E) time and O(C + E) space for C distinct characters.
+
+Preparation
+
+Implement the graph construction and Kahn traversal from memory, then test an isolated character, duplicate edges, multiple valid orders, a cycle, and the invalid-prefix case ["abc", "ab"].
+
+Explain why only the first differing character in each adjacent word pair creates a constraint, and why comparing non-adjacent pairs is unnecessary.
+
+Write a checker that validates a returned order against every adjacent word pair instead of asserting one fixed string when several topological orders are valid.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

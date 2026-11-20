@@ -1,0 +1,50 @@
+===H1===
+Jump Game with Profit
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/jump-game-with-profit
+===BODY===
+Google
+Coding·40 minMembers
+Jump Game with Profit
+LC 55 + LC 322 hybrid. From index `i`, take `profit[i]` and jump to `i + 1 + arr[i]`, or skip; maximize profit reaching the end.
+SWE
+array
+dp
+medium
+Frequency
+Single report
+Last asked
+—
+Stage
+onsite-coding
+Requirements
+
+Array of (jump_length, profit) per index.
+
+Path: from index i, choose to take this profit and jump to i + 1 + jump_length, or skip and try the next jump from i. (Variants differ in skip semantics; clarify.)
+
+Return max profit reaching past the last index.
+
+DP from the right: best[i] = max(profit[i] + best[i + 1 + arr[i]], best[i+1]).
+
+Examples
+
+Variant-dependent; the principal recurrence is the one above.
+
+Notes
+
+Standard intern coding round, single source — clarification with interviewer is key (does "skip" advance by 1 or 0? are revisits allowed?).
+
+Common bug: treating arr[i] as range cap rather than exact jump.
+
+Preparation
+
+Drill the reachability-jump, min-jumps, and coin-change family together so the DP shape is automatic.
+
+Practice clarifying "can I skip without consuming a turn" before coding.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

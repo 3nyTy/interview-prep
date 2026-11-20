@@ -1,0 +1,55 @@
+===H1===
+Ring Buffer (Producer / Consumer with Backpressure)
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/ring-buffer-producer-consumer
+===BODY===
+Coinbase
+CodingMembers
+Ring Buffer (Producer / Consumer with Backpressure)
+Low-level design / concurrency round: implement a fixed-capacity ring buffer with producer/consumer semantics, a backpressure policy when the buffer is full, and support for registering multiple consumers. The interviewer is exacting about production-grade behavior — thread-safety, full/empty handling, and slow or lagging consumers — and drills many edge cases. The bar is production realism, not a passing happy path.
+SWE
+concurrency
+queueing
+ring-buffer
+hard
+Frequency
+Single report
+Last asked
+2026-06-15
+Stage
+onsite-coding
+Requirements
+
+Design and implement a bounded ring buffer (fixed-capacity circular queue) that supports concurrent producers and consumers:
+
+Produce / consume — a producer writes items into the buffer; a consumer reads them in order.
+
+Backpressure — define what happens when the buffer is full. Block the producer, reject the write, or signal the caller — pick a policy and defend it against the production scenario the interviewer describes.
+
+Register multiple consumers — more than one consumer can attach to the buffer. Decide the delivery semantics up front: is each item handed to exactly one consumer (work-sharing) or fanned out to every registered consumer (pub/sub)? Clarify this with the interviewer before coding — it changes the data structure.
+
+The round is run as an open-ended design-and-build: there is no starter scaffolding and no fixed function signature handed to you. You define the API, the internal state, and the concurrency model.
+
+Notes
+
+The bar is production realism, not the happy path. The interviewer is deliberately picky and keeps pulling in real-world conditions — buffer full under sustained load, a consumer that falls behind, a producer racing a consumer on the same slot. A clean single-threaded circular array that ignores these will not clear the round.
+
+Pin down the multi-consumer semantics first. "Register multiple consumers" is ambiguous: work-queue (each item consumed once) and broadcast (each consumer sees every item) lead to very different designs — per-consumer read cursors for broadcast vs. a single shared head for work-sharing. State your assumption and ask before you commit.
+
+Thread-safety is the core axis. Be explicit about how you guard head/tail pointers and the full/empty distinction (e.g. lock + condition variables, or a lock-free design with careful index arithmetic). Know the classic full-vs-empty disambiguation for a circular buffer (track a count, or keep one slot empty).
+
+Full prompt detail beyond the above has not surfaced in the community yet — treat the exact follow-up sequence as interviewer-dependent.
+
+Preparation
+
+Implement a thread-safe bounded ring buffer once end-to-end in your interview language, with both a blocking-producer policy and a reject-on-full policy, so you can switch between them on demand.
+
+Write the broadcast (per-consumer cursor) variant and the work-sharing (single shared head) variant separately, and be ready to explain the trade-off in one sentence.
+
+Rehearse the full-vs-empty disambiguation and the slow-consumer story out loud — these are the two threads the interviewer reliably pulls on.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

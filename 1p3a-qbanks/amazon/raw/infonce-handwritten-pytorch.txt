@@ -1,0 +1,76 @@
+===H1===
+Handwritten InfoNCE in PyTorch
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/infonce-handwritten-pytorch
+===BODY===
+Amazon
+Coding·30 minMembers
+Handwritten InfoNCE in PyTorch
+Hand-implement the InfoNCE contrastive loss in PyTorch given a batch of query and key embeddings. An Amazon Applied Scientist intern phone-screen round, run alongside Transformer / Adam / RoPE concept questions.
+RS
+MLE
+pytorch
+transformer
+medium
+Frequency
+Single report
+Last asked
+2026-02-10
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Inputs: query embeddings q of shape (B, D) and key embeddings k of shape (B, D). Positive pair (q_i, k_i); the other B - 1 keys are negatives.
+
+Compute the symmetric InfoNCE loss with temperature tau.
+
+Return a scalar loss tensor compatible with backward().
+
+Examples
+
+def info_nce(q, k, tau=0.07):
+    q = F.normalize(q, dim=-1)
+    k = F.normalize(k, dim=-1)
+    logits = q @ k.t() / tau              # (B, B)
+    labels = torch.arange(q.size(0), device=q.device)
+    loss_q = F.cross_entropy(logits, labels)
+    loss_k = F.cross_entropy(logits.t(), labels)
+    return 0.5 * (loss_q + loss_k)
+
+Notes
+
+Normalize embeddings before the dot product — without it the temperature loses its calibration.
+
+The symmetric variant (average of query-to-key and key-to-query) is the standard SimCLR formulation; interviewers usually want both halves.
+
+Common follow-ups: how does temperature affect gradients, what happens with hard negatives, how do you extend to memory bank / MoCo-style queues.
+
+For numerical stability, prefer cross-entropy over logits / tau (which internally does log-sum-exp) rather than manually exponentiating and dividing — naive exp(sim/tau) overflows quickly once similarities are denormalized or tau is small.
+
+Do not include the query's own positive in the negative set when building a manual (pos, neg) split — using cross_entropy(logits, labels) on the full (B, B) matrix avoids this by construction.
+
+Negative count drives signal: with batch sizes below ~256 the loss is weak; in that regime fall back to a memory-bank / queue (MoCo-style) so the negative pool is decoupled from B.
+
+When extending to a momentum encoder, .detach() the key branch (or use torch.no_grad()) — without it the keys collapse onto the query.
+
+Temperature tau rescales gradients: typical range 0.05–0.2; too low → sharp distribution, unstable gradients; too high → soft, slow convergence.
+
+Preparation
+
+Re-derive the InfoNCE loss from -log( exp(sim_pos / tau) / sum exp(sim / tau) ) by hand.
+
+Write the snippet from memory at least three times until you can do it on a whiteboard without imports.
+
+Read the SimCLR and MoCo papers' losses side-by-side; expect questions about why MoCo decouples the negative queue from the batch size.
+
+Drill ladder: (1) whiteboard the -log( exp(sim_pos/tau) / sum exp(sim/tau) ) derivation; (2) write a 10-line numpy version on toy (B=4, D=8) random tensors and verify the loss is log(B) at init when embeddings are random and normalized; (3) port to PyTorch with F.cross_entropy; (4) sanity-check the value against a mature library implementation on the same inputs.
+
+Time yourself writing the symmetric variant from blank file to passing loss.backward() in under 8 minutes — this is the actual interview bar.
+
+Add a unit test that asserts the loss is invariant to a shared rotation of q and k (rotation-equivariance of cosine similarity) — a common interviewer follow-up.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

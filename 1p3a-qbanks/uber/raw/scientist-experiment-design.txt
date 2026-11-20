@@ -1,0 +1,77 @@
+===H1===
+Scientist Onsite: Experiment Design (Switchback + CI Interpretation)
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/scientist-experiment-design
+===BODY===
+Uber
+Other·60 minMembers
+Scientist Onsite: Experiment Design (Switchback + CI Interpretation)
+Scientist II onsite round. Reasoning prompt rather than coding. Pick a metric (e.g. ETA vs session conversion), design an experiment to measure causal effect on Uber's marketplace, including rollout strategy, treatment design, guardrails, and confidence-interval interpretation.
+RS
+DS
+MLE
+ml-knowledge
+math-reasoning
+probability
+deep-dive
+Frequency
+Single report
+Last asked
+2026-01-13
+Stage
+onsite-deep-dive · onsite-research
+Requirements
+
+Define the metric clearly. Marketplace metrics are usually ratios (e.g. rides / sessions), not single counters — state this in the first sentence.
+
+Choose the experimentation framework:
+
+A/B test — appropriate when treatment can be randomised at the user level without spillover.
+
+Switchback — required when treatment is at the market level (city / time-of-day) and spillover invalidates user-level randomisation. ETA, dispatch, and surge changes nearly always require switchback.
+
+Design treatment buckets:
+
+For continuous treatments (e.g. ETA multiplier 0.8x / 1.0x / 1.2x), specify the bucket grid and guardrails.
+
+Specify rollout phases (1% → 10% → 50%) and what triggers a roll-back.
+
+Interpret outcomes:
+
+Use 95% confidence intervals; for ratio metrics, compute CI via the delta method or bootstrap, not the standard error on the ratio directly.
+
+Discuss multiple-testing corrections if you ran on multiple metrics.
+
+Notes
+
+The interviewer specifically grades speed and precision in defining the metric. Several candidates have been failed for floundering on the metric definition for 5+ minutes; econ / DS-tracked candidates have an edge.
+
+For non-econ candidates: pre-script the switchback decision tree ("if treatment affects the marketplace → switchback; else → A/B") so you don't burn time deciding live.
+
+Common follow-ups:
+
+"Why not just A/B test this?" — answer with the spillover argument.
+
+"How would you analyse if you see effect at the 90% CI but not at 95%?" — discuss power, sample size, and multiple-testing.
+
+"What is your guardrail metric?" — pre-pick one (e.g. driver-side income, rider cancellations).
+
+Reverse questions about the team's data infra are appropriate at the end of the round.
+
+For switchback variance, the dominant lever is window length: too short and carryover dominates (treated drivers still respond after the switch); too long and you collect too few switches per experiment. A common defensible default is 30–60 minute windows with a 5-minute burn-in / burn-out on each side. Quote CIs via bootstrap rather than analytic SE on the ratio metric.
+
+Preparation
+
+Drill the switchback design pattern; the Uber Engineering blog has multiple posts on switchback that this round draws from.
+
+Practice computing CI for a ratio metric on paper using the delta method.
+
+Pre-script 2 ratio-metric experiments (one ETA-related, one product-surface) so you have ready examples to draw on.
+
+Practice a 60-second decision tree out loud: Does treatment touch a shared marketplace resource? If yes → switchback (city × time-of-day); if no → user-level A/B. State this in the first 60 seconds of the round to avoid the floundering-on-framing trap.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

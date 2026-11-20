@@ -1,0 +1,51 @@
+===H1===
+Track Best Bid/Ask with Cancellations
+===URL===
+https://www.1point3acres.com/interview/problems/company/akunacapital/track-best-bid-ask-with-cancels
+===BODY===
+Akuna Capital
+CodingMembers
+Track Best Bid/Ask with Cancellations
+Process buy, sell, and cancel operations and maintain the highest buy price and the best sell price, each with its aggregated demand/quantity. Buy and sell sides are tracked independently with no crossing or fills. A max-heap (or ordered map) per side with cancellation support gives the current best.
+SWE
+Infra Eng
+order-book
+heap
+data-structure
+trading
+medium
+Frequency
+Low
+Last asked
+2025-09-22
+Stage
+oa
+Requirements
+
+Maintain a trading record system that processes three kinds of operations:
+
+Buy order (price, quantity).
+
+Sell order (price, quantity).
+
+Cancel a buy or sell order.
+
+Track the current highest buy price and the corresponding best sell price, along with the aggregated demand/quantity at those prices. The buy and sell sides are maintained as two separate structures — there is no offsetting, crossing, or matching between them.
+
+Notes
+
+This is deliberately simpler than a full matching engine: nothing fills, so each side is an independent best-price-with-quantity tracker. A max-heap keyed by price (with lazy deletion for cancels) or an ordered map keyed by price both work; aggregate quantity per price level so the "demand" at the best price is available in O(1). On a cancel, reduce the quantity at that price and drop the level when it reaches zero, then the new best is the next non-empty level.
+
+The community reports give the operation set and the no-matching rule but not a full input/output transcript, so confirm the exact output format (whether you print after every operation or only the final best) before coding.
+
+Preparation
+
+Implement one side as a price-keyed ordered map with per-level quantity, then mirror it for the other side.
+
+Test cancelling the current best (best must fall back), cancelling a non-best level, and repeated prices accumulating quantity.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

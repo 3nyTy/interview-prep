@@ -1,0 +1,48 @@
+===H1===
+SnakeYAML Debug (Java)
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/snakeyaml-debug
+===BODY===
+Stripe
+Coding·60 minMembers
+SnakeYAML Debug (Java)
+Java alternative to the Python Mako debug round. Candidates clone a SnakeYAML-style repo, run failing tests, and locate fixes in YAML parsing internals.
+SWE
+debugging
+code-reading
+hard
+Frequency
+Low
+Last asked
+2026-05-23
+Stage
+onsite-coding
+Requirements
+
+Java debug round on a SnakeYAML-style repo. Setup mirrors the Mako round (clone, install deps, run failing tests in your IDE).
+
+One report's bugs included: an On literal failing to convert to boolean, and a CSV-parsing path that throws during YAML parsing.
+
+A Java report lists two concrete bugs: flag: on failing to parse (the YAML 1.1 on boolean literal), and CSV parsing that drops the surrounding quotes from quoted fields.
+
+Notes
+
+The Java variant is the standard Mako substitute when candidates code in Java. One report explicitly checked whether Mako still ships in Java; it does not in recent rounds.
+
+Reports are thin — community knowledge for SnakeYAML lags far behind Mako. Expect the interviewer to be familiar even if you are not.
+
+SnakeYAML is a YAML 1.1 processor for the JVM (Java 8+), Apache-2.0 licensed. Active development happens on Bitbucket with a GitHub mirror; both expose the same module layout. The 1.1 spec is what causes On / Off / Yes / No to round-trip as booleans — a recurring class of bugs in this round.
+
+Preparation
+
+Walk through SnakeYAML's Constructor and Resolver classes with an IDE debugger before the interview.
+
+Be familiar with how YAML 1.1 vs 1.2 handle On, Off, Yes, No as booleans — that is a frequent source of "this should be a string" bugs.
+
+Practice running a Java project's tests from an IDE with breakpoints set inside library code.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

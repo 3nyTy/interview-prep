@@ -1,0 +1,53 @@
+===H1===
+Restore IP Addresses
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/restore-ip-addresses
+===BODY===
+ByteDance / TikTok
+Coding·60 minMembers
+Restore IP Addresses
+Partition a digit string into every valid IPv4 address: exactly four numeric segments, each valid and with no leading zero unless the segment itself is zero. The follow-up generalizes the partition to an arbitrary `k` supplied as another argument.
+SWE
+string
+dfs
+backtracking
+medium
+Frequency
+Low · New
+Last asked
+2026-09-04
+Stage
+phone-screen
+Requirements
+
+Given a string of digits, return every way to split it into four valid IPv4 segments.
+
+Reject segments containing invalid characters or values outside the valid address range.
+
+A multi-digit segment cannot begin with 0; the single segment 0 is valid.
+
+Consume the entire input exactly once with no skipped or reused characters.
+
+Follow-up: add k as an input and partition the string into any valid k segments under the same rules.
+
+Notes
+
+Validate a segment before extending the search state, and stop exploring once the remaining characters cannot fill the remaining segment count.
+
+Clarify whether the generalized k version retains IPv4's numeric bound or changes only the required number of segments.
+
+The one-hour screen also included a project deep-dive, so the implementation must be concise enough to preserve time for the follow-up.
+
+A senior screen pairs IP-address restoration with a substring problem. The candidate completed the supplied tests but still received a rejection; passing visible tests does not establish the overall interview result.
+
+Preparation
+
+Implement the fixed four-segment version from a blank editor and write pruning conditions for too few or too many remaining characters.
+
+Generalize the recursion state from a fixed address shape to k remaining segments, then test zeros, maximum values, and impossible lengths.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

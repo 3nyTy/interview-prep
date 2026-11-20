@@ -1,0 +1,78 @@
+===H1===
+Deployment Window Scheduler (OA)
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/deployment-window-scheduler-oa
+===BODY===
+Stripe
+CodingMembers
+Deployment Window Scheduler (OA)
+Build a deployment-window scheduler over a recurring 10,080-minute week. First compute the union of allowed intervals minus all freeze intervals; then support per-window timezone offsets, cross-week wrapping, a lead-time cutoff, a minimum continuous duration, and a limit on returned windows.
+SWE
+interval
+scheduling
+csv
+medium
+Frequency
+Low
+Last asked
+2026-08-24
+Stage
+oa
+Requirements
+
+Time is represented as minutes in a recurring week: 0 is Monday 00:00 and 10079 is Sunday 23:59. Every interval is half-open: [start, end).
+
+Parse CSV rows whose Part 1 shape is start,end,type, where type is either allowed or freeze.
+
+Return every continuous deployable interval in ascending start-time order. A time is deployable only when it belongs to at least one allowed interval and no freeze interval.
+
+Merge overlapping allowed intervals, overlapping freeze intervals, and adjacent deployable output intervals.
+
+Part 2 begins with utc_now,lead_time_minutes,min_continuous_minutes,k. Each following row has the shape start,end,type,timezone_offset_minutes.
+
+Convert local interval endpoints with UTC = local_time - timezone_offset_minutes. Timezone conversion can move an endpoint before 0 or beyond 10080.
+
+Apply the earliest-start cutoff utc_now + lead_time_minutes, discard output intervals shorter than min_continuous_minutes, sort by UTC start time, and return the first k windows.
+
+A long continuous allowed interval may produce multiple results: advance by min_continuous_minutes and emit fixed-duration windows until k is reached.
+
+Preserve continuity across the weekly boundary. One practical representation expands the timeline to three weeks, covering the previous, current, and next week, before converting results back to the requested coordinate system.
+
+Examples
+
+Part 1 — freeze splits an allowed interval
+
+part = "part1"
+inputCsv = [
+    "540,600,allowed",
+    "570,585,freeze"
+]
+
+Output:
+
+[
+    [540, 570],
+    [585, 600]
+]
+
+Notes
+
+Treat half-open endpoints consistently; touching intervals can be merged without double-counting a minute.
+
+Applying % 10080 to each endpoint too early can split a continuous cross-week interval. Normalize on an unrolled timeline first.
+
+The prompt is long and implementation-heavy: one recent run exposed 11 tests across the first two parts, with six tests in Part 2.
+
+Confirm the exact returned coordinate convention when the earliest-start cutoff itself crosses the week boundary.
+
+Preparation
+
+Implement Part 1 with interval merging and subtraction, then test touching endpoints, a freeze that fully covers an allowed window, and freezes outside all allowed windows.
+
+For Part 2, write separate tests for positive and negative timezone offsets that cross the week boundary, then add a case where a long allowed interval must be split into several fixed-duration results.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

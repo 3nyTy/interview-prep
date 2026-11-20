@@ -1,0 +1,89 @@
+===H1===
+Alert Monitor — Rolling Window + Severity Distribution + Spike Detection
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-alert-monitor
+===BODY===
+LinkedIn
+Coding·60 minFree preview
+Alert Monitor — Rolling Window + Severity Distribution + Spike Detection
+Build an `AlertMonitor` class with three queries against an append-only stream: count alerts in the trailing 15 minutes, return the severity histogram for the current hour-block, and emit a next-greater-volume index per minute. The third sub-task is monotonic-stack territory; the round tests whether the candidate picks the right data structure for each query rather than retrofitting one structure for everything.
+SWE
+Infra Eng
+data-structure
+queue
+stack
+sliding-window
+streaming
+interval
+medium
+Frequency
+Low
+Last asked
+2026-02-04
+Stage
+onsite-coding
+Requirements
+
+Implement a class that records alerts (timestamped, severity-tagged) and answers three queries:
+
+class AlertMonitor {
+    enum SeverityLevel { LOW, MEDIUM, HIGH }
+
+    void recordAlert(int currentTimestamp, SeverityLevel severity);
+
+    // (1) Count alerts in the trailing 900 seconds (15 minutes).
+    int reportAlertsLast15Min(int currentTimestamp);
+
+    // (2) For the current hour-block (3600-second window anchored at the most
+    //     recent timestamp's hour boundary, e.g. ts=3720 -> bucket [3600, 7199]),
+    //     return the counts of LOW / MEDIUM / HIGH alerts inside it.
+    Map<SeverityLevel, Integer> reportSeverityDistribution(int currentTimestamp);
+
+    // (3) For each minute index in the last 15 minutes, return the index of the
+    //     NEXT minute (to the right) whose alert volume is strictly greater.
+    //     Return -1 if none. Each minute has at least one alert.
+    List<Integer> detectAlertVolumeSpike();
+}
+
+Timestamps arrive in non-decreasing order; the class is single-threaded; the interviewer expects:
+
+A deque (or ring buffer) for the 15-minute window so reportAlertsLast15Min is amortized O(1) after evicting expired entries.
+
+A bucketed counter keyed by hour_bucket = ts / 3600 for reportSeverityDistribution. The candidate should explicitly handle the "most recent timestamp" anchor — picking currentTimestamp / 3600 instead of the latest-recorded ts is a common bug.
+
+A monotonic decreasing stack for detectAlertVolumeSpike — the canonical "next greater element" pattern, O(M) over M per-minute counts.
+
+Examples
+
+M  0  1  2  3  4  5
+C  1  2  5  2  2  1
+detectAlertVolumeSpike() -> [1, 2, -1, 4, -1, -1]
+
+reportSeverityDistribution with most-recent ts = 3720:
+
+hour_bucket = 1   ->  alerts in [3600, 7199]
+returns: { LOW: 4, MEDIUM: 6, HIGH: 100 }
+
+Notes
+
+Picking three different structures (deque + hash-bucket + monotonic stack) is the signal. Trying to answer all three with one sorted list runs into either O(N²) spike detection or wrong-bucket histograms.
+
+"Each minute has at least one alert" is a hint, not a guarantee in production — candidates who ask whether to pad missing minutes earn extra signal.
+
+Watch the inclusive/exclusive boundary on the 15-minute query: ts >= currentTimestamp - 900 (inclusive) is the convention used by interviewers who graded recent loops.
+
+The spike-detection sub-task is the same algorithmic family as the canonical next greater element problem; the wrapper is per-minute aggregation rather than a raw integer array.
+
+Preparation
+
+Drill the monotonic-stack template for next-greater / next-smaller until it can be written without thinking — it returns in many LinkedIn rounds beyond this one.
+
+Practice combining a deque for a sliding window with a separate hash-bucket map; this two-structure pattern recurs across the streaming-systems track.
+
+Pre-write the three-method skeleton on scrap paper; the time pressure in the round comes from boilerplate, not algorithmic depth.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,62 @@
+===H1===
+ML System Design: Inference Serving with Back-of-Envelope Capacity Planning
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/sd-ml-inference-serving-back-of-envelope
+===BODY===
+Waymo
+System Design·60 minMembers
+ML System Design: Inference Serving with Back-of-Envelope Capacity Planning
+Onsite ML system design for a runtime / optimization-flavored MLE loop: design an inference serving system for a model with ~100M DAU and reason from first principles about memory footprint, bandwidth, and latency. Deep follow-ups move into accelerator efficiency — kernel fusion, memory layout, quantization-aware training, distillation, and model evaluation.
+MLE
+mlsd
+inference
+performance-modeling
+arithmetic-intensity
+kernel
+scaling
+hard
+Frequency
+Single report
+Last asked
+2026-05-22
+Stage
+onsite-system-design
+Requirements
+
+Design an inference serving stack for a model serving on the order of 100M daily active users.
+
+Do a back-of-envelope study from first principles: estimate model memory footprint, the memory bandwidth required per request, and the achievable latency on the target accelerator.
+
+Optimize for two failure modes the round centers on: latency (tail latency under load) and OOM (fitting weights + activations + KV / intermediate state into device memory).
+
+The round spans three connected sub-areas: inference system design, ML accelerator & efficiency, and the ML framework layer underneath.
+
+Notes
+
+Back-of-envelope scaffold. Start from the numbers, not the diagram. Translate DAU into peak QPS (apply a daily-peak factor), then per-request FLOPs and bytes moved. Decide up front whether the workload is compute-bound or memory-bandwidth-bound by comparing arithmetic intensity (FLOPs / byte) against the accelerator's ridge point — this single judgment drives every later optimization.
+
+Memory budget. Account separately for weights (params × bytes/param at the serving precision), per-request activations / intermediate buffers, and any cached state. OOM is usually an activation / batch-size problem, not a weights problem — show you can trade batch size, sequence length, and precision to stay resident.
+
+Latency levers. Batching (static vs continuous), quantization, trimming the work per request, and overlapping compute with memory transfers. Name the P99 budget explicitly and reason about how batching trades throughput against tail latency.
+
+Accelerator / kernel follow-ups. Be ready to go a level down: kernel fusion to cut intermediate memory traffic, memory-layout choices (contiguous / coalesced access) to hit peak bandwidth, and where a fused kernel changes the arithmetic-intensity verdict above.
+
+Efficiency techniques. Quantization-aware training (QAT) and knowledge distillation are raised as ways to shrink the served model; be able to state what each costs (training-time vs accuracy) and when you would reach for it. Contrastive-learning and model.eval() / evaluation-harness questions also surface as part of the framework discussion.
+
+What is graded. The round rewards driving the estimate yourself and connecting each optimization back to the bandwidth / latency / OOM numbers, rather than listing techniques in the abstract.
+
+Preparation
+
+Drill the roofline mental model: for a given model and accelerator, compute arithmetic intensity and classify the workload as compute- vs memory-bound, then justify which optimizations actually help.
+
+Memorize the back-of-envelope chain DAU → peak QPS → per-request FLOPs / bytes → device count, and rehearse it out loud on one concrete model size.
+
+Be able to derive the memory budget (weights + activations + cache) at two precisions and show how batch size and sequence length move OOM.
+
+Prepare a crisp two-minute answer each on kernel fusion, QAT, and distillation — what they buy and what they cost.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

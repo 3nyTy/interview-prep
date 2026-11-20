@@ -1,0 +1,67 @@
+===H1===
+Restaurant Waitlist: join / delete / find_first_match
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/waitlist-data-structure-with-table-size-match
+===BODY===
+Google
+Coding·45 minMembers
+Restaurant Waitlist: join / delete / find_first_match
+Onsite coding round: design and implement a restaurant waitlist data structure supporting join, delete, and find_first_match(table_size). The find call returns the earliest-joined user whose party size fits the given table.
+SWE
+data-structure
+oop-design
+medium
+Frequency
+Single report
+Last asked
+2026-02-01
+Stage
+onsite-coding
+Requirements
+
+Implement a class with these methods:
+
+join(user) — append user (with their party_size) to the waitlist.
+
+delete(user) — remove user from the waitlist (could be anywhere in the queue).
+
+find_first_match(table_size: int) — return the earliest user still on the waitlist whose party_size <= table_size. Do not remove on find.
+
+Implicit constraints
+
+Order of joins matters (FIFO within those that match).
+
+Users may be deleted out of order, so a plain array/linked list with O(1) join cannot give O(1) delete and find together.
+
+Examples
+
+join(Alice, size=2)
+join(Bob, size=4)
+join(Carol, size=6)
+find_first_match(3) → Alice   // only Alice fits
+find_first_match(5) → Alice   // Alice still earliest matching
+delete(Alice)
+find_first_match(5) → Bob
+find_first_match(2) → null     // no one fits
+
+Notes
+
+A doubly-linked list + hashmap (LRU-style) gives O(1) join and delete; find_first_match then walks the list.
+
+For faster find, bucket users by party size (e.g. one queue per size), and on find_first_match(t) scan sizes 1..t and pick the queue with the smallest head timestamp.
+
+The interviewer cares more about clean class design + tradeoff discussion than a single optimal solution; mention what you'd cache to speed up repeated finds.
+
+Preparation
+
+Drill LRU-cache style implementations (hashmap + DLL) to muscle memory.
+
+Sketch a second variant with party-size buckets and verbalize the trade-off (find_first_match becomes O(table_size) instead of O(n) but uses more memory).
+
+Practice articulating which call should be fast in a real restaurant — typically find_first_match runs once per available table.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

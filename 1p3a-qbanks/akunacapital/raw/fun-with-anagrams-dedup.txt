@@ -1,0 +1,40 @@
+===H1===
+Fun With Anagrams (Deduplicate Anagrams)
+===URL===
+https://www.1point3acres.com/interview/problems/company/akunacapital/fun-with-anagrams-dedup
+===BODY===
+Akuna Capital
+CodingMembers
+Fun With Anagrams (Deduplicate Anagrams)
+Given an array of strings (function funWithAnagrams), remove every string that is an anagram of an earlier kept string (keep the first occurrence), then return the remaining strings in lexicographic order. Anagram key = sorted characters or a character-frequency signature.
+SWE
+hashmap
+string
+sorting
+dedup
+easy
+Frequency
+Single report
+Last asked
+2025-11-04
+Stage
+oa
+Requirements
+
+Implement funWithAnagrams: given an array of strings, remove all strings that are anagrams of an earlier string (keep only the first occurrence of each anagram class), then output the remaining strings in lexicographic order. Determine whether two strings are anagrams by sorting their characters or comparing character-frequency counts.
+
+Notes
+
+Use the sorted-character string (or a frequency tuple) as the anagram key, keep a seen set of keys, and append a string to the result only when its key is new — this preserves the first occurrence. Sort the survivors at the end. It is the same anagram-key idea as the standard Group Anagrams problem, but applied to deduplicate rather than to group. This is the first item in a Python intern OA that also includes a Communications Handler object-design task and a few SQL/data-structure multiple-choice questions.
+
+Preparation
+
+Implement the sorted-key dedup with a seen set, then sort the output.
+
+Test inputs with multiple anagram classes, repeated identical strings, and already-sorted input.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

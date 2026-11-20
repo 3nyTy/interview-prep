@@ -1,0 +1,98 @@
+===H1===
+Debugging: Pick Dasher / Round Robin Load Balancer
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/debugging-pick-dasher-round-robin
+===BODY===
+DoorDash
+Coding·60 minMembers
+Debugging: Pick Dasher / Round Robin Load Balancer
+The canonical DoorDash debugging round. A roughly 200-line load-balancer / dasher-picker codebase contains planted state, boundary, and removal bugs. One branch ends in a consistent-hashing redesign; the random-picker branch focuses on O(1) swap-delete correctness, synchronization scope, and avoiding external calls while holding a shared lock.
+SWE
+debugging
+code-reading
+hashing
+object-design
+medium
+Frequency
+Very high
+Last asked
+2026-09-01
+Stage
+onsite-coding
+Requirements
+
+Input: a pre-written class (variants named LoadBalancer, DasherPicker, DasherMap) that exposes pick(), add(), remove(), and an adjustKey() helper. The class is supposed to assign incoming orders to one of N dashers in round-robin fashion.
+
+Task 1: find and fix the bugs. Typical planted bugs (varies by interviewer):
+
+Missing or misordered constructor — fields are read before being initialized.
+
+adjustKey() uses map.size() instead of map.size() − 1 (or vice versa), leading to IndexOutOfBoundsException.
+
+remove() swaps the key with the tail entry but does not update the swap-target's index reference; subsequent removes corrupt the structure.
+
+pick() increments the round-robin index before bounds-checking, causing it to skip the dasher at index 0 after every wrap.
+
+Misconfigured HashMap initialization — wrong key type, or initialized with Collections.emptyMap() (immutable) and then mutated.
+
+Random source not seeded / seeded inside the loop, producing skewed picks.
+
+Task 2 (always asked): redesign pick() to use consistent hashing instead of round robin. Implement a working version, then discuss virtual nodes.
+
+The candidate is expected to write their own test cases — "how would you test this in production code?" is a graded question.
+
+Notes
+
+Read the file top-to-bottom before touching anything. Many bugs only make sense once you've seen how pick(), add(), and remove() interact. Diving in and editing line-by-line is the most common failure pattern.
+
+Reproduce each bug with a minimal test case before fixing it. Interviewers grade "did you confirm the bug was actually the bug" — fixing without proof sometimes counts against the candidate even when the fix is correct.
+
+For the consistent-hashing redesign:
+
+The clean abstraction is a sorted TreeMap<Long, DasherId> keyed by hash positions on a ring; pick(orderHash) calls tailMap(orderHash).firstEntry() with wrap-around to the first entry.
+
+Virtual nodes (typically 100–200 per real node) flatten the variance on small clusters. If you don't have time, mention the trade-off and ship a version without virtual nodes — interviewers explicitly accept this.
+
+Common Java pitfall: TreeMap is not thread-safe; mention ConcurrentSkipListMap if asked about concurrency.
+
+The DasherMap variant of this prompt swaps the focus from round robin to a random-allocation strategy; the bugs are similar but the redesign asks for a weighted random pick or for a fix to the random-seed bug rather than consistent hashing.
+
+The random-allocation implementation mirrors LeetCode 380 (Insert / Delete / GetRandom in O(1)): pick a random index, swap the chosen dasher with the last element, return it, then pop the tail. The easy-to-miss bug is when the randomly chosen index is already the last element — the self-swap-then-pop must still behave correctly. Confirm that path with a dedicated test; starter code often mishandles it.
+
+The prompt is sometimes framed as assigning orders to backends and workers rather than dashers; the structure and bugs are the same.
+
+If time runs out mid-redesign, interviewers accept pseudocode for add_node / get_node on the consistent-hashing ring. Expect some interviewers to push the pace hard throughout — keep narrating while you type instead of stopping to think silently.
+
+Production follow-ups
+
+What happens when a dasher node is added or removed — with round robin: all subsequent picks shift; with consistent hashing: only ~1/N of orders re-route.
+
+How to bound the variance — virtual nodes; rendezvous (HRW) hashing as an alternative.
+
+How to deploy this to a real distributed system — sticky sessions for follow-up orders; consensus on the ring membership (Zookeeper / etcd); broadcast ring updates over gossip.
+
+How to test in production code — table-driven unit tests for each bug found, randomized property tests over add / remove / pick sequences, contract test on uniform distribution.
+
+Random DasherMap variant — swap-delete and concurrency
+
+The starter structure can be an integer-index-to-dasher map with contiguous indices. add() assigns the next index; remove() moves the tail dasher into the removed slot and updates its index; pick() draws uniformly from the remaining index range. Clarify whether selection consumes a dasher—the current picker variant keeps selection and removal as separate operations.
+
+Test the empty map, a one-element map, removing the tail itself, and removing a middle entry. The last two cases expose stale-index and KeyError / IndexError failures.
+
+After logical fixes, the concurrency drill asks where synchronization belongs: whole synchronized methods versus narrower synchronized blocks. Do not hold the shared-object lock while calling an external service; a downstream timeout would otherwise block every operation on the picker.
+
+The final extension asks what changes when the picker becomes distributed, including shared membership, concurrent updates, and failure handling across processes.
+
+Preparation
+
+Write a clean round-robin LoadBalancer from scratch in 10 minutes, then mutate it with 5 plausible bugs and have a friend fix them. The exercise builds the right reading reflexes.
+
+Memorize a 15-line consistent-hashing implementation with virtual nodes in your preferred language; you should be able to type it from memory in under 5 minutes.
+
+Practice naming each bug + fix out loud while writing — interviewers grade communication as heavily as correctness.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

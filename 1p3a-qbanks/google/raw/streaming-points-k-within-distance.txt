@@ -1,0 +1,58 @@
+===H1===
+Streaming Points: Emit K Within Distance
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/streaming-points-k-within-distance
+===BODY===
+Google
+Coding·45 minMembers
+Streaming Points: Emit K Within Distance
+Process a stream of float positions. Whenever three points satisfy the distance condition, output and remove those three points; a follow-up generalizes from 3 points to K points. The important ambiguity is whether the condition means a span of length `d` or pairwise distance within `d`.
+SWE
+data-structure
+sorting
+sliding-window
+medium
+ambiguous-spec
+Frequency
+Single report
+Last asked
+2026-06-23
+Stage
+onsite-coding
+Requirements
+
+Input is a continuous stream of floating-point positions.
+
+Maintain all active points not yet emitted.
+
+When a qualifying group of 3 points exists under the given distance threshold, output those 3 points and remove them from the active set.
+
+Follow-up: support K points instead of exactly 3.
+
+The critical clarification is the distance predicate:
+
+One interpretation: the 3 points all fit inside an interval of length d.
+
+Interviewer-preferred interpretation in the onsite variant: every pair among the selected points must be within the distance threshold.
+
+Notes
+
+A balanced ordered set / TreeSet-style structure is a natural fit because each new point only needs nearby neighbors.
+
+Be careful with floating-point comparison and epsilon policy.
+
+A wrong clarification can lead to checking subset(target, target + d) when the interviewer expects a wider candidate range around the target. Confirm the predicate with a tiny numeric example before coding.
+
+Preparation
+
+Practice range queries over sorted points with insertion and deletion.
+
+Write the K-generalization in words before coding: identify the local candidate window, test the predicate, then remove exactly the emitted points.
+
+Rehearse explaining float comparison, tie-breaking, and what to do when multiple groups qualify.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

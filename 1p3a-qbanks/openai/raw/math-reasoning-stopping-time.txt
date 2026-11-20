@@ -1,0 +1,159 @@
+===H1===
+Math Reasoning: Stopping Time / Las Vegas Algorithm
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/math-reasoning-stopping-time
+===BODY===
+OpenAI
+Coding·60 minMembers
+Math Reasoning: Stopping Time / Las Vegas Algorithm
+An oracle LLM does math reasoning; the 'solving time' follows a known distribution. Design a restart strategy to compress the expected solving time. Final part: find a strategy that beats single-threshold restart on worst-case performance.
+RS
+RE
+ml-knowledge
+math-reasoning
+probability
+algorithm-design
+hard
+Frequency
+Medium
+Last asked
+2026-05-31
+Stage
+tech-screen
+Problem
+
+You are serving an LLM. The inference latency for a single request is a nonnegative random variable T, and you are told only:
+
+E[T] = 1 minute
+
+The interviewer walks through a sequence of probability and restart-policy questions:
+
+What can you say about P(T > 5)?
+
+If you are allowed to restart once when an attempt has run too long, what success probability can you guarantee within 10 minutes?
+
+If you are allowed to restart N times, what is the success probability?
+
+Is there a restart strategy (a choice of timeout length) that maximizes the success probability?
+
+Is there a distribution where restarting does not change the success probability?
+
+If different (non-uniform) restart times are allowed, is there a better strategy?
+
+Assume each restarted attempt draws an independent fresh copy of T, restart overhead is negligible, and the request succeeds as soon as any attempt finishes before its timeout.
+
+This is a probability / stochastic-process reasoning question, not an implementation question. A strong answer separates three regimes:
+
+Exact probabilities when the latency distribution is known.
+
+Worst-case bounds when only the mean is known.
+
+How restart policies interact with the tail / hazard rate of the latency distribution.
+
+Key clarification. With only E[T] = 1 you generally cannot compute exact probabilities — only bounds. In particular P(T > 5) = 1/5 is not guaranteed exact; the correct statement is the Markov bound P(T > 5) <= 1/5, and it is tight only up to an arbitrarily small gap.
+
+Requirements
+
+Part 1 — Bound P(T > 5)
+
+Because T >= 0, Markov's inequality gives, for any a > 0:
+
+P(T > a) <= E[T] / a      →      P(T > 5) <= 1/5
+
+So a single attempt succeeds within 5 minutes with probability at least P(T <= 5) >= 4/5.
+
+The bound is tight up to epsilon: for any small epsilon > 0, put P(T = 5 + epsilon) = 1/(5 + epsilon) and P(T = 0) = 1 - 1/(5 + epsilon). Then E[T] = 1 and P(T > 5) = 1/(5 + epsilon) → 1/5.
+
+Part 2 — One restart in 10 minutes
+
+Policy: run attempt 1 for at most 5 minutes; if it has not finished, restart and run attempt 2 for the remaining 5 minutes. The request fails only if both independent attempts exceed 5:
+
+P(failure) = P(T_1 > 5) P(T_2 > 5) = P(T > 5)^2 <= (1/5)^2 = 1/25
+P(success) >= 1 - 1/25 = 24/25
+
+(If the interviewer informally writes the answer as 1 - 1/5 * 1/5, that is exactly this Markov lower bound under independent restarts.)
+
+Part 3 — N restarts with equal timeouts
+
+N restarts means N + 1 total attempts. If the survival function S(t) = P(T > t) is known, the exact success probability with timeouts t_1, …, t_(N+1) is:
+
+P(success) = 1 - S(t_1) S(t_2) ... S(t_(N+1))
+
+Without knowing S, use Markov bounds. Giving every attempt 5 minutes, assuming the total budget is large enough to spend 5 minutes on all N + 1 attempts:
+
+P(failure) <= (1/5)^(N + 1)      →      P(success) >= 1 - (1/5)^(N + 1)
+
+If instead a fixed 10-minute budget is split equally across N + 1 attempts, each gets t = 10 / (N + 1). For t >= 1:
+
+P(failure) <= (1/t)^(N + 1) = ((N + 1) / 10)^(N + 1)
+P(success) >= 1 - ((N + 1) / 10)^(N + 1)
+
+When t < 1 Markov's bound exceeds 1, so after clipping it gives no useful guarantee — a corner case worth calling out.
+
+Part 4 — Best fixed timeout under a 10-minute budget
+
+Choose m independent attempts, split 10 minutes equally so each has timeout t = 10 / m. For t >= 1 the Markov failure bound is (m / 10)^m. Minimize its log over real m:
+
+d/dm [ m log(m / 10) ] = log(m / 10) + 1 = 0
+→  m / 10 = e^-1  →  m = 10 / e ≈ 3.68
+
+So the best integer attempt count under this mean-only worst-case objective is 4, i.e. timeout ≈ 2.5 min/attempt, giving:
+
+P(success) >= 1 - (4/10)^4 = 1 - 0.0256 = 0.9744
+
+slightly better than the one-restart guarantee 1 - (1/5)^2 = 0.96.
+
+Part 5 — A distribution where restarting does not help
+
+The exponential is the canonical example. If T ~ Exponential(rate = 1) then E[T] = 1 and it is memoryless:
+
+P(T > s + t | T > s) = P(T > t)
+
+An in-progress attempt that has already run s minutes is statistically as good as a fresh restart, so for a fixed total budget restarting changes nothing. For budget B split into timeouts t_1, …, t_m with sum t_i = B:
+
+P(failure) = e^-t_1 ... e^-t_m = e^-(t_1 + ... + t_m) = e^-B
+P(success) = 1 - e^-B          (independent of how B is split)
+
+Part 6 — Unequal restart times
+
+For a known distribution, unequal timeouts can win, and the right policy is dictated by the hazard rate:
+
+Hazard rate decreasing over time → old attempts become less promising → restarting earlier can help.
+
+Hazard rate increasing → old attempts become more promising → restarting can hurt.
+
+Hazard rate constant (exponential) → restarting is irrelevant.
+
+With only E[T] = 1 you can still optimize the Markov worst-case bound, but be explicit that this is a conservative guarantee, not the true optimum for every distribution. With budget B = 10 and timeouts summing to 10, each timeout contributes the clipped Markov term P(T > t_i) <= min(1, 1 / t_i). If every t_i >= 1 then P(failure) <= 1 / (t_1 t_2 ... t_m). Minimizing the bound means maximizing the product t_1 ... t_m at fixed sum; by AM-GM that product is maximal when all timeouts are equal (t_i = 10 / m). So under the Markov-only assumption unequal restart times do not improve the worst-case bound — non-uniform schedules pay off only once you know more about the actual latency distribution.
+
+Notes
+
+This is a multi-part stochastic-process question; the interviewer pushes on cleanly separating "exact when S is known" from "Markov bound when only the mean is known." The emphasized toolbox is probability concepts: constructing/analyzing distributions, inequalities, plus basic DS/algo.
+
+Detail can run deep past Part 6, and adjacent probability-puzzle prompts (different setups, same toolbox) surface in the same round slot.
+
+This sits in the Las Vegas algorithm restart family: restart past a threshold, then compare expected time / success rate against the no-restart strategy.
+
+Canonical restart-strategy results
+
+Two facts the round explicitly probes (and which generalize Parts 4–6 once you reason about expected runtime rather than fixed-budget success rate):
+
+Fixed-threshold optimality (known distribution). When the runtime distribution F is fully known, the optimal restart policy is a single fixed cutoff τ* minimizing E[min(T, τ)] / Pr[T <= τ] — expected cost per attempt divided by per-attempt success probability. For any heavy-tailed T, a finite τ* beats τ = ∞: you trade a small chance of a long success for many fast retries. The proof is one line of conditional expectation.
+
+Universal strategy (unknown distribution). Without knowing F, the deterministic doubling schedule of cutoffs 1, 1, 2, 1, 1, 2, 4, … achieves expected runtime O(T_opt · log T_opt), where T_opt is the expected runtime under the best fixed-cutoff policy. This is the canonical answer to the "what if you don't know the distribution" follow-up; the analysis is a geometric-budget argument.
+
+Preparation
+
+Review: Markov's inequality (and its tightness construction), geometric / exponential distributions, memorylessness and hazard rate, stopping time, Las Vegas vs Monte Carlo.
+
+Drill: the m = 10/e ≈ 3.68 → 4 optimal-attempt-count derivation cold (minimize m log(m/10)), and the AM-GM argument that equal timeouts are optimal under the Markov-only bound.
+
+Drill: the fixed-threshold optimality derivation (one-line conditional expectation) and the doubling-schedule universal-strategy argument.
+
+Brush up on basic Markov-chain mixing times + coupon collector — the same probability toolbox shows up in the adjacent prob-puzzle prompts that share this slot.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

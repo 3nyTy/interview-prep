@@ -1,0 +1,66 @@
+===H1===
+Babylon Tile-Stack Merge Game
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/babylon-stack-merge-game
+===BODY===
+Google
+Coding·45 minMembers
+Babylon Tile-Stack Merge Game
+Onsite NG round 1 (Munich office): implement a two-player tile-stack merge game ("Babylon") given the rules. Start state is 12 height-1 stacks of 4 colors (Y / W / G / B), 3 of each; a move places one stack on top of another under a constraint; the player who cannot move loses.
+SWE
+simulation
+data-structure
+hard
+Frequency
+Single report
+Last asked
+2025-12-29
+Stage
+onsite-coding
+Requirements
+
+12 tiles initially, partitioned into 12 height-1 stacks.
+
+4 colors: Y / W / G / B; exactly 3 tiles per color.
+
+Two players alternate moves.
+
+A move = pick two stacks and place one entirely on top of the other (merge).
+
+Legal iff at least one of: (a) the two stacks have the same height, OR (b) their top-most tiles share the same color.
+
+After merge: new height = sum of the two heights, new top color = color of the stack placed on top.
+
+The player who has no legal move on their turn loses.
+
+Implement the full game so it can be played out (legal-move detection, state transition, terminal check).
+
+Examples
+
+Start: 12 stacks of height 1, with tops Y Y Y W W W G G G B B B.
+
+A legal opening move: stack the first Y on the second Y (same color top), producing one height-2 stack of color Y plus 10 singletons.
+
+Notes
+
+This is closer to an implementation/simulation interview than a clever-algorithm problem — the interviewer wants a clean game state class, legal-move enumeration, and a play(move) API.
+
+Represent state as a List[Stack] where Stack = (height, topColor, fullSequence?). Whether you keep the full color sequence depends on whether the interviewer asks about "undo" or "re-color from top".
+
+Add a minimax / negamax for "who wins from this state with optimal play" as the natural follow-up — branching factor is small (at most C(12, 2) = 66 initially, drops fast).
+
+Reported as "too hard to finish coding in 45 minutes"; the interviewer gives hints throughout. Pacing matters.
+
+Preparation
+
+Drill clean game-state implementations: e.g. Connect 4, Othello move generators, in 30 minutes.
+
+Practice writing a generic minimax framework so you can plug in this game's legalMoves(state) and terminal(state) quickly.
+
+Watch the merge invariant carefully: "same height OR same top color" — fail mode is forgetting the alternative branch.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

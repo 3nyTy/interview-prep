@@ -1,0 +1,75 @@
+===H1===
+Phone Screen: Rate Limiter (Coding + Trade-offs)
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/phone-screen-rate-limiter
+===BODY===
+Uber
+Coding·60 minMembers
+Phone Screen: Rate Limiter (Coding + Trade-offs)
+Phone-screen / onsite coding prompt. Implement a rate limiter, with variants ranging from per-user windowed request counting to an explicitly thread-safe token bucket. Follow-ups cover custom rules, atomic token distribution, and lock contention.
+SWE
+data-structure
+system-design
+hashmap
+medium
+Frequency
+Medium
+Last asked
+2026-06-26
+Stage
+phone-screen · onsite-coding
+Requirements
+
+allow(user_id, timestamp) → bool: returns true if the user is under the rate limit for this timestamp; otherwise false.
+
+Default policy: at most N requests per W-second sliding window per user.
+
+Onsite concurrency variant:
+
+Implement a token-bucket limiter shared by multiple threads.
+
+Keep token accounting and distribution atomic.
+
+Explain how the design reduces lock contention under high concurrency.
+
+Follow-ups:
+
+Support multiple users with different limits.
+
+Support dynamic / per-endpoint rules.
+
+Distributed setting (multiple instances behind a load balancer).
+
+Notes
+
+Fixed window — easy to implement with Map<user, (window_start, count)>. Bursty at window boundaries.
+
+Sliding window log — keep a deque of recent timestamps per user; pop those older than now − W before checking the deque length. Memory O(N) per user.
+
+Token bucket — refill at rate N / W tokens/sec; consume one token per request. Smooth bursting; easy to extend with burst-capacity.
+
+Sliding window counter — combines fixed window with weighted overlap; common production choice.
+
+Follow-up implementation: a per-rule strategy object with its own state; rules look up by user_id (or (user_id, endpoint)) in a map.
+
+For distributed: shared store (Redis) for the per-user counter; mention Lua scripts for atomic increment-and-check.
+
+Common interviewer push: "What if a single user sends 10K req/s?" → batch increments client-side or shard per user across multiple counter keys.
+
+The concurrency variant makes synchronization part of the coding bar. Be ready to compare a single global lock, per-bucket locking, and atomic state updates without weakening the token invariant.
+
+Preparation
+
+Implement token-bucket and sliding-window-log from scratch; both are short but distinct, and the round may ask for either.
+
+Pre-script the distributed-setting answer: Redis + Lua atomic INCR + EXPIRE.
+
+Drill LC 359 (Logger Rate Limiter) as a warm-up for the simpler version.
+
+A recent onsite variant made the algorithm choice explicit: discuss Token Bucket versus Leaky Bucket, then implement the selected limiter cleanly.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

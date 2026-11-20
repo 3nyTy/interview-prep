@@ -1,0 +1,65 @@
+===H1===
+Trie Autocomplete / Prefix Search
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/trie-autocomplete-prefix-search
+===BODY===
+Pinterest
+Coding·60 minMembers
+Trie Autocomplete / Prefix Search
+Trie-backed prefix search appears as three core coding forms—classic autocomplete, first-index prefix lookup, and moderation matching—plus an MLE phone-screen alternate based on a frequency-ranked autocomplete system.
+SWE
+MLE
+trie
+string
+hashmap
+set
+medium
+Frequency
+Medium
+Last asked
+2026-08-11
+Stage
+phone-screen · onsite-coding
+Requirements
+
+The prompt has three core forms:
+
+Variant A — Search autocompletion (onsite coding). Build a trie over a word dictionary and answer suggest(prefix) returning the words starting with that prefix.
+
+Variant B — First index containing prefix (phone screen). Given a list of words such as ['a', 'apple', 'appz', 'b'] and a list of query prefixes such as ['ap'], return the index of the first word in the list that contains the prefix as a prefix. Example: 'ap' → index 1 ('apple').
+
+Variant C — Pin-log moderation (phone screen). Given a stream of pin log entries {user, text} plus a userset and a textset of banned phrases, emit an alert when an entry's user is in userset AND its text contains any phrase from textset. Use a hash set for the user filter and a multi-pattern matcher for the text filter.
+
+Notes
+
+The canonical autocompletion solution stores at each trie node the top-K suggestions reachable from that node so suggest is O(P + K), where P is the prefix length. The naive walk-and-collect is acceptable for the first pass; precomputed top-K lists are the large-dictionary follow-up.
+
+A frequent bug on Variant A is declaring children as a class variable on TrieNode, which shares the dictionary across nodes. Make it an instance field.
+
+Variant B is solvable in one pass over the word list when the query list is small; a trie or sorted-index approach pays off across many queries.
+
+For Variant C, checking every banned phrase independently is O(|text| × total-pattern-length) in the worst case. Aho-Corasick builds failure links once and scans each text in O(|text| + matches).
+
+Alternate canonical variant — frequency-ranked autocomplete
+
+Initialize a search-autocomplete system from paired sentences and times arrays. The arrays have no useful ordering guarantee. For each typed character, return at most three matching sentences ordered by descending frequency and then ascending lexicographic order; a terminator commits the current sentence and increments its frequency. Do not use input order as a ranking or tie-breaking signal.
+
+Preparation
+
+Build a Trie class from scratch in 8 minutes: insert, startsWith, and search.
+
+Drill the precomputed-top-K augmentation: on insert(word, freq), update each ancestor's bounded candidate set.
+
+Implement frequency-ranked top-3 lookup with the (−frequency, sentence) ordering rule, then shuffle the initialization arrays and verify identical results.
+
+Add an update regression test: commit a sentence, query the same prefix again, and verify that its new frequency changes the ranking correctly.
+
+Practice Aho-Corasick failure-link construction once for the moderation form.
+
+Time yourself: 30 minutes for one base form plus 20 minutes for its follow-up.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

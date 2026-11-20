@@ -1,0 +1,61 @@
+===H1===
+Trading Betting Game (EV / Market-Making)
+===URL===
+https://www.1point3acres.com/interview/problems/company/optiver/trading-betting-game
+===BODY===
+Optiver
+Other·45 minMembers
+Trading Betting Game (EV / Market-Making)
+The core QR/QT interview round: a live betting game over many rounds. Starting from \$1000, you choose how much to wager across several sub-games (coin flips, dice sums, card products) given randomized odds each round, plus a market-making sub-game on the sum of three cards. The interviewer probes your sizing and reasoning; speed and decision-making under pressure matter more than ending profit.
+RS
+DS
+expected-value
+probability
+trading
+mental-math
+market-making
+Frequency
+High
+Last asked
+2026-03-21
+Stage
+phone-screen · onsite-research
+Requirements
+
+A timed game (≈25–45 minutes) on an assessment platform, played over multiple rounds with a starting bankroll of $1000 (often unlimited rounds within a fixed total time).
+
+Three recurring betting sub-games, each with several wagers whose odds are randomly generated each round:
+
+Coin flips — e.g. H>T, T>H, HTH/THT, HHH/TTT.
+
+Two dice — bet on the sum (=2 or 3, =4, =10, =11 or 12, odd, even, etc.).
+
+Three cards — bet on the product of the first two (>20, >100, odd, even).
+
+A market-making sub-game: a market on the sum of three cards where you can buy or sell at quoted prices that move; you profit by buying below or selling above the true sum.
+
+Each round you have ~2–4 minutes to compute EVs and allocate; the interviewer asks you to justify each decision and follows up on sizing and the probability of profit.
+
+Notes
+
+Whether you end up profitable is widely reported as not the main signal — the interviewer evaluates speed, calibrated sizing, and clear reasoning under time pressure. The stated intent is finding people who spot market opportunities fast in high-pressure settings.
+
+Bet only positive-EV wagers; when an arbitrage (guaranteed profit) appears, size it aggressively / all-in rather than applying Kelly. Interviewers frequently hint that candidates are under-betting good edges.
+
+Kelly is a useful framing but several interviewers explicitly say it "doesn't apply here" for the arbitrage cases — don't over-fit to Kelly. A common pitfall is spending too long computing exact EVs early; pick up the pace after the first round.
+
+A related estimation variant scores you on confidence intervals: each round you give a closed interval [L, U] for a numeric answer and score L/U if the true value lands inside it, 0 otherwise — incentivizing the tightest honest interval.
+
+Preparation
+
+Drill fast EV computation for dice/coin/card bets until it's reflexive; pre-build intuition for odds-vs-probability so you can decide bets in seconds.
+
+Practice recognizing arbitrage / guaranteed-profit setups and sizing them decisively; rehearse articulating why you sized a bet a given way, since every decision draws a follow-up.
+
+Practice quoting two-sided markets on a random variable (e.g. sum of three cards) and updating quotes as the price moves.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

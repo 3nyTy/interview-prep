@@ -1,0 +1,355 @@
+===H1===
+Parse Log File by Thread Id
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/parse-log-by-thread-id
+===BODY===
+Coinbase
+Coding·60 minMembers
+Parse Log File by Thread Id
+Given a flat list of log lines, group them by `threadId` and return each group sorted by timestamp. Pure string-parsing warm-up that has shown up as the easier of the two coding rounds in some loops.
+SWE
+string-processing
+parsing
+hashmap
+sorting
+easy
+Frequency
+Low
+Last asked
+2026-08-12
+Stage
+onsite-coding
+Log File Parser
+
+Problem Overview
+
+The goal of this problem is to read a log file with a specific structure. You need to organize the log entries by their thread ID and filter them by time. This tests your skills in string manipulation, data structures, and search algorithms.
+
+Part 1: Parsing and Grouping
+
+Problem Requirements
+
+The input is a list of strings. Each line follows this format:
+
+process_id:thread_id:timestamp:content
+
+process_id — ID of the process (e.g., "p1")
+
+thread_id — ID of the thread (e.g., "t1")
+
+timestamp — Time in seconds (integer, e.g., 1000)
+
+content — The log message (this might contain colons)
+
+You need to write a LogParser class. It should read these raw lines and allow you to look up all logs for a specific thread_id. The results must be sorted by time.
+
+class LogParser:
+    def __init__(self):
+        """Initialize the parser."""
+        pass
+
+    def ingest(self, lines: list[str]) -> None:
+        """
+        Read and save a list of raw log lines.
+
+        Args:
+            lines: A list of strings. Each string is a log line.
+
+        Notes:
+            - The 'content' part might have colons inside it.
+            - Timestamps are always valid numbers.
+            - Ignore lines that do not have 4 parts separated by colons.
+        """
+        pass
+
+    def get_logs_by_thread(self, thread_id: str) -> list[dict]:
+        """
+        Get all logs for a specific thread, sorted by time.
+
+        Args:
+            thread_id: The ID of the thread to find.
+
+        Returns:
+            A list of dictionaries. Each dictionary contains:
+            {
+                "process_id": str,
+                "thread_id": str,
+                "timestamp": int,
+                "content": str
+            }
+            The list is sorted by timestamp (smallest to largest).
+            Return an empty list if the thread_id is not found.
+        """
+        pass
+
+Example Usage
+
+parser = LogParser()
+
+lines = [
+    "p1:t1:1000:User login successful",
+    "p1:t2:1001:DB query started",
+    "p2:t1:1002:Session token refreshed",
+    "p1:t2:1003:DB query completed: result=OK",
+    "p2:t3:999:System health check",
+    "p1:t1:1005:User clicked dashboard",
+]
+
+parser.ingest(lines)
+
+print(parser.get_logs_by_thread("t1"))
+# [
+#   {"process_id": "p1", "thread_id": "t1", "timestamp": 1000, "content": "User login successful"},
+#   {"process_id": "p2", "thread_id": "t1", "timestamp": 1002, "content": "Session token refreshed"},
+#   {"process_id": "p1", "thread_id": "t1", "timestamp": 1005, "content": "User clicked dashboard"},
+# ]
+
+print(parser.get_logs_by_thread("t2"))
+# [
+#   {"process_id": "p1", "thread_id": "t2", "timestamp": 1001, "content": "DB query started"},
+#   {"process_id": "p1", "thread_id": "t2", "timestamp": 1003, "content": "DB query completed: result=OK"},
+# ]
+
+print(parser.get_logs_by_thread("t99"))
+# []
+
+Solution for Part 1
+
+We can use a dictionary (specifically defaultdict) to store logs. The key is the thread_id, and the value is a list of log entries.
+
+from collections import defaultdict
+
+class LogParser:
+    def __init__(self):
+        self.thread_logs = defaultdict(list)  # Key: thread_id, Value: list of logs
+
+    def ingest(self, lines: list[str]) -> None:
+        for line in lines:
+            # Split into at most 4 parts. This keeps extra colons in 'content' safe.
+            parts = line.split(":", 3)
+            if len(parts) < 4:
+                continue
+            process_id, thread_id, timestamp_str, content = parts
+            try:
+                timestamp = int(timestamp_str)
+            except ValueError:
+                continue
+            entry = {
+                "process_id": process_id,
+                "thread_id": thread_id,
+                "timestamp": timestamp,
+                "content": content,
+            }
+            self.thread_logs[thread_id].append(entry)
+
+    def get_logs_by_thread(self, thread_id: str) -> list[dict]:
+        if thread_id not in self.thread_logs:
+            return []
+        # Sort the logs by timestamp before returning
+        return sorted(self.thread_logs[thread_id], key=lambda e: e["timestamp"])
+
+Important Detail: Notice split(":", 3). The number 3 tells Python to split only on the first three colons. If the content message has a colon (like "result=OK"), it stays part of the content string. This is a common test in interviews.
+
+Complexity Analysis:
+
+MethodTimeSpace
+ingestO(N)O(N)
+get_logs_by_threadO(K log K)O(K)
+
+Here, N is the total number of log lines, and K is the number of logs for one specific thread.
+
+Part 2: Counting Active Threads
+
+New Requirements
+
+Interviewer: "I will give you a start time and an end time. I want to know how many threads were 'active' during that time. A thread is active if it has at least one log entry between the start and end times (inclusive)."
+
+You need to add a method to count distinct threads that appear in a time window.
+
+def count_active_threads(self, start: int, end: int) -> int:
+    """
+    Count how many unique threads have a log entry with
+    start <= timestamp <= end.
+
+    Args:
+        start: Start time (inclusive).
+        end: End time (inclusive).
+
+    Returns:
+        The count of active threads.
+    """
+    pass
+
+Example Usage
+
+parser = LogParser()
+
+lines = [
+    "p1:t1:1000:User login successful",
+    "p1:t2:1001:DB query started",
+    "p2:t1:1002:Session token refreshed",
+    "p1:t2:1003:DB query completed: result=OK",
+    "p2:t3:999:System health check",
+    "p1:t1:1005:User clicked dashboard",
+]
+
+parser.ingest(lines)
+
+print(parser.count_active_threads(1000, 1002))
+# 2  (t1 is active at 1000 and 1002; t2 is active at 1001. t3 is NOT active.)
+
+print(parser.count_active_threads(999, 999))
+# 1  (Only t3 matches 999)
+
+print(parser.count_active_threads(1004, 1010))
+# 1  (Only t1 matches 1005)
+
+print(parser.count_active_threads(2000, 3000))
+# 0  (No logs in this range)
+
+Approaches
+
+Simple Loop (Brute Force): Look at every log entry for every thread. Check if the time fits. This is O(N).
+
+Binary Search (Optimized): If we sort the timestamps for each thread ahead of time, we can use Binary Search. This is much faster for repeated queries.
+
+Solution for Part 2
+
+Approach A: Simple Loop
+
+This is acceptable for a first pass in an interview.
+
+def count_active_threads(self, start: int, end: int) -> int:
+    count = 0
+    for thread_id, entries in self.thread_logs.items():
+        for entry in entries:
+            # Check if any entry for this thread is in the range
+            if start <= entry["timestamp"] <= end:
+                count += 1
+                break  # Found one, so this thread is active. Move to next thread.
+    return count
+
+Complexity: O(N) in the worst case (checking every single log line).
+
+Approach B: Using Binary Search
+
+If we need to run this query many times, we should optimize it. We can store a sorted list of timestamps for each thread. Then, we use Python's bisect module (Binary Search) to quickly find if a valid timestamp exists.
+
+import bisect
+from collections import defaultdict
+
+class LogParser:
+    def __init__(self):
+        self.thread_logs = defaultdict(list)
+        self.thread_timestamps = defaultdict(list)  # Key: thread_id, Value: sorted list of times
+        self._sorted = False
+
+    def ingest(self, lines: list[str]) -> None:
+        for line in lines:
+            parts = line.split(":", 3)
+            if len(parts) < 4:
+                continue
+            process_id, thread_id, timestamp_str, content = parts
+            try:
+                timestamp = int(timestamp_str)
+            except ValueError:
+                continue
+            entry = {
+                "process_id": process_id,
+                "thread_id": thread_id,
+                "timestamp": timestamp,
+                "content": content,
+            }
+            self.thread_logs[thread_id].append(entry)
+            self.thread_timestamps[thread_id].append(timestamp)
+        self._sorted = False
+
+    def _ensure_sorted(self):
+        # Sort timestamps only if new data has been added
+        if not self._sorted:
+            for thread_id in self.thread_timestamps:
+                self.thread_timestamps[thread_id].sort()
+            self._sorted = True
+
+    def get_logs_by_thread(self, thread_id: str) -> list[dict]:
+        if thread_id not in self.thread_logs:
+            return []
+        return sorted(self.thread_logs[thread_id], key=lambda e: e["timestamp"])
+
+    def count_active_threads(self, start: int, end: int) -> int:
+        self._ensure_sorted()
+        count = 0
+        for thread_id, timestamps in self.thread_timestamps.items():
+            # Use Binary Search to find the first time >= start
+            idx = bisect.bisect_left(timestamps, start)
+
+            # If a timestamp exists and is <= end, the thread is active
+            if idx < len(timestamps) and timestamps[idx] <= end:
+                count += 1
+        return count
+
+Complexity (Approach B):
+
+MethodTimeSpace
+ingestO(N)O(N)
+_ensure_sortedO(N log N)O(1)
+count_active_threadsO(T log K)O(1)
+
+Here, N is total entries, T is the number of unique threads, and K is the max entries per thread. This search is much faster than checking every log.
+
+Follow-Up Questions
+
+Common Interview Questions
+
+Bad Data: What if a line is broken or the timestamp isn't a number?
+
+You should skip these lines gracefully using try-except. Do not let the program crash.
+
+Too Much Data: What if the file is too big for RAM?
+
+Read the file line-by-line (stream processing). Don't load it all at once. You might need to save results to separate files on the disk.
+
+Real-time Data: What if logs are coming in live?
+
+You can insert new logs into the sorted list using bisect.insort. This keeps the list sorted without re-sorting everything every time.
+
+Thread Definition: What if "active" means the thread started before the end time and finished after the start time?
+
+You would track the min_timestamp (start) and max_timestamp (end) for each thread.
+
+A thread is active if its start time is before end and its end time is after start.
+
+Complexity Summary
+
+MethodApproach A (Loop)Approach B (Binary Search)
+ingestO(N)O(N)
+get_logs_by_threadO(K log K)O(K log K)
+count_active_threadsO(N)O(T log K)
+
+Definitions:
+
+N = Total number of log lines.
+
+K = Number of lines for one thread.
+
+T = Number of unique threads.
+
+Space Complexity: O(N) is needed to store all the log data.
+
+Candidate-Report Notes
+
+The round is intentionally light on algorithm — the signal is whether you parse cleanly (don't reach for regex on three fields), build a Map<threadId, List<(timestamp, line)>>, and sort each bucket once at the end.
+
+Stable sort + composite key handles ties on duplicate timestamps without extra work.
+
+Preparation
+
+Practice the Map<key, List<entry>> + sort each bucket once template — it is the highest-leverage pattern for any "group by X, ordered by Y" prompt and shows up across companies.
+
+Have a 60-second "I'll parse by splitting on [/] rather than regex for clarity, here's why" verbal so you can spend the round on edge cases (missing thread id, malformed timestamps).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

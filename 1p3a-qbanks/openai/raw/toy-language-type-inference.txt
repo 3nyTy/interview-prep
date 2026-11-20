@@ -1,0 +1,165 @@
+===H1===
+Toy Language / Type Inference
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/toy-language-type-inference
+===BODY===
+OpenAI
+Coding·60 minMembers
+Toy Language / Type Inference
+Implement a type system for a toy language with primitives, generics, nested tuples, and function signatures. Core task: a type-inference engine that unifies generics with concrete call-site types and substitutes them in the return type.
+SWE
+RE
+algorithm
+oop-design
+recursion
+medium
+Frequency
+High
+Last asked
+2026-07-13
+Stage
+phone-screen
+Requirements
+
+Type definitions
+
+Primitives: lowercase int / float / str / bool / char
+
+Generics: T1 / T2 / T3 ... (uppercase T + digits)
+
+Tuples: nested, comma-separated inside [ ... ] or ( ... ). Example: [int, [T1, str]].
+
+Functions: [param1, param2] -> returnType.
+
+Part 1 — implement to_str() on Node and Function
+
+Node is either atomic (a string) or a tuple (List[Node]).
+
+atomic → return the type name; tuple → [t1,t2,...] (no space after commas).
+
+Function.to_str(): (param1,param2,...) -> returnType (no space after commas; single space around ->).
+
+Minority variant: some reports format with a single space after each comma ([t1, t2, ...], (p1, p2, ...) -> ret) — confirm the expected __str__ format before relying on string equality in tests.
+
+Part 2 — implement get_return_type(parameters: List[Node], function: Function) -> Node
+
+Generic resolution: walk expected vs actual parameters and build a substitution table (unification).
+
+Substitution: replace every generic in output_type with the resolved concrete type.
+
+Input constraint: actual parameters are always fully concrete — they never contain generics, so no deep DFS is needed on the input list itself.
+
+Errors: argument count mismatch; type mismatch (concrete primitives differ); generic conflict (same T1 bound to two different concrete types in one call).
+
+from typing import List, Union
+
+class Node:
+    def __init__(self, node_type: Union[str, List['Node']]) -> None: ...
+        # str  → primitive ("int", "float", ...) or generic ("T1", "T2", ...).
+        # List → tuple node.
+
+    def __str__(self) -> str: ...
+        # atomic → the name; tuple → "[t1,t2,...]".
+
+    def __eq__(self, other) -> bool: ...
+        # structural equality via str comparison: str(self) == str(other)
+
+class Function:
+    def __init__(self, parameters: List[Node], output_type: Node) -> None: ...
+    def __str__(self) -> str: ...
+        # "(p1,p2,...) -> returnType"
+
+def get_return_type(parameters: List[Node], function: Function) -> Node: ...
+    # Raise on (a) len(parameters) != len(function.parameters),
+    # (b) concrete-vs-concrete mismatch, (c) the same generic Tn bound to two
+    # distinct concrete subtrees within one call. Actual parameters are always concrete.
+
+Confirmed test cases
+
+Example 1 (basic substitution)
+ fn: [T1,T2,int,T1] -> [T1,T2]
+ args: [int,str,int,int]
+ → [int,str]
+
+Example 2 (nested + complex)
+ fn: [[T1,float],T2,T3] -> [T3,T1]
+ args: [[str,float],[int,str],int]
+ → [int,str] // T1 = str (from first tuple), T2 = [int,str], T3 = int
+
+Example 3 (conflict)
+ fn: [T1,T1] -> T1
+ args: [int,str]
+ → ConflictError: T1 cannot be both int and str
+
+Example 4 (concrete mismatch)
+ fn: [T1,T2,int,T1] -> [T1,T2]
+ args: [int,str,float,int]
+ → TypeError: 3rd parameter expects concrete int but received float
+
+Example 5 (nested tuple with repeated generic)
+ fn: [[T1,float],T1] -> [T1,[T1,float]]
+ args: [[str,float],str]
+ → [str,[str,float]]  // T1=str from both args; return substitutes all occurrences
+
+Example 6 (generic binds to a whole tuple)
+ fn: ([[T,float],T],S) -> [S,T]
+ args: [[str,float],str], [float,int]
+ → [[float,int],str]  // T=str (from inner tuple + second slot), S=[float,int]
+
+Notes
+
+This is not a parser problem. Build the AST directly via Python objects; don't write a string parser.
+
+Core algorithm: check_and_bind(template, concrete, bindings) — a unification-style matcher (atomic → same primitive; tuple → same arity + recurse; generic → set if unbound, else structural_eq).
+
+Canonical helper naming: bind_generics(func_param, actual_param, binding_map) for unification, substitute_generics(node, binding_map) for return-type replacement.
+
+is_generic_type(node) must handle both the base-generic case (the node itself is T1) and the contains-generic case (a tuple node has a generic somewhere inside) — needed for substitution traversal.
+
+Use Node.clone() during substitution to avoid shared references between the return-type template and the resolved output; implement __eq__ via str(self) == str(other) for structural equality checks in conflict detection.
+
+After enough practice this is finishable inside 40 min.
+
+Distinguishing generic vs primitive
+
+The cleanest test keeps an explicit primitive set, e.g. PRIMITIVES = {"int", "float", "str", "bool", "char"}. A base node is generic iff it's a string base not in that set:
+
+is_base_generic_type(node) → node.base is not None and node.base not in PRIMITIVES.
+
+is_generic_type(node) → is_base_generic_type(node) or any(is_generic_type(c) for c in node.children).
+
+This avoids relying on casing/regex for T...; only the primitive whitelist is authoritative.
+
+Matcher case ordering (avoids subtle misclassification)
+
+The binder should branch in this order so a generic is never treated as a concrete leaf:
+
+func_param is a generic base → if already bound, assert it equals the actual (else conflict); otherwise record binding_map[base] = actual.
+
+func_param == actual (both concrete, structurally equal) → accept, return.
+
+both are tuples → assert equal arity, then recurse pairwise over children.
+
+otherwise → raise mismatch.
+
+Substitution short-circuit
+
+substitute_generics(node, binding_map): if not is_generic_type(node), return node.clone() immediately (cheap, and guarantees no shared reference). For a generic base, return binding_map[node.base].clone(). For a tuple, rebuild as a new tuple of substituted children.
+
+A generic can resolve to a whole tuple, not just a primitive (see Example 6: S = [float,int]), so substitution must deep-clone the bound subtree rather than assume a scalar.
+
+Preparation
+
+Drill unification + substitution by hand. Watch out for Node.clone() to avoid shared references; use structural equality.
+
+Prep with a self-generated practice harness in Colab, autocomplete off.
+
+Have helpers ready: is_tuple / is_atomic / is_generic / is_primitive.
+
+Don't optimize. Correctness + speed + passing tests is all that matters.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

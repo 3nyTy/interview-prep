@@ -1,0 +1,61 @@
+===H1===
+Frontend Domain — Card / Validation Component to Mockup
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/fe-domain-card-component
+===BODY===
+Coinbase
+Coding·60 minMembers
+Frontend Domain — Card / Validation Component to Mockup
+Frontend Domain round: build a small UI component to a provided mockup — typically a card with an input, button, and validation message — then ship two announced 'extension' features. Spec is precise and unit-tested, but feedback frequently fails candidates whose code matches the spec exactly with a vague 'could be written better' — production-readiness signals matter even at the mid-level bar.
+SWE
+react
+frontend
+ux
+testing
+medium
+Frequency
+Low
+Last asked
+2026-02-23
+Stage
+onsite-coding
+Requirements
+
+A mockup is shared (Figma or static image); you reproduce it as a React component.
+
+A test suite runs against the component; each visible feature has 1–2 hidden tests.
+
+Two "extension" features announced after the main implementation lands. Typical extensions: add an error state to the input, add an async submit with a loading spinner, add accessibility labels, support a disabled prop.
+
+A reported variant (Feb 2026) for the crypto-trading track: reproduce a small trading-UI panel from an animated GIF, including price ticker behavior.
+
+Notes
+
+"Matches spec exactly" is not enough. Recent feedback themes:
+
+Inline validation on every keystroke (not just on submit).
+
+Disabled state of the submit button when the form is invalid.
+
+Loading state during async actions.
+
+Calling out which props you exposed for future reusability.
+Volunteer these even if not tested.
+
+Verbalize what you're not building: "I'll skip i18n / a11y polish to stay in time, but in production I'd add aria-describedby on the validation message and use react-aria for keyboard handling."
+
+The animated-mockup variant (trading UI) is harder because you have to interpret the animation. Pause and describe what you see verbally before coding — interviewer will clarify ambiguities you raise.
+
+Preparation
+
+Practice building 2 small components from a Figma mockup in 45 minutes each: a stylized card and a multi-step input form. Drill the muscle memory of mockup → DOM → styles → state in that order.
+
+Pre-rehearse the production-readiness verbal: validation, loading, error, disabled, a11y, error-boundary. 60 seconds covering all six.
+
+For the animated-mockup variant, watch the GIF twice silently, then narrate the state transitions before you write any code.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

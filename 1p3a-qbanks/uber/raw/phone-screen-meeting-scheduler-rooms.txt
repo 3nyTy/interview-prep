@@ -1,0 +1,101 @@
+===H1===
+Phone Screen / Onsite: Meeting Room Scheduler
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/phone-screen-meeting-scheduler-rooms
+===BODY===
+Uber
+Coding·60 minMembers
+Phone Screen / Onsite: Meeting Room Scheduler
+High-frequency OOD coding round. Given a fixed list of rooms, implement `bookMeeting(start, end)` that returns an available room id (or sentinel) and records the booking. Follow-ups include removing bookings and querying the last `N` scheduled meetings.
+SWE
+data-structure
+interval
+oop-design
+medium
+Frequency
+Medium
+Last asked
+2026-08-16
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Constructor: takes an array of room ids (e.g. ["RoomOne", "RoomTwo", ...]).
+
+bookMeeting(int start, int end) — find any room with no overlapping booking in [start, end). If found, record the booking under that room and return its id. If none available, return "No available room" (or throw).
+
+cancelMeeting(roomId, start) — remove the booking starting at start from the given room.
+
+Follow-up: lastNScheduled(n) — return the most recently created n bookings across all rooms.
+
+Notes
+
+Per-room TreeMap<Integer, Integer> (start → end). To check availability for [start, end) on a room: look at floorKey(start) (latest booking starting at or before start) and ceilingKey(start) (earliest booking starting strictly after start).
+
+If floorKey != null and map.get(floorKey) > start: conflict, skip.
+
+If ceilingKey != null and ceilingKey < end: conflict, skip.
+
+Otherwise: map.put(start, end) and return the room.
+
+Iterate rooms in declared order; first available wins. Document this assumption explicitly to the interviewer.
+
+For the lastNScheduled follow-up, maintain a separate global linked-list / deque ordered by booking-creation time.
+
+Concurrency follow-up: the interviewer often pushes on "two clients book the same room at the same time." Discuss CAS / version on the per-room TreeMap, or a per-room lock with a hashed router.
+
+Alternate canonical variant — Meeting Rooms (can-attend-all boolean)
+
+Instead of a stateful booker, the screen often opens with the stateless predicate: given all intervals up front, can one person attend every meeting (no two overlap)? Intervals are [[start_i, end_i]] with start_i < end_i. Endpoints are half-open — (0,8) and (8,10) do not conflict at the shared point 8.
+
+def can_attend_all(intervals: list[list[int]]) -> bool: ...
+    # True iff no two intervals overlap (touching at an endpoint is allowed).
+    # Sort by start; conflict when a later interval's start < the previous interval's end.
+    # Empty input -> True.
+
+Sort by start, then a single linear scan: return False as soon as intervals[i].start < intervals[i-1].end.
+
+Constraints: 0 <= len(intervals) <= 500, 0 <= start < end <= 1_000_000.
+
+Worked check: [(0,30),(5,10),(15,20)] → False ((0,30) overlaps both later intervals); [(5,8),(9,15)] → True.
+
+Alternate canonical variant — Meeting Rooms II (minimum rooms)
+
+The natural escalation: given all intervals up front, return the minimum number of rooms needed to host every meeting without conflict. Same interval shape and the same half-open touch rule ((0,8),(8,10) share point 8, so they fit in one room).
+
+def min_meeting_rooms(intervals: list[list[int]]) -> int: ...
+    # Minimum concurrent intervals = peak number of meetings live at any instant.
+    # Min-heap of end times: pop while heap.top <= next start (room freed at touch),
+    # then push the current end; answer = max heap size seen. Empty input -> 0.
+
+Equivalent sweep-line: split into (start,+1) / (end,-1) events, sort with end ordered before an equal start (touch frees the room first), and track the running max of the prefix sum.
+
+Constraints: 0 <= len(intervals) <= 500, 0 <= start < end <= 1_000_000.
+
+Worked check: [(0,40),(5,10),(15,20)] → 2 ((0,40) spans both; (5,10) and (15,20) share a room); [(4,9)] → 1.
+
+VO follow-ups — room assignment and online arrivals
+
+When the output changes from the minimum room count to a concrete room assignment for every meeting, keep (end_time, room_id) in the availability heap and reuse the id released by the earliest-ending meeting.
+
+When meetings may be interrupted and moved between rooms, the prompt shifts toward tracking peak concurrency with start/end events. Clarify whether the interviewer still needs an explicit schedule; the concurrency count alone does not produce one.
+
+When intervals arrive as an unsorted stream, sorting up front is no longer available. The discussion moved toward a balanced search tree or segment tree; the exact online update/query contract was left open and should be clarified before coding.
+
+Preparation
+
+Practice the floorKey / ceilingKey interval-conflict check until you can write the 4-line predicate in <2 minutes.
+
+Drill LC 252 / 253 (Meeting Rooms I/II) cold — both alternate variants above are exactly these and frequently lead the phone screen before the stateful booker.
+
+Drill LC 1851 (Minimum Interval to Include Each Query) and LC 729 / 731 / 732 (Calendar I/II/III) — adjacent patterns.
+
+Pre-script the concurrency-follow-up answer; this is a common time sink that has tipped multiple loops.
+
+Confirm the half-open convention before coding: at a shared endpoint the meetings do not conflict ((0,8),(8,10) are compatible / share a room).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

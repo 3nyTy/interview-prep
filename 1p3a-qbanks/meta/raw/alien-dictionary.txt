@@ -1,0 +1,63 @@
+===H1===
+Alien Dictionary
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/alien-dictionary
+===BODY===
+Meta
+Coding·40 minMembers
+Alien Dictionary
+LeetCode 269. Given a list of words sorted in an unknown alphabet's lexicographic order, return a valid letter ordering. Build a precedence graph from adjacent word pairs, run topological sort.
+SWE
+MLE
+Infra Eng
+graph
+topological-sort
+bfs
+hard
+Frequency
+Low
+Last asked
+2026-04-13
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input: a list of words sorted in the alien alphabet's lex order.
+
+Output: any valid letter ordering, or empty string if no valid order exists.
+
+Two-step solve:
+
+Build a directed graph: for each adjacent word pair, find the first differing character and add an edge from earlier to later.
+
+Topological sort (Kahn's BFS or DFS post-order).
+
+Detect impossible orderings (cycle in graph, or a longer prefix word coming after its shorter prefix).
+
+Examples
+
+["wrt","wrf","er","ett","rftt"] → "wertf".
+
+["z","x","z"] → "" (cycle).
+
+["abc","ab"] → "" (prefix rule violation).
+
+Notes
+
+Two corner cases candidates miss: (1) the prefix-violation case above, (2) characters that only appear as nodes with no edges still need to appear in the output.
+
+The graph has at most 26 nodes — complexity is O(C) where C is the total length of all words.
+
+Preparation
+
+Write the Kahn's BFS version from memory in <12 min, including both corner-case checks.
+
+Be ready to switch to a DFS-based topological sort if the interviewer asks.
+
+Common follow-up: "what if there are multiple valid orderings — return them all" → switch to all-topological-orderings backtracking.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

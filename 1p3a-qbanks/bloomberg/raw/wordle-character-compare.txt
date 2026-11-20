@@ -1,0 +1,87 @@
+===H1===
+Wordle Character Compare
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/wordle-character-compare
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Wordle Character Compare
+Given a guess and a target word of equal length, color each guess letter: green for correct letter and position, yellow for correct letter wrong position, gray otherwise — but obey Wordle's nuanced "each target letter can be matched at most once" rule.
+SWE
+string
+hashmap
+simulation
+medium
+Frequency
+Single report
+Last asked
+2026-01-04
+Stage
+phone-screen
+Requirements
+
+Given two equal-length lowercase strings guess and target, return an array of colors (one per character of guess):
+
+GREEN if guess[i] == target[i].
+
+YELLOW if guess[i] != target[i] but guess[i] exists somewhere in target and has not yet been consumed by a green or earlier yellow match.
+
+GRAY otherwise.
+
+Function signature:
+
+Color[] wordle(String guess, String target)
+
+The trap interviewers explicitly probe: when guess has multiple copies of a letter and target has fewer, only the first ones up to the target count are colored (green takes priority, then yellow left-to-right). The rest are gray. The naive "set-based" check fails this case.
+
+Examples
+
+guess  = 'lemon'
+target = 'lover'
+         L: green
+         E: yellow
+         M: gray
+         O: yellow
+         N: gray
+
+guess  = 'speed'
+target = 'erase'
+         S: yellow
+         P: gray
+         E: yellow   (no position matches, so no green; target has two e's)
+         E: yellow   (second e still available in target)
+         D: gray
+
+guess  = 'array'
+target = 'radar'
+         A: yellow  (a exists, not at this position)
+         R: yellow  (target 'radar' has two r's)
+         R: yellow  (second r still available)
+         A: green   (guess 'a' == target 'a' at this index)
+         Y: gray
+
+Notes
+
+Two-pass algorithm: first pass marks greens and decrements a Counter(target) for each green letter. Second pass scans the remaining un-colored positions and assigns yellow if the counter is still positive, gray otherwise; decrement on yellow.
+
+One-pass is possible but the two-pass version is clearer for interview narration and easier to verify by hand.
+
+Time and space O(n) where n is the word length (alphabet size σ is constant).
+
+The most common bug is doing only the yellow pass first or using a set instead of a counter — both produce wrong colors on duplicate-letter inputs.
+
+A follow-up sometimes asks for the rule set as an enum and a struct-of-arrays output. Mostly cosmetic; mention before coding.
+
+Preparation
+
+Hand-trace the three examples above (especially the duplicate-letter cases) before writing code — this is the single largest source of bugs.
+
+Implement the two-pass algorithm and one one-pass alternative; argue why the two-pass version is more defensible.
+
+Drill the rule clarification out loud: confirm green priority, then left-to-right yellow consumption, then everything else is gray.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

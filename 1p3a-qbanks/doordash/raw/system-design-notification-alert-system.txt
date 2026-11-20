@@ -1,0 +1,101 @@
+===H1===
+System Design: Notification / Alert System
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/system-design-notification-alert-system
+===BODY===
+DoorDash
+System Design·75 minMembers
+System Design: Notification / Alert System
+Design an alerting system that receives events from upstream services and fans out to subscribers. The broad variant targets users across email, SMS, push, and in-app channels; a narrower variant targets downstream services instead. Subscription semantics, deduplication, retries, failure isolation, backpressure, and scaling are the core deep-dive themes.
+SWE
+EM
+notification
+fan-out
+messaging
+pubsub
+rate-limiting
+kafka
+medium
+Frequency
+Medium
+Last asked
+2026-08-03
+Stage
+onsite-system-design
+Requirements
+
+Functional
+
+Upstream services publish alerts to the notification system (order ready, dasher arrived, promo, system incident, etc.).
+
+The system has a subscriber model: per user, per alert type, per channel (email / SMS / push / in-app).
+
+Alerts fan out to all matching subscribers via their preferred channels.
+
+Users can mute / opt-out per alert type and per channel.
+
+Throttling: a single user should never receive more than N notifications per minute regardless of upstream volume.
+
+Non-functional
+
+Peak fan-out ratio is high: a single "system incident" alert can target millions of subscribers.
+
+Per-channel delivery has different SLAs: push is near-real-time (seconds); email / SMS can tolerate 1–2 minutes; in-app can be eventually consistent.
+
+Email and SMS have hard rate limits from the provider — backpressure must propagate upstream rather than dropping.
+
+At-least-once delivery; dedupe by (user_id, alert_id, channel).
+
+Notes
+
+API design. A single publish(alert) endpoint where alert = {id, type, payload, target_query}. The target_query is either an explicit list of user_ids, a saved-segment id, or a predicate (role=dasher AND region=SF). The publisher does not enumerate subscribers — that's the system's job.
+
+High-level architecture. Publisher → ingestion API → Kafka topic per alert type → fan-out worker that resolves the target set → per-channel queues (push, email, SMS, in-app) → per-channel dispatcher workers that call the channel provider. Persist alert metadata to a notifications table for audit / dedupe.
+
+Subscriber model. A subscriptions(user_id, alert_type, channel, enabled, throttle_class) table. Index by (alert_type, channel) for fan-out queries; cache the per-user preferences in Redis with a write-through invalidation on edit.
+
+Per-channel dispatchers have very different concurrency profiles:
+
+Push — high concurrency to FCM / APNs; batch per device-token group; respect provider throttles.
+
+Email — batched send via SES / SendGrid; per-domain rate limits; dedicated IP warm-up.
+
+SMS — per-country provider; carrier rate caps; per-recipient daily cap to avoid abuse complaints.
+
+In-app — a websocket / SSE push if the user is connected; otherwise a row in unread_notifications polled on app open.
+
+Throttling and dedupe. Token-bucket per user_id in Redis; reject (or coalesce) over-quota notifications. Dedupe by (user_id, alert_id, channel) with a TTL of a few hours.
+
+Failure handling. Per-channel DLQ for hard failures (invalid email, unsubscribed phone). Retry transient failures with exponential backoff and jitter; cap at 3–5 retries before DLQ.
+
+Observability. Per-alert-type fan-out fan-in dashboard (published vs delivered vs failed); per-channel latency histogram; per-user delivery-failure rate.
+
+Common follow-up themes
+
+How do you avoid sending the same alert twice if the consumer crashes between calling the provider and committing the dedupe row? (Idempotency key sent to the provider; provider-side dedupe is the only true exactly-once.)
+
+How do you scale a single alert with a 10M-target fan-out? (Materialize the target set as a temporary topic; partition the dispatcher pool by user_id hash; never expand the full set in memory.)
+
+How do you handle a misbehaving upstream that publishes a malformed alert? (Schema validation at the ingestion API; quarantine topic; alert SRE.)
+
+How do you let users replay missed alerts? (notifications table is the source of truth; in-app feed reads from it on app open.)
+
+Alternate canonical variant — downstream-service alerts
+
+Some loops remove end-user channels entirely: upstream producers publish an alert and the system notifies downstream services. The deep dive concentrates on the concrete retry mechanism—not merely naming a retry queue—plus failure handling and horizontal scaling. This design segment may follow an approximately 25-minute architecture walkthrough of one of your own projects.
+
+Preparation
+
+Draw the standard fan-out diagram in under 5 minutes (publisher → Kafka → fan-out worker → per-channel queues → dispatchers).
+
+Pre-write a 60-second answer for each per-channel reliability profile (push vs email vs SMS vs in-app) — interviewers commonly drill on one and expect domain-specific knowledge.
+
+Memorize the token-bucket and dedupe-table sketches.
+
+Be ready to discuss the publish-subscribe trade-off: pull-based (clients poll) vs push-based (server pushes via websocket / SSE).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

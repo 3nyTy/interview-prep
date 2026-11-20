@@ -1,0 +1,64 @@
+===H1===
+Count Distinct Values in a Massive Sorted Array
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-count-distinct-sorted-array
+===BODY===
+LinkedIn
+CodingMembers
+Count Distinct Values in a Massive Sorted Array
+Count distinct values in a sorted array where `n` may be in the billions but the number of distinct values `k` is only in the hundreds. Skip each equal-value run with boundary searches for O(k log n), and analyze a divide-and-conquer alternative that can degrade to O(n).
+SWE
+array
+binary-search
+divide-and-conquer
+recursion
+complexity-analysis
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-coding
+Requirements
+
+Given a very large sorted array, return its number of distinct values. The array length n may be on the order of billions while the distinct-value count k is only in the hundreds.
+
+A linear scan is the baseline but does not exploit k << n. From the first element of each equal-value run, binary-search for that run's right boundary and jump directly to the next value. Analyze the resulting O(k log n) bound.
+
+Discuss the equivalent divide-and-conquer formulation below. Explain why checking equal endpoints can prune a uniform range, why a duplicate straddling the midpoint must be counted once, and why an all-distinct input degrades to O(n).
+
+def count_unique(arr, start, end):
+    if start > end:
+        return 0
+    if start == end:
+        return 1
+    if arr[start] == arr[end]:
+        return 1
+
+    mid = (start + end) // 2
+    left = count_unique(arr, start, mid)
+    right = count_unique(arr, mid + 1, end)
+    if arr[mid] == arr[mid + 1]:
+        return left + right - 1
+    return left + right
+
+Notes
+
+The key signal is recognizing that the useful complexity parameter is the number of runs, not only the total array length.
+
+State the worst case of each formulation explicitly; the divide-and-conquer version is not sublinear when every element is different.
+
+Preparation
+
+Implement the run-jumping formulation without off-by-one errors at the final run.
+
+Trace the divide-and-conquer version on an empty range, one uniform range, a duplicate crossing the midpoint, and an all-distinct range.
+
+Practice expressing complexity in both n and k, including when O(k log n) is materially better than O(n).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

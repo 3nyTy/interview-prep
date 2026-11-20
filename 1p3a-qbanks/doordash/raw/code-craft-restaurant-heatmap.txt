@@ -1,0 +1,63 @@
+===H1===
+Code Craft: Restaurant Delivery Heatmap
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/code-craft-restaurant-heatmap
+===BODY===
+DoorDash
+Coding·60 minMembers
+Code Craft: Restaurant Delivery Heatmap
+A grid-coverage coding round seen in DoorDash MLE and SWE loops. Given an n×n grid and a list of restaurants `(i, j, r, d)` (location, range, expected deliveries), build a heatmap where each cell holds the sum of expected deliveries from all restaurants whose `(Chebyshev) range r` covers that cell.
+MLE
+SWE
+grid
+prefix-sum
+interval-aggregation
+medium
+Frequency
+Low
+Last asked
+2026-03-23
+Stage
+onsite-coding
+Requirements
+
+Input: grid size n, list of restaurants. Each restaurant (i, j, r, d) covers all cells within Chebyshev distance r of (i, j) (so the (2r+1)×(2r+1) square centered on (i, j), clipped to grid bounds).
+
+Output: 2D int grid of size n×n; cell (x, y) is the sum of d over all restaurants whose Chebyshev ball includes (x, y).
+
+Examples
+
+From the original prompt (verbatim):
+
+n = 5, restaurants = [(2, 3, 1, 2), (4, 4, 1, 4)]
+
+Resulting heatmap:
+ 0 0 0 0 0
+ 0 0 2 2 2
+ 0 0 2 2 2
+ 0 0 2 6 6
+ 0 0 0 4 4
+
+Notes
+
+Naive approach: for each restaurant, double-loop over its (2r+1)² neighborhood and add d. Time O(K × r²) where K is the number of restaurants — fine for small inputs, but breaks if interviewer pushes scale.
+
+2D difference-array (range-add) optimization: for each restaurant (i, j, r, d), increment the four corners of its bounding box with +d, +d, −d, −d in a difference grid; sweep twice (row prefix sum, column prefix sum) to recover the heatmap in O(n² + K). Mention this as the follow-up answer.
+
+For the Chebyshev case the box is axis-aligned, so the standard 2D range-add works out of the box. If the interviewer changes to Manhattan distance, rotate coordinates 45° first.
+
+Clip the bounding box to grid bounds before applying the increments — off-by-one on the boundary is the most common bug.
+
+Though first reported in an MLE loop, the same grid coverage / distance prompt also appears in senior and staff SWE onsites, typically with two follow-ups you are expected to fully implement and pass tests on.
+
+Preparation
+
+Practice the 2D difference-array trick on a small grid; the four-corner increment + double prefix sum is a 15-line pattern worth memorizing.
+
+Write the naive version first, verify on the provided example, then refactor — this is the safer interview path than starting from the optimized version cold.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

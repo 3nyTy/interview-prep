@@ -1,0 +1,68 @@
+===H1===
+Hyperparameter Combinations (Cartesian Product)
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/hyperparameter-cartesian-product
+===BODY===
+Pinterest
+Coding·60 minMembers
+Hyperparameter Combinations (Cartesian Product)
+Given a dict of hyperparameter name → list of candidate values, generate every combination (one value per key). ML Platform asks this directly; the follow-up is to enumerate test cases the function should be exercised on.
+SWE
+MLE
+recursion
+backtracking
+hashmap
+iterator
+testing
+easy
+Frequency
+Low
+Last asked
+2026-08-30
+Stage
+phone-screen
+Requirements
+
+Given input of the form
+
+parameters = {
+    "learning_rate": [0.1, 0.2, 0.3],
+    "feature":       ["A", "B", "C"],
+    "batch":         [10, 20, 30],
+    "depth":         [100, 200, 300],
+}
+
+produce every combination, one value per key:
+
+{"learning_rate": 0.1, "feature": "A", "batch": 10, "depth": 100}
+{"learning_rate": 0.1, "feature": "A", "batch": 10, "depth": 200}
+...
+{"learning_rate": 0.3, "feature": "C", "batch": 30, "depth": 300}
+
+The ML Platform variant adds a test-case design follow-up: list the inputs you would exercise the function on (empty dict, single key, empty list under a key, large key count).
+
+Examples
+
+With the input above the output has 3 × 3 × 3 × 3 = 81 combinations.
+
+Notes
+
+Two equally accepted implementations: recursive enumeration (pick a key, recurse on the remaining keys, prepending each value of the current key to each suffix combination) or itertools.product over the values, zipped with keys at emission time.
+
+The interviewer typically pushes for an iterator / generator version so the consumer can stream combinations without materializing the full list — important when the cardinality explodes (a 6-key grid with 5 values each is already 15,625 combinations).
+
+Test cases the interviewer wants to hear: empty dict (one empty combination, or zero, define which), key mapped to empty list (zero combinations), single-key dict, one key with one value, very large cardinality (does the iterator stay constant-memory?).
+
+Preparation
+
+Write both implementations once. The recursive version is the harder one to keep clean; the generator version is the more idiomatic-Python answer.
+
+Verbally enumerate 5 test cases in 60 seconds and explain what each one stresses. The follow-up is graded.
+
+For a Java-flavored alternate, practice the recursive version with a List<Map<String, Object>> accumulator and a single key-ordering pass.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

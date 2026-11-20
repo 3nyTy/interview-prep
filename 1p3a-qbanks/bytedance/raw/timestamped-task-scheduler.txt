@@ -1,0 +1,57 @@
+===H1===
+Timestamped Task Scheduler
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/timestamped-task-scheduler
+===BODY===
+ByteDance / TikTok
+Coding·60 minMembers
+Timestamped Task Scheduler
+Implement a task scheduler supporting `addTask(taskID, timestamp)`, `removeTask(taskID)`, and `popTask(num)`, where `popTask` removes and returns the first `num` tasks ordered by start timestamp.
+SWE
+heap
+scheduling
+data-structure
+medium
+Frequency
+Single report
+Last asked
+2026-08-20
+Stage
+phone-screen
+Requirements
+
+Implement a scheduler with three operations:
+
+addTask(taskID, timestamp)
+removeTask(taskID)
+popTask(num)
+
+addTask inserts a task identified by taskID with its start timestamp.
+
+removeTask removes the identified task if it is present.
+
+popTask(num) returns and removes the first num tasks ordered by start timestamp.
+
+Clarify tie-breaking for identical timestamps, duplicate task identifiers, missing removals, and behavior when fewer than num tasks remain.
+
+Notes
+
+popTask is destructive. Confirming that contract early avoids choosing a representation optimized for non-destructive reads.
+
+The round followed roughly twenty minutes of project and behavioral probing inside a one-hour screen.
+
+Discuss how direct removal by task identifier interacts with ordered retrieval and how stale entries, if any, are recognized.
+
+Preparation
+
+Implement the three-operation interface and test interleaved additions, direct removals, and multi-item pops.
+
+Compare at least two representations against the cost of ordered extraction and arbitrary-ID deletion.
+
+State and test a deterministic tie-break rule for equal timestamps.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

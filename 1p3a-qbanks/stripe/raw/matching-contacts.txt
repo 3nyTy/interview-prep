@@ -1,0 +1,48 @@
+===H1===
+Matching Contacts
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/matching-contacts
+===BODY===
+Stripe
+CodingMembers
+Matching Contacts
+Phone-screen coding task. Match contacts to people by email domain, then filter and rank the matches by each person's stated preferences. A long, verbose prompt where reading speed is the main constraint.
+SWE
+string
+parsing
+hashmap
+sorting
+medium
+Frequency
+Single report
+Last asked
+2026-06-10
+Stage
+phone-screen
+Requirements
+
+Input is read from stdin — practice the read/parse boilerplate ahead of time.
+
+Part 1: match each contact to a person by email domain.
+
+Part 2: for each person, filter and sort the matched contacts according to that person's preferences.
+
+Part 3 (reported, not always reached): support wildcard matching in the rules.
+
+Notes
+
+A new prompt as of mid-2026; earlier community mentions carried no detail. Stripe's house style applies — the prompt is long and verbose, and candidates who haven't seen it rarely finish in time (one candidate completed only Part 2).
+
+The three parts escalate; budget reading time accordingly.
+
+Preparation
+
+Drill stdin parsing in your language: read lines, split fields, build records.
+
+Pre-write a group-by-domain helper (dict keyed by email domain) and a stable multi-key sort so the Part 2 ranking is fast to assemble.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

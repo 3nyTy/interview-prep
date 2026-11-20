@@ -1,0 +1,73 @@
+URL: https://www.1point3acres.com/interview/problems/67fbaffb-1cf3-4cf6-8274-93dcc53df969
+Captured: 2026-09-21
+
+Toggle Sidebar
+Popular Questions
+Details
+Search companies, questions, guides…⌘KInterview Copilot中
+Max Profit from Cutting Rods into Equal Sale Length
+Related Discussion
+anduril
+Problem: Max Profit from Cutting Rods into Equal Sale Length
+
+You are given a list of rod lengths lengths. You may choose an integer saleLength (saleLength >= 1) and cut rods into smaller pieces of length saleLength to sell.
+
+Each cut costs costPerCut.
+
+Each produced piece of length saleLength earns revenue saleLength * salePrice.
+
+For an original rod of length L:
+
+You can obtain k = floor(L / saleLength) sellable pieces.
+
+The leftover L % saleLength is discarded and yields no revenue.
+
+If k = 0, the rod yields nothing.
+
+If L % saleLength == 0 (exactly divisible), producing k pieces requires k - 1 cuts.
+
+Otherwise, producing k pieces requires k cuts.
+
+You may discard any rod entirely if using it would reduce total profit.
+
+Choose saleLength to maximize total profit:
+
+total profit = total revenue − total cutting cost
+
+Implement:
+
+def maxProfit(costPerCut: int, salePrice: int, lengths: list[int]) -> int:
+    """Return the maximum achievable profit."""
+
+Constraints (reasonable interview assumptions)
+
+1 <= len(lengths) <= 2e5
+
+1 <= lengths[i] <= 1e5 (or larger; justify complexity)
+
+0 <= costPerCut <= 1e9
+
+1 <= salePrice <= 1e9
+
+Sample Tests
+
+costPerCut=1, salePrice=10, lengths=[5] → 50
+
+costPerCut=2, salePrice=1, lengths=[4,4,4] → 12
+
+costPerCut=100, salePrice=1, lengths=[10,20] → 20
+
+costPerCut=1, salePrice=2, lengths=[1,2,3,4,5] → 18
+
+(Any valid set of 5 tests that covers divisibility vs. remainder and discarding rods is acceptable in an interview setting.)
+Example
+Unlock to view complete problem details
+and practice with sample input/output
+Unlock with Membership
+Was this article helpful?
+Python 3Java12px14px16px18px20px22px24px
+View Test Cases & Run Code requires membership
+Unlock with Membership
+Standard Input
+RunHistory
+Execution Result:

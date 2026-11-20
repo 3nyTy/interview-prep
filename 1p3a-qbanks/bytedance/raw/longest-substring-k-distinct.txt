@@ -1,0 +1,58 @@
+===H1===
+Longest Substring with At Most K Distinct Characters
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/longest-substring-k-distinct
+===BODY===
+ByteDance / TikTok
+Coding·30 minMembers
+Longest Substring with At Most K Distinct Characters
+Sliding-window warmup in a TT SDE phone screen, paired with a much harder grid-with-fuel BFS problem.
+SWE
+sliding-window
+hashmap
+string
+easy
+Frequency
+Low
+Last asked
+2026-09-04
+Stage
+phone-screen
+Requirements
+
+Given a string s and an integer k, return the length of the longest substring of s that contains at most k distinct characters.
+
+def lengthOfLongestSubstringKDistinct(s: str, k: int) -> int: ...
+
+Example:
+
+Input:  s = "eceba", k = 2
+Output: 3   (substring "ece")
+
+A senior-screen version fixes the distinct-character limit at two.
+
+Notes
+
+Standard sliding window: expand the right pointer, track a char -> count map, and shrink the left pointer whenever the map has more than k distinct keys.
+
+Use a defaultdict(int) or a fixed-size array (if the alphabet is bounded) and remove keys whose count drops to zero — otherwise the "distinct count" check is wrong.
+
+Reported as a quick warmup ("秒" — solve in a few minutes), so interviewers expect a clean implementation without backtracking.
+
+Time O(n), space O(k).
+
+The senior screen pairs this task with IP-address restoration. Python editor execution was slow enough that the candidate initially suspected an infinite loop.
+
+Preparation
+
+Write the sliding-window template once and reuse for the entire family: lengthOfLongestSubstring, K Distinct, Longest Substring with At Most Two Distinct, etc.
+
+Be ready to articulate why a shrink-left invariant is sufficient (because the window is always valid at the end of each iteration).
+
+Pair-drill with the grid-with-fuel follow-up below — interviewers in this slot like to escalate quickly.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

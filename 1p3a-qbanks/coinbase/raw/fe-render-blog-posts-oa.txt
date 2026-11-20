@@ -1,0 +1,61 @@
+===H1===
+Frontend OA — Render Blog Posts (Multi-Stage CodeSignal)
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/fe-render-blog-posts-oa
+===BODY===
+Coinbase
+Coding·90 minMembers
+Frontend OA — Render Blog Posts (Multi-Stage CodeSignal)
+Frontend CodeSignal OA: build a blog-post rendering app in four stages — render from local JSON, add a submit form, fetch from an external API and resolve author ids to names (showing 'you' for the current user), then sort by likes and add a delete button for own posts. 90-minute hard cap; tooling friction (slow IDE, missing autocomplete) eats time.
+SWE
+react
+frontend
+api-integration
+codesignal
+oa
+medium
+Frequency
+Low
+Last asked
+2026-03-09
+Stage
+oa
+Requirements
+
+Language / framework choice from React / Vue / Angular (most candidates choose React; TypeScript triggered package errors for at least one candidate, plain JS is safer in this harness).
+
+Stage 1 — Render a list of posts from a local JSON file.
+
+Stage 2 — Add a <textarea> and submit button; submitted posts append to local state and re-render the list.
+
+Stage 3 — Replace the local JSON with two API calls: one for posts (each post carries an author id, not a name), one for the user directory. Resolve every author id to a name; for the current user (also fetched), display "you" instead of the username.
+
+Stage 4 — Each post now has a likes count; sort the list descending. For posts authored by the current user, show a delete button that removes the post from local state. Posts with equal likes show newest-first; new posts created in Stage 2 must maintain the same sort.
+
+Notes
+
+TypeScript trap: the CodeSignal harness frequently fails on missing types packages and does not let you npm install. Pick plain JavaScript unless you have specific confirmation TS works.
+
+Editor friction is real: no auto-import, partial autocomplete, and the page has been reported to flake out mid-stage (Stage 3 specifically has eaten state for at least one candidate). Save your work to a local note as you go; consider committing chunks of state to localStorage defensively.
+
+Stage 3 is the time pit. Pre-write the data-fetching pattern (Promise.all([fetchPosts, fetchUsers, fetchMe]) → merge in a useMemo) so you spend zero brain cycles on architecture and all your time on rendering.
+
+Stage 4 sort stability is what most candidates miss when they run out of time — the merge of newly-submitted posts with API-fetched posts has to preserve descending-by-likes-then-newest-first ordering both at first paint and after every mutation. A single sorted derivation in a useMemo over the union of both arrays is cleaner than maintaining two lists.
+
+Webcam + single-screen + single-browser-tab is enforced.
+
+Preparation
+
+Drill the React data-fetch + merge pattern (Promise.all → derive in a memo → render) end-to-end in 10 minutes.
+
+Pre-write a 30-line "controlled textarea + submit appends to state" snippet — this is Stage 2 in muscle memory.
+
+Practice the "sorted insert" pattern (descending by primary key, secondary tiebreak) so Stage 4 sorting is reflexive.
+
+Open a vanilla React playground in the browser and time a four-stage prototype under 60 minutes to budget the tooling overhead realistically.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

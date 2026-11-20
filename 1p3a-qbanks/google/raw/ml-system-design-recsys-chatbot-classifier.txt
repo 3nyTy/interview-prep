@@ -1,0 +1,91 @@
+===H1===
+ML System Design (Recsys / Chatbot / Image Classifier)
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/ml-system-design-recsys-chatbot-classifier
+===BODY===
+Google
+System Design·60 minMembers
+ML System Design (Recsys / Chatbot / Image Classifier)
+MLE / AI-ML L4-L5 loops include one ML System Design round (~60 min). Prompts span recommender, chatbot, image classifier, video moderation, fraud detection. Interviewers probe pipeline structure, feature engineering, training/serving split, cold start, A/B testing, and latency vs accuracy trade-offs.
+MLE
+SWE
+RS
+system-design
+retrieval
+rag
+scaling
+Frequency
+High
+Last asked
+2026-08-25
+Stage
+onsite-system-design · tech-screen
+Requirements
+
+Confirmed prompts:
+
+Real-time recommendation system (e.g. for an e-commerce, social, or YouTube-like video platform).
+
+Mobile app: photograph a leaf, classify it into one of K species — retrieval + ranking architecture.
+
+Chatbot grounded in mixed structured + unstructured data — retrieval-augmented generation, citation, fallbacks.
+
+Short-video duplicate detection (anti-duplicate at billions-of-videos scale).
+
+NLP clustering / category expansion pipeline — explain data preparation, labeling strategy, model choice, evaluation, how the approach extends to new categories, and how the system is served.
+
+Internal-document search agent — design an agent over company documents, then reduce cost and latency, scale it to 100,000 users, and defend the agent framework.
+
+Music recommendation system — design the recommender, compare trade-offs and alternatives, then extend it into an LLM-powered recommendation agent.
+
+The interviewer drives the discussion across these axes:
+
+Functional requirements: traffic profile, latency SLO, freshness requirement.
+
+Data: training data sources, labeling, cold-start strategy.
+
+Pipeline: feature store, offline training, online serving, near-line updates.
+
+Model: baseline (LR / GBDT) → neural; two-tower retrieval + ranker stack for recsys.
+
+Scaling: sharding, embedding compression / quantization, ANN / LSH retrieval.
+
+Online: A/B testing, holdback, counterfactual eval, monitoring (drift, fairness, fallback).
+
+Cold start: content-based embedding, collaborative filtering, contextual bandits — give multiple options.
+
+Failure modes: stale features, training-serving skew, prediction drift, human-in-the-loop calibration after appeals.
+
+Latency vs accuracy: cache, distilled student model, near-line inference vs online.
+
+Notes
+
+Candidates who only said "collaborative filtering" for cold start were flagged shallow. Always offer ≥3 strategies and trade them off.
+
+Mention monitoring + iteration explicitly: interviewers down-rate candidates who design only the happy path without discussing post-launch.
+
+For the leaf classifier, the expected architecture is two-stage: vision encoder → embedding → ANN retrieval → re-ranker; don't jump straight to a 1k-way softmax.
+
+For the chatbot, RAG with citations is table stakes; bonus for discussing structured-data routing (SQL query vs vector search) and fallback policies.
+
+For the short-video dedup task, expect deep follow-ups on ANN cost vs accuracy, hot-key handling, embedding dimensionality vs latency.
+
+The NLP clustering variant rewards a complete ML lifecycle rather than model trivia: connect labels and evaluation to deployment, then close with serving and category expansion.
+
+Preparation
+
+Whiteboard the canonical video-recommendation pipeline (candidate generation → two-tower retrieval → lightweight ranker → heavy ranker → re-ranking) twice cold; do the same for ad ranking and image search. Watching a walkthrough is not enough — redraw without the reference.
+
+Read "Designing Machine Learning Systems" by Chip Huyen, chapters on data and serving.
+
+Prepare a generic 6-section template: requirements → data → features → model → serving → monitoring. Drill walking through it in 50 minutes on any prompt.
+
+For each domain (recsys / chatbot / vision), prepare 1 quantitative example: target QPS, model size, latency budget.
+
+Practice the cold-start sub-question with a script: "Three approaches, here's when each wins, here's how I'd combine them."
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

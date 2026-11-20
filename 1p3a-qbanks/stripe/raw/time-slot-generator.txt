@@ -1,0 +1,117 @@
+===H1===
+Time Slot Generator from Weekly Working Hours
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/time-slot-generator
+===BODY===
+Stripe
+Coding·45 minMembers
+Time Slot Generator from Weekly Working Hours
+Phone-screen. Given a `start_date`, `end_date`, and a weekly-repeating `working_hours` config, generate every 30-minute slot inside the range, with strict boundary handling for the first and last day.
+SWE
+interval
+easy
+Frequency
+Single report
+Last asked
+2026-04-30
+Stage
+phone-screen
+Requirements
+
+Inputs: a start_date/end_date range and a working_hours table that repeats weekly (e.g. Mon 09:00-12:00, 13:00-17:00, Tue 09:00-12:00, ...).
+
+Output: every 30-minute slot that falls inside the range AND inside that day's working hours, sorted by start time.
+
+Boundary handling: compare the full datetime, not just the date, on the first and last day. A slot must never start before start_date and never end after end_date. Checking only the date would wrongly include slots before the start time or after the end time on the boundary days.
+
+The round requires the candidate to write their own test cases.
+
+The canonical OA shape:
+
+def generate_time_slots(
+    start_date: str,        # "YYYY-MM-DD HH:MM"
+    end_date: str,          # "YYYY-MM-DD HH:MM"
+    working_hours: list[dict],
+) -> list[tuple[str, str]]: ...
+    # Each working_hours row: {"day_of_week": int, "start_time": "HH:MM", "end_time": "HH:MM"}
+    #   day_of_week: 0 = Monday, 1 = Tuesday, ..., 6 = Sunday
+    #   start_time inclusive; end_time exclusive, but a slot ending exactly at end_time is valid.
+    # Returns 30-minute slots as ("YYYY-MM-DD HH:MM", "YYYY-MM-DD HH:MM") tuples, sorted by start.
+    # All datetimes share one timezone (no tz/DST in the base ask).
+
+Slot rules
+
+Each slot is exactly 30 minutes long, generated in 30-minute increments counted from the working interval's start_time.
+
+A slot must be fully contained inside a working-hours interval for that weekday: slot_start >= work_start and slot_end <= work_end.
+
+A slot start must be >= start_date; a slot end must be <= end_date. A slot ending exactly at end_date is included.
+
+If start_date >= end_date, return an empty list.
+
+Overlapping/touching working intervals on the same weekday should be merged so duplicate slots are not emitted.
+
+Examples
+
+start_date = "2026-03-02 10:15" (Mon), end_date = "2026-03-04 11:45" (Wed), with working hours Mon 09:00-12:00, Tue 13:00-14:00, Wed 10:00-12:00:
+
+[
+    ("2026-03-02 10:30", "2026-03-02 11:00"),
+    ("2026-03-02 11:00", "2026-03-02 11:30"),
+    ("2026-03-02 11:30", "2026-03-02 12:00"),
+    ("2026-03-03 13:00", "2026-03-03 13:30"),
+    ("2026-03-03 13:30", "2026-03-03 14:00"),
+    ("2026-03-04 10:00", "2026-03-04 10:30"),
+    ("2026-03-04 10:30", "2026-03-04 11:00"),
+    ("2026-03-04 11:00", "2026-03-04 11:30"),
+]
+
+The Monday 10:00->10:30 slot is dropped (starts before start_date); the Wednesday 11:30->12:00 slot is dropped (ends after end_date).
+
+Notes
+
+The source report is light on Parts 2/3 detail — assume the interviewer will follow up on time-zone handling, DST, or recurring exceptions.
+
+Off-by-one on the last slot (slot ends exactly at end-of-day) is the most likely source of bugs.
+
+Boundary edge cases to test
+
+Start mid-slot: start_date = "...09:01", interval 09:00-10:00 → the 09:00->09:30 slot is excluded (starts before start_date); first emitted slot is 09:30->10:00.
+
+End mid-slot: end_date = "...09:59", interval 09:00-10:00 → the 09:30->10:00 slot is excluded (ends after end_date); only 09:00->09:30 is emitted.
+
+No matching weekday in range: range falls only on a weekday with no working_hours row → return [].
+
+Input invariants to validate
+
+When normalizing the working_hours table, enforce these per-row before generating slots:
+
+day_of_week must be in 0..6; otherwise raise ValueError.
+
+Within a single row, start_time must be strictly before end_time; otherwise raise ValueError.
+
+Interval merge for overlapping/touching same-weekday rows: sort the day's intervals by start, then fold left — open a new merged interval when start_time > merged[-1].end, else extend merged[-1].end = max(merged[-1].end, end_time). Using > (not >=) treats touching intervals (...12:00 then 12:00...) as one, so the boundary slot is not emitted twice.
+
+Suggested approach
+
+Parse both bounds to datetime; group working_hours by day_of_week; iterate calendar days from start_date.date() through end_date.date().
+
+For each matching interval, build concrete datetimes for that date, advance a cursor in 30-minute steps to the first boundary >= max(work_start, start_date), then emit while cursor + 30min <= min(work_end, end_date).
+
+Jump the cursor in O(1) instead of stepping: boundaries are counted from work_start, so the first valid start is work_start + ceil((lower_bound - work_start) / 30min) * 30min where lower_bound = max(work_start, start_date) (return work_start directly when lower_bound <= work_start). This avoids a per-slot loop just to skip past start_date on the first day.
+
+Complexity O(D * H + S) time, O(S) space — D calendar days, H intervals/day, S emitted slots.
+
+Preparation
+
+Drill timezone-aware datetime arithmetic in your language of choice (zoneinfo in Python, java.time in Java).
+
+Pre-write a generator that walks a date range day by day and yields slots inside per-day working-hour intervals.
+
+Have a test-case template ready: same-day range, multi-day range, range that starts mid-slot, range that ends mid-slot.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

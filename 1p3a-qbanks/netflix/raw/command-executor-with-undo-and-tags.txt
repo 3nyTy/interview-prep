@@ -1,0 +1,116 @@
+===H1===
+Command Executor With Undo And Tags
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/command-executor-with-undo-and-tags
+===BODY===
+Command Executor With Undo And Tags
+
+<https://www.1point3acres.com/interview/problems/company/netflix/command-executor-with-undo-and-tags>
+
+Netflix
+Coding
+
+60 min
+Members
+Command Executor with Undo and Tags
+
+Design and implement a command executor that can execute commands and undo either the most recent command or the most recent command carrying a given tag. Interviewers probe data structures and time complexity.
+
+SWE
+data-structure
+stack
+linked-list
+oop-design
+complexity-analysis
+medium
+Frequency
+Medium
+Last asked
+2026-04-30
+Stage
+onsite-coding
+Requirements
+execute(command: str, tags: list[str]) records and performs a command.
+undo() undoes the most recently executed command.
+undo(tag) undoes the most recent executed command that has the given tag.
+A command can have zero, one, or multiple tags.
+Return or expose which command was undone.
+Discuss complexity for execute and both undo paths.
+class CommandLog:
+    def execute(self, command: str, tags: list[str]) -> None: ...
+        # Append a command (latest = most recent). A command may carry 0..N tags.
+    def undo(self, tag: str | None = None) -> str: ...
+        # tag is None  -> undo + return the most recent still-active command overall.
+        # tag provided -> undo + return the most recent active command carrying that tag.
+        # Each command can be undone at most once and is never returned again.
+
+Worked example: execute("A",["x"]); execute("B",["y"]); execute("C",["x","y"]); undo() -> "C"; undo("x") -> "A"; undo("y") -> "B". The undo() pops the global tail (C); undo("x") skips the already-undone C in the x stack and returns A; undo("y") skips C and returns B. Must stay efficient for up to 10^5 calls.
+
+Design
+Maintain a global doubly linked list of executed command records in execution order.
+Maintain tag -> stack/list of command record references for tagged undo.
+On execute, append to the global list and push the node reference into each tag list.
+On global undo, pop from the global tail, mark the node undone, and lazily skip it in tag stacks later.
+On tagged undo(tag), pop stale / undone nodes from that tag's stack until a live node is found, remove it from the global list, and mark it undone.
+Notes
+Lazy deletion avoids O(number_of_tags) cleanup during every undo, but every stale node is popped at most once per tag stack.
+If commands have real side effects, the Command interface should include execute() and undo() methods; the interview may simplify it to strings.
+Clarify whether undoing an older tagged command should leave newer unrelated commands in place. The expected answer is yes.
+Edge cases: undo on empty history, unknown tag, duplicate tag on a command, command with no tags.
+Preparation
+Implement the lazy-deletion linked-list version.
+Implement a simpler two-stack version for the no-tag base case.
+Practice explaining amortized complexity: execute O(t), global undo O(1), tagged undo amortized O(number of skipped stale nodes + 1).
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Design
+Notes
+Preparation
+Related discussions  4
+?????????????????
+?? Ads L5 ?? + ?????
+??Ads L4 ????
+????????~??
+Related questions
+
+Other Netflix questions sharing tags with this one
+
+Weighted Cache / Timed Cache
+Medium
+data-structure
+medium
+heap
++3
+Music Playlist History
+Single report
+data-structure
+medium
+hashmap
++2
+Movie Billboard Rotation Service
+Low
+data-structure
+medium
+heap
++3
+Homepage Video Recommendation System
+Single report
+medium
+recommendation
+mlsd
++1
+Basic Calculator
+Single report
+stack
+parsing
+string-processing
++1
+Code editor
+
+---

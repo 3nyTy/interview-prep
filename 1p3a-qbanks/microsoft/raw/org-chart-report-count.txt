@@ -1,0 +1,57 @@
+===H1===
+Org Chart Report Count (Tree Aggregation)
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/org-chart-report-count
+===BODY===
+Microsoft
+Coding·45 minMembers
+Org Chart Report Count (Tree Aggregation)
+Given a manager → reports graph, answer `countReports(id)` quickly under read-heavy workloads. Follow-up: how to update the aggregate when a single relationship changes.
+SWE
+tree
+tree-broadcast
+data-structure
+medium
+Frequency
+Low
+Last asked
+2026-05-21
+Stage
+onsite-coding
+Requirements
+
+Input is a list of (manager_id, employee_id) edges describing an org tree. Implement:
+
+count_reports(person_id) -> int   # total subtree size (direct + indirect reports)
+add_edge(manager_id, employee_id) -> None
+move(employee_id, new_manager_id) -> None
+
+Workload is read-heavy. The interviewer explicitly flags: optimize for count_reports; move may be expensive.
+
+Notes
+
+For the read-optimal answer, precompute and cache subtree sizes. Build the tree from the edge list with a single DFS / BFS post-order pass: size[v] = 1 + sum(size[c] for c in children[v]). Answer count_reports(v) in O(1).
+
+For mutation, propagate the delta up the chain to the root: when employee_id moves from old_manager to new_manager, walk up from each of the two managers and adjust their cumulative size by ±size[employee_id]. Cost is O(depth) per move, which is much cheaper than recomputing the full tree.
+
+For add_edge, the same pattern: add size[employee_id] to every ancestor of manager_id.
+
+Edge cases to acknowledge: cycle detection (the spec says it is a tree but the interviewer may seed a malformed input — return an error rather than infinite loop), and root identification (the manager id that never appears as employee).
+
+Heavier-traffic alternative: an Euler tour with order-statistic trees gives O(log N) subtree-size queries with O(log N) updates — overkill for org-chart scale, but worth name-dropping when the interviewer asks "what if the org has 10M people and changes constantly".
+
+Some loops ask for the full list of reports under a person (not just the count) — a straight BFS / DFS over the children map — and deliver it as a follow-up to an in-memory CRUD store exposed through a REST API. Candidates lose real time deciphering the provided FastAPI-style test client (client.post('/user/', json=...) then asserting on response.json()) before writing any logic; read the harness first, then the algorithm is short.
+
+Preparation
+
+Pre-write the post-order DFS subtree-size computation.
+
+Practice the up-propagation pattern for move — walk to root from both old and new manager and adjust.
+
+Be ready to discuss the read-vs-write trade-off explicitly; interviewers want to see you ask "which is more frequent" up front.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

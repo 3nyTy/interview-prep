@@ -1,0 +1,261 @@
+===H1===
+Top K Frequent Elements
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/top-k-frequent-elements
+===BODY===
+Apple
+CodingMembers
+Top K Frequent Elements
+Given an integer array nums and an integer k, return the k most frequent elements. You may return the answer in any order.
+SWE
+medium
+hashmap
+heap
+top-k
+Frequency
+Single report
+Last asked
+2026-06-08
+Stage
+phone-screen
+Basic Problem: Top K Frequent Elements
+
+Given an integer array nums and an integer k, return the k most frequent elements. You may return the answer in any order.
+
+Example 1
+
+Input: nums = [1,1,1,2,2,3], k = 2
+Output: [1,2]
+
+Example 2
+
+Input: nums = [1], k = 1
+Output: [1]
+
+Constraints
+
+1 <= nums.length <= 10^5
+
+-10^4 <= nums[i] <= 10^4
+
+k is in the range [1, number of unique elements in the array]
+
+The answer is guaranteed to be unique
+
+Approach 1: HashMap + Min-Heap
+
+Count frequencies using a hash map: freq[num] = count.
+
+Maintain a min-heap of size k. For each (num, count) pair:
+
+Push onto the heap.
+
+If heap size exceeds k, pop the minimum.
+
+The heap now contains the k most frequent elements.
+
+Complexity
+
+Time: O(n log k) — n insertions, each heap operation is O(log k).
+
+Space: O(n) for the frequency map + O(k) for the heap.
+
+Reference Implementation (Python)
+
+import heapq
+from collections import Counter
+from typing import List
+
+class Solution:
+    def topKFrequent(self, nums: List[int], k: int) -> List[int]:
+        freq = Counter(nums)
+        # min-heap of (count, num); keep only k largest
+        heap = []
+        for num, count in freq.items():
+            heapq.heappush(heap, (count, num))
+            if len(heap) > k:
+                heapq.heappop(heap)
+        return [num for _, num in heap]
+
+Reference Implementation (Java)
+
+class Solution {
+    public int[] topKFrequent(int[] nums, int k) {
+        Map<Integer, Integer> freq = new HashMap<>();
+        for (int n : nums) freq.merge(n, 1, Integer::sum);
+
+        // min-heap ordered by frequency
+        PriorityQueue<int[]> heap = new PriorityQueue<>((a, b) -> a[1] - b[1]);
+        for (var entry : freq.entrySet()) {
+            heap.offer(new int[]{entry.getKey(), entry.getValue()});
+            if (heap.size() > k) heap.poll();
+        }
+
+        int[] result = new int[k];
+        for (int i = 0; i < k; i++) result[i] = heap.poll()[0];
+        return result;
+    }
+}
+
+Approach 2: Bucket Sort (O(n))
+
+Map each number to a frequency bucket, then read from the highest-frequency bucket down.
+
+Build freq hash map as before.
+
+Create a list buckets of length n + 1; buckets[i] holds all numbers with frequency i.
+
+Iterate buckets from the end; collect elements until you have k.
+
+class Solution:
+    def topKFrequent(self, nums: List[int], k: int) -> List[int]:
+        freq = Counter(nums)
+        buckets = [[] for _ in range(len(nums) + 1)]
+        for num, count in freq.items():
+            buckets[count].append(num)
+
+        result = []
+        for i in range(len(buckets) - 1, 0, -1):
+            result.extend(buckets[i])
+            if len(result) >= k:
+                return result[:k]
+        return result
+
+Time: O(n) — linear pass for counting and for scanning buckets.
+
+Space: O(n).
+
+Follow-up 1: Data Too Large to Fit in Memory
+
+The interviewer may ask: "What if the dataset is too large to fit in memory?"
+
+Key Insight
+
+When data can't fit in RAM, the bottleneck shifts from time complexity to I/O. The two standard approaches are external sorting / partitioning and approximate streaming algorithms.
+
+Approach A: Partition by Hash
+
+Hash-partition the input file into B smaller shards, where all occurrences of the same number land in the same shard: shard = hash(num) % B.
+
+Each shard fits in memory. Process each shard independently with a hash map + heap to find its top-k candidates.
+
+Merge the per-shard top-k lists using a global min-heap to produce the final top-k.
+
+This is the same pattern used in MapReduce: map phase counts per shard, reduce phase merges the counts.
+
+Approach B: Sampling
+
+If an approximate answer is acceptable, sample a fraction of the data, compute top-k on the sample, and return those as estimates. Works well when the frequency distribution is skewed (a few elements dominate).
+
+Approach C: Count-Min Sketch (approximate)
+
+A Count-Min Sketch is a probabilistic data structure that uses O(ε⁻¹ log δ⁻¹) space to estimate frequencies with bounded error. For truly massive datasets (web-scale), it's preferable to exact counting.
+
+Clarifying Questions to Ask
+
+Is an approximate answer acceptable?
+
+Is the data sorted or partitioned in any way already?
+
+What is the ratio of distinct values to total entries? (High cardinality makes hashing more attractive.)
+
+Follow-up 2: Streaming Data
+
+The interviewer may ask: "What if the numbers arrive as a continuous stream?"
+
+Problem Restatement
+
+Elements arrive one at a time; at any point you must be able to return the current top-k frequent elements. The stream may be unbounded.
+
+Approach: HashMap + Heap with Lazy Updates
+
+Maintain a frequency hash map and a min-heap tracking the current top-k. On each new element:
+
+Increment freq[num].
+
+If num is already in the top-k set, push an updated (count, num) entry onto the heap. The older entry becomes stale.
+
+Otherwise, compare count against the current top-k minimum (after discarding stale entries at the heap's top). If larger, evict the minimum and insert num.
+
+The lazy-deletion trick (stale entries are tolerated and skipped on demand) keeps each update at amortized O(log k).
+
+import heapq
+from collections import defaultdict
+
+class TopKStream:
+    def __init__(self, k: int):
+        self.k = k
+        self.freq = defaultdict(int)
+        self.heap = []           # (count, num) — min-heap, may contain stale entries
+        self.in_top_k = set()    # nums currently in top-k
+
+    def _drop_stale_top(self) -> None:
+        # Pop entries from the heap top that no longer reflect current state.
+        while self.heap:
+            cnt, num = self.heap[0]
+            if num in self.in_top_k and cnt == self.freq[num]:
+                return
+            heapq.heappop(self.heap)
+
+    def add(self, num: int) -> None:
+        self.freq[num] += 1
+        count = self.freq[num]
+
+        if num in self.in_top_k:
+            # Already tracked — push the refreshed entry; the old one is now stale.
+            heapq.heappush(self.heap, (count, num))
+            return
+
+        if len(self.in_top_k) < self.k:
+            heapq.heappush(self.heap, (count, num))
+            self.in_top_k.add(num)
+            return
+
+        self._drop_stale_top()
+        # heap[0] now reflects the true minimum among the current top-k.
+        if count > self.heap[0][0]:
+            _, evicted = heapq.heapreplace(self.heap, (count, num))
+            self.in_top_k.discard(evicted)
+            self.in_top_k.add(num)
+
+    def top_k(self) -> list:
+        return list(self.in_top_k)
+
+The in_top_k set is the source of truth for membership; the heap exists only to locate the min-frequency element efficiently during evictions.
+
+Sliding Window Variant
+
+If only the last W elements of the stream matter (a time window), maintain a deque of the last W elements plus the frequency map. On each new element: append to the deque, evict the front when size exceeds W, and adjust freq by ±1 accordingly. Each arrival is O(1) for the deque/map updates; recomputing the top-k on demand is O(U log k) where U is the number of distinct values in the window, using the heap approach above.
+
+Count-Min Sketch for Streams
+
+For unbounded streams where exact counts are too expensive, a Count-Min Sketch provides frequency estimates with configurable error bounds and uses constant memory regardless of stream length. Combined with a heap over tracked "heavy hitter" candidates, it gives an approximate top-k answer in O(d) per update, where d is the sketch depth (typically a small constant like 5–10).
+
+Additional Discussion Topics
+
+Heavy Hitters Problem
+
+The streaming top-k problem is also known as the heavy hitters problem — finding elements with frequency above n/k. The Misra-Gries algorithm solves this in one pass with O(k) space and guarantees finding all elements with frequency > n/k.
+
+Distributed Counting
+
+In a distributed system (e.g., multiple servers each seeing a fraction of the stream):
+
+Each node maintains a local frequency map and reports its top candidates.
+
+A coordinator periodically collects per-node lists and merges them.
+
+Merging just top-k per node is generally incorrect: a global top-k element may sit outside some node's top-k because the stream is not uniformly distributed. Common mitigations are (a) hash-partition by key so each key lives on one node (shards are independent, then merge), or (b) have nodes report top-m for m >> k to reduce miss probability, treating the result as approximate.
+
+Choosing k Dynamically
+
+If k is not fixed in advance (e.g., "return all elements above the median frequency"), replace the heap with a full sort of the frequency map — O(n log n) — or use quickselect for O(n) average time.
+
+Real-world framing
+
+Apple's Java-backend AI-Engineer phone screen poses this as a log-processing task — given a batch of log lines, return the top-N most frequent — and asks you to write your own test harness rather than supplying one.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

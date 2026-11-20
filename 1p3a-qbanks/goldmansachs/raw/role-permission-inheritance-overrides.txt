@@ -1,0 +1,51 @@
+===H1===
+Role Permission Inheritance and Overrides
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/role-permission-inheritance-overrides
+===BODY===
+Goldman Sachs
+CodingMembers
+Role Permission Inheritance and Overrides
+Given a list of roles that may define a parent, an acceptlist, and a denylist, implement getPermission(role) to return the role's effective permissions. A child inherits its parent's permissions and overrides them with its own settings; the follow-up extends the model to multiple parents.
+SWE
+access-control
+graph
+hashmap
+medium
+Frequency
+Single report
+Last asked
+2026-08-12
+Stage
+onsite-coding
+Requirements
+
+Input: a list of roles. Each role may contain a parent, an acceptlist, and a denylist for permissions such as read and write.
+
+Implement getPermission(role) to return the effective permissions for the requested role.
+
+A child role inherits all permissions from its parent.
+
+The child's own permission settings override the inherited settings.
+
+Follow-up: extend the design to support roles with multiple parents.
+
+Notes
+
+Resolve a single-parent chain with memoized DFS: compute the parent's effective permission map, copy it, then apply the child's explicit allow / deny entries last.
+
+Model inheritance as a directed acyclic graph. Track visiting and resolved states so malformed cycles fail cleanly instead of recursing forever.
+
+For multiple parents, establish an explicit conflict policy before merging. Parent priority or deny-wins are both defensible choices; the child's explicit setting should still override inherited state.
+
+Preparation
+
+Implement a small role model and exercise allow / deny inheritance across a multi-level parent chain.
+
+Add multiple parents, define a deterministic conflict policy, and test cases where the parents disagree.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

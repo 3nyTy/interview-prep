@@ -1,0 +1,65 @@
+===H1===
+Minimum Replacements to Make Array Contiguous
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/min-ops-to-make-array-contiguous
+===BODY===
+Amazon
+Coding·40 minMembers
+Minimum Replacements to Make Array Contiguous
+You may replace every occurrence of value `x` in the array with another value `y`. Minimum number of such bulk replacements to make every value's occurrences form a single unbroken block.
+SWE
+array
+graph
+hard
+Frequency
+Low
+Last asked
+2026-04-12
+Stage
+oa
+Requirements
+
+Operation: pick any value x present in the array and any value y; replace every x with y everywhere.
+
+Target: the final array must be such that, for every distinct value v, all occurrences of v are contiguous (no two vs separated by a different value).
+
+Return the minimum number of operations.
+
+Examples
+
+arr = [1, 2, 1, 3, 2]
+# value 1 occurs at indices 0,2 with a 2 between -> non-contiguous
+# value 2 occurs at indices 1,4 with 1,3 between -> non-contiguous
+# one strategy: replace all 2 -> 1 -> [1,1,1,3,1] still bad; harder than it looks.
+
+Notes
+
+Equivalent to merging "run groups" in the array. After all operations, the array partitions into runs of identical values; the number of distinct values can only decrease by an operation.
+
+A clean restatement: build a graph where edge (u, v) exists if values u and v interleave; the answer relates to a vertex-cover style argument on this graph.
+
+Watch out — naive greedy (always merge the most-interleaved pair) is wrong on adversarial inputs. Prove the invariant before coding.
+
+Reframe: an operation rewrites every occurrence of one value, so the number of distinct values is monotone non-increasing. The optimum picks a sequence of relabelings such that the final array has each value appearing in one contiguous run.
+
+Useful structural object: the interleave graph with one node per distinct value and an edge (u, v) whenever a u sits between two vs (or vice versa). Operations correspond to vertex contractions; minimizing operations relates to a minimum set of contractions that yields an interval graph.
+
+Greedy traps to call out: "always merge the most interleaved pair" is wrong on adversarial inputs because contracting two values may create new interleavings with previously-clean values. Prove or brute-force-validate before coding.
+
+Preparation
+
+Solve LC 1546 (Maximum Number of Non-Overlapping Subarrays) and LC 1717 (Maximum Score from Removing Substrings) to get used to merge-and-collapse arguments.
+
+Build the interleave graph on small examples and trace operations by hand.
+
+If you can't crack the optimal solution in 30 minutes, code the brute-force and articulate the search-space pruning — Amazon grades partial credit highly when you explain the gap.
+
+Brute-force baseline: BFS over states (frozenset of relabelings applied) with distinct_values as a tie-break heuristic. Keeps you safe under interview time pressure even if you don't crack the optimal proof.
+
+Trace the interleave graph on hand-drawn arrays of length 5–7 to feel where the greedy fails — this is the single highest-leverage prep activity for this problem.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

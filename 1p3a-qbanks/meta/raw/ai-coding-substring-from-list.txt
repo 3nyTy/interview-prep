@@ -1,0 +1,61 @@
+===H1===
+AI Coding — Shared Substring in String List
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/ai-coding-substring-from-list
+===BODY===
+Meta
+Coding·60 minMembers
+AI Coding — Shared Substring in String List
+AI-Enabled Coding variant outside the Maze / Card-Game canon: given a list of strings, find a string that contains another from the list as a substring (or any pair sharing a substring relationship), then improve beyond brute force across 2-3 successive approaches.
+SWE
+MLE
+string
+trie
+sorting
+ai-coding
+ai-allowed
+complexity-analysis
+medium
+Frequency
+Low
+Last asked
+2026-06-09
+Stage
+onsite-coding
+Requirements
+
+Input: a list of strings (e.g. ["programming", "am", "pro"]).
+
+Output: a string from the list that contains at least one other list member as a substring (in the example, "programming" contains both "am" and "pro").
+
+Test cases are pre-written in the prompt; the interviewer expects the brute-force solution first, then 2-3 progressively faster approaches along with their time and space complexity.
+
+Notes
+
+The interviewer in the reported round required the idea to come from the candidate; implementation could be delegated to the AI assistant. Time/space complexity still had to be stated explicitly — the assistant readily prints them, so practice arriving at the same numbers yourself before peeking.
+
+Standard progression:
+
+Brute force: for each string, check every other string with in — O(n² · L) worst-case.
+
+Sort by length ascending, then for each longer string only check shorter ones it could contain — prunes a constant factor and lets you exit early once the candidates are exhausted.
+
+Trie of all strings; for each starting position in each string, walk the trie and report matches — O(total_chars · L) and naturally handles the prefix family.
+
+Sort + trie — feed strings into the trie shortest-first so that once a longer string traverses the trie it can detect any contained shorter string in O(L).
+
+Watch for the interpretation ambiguity: "shared substring" can mean (a) one whole string appears inside another (this round's intent based on the example) or (b) any common substring across two strings. Confirm before coding.
+
+A common framing ("ParanoidEcho" / "Echo") hands you a working brute-force solution plus a provided benchmark harness; you brainstorm optimizations (the assistant typically surfaces both a Trie and a hash-set approach), implement each, and plug them into the benchmark. The two often land at similar runtime with the Trie using more memory — be ready to read that result and argue the trade-off.
+
+Preparation
+
+Drill the trie-of-strings + scan pattern; this same skeleton powers LC 720 (Longest Word in Dictionary) and Aho-Corasick warm-ups.
+
+Rehearse a 30-second monologue per approach covering correctness, time, and space — this round grades the explanation as much as the AI-produced code.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

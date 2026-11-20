@@ -1,0 +1,63 @@
+===H1===
+Satellite Message Propagation
+===URL===
+https://www.1point3acres.com/interview/problems/company/optiver/satellite-message-propagation
+===BODY===
+Optiver
+Coding·90 minMembers
+Satellite Message Propagation
+A graph-simulation OA: model a satellite network where a message floods from Earth, each satellite forwards to its lower-id-first neighbors with a 10s-per-forward cost, then reports back to Earth after a 30s processing delay. Output the order in which satellites report back, with timing tie-breaks.
+SWE
+graph
+bfs
+simulation
+oop-design
+oa
+hard
+Frequency
+Low
+Last asked
+2025-08-05
+Stage
+oa
+Requirements
+
+Process a stream of N instructions and implement the SatelliteNetwork class:
+
+SatelliteConnected(satelliteId) — a satellite joins the network. Calling ErrDuplicateSatellite(id) if it connects more than once.
+
+RelationshipEstablished(satelliteId1, satelliteId2) — a two-way link. Reference to a non-existent satellite triggers ErrInvalidSatellite(id) and the whole instruction is skipped.
+
+MessageReceived(M, id_1, …, id_M) — M satellites simultaneously receive a message from Earth.
+
+Protocol:
+
+A satellite that receives the message forwards it to each direct connection that hasn't received it yet, in increasing SatelliteId order.
+
+Forwarding to one connection is synchronous and atomic and takes exactly 10 seconds; a sender forwards to only one connection at a time.
+
+While a forward to some satellite is in progress, other satellites may also attempt to forward to it (also spending 10s), but a satellite never re-notifies one already known to be notified, and never notifies the satellite that notified it.
+
+Once all of a satellite's direct connections have been notified, it spends 30 seconds processing, then reports back to Earth by calling OnSatelliteReportedBack(satelliteId).
+
+If two satellites report back at the same time, the one with the smaller SatelliteId is first.
+
+Notes
+
+This is a timed graph traversal: maintain each satellite's notified set and a per-sender serial forwarding timeline, then compute each satellite's report time as (time all its neighbors are notified) + 30s.
+
+The subtle parts are the per-sender atomic 10s queue (a satellite with many neighbors forwards sequentially) and the simultaneous-report tie-break by id.
+
+Output is the report order keyed by report timestamp, emitted via OnSatelliteReportedBack in order.
+
+Preparation
+
+Model the event timeline explicitly (priority queue of forward-completion events) rather than a plain BFS, since edge traversal has duration and per-sender serialization.
+
+Test simultaneous notifications (multiple seeds in one MessageReceived) and the id tie-break on equal report times.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

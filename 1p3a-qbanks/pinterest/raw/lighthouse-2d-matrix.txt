@@ -1,0 +1,45 @@
+===H1===
+Lighthouse Light Propagation
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/lighthouse-2d-matrix
+===BODY===
+Pinterest
+Coding·60 minMembers
+Lighthouse Light Propagation
+Simulate light propagation across a 2-D matrix: lighthouses emit light in defined directions, and walls or grid edges stop each ray. The core mechanic is ray casting or directional traversal; exact direction encoding is intentionally left for clarification.
+SWE
+grid
+simulation
+bfs
+medium
+Frequency
+Single report
+Last asked
+2026-03-28
+Stage
+onsite-coding
+Requirements
+
+A 2-D grid contains lighthouse cells. Each lighthouse emits beams in one or more directions. A beam travels in a straight line until it reaches a wall or leaves the grid. Return the cells that receive light. Clarify the direction encoding and whether any reflection, rotation, or corner interaction exists.
+
+Notes
+
+Ray casting walks each lighthouse-direction pair cell by cell, marking lit cells until blocked. A directional traversal instead stores (cell, direction) states; both are straightforward when beams do not branch.
+
+Deduplicate repeated (cell, direction) states if beams can merge or cycle. If rotation adds a time phase, extend the state with that phase.
+
+State no-reflection and wall-inclusion assumptions before coding when the contract does not define them.
+
+Preparation
+
+Implement a direction-vector ray helper and test boundary and wall stops.
+
+Practice directional traversal with (row, col, direction) states and a visited set.
+
+Prepare clarification questions for direction encoding, source-cell lighting, wall cells, reflection, and rotation.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,53 @@
+===H1===
+String Pattern Partition
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/string-pattern-partition
+===BODY===
+Databricks
+Coding·60 minMembers
+String Pattern Partition
+Given two strings, represent the target string as a minimum sequence of substrings indexed from the source string. A follow-up deletes one character and asks for the new minimum partition.
+SWE
+string
+dp
+parsing
+medium
+Frequency
+Single report
+Last asked
+2026-05-22
+Stage
+onsite-coding
+Requirements
+
+Inputs are two strings: a source string a and a target string b.
+
+Return a list of index ranges into a whose concatenated substrings represent b.
+
+Example framing: a = "abcdbcd", b = "sabcd", with an index-range style output such as [[1, 3], [4, 4], [2, 4]]. The exact indexing convention and how to handle a target character absent from a should be clarified before coding.
+
+Optimize for the minimum number of partitions.
+
+Follow-up: after deleting one character, recompute the minimum partition result.
+
+Notes
+
+This is a string-cover / segmentation prompt. A direct approach precomputes all source substrings, then runs DP over target positions: dp[i] = min(dp[j] + 1) if b[j:i] appears in a.
+
+For larger inputs, use a trie, suffix automaton, suffix array, or rolling-hash lookup to find source-substring matches starting at each target position without materializing every substring.
+
+The reported example is ambiguous because the target contains a character not present in the source. Clarify whether unmatched characters are allowed, whether they imply failure, and whether ranges are 0-based or 1-based inclusive.
+
+The deletion follow-up can often be answered by recomputing DP if constraints are small; for large strings, discuss incremental DP invalidation around the deleted position.
+
+Preparation
+
+Implement the clean DP version first.
+
+Prepare tests for absent characters, repeated source substrings, tie-breaking among equal partition counts, empty target, and deletion at the beginning / middle / end.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

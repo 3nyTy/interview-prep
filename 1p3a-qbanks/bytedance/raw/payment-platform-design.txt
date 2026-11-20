@@ -1,0 +1,66 @@
+===H1===
+Design a Stripe-like Payment Platform
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/payment-platform-design
+===BODY===
+ByteDance / TikTok
+System Design·60 minMembers
+Design a Stripe-like Payment Platform
+Open-ended payment-platform system design for an SRE candidate: payment intent lifecycle, idempotency, transactional integrity, retry semantics under partial failure.
+Infra Eng
+SWE
+payment
+idempotency
+transactions
+scaling
+distributed-systems
+hard
+Frequency
+Single report
+Last asked
+2025-12-10
+Stage
+onsite-system-design
+Requirements
+
+Design a payment platform similar to Stripe. Interviewer expects discussion of:
+
+Functional: merchant integrates via SDK / REST; payer initiates a charge; system authorizes against the bank network; settles funds asynchronously; surfaces webhook events for both success and failure.
+
+Idempotency: charge requests carry an idempotency key; same key replayed must not double-charge.
+
+Transactional integrity: a single charge spans charge service + ledger + bank-network call; partial failure must be recoverable, not result in lost or duplicated debits.
+
+Scale: 1M+ TPS at peak (flash sales); 99.99% availability SLA; PCI-DSS-shaped data handling.
+
+Reliability: handle bank-network timeout (reconcile asynchronously), payment-method failures (cards declined, retry policies), and chargebacks (event replay).
+
+Notes
+
+The canonical decomposition: API gateway → payment-intent service (creates and tracks intent state) → payment-processor service (calls bank network) → ledger service (double-entry bookkeeping) → webhook dispatcher.
+
+Idempotency is implemented via a per-key write-once record (status: pending / completed / failed); the second call to the same key returns the stored result.
+
+For partial-failure handling, persist intent state at each transition; on retry, drive forward from last persisted state rather than restarting. Use a saga pattern with compensating actions, not 2PC.
+
+Ledger should be append-only and double-entry; never mutate past entries. Reconciliation runs nightly against bank-network statements.
+
+For bank-network timeout, mark intent unknown, schedule a reconciliation job, and surface to the merchant as processing; commit final state only after explicit confirmation.
+
+Common pitfall: candidates dive into sharding the database before establishing the intent state machine. Sequence the discussion: state machine → durability → idempotency → scaling.
+
+Preparation
+
+Sketch a payment intent state machine: requires_payment_method → requires_confirmation → processing → succeeded / failed. Be able to draw it in under 3 minutes.
+
+Drill the idempotency-key pattern: insert-on-first-call with ON CONFLICT DO NOTHING, return stored result on conflict.
+
+Practice the saga pattern with one concrete example (auth → capture → ledger entry → webhook), including compensating actions for each step.
+
+Refresh PCI-DSS basics: never store PAN in clear, tokenization separates cardholder data from your service surface.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,54 @@
+===H1===
+Ride-Hailing System Design (Uber)
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/ride-hailing-system-design
+===BODY===
+Amazon
+System DesignMembers
+Ride-Hailing System Design (Uber)
+Design an Uber-style ride-hailing service. The interviewer drives on high-frequency driver GPS writes (dedup/throttle), geospatial indexing (Quadtree vs H3), and Redis GEO caching.
+SWE
+location
+geohash
+caching
+scaling
+system-design
+Frequency
+Single report
+Last asked
+2026-05-22
+Stage
+onsite-system-design
+Requirements
+
+Design a ride-hailing service (Uber / Lyft-style): riders request rides and the system matches them to nearby drivers.
+
+Functional focus the interviewer pressed on:
+
+Ingest high-frequency driver GPS updates and keep a fresh driver-location index.
+
+Match a rider to nearby available drivers via a geospatial query.
+
+Serve location reads with low latency under heavy write load.
+
+Notes
+
+The driver GPS write path is the hot spot: dedup / throttle / coalesce updates (a driver pinging every second does not need every ping persisted) before they reach the index.
+
+Geospatial indexing is the central trade-off — be ready to compare Quadtree vs H3 (hex grid): cell uniformity, neighbor lookup, hot-cell handling, rebalancing cost.
+
+Use Redis GEO (sorted-set / geohash backed) as the hot cache for "drivers near a point"; discuss GEOSEARCH mechanics and TTL / eviction for stale locations.
+
+Expect follow-ups on driver-state consistency (available vs on-trip), matching fairness, and surge / hot-region handling.
+
+Preparation
+
+Walk the driver-location write path end to end: client throttle -> ingestion -> geo-index update -> cache.
+
+Be able to whiteboard Quadtree and H3 side by side with pros / cons, and explain Redis GEO's geohash encoding.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

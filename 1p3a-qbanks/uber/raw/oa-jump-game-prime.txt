@@ -1,0 +1,74 @@
+===H1===
+OA: Jump Game with Prime-3 Steps
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/oa-jump-game-prime
+===BODY===
+Uber
+Coding·90 minFree preview
+OA: Jump Game with Prime-3 Steps
+One of two problems in the 90-min Hack2Hire OA. Variant of LeetCode 1696 (Jump Game VI). From index 0 of an integer array, at each step you may jump +1 or jump +k where k is a prime ending in digit 3 (3, 13, 23, 43, 53, 73, 83, …). Maximize the sum of values landed on, finishing at index n−1.
+SWE
+dp
+array
+hard
+Frequency
+High
+Last asked
+2026-06-01
+Stage
+oa
+Requirements
+
+Input: integer array arr of length n, where arr[i] is the score at index i. Values may be negative (-10⁴ ≤ arr[i] ≤ 10⁴, 1 ≤ n ≤ 10⁵), so the maximum path is not simply "land on everything" — negative indices must sometimes be skipped over.
+
+Start at index 0. The starting index is already landed on, so arr[0] is always included in the total.
+
+Standard scoring is the sum of arr[i] for each index landed on (including start and end).
+
+At each step you may jump only to the right by +1 or by +k for any prime k whose units digit is 3 (so 3, 13, 23, 43, 53, 73, 83, 103, …; note 33, 63, 93 are excluded because they are not prime).
+
+All jumps must stay within bounds. You must finish exactly at index n − 1.
+
+Output: the maximum total sum reachable.
+
+def max_jump_score(arr: list[int]) -> int: ...
+    # arr[i] is the score at index i; arr[0] always counts (start is pre-landed).
+    # From i you may move only forward: to i+1, or to i+p for any prime p ending in 3.
+    # Must end exactly at index n-1; return the max total score.
+    # n == 1 -> return arr[0] (start is already the last index).
+
+Examples
+
+arr = [5, -100, 4, 10] → 15. Jump 0 → 3 with a 3-step jump: 5 + 10 = 15 (skips the -100).
+
+arr = [4, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 20] → 24. A 13-step jump (13 is prime, ends in 3) goes 0 → 13 directly: 4 + 20 = 24.
+
+arr = [7] → 7. Already on the last index, so the answer is just arr[0].
+
+Notes
+
+Pre-sieve the set of prime numbers up to n − 1 (limit = n is enough), then filter to those ending in 3. The valid jump-set is small (~n / (ln n) candidates filtered by % 10 == 3, so typically dozens at most for n ≤ 10⁵).
+
+Classic DP: dp[i] = arr[i] + max(dp[i − j]) for every valid jump length j ≤ i. The +1 step is always available; the prime-3 jumps are added on top.
+
+A naive O(n²) solution passes the small visible tests but times out on the hidden cases — the grader runs the solution on large inputs (n near 10⁵).
+
+To get full credit, fall back to a sieve precomputation + bounded DP, or precompute prefix maxima over the jump candidates.
+
+The platform shows ~2–3 visible test cases. You must add your own large random input before submitting — the hidden grader runs offline.
+
+Corner case: n == 1 returns arr[0] directly (no jumps needed).
+
+Preparation
+
+Drill LC 1696 (Jump Game VI) and LC 55 / 45 (Jump Game I / II) until DP transitions feel automatic.
+
+Code a sieve of Eratosthenes from memory; practice extracting the % 10 == 3 subset.
+
+Pre-write a 5-line test harness that generates an n = 10⁵ random array so you can sanity-check your DP runtime in the editor before submitting.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

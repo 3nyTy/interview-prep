@@ -1,0 +1,68 @@
+===H1===
+Listing Lifetime Value — Estimation (ML Design)
+===URL===
+https://www.1point3acres.com/interview/problems/company/airbnb/listing-lifetime-value-ml-design
+===BODY===
+Airbnb
+System Design·60 minMembers
+Listing Lifetime Value — Estimation (ML Design)
+Estimate the lifetime value of a listing — projected revenue over the next 12 months. Used downstream for ranking, host outreach, and inventory acquisition decisions. The prompt is intentionally open and rewards strong scoping.
+MLE
+mlsd
+classification
+feature-engineering
+evaluation
+medium
+Frequency
+Single report
+Last asked
+2026-05-03
+Stage
+onsite-system-design
+Requirements
+
+Functional
+
+Predict per-listing 12-month booking revenue (or a related target the candidate proposes).
+
+Output consumed by ranking (boost high-LTV listings) and by host-success teams (prioritize outreach).
+
+Non-functional
+
+Batch inference is acceptable; daily refresh.
+
+Predictions should be calibrated — absolute dollar values, not relative scores.
+
+Notes
+
+Problem framing. Two-step: ask clarifying questions to pin down the target (calendar-year revenue? 12-month forward revenue?), then pick regression vs classification. The community version of this question was answered with "bucketize and classify" because the candidate did not feel comfortable with regression; the interviewer accepted but the regression framing scores higher.
+
+Target choice. Forward 12-month bookings × average nightly price. Censoring (new listings, host pauses) is the most subtle issue — handle with survival analysis or simply train on listings with ≥ 12 months of history.
+
+Features. Listing (price, location, amenities, host tenure, photo quality embedding), historical performance (last-12mo bookings, conversion rate, cancellation rate), market (geo demand index, seasonality).
+
+Model. GBDT (XGBoost / LightGBM) is the standard answer for tabular regression; argue against deep models on the basis of feature-density + interpretability.
+
+Eval. Regression: MAE / RMSE on a held-out future period (not random split — temporal split avoids leakage). Calibration plot. Per-segment error (new vs mature listings, low vs high LTV).
+
+Cold start. For new listings, fall back to a market-segment average with a confidence interval; flag as "low confidence" downstream.
+
+Production loop. Daily batch; write predictions + confidence to a feature store consumed by ranking and outreach teams.
+
+The interviewer pushed on the regression / classification choice — be ready to defend either, but the regression framing is the senior answer.
+
+Preparation
+
+Pre-script the regression-vs-classification trade-off so it lands in one minute.
+
+Drill the temporal-split eval argument (random split leaks future into past).
+
+Pre-write the cold-start fallback (market-segment average + low-confidence flag).
+
+Pair-prep with the search-ranking MLSD; both share the listing-features section.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,53 @@
+===H1===
+Android Phone Screen: Build a Pickup Screen in Jetpack Compose
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/android-pickup-screen-jetpack-compose
+===BODY===
+Waymo
+Coding·45 minMembers
+Android Phone Screen: Build a Pickup Screen in Jetpack Compose
+Android engineer phone screen run live in Android Studio: build a Waymo pickup screen in Jetpack Compose. Touches a scrolling list, LiveData-driven state, and currency formatting / translation.
+SWE
+android
+frontend
+mini-project
+medium
+Frequency
+Single report
+Last asked
+2026-06-01
+Stage
+phone-screen
+Requirements
+
+Open Android Studio and implement a Waymo 'pickup' screen in Jetpack Compose during the call.
+
+Render a scrolling list of items (LazyColumn / list view).
+
+Drive UI state from LiveData (observe and recompose on change).
+
+Handle currency formatting / translation for displayed values.
+
+Notes
+
+This is a hands-on mobile mini-project, not an algorithm round — fluency with the Compose + LiveData toolchain inside Android Studio is the signal. Being able to scaffold the screen quickly matters more than algorithmic depth.
+
+Be ready for the standard Compose state-management pieces: hoisting state out of composables, observing LiveData as Compose state (observeAsState), and keeping recomposition scoped.
+
+Currency handling means locale-aware formatting (number formatter + currency code), not a hand-rolled string concat — call this out.
+
+Clearing the implementation does not guarantee a move-on; candidates report finishing the screen and still not advancing, so treat code quality and idiomatic Compose as part of the bar.
+
+Preparation
+
+Build a throwaway Compose app with a LazyColumn bound to a ViewModel + LiveData list and verify it recomposes on data change.
+
+Practice locale-aware currency formatting with NumberFormat.getCurrencyInstance(locale) and wiring it into a composable.
+
+Rehearse scaffolding a new screen (Activity / setContent / state hoisting) from an empty Android Studio project under time pressure.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,81 @@
+===H1===
+Distributed Job Scheduler / Calendar Service
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/sd-job-scheduler
+===BODY===
+LinkedIn
+System Design·60 minMembers
+Distributed Job Scheduler / Calendar Service
+Design a job scheduler / calendar service that supports millions of scheduled tasks, range queries for upcoming tasks, and real-time dashboard updates. Variants include event scheduling with timezones and recurring events.
+SWE
+Infra Eng
+scheduling
+distributed-systems
+storage
+query-optimization
+data-modeling
+ci-cd
+medium
+Frequency
+Medium
+Last asked
+2026-08-18
+Stage
+onsite-system-design
+Requirements
+
+Functional:
+
+schedule(task_id, run_at_ts, payload) — schedule a task for a future run.
+
+cancel(task_id) — cancel before execution.
+
+query(window_start, window_end) — list tasks scheduled in the window; powers a real-time dashboard.
+
+Worker pool consumes tasks at their scheduled time, with at-least-once execution semantics and idempotency hooks for the payload.
+
+In the CI/CD variant, ingest source-control changes and schedule the corresponding build and test jobs.
+
+Make build status and live process output available in the CI user interface.
+
+Variant: Calendar service for events with timezone, recurrence rules (RRULE), and conflict detection.
+
+Non-functional:
+
+Millions of scheduled tasks live at any time.
+
+Sub-second worker pickup of due tasks.
+
+Dashboard read path tolerates < 5 s staleness; the schedule path tolerates none.
+
+Notes
+
+The canonical shape: time-bucketed sharded store — partition by minute (or finer) and bucket; workers poll their assigned buckets. Avoid a single global priority queue — it does not shard.
+
+For dashboard queries, the right structure is an indexed time-range scan over the bucketed store. Many candidates default to scanning all live tasks; the interviewer is checking whether you propose a covering index on (window_bucket, run_at_ts).
+
+For the calendar variant, store the recurrence rule and a next_occurrence_ts pointer; recompute the pointer on each fire. Timezones are the trap — store all timestamps in UTC, attach the originating timezone for display, and re-evaluate DST transitions at each occurrence.
+
+Idempotency keys are required for at-least-once execution; the interviewer will probe whether the worker dedupes via a task_id × occurrence_ts key.
+
+A newer framing presents the same scheduler core as a CI/CD design problem. Clarify whether the expected scope is the scheduling engine or the end-to-end CI/CD pipeline before committing to an architecture. A positive in-session reaction may still be followed by weak written feedback, so make the requirements and trade-offs explicit.
+
+For CI triggering, clarify whether source control sends a webhook or the CI service polls for changes. Interviewers may impose either model; justify the choice against network reachability, latency, and operational simplicity before drawing the rest of the pipeline.
+
+Preparation
+
+Walk through the time-bucketed sharding scheme on paper; quantify bucket size vs poll frequency trade-off.
+
+Pre-load the timezone discussion: UTC storage, IANA tz database, DST forward/backward jump handling.
+
+Sketch the worker leasing pattern (lease + heartbeat + lease-takeover on heartbeat miss); it's the standard answer to "what if a worker dies mid-task".
+
+Be explicit about the dashboard query path being read-only on a follower replica.
+
+Rehearse the CI/CD variant end to end: change detection, job scheduling, worker execution, and live build-output delivery to the UI.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,56 @@
+===H1===
+MLSD — Notification Ranking (Multi-source)
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/mlsd-notification-ranking
+===BODY===
+Meta
+System Design·45 minMembers
+MLSD — Notification Ranking (Multi-source)
+Rank notifications from heterogeneous sources (friend activity, ads, system) under a unified objective. Multi-objective ranking + frequency-cap + value-normalization across sources are the deep-dive axes.
+MLE
+RS
+mlsd
+recommendation
+ranking
+calibration
+notification
+hard
+Frequency
+Low
+Last asked
+2026-04-15
+Stage
+onsite-system-design
+Requirements
+
+Functional: each user has a notification inbox fed by many sources (social, ads, product, system). Decide ordering + send/skip.
+
+Inputs per candidate: source type, freshness, predicted CTR, advertiser value (if applicable), user fatigue.
+
+Pipeline: source-specific retrievers → unified candidate pool → multi-objective ranker → frequency-cap + diversity post-filter → delivery channel selection.
+
+Metrics: per-source CTR, daily-active notifications, unsubscribe / complaint rate.
+
+Cold start: new user gets product-default notifications + content-based fallback.
+
+Notes
+
+Reported emphasis: cross-source value normalization. "How do you compare an ad bid in $ to a friend-event CTR?" Calibrated probability × monetization weight is the standard answer.
+
+Frequency cap is often the deciding deep-dive — global per-user cap vs per-source caps vs adaptive cap.
+
+Bias and feedback-loop discussion expected: high-CTR notifications crowd out lower-CTR ones forever without exploration.
+
+Preparation
+
+Memorize the multi-source unified-pool diagram.
+
+Prep a 2-minute value-normalization pitch (calibrated probability × value weight + per-source clipping).
+
+Drill the frequency-cap deep-dive: token bucket per user × source × type.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,59 @@
+===H1===
+Merge N-ary Trees by Node Key
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-merge-nary-trees-by-key
+===BODY===
+LinkedIn
+CodingMembers
+Merge N-ary Trees by Node Key
+Merge two N-ary trees whose nodes carry stable keys, combining nodes only when their keys match. The prompt is an N-ary transformation of the familiar binary-tree merge family, with conflict-policy and concurrent-update follow-ups.
+SWE
+Infra Eng
+tree
+dfs
+recursion
+concurrency
+medium
+Frequency
+Medium
+Last asked
+2026-08-27
+Stage
+onsite-coding
+Requirements
+
+Given two rooted N-ary trees, recursively combine them into one tree.
+
+Every node has a stable key. Two nodes are eligible to merge only when their keys are equal; clarify how unmatched keyed branches should be carried into the result.
+
+Apply the prompt's conflict rule when matching nodes carry overlapping values. The rule has appeared as overwrite-style or sum-style behavior, so clarify it before coding.
+
+Be ready to serialize the merged N-ary tree.
+
+Be ready to extend the design for concurrent updates to the same tree.
+
+Notes
+
+The base problem has been framed as an N-ary transformation of LC 617 rather than a binary-tree-only exercise.
+
+Once the conflict and ownership policies are fixed, use a recursive merge. When both nodes exist, require matching keys, combine their values under the selected rule, index each node's children by key, and recurse over the union of child keys. Deep-copy an unmatched subtree when the result must not alias either input.
+
+State whether sibling keys are unique. A one-child-per-key map is correct only under that invariant; duplicate sibling keys require rejection or an explicitly ordered multimap policy.
+
+With unique sibling keys and hash indexes, each node is visited once: expected O(n + m) time and O(n + m) worst-case auxiliary/output space, including child indexes and the merged tree.
+
+The concurrency follow-up is open-ended. Locking and MVCC are useful discussion starting points, but no single canonical policy is established; define the required consistency and conflict semantics first.
+
+Preparation
+
+In 20 minutes, implement a non-mutating recursive merge with a child-key map and a pluggable value-conflict function.
+
+Test empty input, mismatched root keys, disjoint child sets, overlapping child keys, and duplicate sibling keys; write down the chosen policy for each case before running the code.
+
+Explain in two minutes why every input node enters at most one child index and one recursive merge, then sketch how a coarse tree lock differs from versioned copy-on-write for concurrent updates.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,64 @@
+===H1===
+Robot Navigation in an Unknown Grid
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-robot-navigation-unknown-grid
+===BODY===
+LinkedIn
+CodingMembers
+Robot Navigation in an Unknown Grid
+Control a robot in an initially unexplored matrix using turn, forward-move, wall-detection, and return-to-explored-location operations. Discover traversable cells while finding a path from the starting position to the destination.
+SWE
+grid
+graph
+bfs
+simulation
+medium
+Frequency
+Single report
+Last asked
+2026-08-18
+Stage
+onsite-coding
+Requirements
+
+A robot starts in an unexplored matrix and must find a path from its starting position to a destination. The full obstacle map is not available in advance.
+
+Interact with the environment only through operations that:
+
+rotate the robot;
+
+move it forward;
+
+detect whether a wall blocks the next move; and
+
+move it to a location that has already been explored.
+
+Build an internal representation of discovered cells and passages while searching for a valid route to the destination.
+
+Keep the robot's physical position and orientation synchronized with the logical search state.
+
+Notes
+
+Assign coordinates relative to the start and record each successful move as an edge between traversable cells; record blocked directions as walls so they are not retried. Explore the reachable graph through the wrapper, preserving a parent pointer for each discovered cell.
+
+When the destination is detected, reconstruct any valid route from the parent map. If the requirement is the shortest route rather than any route, finish mapping the relevant reachable region and run BFS over the discovered graph.
+
+Treat physical motion as an adapter for the logical frontier: before expanding a cell, relocate to that explored cell and synchronize orientation, then update both the robot state and the stored graph after each operation.
+
+The exact method signatures and destination representation may vary. Clarify the coordinate system, rotation semantics, wall-detection behavior, and guarantee provided by the move-to-explored-location operation before coding.
+
+The wrapper API is the main source of mistakes: a logically valid search is insufficient if the physical robot state drifts from the stored state.
+
+Preparation
+
+Write a small mock robot interface and implement exploration without reading the hidden grid directly.
+
+Trace the robot's position and orientation through a corridor, a dead end, and a branch while checking the internal map after every operation.
+
+Practice separating environment-adapter code from the graph-search routine so API semantics can change without rewriting the search.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

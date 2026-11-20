@@ -1,0 +1,54 @@
+===H1===
+System Design: Distributed Rate Limiter
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/system-design-rate-limiter
+===BODY===
+Pinterest
+System Design·60 minMembers
+System Design: Distributed Rate Limiter
+Standard distributed rate-limiter SD — enforce per-API-key request quotas across a horizontally-sharded API gateway. Interviewers expect a token-bucket vs sliding-window comparison, plus a Redis-backed implementation discussion.
+SWE
+MLE
+rate-limiting
+throttling
+redis
+distributed-systems
+scaling
+medium
+Frequency
+Low
+Last asked
+2026-07-12
+Stage
+onsite-system-design
+Requirements
+
+Enforce a quota such as 1000 requests per minute per API key across a fleet of API servers. Address algorithm choice, centralized versus decentralized state, clock skew, burst behavior, failure mode, and the 429/Retry-After contract.
+
+Notes
+
+For a strict limit, route each API key to one Redis shard and run an atomic Lua check-and-increment keyed by (api_key, window); use Redis time to avoid host clock skew. Token bucket supports bounded bursts, while sliding-window log is more exact and more expensive.
+
+Per-host counters or independently writable subkeys trade accuracy for availability and latency. State the maximum over-admission explicitly; periodic synchronization cannot preserve a strict global cap.
+
+Randomly writing to N subkeys and summing later is not an atomic limiter: two requests can observe the same total and both increment different shards. Do not present it as a strict hot-key fix.
+
+Strict hot-key options include assigning the key to a dedicated owner, batching increments through that owner, or leasing bounded token sub-quotas to hosts. With leases, the sum of outstanding tokens must never exceed the global budget; unused leases reduce utilization until they expire or return.
+
+Define fail-open versus fail-closed behavior for Redis outages and include the decision in metrics and alerts.
+
+Preparation
+
+Compare token bucket and sliding-window counter in 90 seconds.
+
+Write the atomic Lua check-and-increment flow and its TTL behavior.
+
+Walk the two-concurrent-request counterexample for random subkey sharding.
+
+Allocate a 1000-token budget across four host leases and prove the global bound under a host failure.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,135 @@
+===H1===
+Onsite OOD: Multi-Level Parking Lot
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/onsite-ood-parking-lot
+===BODY===
+Uber
+Coding·60 minMembers
+Onsite OOD: Multi-Level Parking Lot
+High-frequency onsite OOD round. Design a parking-lot system supporting multiple vehicle types (motorcycle, car, optionally bus) and multiple slot types with size constraints. Implement `park`, `unpark`, and availability queries.
+SWE
+oop-design
+data-structure
+medium
+Frequency
+Medium
+Last asked
+2026-07-28
+Stage
+onsite-coding · phone-screen
+Requirements
+
+Multiple levels; each level has a fixed list of slots.
+
+Slot types include bike and car (some loops add bus taking 5 consecutive car slots).
+
+A motorcycle may park in any slot (bike or car). When choosing, prefer a motorcycle/bike slot first, fall back to a car/regular slot.
+
+A car may park only in a car slot.
+
+A bus may park only when 5 consecutive car slots are free on a single level.
+
+Implement at least:
+
+park(vehicle) → slot_id (or null / throw if full).
+
+unpark(slot_id) → void.
+
+availableSlots(level, type) → int.
+
+Some loops trim the model to two spot types (MOTORCYCLE, REGULAR) and key every operation on the vehicle's license plate. Core operations:
+
+def park(self, vehicle: Vehicle) -> ParkingAssignment: ...
+    # Find first compatible available spot, mark occupied, record assignment.
+    # Raises if vehicle.license_plate is already parked (no double-park) or no compatible spot is free.
+
+def unpark(self, license_plate: str) -> ParkingAssignment: ...
+    # Look up the assignment by plate, free its spot back to the available pool, return it.
+    # Raises if the plate is not currently parked.
+
+def check_car(self, license_plate: str) -> ParkingAssignment | None: ...
+    # Direct lookup by plate: returns the assignment (parked status + assigned spot) or None.
+
+Spot-compatibility ordering: motorcycles use MOTORCYCLE spots first, then REGULAR spots; cars use only REGULAR spots.
+
+Invariants to state up front: every vehicle has a unique license_plate; each spot has a unique spot_id; the lot is initialized with a fixed set of spots; a vehicle cannot be parked twice at once; if multiple spots are valid, any deterministic choice is acceptable.
+
+Common follow-up: charging by hourly rate per type; entry/exit logging.
+
+Notes
+
+Classic OOD round; algorithmic content is minimal but the interviewer grades class structure, inheritance, encapsulation, and naming. The implementation tends to get long because you must keep multiple indexes in sync (map-of-map bookkeeping).
+
+Standard layout:
+
+Vehicle (abstract) → Motorcycle, Car, Bus.
+
+Slot (abstract) → BikeSlot, CarSlot. Use a canFit(Vehicle) predicate rather than a chain of instanceof checks.
+
+Level holds the slot list and exposes findSlots(Vehicle); for bus, this scans for 5 consecutive free CarSlots.
+
+ParkingLot is the top-level orchestrator iterating levels.
+
+The interviewer often pushes for explicit handling of the bus case mid-round; pre-bake the consecutive-slot scan so you don't get stuck.
+
+unpark typically takes a ticket id (issued at park time), not a slot id, in cleaner designs — clarify with the interviewer. The plate-keyed variant above (unpark(license_plate)) is a common alternative; confirm which key the interviewer wants.
+
+A Map<SlotId, Slot> lookup keeps both park and unpark O(1) after the initial scan.
+
+Apply the Strategy pattern to the rate card (HourlyRate, FlatRate, MembershipRate all implement a BillingStrategy) so the billing follow-up is a 30-second swap rather than a refactor. Keep ParkingLot itself a singleton if the interviewer asks for global state.
+
+Suggested core state (keep three indexes in sync)
+
+The cleanest implementation keeps three pieces of state, which is where most points are won or lost:
+
+Spot metadata by spot_id.
+
+Parked assignment by license_plate.
+
+Available spots grouped by spot type (a per-type pool, e.g. Dict[SpotType, Dict[spot_id, Spot]]).
+
+This makes every operation cheap and predictable:
+
+park: find the first compatible available spot from the per-type pool, pop it from available, record the assignment by plate.
+
+unpark: pop the assignment by plate, return the spot to the available pool for its type.
+
+check_car: direct dictionary lookup by plate.
+
+The lookup method is often named check_car, but the same lookup serves motorcycles too — the key is just the license plate. All three operations are O(1) average; space is O(s + v) for s spots and v currently-parked vehicles.
+
+A current SDE II screening variant starts as a high-level design with several black-box components, then explicitly expands into fully runnable code. Scoring emphasizes data-structure choice, code quality, and performance.
+
+Examples
+
+Spots [("m1", MOTORCYCLE), ("m2", MOTORCYCLE), ("r1", REGULAR)].
+
+park(moto-1) → parks (takes a motorcycle spot).
+
+park(car-1) → must use r1 (only regular spot).
+
+park(car-2) → fails: no regular spot left.
+
+check_car(moto-1) → returns parked status + assigned spot.
+
+unpark(moto-1) → frees its spot.
+
+park(moto-2) → can use m1, m2, or r1 if free (motorcycle prefers a motorcycle spot, falls back to regular).
+
+Preparation
+
+Pre-write the class skeleton on paper before the interview; transcribing a well-known design in 5 minutes leaves time for the bus follow-up.
+
+Drill the consecutive-free-slot scan separately; the bug-magnet is forgetting to release the consecutive count when an occupied slot is encountered.
+
+Be ready for the rate-card / billing follow-up: a BillingStrategy interface that the lot consults on unpark.
+
+Write the class skeleton once on paper in under 5 minutes, including canFit(Vehicle) polymorphism and the consecutive-slot scan for buses; the round rewards muscle memory over invention.
+
+Practice the three-index bookkeeping (spot-by-id, assignment-by-plate, available-by-type) so the indexes never drift out of sync — desync between the available pool and the assignment map is the most common correctness bug.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

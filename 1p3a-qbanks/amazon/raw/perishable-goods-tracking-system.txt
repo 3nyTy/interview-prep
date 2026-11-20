@@ -1,0 +1,56 @@
+===H1===
+Perishable-Goods Tracking & Location System
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/perishable-goods-tracking-system
+===BODY===
+Amazon
+System DesignMembers
+Perishable-Goods Tracking & Location System
+Phone-screen system design (part of a combined ~55-min round). Design a service that tracks and locates perishable products across multiple stores: when an item expires it moves to a storage area, and the system must locate any product by ID, persist a ledger, and answer 'which store has which expired items, and where in storage they are now.' Deep-dives: REST/GET API shape, relational (RDS/Postgres/MySQL) vs NoSQL (DynamoDB) with consistency *not* being the only justification, and avoiding a few-minutes full-table expiry scan over millions of items (expiry index + bucketing/queue, cache for read-heavy load, horizontal scaling + load balancing).
+SWE
+database
+schema-design
+scaling
+storage
+medium
+Frequency
+Single report
+Last asked
+2026-06-24
+Stage
+phone-screen
+Requirements
+
+Track perishable products across multiple stores. When a product expires it is moved to a storage area; there are many stores, many perishable products, and many storage areas.
+
+Functional needs:
+
+Locate any product by its ID.
+
+Persist a durable ledger of product state and movements.
+
+Answer, at query time, which store holds which expired products and where in the storage area each one currently is.
+
+This is a high-level design round (API + data model + scaling), not a low-level schema-DDL exercise.
+
+Notes
+
+API shape: front it with a web tier + REST API; be ready to specify the read path (GET /products/{id}/location, store/expiry query endpoints) and how clients access it.
+
+Datastore choice — the main probe: relational (RDS / PostgreSQL / MySQL) vs NoSQL (DynamoDB). Consistency / ACID is a valid point, but the interviewer explicitly pushes back on "is consistency the only reason to pick relational?" — bring more axes: query flexibility and ad-hoc joins (store × expiry × location) favor relational; predictable key-based lookups at massive scale and write throughput favor DynamoDB. Frame it as a trade-off, not a verdict.
+
+Expiry scan at scale — the second probe: with millions of products, re-scanning the full table every few minutes to find newly-expired items will crash the DB. Index on expiry time and bucket / queue the work — e.g. pull only "items expiring in the next 5 minutes" into a dedicated structure to process, rather than scanning everything. A time-bucketed queue or a sorted index on expiry timestamp is the expected answer.
+
+Read-heavy scaling: add a cache layer for hot location lookups; for millions of requests, discuss load balancing (health checks, traffic distribution, horizontal autoscaling by load).
+
+Preparation
+
+Prepare a 3-axis datastore comparison (consistency, query flexibility, scale/throughput) so "consistency" is not your only relational argument.
+
+Sketch the expiry-processing path two ways — naive full scan vs. expiry-indexed time bucket / queue — and be able to explain why the second survives millions of items.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

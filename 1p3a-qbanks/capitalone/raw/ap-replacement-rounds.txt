@@ -1,0 +1,63 @@
+===H1===
+AP Replacement Rounds
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/ap-replacement-rounds
+===BODY===
+Capital One
+Coding·70 minMembers
+AP Replacement Rounds
+Repeatedly transform an `A`/`P` array: if the trailing run of `P`s is at least `replacement_rate`, strip that many `P`s from the end; else if any `A` exists, replace the rightmost `A` with `P`; else stop. Return the number of rounds to reach the terminal state.
+SWE
+array
+simulation
+math
+medium
+oa
+codesignal
+Frequency
+Single report
+Last asked
+2026-01-27
+Stage
+oa
+Requirements
+
+Input: an array arr of characters A or P, and integer replacement_rate.
+
+One round of the transform applies exactly one rule, in priority order:
+
+If the count of Ps at the tail (consecutive from the right) is ≥ replacement_rate, remove replacement_rate of them.
+
+Else if any A exists, replace the rightmost A with P.
+
+Else stop.
+
+Return the number of rounds to reach a stop.
+
+Examples
+
+rate = 3, arr = ['A','A','P']
+Round 1: tail P count = 1 < 3, rightmost A -> P:  ['A','P','P']
+Round 2: tail P count = 2 < 3, rightmost A -> P:  ['P','P','P']
+Round 3: tail P count = 3 >= 3, strip 3 P's:      []
+Return 3
+
+Notes
+
+The natural simulation is correct but O(n²) on adversarial inputs. With this OA's constraints, simulation passes; the hidden tests do not push toward a closed form.
+
+Resist the urge to shortcut with a closed-form round count: strips and replacements interleave in ways that depend on where the Ps sit (leading Ps only become strippable after later replacements reach them), so simple formulas over count_A and the initial trailing-P run miscount. The simulation is the reliable answer.
+
+Watch the priority: rule 1 (strip) outranks rule 2 (replace) even when both are available. Reversing the priority changes the answer.
+
+Preparation
+
+Implement the simulation cleanly with the priority order; verify on the worked example.
+
+If a follow-up asks about scale, reason with an amortised bound instead of a formula: every round either strips replacement_rate trailing Ps or converts one A, so the total round count is O(count_A + n / replacement_rate).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

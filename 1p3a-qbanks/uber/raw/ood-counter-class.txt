@@ -1,0 +1,82 @@
+===H1===
+OOD Counter Class
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/ood-counter-class
+===BODY===
+Uber
+CodingMembers
+OOD Counter Class
+Design an expiring counter that tracks how many unexpired copies of each element are currently stored, supporting per-element and total counts under a sliding expiration window. A common follow-up asks how to scale to roughly one million inputs per second by batching counts into per-second aggregates.
+SWE
+oop-design
+data-structure
+hashmap
+queue
+ttl
+streaming
+medium
+Frequency
+Single report
+Last asked
+2026-07-17
+Stage
+phone-screen
+OOD Counter Class
+
+Design an expiring counter that tracks how many unexpired copies of each element are currently stored.
+
+Implement the Counter class:
+
+Counter(int window) Initializes the counter with an expiration window of window seconds.
+
+void put(int timestamp, string element) Adds one copy of element at timestamp.
+
+int getCount(int timestamp, string element) Returns the number of unexpired copies of element at timestamp.
+
+int getTotalCount(int timestamp) Returns the total number of unexpired elements across the entire counter at timestamp.
+
+An inserted element remains valid at query time timestamp only when timestamp - insertedTimestamp < window.
+
+You may assume all calls are made in non-decreasing timestamp order.
+
+Follow-up note: If the system receives millions of inputs per second, storing one queue entry per event can become too expensive. A common optimization is to batch by second, keeping one time bucket per second and aggregating counts per element inside that bucket so expiration still happens lazily at bucket granularity.
+
+Examples
+
+Example 1:
+
+Input: ["Counter","put","put","put","getCount","getTotalCount","getCount","getTotalCount"] [[10],[1,"a"],[3,"a"],[5,"b"],[6,"a"],[6],[12,"a"],[12]]
+
+Output: [null,null,null,null,2,3,1,2]
+
+Explanation:
+
+Counter counter = new Counter(10); counter.put(1, "a"); counter.put(3, "a"); counter.put(5, "b"); counter.getCount(6, "a"); // return 2 counter.getTotalCount(6); // return 3 counter.getCount(12, "a"); // return 1 counter.getTotalCount(12); // return 2
+
+Example 2:
+
+Input: ["Counter","put","put","put","getCount","getTotalCount","getCount"] [[2],[1,"x"],[1,"x"],[2,"y"],[2,"x"],[3],[3,"x"]]
+
+Output: [null,null,null,null,2,1,0]
+
+Explanation:
+
+Two values inserted at the same timestamp are both valid until the window boundary is reached. At timestamp 3 with window 2, both entries from timestamp 1 have expired.
+
+Constraints
+
+1 <= window <= 10^9
+
+1 <= timestamp <= 10^9
+
+timestamp values are passed in non-decreasing order.
+
+element consists of lowercase English letters.
+
+At most 10^5 calls will be made to put, getCount, and getTotalCount.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

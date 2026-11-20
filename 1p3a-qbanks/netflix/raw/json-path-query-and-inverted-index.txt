@@ -1,0 +1,107 @@
+===H1===
+Json Path Query And Inverted Index
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/json-path-query-and-inverted-index
+===BODY===
+Json Path Query And Inverted Index
+
+<https://www.1point3acres.com/interview/problems/company/netflix/json-path-query-and-inverted-index>
+
+Netflix
+Coding
+
+60 min
+Members
+JSON Path Query / Inverted Index
+
+Two related search/parsing prompts appear in recent Netflix rounds: implement a mini `jq` path query with wildcard support, or build an inverted index that supports word and phrase search over documents.
+
+SWE
+json
+parsing
+search
+hashmap
+recursion
+string-processing
+medium
+Frequency
+Low
+Last asked
+2026-04-24
+Stage
+phone-screen  onsite-coding
+Requirements
+Mini jq Variant
+Input: parsed JSON object and a query path such as ., .name.email, or .*.email.*.
+Return matching values.
+Support field traversal and wildcard * over object children.
+Use a real JSON parser if the language provides one; the interview focus is traversal, not hand-parsing JSON text.
+Canonical signatures and path grammar: get_by_path(data: dict, path: str) -> object | None for the exact-path stage, then get_by_path_with_wildcard(data: dict, path: str) -> list[object] for the wildcard follow-up. Paths always start with . and segments split on . (e.g. .contacts.cell, . itself selects the root). On the exact path, return None if any segment is missing or if traversal hits a non-map value. * matches exactly one key at that level over an object's children (not array indices), may appear at any segment, and the wildcard query returns all terminal matches in the map's natural iteration order (empty list if none).
+Inverted Index Variant
+Input: list of document strings.
+Build word -> docId -> positions index.
+search(word) returns documents containing a word.
+search(phrase) returns documents where all words appear consecutively.
+Notes
+Mini jq is recursive DFS over the parsed JSON tree. Each path token transforms a current frontier of nodes into a next frontier.
+Inverted index phrase search starts from the posting list of the first word, then checks whether later words exist at start + offset in the same document.
+Normalize text consistently: lowercase, split on whitespace, and decide whether punctuation is stripped.
+If position lists are sorted, binary search makes phrase matching efficient.
+Edge cases: missing fields, wildcard over arrays vs objects, empty query, repeated words in phrase, and documents with no tokens.
+Preparation
+Implement query(json_obj, path) with wildcard tokens.
+Implement buildIndex(docs) and search(phrase).
+Walk through phrase search complexity: proportional to candidate positions of the first term times phrase length, improved by choosing the rarest term as anchor.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Mini jq Variant
+Inverted Index Variant
+Notes
+Preparation
+Related discussions  3
+???????
+?? L5 ??
+?Netflix technical ????
+Related questions
+
+Other Netflix questions sharing tags with this one
+
+User Engagement Pattern Classification
+Single report
+hashmap
+string-processing
+medium
++1
+Count Disjoint String Pairs
+Low
+hashmap
+medium
+bitmask
++1
+Human-Readable Duration Timer
+Single report
+recursion
+string-processing
+math
++1
+Basic Calculator
+Single report
+parsing
+string-processing
+stack
++1
+Music Playlist History
+Single report
+hashmap
+medium
+data-structure
++2
+Code editor
+
+---

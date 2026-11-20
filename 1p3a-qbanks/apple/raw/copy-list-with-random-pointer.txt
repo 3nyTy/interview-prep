@@ -1,0 +1,50 @@
+===H1===
+Copy List with Random Pointer (LC 138)
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/copy-list-with-random-pointer
+===BODY===
+Apple
+CodingMembers
+Copy List with Random Pointer (LC 138)
+Clone the linked list with random pointers from LC 138, then satisfy an O(1)-auxiliary-space follow-up without corrupting the original list. Pointer restoration and terminal-node handling receive explicit scrutiny.
+SWE
+linked-list
+hashmap
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-coding
+Requirements
+
+Given a linked list whose nodes have both next and random pointers, return a deep copy of the list.
+
+Every copied next and random pointer must target the corresponding copied node rather than an original node.
+
+Preserve the original list exactly after the function returns.
+
+Produce a working baseline solution, then reduce auxiliary space to O(1).
+
+Notes
+
+A mapping baseline makes one pass to allocate a copy for every original node, then a second pass to wire each copied next and random pointer through the identity map. It takes O(n) time and O(n) auxiliary space.
+
+For the constant-auxiliary-space version, insert each copied node immediately after its original node. Then original.random.next identifies the copied random target when the original random pointer is non-null. A final pass separates the interleaved chains while restoring every original next pointer and explicitly terminating the copied list. Each node is touched a constant number of times, so the algorithm takes O(n) time and O(1) auxiliary space excluding the returned copy.
+
+Pointer restoration is the core signal in the O(1)-space follow-up. A solution can appear to produce the right copy while still leaving the original structure corrupted.
+
+Preparation
+
+Implement both the mapping-based and interleaved versions from memory.
+
+Trace the separation step on a one-node list, a multi-node list, and a list with null and self-referential random pointers.
+
+Add assertions that the original list is structurally unchanged after cloning.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

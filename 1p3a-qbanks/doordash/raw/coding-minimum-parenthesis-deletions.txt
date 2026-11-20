@@ -1,0 +1,55 @@
+===H1===
+Coding: Minimum Parenthesis Deletions
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/coding-minimum-parenthesis-deletions
+===BODY===
+DoorDash
+CodingMembers
+Coding: Minimum Parenthesis Deletions
+Given a string containing only `(` and `)`, return the minimum number of characters that must be deleted to make it valid. The follow-up asks for the deletion indices rather than only the count.
+SWE
+string
+greedy
+stack
+easy
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-coding
+Requirements
+
+Input: a string containing only ( and ).
+
+Return the minimum number of characters that must be deleted so the remaining parentheses are valid.
+
+Follow-up: return the positions that should be deleted, not only the count.
+
+Examples
+
+")(" → 2
+
+")(()())(" → 2
+
+")()" → 1
+
+Notes
+
+For the count-only version, scan left to right with an unmatched-open balance. An unmatched ) increments the deletion count; after the scan, every remaining unmatched ( contributes one more deletion. This is O(n) time and O(1) auxiliary space.
+
+The interviewer explicitly probes whether the count-only version needs to remember individual characters.
+
+For the index-returning follow-up, keep indices of unmatched ( on a stack, record each unmatched ) immediately, and combine those positions with the stack contents after the scan.
+
+Preparation
+
+Implement the count-only scan with constant auxiliary space and explain why every unmatched parenthesis contributes one deletion.
+
+Extend the implementation to return deletion indices, then test leading closes, trailing opens, balanced input, and empty input.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

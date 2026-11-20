@@ -1,0 +1,53 @@
+===H1===
+Alternating Triplets
+===URL===
+https://www.1point3acres.com/interview/problems/company/jpmorgan/alternating-triplets
+===BODY===
+JPMorgan Chase
+Coding·60 minMembers
+Alternating Triplets
+Given an array, inspect every adjacent triple and count triples where the middle element is greater than both neighbors or less than both neighbors.
+SWE
+array
+simulation
+oa
+easy
+Frequency
+Single report
+Last asked
+2025-06-30
+Stage
+oa
+Requirements
+
+Input: an array.
+
+For each adjacent triple (a[i], a[i+1], a[i+2]), check whether the middle element is a strict local maximum or strict local minimum.
+
+Count triples satisfying either condition:
+
+a[i] < a[i+1] > a[i+2]
+
+a[i] > a[i+1] < a[i+2]
+
+Return the count.
+
+Notes
+
+This is a one-pass scan over windows of length three.
+
+Equality should not count unless the interviewer explicitly changes the rule; the phrase "middle high / middle low" implies strict inequality.
+
+For arrays of length less than three, return 0.
+
+Preparation
+
+Write the strict comparison version first.
+
+Test equal adjacent values, length-two arrays, monotonic arrays, and fully alternating arrays.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,53 @@
+===H1===
+Valid Number
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/lc-valid-number
+===BODY===
+Meta
+Coding·20 minMembers
+Valid Number
+Classic LC 65 — decide whether a string is a valid number (integer, decimal, with optional sign, optional `e`/`E` exponent). Surfaced as the warm-up in a recent E5 phone screen with light wording changes.
+SWE
+string
+parsing
+state-machine
+medium
+Frequency
+Single report
+Last asked
+2026-05-16
+Stage
+phone-screen
+Requirements
+
+Input: a string s.
+
+Return True iff s parses as a valid number per the canonical definition:
+
+Optional sign (+/-).
+
+Integer part, decimal part (or both, but at least one digit is required somewhere in the mantissa).
+
+Optional exponent e/E followed by an optional sign and a non-empty integer.
+
+Whitespace and other characters are invalid.
+
+Notes
+
+Two clean approaches: hand-rolled state machine (states: start / sign / int / dot / frac / exp-sign / exp-int / end) or a single linear scan with three flags (seen_digit, seen_dot, seen_exp).
+
+The interviewer typically pushes on edge cases: ".", ".1", "1.", "1e", "+.8", "4e+", "  3  ". Walk through each before declaring you're done.
+
+Avoid try/except float(s) — explicitly disallowed by most interviewers; the round is graded on the case enumeration.
+
+Preparation
+
+Sketch the state-machine transitions on paper once before coding; the structure makes the case analysis self-documenting.
+
+Run the canonical edge-case checklist after writing the function — interviewers reportedly award most of the points here.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

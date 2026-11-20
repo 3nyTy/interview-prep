@@ -1,0 +1,152 @@
+===H1===
+Memory Allocator
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/memory-allocator
+===BODY===
+OpenAI
+Coding·75 minMembers
+Memory Allocator
+LeetCode 'Design Memory Allocator'. `Allocator(size=1000)` with `malloc(size) -> pointer` and `free(pointer) -> bool`. The interviewer explicitly rejects O(n) linked-list solutions and asks for a better approach.
+SWE
+MLE
+RE
+algorithm
+data-structure
+hard
+Frequency
+High
+Last asked
+2026-08-05
+Stage
+phone-screen
+Requirements
+
+malloc(size) returns an address by splitting the leftmost free block of sufficient size.
+
+free(pointer) releases and merges with adjacent free blocks automatically.
+
+Complexity target: O(log m) where m = number of operations / blocks.
+
+Alternate canonical variant — explicit (address, size) free
+
+A common rotation fixes the total capacity up front and requires the caller to pass the block size back to free:
+
+class MemoryAllocator:
+    def __init__(self, total_capacity: int) -> None: ...
+        # total_capacity = total memory size in bytes; all bytes start free
+        # (one block covering [0, total_capacity)). Raise on total_capacity <= 0.
+
+    def allocate(self, size: int) -> int: ...
+        # First-fit over free gaps kept sorted by start address (lowest first).
+        # Walk from the front, stop at the first gap with gap.size >= size.
+        #   exact fit  -> remove that gap node entirely.
+        #   larger gap -> shrink in place: gap.start += size, gap.size -= size.
+        # Return the start address of the new block.
+        # Raise on size <= 0, or no contiguous gap of >= size remains.
+
+    def free(self, address: int, size: int) -> None: ...
+        # Mark [address, address + size) as free and merge with the left and/or
+        # right neighbour gap when adjacent.
+        # Raise on address < 0 or address >= capacity, on address + size > capacity,
+        # on wrong size (size differs from the recorded allocation), or on freeing
+        # memory that was not handed out (incl. double-free — tracked via an
+        # {address: size} allocation map).
+
+The four merge cases on free are: no neighbour free (insert new gap), left-neighbour free (extend it), right-neighbour free (extend the freed block and drop the right gap), both neighbours free (collapse all three into one).
+
+Examples
+
+alloc = MemoryAllocator(100)
+a = alloc.allocate(20)   # -> 0    [Used 0-19][Free 20-99]
+b = alloc.allocate(30)   # -> 20   [Used 0-19][Used 20-49][Free 50-99]
+c = alloc.allocate(40)   # -> 50   [Used 0-19][Used 20-49][Used 50-89][Free 90-99]
+alloc.free(20, 30)       #         [Used 0-19][Free 20-49][Used 50-89][Free 90-99]
+d = alloc.allocate(25)   # -> 20   reuses the gap, leaving [Free 45-49]
+alloc.free(0, 20)        #         [Free 0-19][Used 20-44][Free 45-49] ...
+alloc.free(20, 25)       #         merges both sides -> [Free 0-49][Used 50-89][Free 90-99]
+
+Notes
+
+The typical first attempt is an O(n) linked list, which gets rejected.
+
+One verified O(log n) approach:
+
+Sorted list of free blocks (keyed by size) for lookup
+
+Doubly linked list of all blocks for O(1) adjacent merge
+
+In Python, sortedcontainers.SortedDict is the natural fit.
+
+Hardcore alternative: use a treap (or splay tree) for the free-block list — insert / delete / "smallest leftmost" in O(m log m), independent of address space n; pair with a doubly linked list for O(1) merge.
+
+The usual rotation hands you tests, so spend the time on brainstorming and implementation rather than building a separate harness.
+
+Baseline data structure and complexity
+
+The expected starting point is a doubly linked list of free gaps, each node {start, size, prev, next}, kept sorted by start address (lowest first) so neighbour-merge on free only needs to inspect the insertion-point's prev and next.
+
+Track live allocations in a side map ({address: size}) purely for validation: it lets free reject a wrong size, an address that was never handed out, and a double-free. A space-optimized version would instead store this metadata in headers inside the memory itself rather than a separate map.
+
+Baseline cost: allocate and free are both O(n) in the number of free blocks (linear scan to find the fit / the insertion point); space is O(m) in the number of free blocks, which grows as memory fragments.
+
+Useful introspection helpers to offer: get_free_memory() (sum of all gap sizes) and get_largest_free_block() (max single gap) — both O(n) walks, handy for reasoning about fragmentation.
+
+Known weaknesses of the baseline
+
+External fragmentation: many small gaps accumulate — 100 bytes free total but in 10-byte chunks cannot satisfy a 50-byte request.
+
+Slow search: the linear scan is O(n) per operation.
+
+No compaction: allocated blocks are never moved, so existing gaps cannot be closed by relocation.
+
+Optimization techniques to know
+
+Beyond the baseline O(n) linked list, be ready to discuss these in the complexity follow-up:
+
+Fragmentation fixes: Segregated free lists (separate lists per size class); best-fit strategy (find the smallest sufficient block); buddy system (split/merge in powers-of-2, making merging trivial).
+
+Speed improvements: Balanced BST (O(log n) allocation/deallocation); bitmap allocation (O(1) for fixed-size blocks).
+
+Space-efficiency: Implicit free list (store block metadata as headers inside the memory itself); boundary tags (add a footer to every block so merging with the previous block is O(1) without traversal).
+
+Follow-up questions interviewers ask
+
+Alignment: how would you ensure all returned addresses are multiples of 8 (or another alignment boundary)?
+
+Realloc: how do you resize an allocated block in-place while preserving its contents?
+
+Thread safety: what locking strategy would you apply to make the allocator safe under concurrent access?
+
+Double-free / use-after-free detection: how do you guard against a caller freeing already-freed or never-allocated memory?
+
+Comparison to hardware: how does your allocator differ from what the OS / MMU does at the physical/virtual memory layer?
+
+Recurring framings and follow-ups
+
+Asked as a 75-minute systems-coding screen for infra / inference teams. A common arc: implement malloc/free with a linear-scan first-fit strategy (~25 min), then optimize to best-fit by keeping free blocks in a heap keyed by size.
+
+The other common framing names the goal explicitly as coalescing to reduce fragmentation: a single linked list passing all tests in O(n), with the perf follow-up being a doubly linked list (O(1) neighbour merge) or an interval tree for faster best-fit lookup.
+
+Execution pattern in the 75-minute screen
+
+Expect substantial discussion before implementation: first-fit data structures, left/right coalescing, how to locate the insertion point, and explicit time/space complexity.
+
+The optimization phase can ask for best-fit backed by an additional sorted index. High-level data structures may be allowed, but every operation still needs a precise explanation.
+
+Minority variant: Another 75-minute rotation explicitly asks for tests and then drills test design; clarify the testing contract before coding, and be ready to explain the plan even if the coding environment cannot execute it.
+
+Preparation
+
+Drill the canonical "Design Memory Allocator" formulation (LeetCode 2502, publicly available as a LeetCode hard) until you can implement both the O(n) baseline and the O(log m) treap-based solution end-to-end
+
+Practice the sortedcontainers.SortedDict / SortedList API
+
+Think through the merge-on-free edge cases upfront (left free / right free / both free)
+
+Cover the standard edge cases in your own tests: size 0 / negative, freeing a non-existent address, double-free, memory full or too fragmented to fit, and the boundary blocks (address 0 and the very end of capacity)
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

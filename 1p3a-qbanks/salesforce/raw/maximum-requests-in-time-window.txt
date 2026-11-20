@@ -1,0 +1,67 @@
+===H1===
+Maximum Requests in a Time Window (OA)
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/maximum-requests-in-time-window
+===BODY===
+Salesforce
+Coding·30 minMembers
+Maximum Requests in a Time Window (OA)
+Second problem on the same recent Salesforce OA (HackerRank, 2 problems / 60 min). Given a list of integer timestamps and a window size W, find the maximum number of timestamps that fit inside any contiguous window of length W (window = `[start, start + W - 1]`).
+SWE
+array
+sliding-window
+two-pointer
+sorting
+easy
+Frequency
+Single report
+Last asked
+2026-03-19
+Stage
+oa
+Requirements
+
+Input: array timestamp of length n (1 ≤ n ≤ 2·10⁵) with 1 ≤ timestamp[i] ≤ 10⁹, and integer windowSize (1 ≤ W ≤ 10⁹).
+
+Output: maximum count of timestamp[i] values inside any inclusive window [s, s + W - 1] for some integer s.
+
+The optimal window always has its left edge at one of the input timestamps (otherwise sliding right loses no points and may gain some).
+
+Examples
+
+timestamp = [1, 3, 7, 5], W = 4   → 2     # e.g. [1,4], [3,6], or [5,8]
+timestamp = [2, 2, 3],    W = 1   → 2     # window [2,2] catches both
+
+Notes
+
+Canonical sliding-window solution:
+
+Sort timestamp ascending. O(n log n).
+
+Two-pointer sweep: keep lo at the left edge; advance hi while timestamp[hi] - timestamp[lo] <= W - 1 (inclusive window of length W = W-1 span). When the condition breaks, advance lo. Track the running maximum (hi - lo + 1).
+
+Answer is the maximum count observed. O(n) after the sort.
+
+Equivalent formulation: for each i, binary search for the largest j such that timestamp[j] <= timestamp[i] + W - 1. Max of (j - i + 1). Same complexity, slightly more code.
+
+Duplicate timestamps are fine — the sort puts them adjacent and the two-pointer counts them naturally.
+
+Edge cases: W = 1 (each window holds only the timestamps equal to its single value — count duplicates of the most-common value); all timestamps equal (answer = n); n = 1 (answer = 1).
+
+Be careful with the inclusive window definition. "Length W" in this prompt means span W-1; an off-by-one in the inner comparison silently produces wrong answers on the boundary cases.
+
+Preparation
+
+Write the sliding-window version twice — once expanding hi, once shrinking lo — and confirm both pass the two examples plus a 1-element and a duplicate-heavy case.
+
+Verify your inequality carefully: timestamp[hi] - timestamp[lo] <= W - 1 vs < W are equivalent here; pick one and stick to it.
+
+Time the implementation — interviewers expect <10 minutes given the 60-minute / 2-problem budget. The bulk of OA time goes to the palindrome problem above; this one should be fast.
+
+Be ready for the variation "return the actual window" — track (lo, hi) at the moment the maximum was set, not just the count.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

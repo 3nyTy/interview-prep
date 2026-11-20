@@ -1,0 +1,54 @@
+===H1===
+Remove Duplicate Letters for Lexicographically Smallest Result
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/remove-duplicate-letters-lexicographically-smallest
+===BODY===
+ByteDance / TikTok
+Coding·30 minMembers
+Remove Duplicate Letters for Lexicographically Smallest Result
+Given a string, remove duplicate letters so each character appears exactly once and the final string is lexicographically smallest among all valid results. The round explicitly included the two standard examples `bcabc -> abc` and `cbacdcbc -> acdb`, with a monotonic-stack solution expected.
+SWE
+string
+stack
+monotonic-stack
+greedy
+medium
+Frequency
+Low
+Last asked
+2026-07-13
+Stage
+phone-screen
+Requirements
+
+Given a string s, remove duplicate letters so that every letter appears once and only once. Return the lexicographically smallest result among all valid strings.
+
+Examples
+
+Input:  s = "bcabc"
+Output: "abc"
+
+Input:  s = "cbacdcbc"
+Output: "acdb"
+
+Notes
+
+The interviewer accepted the monotonic-stack framing: track whether a character is already in the stack, and only pop a larger top character when it appears again later.
+
+The round starts with roughly 30 minutes of project discussion plus DB / Redis / Kafka concepts, leaving about 30 minutes for this coding task.
+
+Common bug: popping a character whose last occurrence has already passed makes it impossible to include every distinct letter exactly once.
+
+Preparation
+
+Drill the monotonic-stack template with last_index, in_stack, and a mutable result stack.
+
+Trace both provided examples by hand; they expose the two key cases: safe pop versus must-keep.
+
+Prepare a one-minute explanation of why the stack remains lexicographically minimal without losing required characters.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

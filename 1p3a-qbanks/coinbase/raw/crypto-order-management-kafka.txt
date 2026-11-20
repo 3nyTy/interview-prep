@@ -1,0 +1,884 @@
+===H1===
+Crypto Order Management (Kafka Consumer)
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/crypto-order-management-kafka
+===BODY===
+Coinbase
+Coding·60 minMembers
+Crypto Order Management (Kafka Consumer)
+Build the consumer side of an order management system that ingests Kafka messages, tracks each order through New → In_Progress → Completed (with a Cancel extension), and exposes a status query. Spec is deliberately under-specified — you parse the input format, define the API, and decide where idempotency lives. The production-grade signal is whether you raise idempotency keys, exactly-once semantics, and state-machine validation unprompted.
+SWE
+state-machine
+hashmap
+kafka
+idempotency
+parsing
+testing
+ambiguous-spec
+medium
+Frequency
+Medium
+Last asked
+2026-07-11
+Stage
+onsite-coding
+Crypto Order Event Processing
+
+The Scenario
+
+Imagine a trading platform like Coinbase. The system sends messages to a Kafka topic whenever a user places an order or a trade happens. Your job is to read these messages and track the status of every order.
+
+Orders move through three stages: NEW → IN_PROGRESS → COMPLETED.
+
+Every message includes: orderId, operation, symbol, quantity, orderType.
+
+Part 1: Tracking Orders
+
+Requirements
+
+You need to write two functions:
+
+consumeMessages(messages) — Read messages from Kafka and save them in an in-memory database.
+
+getOrderStatus(orderId) — Return the current status of a specific order.
+
+Order Types:
+
+NEW — A user places a new order for a specific amount.
+
+FILLED — A trade happens (part of the order is bought or sold).
+
+Rules for Order Status:
+
+If no trades have happened yet → NEW
+
+If some trades happened, but not the full amount → IN_PROGRESS
+
+If the full amount has been traded → COMPLETED
+
+class OrderEventProcessor:
+    def __init__(self):
+        """Start the processor with empty storage."""
+        pass
+
+    def consume_messages(self, messages: list[str]) -> None:
+        """
+        Process a list of Kafka messages.
+
+        Args:
+            messages: List of strings like:
+                      "orderId, operation, symbol, quantity, orderType"
+
+        Example: "1234, BUY, BTC, 10, NEW"
+        """
+        pass
+
+    def get_order_status(self, order_id: str) -> str:
+        """
+        Get the status of an order.
+
+        Returns:
+            One of: "NEW", "IN_PROGRESS", "COMPLETED", "NOT_FOUND"
+        """
+        pass
+
+Example Input
+
+Here is a list of messages (comments explain what happens):
+
+1234, BUY, BTC, 10, NEW     # User wants to buy 10 BTC
+1234, BUY, BTC, 5, FILLED   # 5 BTC bought
+1234, BUY, BTC, 3, FILLED   # 3 BTC bought
+1234, BUY, BTC, 2, FILLED   # 2 BTC bought (Total is now 10)
+5678, SELL, BTC, 20, NEW
+5678, SELL, BTC, 10, FILLED
+5678, SELL, BTC, 10, FILLED
+0000, BUY, BTC, 10, NEW     # New order placed
+1111, BUY, BTC, 10, NEW     # New order placed
+1111, BUY, BTC, 5, FILLED   # 5 BTC bought
+
+Expected Output
+
+getOrderStatus(1234) → COMPLETED
+getOrderStatus(5678) → COMPLETED
+getOrderStatus(0000) → NEW
+getOrderStatus(1111) → IN_PROGRESS
+
+Solution for Part 1
+
+from enum import Enum
+
+class OrderStatus(Enum):
+    NEW = "NEW"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
+
+class Order:
+    def __init__(self, order_id: str, operation: str, symbol: str, total_quantity: int):
+        self.order_id = order_id
+        self.operation = operation
+        self.symbol = symbol
+        self.total_quantity = total_quantity
+        self.filled_quantity = 0
+        self.status = OrderStatus.NEW
+
+    def fill(self, quantity: int) -> None:
+        self.filled_quantity += quantity
+        if self.filled_quantity >= self.total_quantity:
+            self.status = OrderStatus.COMPLETED
+        else:
+            self.status = OrderStatus.IN_PROGRESS
+
+class OrderEventProcessor:
+    def __init__(self):
+        self.orders = {}  # order_id -> Order
+
+    def consume_messages(self, messages: list[str]) -> None:
+        for message in messages:
+            parts = [p.strip() for p in message.split(",")]
+            order_id = parts[0]
+            operation = parts[1]
+            symbol = parts[2]
+            quantity = int(parts[3])
+            order_type = parts[4]
+
+            if order_type == "NEW":
+                self.orders[order_id] = Order(order_id, operation, symbol, quantity)
+            elif order_type == "FILLED":
+                if order_id in self.orders:
+                    self.orders[order_id].fill(quantity)
+
+    def get_order_status(self, order_id: str) -> str:
+        if order_id not in self.orders:
+            return "NOT_FOUND"
+        return self.orders[order_id].status.value
+
+Performance Analysis:
+
+MethodTimeSpace
+consume_messagesO(M)O(1) per order
+get_order_statusO(1)O(1)
+
+Here, M is the number of messages in the batch.
+
+Part 2: Adding Cancellations
+
+New Requirements
+
+The interviewer adds a new feature: users must be able to cancel an order.
+
+You need to handle a new message type: CANCEL.
+
+A CANCEL message changes the order status to CANCELLED.
+
+Important Rule: You can only cancel an order if no trades have happened yet. If the order is IN_PROGRESS or COMPLETED, the cancel request must be rejected.
+
+You must still be able to look up cancelled orders.
+
+New Example Input
+
+1234, BUY, BTC, 10, NEW       # New order
+1234, BUY, BTC, 5, FILLED     # Partial fill
+1234, BUY, BTC, 3, FILLED     # Partial fill
+1234, BUY, BTC, 10, CANCEL    # REJECT: Some trades already happened
+5678, SELL, BTC, 20, NEW
+5678, SELL, BTC, 20, CANCEL   # ALLOW: No trades happened yet
+
+New Expected Output
+
+getOrderStatus(1234) → IN_PROGRESS   # Cancel failed
+getOrderStatus(5678) → CANCELLED     # Cancel worked
+
+Solution for Part 2
+
+from enum import Enum
+
+class OrderStatus(Enum):
+    NEW = "NEW"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
+    CANCELLED = "CANCELLED"
+
+class Order:
+    def __init__(self, order_id: str, operation: str, symbol: str, total_quantity: int):
+        self.order_id = order_id
+        self.operation = operation
+        self.symbol = symbol
+        self.total_quantity = total_quantity
+        self.filled_quantity = 0
+        self.status = OrderStatus.NEW
+
+    def fill(self, quantity: int) -> None:
+        self.filled_quantity += quantity
+        if self.filled_quantity >= self.total_quantity:
+            self.status = OrderStatus.COMPLETED
+        else:
+            self.status = OrderStatus.IN_PROGRESS
+
+    def cancel(self) -> bool:
+        """Cancel the order. Returns True if cancelled, False if not allowed."""
+        if self.status == OrderStatus.NEW:  # Only unfilled orders can be cancelled
+            self.status = OrderStatus.CANCELLED
+            return True
+        return False
+
+class OrderEventProcessor:
+    def __init__(self):
+        self.orders = {}  # order_id -> Order
+
+    def consume_messages(self, messages: list[str]) -> None:
+        for message in messages:
+            parts = [p.strip() for p in message.split(",")]
+            order_id = parts[0]
+            operation = parts[1]
+            symbol = parts[2]
+            quantity = int(parts[3])
+            order_type = parts[4]
+
+            if order_type == "NEW":
+                self.orders[order_id] = Order(order_id, operation, symbol, quantity)
+            elif order_type == "FILLED":
+                if order_id in self.orders:
+                    self.orders[order_id].fill(quantity)
+            elif order_type == "CANCEL":
+                if order_id in self.orders:
+                    self.orders[order_id].cancel()
+
+    def get_order_status(self, order_id: str) -> str:
+        if order_id not in self.orders:
+            return "NOT_FOUND"
+        return self.orders[order_id].status.value
+
+Main Update: inside cancel(), we check self.status == OrderStatus.NEW. This ensures we only cancel orders that have zero fills. This is a very common trick question.
+
+Performance Analysis:
+
+MethodTimeSpace
+consume_messagesO(M)O(1) per order
+get_order_statusO(1)O(1)
+
+Discussion Questions
+
+Common Interview Topics
+
+Idempotency (Duplicates): What if Kafka sends the same message twice?
+
+We can track event IDs or message offsets.
+
+Processing the same message twice could cause double-charging, so we must detect duplicates.
+
+Out-of-Order Messages: What if the FILLED message arrives before the NEW message?
+
+We can hold the FILLED message in a buffer and retry it later.
+
+We can rely on Kafka partition keys (using orderId as the key) to guarantee order.
+
+Data Persistence: What if the server crashes?
+
+We can use Kafka offsets to know where we left off.
+
+We should save the in-memory data to a real database periodically (snapshots).
+
+Scaling: How do we handle millions of messages?
+
+Split the Kafka topic into partitions based on orderId.
+
+Run multiple consumer instances. Each one handles a specific set of orders.
+
+Edge Cases:
+
+What if a FILLED message claims we filled more than the total order size?
+
+What if we get a NEW message for an ID that already exists?
+
+Final Performance Summary
+
+MethodTimeSpace
+consume_messagesO(M)O(N)
+get_order_statusO(1)O(1)
+
+Here, M is the number of messages, and N is the number of unique orders stored in the HashMap.
+
+Alternate canonical variant — Crypto Order Lifecycle System
+
+The Challenge
+
+You need to build a crypto trading order system. This system handles a flow of trading orders. You must be able to place, pause, resume, and cancel orders. Finally, you need to show a list of all active orders and their status.
+
+You will build this solution in steps, starting simple and adding features.
+
+Part 1: Basic Requirements
+
+Problem Statement
+
+Create a CryptoOrderSystem class. This class manages trading orders. Each order has a unique ID. You must support these four actions:
+
+Place: Add a new order.
+
+Pause: Stop an active order temporarily.
+
+Resume: Restart a paused order.
+
+Cancel: Delete an order completely.
+
+class CryptoOrderSystem:
+    def __init__(self):
+        """Start the order system."""
+        pass
+
+    def place(self, order_id: str, currency: str, amount: float, price: float) -> None:
+        """
+        Add a new order.
+
+        Args:
+            order_id: The order's unique ID
+            currency: The coin type (e.g., "BTC", "ETH")
+            amount: How much to trade
+            price: Price per unit
+
+        Notes:
+            - The order starts as ACTIVE.
+            - If the ID exists, ignore this new order.
+        """
+        pass
+
+    def pause(self, order_id: str) -> bool:
+        """
+        Pause an order.
+
+        Returns:
+            True if paused successfully. False if the order is missing
+            or not ACTIVE.
+
+        Notes:
+            - You can only pause ACTIVE orders.
+        """
+        pass
+
+    def resume(self, order_id: str) -> bool:
+        """
+        Restart a paused order.
+
+        Returns:
+            True if resumed successfully. False if the order is missing
+            or not PAUSED.
+
+        Notes:
+            - You can only resume PAUSED orders.
+        """
+        pass
+
+    def cancel(self, order_id: str) -> bool:
+        """
+        Delete an order completely.
+
+        Returns:
+            True if cancelled. False if the order does not exist.
+
+        Notes:
+            - Remove the order from memory.
+            - You can cancel both ACTIVE and PAUSED orders.
+        """
+        pass
+
+    def display_all_live_orders(self) -> list:
+        """
+        Get a list of all current orders.
+
+        Returns:
+            A list of strings like:
+            ["order1", "order2(paused)", "order3"]
+
+        Notes:
+            - Show orders in the order they arrived.
+            - Add "(paused)" to paused orders.
+            - Do NOT show cancelled orders.
+        """
+        pass
+
+Order Lifecycle
+
+    place()         pause()
+  ---------> ACTIVE --------> PAUSED
+                |                |
+                | cancel()       | resume() -> ACTIVE
+                |                |
+                v                | cancel()
+             REMOVED            v
+              (from          REMOVED
+             memory)          (from
+                             memory)
+
+How It Should Work
+
+system = CryptoOrderSystem()
+
+system.place("order1", "BTC", 10, 50000.0)
+system.place("order2", "ETH", 100, 3000.0)
+system.place("order3", "BTC", 5, 51000.0)
+system.place("order4", "ETH", 50, 3100.0)
+
+system.pause("order2")
+system.pause("order3")
+
+print(system.display_all_live_orders())
+# ["order1", "order2(paused)", "order3(paused)", "order4"]
+
+system.cancel("order2")
+
+print(system.display_all_live_orders())
+# ["order1", "order3(paused)", "order4"]
+
+Solution for Part 1
+
+from enum import Enum
+from collections import OrderedDict
+
+class OrderStatus(Enum):
+    ACTIVE = "active"
+    PAUSED = "paused"
+
+class Order:
+    def __init__(self, order_id: str, currency: str, amount: float, price: float):
+        self.order_id = order_id
+        self.currency = currency
+        self.amount = amount
+        self.price = price
+        self.status = OrderStatus.ACTIVE
+
+class CryptoOrderSystem:
+    def __init__(self):
+        self.orders = OrderedDict()  # Map ID -> Order (keeps arrival order)
+
+    def place(self, order_id: str, currency: str, amount: float, price: float) -> None:
+        if order_id in self.orders:
+            return  # Ignore duplicate
+        self.orders[order_id] = Order(order_id, currency, amount, price)
+
+    def pause(self, order_id: str) -> bool:
+        if order_id not in self.orders:
+            return False
+        order = self.orders[order_id]
+        if order.status != OrderStatus.ACTIVE:
+            return False
+        order.status = OrderStatus.PAUSED
+        return True
+
+    def resume(self, order_id: str) -> bool:
+        if order_id not in self.orders:
+            return False
+        order = self.orders[order_id]
+        if order.status != OrderStatus.PAUSED:
+            return False
+        order.status = OrderStatus.ACTIVE
+        return True
+
+    def cancel(self, order_id: str) -> bool:
+        if order_id not in self.orders:
+            return False
+        del self.orders[order_id]
+        return True
+
+    def display_all_live_orders(self) -> list:
+        result = []
+        for order in self.orders.values():
+            if order.status == OrderStatus.PAUSED:
+                result.append(f"{order.order_id}(paused)")
+            else:
+                result.append(order.order_id)
+        return result
+
+Complexity Analysis:
+
+MethodTimeSpace
+placeO(1)O(1) per order
+pauseO(1)O(1)
+resumeO(1)O(1)
+cancelO(1)O(1)
+display_all_live_ordersO(N)O(N)
+
+Part 2: Adding Users
+
+Problem Statement
+
+Interviewer: "Now we need to track which user placed each order. Add a feature to cancel all orders for a specific user."
+
+Update the system to link every order to a user. You must also implement a "bulk cancel" feature using the user ID.
+
+def place(self, order_id: str, user_id: str, currency: str, amount: float, price: float) -> None:
+    """Place a new order, now linked to a user."""
+    pass
+
+def cancel_all_by_user(self, user_id: str) -> int:
+    """
+    Cancel all orders made by this user.
+
+    Returns:
+        The number of orders cancelled.
+
+    Notes:
+        - Remove all the user's orders from memory.
+        - Clean up the user's tracking data.
+    """
+    pass
+
+Key Design Decisions
+
+Fast Lookup: We need to find a user's orders quickly. We will use a HashMap where the key is user_id and the value is a Set of order_ids.
+
+Memory Cleanup: When you cancel by user, you must remove data from two places: the main order list and the user map.
+
+Consistency: The single cancel() method must also update the user map. If you forget this, the map will hold old, invalid data.
+
+Solution for Part 2
+
+from enum import Enum
+from collections import OrderedDict, defaultdict
+
+class OrderStatus(Enum):
+    ACTIVE = "active"
+    PAUSED = "paused"
+
+class Order:
+    def __init__(self, order_id: str, user_id: str, currency: str, amount: float, price: float):
+        self.order_id = order_id
+        self.user_id = user_id
+        self.currency = currency
+        self.amount = amount
+        self.price = price
+        self.status = OrderStatus.ACTIVE
+
+class CryptoOrderSystem:
+    def __init__(self):
+        self.orders = OrderedDict()       # order_id -> Order
+        self.user_orders = defaultdict(set)  # user_id -> set of order_ids
+
+    def place(self, order_id: str, user_id: str, currency: str, amount: float, price: float) -> None:
+        if order_id in self.orders:
+            return
+        order = Order(order_id, user_id, currency, amount, price)
+        self.orders[order_id] = order
+        self.user_orders[user_id].add(order_id)
+
+    def pause(self, order_id: str) -> bool:
+        if order_id not in self.orders:
+            return False
+        order = self.orders[order_id]
+        if order.status != OrderStatus.ACTIVE:
+            return False
+        order.status = OrderStatus.PAUSED
+        return True
+
+    def resume(self, order_id: str) -> bool:
+        if order_id not in self.orders:
+            return False
+        order = self.orders[order_id]
+        if order.status != OrderStatus.PAUSED:
+            return False
+        order.status = OrderStatus.ACTIVE
+        return True
+
+    def cancel(self, order_id: str) -> bool:
+        if order_id not in self.orders:
+            return False
+        order = self.orders[order_id]
+        # Clean up user mapping
+        self.user_orders[order.user_id].discard(order_id)
+        if not self.user_orders[order.user_id]:
+            del self.user_orders[order.user_id]
+        del self.orders[order_id]
+        return True
+
+    def cancel_all_by_user(self, user_id: str) -> int:
+        if user_id not in self.user_orders:
+            return 0
+        order_ids = list(self.user_orders[user_id])  # Copy list because we will delete items
+        for order_id in order_ids:
+            del self.orders[order_id]
+        del self.user_orders[user_id]
+        return len(order_ids)
+
+    def display_all_live_orders(self) -> list:
+        result = []
+        for order in self.orders.values():
+            if order.status == OrderStatus.PAUSED:
+                result.append(f"{order.order_id}(paused)")
+            else:
+                result.append(order.order_id)
+        return result
+
+Key Change: Note that cancel() now has extra logic. It must remove the ID from user_orders. This prevents memory leaks. Interviewers check to see if you remember this.
+
+Complexity Analysis:
+
+MethodTimeSpace
+placeO(1)O(1) per order
+cancelO(1)O(1)
+cancel_all_by_userO(K)O(1)
+
+Where K = the number of orders owned by that user.
+
+Part 3: Distributing the System
+
+Problem Statement
+
+Interviewer: "We can no longer store all orders in one list. We need to split (shard) the orders across multiple streams. All orders for a single user must go to the same stream. How would you build this?"
+
+Update the system to distribute orders into N streams based on the user ID.
+
+class CryptoOrderSystem:
+    def __init__(self, num_streams: int):
+        """
+        Start the system with multiple streams.
+
+        Args:
+            num_streams: How many streams to use.
+
+        Notes:
+            - Use hash(user_id) % num_streams to find the right stream.
+            - A user's orders must always stay in the same stream.
+        """
+        pass
+
+What You Need to Do
+
+Consistent splitting: Use hash(user_id) % num_streams to pick the stream.
+
+Routing: Send all actions (place, cancel, etc.) to the correct stream.
+
+Displaying: Gather orders from all streams to show the full list.
+
+Grouping: Ensure all orders from one user stay together.
+
+Why We Design It This Way
+
+Why split by user? This keeps all data for one user in one place. It makes cancel_all_by_user efficient because it only needs to check one stream.
+
+Hash function: We use Python's hash() for simplicity. In a real system, you would use "Consistent Hashing."
+
+Performance: Each stream can be handled by a different worker or thread.
+
+Solution for Part 3
+
+from enum import Enum
+from collections import OrderedDict, defaultdict
+
+class OrderStatus(Enum):
+    ACTIVE = "active"
+    PAUSED = "paused"
+
+class Order:
+    def __init__(self, order_id: str, user_id: str, currency: str, amount: float, price: float):
+        self.order_id = order_id
+        self.user_id = user_id
+        self.currency = currency
+        self.amount = amount
+        self.price = price
+        self.status = OrderStatus.ACTIVE
+
+class Stream:
+    """A single shard that manages a smaller group of orders."""
+    def __init__(self):
+        self.orders = OrderedDict()          # order_id -> Order
+        self.user_orders = defaultdict(set)  # user_id -> set of order_ids
+
+    def place(self, order: Order) -> None:
+        if order.order_id in self.orders:
+            return
+        self.orders[order.order_id] = order
+        self.user_orders[order.user_id].add(order.order_id)
+
+    def pause(self, order_id: str) -> bool:
+        if order_id not in self.orders:
+            return False
+        order = self.orders[order_id]
+        if order.status != OrderStatus.ACTIVE:
+            return False
+        order.status = OrderStatus.PAUSED
+        return True
+
+    def resume(self, order_id: str) -> bool:
+        if order_id not in self.orders:
+            return False
+        order = self.orders[order_id]
+        if order.status != OrderStatus.PAUSED:
+            return False
+        order.status = OrderStatus.ACTIVE
+        return True
+
+    def cancel(self, order_id: str) -> bool:
+        if order_id not in self.orders:
+            return False
+        order = self.orders[order_id]
+        self.user_orders[order.user_id].discard(order_id)
+        if not self.user_orders[order.user_id]:
+            del self.user_orders[order.user_id]
+        del self.orders[order_id]
+        return True
+
+    def cancel_all_by_user(self, user_id: str) -> list:
+        if user_id not in self.user_orders:
+            return []
+        order_ids = list(self.user_orders[user_id])
+        for order_id in order_ids:
+            del self.orders[order_id]
+        del self.user_orders[user_id]
+        return order_ids
+
+    def get_live_orders(self) -> list:
+        result = []
+        for order in self.orders.values():
+            if order.status == OrderStatus.PAUSED:
+                result.append(f"{order.order_id}(paused)")
+            else:
+                result.append(order.order_id)
+        return result
+
+class CryptoOrderSystem:
+    def __init__(self, num_streams: int):
+        self.num_streams = num_streams
+        self.streams = [Stream() for _ in range(num_streams)]
+        self.order_to_stream = {}  # order_id -> stream_index (helps find orders quickly)
+
+    def _get_stream_index(self, user_id: str) -> int:
+        """Decide which stream a user belongs to."""
+        return hash(user_id) % self.num_streams
+
+    def place(self, order_id: str, user_id: str, currency: str, amount: float, price: float) -> None:
+        if order_id in self.order_to_stream:
+            return  # Ignore duplicate
+        stream_idx = self._get_stream_index(user_id)
+        order = Order(order_id, user_id, currency, amount, price)
+        self.streams[stream_idx].place(order)
+        self.order_to_stream[order_id] = stream_idx
+
+    def pause(self, order_id: str) -> bool:
+        if order_id not in self.order_to_stream:
+            return False
+        stream_idx = self.order_to_stream[order_id]
+        return self.streams[stream_idx].pause(order_id)
+
+    def resume(self, order_id: str) -> bool:
+        if order_id not in self.order_to_stream:
+            return False
+        stream_idx = self.order_to_stream[order_id]
+        return self.streams[stream_idx].resume(order_id)
+
+    def cancel(self, order_id: str) -> bool:
+        if order_id not in self.order_to_stream:
+            return False
+        stream_idx = self.order_to_stream[order_id]
+        result = self.streams[stream_idx].cancel(order_id)
+        if result:
+            del self.order_to_stream[order_id]
+        return result
+
+    def cancel_all_by_user(self, user_id: str) -> int:
+        stream_idx = self._get_stream_index(user_id)
+        cancelled_ids = self.streams[stream_idx].cancel_all_by_user(user_id)
+        for order_id in cancelled_ids:
+            del self.order_to_stream[order_id]
+        return len(cancelled_ids)
+
+    def display_all_live_orders(self) -> list:
+        """Combine live orders from all streams."""
+        result = []
+        for stream in self.streams:
+            result.extend(stream.get_live_orders())
+        return result
+
+How It Should Work
+
+system = CryptoOrderSystem(num_streams=3)
+
+# "alice" and "bob" might end up in different streams
+system.place("order1", "alice", "BTC", 10, 50000.0)
+system.place("order2", "alice", "ETH", 100, 3000.0)
+system.place("order3", "bob", "BTC", 5, 51000.0)
+system.place("order4", "bob", "ETH", 50, 3100.0)
+
+system.pause("order2")
+
+print(system.display_all_live_orders())
+# Shows orders from all streams
+
+# Cancel all of alice's orders — only affects one stream
+cancelled = system.cancel_all_by_user("alice")
+print(f"Cancelled {cancelled} orders")  # 2
+
+print(system.display_all_live_orders())
+# Only bob's orders remain
+
+Why this works:
+
+Same user, same stream: We group users together so one stream holds all their data.
+
+Fast Operations: cancel_all_by_user is fast because it doesn't need to search every stream.
+
+Order Routing: The order_to_stream map lets us find an order instantly, even if we don't know who placed it.
+
+Common Follow-Up Questions
+
+Discussed in Interviews
+
+Sharding Strategy: Why hash the user_id instead of the order_id?
+
+Hashing the user_id keeps a user's orders together. This makes bulk cancellation easy.
+
+If we hashed the order_id, a user's orders would be scattered everywhere. Bulk cancellation would have to check every single stream.
+
+Consistent Hashing: What if we add more streams?
+
+Using simple math (% N) causes problems. If N changes, almost every user moves to a new stream.
+
+"Consistent Hashing" is a technique that minimizes this movement.
+
+Timing Issues: What if events arrive in the wrong order?
+
+You can use a buffer to hold events and sort them by timestamp before processing.
+
+You can use a Priority Queue.
+
+Thread Safety: If we use multiple threads, how do we prevent errors?
+
+Use locks. Instead of locking the whole system, give each stream its own lock. This allows streams to work in parallel.
+
+Performance Summary
+
+Implementationplacepause/resumecancelcancel_all_by_userdisplay_all
+Single streamO(1)O(1)O(1)O(K)O(N)
+Sharded (S streams)O(1)O(1)O(1)O(K)O(N)
+
+N = total orders, K = orders per user, S = number of streams.
+
+Space complexity is O(N) to store orders + O(U) to store the user index (where U is the number of users).
+
+Candidate-Report Notes
+
+Volunteer idempotency in the first 5 minutes. Kafka redelivers; a naive consumer that just sums FILLED quantities can complete an order twice on the same fill. Add a per-message idempotency key (or store the message offset against each fill) before the interviewer asks — at least one rejection report cites "didn't raise idempotency" as the failing signal even after a clean implementation of the happy path.
+
+State-transition validation matters. A FILLED arriving before the NEW, two NEWs for the same orderId, a FILLED whose cumulative quantity exceeds the order's NEW quantity — call each out, decide whether to drop / log / throw, and be consistent.
+
+A data-structure that scales well across the round: Map<orderId, Order> where Order holds (originalQty, filledQty, state, processedMessageIds: Set). The processed-id set is what makes the consumer idempotent.
+
+The cancellation extension is intentionally short — the interesting decision is what "any partial fill" means once you have a state machine in place. Codify it as: cancel succeeds only if state == NEW.
+
+No starter scaffolding — you write the data classes, the parser, and your own test driver. Budget 8–10 minutes up front for this so you don't run out of time on the extension.
+
+Tech-execution variant contract: the lifecycle variant's canonical signatures return the order ID string on success and an empty string on failure (not a boolean), and add a completeOrder(id) transition for live orders — giving the state set live / paused / completed / canceled. Orders carry a placement timestamp, and displayLiveOrders() returns live orders sorted by ascending timestamp rather than arrival order. Clarify which return/display contract applies before coding.
+
+Recruiters explicitly advise writing your own test cases proactively in this round rather than waiting for a prompt — treat it as part of the graded deliverable.
+
+Preparation
+
+Drill the "consumer that parses its own input, defines its own API, runs its own happy-path tests" workflow once end-to-end in your interview language so the boilerplate is reflexive.
+
+Have a 30-second story ready on Kafka delivery semantics (at-least-once by default, why exactly-once requires either idempotent writes or transactions). The interviewer almost always opens this thread.
+
+Walk through one out-of-order fills scenario by hand and decide your handling policy ahead of time. Defending the policy is worth more than handling every conceivable case.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

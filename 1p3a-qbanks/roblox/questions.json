@@ -1,0 +1,1580 @@
+{
+  "company": "roblox",
+  "display_name": "Roblox",
+  "qbank_count": 44,
+  "questions_scraped": 44,
+  "site_total_count": 136,
+  "oj_count": 50,
+  "external_count": 42,
+  "description": "Roblox interviews lean heavily on a small, stable repertoire of coding and system design prompts drawn from the company's own product surface — rate limiting, like-button counters, matchmaking queues, delayed payments. The bar is high but predictable: interviewers want bug-free implementations with crisp boundary handling and design discussions that ground every trade-off in real platform scale (millions of concurrent players, hot creator experiences, cross-region latency). HM and director rounds heavily probe past experience with comparable traffic and scope.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/roblox",
+  "scraped_at": "2026-09-20",
+  "source": "1point3acres qbank (logged-in session)",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "most-frequent-call-path-from-trace-logs",
+      "title": "Most Frequent Call Path from Function Trace Logs",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "High",
+      "last_asked": "2026-08-13",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "stack",
+        "parsing",
+        "hashmap",
+        "string-processing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "stack",
+        "parsing",
+        "hashmap",
+        "string-processing",
+        "medium"
+      ],
+      "overview": "Parse a stream of function entry / exit events, maintain the active call stack, and return the full call path (root → leaf) that occurs most often across the trace. Tie-breaking prefers the deeper path, then the path that first reached the top frequency. Two follow-ups extend the problem to multiple threads and to returning the longest active stack.",
+      "source_count": 14,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/most-frequent-call-path-from-trace-logs"
+    },
+    {
+      "n": 2,
+      "slug": "rate-limiter-sliding-window",
+      "title": "Rate Limiter (Sliding Window) with Per-Entity Follow-up",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "High",
+      "last_asked": "2026-07-09",
+      "stage": "phone-screen · oa · onsite-coding",
+      "access": "Free preview",
+      "roles": [
+        "SWE",
+        "MLE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "rate-limiting",
+        "sliding-window",
+        "hashmap",
+        "queue",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "rate-limiting",
+        "sliding-window",
+        "hashmap",
+        "queue",
+        "medium"
+      ],
+      "overview": "The single most common Roblox phone-screen / OA coding problem: implement a sliding-window rate limiter that decides, request by request, whether each timestamped request would breach a `maxRequests` cap within a fixed `windowLength`. The follow-up generalizes the cap to be enforced independently per user and per experience (game), denying a request if either limit is exceeded.",
+      "source_count": 13,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/rate-limiter-sliding-window"
+    },
+    {
+      "n": 3,
+      "slug": "topological-sort-with-ordering",
+      "title": "Topological Sort with Secondary Ordering",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Medium",
+      "last_asked": "2026-06-29",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "topological-sort",
+        "heap",
+        "graph",
+        "scheduling",
+        "complexity-analysis",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "topological-sort",
+        "heap",
+        "graph",
+        "scheduling",
+        "complexity-analysis",
+        "medium"
+      ],
+      "overview": "Given dependency declarations where each row starts with a component and the remaining entries are prerequisites, return a valid build order. The current canonical Roblox variant requires components that become buildable at the same level to be emitted in declaration order, and returns `[\"Error\"]` for missing dependencies or cycles.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/topological-sort-with-ordering"
+    },
+    {
+      "n": 4,
+      "slug": "file-chunks-consecutive-byte-ranges",
+      "title": "File Chunk Range Tracking",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-09-09",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "interval",
+        "array",
+        "codesignal"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "interval",
+        "array",
+        "codesignal"
+      ],
+      "overview": "Process a stream of file chunks represented by inclusive byte ranges [start, end]. After each arrival, return the merged continuous ranges, joining both overlaps and directly adjacent byte ranges.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/file-chunks-consecutive-byte-ranges"
+    },
+    {
+      "n": 5,
+      "slug": "piano-keys-vanilla-ui",
+      "title": "Piano Keys: Vanilla UI Interaction",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-17",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "frontend",
+        "javascript",
+        "dom",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "frontend",
+        "javascript",
+        "dom",
+        "medium"
+      ],
+      "overview": "Build six on-screen piano keys in vanilla HTML, CSS, and JavaScript. Mouse and keyboard presses must independently control held-state styling, multiple keys must work simultaneously, and unrelated keyboard input must have no effect.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/piano-keys-vanilla-ui"
+    },
+    {
+      "n": 6,
+      "slug": "distinct-cyclic-number-pairs",
+      "title": "Distinct Cyclic Number Pairs",
+      "category": "coding",
+      "duration": "50 min",
+      "frequency": "Single report",
+      "last_asked": "2026-08-12",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "string-processing",
+        "hashmap",
+        "codesignal",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "string-processing",
+        "hashmap",
+        "codesignal",
+        "medium"
+      ],
+      "overview": "Count index pairs whose integers have equal digit lengths and whose decimal strings are cyclic rotations of one another. The initial pairwise rotation check missed hidden-test performance expectations; the target complexity is linear in the number of input digits through canonical grouping.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/distinct-cyclic-number-pairs"
+    },
+    {
+      "n": 7,
+      "slug": "merge-intervals",
+      "title": "Merge Intervals (LeetCode 56)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-05-27",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "interval",
+        "merge",
+        "sorting",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "interval",
+        "merge",
+        "sorting",
+        "medium"
+      ],
+      "overview": "Given a list of intervals, merge every overlapping interval and return the non-overlapping coverage.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/merge-intervals"
+    },
+    {
+      "n": 8,
+      "slug": "cursor-based-pagination-over-sorted-logs",
+      "title": "Cursor-Based Pagination Over Sorted Logs",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-05-24",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "sorting",
+        "streaming",
+        "backend",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "sorting",
+        "streaming",
+        "backend",
+        "medium"
+      ],
+      "overview": "Implement cursor-based pagination over sorted logs while preserving stable order and continuation semantics.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/cursor-based-pagination-over-sorted-logs"
+    },
+    {
+      "n": 9,
+      "slug": "implement-trie",
+      "title": "Implement Trie (LeetCode 208)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-05-20",
+      "stage": "tech-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "trie",
+        "data-structure",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "trie",
+        "data-structure",
+        "medium"
+      ],
+      "overview": "Implement a prefix tree with insert, exact-word lookup, and prefix lookup operations.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/implement-trie"
+    },
+    {
+      "n": 10,
+      "slug": "phone-battery-discharge-scheduling",
+      "title": "Phone Battery Discharge Scheduling",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-05-09",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "scheduling",
+        "greedy",
+        "heap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "scheduling",
+        "greedy",
+        "heap",
+        "medium"
+      ],
+      "overview": "Schedule or select phone activities under battery discharge constraints to maximize usable time or completed work.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/phone-battery-discharge-scheduling"
+    },
+    {
+      "n": 11,
+      "slug": "single-threaded-cpu",
+      "title": "Single-Threaded CPU (LeetCode 1834)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-03-23",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "heap",
+        "sorting",
+        "scheduling",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "heap",
+        "sorting",
+        "scheduling",
+        "medium"
+      ],
+      "overview": "Simulate a single-threaded CPU that picks available tasks by shortest processing time, then original index.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/single-threaded-cpu"
+    },
+    {
+      "n": 12,
+      "slug": "candy-crush-grid-matching-and-gravity",
+      "title": "Candy Crush Grid Matching and Gravity",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-03-21",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "grid",
+        "simulation",
+        "array",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "grid",
+        "simulation",
+        "array",
+        "medium"
+      ],
+      "overview": "Implement Candy Crush-style grid matching, clearing, gravity, and repeated stabilization.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/candy-crush-grid-matching-and-gravity"
+    },
+    {
+      "n": 13,
+      "slug": "flatten-nested-array",
+      "title": "Flatten Nested Array",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-03-15",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "recursion",
+        "iterator",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "recursion",
+        "iterator",
+        "medium"
+      ],
+      "overview": "Flatten a nested array structure into a single list while preserving left-to-right order.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/flatten-nested-array"
+    },
+    {
+      "n": 14,
+      "slug": "highest-earning-experience-tracker",
+      "title": "Highest-Earning Experience Tracker",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-03-10",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "heap",
+        "hashmap",
+        "streaming",
+        "data-structure",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "heap",
+        "hashmap",
+        "streaming",
+        "data-structure",
+        "medium"
+      ],
+      "overview": "Build a streaming tracker over update/query operations: each update mutates an experience's running profit by a delta; each query returns the name of the experience with the current highest total. Tests the classic streaming-top-1 / max-heap pattern with stale-entry pruning.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/highest-earning-experience-tracker"
+    },
+    {
+      "n": 15,
+      "slug": "meeting-rooms-ii",
+      "title": "Meeting Rooms II (LeetCode 253)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-03-05",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "interval",
+        "heap",
+        "sorting",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "interval",
+        "heap",
+        "sorting",
+        "medium"
+      ],
+      "overview": "Given meeting time intervals, compute the minimum number of rooms needed so no meetings assigned to the same room overlap.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/meeting-rooms-ii"
+    },
+    {
+      "n": 16,
+      "slug": "dfs-grid-with-obstacles",
+      "title": "Grid Pathfinding with Obstacles (DFS)",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-02-28",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "dfs",
+        "bfs",
+        "grid",
+        "graph",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "dfs",
+        "bfs",
+        "grid",
+        "graph",
+        "easy"
+      ],
+      "overview": "Classic 2D grid reachability problem reported in the ads-team phone screen: given a grid with obstacles, determine whether a path exists from a start cell to a goal cell. Solved with DFS or BFS; complexity discussion expected.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/dfs-grid-with-obstacles"
+    },
+    {
+      "n": 17,
+      "slug": "find-the-closest-palindrome",
+      "title": "Find the Closest Palindrome (LeetCode 564)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-02-14",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "palindromes",
+        "math",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "palindromes",
+        "math",
+        "hard"
+      ],
+      "overview": "Given an integer string, find the nearest different integer that is a palindrome.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/find-the-closest-palindrome"
+    },
+    {
+      "n": 18,
+      "slug": "closest-binary-search-tree-value-variant",
+      "title": "Closest Binary Search Tree Value Variant (LeetCode 270)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-02-13",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "bst",
+        "tree",
+        "tree-traversal",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "bst",
+        "tree",
+        "tree-traversal",
+        "easy"
+      ],
+      "overview": "Given a BST and a target value, return the tree value closest to the target.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/closest-binary-search-tree-value-variant"
+    },
+    {
+      "n": 19,
+      "slug": "design-search-autocomplete-system",
+      "title": "Design Search Autocomplete System",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-01-16",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "trie",
+        "heap",
+        "search",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "trie",
+        "heap",
+        "search",
+        "hard"
+      ],
+      "overview": "Design an autocomplete system that returns top suggestions for the current prefix and learns completed queries.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/design-search-autocomplete-system"
+    },
+    {
+      "n": 20,
+      "slug": "maximize-distance-to-closest-person",
+      "title": "Maximize Distance to Closest Person (LeetCode 849)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2025-12-23",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "two-pointer",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "two-pointer",
+        "easy"
+      ],
+      "overview": "Given a row of occupied and empty seats, choose an empty seat that maximizes distance to the closest occupied person.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/maximize-distance-to-closest-person"
+    },
+    {
+      "n": 21,
+      "slug": "remove-prefix-strings",
+      "title": "Remove Prefix Strings",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2025-12-11",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "sorting",
+        "trie",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "sorting",
+        "trie",
+        "medium"
+      ],
+      "overview": "Remove strings that are prefixes of another string, returning only the non-prefix survivors.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/remove-prefix-strings"
+    },
+    {
+      "n": 22,
+      "slug": "minimum-height-difference-between-distant-peaks",
+      "title": "Minimum Height Difference Between Distant Peaks",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2025-12-09",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "sorting",
+        "two-pointer",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "sorting",
+        "two-pointer",
+        "medium"
+      ],
+      "overview": "Select two sufficiently distant peaks with minimum height difference, using sorting or indexed scanning to satisfy the distance constraint.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/minimum-height-difference-between-distant-peaks"
+    },
+    {
+      "n": 23,
+      "slug": "maximum-number-of-balls-in-a-box",
+      "title": "Maximum Number of Balls in a Box (LeetCode 1742)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2025-12-05",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "hashmap",
+        "math",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "hashmap",
+        "math",
+        "easy"
+      ],
+      "overview": "Count balls by digit-sum box number and return the maximum number of balls in any box.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/maximum-number-of-balls-in-a-box"
+    },
+    {
+      "n": 24,
+      "slug": "laser-grid-maximum-safe-steps",
+      "title": "Maximum Safe Steps on a Laser Grid",
+      "category": "coding",
+      "duration": "50 min",
+      "frequency": "Low · New",
+      "last_asked": "2026-09-09",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "grid",
+        "set",
+        "simulation",
+        "codesignal",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "grid",
+        "set",
+        "simulation",
+        "codesignal",
+        "medium"
+      ],
+      "overview": "On a 1-indexed rectangular board, a robot starts at a given cell and may move in one straight cardinal direction. Laser centers make their entire rows and columns unsafe; return the greatest number of safe steps available before the robot reaches an unsafe line or the board boundary.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/laser-grid-maximum-safe-steps"
+    },
+    {
+      "n": 25,
+      "slug": "sliding-window-target-and-most-repeat",
+      "title": "Sliding Window: Target Containment and Most-Repeated Window",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Low",
+      "last_asked": "2026-05-19",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "sliding-window",
+        "hashmap",
+        "array",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "sliding-window",
+        "hashmap",
+        "array",
+        "medium"
+      ],
+      "overview": "MLE onsite coding round: given a list of integers, a target value, and a fixed window size, (1) return every sliding window that contains the target, then (2) find the first window that maximizes the count of the target. Tests fluency with sliding-window + hashmap and crisp boundary handling.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/sliding-window-target-and-most-repeat"
+    },
+    {
+      "n": 26,
+      "slug": "like-unlike-counter-system",
+      "title": "Like / Unlike Counter System",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-23",
+      "stage": "phone-screen · oa · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "system-design",
+        "ranking",
+        "caching",
+        "scaling",
+        "sharding",
+        "schema-design",
+        "idempotency",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "system-design",
+        "ranking",
+        "caching",
+        "scaling",
+        "sharding",
+        "schema-design",
+        "idempotency",
+        "hard"
+      ],
+      "overview": "Design a like / unlike service that supports per-user, per-item like state, list of items a user has liked, and an approximate or exact total like count per item — at platform scale (hundreds of millions of users, hot creator experiences pushing billions of likes/day). Interviewers focus on schema design, idempotency under retry, hot-shard handling, and the read-vs-write trade-off in the counter path.",
+      "source_count": 7,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/like-unlike-counter-system"
+    },
+    {
+      "n": 27,
+      "slug": "delayed-payment-scheduler",
+      "title": "Delayed Payment Scheduler (Robux Transfer)",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-04-12",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "system-design",
+        "payment",
+        "scheduling",
+        "idempotency",
+        "transactions",
+        "distributed-lock",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "system-design",
+        "payment",
+        "scheduling",
+        "idempotency",
+        "transactions",
+        "distributed-lock",
+        "hard"
+      ],
+      "overview": "Design a system that lets a user schedule a virtual-currency transfer (Robux) from one account to another, to be executed automatically at a specified future time. The core deep-dive is on durable scheduling under failure, exactly-once execution despite retries, and how to keep the scheduler accurate when millions of payments are queued for the same wall-clock minute.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/delayed-payment-scheduler"
+    },
+    {
+      "n": 28,
+      "slug": "matchmaking-service-multiplayer",
+      "title": "Matchmaking Service for Multiplayer Games",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-04-08",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "system-design",
+        "scaling",
+        "distributed-lock",
+        "queueing",
+        "game-engine",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "system-design",
+        "scaling",
+        "distributed-lock",
+        "queueing",
+        "game-engine",
+        "hard"
+      ],
+      "overview": "Design a matchmaking service that places players into balanced multiplayer sessions. Players enter a queue, get grouped by skill into teams of a fixed size (commonly 16), and are allocated to a freshly provisioned game server. The interview focuses on queue partitioning, the skill-bucketing strategy, time-vs-fairness trade-offs as wait time grows, and how to keep matches from leaking across regions.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/matchmaking-service-multiplayer"
+    },
+    {
+      "n": 29,
+      "slug": "notification-system",
+      "title": "Notification System",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-06-04",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "notification",
+        "push-notification",
+        "queueing",
+        "scaling"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "notification",
+        "push-notification",
+        "queueing",
+        "scaling"
+      ],
+      "overview": "Design a notification system with user preferences, fan-out, delivery channels, retries, and observability.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/notification-system"
+    },
+    {
+      "n": 30,
+      "slug": "image-feed-frontend-design",
+      "title": "Image Feed (Frontend System Design)",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-05-07",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "system-design",
+        "frontend",
+        "react",
+        "caching",
+        "testing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "system-design",
+        "frontend",
+        "react",
+        "caching",
+        "testing",
+        "medium"
+      ],
+      "overview": "Frontend-leaning system design: build an infinite-scroll image feed (no like / comment surface) against a fixed backend API. The deep-dive concentrates on infinite-load mechanics, offline support, and testability — the three axes the interviewer scores on explicitly.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/image-feed-frontend-design"
+    },
+    {
+      "n": 31,
+      "slug": "ml-system-design-game-genre-classification",
+      "title": "ML System Design: Game Genre Classification From Scratch",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-04-18",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "mlsd",
+        "classification",
+        "feature-engineering",
+        "evaluation",
+        "active-learning",
+        "vlm",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "mlsd",
+        "classification",
+        "feature-engineering",
+        "evaluation",
+        "active-learning",
+        "vlm",
+        "medium"
+      ],
+      "overview": "MLE phone-screen prompt: design a system to classify each game on the platform into a fixed genre taxonomy from scratch. Covers label collection, feature pipelines, model choice for a multi-modal item, training and refresh cadence, and downstream consumption.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/ml-system-design-game-genre-classification"
+    },
+    {
+      "n": 32,
+      "slug": "design-roblox-wallet",
+      "title": "Design Roblox Wallet",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-04-07",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "payment",
+        "transactions",
+        "idempotency",
+        "database"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "payment",
+        "transactions",
+        "idempotency",
+        "database"
+      ],
+      "overview": "Design a Roblox wallet with balances, ledger entries, idempotent transfers, reconciliation, and fraud controls.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/design-roblox-wallet"
+    },
+    {
+      "n": 33,
+      "slug": "online-fraud-detection-system",
+      "title": "Online Fraud Detection System",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-03-24",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "integrity",
+        "streaming",
+        "ranking",
+        "scaling"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "integrity",
+        "streaming",
+        "ranking",
+        "scaling"
+      ],
+      "overview": "Design an online fraud detection pipeline that scores user actions in near real time and escalates suspicious activity.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/online-fraud-detection-system"
+    },
+    {
+      "n": 34,
+      "slug": "design-roblox-release-deployment-workflow",
+      "title": "Design Roblox Release Deployment Workflow",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-03-03",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "ci-cd",
+        "versioning",
+        "scaling",
+        "distributed-systems"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "ci-cd",
+        "versioning",
+        "scaling",
+        "distributed-systems"
+      ],
+      "overview": "Design a Roblox release deployment workflow with staged rollout, rollback, health checks, and multi-region coordination.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/design-roblox-release-deployment-workflow"
+    },
+    {
+      "n": 35,
+      "slug": "design-a-ros-like-pub-sub-system",
+      "title": "Design a ROS-like Pub/Sub System",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-02-16",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "pubsub",
+        "messaging",
+        "distributed-systems",
+        "backend"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "pubsub",
+        "messaging",
+        "distributed-systems",
+        "backend"
+      ],
+      "overview": "Design a ROS-like publish/subscribe system for topics, publishers, subscribers, delivery guarantees, and scaling.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/design-a-ros-like-pub-sub-system"
+    },
+    {
+      "n": 36,
+      "slug": "feed-status-app",
+      "title": "Feed Status App",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-02-11",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "feed",
+        "presence",
+        "social-graph",
+        "backend"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "feed",
+        "presence",
+        "social-graph",
+        "backend"
+      ],
+      "overview": "Design a status/feed app that stores user updates, serves timelines, and handles real-time or near-real-time freshness.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/feed-status-app"
+    },
+    {
+      "n": 37,
+      "slug": "design-instagram",
+      "title": "Design Instagram",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-01-22",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "feed",
+        "social-graph",
+        "storage",
+        "scaling"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "feed",
+        "social-graph",
+        "storage",
+        "scaling"
+      ],
+      "overview": "Design Instagram-style media posting, feed generation, follows, likes, comments, and large-scale media serving.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/design-instagram"
+    },
+    {
+      "n": 38,
+      "slug": "design-a-multi-resource-resource-loader",
+      "title": "Design a Multi-Resource Resource Loader",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2025-12-23",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "scheduling",
+        "concurrency",
+        "backend",
+        "scaling"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "scheduling",
+        "concurrency",
+        "backend",
+        "scaling"
+      ],
+      "overview": "Design a loader that schedules work across multiple constrained resources while respecting dependencies, fairness, and failure handling.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/design-a-multi-resource-resource-loader"
+    },
+    {
+      "n": 39,
+      "slug": "tiny-url",
+      "title": "TinyURL (URL Shortener)",
+      "category": "system-design",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2025-10-15",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "system-design",
+        "caching",
+        "scaling",
+        "schema-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "system-design",
+        "caching",
+        "scaling",
+        "schema-design",
+        "medium"
+      ],
+      "overview": "Standard URL-shortener system design used as a phone-screen SD warm-up in some loops. Cover the encoding scheme, collision handling, read-heavy caching, and analytics.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/tiny-url"
+    },
+    {
+      "n": 40,
+      "slug": "todo-list-multi-user-collab",
+      "title": "To-Do List with Multi-User Collaboration",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-09-05",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "system-design",
+        "schema-design",
+        "ambiguous-spec",
+        "concurrency",
+        "websocket",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "system-design",
+        "schema-design",
+        "ambiguous-spec",
+        "concurrency",
+        "websocket",
+        "medium"
+      ],
+      "overview": "Design a shared to-do list product where multiple users can read and edit the same list concurrently. The interview is intentionally under-specified; the candidate is expected to clarify requirements up front and drive the conversation. Focus is on the schema, the read/write conflict model, and the API surface for collaboration.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/todo-list-multi-user-collab"
+    },
+    {
+      "n": 41,
+      "slug": "friend-played-game-near-realtime",
+      "title": "Near-Real-Time Friend-Played-Game Counter",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-06-19",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "system-design",
+        "scaling",
+        "social-graph",
+        "feed",
+        "fan-out",
+        "redis",
+        "caching",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "system-design",
+        "scaling",
+        "social-graph",
+        "feed",
+        "fan-out",
+        "redis",
+        "caching",
+        "hard"
+      ],
+      "overview": "Design a service that, for a given (user, game) pair, surfaces near-real-time signals: how many of the user's friends have played the game, plus the total active-player count for the game. Targets 10M users and 100k games. The core problem is the fan-out from a play event to every friend of the player without overwhelming the storage layer at peak hours.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/friend-played-game-near-realtime"
+    },
+    {
+      "n": 42,
+      "slug": "behavioral-hm-traffic-and-scope",
+      "title": "HM Behavioral: Traffic Scale & Scope of Past Work",
+      "category": "behavioral",
+      "duration": "45 min",
+      "frequency": "High",
+      "last_asked": "2026-08-13",
+      "stage": "onsite-bq · final-round",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE",
+        "Infra Eng",
+        "EM",
+        "All"
+      ],
+      "tags": [
+        "behavioral",
+        "bq",
+        "star",
+        "leadership",
+        "scaling",
+        "ambiguity",
+        "culture-fit",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "infra-eng",
+        "em",
+        "all-roles"
+      ],
+      "tags_slug": [
+        "behavioral",
+        "bq",
+        "star",
+        "leadership",
+        "scaling",
+        "ambiguity",
+        "culture-fit",
+        "medium"
+      ],
+      "overview": "Roblox HM, director, and executive conversations are short but high-leverage. They consistently weight traffic / scope of past work, ownership under ambiguity, product-specific motivation, and proactive decision-making; a strong technical loop can still fail at final matching if these signals are thin.",
+      "source_count": 12,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/behavioral-hm-traffic-and-scope"
+    },
+    {
+      "n": 43,
+      "slug": "mle-project-deep-dive",
+      "title": "MLE Project / Paper Deep Dive",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-08-13",
+      "stage": "onsite-deep-dive · onsite-research",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RS"
+      ],
+      "tags": [
+        "deep-dive",
+        "paper-read",
+        "presentation",
+        "ml-knowledge",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "rs"
+      ],
+      "tags_slug": [
+        "deep-dive",
+        "paper-read",
+        "presentation",
+        "ml-knowledge",
+        "medium"
+      ],
+      "overview": "Standard MLE / Research onsite deep-dive round: walk the interviewer through one of your published papers or a shipped ML project. The interviewer goes deep on the technical detail, picks at edge cases, and steers the conversation toward how the work would transfer to Roblox's product surface.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/mle-project-deep-dive"
+    },
+    {
+      "n": 44,
+      "slug": "ml-modeling-game-recommendation",
+      "title": "ML Modeling: Recommend Games to a Roblox User",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-05-19",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "mlsd",
+        "recommendation",
+        "two-tower",
+        "ranking",
+        "ml-knowledge",
+        "evaluation",
+        "ab-testing",
+        "feature-engineering",
+        "hard"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "mlsd",
+        "recommendation",
+        "two-tower",
+        "ranking",
+        "ml-knowledge",
+        "evaluation",
+        "ab-testing",
+        "feature-engineering",
+        "hard"
+      ],
+      "overview": "Open-ended ML / recommendation round for MLE candidates: \"how would you recommend games to a Roblox user?\" The interviewer expects end-to-end coverage of the recommender pipeline rather than depth on any single component. Used as the MLE onsite modeling slot.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/roblox/ml-modeling-game-recommendation"
+    }
+  ]
+}

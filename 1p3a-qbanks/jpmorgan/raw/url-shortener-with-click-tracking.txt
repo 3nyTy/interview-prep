@@ -1,0 +1,75 @@
+===H1===
+URL Shortener With Click Tracking
+===URL===
+https://www.1point3acres.com/interview/problems/company/jpmorgan/url-shortener-with-click-tracking
+===BODY===
+JPMorgan Chase
+System Design·60 minMembers
+URL Shortener With Click Tracking
+Design a URL-shortening service, then extend it to track clicks. Interviewers usually stay at overall architecture depth: encoding, redirect path, storage, collision handling, latency, and analytics write flow.
+SWE
+url-shortener
+caching
+storage
+analytics-dashboard
+scaling
+medium
+Frequency
+Medium
+Last asked
+2026-04-22
+Stage
+onsite-system-design
+Requirements
+
+Functional requirements:
+
+Create a short URL for a long URL.
+
+Redirect a short URL to the original destination with low latency.
+
+Support custom or generated short codes, with collision handling.
+
+Expire, disable, or update links when required by product policy.
+
+Track each click for analytics as a bonus extension.
+
+Scale / constraints:
+
+Redirect reads dominate writes; design the redirect path as the hot path.
+
+Click tracking should not slow down redirects.
+
+Storage must preserve uniqueness of short codes and support fast lookup by code.
+
+Design decisions to discuss:
+
+random code generation vs counter / base62 encoding
+
+cache placement for hot links
+
+synchronous vs asynchronous analytics writes
+
+abuse / invalid-link handling
+
+Notes
+
+A strong click-tracking extension emits an event after resolving the code, then returns the redirect immediately. Downstream analytics can aggregate by short code, timestamp bucket, user-agent, referrer, or geography.
+
+Clarify whether the interviewer wants an API-level design or a higher-level component diagram. Several JPMorgan interviewers keep this prompt at the overall system level and do not push hard on database schema.
+
+For custom aliases, add a uniqueness check and a reserved-word list; for generated aliases, make collision handling explicit.
+
+Preparation
+
+Draw the redirect path in under five minutes: client -> edge / load balancer -> redirect service -> cache -> URL store -> 301/302 response.
+
+Prepare one answer for click tracking that uses an async queue and one answer that writes a bounded best-effort counter inline.
+
+Practice explaining why analytics should be eventually consistent while redirect correctness should be strongly consistent for a single short code.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

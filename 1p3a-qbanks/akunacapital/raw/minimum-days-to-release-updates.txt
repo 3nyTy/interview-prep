@@ -1,0 +1,66 @@
+===H1===
+Minimum Days to Release Updates
+===URL===
+https://www.1point3acres.com/interview/problems/company/akunacapital/minimum-days-to-release-updates
+===BODY===
+Akuna Capital
+CodingMembers
+Minimum Days to Release Updates
+Given plannedDate[] and alternateDate[] for n updates that must launch in planned order (each on its planned or alternate day, multiple per day allowed), return the minimum number of days to release all updates. Greedy after sorting by planned date.
+SWE
+RS
+greedy
+sorting
+array
+medium
+Frequency
+Low
+Last asked
+2025-10-29
+Stage
+oa
+Requirements
+
+A mobile app has n planned updates. plannedDate[i] is the scheduled release day for update i; alternateDate[i] is an alternate day for the same update.
+
+Updates must be launched in the order of their planned release times.
+
+Each update can launch on either its planned date or its alternate date.
+
+Multiple updates may be released on the same day.
+
+Return the minimum number of days required to release all updates.
+
+Examples
+
+n = 4
+plannedDate   = [3, 7, 4, 9]
+alternateDate = [1, 5, 2, 3]
+
+Launch order by planned date is updates [1, 3, 2, 4]:
+
+Update 1 on Day 1 (alternate)
+
+Update 3 on Day 2 (alternate)
+
+Update 2 on Day 5 (alternate)
+
+Update 4 on Day 9 (planned, since its alternate day 3 has already passed)
+
+Minimum days = 9.
+
+Notes
+
+Sort the updates by planned date, then walk them in that order keeping the last day used. For each update, pick the earlier of its two dates that does not move time backward relative to the last launch; if the alternate has already passed, fall back to the planned date. The answer is the largest day assigned. A naive reading looks complicated, but the greedy choice per update is the whole solution — remember to sort first.
+
+Preparation
+
+Implement the sort-then-greedy pass and verify the worked example returns 9.
+
+Test cases where every alternate is earlier than its planned date, and where alternates force the planned date because of ordering.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,53 @@
+===H1===
+Sharded Matmul and Backprop Debugging
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/sharded-matmul-backprop-debugging
+===BODY===
+OpenAI
+CodingMembers
+Sharded Matmul and Backprop Debugging
+Derive a simplified sharded matrix multiplication, implement its forward and backward behavior across devices with NumPy or PyTorch, and debug a fixed set of planted defects.
+MLE
+RE
+autograd
+linear-algebra
+numpy
+pytorch
+parallelism
+debugging
+hard
+Frequency
+Low
+Last asked
+2026-07-31
+Stage
+onsite-coding
+Requirements
+
+Derive the forward computation for a simplified matrix multiplication whose operands or work are sharded across devices.
+
+Implement the matrix multiplication and its backward pass across devices using NumPy or PyTorch.
+
+Debug a starter implementation containing a fixed number of planted defects.
+
+Explain each gradient and communication step from the underlying matrix-multiplication identities.
+
+Notes
+
+The exact starter code, shard axis, and bug list can vary. Clarify which tensor dimension is partitioned, what each device owns, and where aggregation happens before writing code. The debugging section is grounded in basic matrix multiplication and gradient derivation rather than framework trivia.
+
+A current MLP/backprop rotation uses a large starter implementation with exactly five planted bugs. Shape tracing is central: the interviewer may prompt you to print tensor shapes and compare shard boundaries when progress stalls.
+
+Preparation
+
+Derive matrix-multiplication gradients by hand for both operands and annotate every tensor shape.
+
+Implement a small sharded forward and backward pass in NumPy or PyTorch and compare it against an unsharded reference.
+
+Practice locating multiple independent shape, transpose, and aggregation defects in a compact tensor program.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

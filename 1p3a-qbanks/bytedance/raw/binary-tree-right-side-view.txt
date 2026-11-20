@@ -1,0 +1,58 @@
+===H1===
+Binary Tree Right Side View
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/binary-tree-right-side-view
+===BODY===
+ByteDance / TikTok
+Coding·60 minMembers
+Binary Tree Right Side View
+Standard tree-from-the-right view problem, but reported with the extra constraint of building the input tree yourself and writing all test scaffolding inside the round.
+SWE
+tree
+bfs
+dfs
+tree-traversal
+medium
+Frequency
+Single report
+Last asked
+2026-02-01
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Given the root of a binary tree, return the values of the rightmost node at each level, ordered top-down.
+
+def rightSideView(root: Optional[TreeNode]) -> List[int]: ...
+
+The reported round adds two operational constraints:
+
+You must define the TreeNode class yourself.
+
+You must construct the test input tree manually in your editor and run your own tests.
+
+Notes
+
+Standard BFS solution: level-order traversal, take the last element of each level. O(n) time, O(w) space.
+
+Alternative DFS: traverse right-first, record the first node seen at each depth into a per-level dictionary. Also O(n) time, O(h) space.
+
+Common bug: confusing "right side view" with "rightmost leaf path" — the right side view picks the rightmost node at each level, which may not be a leaf.
+
+The tree-construction overhead is non-trivial in the time budget — practice a build_tree(values_level_order) helper that handles None placeholders.
+
+Preparation
+
+Write both BFS and DFS solutions; some interviewers ask for both.
+
+Build a TreeNode + build_tree helper from memory in under 3 minutes; the test scaffolding eats real time otherwise.
+
+Drill a couple of test cases including: skewed-left tree (right side view is the leftmost path because there's no right subtree), full tree, single node.
+
+Be ready to explain why "rightmost" needs level-order, not pre-order, to handle missing right subtrees correctly.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

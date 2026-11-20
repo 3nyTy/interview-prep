@@ -1,0 +1,76 @@
+===H1===
+Minimum Cost Flight Split
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/minimum-cost-flight-split
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Minimum Cost Flight Split
+Schedule exactly half of `n` people to fly to San Francisco and the rest to New York, minimizing total travel cost. The follow-up changes the split to `k` people for one city and may require implementing the DP baseline rather than only the greedy shortcut.
+SWE
+greedy
+sorting
+array
+medium
+Frequency
+Low
+Last asked
+2026-06-04
+Stage
+onsite-coding
+Requirements
+
+Given n candidates (even in the base case), each with two travel costs:
+
+costSF[i] — cost of sending person i to San Francisco.
+
+costNY[i] — cost of sending person i to New York.
+
+Assign exactly n / 2 people to San Francisco and n / 2 to New York such that the total cost is minimized. Return that minimum total.
+
+Function signature:
+
+int twoCitySchedCost(int[][] costs)   // costs[i] = [costSF[i], costNY[i]]
+
+Follow-ups:
+
+What if exactly k people must go to San Francisco and the remaining n - k go to New York?
+
+Implement the DP version: dp[i][j] is the minimum cost after considering the first i people with j assigned to San Francisco.
+
+Why is sorting by costSF[i] - costNY[i] the correct greedy?
+
+What if each person has more than two destinations? Now it is an assignment problem — Hungarian algorithm or min-cost-max-flow.
+
+Examples
+
+costs = [[10,20],[30,200],[400,50],[30,20]]
+
+Sort by costSF - costNY: person1 (-170), person0 (-10), person3 (10), person2 (350)
+Send the first n/2 = 2 to San Francisco: persons 1, 0 -> 30 + 10 = 40
+Send the rest to New York:               persons 2, 3 -> 50 + 20 = 70
+Total: 110
+
+Notes
+
+The slick solution: assign everyone to San Francisco initially, then "refund" the n / 2 people whose New York cost is cheapest relative to San Francisco. Equivalent to sorting by costSF[i] - costNY[i] ascending and sending the first n / 2 to San Francisco, rest to New York. Time O(n log n), space O(1).
+
+The unequal-split follow-up is the same sort; just pick the first k instead of n / 2.
+
+The DP solution is O(n * k) time and space for the unequal split, or O(n^2) if k = n / 2. It is not the shortest answer, but some interviewers explicitly ask for it after the greedy discussion.
+
+The greedy is correct because the cost difference is the only quantity that matters when rebalancing: the only way to reduce total cost by swapping is to swap a person whose (costSF - costNY) is smaller than another's, and the sort eliminates exactly those swap opportunities.
+
+Preparation
+
+Derive the cost-difference greedy from a 4-person example by hand; the algebra makes the correctness argument click.
+
+Implement once as DP for warm-up, then refactor to the greedy. Be able to go back to DP quickly if the interviewer asks for implementation rather than discussion.
+
+Be ready to articulate the swap-argument correctness proof out loud — Bloomberg explicitly tests whether the candidate can defend a greedy beyond "it worked on examples".
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,65 @@
+===H1===
+Data Fluency: Self-Driving Progress Metrics & Experiment Comparison
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/data-fluency-progress-metrics
+===BODY===
+Waymo
+Other·45 minMembers
+Data Fluency: Self-Driving Progress Metrics & Experiment Comparison
+Waymo signature round with no LC analog. Two simulation experiments produce metrics — collision rate, intervention rate, planner latency — and the candidate must reason about which experiment 'won' and how to design a statistically defensible comparison. Often paired with an open-ended sub-question on AD-specific progress metrics.
+SWE
+MLE
+experiment-design
+ab-testing
+evaluation
+open-ended
+hard
+Frequency
+Low
+Last asked
+2026-04-24
+Stage
+onsite-research
+Requirements
+
+Interviewer presents two simulation runs of a self-driving model with different parameter changes (e.g. updated planner, updated prediction model).
+
+The metric reports include a mix of safety metrics (collision rate, near-miss rate), trajectory metrics (jerk, time-to-collision), and operational metrics (planner latency, throughput).
+
+Decide which experiment is preferable and justify; design the next experiment to confirm the result.
+
+Specific sub-prompt reported: 'two latency profiles for the planning module — which is better and how would you confirm?'
+
+Notes
+
+Framework first. Open with the statistical-testing scaffold: hypothesis, primary metric, secondary metrics, success criterion, sample size + power, confounders, stratification.
+
+Pick a primary metric, then a guardrail. Safety metrics (collision rate, intervention rate) are primary; latency, jerk, mission completion are guardrails. State explicitly that you would not promote a model that wins on latency but degrades safety.
+
+Distribution > average. Mean latency hides P99 spikes that the planner cares about. Report distributional comparisons (P50, P95, P99) with confidence intervals via bootstrap. The same applies to collision rate stratified by scenario class.
+
+Stratification. Aggregate metrics blur trade-offs (the new planner might be faster in highway scenarios but slower in dense urban). Always stratify by scenario class before declaring a winner.
+
+Confounders. Same scenario library across both runs? Same simulator version? Same sensor noise model? If any of these differ, the metric delta confounds the parameter change with the environment change.
+
+Sample size and power. Compute the minimum scenarios needed to detect the target effect at a given power; for rare events (collisions), this often requires millions of scenarios. Mention importance sampling or stratified sampling to boost effective sample size for rare event classes.
+
+Sim-to-real and external validity. Even a clean win in simulation needs to be validated on a smaller real-fleet evaluation before promotion; surface this proactively.
+
+Common candidate failure modes the interviewer probes for. Reporting a single mean and declaring a winner; ignoring the sim-to-real gap; mixing primary and guardrail metrics into a composite score; failing to ask about the scenario library.
+
+Preparation
+
+Memorize the framework opener and rehearse it aloud in under 60 seconds: hypothesis, primary, guardrails, stratification, confidence interval, sim-to-real.
+
+Read 1–2 applied A/B testing writeups from search / ads / video-recommendation companies. Translate each step ('primary metric', 'novelty effect', 'CUPED') to the AD context.
+
+Pre-stage a vocabulary list for AD metrics: collision rate, intervention rate, time-to-collision, jerk, comfort, mission completion, route adherence, hand-off rate.
+
+Practice talking through one full hypothetical comparison end-to-end (e.g. 'new planner reduces P95 latency by 20% but increases collision rate by 0.1%') without writing anything down.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

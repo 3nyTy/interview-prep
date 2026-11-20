@@ -1,0 +1,74 @@
+===H1===
+Log Aggregation and Group-By
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/log-aggregation-and-grouping
+===BODY===
+Amazon
+Coding·45 minMembers
+Log Aggregation and Group-By
+Given a raw log stream, parse, aggregate, and group entries to produce a sorted report (e.g., dedupe by event id, group by user, return top-K per category). Multiple Amazon onsite reports describe variants of this prompt.
+SWE
+string
+hashmap
+medium
+Frequency
+Low
+Last asked
+2026-03-25
+Stage
+onsite-coding
+Requirements
+
+Input: a list of log entries (strings or pre-parsed records). Format and key fields are intentionally fuzzy — clarify before coding.
+
+Two common variants:
+
+Aggregate-and-sort: group by an aggregation key (user, event type, etc.), then sort by count or recency.
+
+Deduplicate: collapse log entries with the same event_id, keeping only the most recent (sort + Map<event_id, stack-of-events> works).
+
+Edge cases to surface: malformed lines, missing fields, negative counts, time-zone in timestamps.
+
+Examples
+
+Dedup variant:
+
+events = [("e1", 10), ("e2", 12), ("e1", 15)]
+# after dedup keeping latest: [("e1", 15), ("e2", 12)]
+
+Aggregation variant:
+
+logs = ["u1 click", "u1 view", "u2 click"]
+# group by user -> {"u1": {"click": 1, "view": 1}, "u2": {"click": 1}}
+
+Notes
+
+Interviewers reward early clarification — input format, what counts as a duplicate, ordering of ties. One reported quote: "I'm glad you ask that" appears in feedback when you probe edge cases.
+
+Be explicit about parallelism and large-input handling when the interviewer mentions scale; a MapReduce-style grouping is a clean talking point.
+
+For dedup, a stack per id only matters if you also need rollback semantics — otherwise a single "latest" record per id is enough.
+
+The aggregation core is a dict-of-dicts (or defaultdict(Counter)) keyed by the grouping field. O(N) time, O(distinct keys * distinct event types) space. If the prompt asks for a sorted output, the sort step dominates at O(K log K) where K is the number of distinct groups.
+
+For the dedup variant ("keep latest per event_id"), a single pass with latest[event_id] = max(latest.get(event_id, -inf), ts) plus a final sort is O(N + K log K). The "stack of events per id" pattern only matters if the prompt also requires rollback or audit semantics.
+
+Scale follow-up: if the input does not fit on one machine, partition by aggregation key (consistent hash of the group field) and reduce per partition. This is the MapReduce shape — mention skew on hot keys as a known failure mode and salting as the mitigation.
+
+Preparation
+
+Drill string parsing in your primary language: split, regex extraction, and tuple-key hashmaps.
+
+Practice articulating the clarification checklist: format, sortedness, duplicates, missing fields, ordering of ties, output structure.
+
+Pre-rehearse the scale follow-up: when the input is too large for one machine, partition by aggregation key and reduce per partition.
+
+Layered drill: (1) write the aggregation variant with defaultdict(Counter) in 5 minutes; (2) write the dedup variant with a single latest dict; (3) extend to the sorted-output variant with explicit tie-break rules; (4) verbally walk through the MapReduce partition-and-reduce shape for the scale follow-up.
+
+Pre-rehearse the clarification opener: log format, what counts as a duplicate, tie-break on equal timestamps, missing fields, output structure (flat list vs nested dict).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

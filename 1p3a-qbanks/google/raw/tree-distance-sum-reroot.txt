@@ -1,0 +1,60 @@
+===H1===
+Tree Distance Sum (Re-root DP)
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/tree-distance-sum-reroot
+===BODY===
+Google
+Coding·45 minMembers
+Tree Distance Sum (Re-root DP)
+Onsite coding round 1: given an undirected tree on N nodes, return for every node the sum of distances to all other nodes. Equivalent to LC 834. Interviewer expects baseline O(n²) DFS followed by the O(n) re-root DP.
+SWE
+tree
+dp
+dfs
+hard
+Frequency
+Single report
+Last asked
+2026-01-19
+Stage
+onsite-coding
+Requirements
+
+Input: undirected tree with N nodes and N-1 edges.
+
+Output: array ans where ans[u] is the sum of shortest-path distances from u to every other node.
+
+Walk through baseline (BFS/DFS from every node, O(n²)) before optimizing.
+
+Final solution should be O(n) via two-pass re-root DP.
+
+Examples
+
+Edges: [[0,1],[0,2],[2,3],[2,4],[2,5]]
+ans:   [8, 12, 6, 10, 10, 10]
+
+Notes
+
+The interviewer explicitly liked the "baseline first, optimize later" structure — name the O(n²) and move on within the first ~10 minutes.
+
+Two-pass technique to memorize:
+
+Post-order DFS rooted at any node: compute subSize[u] and subSum[u] (sum of distances inside u's subtree). Recurrence: subSum[u] += subSum[v] + subSize[v].
+
+Pre-order DFS doing re-root: when moving root from parent p to child v, ans[v] = ans[p] + (n - subSize[v]) - subSize[v].
+
+Verbalize the geometric intuition for the re-root formula: moving root toward v shortens distance to the subSize[v] nodes inside v's subtree by 1 and lengthens the other n - subSize[v] by 1.
+
+Preparation
+
+Drill the canonical sum-of-distances-in-tree problem until you can derive the re-root formula on a whiteboard without notes.
+
+Practice both an iterative and a recursive version; deep recursion can blow the stack on chain-like trees.
+
+Be prepared to explain why re-rooting is correct (proof by induction on the subtree boundary).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

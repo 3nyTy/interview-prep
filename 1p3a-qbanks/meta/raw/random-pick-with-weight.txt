@@ -1,0 +1,58 @@
+===H1===
+Random Pick with Weight
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/random-pick-with-weight
+===BODY===
+Meta
+Coding·40 minMembers
+Random Pick with Weight
+LeetCode 528. Sample an index proportional to its weight. Prefix-sum + binary-search is the LC answer; Meta's MLE follow-up pushes you to the Alias Method for O(1)-per-call sampling under millions of calls.
+SWE
+MLE
+Infra Eng
+array
+binary-search
+sampling
+probability
+medium
+Frequency
+Medium
+Last asked
+2026-08-24
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Constructor takes w: list[int] (positive weights).
+
+pickIndex() -> int returns an index i with probability w[i] / sum(w).
+
+LC answer: precompute prefix sums in O(n); each pick is binary-search on a uniform random in [0, total).
+
+MLE follow-up: "called millions of times — optimize." Expected response: Alias Method — O(n) build, O(1) per pick, two arrays (probability and alias).
+
+Examples
+
+w = [1, 3] → P(0) = 1/4, P(1) = 3/4.
+
+w = [1, 1, 1, 1] → uniform pick over 4 indices.
+
+Notes
+
+The MLE follow-up is the discriminator. Many candidates rely on the LC O(log n) answer and miss that Alias is the production-grade solution. Recruiters and HMs in MLE / data-infra roles ask the follow-up explicitly.
+
+Walker's Alias Method: split each bucket into a primary probability and an alias overflow. Pick a bucket uniformly, then a coin flip routes to primary vs alias.
+
+Preparation
+
+Write the prefix-sum + bisect solution in under 5 min.
+
+Read Walker's Alias Method until you can construct the alias table on a whiteboard for w = [1, 3, 4, 2].
+
+Be ready to compare O(log n) vs O(1) per pick: when does the constant factor make Alias worth it?
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

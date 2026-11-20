@@ -1,0 +1,59 @@
+===H1===
+Coding: Minimum Dasher Processing Speed
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/coding-minimum-dasher-processing-speed
+===BODY===
+DoorDash
+CodingMembers
+Coding: Minimum Dasher Processing Speed
+A DoorDash business wrapper around LC 875, Koko Eating Bananas. Given N order workloads and H hours, find the minimum integer processing rate K when a dasher can work on only one order per hour and unused time in a finished hour is lost.
+SWE
+array
+binary-search
+math
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-coding
+Requirements
+
+Input: N order workloads, an integer deadline H, and an unknown integer processing rate K measured in workload units per hour.
+
+In one hour, the dasher may process part or all of exactly one order. If an order finishes early, the remaining portion of that hour cannot be used on another order.
+
+Return the minimum K that completes all orders within H hours.
+
+Explain why the useful upper bound for K is the largest single workload rather than the total workload.
+
+Explain a safe integer expression for ceiling division.
+
+Follow-up: determine whether forcing orders to be processed in priority order changes the result.
+
+Follow-up: extend the feasibility check to multiple dashers.
+
+Notes
+
+The single-order-per-hour rule is the clarification that controls the rounding semantics. Confirm it before coding.
+
+Before searching, confirm that the input guarantees H >= N. If H < N, no finite rate can finish N nonempty orders under the one-order-per-hour rule; when H >= N, the largest workload is a feasible upper bound.
+
+For a trial rate K, compute the required hours as sum((workload + K - 1) // K). This value is monotone non-increasing in K, so binary search over [1, max(workloads)] returns the minimum feasible rate in O(N log max(workloads)) time and O(1) auxiliary space.
+
+The multi-dasher extension was discussed at the design level rather than completed in code.
+
+Preparation
+
+Implement the binary-search-on-answer version cold and derive the integer ceiling expression by hand.
+
+Write boundary tests for one order, H = N, very large workloads, and a rate equal to the maximum workload.
+
+Practice explaining how the feasibility check must change when M dashers share the orders.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

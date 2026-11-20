@@ -1,0 +1,51 @@
+===H1===
+Accounts Merge (LC 721)
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/accounts-merge-lc721
+===BODY===
+Oracle
+CodingMembers
+Accounts Merge (LC 721)
+Implement the original LC 721 Accounts Merge prompt: merge account records that share an email address and return each person's name with the sorted set of emails in the connected group.
+SWE
+graph
+union-find
+sorting
+medium
+Frequency
+Single report
+Last asked
+2026-08-28
+Stage
+onsite-coding
+Requirements
+
+Each account record contains a name followed by one or more email addresses.
+
+Two account records belong to the same person when they share at least one email address, including transitively through other records.
+
+Merge every connected group into one record containing the person's name and all distinct email addresses in sorted order.
+
+The output records may be returned in any order.
+
+Notes
+
+The onsite used the original LeetCode 721 prompt. Equal names alone do not establish identity; connectivity is determined by shared email addresses.
+
+Model emails as nodes. Either union all emails in each account with a disjoint-set structure or connect them in an adjacency list and traverse components. Group emails by component, sort each group, then prepend the associated name.
+
+With E email occurrences, disjoint-set operations are near-linear and sorting dominates at O(E log E) time; maps, component storage, and the output use O(E) auxiliary space.
+
+Clean implementation is the central difficulty. In one successful IC4 loop, a mostly complete implementation was accepted after the remaining details were explained verbally.
+
+Preparation
+
+Implement both union-find and graph-traversal versions, then test transitive overlap, duplicate names with no shared email, isolated accounts, and repeated email occurrences.
+
+Rehearse a five-minute walkthrough covering the component invariant, where the name is stored, why emails are deduplicated, and why sorting determines the final time bound.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

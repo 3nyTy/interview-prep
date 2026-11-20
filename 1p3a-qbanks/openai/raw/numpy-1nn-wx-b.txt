@@ -1,0 +1,162 @@
+===H1===
+NumPy Puzzle: 1-NN Vectorization → Wx+b Network
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/numpy-1nn-wx-b
+===BODY===
+OpenAI
+Coding·60 minMembers
+NumPy Puzzle: 1-NN Vectorization → Wx+b Network
+Implement 1-NN classification in pure NumPy (no for-loops). Follow-up: rewrite as the forward pass of a neural network, forced into `Wx + b` form with an activation function.
+MLE
+RE
+ml-knowledge
+numpy
+linear-algebra
+medium
+Frequency
+High
+Last asked
+2026-08-21
+Stage
+tech-screen · onsite-coding
+Requirements
+
+Part 1: Pure NumPy 1-NN — given train set X, labels y, query x, return the label of the closest train point. No for loops.
+
+Part 2: Rewrite Part 1 as a single (or multi-layer) NN forward pass
+
+Must use Y = Wx + b
+
+Must use an activation function (softmax / argmax acts as the "activation")
+
+Distance metric is squared Euclidean; ties break toward the smallest training index (free with np.argmin, which returns the first minimum).
+
+Key trick:
+import numpy as np
+
+def one_nn_predict(
+    X_train: np.ndarray,   # (n, d)
+    y_train: np.ndarray,   # (n,)
+    X_query: np.ndarray,   # (m, d)
+) -> np.ndarray:           # (m,)
+    ...
+
+# ---- Layer 1: scores_i = 2 * x^T x_i - ||x_i||^2 ----
+W1 = 2.0 * X.T                  # (d, n), columns = 2*x_i
+b1 = -np.sum(X * X, axis=1)     # (n,), = -||x_i||^2
+# logits = X_query @ W1 + b1     # (m, n)
+# then softmax / argmax picks the nearest neighbor
+
+Notes
+
+Key insight: ||x - x_i||^2 = ||x||^2 - 2 x·x_i + ||x_i||^2; since ||x||^2 is the same for all i, the remaining 2 x·x_i - ||x_i||^2 is exactly a linear function — fits the Wx + b form. Softmax preserves ordering, so argmax_i softmax(z)_i == argmax_i z_i and the hard 1-NN label survives the activation.
+
+Interviewer drills dimensions at every step; you must know each tensor's shape cold (query_sq (m,1), train_sq (n,), cross (m,n), dist2 (m,n), nn_idx (m,)).
+
+Often paired with the Transformer bug-hunt round in the same loop.
+
+Single-query W_1 q + b_1 derivation
+
+The interviewer often pushes for the column-vector formulation before the batched one, because it makes the affine-layer mapping unambiguous. For a single query q ∈ R^d and training examples x_1, …, x_n ∈ R^d, define:
+
+W_1 ∈ R^(n×d), where row i is 2 x_i^T
+
+b_1 ∈ R^n, where b_1[i] = -||x_i||^2
+
+Then the first affine layer gives z = W_1 q + b_1, with each coordinate z_i = 2 x_i^T q - ||x_i||^2. Expanding the squared distance:
+
+||q - x_i||^2 = ||q||^2 + ||x_i||^2 - 2 x_i^T q = ||q||^2 - z_i
+
+Since ||q||^2 is constant across i for a fixed query, argmin_i ||q - x_i||^2 = argmax_i z_i. This is the same math as the batched (d, n) W = 2 * X_train.T code below — just transposed into row-major batch form (logits = X_query @ W + b). Be ready to write either; the interviewer may ask you to reconcile the two shapes (W_1 is (n, d) for the single-column W_1 q; W is (d, n) for the row-major X_query @ W).
+
+Optional label-projection follow-up
+
+If the interviewer asks for class scores instead of a hard label, build one-hot labels Y_onehot of shape (n, c) and compute class_scores = softmax(logits, axis=1) @ Y_onehot of shape (m, c). This is a soft aggregation over training examples; it is NOT identical to hard 1-NN unless you take argmax over exemplars first and then index y_train.
+
+Reference implementation
+
+Part 1 — vectorized distance:
+
+import numpy as np
+
+def one_nn_indices(X_train: np.ndarray, X_query: np.ndarray) -> np.ndarray:
+    # X_train: (n, d),  X_query: (m, d) -> (m,)
+    train_sq = np.sum(X_train * X_train, axis=1)                # (n,)
+    query_sq = np.sum(X_query * X_query, axis=1, keepdims=True) # (m, 1)
+    cross = X_query @ X_train.T                                 # (m, n)
+    dist2 = query_sq + train_sq[None, :] - 2.0 * cross          # (m, n)
+    return np.argmin(dist2, axis=1)                             # (m,)
+
+def one_nn_predict(
+    X_train: np.ndarray,
+    y_train: np.ndarray,
+    X_query: np.ndarray,
+) -> np.ndarray:
+    return y_train[one_nn_indices(X_train, X_query)]
+
+Part 2 — affine layer + softmax:
+
+def softmax(x: np.ndarray, axis: int = -1) -> np.ndarray:
+    x = x - np.max(x, axis=axis, keepdims=True)
+    exp_x = np.exp(x)
+    return exp_x / np.sum(exp_x, axis=axis, keepdims=True)
+
+def one_nn_network_forward(
+    X_train: np.ndarray,   # (n, d)
+    X_query: np.ndarray,   # (m, d)
+) -> tuple[np.ndarray, np.ndarray]:
+    # Returns: probs (m, n), nn_idx (m,)
+    W = 2.0 * X_train.T                         # (d, n)
+    b = -np.sum(X_train * X_train, axis=1)      # (n,)
+    logits = X_query @ W + b                    # (m, n)
+    probs = softmax(logits, axis=1)             # (m, n)
+    nn_idx = np.argmax(probs, axis=1)           # (m,)
+    return probs, nn_idx
+
+Common bugs candidates report
+
+Forgetting keepdims=True on query_sq → shape (m,) instead of (m, 1) → silent broadcast error in dist2
+
+Mixing up (n, d) vs (d, n) when building the affine weight matrix (W should be (d, n) for row-major batch multiply X_query @ W)
+
+Applying softmax / argmin over the wrong axis (axis=0 vs axis=1)
+
+Forgetting that b must broadcast across the batch dimension (it does automatically when shape is (n,) and logits is (m, n))
+
+Complexity and scaling
+
+Time: O(mnd) dominated by the matrix multiply X_query @ X_train.T
+
+Space: O(mn) for the full distance / logit matrix
+
+If m × n is too large to materialize, chunk X_query in blocks
+
+For very large n, switch to approximate nearest-neighbor methods instead of the exact full-matrix scan
+
+If the interviewer pivots to cosine similarity, normalize the vectors first (then the same Wx + b argmax machinery applies to the dot products)
+
+Common follow-up questions
+
+Why squared distance instead of Euclidean? Square root is monotonic, so argmin ||q − xᵢ|| = argmin ||q − xᵢ||². Squared form is easier to vectorize and algebraically reduces to an affine expression.
+
+Where did ||q||² go in Part 2? It is the same constant for every candidate i given a fixed query, so it cancels out of the argmax and can be dropped entirely.
+
+Why doesn't softmax change the answer? Softmax is strictly monotone with respect to each coordinate when the others are fixed, so the argmax index is invariant to the softmax transformation.
+
+L1-distance follow-up
+
+After the L2 → Wx + b reduction, a recurring follow-up asks how to express 1-NN under L1 (Manhattan) distance as a network forward pass. The clean reduction that worked for L2 (the ||x||² cancellation that makes the score affine) does not carry over, because |x − xᵢ| is not a quadratic form. Be ready to discuss why a single affine layer no longer suffices and what a network expressing Σ_d |q_d − x_{i,d}| actually needs (an explicit absolute-value / nonlinearity layer over per-dimension differences).
+
+Preparation
+
+Drill NumPy vectorization + einsum until index manipulation is automatic
+
+Derive the L2 → Wx+b reduction by hand multiple times until you can write the algebra during the interview
+
+Write a mini Linear + Activation + Linear framework in NumPy and plug 1-NN into it
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

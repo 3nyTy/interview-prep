@@ -1,0 +1,53 @@
+===H1===
+Cutting Ribbons (LC 1891)
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/cutting-ribbons-max-equal-length
+===BODY===
+Google
+Coding·45 minMembers
+Cutting Ribbons (LC 1891)
+LC 1891 Cutting Ribbons: given wood lengths and K, maximize the equal piece length that yields at least K pieces. Follow-ups cover the search bound, floating-point lengths, and why complexity depends on the value range rather than the number of elements.
+SWE
+array
+binary-search
+complexity-analysis
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-coding
+Requirements
+
+Given several pieces of wood with different lengths, cut at least K equal-length pieces and maximize that common length. Pieces cannot be joined across two source boards.
+
+For a candidate length L, count sum(length // L for length in woods) and test whether the count is at least K.
+
+Search the integer range [1, max(woods)], moving toward larger feasible lengths.
+
+Follow-up: justify why the upper bound is max(woods) rather than sum(woods).
+
+Follow-up: support floating-point lengths by searching a real-valued range with a fixed iteration count or precision threshold.
+
+Follow-up: state the complexity as O(n log M), where M is the length value range, not O(n log n).
+
+Notes
+
+The interviewer allowed the candidate to abandon an initial greedy/sorting direction, then unlocked the problem with one question: what changes if a candidate length is supplied? Expect the follow-ups, not the base implementation, to consume most of the round.
+
+For the integer version, initialize the best answer to 0, search only positive candidate lengths, and return 0 when even length 1 cannot produce K pieces. The feasibility predicate is monotone: once a length is infeasible, every larger length is also infeasible.
+
+Preparation
+
+Implement the integer version from memory and prove the monotonic feasibility predicate.
+
+Rework it with floating-point lengths and explain termination under both fixed-iteration and epsilon-based policies.
+
+Practice stating the bound and complexity in terms of the numeric value domain without conflating it with input size.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

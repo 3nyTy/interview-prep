@@ -1,0 +1,137 @@
+===H1===
+Ads Audience Targeting System
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/ads-audience-targeting-system
+===BODY===
+Ads Audience Targeting System
+
+<https://www.1point3acres.com/interview/problems/company/netflix/ads-audience-targeting-system>
+
+Netflix
+System Design
+
+60 min
+Members
+Ads Audience Targeting / Custom Audience System
+
+Design a system where advertisers upload first-party user lists (emails / phones / device IDs), match them to internal users, package them with AND/OR/NOT rules, and answer membership checks in under 10ms at 200M-user scale.
+
+SWE
+Infra Eng
+ads
+caching
+redis
+scaling
+schema-design
+distributed-systems
+idempotency
+hard
+Frequency
+Single report
+Last asked
+2026-01-24
+Stage
+onsite-system-design  onsite-deep-dive
+Design an Ads Audience Targeting System
+
+Design a system that lets advertisers upload lists of users. The system must group these users into segments and use them to target ads precisely. The system handles "first-party data"this means data the advertiser owns, like email lists or customer IDs.
+
+The main challenge is speed and size. You need to process files with millions of users quickly. Then, when an ad request comes in, you must check if a user is in a group in under 10ms. This system needs to work at Netflix's scale (200M+ users) and stay online all the time.
+
+Phase 1: Project Requirements
+What the System Must Do
+Advertisers upload files: Support large files (CSV, JSON) with millions of user IDs.
+System matches users: Match the uploaded data (emails, phone numbers) to our internal user base.
+Create packages: Allow advertisers to combine groups using rules like AND/OR/NOT.
+Fast checks: The ad server must quickly check if a user belongs to a group.
+Track progress: Advertisers can see upload progress, match rates, and errors.
+
+Note: Features like "lookalike audiences" or real-time updates are "nice-to-have" but not the main focus here.
+
+Performance Goals
+Requirement	Target	Why?
+Large file support	10M+ IDs, up to 1GB	Customer lists are huge.
+Processing time	10M rows in < 30 mins	Advertisers need to launch campaigns fast.
+Lookup latency	Sub-10ms	Ad servers must respond instantly.
+Availability	99.9% uptime	Ad serving cannot stop.
+Fault tolerance	Resume failed uploads	Big uploads often fail halfway; don't lose progress.
+Data privacy	Hashed IDs only	We must protect user privacy and follow laws.
+
+Important: For uploads, throughput (speed of processing) matters most. Advertisers can wait 30 minutes. But for ad serving, latency (speed of response) matters most. The system cannot take 100ms to check a user.
+
+Capacity Estimates
+Metric	Value
+Total users	200M
+Active advertisers	10K
+Total audience groups	100K
+Average group size	200K users
+Ad requests	100K/second
+Membership lookups	500K-1M/second
+
+Storage Math:
+
+One membership link: user_id (8B) + audience_id (8B) = 16 bytes.
+Total links: 100K groups * 200K users = 20B links.
+Raw size: 20B * 16 bytes = 320 GB.
+With database overhead (Cassandra) and copies for safety (Replication Factor=3), we need multiple TB of storage.
+
+We will use Cassandra for storage and Redis for caching.
+
+Phase 2: Data Model
+Database Schema
+Audience
+??? id: UUID (PK)
+??? advertiser_id: UUID (FK)
+??? name: VARCHAR
+??? type: ENUM (uploaded, rule_based, package)
+??? status: ENUM (processing, ready, failed, expired)
+??? user_count: INTEGER
+??? match_rate: DECIMAL
+??? created_at: TIMESTAMP
+??? updated_at: TIMESTAMP
+??? expires_at: TIMESTAMP
+
+AudienceUpload
+??? id: UUID (PK)
+??? audience_id: UUID (FK)
+??? file_path: VARCHAR
+??? file_size_bytes: BIGINT
+??? total_rows: INTEGER
+??? processed_rows: INTEGER
+??? matched_rows: INTEGER
+??? status: ENUM (pending, processing, completed, failed)
+??? error_message: VARCHAR
+??? checkpoint_offset: BIGINT
+??? started_at: TIMESTAMP
+??? completed_at: TIMESTAMP
+
+AudiencePackage
+??? id: UUID (PK)
+??? advertiser_id: UUID (FK)
+??? name: VARCHAR
+??? expression: JSONB  -- {"operator": "AND", "operands": [...]}
+??? estimated_size: INTEGER
+??? created_at: TIMESTAMP
+
+AudienceMembership (Hot path - Cassandra, dual tables for different access patterns)
+
+-- Primary table: Fast lookups by user during ad serving
+memberships_by_user
+??? user_id: VARCHAR (partition key)
+??? audience_id: UUID (clustering key)
+??? added_at: TIMESTAMP
+
+-- Reverse index: Efficient deletion and stats by audience
+memberships_by_audience
+??? audience_id: UUID (partition key)
+??? user_id: VARCHAR (clustering key)
+??? added_at: TIMESTAMP
+
+IdentifierMapping (Pre-built index; one identifier can map to multiple users)
+??? identifier_type: ENUM (email_sha256, phone_sha256, device_id)
+??? identifier_value: VARCHAR (hashed)
+??? user_id: VARCHAR  -- multiple rows per identifier_value
+
+Matching U
+
+---

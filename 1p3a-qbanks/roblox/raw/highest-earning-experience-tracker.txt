@@ -1,0 +1,96 @@
+===H1===
+Highest-Earning Experience Tracker
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/highest-earning-experience-tracker
+===BODY===
+Roblox
+Coding·45 minMembers
+Highest-Earning Experience Tracker
+Build a streaming tracker over update/query operations: each update mutates an experience's running profit by a delta; each query returns the name of the experience with the current highest total. Tests the classic streaming-top-1 / max-heap pattern with stale-entry pruning.
+SWE
+heap
+hashmap
+streaming
+data-structure
+medium
+Frequency
+Single report
+Last asked
+2026-03-10
+Stage
+phone-screen
+You are building a core component of a real-time analytics system that monitors the profitability of experiences (games, features, events) on a large online platform. The component must efficiently track the current highest-earning experience as profit changes over time.
+
+You will receive a stream of operations of two types:
+
+Update — adjust the profit of an experience by some delta (can be positive or negative).
+
+Query — return the name of the experience with the highest total earnings at that moment.
+
+The stream is given as three equal-length arrays:
+
+operations[i] — either "U" (update) or "Q" (query).
+
+experiences[i] — the name of the experience involved in operation i. For a query operation, this value is unused and may be the empty string.
+
+deltas[i] — for an update, the signed change to that experience's profit. For a query, the value is unused.
+
+Return an array containing the result of every Query operation, in the order the queries appear.
+
+Tie-break. If two or more experiences are tied for the highest total earnings at the time of a query, return the lexicographically smallest name among them.
+
+If a query is issued before any Update has occurred, return the empty string for that query.
+
+This was observed from a Roblox onsite (March 2026). The interviewer explicitly asked for a heap-based solution — a single hash map gives O(1) updates but O(N) queries, and the heap is what prioritizes query time.
+
+Examples
+
+Example 1:
+
+Input: operations = ["U","U","Q","U","Q"] experiences = ["adopt-me","blox-fruits","","adopt-me",""] deltas = [100, 200, 0, 150, 0]
+
+Output: ["blox-fruits","adopt-me"]
+
+Explanation:
+
+After the first two updates: adopt-me = 100, blox-fruits = 200. First query returns "blox-fruits". After the third update: adopt-me = 250, blox-fruits = 200. Second query returns "adopt-me".
+
+Example 2:
+
+Input: operations = ["U","U","Q"] experiences = ["beta","alpha",""] deltas = [50, 50, 0]
+
+Output: ["alpha"]
+
+Explanation:
+
+Both experiences have profit 50. Tie-break by lexicographic order returns "alpha".
+
+Example 3:
+
+Input: operations = ["U","U","Q","U","Q"] experiences = ["x","x","","x",""] deltas = [100, -30, 0, -100, 0]
+
+Output: ["x","x"]
+
+Explanation:
+
+After deltas, x has profit 70, then 70, then -30. x is always the only experience, so it wins every query — even with negative profit.
+
+Constraints
+
+1 <= operations.length <= 10^5
+
+operations.length == experiences.length == deltas.length
+
+operations[i] is either "U" or "Q".
+
+Experience names consist of lowercase letters, digits, and -, with 1 <= name.length <= 32.
+
+-10^6 <= deltas[i] <= 10^6.
+
+For a "Q" operation, experiences[i] and deltas[i] are unused (may be "" and 0).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

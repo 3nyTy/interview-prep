@@ -1,0 +1,68 @@
+===H1===
+Duplicate Records Within a Time Window
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/duplicate-records-time-window
+===BODY===
+Bloomberg
+CodingMembers
+Duplicate Records Within a Time Window
+Senior phone-screen stream-processing problem: given log records of `id, text, title, timestamp`, emit every record whose content repeats within a 60-second window, with an explicit follow-up to evict expired entries from the tracking structure so memory stays bounded by the window. Candidates often shorthand it as "the LRU question", but the real pattern is sliding-window deduplication.
+SWE
+sliding-window
+dedup
+hashmap
+medium
+Frequency
+Single report
+Last asked
+2026-07-09
+Stage
+phone-screen
+Requirements
+
+Given a stream of log records, each a line of the form id, text, title, timestamp, output every record whose content duplicates an earlier record within a 60-second window.
+
+Records arrive in timestamp order.
+
+A record is reported when a matching record exists no more than 60 seconds before it.
+
+Space optimization is an explicit follow-up: once a tracked record is more than 60 seconds older than the current record's timestamp it can never match again — remove it from the tracking structure so memory stays bounded by the window, not by the stream.
+
+Clarify before coding:
+
+What defines a duplicate — the text alone, or the (text, title) pair?
+
+The exact output format — full original lines vs record ids.
+
+Examples
+
+Input:
+
+id1, t1, t1, 2
+id2, t2, t2, 4
+id3, t1, t1, 50
+id4, t1, t1, 80
+
+Output:
+
+['id3, t1, t1, 50', 'id4, t1, t1, 80']
+
+id3 is reported because it repeats id1's content 48 seconds later; id4 is reported because it repeats id3's content 30 seconds later — inside the window relative to id3, even though it is 78 seconds after id1.
+
+Notes
+
+Easy to misread: candidates often shorthand this as "the LRU question", but the actual ask is sliding-window duplicate detection — the LRU-adjacent part is only the eviction of expired entries. Recognizing the pattern late costs significant time in the round.
+
+The space discussion is graded explicitly: a hashmap of content → most recent in-window timestamp plus eviction of expired entries keeps memory proportional to the 60-second window.
+
+Preparation
+
+Implement sliding-window duplicate detection with a hashmap keyed on content mapping to the most recent in-window timestamp, plus an eviction pass dropping entries older than the window; test duplicates that straddle the 60-second boundary.
+
+Rehearse the clarification script for stream-processing prompts — duplicate-key definition, output format, timestamp-ordering guarantees — before writing any code.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

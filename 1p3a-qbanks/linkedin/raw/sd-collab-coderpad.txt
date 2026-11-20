@@ -1,0 +1,74 @@
+===H1===
+Real-Time Collaborative Code Editor
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/sd-collab-coderpad
+===BODY===
+LinkedIn
+System Design·60 minMembers
+Real-Time Collaborative Code Editor
+Design a CoderPad-like session: one admin can edit, all viewers see real-time updates, new joiners catch up immediately, optional code execution. The interviewer explicitly forbids referring to operational-transform algorithms — derive the propagation model from scratch.
+SWE
+system-design
+websocket
+concurrency
+pubsub
+scaling
+frontend
+medium
+Frequency
+Single report
+Last asked
+2025-11-13
+Stage
+onsite-system-design
+Requirements
+
+Functional:
+
+Create a session; one user is admin (editor), others are viewers.
+
+All viewers see admin edits in real time.
+
+New users joining mid-session see the current state immediately.
+
+Optional code execution (do not over-design — the interviewer signals this is not the focus).
+
+Non-functional:
+
+Latency for viewer-side update: tens of ms.
+
+Session-level scale (10s of concurrent viewers); deployment-level scale (10k concurrent sessions).
+
+Tolerate brief network blips on the viewer side.
+
+Notes
+
+The expected propagation model:
+
+Admin client emits delta events (insert/delete with (position, length, payload)).
+
+Server stages deltas in an append-only per-session log and broadcasts to subscribed viewers over WebSocket.
+
+Viewers apply deltas locally.
+
+New joiners receive a snapshot of the current document plus a tail of pending deltas after the snapshot version.
+
+Because only one editor exists, the OT / CRDT complexity collapses — the canonical insight to articulate aloud. With multiple editors, OT or CRDT would be required.
+
+For code execution, sandbox each session's runtime (Firecracker / lightweight container); rate-limit per session.
+
+Preparation
+
+Sketch the WebSocket pub/sub broadcast diagram with snapshot + delta semantics.
+
+Pre-load the "what if the admin disconnects" discussion: admin-token reassignment, delta log durability.
+
+Be ready to derive why a single editor obviates OT — the interviewer is checking whether the candidate spots the simplification.
+
+Brush up on snapshot-plus-tail-log catch-up patterns; they recur in metrics and pub/sub designs.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

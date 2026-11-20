@@ -1,0 +1,122 @@
+===H1===
+OA — Bank System with Transfer/Accept and Merge
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/oa-bank-system
+===BODY===
+Anthropic
+Coding·90 minMembers
+OA — Bank System with Transfer/Accept and Merge
+AI Safety Fellow OA variant. CodeSignal, 4 levels on a simple bank: deposits, withdrawals, a two-step `transfer + transfer_accept` flow with on-hold balances, and an account-merge step that has to survive the merged account being recreated later.
+SWE
+Fellows
+oa
+codesignal
+oop
+transactions
+merge
+medium
+Frequency
+Medium
+Last asked
+2026-06-15
+Stage
+oa
+Requirements
+
+Levels 1–2
+
+Standard account ledger: create_account, deposit, withdraw, transfer between accounts atomically.
+
+Level 3 — Two-step transfer
+
+transfer(from, to, amount) puts the funds on hold instead of moving them. transfer_accept(transfer_id) finalizes; until then the sender's available balance is reduced but the recipient's is unchanged. Expiry semantics for unaccepted transfers vary.
+
+Level 4 — Merge account
+
+merge_account(from, into) collapses two accounts into one, preserving the union of their pending transfers and history. The trip-up: a merged account can be recreated later under the same id, and the new account must not inherit the merged-away history — a robust history representation (e.g. ledger entries keyed by (account_id, generation)) is what passes the hidden tests.
+
+Notes
+
+This is the OA used for the AI Safety Fellow track in fall 2025. Confirm the current variant with your recruiter — Anthropic rotates OAs and the bank flavor may not be in active rotation by the time you read this.
+
+Generation-keyed history is the design that handles the merge-then-recreate corner; a simple dict[account_id] = history will fail those hidden cases.
+
+In the transfer/accept rotation, an unaccepted transfer that expires must release the held funds, and a later deposit on the source account is expected to reclaim a still-pending transfer. Model the hold → (accept | expire) → reclaim transitions explicitly; the timeout-then-deposit interaction is a frequently-failed edge.
+
+Alternate canonical variant in rotation — cashback / top-spenders
+
+A separate Bank System OA rotates alongside the Fellow track shape. Same 4-level CodeSignal harness, different vocabulary. Cross-reports indicate the harness exposes these exact signatures:
+
+# Level 1 — accounts + atomic transfers
+def create_account(self, timestamp: int, account_id: str) -> bool: ...
+    # True on creation; False if account_id is already taken.
+
+def deposit(self, timestamp: int, account_id: str, amount: int) -> int | None: ...
+    # Returns new balance, or None if the account is missing.
+
+def transfer(self, timestamp: int, source_id: str, target_id: str, amount: int) -> int | None: ...
+    # Returns the source's new balance.
+    # None if: either account missing, source == target, or insufficient funds.
+
+# Level 2 — ranking by outgoing volume
+def top_spenders(self, timestamp: int, n: int) -> list[str]: ...
+    # Returns ["id1(spent_amount)", "id2(spent_amount)", ...]
+    # Sort: outgoing-total desc, then account_id alphabetical asc.
+    # Outgoing counts transfer + pay (Level 3), NOT cashback inflows.
+    # If fewer than n accounts exist, return all of them.
+
+# Level 3 — payments with cashback
+def pay(self, timestamp: int, account_id: str, amount: int) -> str | None: ...
+    # Returns a unique payment id (e.g. "payment1"), or None if the account
+    # is missing or has insufficient funds.
+    # Cashback = floor(amount * 0.02) added back to the account exactly
+    # 86,400,000 ms (= 24 h) after `timestamp`.
+    # The withdrawal counts toward `top_spenders` outgoing totals.
+
+def get_payment_status(self, timestamp: int, account_id: str, payment: str) -> str | None: ...
+    # Returns "IN_PROGRESS" or "CASHBACK_RECEIVED".
+    # None if the account or payment id is missing, OR if the payment id
+    # belongs to a different account.
+
+# Level 4 — merge + look-back history
+def merge_accounts(self, timestamp: int, account_id_1: str, account_id_2: str) -> bool: ...
+    # Merges account_2 INTO account_1. account_2 is deleted.
+    # account_1 inherits: balance, outgoing-spend history, pending cashbacks,
+    # and the ability to look up account_2's old payment statuses via its own id.
+    # False if account_1 == account_2 or either is missing.
+
+def get_balance(self, timestamp: int, account_id: str, time_at: int) -> int | None: ...
+    # Balance of account_id at the exact moment time_at.
+    # None if the account did not exist at time_at.
+    # After a merge: account_1 inherits account_2's pre-merge balance history;
+    # a *new* account_2 created post-merge starts at $0 with no inherited history.
+
+Implementation notes for this variant:
+
+Cashback rounds down to the nearest whole number — floor(amount * 0.02).
+
+The 24-hour delay is in milliseconds (86,400,000) and timestamps are guaranteed strictly increasing; an event-queue / sorted-by-due-time list of pending cashbacks works.
+
+The post-merge "recreate" case is the same generational-history trap as the Fellow track: history is keyed per (account_id, generation), where generation increments each time the id is recreated after deletion-by-merge. A naive dict[account_id] = history map will return wrong results for get_balance(time_at < merge_ts) once the id is reused.
+
+For top_spenders tiebreakers, the spend tally is per-account; after a merge, account_1 absorbs account_2's tally so the post-merge ranking reflects the combined outgoing.
+
+If your harness names pay / top_spenders / merge_accounts rather than transfer_accept, switch to this shape — the data-structure work overlaps but the API surface and tiebreakers differ enough that mixing them up will fail visible cases.
+
+Preparation
+
+Build a Ledger aggregate where every mutation appends an immutable entry; queries fold over filtered slices. Same shape covers both variants.
+
+Write the transfer-accept two-step flow as a state machine: PENDING → ACCEPTED | EXPIRED. Document the held-balance semantics on a sticky note before coding.
+
+Drill the merge-and-recreate case explicitly with a synthetic test before submission — this is the single most-failed corner across both rotations.
+
+For the cashback variant: write a due_at = pay_ts + 86_400_000 sorted list and process all due cashbacks on every command (cheap, since timestamps are monotonic). Don't try to "schedule" them — the harness drives the clock.
+
+Memorize the top_spenders return format exactly: "id1(spent)" with no space inside the parens, comma-space between entries.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

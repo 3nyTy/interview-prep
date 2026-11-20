@@ -1,0 +1,89 @@
+===H1===
+Design (key, value) Storage with Snapshots
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/design-key-value-storage-with-snapshots
+===BODY===
+Apple
+System DesignMembers
+Design (key, value) Storage with Snapshots
+Design a key-value store that supports point-in-time snapshots.
+MLE
+llm
+rag
+retrieval
+mlsd
+Frequency
+Single report
+Last asked
+2025-12-09
+Stage
+phone-screen · onsite-system-design
+Design a key-value store that supports point-in-time snapshots.
+
+Implement the SnapshotMap class:
+
+SnapshotMap() Initializes an empty store. The next snapshot id is 0.
+
+void put(String key, String value) Sets key to value in the current (live) state.
+
+String get(String key) Returns the current value for key, or "" if key has never been set.
+
+int snapshot() Freezes the current state and returns its snapshot id. The returned id is the id the snapshot was taken under; the next snapshot will have id one larger. Ids start at 0.
+
+String getSnapshot(int snapId, String key) Returns the value of key at the moment snapshot snapId was taken. If key had not been set yet at that snapshot, return "".
+
+Constraints that motivate the design (from the interviewer):
+
+The total number of put calls can be very large, so you cannot afford to copy the entire map on every snapshot() call — snapshot() should be O(1).
+
+put, get, and getSnapshot should each run in O(log U) time, where U is the number of historical versions for the given key.
+
+Writes that happen after snapshot() only affect live state and later snapshots — not earlier ones. A snapshot is immutable.
+
+Examples
+
+Example 1:
+
+Input: ["SnapshotMap","put","put","snapshot","put","get","getSnapshot","get","getSnapshot"] [[],["a","a-foo"],["b","b-foo"],[],["a","a-foo-prime"],["a"],[0,"a"],["b"],[0,"b"]]
+
+Output: [null,null,null,0,null,"a-foo-prime","a-foo","b-foo","b-foo"]
+
+Explanation:
+
+Put two keys, take a snapshot (id=0), overwrite "a". Live get of "a" sees the overwrite; getSnapshot(0, "a") still sees the old value. Key "b" was unchanged after the snapshot, so live and snapshot reads match.
+
+Example 2:
+
+Input: ["SnapshotMap","put","snapshot","put","snapshot","getSnapshot","getSnapshot","get"] [[],["k","v0"],[],["k","v1"],[],[0,"k"],[1,"k"],["k"]]
+
+Output: [null,null,0,null,1,"v0","v1","v1"]
+
+Explanation:
+
+Two snapshots (ids 0 and 1) capture successive values of "k". getSnapshot reads each historical version; live get returns the latest.
+
+Example 3:
+
+Input: ["SnapshotMap","snapshot","getSnapshot","get"] [[],[],[0,"missing"],["missing"]]
+
+Output: [null,0,"",""]
+
+Explanation:
+
+Reads for keys that were never set return the empty string, both live and in snapshots.
+
+Constraints
+
+At most 10^5 total method calls
+
+1 <= key.length, value.length <= 100 (lowercase letters, digits, and dashes)
+
+0 <= snapId < number of snapshots taken
+
+snapshot() is O(1); do not copy the full map on snapshot
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

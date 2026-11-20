@@ -1,0 +1,67 @@
+===H1===
+Maximum Safe Steps on a Laser Grid
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/laser-grid-maximum-safe-steps
+===BODY===
+Roblox
+Coding·50 minMembers
+Maximum Safe Steps on a Laser Grid
+On a 1-indexed rectangular board, a robot starts at a given cell and may move in one straight cardinal direction. Laser centers make their entire rows and columns unsafe; return the greatest number of safe steps available before the robot reaches an unsafe line or the board boundary.
+SWE
+array
+grid
+set
+simulation
+codesignal
+medium
+Frequency
+Low · New
+Last asked
+2026-09-09
+Stage
+oa
+Requirements
+
+int solution(
+    int numRows,
+    int numCols,
+    int curRow,
+    int curCol,
+    int[][] laserCoordinates
+)
+
+The board has numRows rows and numCols columns and uses 1-based coordinates.
+
+The robot begins at (curRow, curCol). The starting cell does not count as a step.
+
+Each entry in laserCoordinates gives the center of a laser. A laser makes its complete row and complete column unsafe.
+
+Choose one of the four cardinal directions — up, down, left, or right — and move in a straight line. Stop before entering a laser-affected row or column, or at the board edge if no unsafe line occurs first.
+
+Return the maximum safe step count among the four directions.
+
+Notes
+
+The intern/new-grad version explicitly guarantees a safe starting cell; the hazardous-start case below is a defensive extension rather than an input expected in that version.
+
+The board's 1-based indexing is an explicit edge case; applying zero-based boundary arithmetic changes the answer.
+
+Keep hazardous rows and hazardous columns distinct when evaluating vertical versus horizontal movement.
+
+In one scan, retain the nearest hazardous row strictly above and below curRow and the nearest hazardous column strictly left and right of curCol. The four candidate distances are the gaps to those lines minus one, or the gaps to the corresponding board edges when no blocking line exists.
+
+If the starting row or column is itself hazardous, there are no safe moves under the stated unsafe-line rule. Otherwise, the nearest-line scan runs in O(K) time for K lasers and uses O(1) auxiliary space.
+
+The task appeared as one of two questions in a 50-minute intern assessment, so implementation and boundary debugging time are both part of the signal.
+
+Preparation
+
+Write the four 1-based distance formulas from memory, then check a blocker adjacent to the start, a blocker on the board edge, and a direction with no blocker.
+
+Implement both a brute-force grid simulator and the O(K) nearest-line scan, then compare them on small random boards to catch off-by-one errors.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

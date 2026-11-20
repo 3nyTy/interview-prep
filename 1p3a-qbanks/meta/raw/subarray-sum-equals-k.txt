@@ -1,0 +1,61 @@
+===H1===
+Subarray Sum Equals K
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/subarray-sum-equals-k
+===BODY===
+Meta
+Coding·40 minMembers
+Subarray Sum Equals K
+LeetCode 560. Count subarrays whose sum equals K. Prefix-sum + hashmap is the canonical solution; appears as the second half of Meta phone screens paired with a heavier first problem.
+SWE
+MLE
+Infra Eng
+array
+hashmap
+prefix-sum
+medium
+Frequency
+Low
+Last asked
+2026-08-16
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Given an integer array nums and integer k, return the number of contiguous subarrays whose sum equals k.
+
+Values may be negative; brute-force O(n²) and sliding-window do NOT work.
+
+Canonical solution: prefix-sum hash — keep a running prefix sum, count how often prefix - k has appeared.
+
+Examples
+
+nums = [1,1,1], k = 2 → 2.
+
+nums = [1,2,3], k = 3 → 2.
+
+With negatives: nums = [3,4,-7,1,2,-1], k = 0 → 4.
+
+Notes
+
+Initialize the hashmap with {0: 1} to count subarrays that start at index 0.
+
+Common bug: returning longest subarray instead of count (that's LC 325).
+
+Frequent pairing in Meta phone screens: appears as Problem 2 after a heavier Tag-list problem (Kth Largest, Subarray-K variations).
+
+Interviewers may ask you to propose the test suite. Cover empty input, one element, all zeros, negative values, and k = 0.
+
+Preparation
+
+Write the prefix-sum + hashmap solution in under 5 minutes.
+
+Drill LC 560 + LC 325 (max-length variant) + LC 974 (divisible-by-k variant) as a triplet.
+
+Be ready to explain why sliding-window fails when negatives are allowed.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,474 @@
+===H1===
+Multi-Threaded Log Writer
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/multi-threaded-log-writer
+===BODY===
+Databricks
+Coding·60 minMembers
+Multi-Threaded Log Writer
+Design and partially implement a durable event writer shared by thousands of application threads on one server. Each opaque payload is at most 1 KB; follow-ups center on batching, `fsync`, group commit, ordering, and crash recovery.
+SWE
+Infra Eng
+io
+concurrency
+threading
+persistence
+hard
+Frequency
+High
+Last asked
+2026-08-13
+Stage
+onsite-coding · onsite-system-design
+The Challenge
+
+We need to build a library that writes logs to a file on a single server. This library must be thread-safe and fast.
+
+Key details:
+
+Thousands of threads will try to write data at the same time.
+
+The data must be safely saved to the disk (persistent).
+
+The Code Interface
+
+class DataWriter {
+    public DataWriter(String filePathOnDisk) {
+        // Setup the writer
+    }
+
+    public void push(byte[] data) {
+        // Write data to the file
+        // IMPORTANT: This method must wait and only return AFTER data is safe on the disk
+    }
+}
+
+What Must Be True
+
+1. Durability (Safety) ⚠️
+
+The push() method must wait (block). It cannot return until the data is physically written to the disk using fsync.
+
+If the server loses power or crashes, the data must still be there when it restarts.
+
+2. Order of Messages
+
+Data coming from the same thread must stay in order in the file.
+
+Data from different threads can mix together.
+
+Example:
+
+Thread A sends: d1, then d2
+Thread B sends: d3, then d4
+
+✅ Good results:    d1_d2_d3_d4, d1_d3_d4_d2, d3_d1_d2_d4
+❌ Bad results:     d2_d1_d3_d4 (Thread A is out of order)
+
+3. Speed Goals
+
+High Throughput: Handle as many total writes per second as possible.
+
+Low Latency: Do not make threads wait too long.
+
+The Hard Part: Using fsync() is very slow (it takes 1-10ms). If we do it every time, the system will be too slow.
+
+4. Crash Recovery
+
+Define a file format.
+
+Explain how to fix the file if the server crashes in the middle of a write.
+
+Hard Problems to Solve
+
+Fsync is Slow: Doing one fsync per write takes ~5ms. This limits us to only 200 writes per second.
+
+Concurrency: How do we handle 1000 threads trying to write at once?
+
+Ordering: How do we make sure Thread A's messages stay in order?
+
+Recovery: How do we find and fix half-written data after a crash?
+
+The Solution
+
+Main Strategy: Group Commit
+
+The secret to making this fast is Batching.
+
+Instead of writing and saving to disk for every single thread, we group many threads together. Then, we do one single fsync for the whole group.
+
+Old Way (No Batching):     New Way (Group Commit):
+┌─────────────────┐        ┌─────────────────┐
+│ Thread 1: write │        │ Thread 1 ────┐  │
+│          fsync  │ 5ms    │ Thread 2 ────┼─ Group Together │
+│ Thread 2: write │        │ Thread 3 ────┘  │
+│          fsync  │ 5ms    │   ↓             │
+│ Thread 3: write │        │ write all       │
+│          fsync  │ 5ms    │ single fsync    │ 5ms
+└─────────────────┘        └─────────────────┘
+Total time: 15ms           Total time: 5ms
+Speed: 200 writes/sec      Speed: 20,000 writes/sec (100x Faster!)
+
+How It Fits Together
+
+┌──────────┐
+│ Thread 1 │──┐
+├──────────┤  │
+│ Thread 2 │──┼──> [BlockingQueue] ──> [Writer Thread] ──> Batch ──> fsync() ──> Disk
+├──────────┤  │                              │
+│ Thread 3 │──┘                              │
+└──────────┘                          All threads wait here
+                                      (using CountDownLatch)
+
+The Java Code
+
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.file.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.zip.CRC32;
+
+class DataWriter {
+    // File Tools
+    private final FileChannel fileChannel;
+    private final Object writeLock = new Object();
+
+    // Queue to hold incoming requests
+    private final BlockingQueue<WriteRequest> pendingWrites;
+    private final AtomicLong sequenceNumber = new AtomicLong(0);
+
+    // The background worker thread
+    private final Thread writerThread;
+    private volatile boolean running = true;
+
+    // Batch settings
+    private static final int MAX_BATCH_SIZE = 1000;
+    private static final int MAX_BATCH_BYTES = 4 * 1024 * 1024; // 4MB
+    private static final long BATCH_TIMEOUT_MS = 1; // Don't wait too long
+
+    public DataWriter(String filePathOnDisk) throws IOException {
+        // Open file to add data (we will manually fsync for safety)
+        this.fileChannel = FileChannel.open(
+            Paths.get(filePathOnDisk),
+            StandardOpenOption.CREATE,
+            StandardOpenOption.APPEND,
+            StandardOpenOption.WRITE
+        );
+
+        this.pendingWrites = new LinkedBlockingQueue<>();
+
+        // Start the background worker
+        this.writerThread = new Thread(this::writerLoop, "DataWriter-Worker");
+        this.writerThread.start();
+    }
+
+    /**
+     * Push data to log.
+     * IMPORTANT: This blocks the thread until data is safely on disk.
+     */
+    public void push(byte[] data) throws IOException, InterruptedException {
+        // Create a request with a number to keep order
+        WriteRequest request = new WriteRequest(
+            Thread.currentThread().getId(),
+            sequenceNumber.incrementAndGet(),
+            data
+        );
+
+        // Add to queue (this does not block)
+        pendingWrites.put(request);
+
+        // IMPORTANT: Stop here and wait until the writer thread finishes fsync
+        request.await();
+
+        // Check if anything went wrong
+        if (request.exception != null) {
+            throw new IOException("Write failed", request.exception);
+        }
+    }
+
+    /**
+     * The background loop that groups writes together
+     */
+    private void writerLoop() {
+        List<WriteRequest> batch = new ArrayList<>(MAX_BATCH_SIZE);
+
+        while (running) {
+            try {
+                batch.clear();
+
+                // Get a group of pending writes
+                collectBatch(batch);
+
+                if (!batch.isEmpty()) {
+                    // Write the whole group with one fsync
+                    processBatch(batch);
+                }
+
+            } catch (Exception e) {
+                // Tell all waiting threads that it failed
+                for (WriteRequest req : batch) {
+                    req.completeWithError(e);
+                }
+            }
+        }
+    }
+
+    /**
+     * Gather writes into a list
+     */
+    private void collectBatch(List<WriteRequest> batch) throws InterruptedException {
+        long totalBytes = 0;
+        long deadline = System.currentTimeMillis() + BATCH_TIMEOUT_MS;
+
+        // Wait for the first request (blocking)
+        WriteRequest first = pendingWrites.poll(BATCH_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        if (first == null) {
+            return; // Timed out, queue is empty
+        }
+
+        batch.add(first);
+        totalBytes += first.data.length;
+
+        // Grab more items if they are ready immediately (don't wait)
+        while (batch.size() < MAX_BATCH_SIZE &&
+               totalBytes < MAX_BATCH_BYTES &&
+               System.currentTimeMillis() < deadline) {
+
+            WriteRequest req = pendingWrites.poll(); // Non-blocking check
+            if (req == null) break;
+
+            batch.add(req);
+            totalBytes += req.data.length;
+        }
+    }
+
+    /**
+     * Write the batch to disk and fsync once
+     */
+    private void processBatch(List<WriteRequest> batch) throws IOException {
+        // IMPORTANT: Sort by sequence number to keep threads in order
+        // Example: If Thread A sent msg 1 then msg 3, sort ensures 1 comes before 3
+        Collections.sort(batch, Comparator.comparingLong(r -> r.sequenceNumber));
+
+        // Calculate how much memory we need
+        int totalSize = 0;
+        for (WriteRequest req : batch) {
+            totalSize += 4 + req.data.length + 4; // [length][data][crc32]
+        }
+
+        ByteBuffer buffer = ByteBuffer.allocateDirect(totalSize);
+
+        // Fill the buffer
+        CRC32 crc = new CRC32();
+        for (WriteRequest req : batch) {
+            // Format: [Size][Data][Checksum]
+            buffer.putInt(req.data.length);
+            buffer.put(req.data);
+
+            // Calculate checksum (CRC32) to detect corruption later
+            crc.reset();
+            crc.update(req.data);
+            buffer.putInt((int) crc.getValue());
+        }
+        buffer.flip();
+
+        // Write to file and sync
+        synchronized (writeLock) {
+            // Write data to OS cache
+            while (buffer.hasRemaining()) {
+                fileChannel.write(buffer);
+            }
+
+            // IMPORTANT: Force the OS to write to the physical disk (fsync)
+            // This is the slow part (1-10ms), but we only do it once for the whole batch
+            fileChannel.force(true);
+        }
+
+        // Wake up all the waiting threads
+        // Their data is now safe!
+        for (WriteRequest req : batch) {
+            req.complete();
+        }
+    }
+
+    public void close() throws IOException {
+        running = false;
+        writerThread.interrupt();
+        try {
+            writerThread.join(5000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        fileChannel.close();
+    }
+
+    /**
+     * Helper class for a single request
+     */
+    private static class WriteRequest {
+        final long threadId;
+        final long sequenceNumber;
+        final byte[] data;
+
+        // This latch makes the calling thread wait
+        private final CountDownLatch latch = new CountDownLatch(1);
+        private volatile Exception exception;
+
+        WriteRequest(long threadId, long sequenceNumber, byte[] data) {
+            this.threadId = threadId;
+            this.sequenceNumber = sequenceNumber;
+            this.data = data;
+        }
+
+        // Wait here until done
+        void await() throws InterruptedException {
+            latch.await();
+        }
+
+        // Mark as done
+        void complete() {
+            latch.countDown();
+        }
+
+        // Mark as failed
+        void completeWithError(Exception e) {
+            this.exception = e;
+            latch.countDown();
+        }
+    }
+}
+
+Step-by-Step Explanation
+
+1. How We Keep Order
+
+We use a sequenceNumber.
+
+Time 1: Thread A calls push(d1). It gets number 1. It sits and waits.
+
+Time 2: Thread B calls push(d3). It gets number 2. It sits and waits.
+
+Time 3: Thread A cannot send d2 yet because it is still waiting for d1 to finish.
+
+Time 4: The writer thread saves d1 and d3. It wakes up Thread A.
+
+Time 5: Thread A can now send d2. It gets number 3.
+
+Because push() makes the thread wait, Thread A naturally sends d1 before d2.
+
+2. How We Ensure Safety
+
+Inside push(), we call request.await(). This uses a CountDownLatch. The code literally stops on that line. It only continues after the background thread calls fileChannel.force(true) (which is the fsync).
+
+3. Why It Is Fast (Group Commit)
+
+fsync is expensive (5ms).
+
+Without Batching:
+
+3 threads = 3 fsyncs = 15ms.
+
+Throughput = 200 writes/sec.
+
+With Batching:
+
+3 threads = 1 batch = 1 fsync = 5ms.
+
+Throughput = 600 writes/sec.
+
+With 100 threads, we reach 20,000 writes/sec.
+
+4. How to Recover from a Crash
+
+We write data in this format:
+[Length][Data][CRC32 Checksum]
+
+Recovery Logic:
+
+Read the length.
+
+Read the data.
+
+Calculate the Checksum (CRC32) of that data.
+
+Compare it to the Checksum stored in the file.
+
+If they match: The record is good.
+
+If they don't match or the file ends abruptly: The server crashed during this write. Cut off (truncate) the file at this point.
+
+Why It Is Fast
+
+ConfigurationFsyncs/secBatch SizeTotal Writes/sec
+No batching2001200
+Small batches2005010,000
+Large batches20010020,000
+Optimal20025050,000
+
+Throughput: We are limited by how fast the disk handles fsync (usually 200 times/sec). By packing more data into each fsync, we increase total throughput.
+
+Latency: The wait time is small. In the worst case, a thread waits for BATCH_TIMEOUT_MS (1ms) + the fsync time (5ms).
+
+Why This Is Good Design
+
+Meets Safety Rules: Uses fsync so data is never lost.
+
+Solves Ordering: Uses sequence numbers so data isn't scrambled.
+
+Industry Standard: This technique (Group Commit) is used by PostgreSQL, MySQL, Kafka, and LevelDB.
+
+Smart Memory Use: We use ByteBuffer.allocateDirect to write directly to disk, skipping extra copying in Java memory.
+
+Bad Approaches (And Why We Avoid Them)
+
+❌ Locking per Write
+
+public void push(byte[] data) {
+    synchronized(lock) {
+        write(data);
+        fsync(); // 5ms
+    }
+}
+
+Why it fails: Threads have to wait in a single line. It is too slow (max 200 writes/sec).
+
+❌ Async (Don't Wait)
+
+public void push(byte[] data) {
+    queue.add(data);
+    return; // Return immediately
+}
+
+Why it fails: The requirement says push() must block. If we return early, the user thinks data is safe, but it might still be in memory.
+
+❌ No Fsync
+
+public void push(byte[] data) {
+    write(data); // Just write to OS cache
+}
+
+Why it fails: If the power goes out, the data is lost. It is not durable.
+
+Interview Questions & Answers
+
+Q: Can we skip fsync to make it faster?
+A: No. If you don't use fsync, data sits in the operating system's RAM (Page Cache). If the server loses power, that data is gone.
+
+Q: What if the disk is very slow?
+A: If fsync takes longer (e.g., 20ms), we should increase the MAX_BATCH_SIZE. This puts more work into every fsync to keep throughput high.
+
+Q: Can we use Async I/O (AIO)?
+A: Async I/O helps CPU usage, but you still need fsync for safety. The bottleneck is the physical disk, not the CPU.
+
+Q: How do we handle logs getting too big?
+A: We implement Log Rotation. When a file hits a size limit (e.g., 1GB), we close it and start a new file.
+
+Key Takeaway: "Group Commit" is the standard pattern for high-performance logging. It allows you to have both safety (durability) and speed (throughput) by sharing the cost of expensive disk operations across many threads.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

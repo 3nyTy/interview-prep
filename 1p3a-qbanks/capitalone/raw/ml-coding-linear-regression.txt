@@ -1,0 +1,55 @@
+===H1===
+ML Coding: Linear Regression from Scratch
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/ml-coding-linear-regression
+===BODY===
+Capital One
+Coding·60 minMembers
+ML Coding: Linear Regression from Scratch
+Applied Researcher Tech Interview 1. Implement linear regression end-to-end in NumPy — closed-form solution, then a gradient-descent variant. Standard ML coding warm-up.
+RS
+MLE
+ml-knowledge
+linear-regression
+numpy
+gradient-descent
+medium
+Frequency
+Single report
+Last asked
+2026-01-19
+Stage
+onsite-coding · onsite-research
+Requirements
+
+Implement LinearRegression.fit(X, y) and LinearRegression.predict(X) using NumPy only (no scikit-learn).
+
+Support both the closed-form normal equation θ = (XᵀX)^(-1) Xᵀy and an iterative gradient-descent variant; the interviewer typically asks for both back to back.
+
+Include the intercept term either by prepending a ones column to X or by carrying a separate bias parameter.
+
+Discuss complexity, conditioning, and when to prefer each approach.
+
+Notes
+
+Closed-form derivation from MSE: L(θ) = (1/N) (y - Xθ)ᵀ(y - Xθ). Setting ∂L/∂θ = 0 gives XᵀXθ = Xᵀy. Cost is O(d³) for the matrix inverse; the dominant constant is the d × d solve. Use np.linalg.solve(XᵀX, Xᵀy) rather than np.linalg.inv(...) for numerical stability.
+
+Gradient-descent variant: θ_{t+1} = θ_t - α · (2/N) Xᵀ(Xθ_t - y). Cost per step is O(Nd). Preferable when N and d are both large; closed-form preferable when d is small (< 10³) and N is moderate.
+
+Conditioning: when XᵀX is near-singular (correlated features), the closed-form blows up; ridge regularisation θ = (XᵀX + λI)^(-1) Xᵀy stabilises it. Mention this even if not asked — it shows depth.
+
+For the prediction interface, return a vector of shape (N,), not (N, 1) — sklearn convention.
+
+Preparation
+
+Implement both variants from scratch on a 2-feature toy dataset. Verify against sklearn.linear_model.LinearRegression to confirm coefficients match within numerical tolerance.
+
+Re-derive the closed-form solution on paper without notes; the interviewer often asks for the derivation alongside the code.
+
+Practise the ridge extension as a 2-minute follow-up; it is the most common deepening question.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

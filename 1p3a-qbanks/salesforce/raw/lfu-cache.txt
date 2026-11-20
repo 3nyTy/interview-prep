@@ -1,0 +1,83 @@
+===H1===
+LFU Cache (LeetCode 460)
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/lfu-cache
+===BODY===
+Salesforce
+Coding·45 minMembers
+LFU Cache (LeetCode 460)
+Implement an O(1) LFU (Least Frequently Used) cache supporting `get(key)` and `put(key, value)` under a fixed capacity. Asked both as a phone-screen coding problem and as the second coding round in onsite loops.
+SWE
+linked-list
+hashmap
+design
+caching
+hard
+Frequency
+Low
+Last asked
+2026-01-28
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Fixed capacity set at construction.
+
+get(key): return the value if present, otherwise -1. On hit, increment the key's use-frequency.
+
+put(key, value): insert or update.
+
+If at capacity, evict the least-frequently-used key first.
+
+Ties in frequency are broken by least-recently-used (the older insertion within the lowest-freq bucket goes).
+
+Both operations must run in O(1) average time.
+
+Examples
+
+LFUCache cache = new LFUCache(2);
+cache.put(1, 1);              // cache=[1]
+cache.put(2, 2);              // cache=[2,1]
+cache.get(1);   // returns 1  // cache=[1,2] (1 is now freq=2)
+cache.put(3, 3);              // evict key 2 (freq=1, LRU). cache=[3,1]
+cache.get(2);   // returns -1
+cache.get(3);   // returns 3  // cache=[3,1] (3 is now freq=2)
+cache.put(4, 4);              // evict key 1 (tied freq=2 with 3, but 1 is LRU). cache=[4,3]
+
+Notes
+
+The canonical O(1) construction uses three structures:
+
+key -> Node{value, freq} map for direct lookup.
+
+freq -> doubly-linked-list of keys map; each list holds keys with that exact frequency in MRU order at the head, LRU at the tail.
+
+A minFreq integer pointing at the smallest frequency that currently has a non-empty list (the eviction candidate bucket).
+
+get: look up node → remove it from its freq list → append it to the freq+1 list → bump node's freq → if the removed-from list is now empty and it was minFreq, increment minFreq.
+
+put on an existing key: same as get plus value update.
+
+put on a new key at capacity: evict the tail of the minFreq list, then insert the new node into the freq=1 list and reset minFreq = 1.
+
+The minFreq invariant is the part most candidates get wrong under pressure. After every get and put you must answer two questions: (a) did I just create a list with a smaller frequency than minFreq? (b) did I just empty the list minFreq was pointing at?
+
+Common mistakes: maintaining only one global doubly-linked list ordered by (freq, recency) — operations become O(log n) at best; storing frequencies in a heap — eviction becomes O(log n); forgetting to reset minFreq to 1 on every fresh insert.
+
+An OrderedDict-of-OrderedDicts implementation in Python is the same algorithm with less manual linked-list code and is acceptable in an interview as long as the candidate can articulate the O(1) reasoning.
+
+Preparation
+
+Write the three-map skeleton from scratch and run the example above by hand, updating minFreq after each step.
+
+Drill the eviction path explicitly: when capacity is reached, the candidate must demonstrate locating the LRU node in the minFreq bucket in O(1).
+
+After the standalone version, practise an LRU implementation back-to-back so the distinction (frequency bucketing vs single recency list) is sharp.
+
+Be ready to explain the space lower bound: a capacity-n cache must retain O(n) entries; the auxiliary maps and linked-list nodes should remain O(n) with no unbounded empty frequency buckets.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,82 @@
+===H1===
+Exchange Order Matching Engine
+===URL===
+https://www.1point3acres.com/interview/problems/company/akunacapital/exchange-order-matching-engine
+===BODY===
+Akuna Capital
+CodingMembers
+Exchange Order Matching Engine
+Implement an order book that supports BUY, SELL, CANCEL, MODIFY, and PRINT commands, with IOC/GFD order types and order-id based updates.
+SWE
+Infra Eng
+trading
+data-structure
+queue
+sorting
+state-machine
+medium
+Frequency
+Medium
+Last asked
+2025-10-13
+Stage
+oa
+Requirements
+
+Write an exchange order matching engine. Input lines begin with one of these operations:
+
+BUY <IOC|GFD> <price> <quantity> <order_id>
+
+SELL <IOC|GFD> <price> <quantity> <order_id>
+
+CANCEL <order_id>
+
+MODIFY <order_id> <BUY|SELL> <new_price> <new_quantity>
+
+PRINT
+
+Rules visible from the prompt:
+
+price and quantity are positive integers.
+
+order_id can be any printable-character sequence.
+
+CANCEL removes the order id if it exists; do nothing if it does not.
+
+MODIFY changes an existing order's side, price, and quantity; do nothing if the id does not exist.
+
+BUY and SELL update the order book; PRINT prints current book state.
+
+Notes
+
+The missing part of the prompt is the exact print format and matching priority, so treat this as a partial card. The standard exchange-engine skeleton is still clear:
+
+Maintain buy levels in descending price and sell levels in ascending price.
+
+Within a price level, use FIFO queues for time priority.
+
+Keep an order_id -> order_handle index so CANCEL and MODIFY do not scan the book.
+
+IOC orders match immediately and discard residual quantity; GFD orders rest on the book if not fully filled.
+
+A buy crosses while best_ask <= buy_price; a sell crosses while best_bid >= sell_price.
+
+MODIFY is easiest to implement as cancel-then-new-order with the same id and a fresh time priority, unless the interviewer states that priority must be preserved.
+
+The same engine recurs in C++ form as a "write a Buy/Sell matching-engine POC from scratch and run it" task. The HackerRank harness does not feed stdin in that variant; a common workaround is to inspect the provided input through stderr. The C++ sittings are time-pressured (one notes a deliberately absurd 4320-minute duration) and several candidates time out on two cases, so prioritize a correct, fully-running core over edge-case completeness. A live pair-coding follow-up after the OA has asked candidates to implement a fixed-capacity ring buffer.
+
+Preparation
+
+Write a minimal matching engine with two ordered maps and per-level deques; do not start with a single sorted list.
+
+Drill CANCEL cleanup: remove the order from its level queue and delete empty price levels.
+
+Practice explaining IOC vs GFD and price-time priority in plain language before coding.
+
+Add tests for partial fill, full fill, cancel missing id, modify missing id, and modify that crosses the spread.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

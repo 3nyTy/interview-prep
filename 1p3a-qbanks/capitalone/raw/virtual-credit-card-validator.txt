@@ -1,0 +1,101 @@
+===H1===
+Virtual Credit Card Validator (Case Study)
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/virtual-credit-card-validator
+===BODY===
+Capital One
+Other·60 minFree preview
+Virtual Credit Card Validator (Case Study)
+The canonical Capital One case study. Three phases: discuss virtual credit cards as a product, implement a rule-based transaction validator using bit-position rules embedded in card and transaction IDs, then debug provided code that fails some tests. Appears in SDE, MLE, and Applied Research loops.
+SWE
+MLE
+RS
+payment
+object-design
+debugging
+critical-thinking
+verbal
+medium
+Frequency
+Medium
+Last asked
+2026-07-13
+Stage
+onsite-deep-dive · final-round
+Requirements
+
+Phase 1 — Product discussion
+
+Explain the pros and cons of virtual credit cards from both the user's and Capital One's perspective.
+
+Common themes the interviewer probes: fraud reduction, merchant lock-in ("merchant-bound" cards), one-time-use vs multi-use trade-off, customer experience friction, reconciliation overhead for the bank.
+
+5-10 minutes; the answer is graded on structure, not breadth.
+
+Phase 2 — Rule-based validator implementation
+
+Implement a function that, given a transaction's metadata and a card's metadata (all encoded as specific bit / digit positions of fixed-width integer ids), returns whether the transaction is valid.
+
+Example rule set (from the most detailed variant):
+
+Transaction ID is an 8-digit integer.
+
+7th digit = 1 → valid online channel; 7th digit = 0 → valid offline channel.
+
+6th digit = 1 → charge; 6th digit = 0 → authorisation.
+
+Card number is a 16-digit integer.
+
+15th digit = 1 → merchant-bound; 15th digit = 0 → not merchant-bound.
+
+14th digit = 1 → Mastercard; 14th digit = 0 → Visa.
+
+13th digit = 1 → multi-use; 13th digit = 0 → one-time use.
+
+Validity rules by network:
+
+Visa: valid iff (merchant-bound AND multi-use) OR (online AND amount < $100 AND not authorisation).
+
+Mastercard: valid iff (amount < $100 AND (online OR in-person) AND not merchant-bound) OR (merchant-bound AND amount > $100).
+
+Worked example, asked as the graded task in a recent Power Day instance: card 1234567891011111, transaction 50781100, amount $150 — offline, charge, merchant-bound Mastercard, multi-use → valid via the merchant-bound amount > $100 branch.
+
+Phase 3 — Debug provided code
+
+The interviewer hands the candidate a working but bug-laden implementation of the validator and a set of test cases.
+
+Identify why specific tests fail; fix the bugs; re-run.
+
+Bugs are typically off-by-one digit positions (1-indexed vs 0-indexed, left-to-right vs right-to-left), wrong boolean precedence in the network rules, or mis-applied rule for one network leaking into the other.
+
+MLE / AR follow-up
+
+One extra prompt occasionally added: "if the card type (Visa / Mastercard) were determined from the leading digits of the card number instead of an explicit position, how would you change the validator?" Verbal answer only — no code needed.
+
+Notes
+
+Phase 2 is mechanical once the bit-position table is correctly built. The single most common mistake is mis-reading "7th digit" — prompt variants do not always specify whether it is 1-indexed from the left or right. Ask the interviewer up front. The worked example above uses 1-indexed from the left. Recent prompt instances state this explicitly — "positions counted from left starting at 1" — but confirm aloud anyway.
+
+Build a tiny helper digit_at(num, position, length) that returns the digit at a specific position with explicit semantics. Avoid str(num)[6]-style inline parsing — it conflates the indexing direction and produces hard-to-debug failures.
+
+The provided buggy code in Phase 3 typically passes ~60% of tests; the bug surface concentrates in the network-rule combinators (the AND / OR / NOT precedence) and in the digit-position constants. Re-derive the digit positions from the spec independently before reading the provided code — it is faster than trying to spot the bug from inspection alone.
+
+The product-discussion phase is graded on structure: user-perspective pros, user-perspective cons, bank-perspective pros, bank-perspective cons. Hitting all four explicitly is the rubric.
+
+The MLE / AR follow-up about card-type determination is checking whether the candidate understands that encoding card type in leading digits is the real-world convention (BIN ranges), so the change is a lookup table keyed on the first 4-6 digits rather than a positional bit. Mention the BIN table even if the interviewer doesn't.
+
+Preparation
+
+Build the validator from scratch on paper before the loop; the exact rules change between variants but the structure is constant.
+
+Practise the bit-position helper twice with explicit indexing direction; the round penalises ambiguity here.
+
+For the debug phase, build a small driver that prints expected vs actual for each test case — the round's IDE is bare, and visual diff is faster than mental tracing.
+
+For MLE / AR loops, prepare a 90-second pitch on the BIN-table follow-up; it is the difference between a 'pass' and a 'strong pass' grade in the case round.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

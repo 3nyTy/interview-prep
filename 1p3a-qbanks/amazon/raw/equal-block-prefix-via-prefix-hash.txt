@@ -1,0 +1,63 @@
+===H1===
+Equal-Frequency Block Prefix Count
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/equal-block-prefix-via-prefix-hash
+===BODY===
+Amazon
+Coding·40 minMembers
+Equal-Frequency Block Prefix Count
+For every prefix of a string, find the maximum number of equal-length blocks the prefix can be split into such that each character has the same frequency in every block.
+SWE
+string
+hashmap
+hard
+Frequency
+Single report
+Last asked
+2026-01-31
+Stage
+oa
+Requirements
+
+Input: a lowercase string s.
+
+For each prefix length i from 1 to |s|, determine the largest k such that s[0..i) can be partitioned into k equal-length contiguous blocks with identical per-character frequency.
+
+Output the array of best k values.
+
+Examples
+
+s = "ABBA"
+# prefix length 4 -> k=2 ("AB" + "BA", each has 1 A + 1 B)
+
+Notes
+
+Per prefix: let G = gcd(c_a, c_b, ...) over its character counts. Valid k must divide G. Iterate the divisors of G from largest to smallest; for each candidate k, check whether every block has equal frequency via a precomputed prefix-hash over per-character counts.
+
+Precompute prefix character counts and a rolling hash to make each divisor check O(k) or O(1) via difference arrays.
+
+Beware: even if G is large, a candidate k may fail because the frequency pattern shifts inside the prefix; the hash check catches that.
+
+Two prerequisites to set up before the main loop: a 2-D prefix-count array pre[c][i] over each of the 26 letters, and a divisor list per i (built incrementally as i grows, or via a per-prefix gcd then enumerate-divisors-of-gcd).
+
+For each prefix length i and candidate k (descending divisors of the current gcd), the per-block frequency check is O(26) using the prefix counts: freq(block_j) == freq(block_0) for all j. Total complexity O(n * d(gcd) * 26).
+
+A rolling hash over the per-character frequency vector lets you collapse the equality check to O(1) per block, but the constant-factor win is typically not worth the implementation risk inside an OA window.
+
+Preparation
+
+Solve LC 1933 (Check if String Is Decomposable Into Value-Equal Substrings) and LC 1959 (Substring with Largest Variance) as warmups for prefix-based block reasoning.
+
+Practice divisor enumeration and prefix-hash setup separately, then combine.
+
+Pre-think the complexity: O(n * d(G)) where d(G) is the number of divisors — well under 50 for any practical input.
+
+Build the prefix-count table separately first; verify on "AABBAABB" that freq(s[0..4)) == freq(s[4..8)) via two-line subtraction. This is the inner loop of every block check.
+
+Time-budget the divisor enumeration: precompute divisors up to n in O(n log n) once, do not re-factor per prefix inside the main loop.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

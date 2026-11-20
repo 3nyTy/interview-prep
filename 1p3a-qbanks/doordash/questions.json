@@ -1,0 +1,1271 @@
+{
+  "company": "doordash",
+  "display_name": "DoorDash",
+  "qbank_count": 35,
+  "questions_scraped": 35,
+  "site_total_count": 143,
+  "oj_count": 108,
+  "external_count": 0,
+  "description": "DoorDash's loop is dominated by a small, slow-moving library of original Code Craft prompts (Dasher Pay, Bootstrap API, Round Robin debugging) plus a handful of recurring system-design favorites (3-day Donation, Notification, Food Review). Coding bar is the gate; system design correctness and behavioral consistency drive leveling. The bar swings sharply with the interviewer — multiple candidates report bug-free coding rounds that still ended in rejection — so prepping the canonical question set cold matters more than chasing breadth.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/doordash",
+  "scraped_at": "2026-09-20",
+  "source": "1point3acres qbank (logged-in session)",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "code-craft-dasher-pay",
+      "title": "Code Craft: Dasher Pay",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Very high",
+      "last_asked": "2026-09-10",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Free preview",
+      "roles": [
+        "SWE",
+        "EM"
+      ],
+      "tags": [
+        "simulation",
+        "interval",
+        "state-machine",
+        "json",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "em"
+      ],
+      "tags_slug": [
+        "simulation",
+        "interval",
+        "state-machine",
+        "json",
+        "medium"
+      ],
+      "overview": "The canonical DoorDash Code Craft prompt. Given a chronological event stream for a dasher's day (orders ACCEPTED / FULFILLED / CANCELED with timestamps), compute the dasher's total pay. Pay accrues per minute that the dasher has at least one ongoing delivery; multiple concurrent orders typically multiply the per-minute rate. Production-style follow-ups dominate the second half of the round.",
+      "source_count": 27,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/code-craft-dasher-pay"
+    },
+    {
+      "n": 2,
+      "slug": "debugging-pick-dasher-round-robin",
+      "title": "Debugging: Pick Dasher / Round Robin Load Balancer",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Very high",
+      "last_asked": "2026-09-01",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "debugging",
+        "code-reading",
+        "hashing",
+        "object-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "debugging",
+        "code-reading",
+        "hashing",
+        "object-design",
+        "medium"
+      ],
+      "overview": "The canonical DoorDash debugging round. A roughly 200-line load-balancer / dasher-picker codebase contains planted state, boundary, and removal bugs. One branch ends in a consistent-hashing redesign; the random-picker branch focuses on O(1) swap-delete correctness, synchronization scope, and avoiding external calls while holding a shared lock.",
+      "source_count": 16,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/debugging-pick-dasher-round-robin"
+    },
+    {
+      "n": 3,
+      "slug": "code-craft-bootstrap-aggregated-api",
+      "title": "Code Craft: Bootstrap Aggregated API",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-09-09",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "api-integration",
+        "circuit-breaker",
+        "object-design",
+        "json",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "api-integration",
+        "circuit-breaker",
+        "object-design",
+        "json",
+        "medium"
+      ],
+      "overview": "The second-most-common Code Craft prompt. Given three internal services (consumer / payment / address), implement a single bootstrap endpoint that takes a `user_id`, fans out to all three downstream APIs, and assembles the responses into one composite payload. Resilience to partial downstream failure is the central signal.",
+      "source_count": 9,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/code-craft-bootstrap-aggregated-api"
+    },
+    {
+      "n": 4,
+      "slug": "ai-code-craft-workflow-engine",
+      "title": "AI Code Craft Challenge: Delayed-Delivery Workflow Engine",
+      "category": "coding",
+      "duration": "75 min",
+      "frequency": "High",
+      "last_asked": "2026-09-01",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE",
+        "EM"
+      ],
+      "tags": [
+        "ai-coding",
+        "ai-tools",
+        "ai-allowed",
+        "ai-collaboration",
+        "parsing",
+        "new-round",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "em"
+      ],
+      "tags_slug": [
+        "ai-coding",
+        "ai-tools",
+        "ai-allowed",
+        "ai-collaboration",
+        "parsing",
+        "new-round",
+        "medium"
+      ],
+      "overview": "A 2026 round that explicitly encourages AI coding assistants in the candidate's own IDE. Delivery varies between a starter-code workflow engine and a from-scratch refund-service variant; the latter requires real HTTP services running on separate local ports. The graded signal is rapid, validated AI collaboration plus early clarification of the expected runtime shape.",
+      "source_count": 11,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/ai-code-craft-workflow-engine"
+    },
+    {
+      "n": 5,
+      "slug": "coding-minimum-dasher-processing-speed",
+      "title": "Coding: Minimum Dasher Processing Speed",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-16",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "binary-search",
+        "math",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "binary-search",
+        "math",
+        "medium"
+      ],
+      "overview": "A DoorDash business wrapper around LC 875, Koko Eating Bananas. Given N order workloads and H hours, find the minimum integer processing rate K when a dasher can work on only one order per hour and unused time in a finished hour is lost.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/coding-minimum-dasher-processing-speed"
+    },
+    {
+      "n": 6,
+      "slug": "coding-minimum-parenthesis-deletions",
+      "title": "Coding: Minimum Parenthesis Deletions",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-16",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "greedy",
+        "stack",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "greedy",
+        "stack",
+        "easy"
+      ],
+      "overview": "Given a string containing only `(` and `)`, return the minimum number of characters that must be deleted to make it valid. The follow-up asks for the deletion indices rather than only the count.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/coding-minimum-parenthesis-deletions"
+    },
+    {
+      "n": 7,
+      "slug": "coding-first-unique-restaurant-stream",
+      "title": "Coding: First Unique Restaurant in a Stream",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-16",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-structure",
+        "streaming",
+        "hashmap",
+        "linked-list",
+        "concurrency",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "streaming",
+        "hashmap",
+        "linked-list",
+        "concurrency",
+        "medium"
+      ],
+      "overview": "DoorDash wrapper around LC 1429, First Unique Number. Support `add(restaurant_id)` and return the earliest restaurant ID that has appeared exactly once, preserving arrival order; follow-ups probe unbounded metadata growth and concurrent calls.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/coding-first-unique-restaurant-stream"
+    },
+    {
+      "n": 8,
+      "slug": "code-craft-validate-cart",
+      "title": "Code Craft: Validate Cart",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-10",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "object-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "object-design",
+        "medium"
+      ],
+      "overview": "Phone-screen Code Craft prompt. Given a cart with item entries, validate whether the cart is orderable under quantity, availability, and min/max-limit rules. The prompt is intentionally open-ended; candidates are expected to negotiate exact rule semantics before coding.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/code-craft-validate-cart"
+    },
+    {
+      "n": 9,
+      "slug": "code-craft-chef-dish-profit-assignment",
+      "title": "Code Craft: Chef Skill → Dish Profit Assignment",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-05-11",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "greedy",
+        "sorting",
+        "two-pointer",
+        "prefix-sum",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "greedy",
+        "sorting",
+        "two-pointer",
+        "prefix-sum",
+        "medium"
+      ],
+      "overview": "Assign chefs to dishes to maximize total profit. Each chef can cook at most one dish; multiple chefs can cook the same dish. Each dish has a difficulty level, and a chef can cook a dish only if their skill ≥ the dish's difficulty. Profits sorted (or queryable) by difficulty.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/code-craft-chef-dish-profit-assignment"
+    },
+    {
+      "n": 10,
+      "slug": "code-craft-path-key-value-store",
+      "title": "Code Craft: Hierarchical Path Key-Value Store",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-04-11",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-structure",
+        "tree",
+        "oop-design",
+        "filesystem",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "tree",
+        "oop-design",
+        "filesystem",
+        "medium"
+      ],
+      "overview": "OOD Code Craft round. Implement a hierarchical key-value store using directory-like paths (e.g. `/a/b/c`). The store starts with a root path `/` whose value is `\"root\"`. Operations: `create`, `set`, `get`, `delete` (leaf-only; root cannot be deleted).",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/code-craft-path-key-value-store"
+    },
+    {
+      "n": 11,
+      "slug": "code-craft-basic-calculator-no-parens",
+      "title": "Code Craft: Basic Calculator (No Parentheses)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-04-06",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "stack",
+        "string",
+        "parsing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "stack",
+        "string",
+        "parsing",
+        "medium"
+      ],
+      "overview": "Phone-screen coding round. Implement a basic calculator that handles `+`, `−`, `×`, `÷` over integer operands. No parentheses. Standard operator-precedence evaluation.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/code-craft-basic-calculator-no-parens"
+    },
+    {
+      "n": 12,
+      "slug": "code-craft-batch-with-capacity-window-mle",
+      "title": "Code Craft: Batch with Capacity & Time Window (MLE)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-02-07",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "greedy",
+        "sliding-window",
+        "interval",
+        "heap",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "greedy",
+        "sliding-window",
+        "interval",
+        "heap",
+        "medium"
+      ],
+      "overview": "MLE PhD intern coding round. Given timepoints `1, 3, 5, ...` and per-batch constraints `(capacity B, window W)`, group timepoints into the minimum number of batches such that each batch holds at most B items and the latest item in a batch is within W time units of the earliest. Follow-up extends to a meeting-room-2 style sweep-line variant.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/code-craft-batch-with-capacity-window-mle"
+    },
+    {
+      "n": 13,
+      "slug": "code-craft-menu-tree-diff",
+      "title": "Menu Tree Diff — Count Changed Nodes",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-01-30",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "recursion",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "recursion",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "DoorDash phone-screen coding prompt. Given an existing menu tree (in our system) and a new menu tree sent by a merchant, count how many nodes changed. Nodes are matched by key and position: a value change on a matching node counts as 1; a removed or added subtree counts every node inside it; and moving a node under a different parent counts as one removal plus one addition. The clean solution is a recursive co-traversal that matches children by key. Two worked examples leaked verbatim.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/code-craft-menu-tree-diff"
+    },
+    {
+      "n": 14,
+      "slug": "code-craft-eligible-orders-sweep",
+      "title": "Code Craft: Eligible Orders / Neighbor-Check Sweep",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-12-18",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "linked-list",
+        "data-structure",
+        "two-pointer",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "linked-list",
+        "data-structure",
+        "two-pointer",
+        "medium"
+      ],
+      "overview": "Code Craft round centered on processing an ordered list of orders where each removal can re-enable its neighbors. Naive `O(n²)` works but interviewer pushes for `O(n)` using a doubly-linked-list / neighbor-eligibility recomputation pattern.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/code-craft-eligible-orders-sweep"
+    },
+    {
+      "n": 15,
+      "slug": "code-craft-common-restaurant-list",
+      "title": "Code Craft: Common Restaurant Pickup Order (LCS Variant)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-12-11",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "dp",
+        "string",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "dp",
+        "string",
+        "medium"
+      ],
+      "overview": "Two drivers each have an ordered list of restaurants to pick up from; one car, can only pick up at restaurants both lists contain, must preserve each list's order. Return the longest common pickup list. Equivalent to the classic Longest Common Subsequence reconstruction.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/code-craft-common-restaurant-list"
+    },
+    {
+      "n": 16,
+      "slug": "code-craft-day-time-interval-codes",
+      "title": "Code Craft: Generate 5-Minute Day-Time Codes",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-12-08",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string-processing",
+        "simulation",
+        "parsing",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string-processing",
+        "simulation",
+        "parsing",
+        "easy"
+      ],
+      "overview": "Given a start and end day-time (e.g. `Mon 10:00 AM` to `Tue 11:00 PM`), generate an integer list representing every 5-minute interval in the range, encoded as `DHHMM` where D is the day index (Mon=1..Sun=7) and HHMM is 24-hour time.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/code-craft-day-time-interval-codes"
+    },
+    {
+      "n": 17,
+      "slug": "code-craft-cart-promotions-ood",
+      "title": "Code Craft: Cart with Promotions (OOD)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-12-07",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "oop-design",
+        "object-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "oop-design",
+        "object-design",
+        "medium"
+      ],
+      "overview": "OOD Code Craft round. A shopping cart contains items with prices and a shipping fee. A list of promotions applies — either a percentage discount (does not apply to shipping) or a fixed-dollar discount. Find the promotion that yields the lowest payment and return the final amount. Multiple parts, each adding edge cases.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/code-craft-cart-promotions-ood"
+    },
+    {
+      "n": 18,
+      "slug": "code-craft-dasher-pay-via-api-mock",
+      "title": "Code Craft: Dasher Pay via Mock Service API",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-09-02",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "interval",
+        "interval-aggregation",
+        "api-integration",
+        "object-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "interval",
+        "interval-aggregation",
+        "api-integration",
+        "object-design",
+        "medium"
+      ],
+      "overview": "Variant of the Dasher Pay round in which the dasher's order data is exposed by a mock service. The candidate must call the service, compute pay, and (mid-round) be told to also write a mock API wrapper around the underlying function. Tests whether the candidate can keep the algorithmic core decoupled from the API plumbing.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/code-craft-dasher-pay-via-api-mock"
+    },
+    {
+      "n": 19,
+      "slug": "code-craft-multi-source-bfs-grid",
+      "title": "Code Craft: Nearest Destination on 2D Grid (Multi-Source BFS)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-07-28",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "bfs",
+        "grid",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "bfs",
+        "grid",
+        "medium"
+      ],
+      "overview": "Given a 2D grid containing obstacles and DashMart destinations, compute shortest distances to the nearest destination. The output is either a distance grid or one distance per supplied query location. Obstacles, queries already on a destination, and unreachable locations require explicit contract clarification.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/code-craft-multi-source-bfs-grid"
+    },
+    {
+      "n": 20,
+      "slug": "code-craft-restaurant-heatmap",
+      "title": "Code Craft: Restaurant Delivery Heatmap",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-03-23",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "SWE"
+      ],
+      "tags": [
+        "grid",
+        "prefix-sum",
+        "interval-aggregation",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "swe"
+      ],
+      "tags_slug": [
+        "grid",
+        "prefix-sum",
+        "interval-aggregation",
+        "medium"
+      ],
+      "overview": "A grid-coverage coding round seen in DoorDash MLE and SWE loops. Given an n×n grid and a list of restaurants `(i, j, r, d)` (location, range, expected deliveries), build a heatmap where each cell holds the sum of expected deliveries from all restaurants whose `(Chebyshev) range r` covers that cell.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/code-craft-restaurant-heatmap"
+    },
+    {
+      "n": 21,
+      "slug": "frontend-vo-build-ui",
+      "title": "Frontend VO: Build UI from Mockup with API",
+      "category": "coding",
+      "duration": "75 min",
+      "frequency": "Low",
+      "last_asked": "2026-03-20",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "frontend",
+        "react",
+        "fullstack",
+        "api-integration",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "frontend",
+        "react",
+        "fullstack",
+        "api-integration",
+        "medium"
+      ],
+      "overview": "Frontend phone-screen and onsite coding rounds. Given a mock API and a design mockup, build the UI to match in HackerRank's in-browser editor. Variants include adding filter buttons, conditional category rendering, see-more / collapse behavior, and an exact CSS / flexbox layout match. Tests both React / TypeScript fluency and ability to work in the platform's editor.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/frontend-vo-build-ui"
+    },
+    {
+      "n": 22,
+      "slug": "de-ae-sql-python-screen",
+      "title": "DE / AE Screen: SQL + Python (Sliding Window + Joins)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-03-20",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "DS"
+      ],
+      "tags": [
+        "sql",
+        "python",
+        "sliding-window",
+        "query-optimization",
+        "medium"
+      ],
+      "roles_slug": [
+        "ds"
+      ],
+      "tags_slug": [
+        "sql",
+        "python",
+        "sliding-window",
+        "query-optimization",
+        "medium"
+      ],
+      "overview": "Data Engineer / Analytics Engineer screen. One Python coding (sliding-window max-sum returning the 1-based start day) + four SQL queries against a merchant / menu / order / dasher ER diagram (bucket assignment, top-5 selection, vegetarian-merchant percentage). Candidate chooses Python-first or SQL-first ordering.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/de-ae-sql-python-screen"
+    },
+    {
+      "n": 23,
+      "slug": "code-craft-similar-restaurant-names",
+      "title": "Code Craft: Similar Restaurant Names (K-Swap Anagram)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-03-13",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "hashmap",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "hashmap",
+        "easy"
+      ],
+      "overview": "K-anagram-family Code Craft variant. Determine if two restaurant names are \"similar\" — equivalent up to at most `k` character swaps. Several recent loops use `k = 2` (one swap of two character positions allowed); some older loops use the general K-anagram form.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/code-craft-similar-restaurant-names"
+    },
+    {
+      "n": 24,
+      "slug": "system-design-food-review-system",
+      "title": "System Design: Food Review System with Reward Bonus",
+      "category": "system-design",
+      "duration": "75 min",
+      "frequency": "High",
+      "last_asked": "2026-09-01",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "ranking",
+        "feed",
+        "caching",
+        "idempotency",
+        "moderation",
+        "kafka",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "ranking",
+        "feed",
+        "caching",
+        "idempotency",
+        "moderation",
+        "kafka",
+        "medium"
+      ],
+      "overview": "Design a food-review system on top of DoorDash orders. Users submit reviews (text, rating 1–5, optional photos) tied to a delivered order. The system aggregates per-item ratings (5-point scale), shows posts with like counts, and rewards high-engagement reviews (100+ thumbs up) with DoorDash credit. Sometimes paired with a monthly driver-payout subsystem in the same prompt.",
+      "source_count": 10,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/system-design-food-review-system"
+    },
+    {
+      "n": 25,
+      "slug": "system-design-three-day-donation",
+      "title": "System Design: 3-Day Donation Service",
+      "category": "system-design",
+      "duration": "75 min",
+      "frequency": "High",
+      "last_asked": "2026-07-30",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "EM"
+      ],
+      "tags": [
+        "payment",
+        "idempotency",
+        "transactions",
+        "messaging",
+        "async",
+        "kafka",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "em"
+      ],
+      "tags_slug": [
+        "payment",
+        "idempotency",
+        "transactions",
+        "messaging",
+        "async",
+        "kafka",
+        "medium"
+      ],
+      "overview": "Design a donation service for a 3-day charity event integrated into the DoorDash app. Users browse charities, donate via the existing DoorDash payment integration, and receive confirmation. The round is dominated by payment-integration trade-offs: idempotency, exactly-once semantics, async vs sync flows, webhook handling, and reconciliation.",
+      "source_count": 9,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/system-design-three-day-donation"
+    },
+    {
+      "n": 26,
+      "slug": "system-design-notification-alert-system",
+      "title": "System Design: Notification / Alert System",
+      "category": "system-design",
+      "duration": "75 min",
+      "frequency": "Medium",
+      "last_asked": "2026-08-03",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "EM"
+      ],
+      "tags": [
+        "notification",
+        "fan-out",
+        "messaging",
+        "pubsub",
+        "rate-limiting",
+        "kafka",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "em"
+      ],
+      "tags_slug": [
+        "notification",
+        "fan-out",
+        "messaging",
+        "pubsub",
+        "rate-limiting",
+        "kafka",
+        "medium"
+      ],
+      "overview": "Design an alerting system that receives events from upstream services and fans out to subscribers. The broad variant targets users across email, SMS, push, and in-app channels; a narrower variant targets downstream services instead. Subscription semantics, deduplication, retries, failure isolation, backpressure, and scaling are the core deep-dive themes.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/system-design-notification-alert-system"
+    },
+    {
+      "n": 27,
+      "slug": "mle-system-design-restaurant-recommendation",
+      "title": "ML System Design: Restaurant / Store Recommendation",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-02",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RS"
+      ],
+      "tags": [
+        "recommendation",
+        "mlsd",
+        "two-tower",
+        "ranking",
+        "ml-infra",
+        "ann",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "rs"
+      ],
+      "tags_slug": [
+        "recommendation",
+        "mlsd",
+        "two-tower",
+        "ranking",
+        "ml-infra",
+        "ann",
+        "medium"
+      ],
+      "overview": "The dominant MLE / Applied Scientist system-design prompt. Design a recommendation system that surfaces restaurants or store items to a DoorDash user given query + context. Interviewers tend to push the discussion toward infrastructure (feature store, two-tower retrieval, online serving) rather than model architecture; multi-objective optimization (CVR vs delivery time) is a recurring follow-up.",
+      "source_count": 6,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/mle-system-design-restaurant-recommendation"
+    },
+    {
+      "n": 28,
+      "slug": "system-design-realtime-restaurant-leaderboard",
+      "title": "System Design: Real-Time Restaurant Leaderboard",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-16",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "leaderboard",
+        "streaming",
+        "top-k",
+        "sliding-window",
+        "sharding",
+        "dedup",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "leaderboard",
+        "streaming",
+        "top-k",
+        "sliding-window",
+        "sharding",
+        "dedup",
+        "medium"
+      ],
+      "overview": "Design a system that continuously displays the ten restaurants with the most orders in a sliding one-hour window. Second-level freshness is acceptable, approximate answers are allowed, and extensions cover per-city leaderboards, late or duplicate events, and stream-processor recovery.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/system-design-realtime-restaurant-leaderboard"
+    },
+    {
+      "n": 29,
+      "slug": "system-design-realtime-monitoring",
+      "title": "System Design: Realtime Monitoring System",
+      "category": "system-design",
+      "duration": "75 min",
+      "frequency": "Single report",
+      "last_asked": "2026-04-06",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "distributed-systems",
+        "kafka",
+        "sharding",
+        "storage",
+        "scaling",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "distributed-systems",
+        "kafka",
+        "sharding",
+        "storage",
+        "scaling",
+        "medium"
+      ],
+      "overview": "Design a real-time monitoring system: services emit metrics, the platform ingests at high volume, supports queries / dashboards / alerts. This is the canonical Datadog-style metrics-monitoring prompt (ingest → storage → query → alerting); the DoorDash variant follows that standard structure closely.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/system-design-realtime-monitoring"
+    },
+    {
+      "n": 30,
+      "slug": "system-design-customer-review-page-em",
+      "title": "System Design: Customer Review Page (EM)",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-04-02",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "EM"
+      ],
+      "tags": [
+        "search",
+        "ranking",
+        "llm",
+        "caching",
+        "product-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "em"
+      ],
+      "tags_slug": [
+        "search",
+        "ranking",
+        "llm",
+        "caching",
+        "product-design",
+        "medium"
+      ],
+      "overview": "EM-track SD prompt. Design a customer-facing review page for DoorDash with text + rating + multimedia, search, and (newer dimension) AI-based summarization of reviews. Less infra-deep than the SDE SD round; more focus on product trade-offs and team-level decisions.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/system-design-customer-review-page-em"
+    },
+    {
+      "n": 31,
+      "slug": "de-ae-data-modeling",
+      "title": "DE / AE Onsite: Data Modeling (Fitness App)",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-03-16",
+      "stage": "onsite-coding · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "DS"
+      ],
+      "tags": [
+        "sql",
+        "data-modeling",
+        "schema-design",
+        "etl",
+        "data-engineering",
+        "medium"
+      ],
+      "roles_slug": [
+        "ds"
+      ],
+      "tags_slug": [
+        "sql",
+        "data-modeling",
+        "schema-design",
+        "etl",
+        "data-engineering",
+        "medium"
+      ],
+      "overview": "Data modeling round for Analytics Engineering. Design a schema for a fitness app, define DAU, and write the DAU query against the schema. A small set of standard SQL follow-ups extend the round; window functions cover most of them.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/de-ae-data-modeling"
+    },
+    {
+      "n": 32,
+      "slug": "hm-behavioral-round",
+      "title": "Hiring Manager Behavioral Round",
+      "category": "behavioral",
+      "duration": "45 min",
+      "frequency": "Very high",
+      "last_asked": "2026-09-01",
+      "stage": "onsite-bq · final-round",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE",
+        "EM"
+      ],
+      "tags": [
+        "behavioral",
+        "bq",
+        "star",
+        "conflict",
+        "leadership",
+        "ai-collaboration",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "em"
+      ],
+      "tags_slug": [
+        "behavioral",
+        "bq",
+        "star",
+        "conflict",
+        "leadership",
+        "ai-collaboration",
+        "easy"
+      ],
+      "overview": "Standard HM BQ slot. 45–60 minutes covering 4–6 questions on conflict, mistakes, mentorship, and increasingly AI-usage philosophy. Same shape across SDE, MLE, EM tracks; EM gets deeper on people-management and decision-making, MLE gets a domain-knowledge thread woven in.",
+      "source_count": 21,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/hm-behavioral-round"
+    },
+    {
+      "n": 33,
+      "slug": "onsite-project-deep-dive",
+      "title": "Onsite: Project Deep Dive",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-08-15",
+      "stage": "phone-screen · onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE",
+        "EM"
+      ],
+      "tags": [
+        "deep-dive",
+        "presentation",
+        "behavioral",
+        "leadership",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "em"
+      ],
+      "tags_slug": [
+        "deep-dive",
+        "presentation",
+        "behavioral",
+        "leadership",
+        "medium"
+      ],
+      "overview": "Standalone deep-dive round (especially for MLE, Staff, and EM). DoorDash publishes a prep outline ahead of time: problem statement, your role, methods used, difficulties, success metrics. The interviewer drills on trade-offs, metric selection (offline / online / business), and post-launch learnings.",
+      "source_count": 13,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/onsite-project-deep-dive"
+    },
+    {
+      "n": 34,
+      "slug": "onsite-case-investigation",
+      "title": "Onsite: On-Call Case Investigation",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-17",
+      "stage": "onsite-coding · onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "EM"
+      ],
+      "tags": [
+        "sre",
+        "troubleshooting",
+        "verbal",
+        "open-ended",
+        "operating-systems",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "em"
+      ],
+      "tags_slug": [
+        "sre",
+        "troubleshooting",
+        "verbal",
+        "open-ended",
+        "operating-systems",
+        "medium"
+      ],
+      "overview": "Verbal-only onsite round that simulates discovering a live production incident. The candidate is given a scenario (alert fired, dashboard anomaly, customer complaint), and must verbally walk through investigation, mitigation, and recovery. Tests real on-call experience.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/onsite-case-investigation"
+    },
+    {
+      "n": 35,
+      "slug": "mle-ml-discussion-round",
+      "title": "MLE Onsite: ML Knowledge / Discussion Round",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-02",
+      "stage": "onsite-research",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RS"
+      ],
+      "tags": [
+        "ml-knowledge",
+        "ab-testing",
+        "ranking",
+        "experiment-design",
+        "verbal",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "rs"
+      ],
+      "tags_slug": [
+        "ml-knowledge",
+        "ab-testing",
+        "ranking",
+        "experiment-design",
+        "verbal",
+        "medium"
+      ],
+      "overview": "MLE-specific onsite slot. Open-ended ML discussion driven by the interviewer's interests: A/B testing fundamentals, ranking metric definitions, multi-objective ranker design, offline-vs-online metric reconciliation, marketplace-specific experiment design. Less infrastructure than the ML system design round.",
+      "source_count": 6,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/doordash/mle-ml-discussion-round"
+    }
+  ]
+}

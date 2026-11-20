@@ -1,0 +1,53 @@
+===H1===
+Onsite Coding: Minesweeper (LC 529)
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/onsite-coding-minesweeper-lc-529
+===BODY===
+Uber
+CodingMembers
+Onsite Coding: Minesweeper (LC 529)
+An onsite coding round used the canonical LC 529 Minesweeper update task after a simpler undisclosed warm-up. Given a board and a click, update the board according to the mine and reveal rules.
+SWE
+grid
+bfs
+simulation
+medium
+Frequency
+Single report
+Last asked
+2026-08-10
+Stage
+onsite-coding
+Requirements
+
+Input is a 2-D Minesweeper board plus the row and column of a click.
+
+An unrevealed mine changes to X when clicked.
+
+An unrevealed empty cell with one or more adjacent mines changes to the corresponding digit.
+
+An unrevealed empty cell with no adjacent mine changes to B, and the same reveal rule expands through its unrevealed neighbors.
+
+Return the updated board after the click has been fully processed.
+
+Notes
+
+The round used the canonical LC 529 task and placed a simpler warm-up before the main board-reveal step. The warm-up contract was not disclosed, so clarify how it connects to the main task before coding.
+
+Use BFS or DFS from the clicked cell. For each unrevealed empty cell, count mines across all eight neighboring positions; write the corresponding digit when the count is positive, otherwise write B and expand into neighboring unrevealed empty cells.
+
+Mark a cell when scheduling it for expansion, or mutate it before visiting its neighbors, so multiple blank parents cannot enqueue the same cell repeatedly. A direct mine click is terminal and changes only that cell to X.
+
+Worst-case time is O(mn) because each cell is processed at most once. The BFS queue or recursive DFS stack can use O(mn) auxiliary space.
+
+Preparation
+
+Implement both BFS and DFS versions from scratch, keeping the eight directions in one reusable table and marking cells before enqueueing or recursing.
+
+Run a focused test set covering a direct mine click, a numbered cell next to a diagonal mine, a blank cascade at an edge or corner, and multiple blank parents reaching the same unrevealed cell.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

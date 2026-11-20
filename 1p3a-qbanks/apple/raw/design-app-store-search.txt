@@ -1,0 +1,395 @@
+===H1===
+Design App Store Search
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/design-app-store-search
+===BODY===
+Apple
+System DesignMembers
+Design App Store Search
+Design the search system for the Apple App Store.
+MLE
+search
+ranking
+retrieval
+Frequency
+Single report
+Last asked
+2026-04-08
+Stage
+phone-screen · onsite-system-design
+Problem Statement
+
+Design the search system for the Apple App Store. A user types a query (e.g. "meditation app", "photo editor", or a brand name like "instagram") into the search bar and should get back a ranked list of relevant apps, optimized jointly for relevance and business objectives (downloads, post-install retention, revenue).
+
+This was asked in an Apple onsite round for a Machine Learning Engineer. The interviewer focused on how you frame the problem as an ML system, how retrieval and ranking interact, what features and signals you use, how you train and evaluate the system, and how you operate it in production.
+
+What Makes App Store Search Hard
+
+Mixed intents. "tiktok" is a navigational query with one correct answer; "best running app" is exploratory and has many good answers. The system has to handle both without hurting either.
+
+Multi-objective. Users, developers, and the platform care about different things (relevance, installs, retention, revenue, editorial quality). A single ranker has to balance them.
+
+Cold start. New apps have no engagement signal but still need to rank fairly, otherwise the catalog rots.
+
+Long tail. Millions of apps with skewed popularity. Head queries dominate traffic but tail quality drives user trust.
+
+Localization. Queries and apps span dozens of locales with very different tokenization and cultural expectations.
+
+Adversarial. Developers actively optimize metadata (keyword stuffing, fake reviews, install farms). The system has to be robust to manipulation.
+
+Phase 1: Requirements and ML Framing
+
+Functional Requirements
+
+Given a text query, return a ranked list of apps with ~20 results per page.
+
+Handle both navigational (brand/app name) and exploratory (category/intent) queries.
+
+Personalize when it helps (exploratory queries, repeat users) and don't when it hurts (brand-name navigational queries).
+
+Integrate editorial overrides (featured apps, policy suppressions) without retraining.
+
+Support freshness: newly launched apps should be discoverable within hours.
+
+Non-Functional Requirements
+
+Latency. End-to-end p99 under ~300 ms. Users abandon slow searches.
+
+Scale. Hundreds of millions of DAU, tens of thousands of QPS at peak, ~2M apps in catalog, dozens of locales.
+
+Availability. 99.95%+. Search is on the critical path to app discovery and App Store revenue.
+
+Privacy. Apple's privacy posture constrains what user signals are usable. Prefer on-device or cohort-level features over raw per-user logs where possible.
+
+Fairness. Small and new developers shouldn't be structurally suppressed.
+
+Capacity Estimation
+
+MetricEstimate
+Catalog size~2M apps
+Locales~40
+Queries per day~1B (hundreds of M DAU, a few searches per active user)
+Average QPS~12K
+Peak QPS~50K (5x over average)
+Retrieval candidates per query~1,000
+Final ranked results surfaced~20–100
+
+At 50K QPS with 1,000 candidates each, the ranker evaluates ~50M (query, app) pairs per second. This drives the choice of a multi-stage ranker (cheap first pass, expensive second pass on top 100) rather than a single heavy model over all candidates.
+
+ML Framing
+
+The problem decomposes cleanly into two stages:
+
+Retrieval. Given a query, narrow the ~2M catalog down to ~1,000 plausibly relevant candidates. Objective: high recall at ~1K.
+
+Ranking. Given those ~1,000 candidates, order them to maximize a business-weighted utility (relevance + install probability + retention). Objective: high NDCG at 10 on the composite reward.
+
+Stating the two-stage framing upfront is a strong signal. It immediately justifies why you'll build two separate models with different objectives and different latency budgets, and it mirrors how real search systems (Google, Amazon, YouTube) are built.
+
+Phase 2: Data and Features
+
+Labels
+
+Ranking training requires labels. For each (query, app) impression you log:
+
+Click (user tapped the result)
+
+Install (user installed the app)
+
+Post-install engagement (opened 3+ times in 7 days)
+
+Long-term retention (still installed at day 30)
+
+Uninstall (negative signal within N days)
+
+Each has different noise and delay. Click is fast and abundant but noisy (curiosity clicks). Install is the core business label. Retention is the most aligned with user value but has a 7–30 day delay and dilutes the training set. A realistic setup trains a multi-task model that predicts click, install, and retention jointly, then combines the heads at serving time.
+
+Features
+
+FamilyExamplesNotes
+App statictitle, subtitle, description, category, keywords, icon embedding, screenshot embeddings, age, size, price, IAP presence, developer reputationRecomputed on app updates
+App dynamicrating, review count, recent install velocity, recent CTR, recent uninstall rateStreaming counters, updated minutely
+Queryraw tokens, normalized tokens, detected language, query embedding, inferred intent (navigational vs. exploratory), query popularityComputed online
+Query-app interactionBM25 score, semantic cosine similarity, historical CTR for (query, app), historical install rate for (query, app), lexical overlap between query and app titleSome online, some precomputed per-query
+User and contextlocale, device type, prior downloads, prior searched queries, cohort embedding, time of daySubject to privacy constraints
+Editorialfeatured flag, policy suppression flag, manual boostOverrides the ranker when set
+
+Under Apple's privacy posture, user-level features are typically aggregated (cohort embeddings, on-device personalization) rather than raw per-user logs. Call this out; it's a real constraint that shapes the design.
+
+Data Pipeline
+
+Serving logs capture every impression with the features used and the user outcome.
+
+Offline ETL joins impressions with delayed labels (install at T+1 hour, retention at T+30 days) and writes training tables.
+
+Feature store serves the same feature values online (for inference) and offline (for training) to avoid train/serve skew.
+
+Phase 3: High-Level Architecture
+
+The request path:
+
+Query understanding tokenizes the query, computes a query embedding, and classifies intent (navigational vs. exploratory, detected language).
+
+Retrieval runs lexical (BM25) and semantic (ANN over two-tower embeddings) in parallel and unions the candidates (~1,000).
+
+Feature fetcher loads per-candidate features from the feature store in a single batched call.
+
+First-pass ranker (GBDT on tabular features) scores all ~1,000 candidates cheaply and keeps the top ~100.
+
+Second-pass ranker (neural multi-task) scores the top ~100 with the full feature set and emits final scores.
+
+Editorial and policy rules apply overrides (feature slots, blocklisted apps) before returning results.
+
+Phase 4: Retrieval
+
+Lexical: BM25 over an Inverted Index
+
+Precompute an inverted index from tokens in app title, subtitle, keywords, and description. At query time, score candidate apps with BM25. This is fast, interpretable, and dominates on navigational queries: someone typing "tiktok" expects a lexical match on the title.
+
+Boost title and keyword matches over description matches (field-weighted BM25 or BM25F). Lowercase, strip diacritics, apply per-locale tokenization (e.g., CJK segmentation).
+
+Semantic: Two-Tower Model + ANN
+
+Train a two-tower model:
+
+Query tower: small transformer producing a query embedding.
+
+App tower: embeds the app's title, description, category, and icon into the same vector space.
+
+Training data: (query, installed_app) pairs from logs as positives; in-batch negatives plus hard negatives mined from apps that appeared for the query but were not installed. Loss: sampled softmax or contrastive (cosine with temperature).
+
+At serving time, the app tower runs offline: every app is embedded once and indexed in an ANN structure (HNSW or ScaNN). The query tower runs online, producing a vector that's looked up against the index for top-K (~500) candidates. Semantic retrieval shines on exploratory queries like "meditation app", where lexical BM25 misses apps whose descriptions don't literally contain those tokens.
+
+Hybrid Merge
+
+Union lexical and semantic candidates and deduplicate, targeting ~1,000 candidates going into the first-pass ranker. Do not try to rank across the two sources at this stage; leave that to the ranker, which has access to both the BM25 score and the semantic similarity as features.
+
+A common trap is to pick lexical or semantic. Real systems run both. Lexical anchors brand-name queries; semantic covers intent. Both scores flow into the ranker as features, and the ranker learns the right weighting per query type.
+
+Freshness
+
+A newly launched app must be retrievable within hours:
+
+Lexical index supports incremental updates: index new apps and updated metadata as they land.
+
+Semantic index is harder to update incrementally. Options: nightly full rebuild + a fresh-delta index (in-memory HNSW holding the last 24 hours of new apps) searched in parallel and merged in. This is a common pattern and worth calling out.
+
+Phase 5: Ranking
+
+Two-Stage Ranking
+
+StageCandidates InCandidates OutModelLatency Budget
+First pass~1,000~100GBDT (LightGBM/XGBoost) on tabular features~20 ms
+Second pass~100~20DNN multi-task (click, install, retention heads)~50 ms
+
+Why two stages. A heavy neural ranker cannot afford ~1,000 evaluations per query at 50K QPS. A cheap GBDT filters down to ~100, and the expensive model runs only on that shortlist. This mirrors Google, Amazon, and Netflix ranking stacks.
+
+Features at Each Stage
+
+First pass leans on cheap, precomputed features: BM25 score, semantic cosine similarity, CTR priors, app rating, install velocity, category match.
+
+Second pass adds personalization features, cohort embeddings, long-horizon retention priors, and richer query-app interactions.
+
+Multi-Task Training
+
+The second-pass model predicts multiple heads and combines them:
+
+score = w_click * p(click) + w_install * p(install) + w_retention * p(retained_at_30d) - w_uninstall * p(uninstall)
+
+Weights are tuned by online A/B tests against a composite reward. Multi-task training improves generalization: sharing representations across click and install tasks helps with sparse long-term retention labels.
+
+Learning-to-Rank Loss
+
+Pointwise (binary cross-entropy per label) is the easiest to train and debug.
+
+Pairwise (RankNet) optimizes relative ordering between pairs and usually wins on NDCG.
+
+Listwise (LambdaRank, ListNet) is closer to the final metric but harder to tune.
+
+A pragmatic choice is pointwise for the individual heads, then a LambdaRank-style listwise loss on the composite score for the final model. State the trade-off; don't pretend one is strictly best.
+
+Personalization Done Carefully
+
+Personalize exploratory queries (e.g., re-rank "running app" based on the user's history of fitness apps) but not navigational queries. A user typing "instagram" expects Instagram at position 1 regardless of their history. Gate personalization on the query-understanding intent classifier.
+
+Phase 6: Training and Evaluation
+
+Training Cadence
+
+ComponentCadenceWhy
+Lexical indexContinuous (streaming)New apps discoverable in minutes
+App-side embeddingsDaily full rebuild + hourly deltaMetadata changes shift embeddings
+Query towerWeeklyQuery distribution shifts slowly
+First-pass GBDTDailyCheap to retrain, catches trends
+Second-pass DNNDaily or twice-weeklyHeavier, but needed to reflect fresh engagement patterns
+
+Offline Evaluation
+
+NDCG@10, MAP, MRR on a held-out slice of logged impressions.
+
+Counterfactual evaluation (Inverse Propensity Scoring, doubly robust estimators) to estimate online CTR and install rate from logged data under a candidate model. Critical because logged data is biased by the current model's decisions.
+
+Human-rated relevance on a sampled query set for head queries and new categories. Humans catch catastrophic ranker regressions that metrics miss.
+
+Online Evaluation
+
+A/B tests on the following business and guardrail metrics:
+
+Primary: install rate per search, retention rate 7/30 days post-install, revenue per search.
+
+Secondary: CTR, query abandonment rate, re-query rate, diversity of categories surfaced.
+
+Guardrails: p50/p99 latency, catalog coverage (% of apps ever impressed), small-developer share, editorial override rate.
+
+Run tests for at least 1–2 weeks to capture retention signal. Short-run CTR wins often fail to hold up on 30-day retention.
+
+Handling Train/Serve Skew
+
+Use the same feature store for training and serving. Log the features used to score each impression (not just the features computed at training time) so offline models train on the exact same values the production system saw. This is the single most common source of silent model regressions.
+
+Phase 7: Serving, Scaling, and Cold Start
+
+Latency Budget
+
+StageBudget
+Query understanding10 ms
+Retrieval (parallel lexical + ANN)30 ms
+Feature fetch (batched)40 ms
+First-pass ranker20 ms
+Second-pass ranker50 ms
+Rules and response assembly10 ms
+Network / overhead40 ms
+Total p99~200 ms
+
+Feature fetch dominates. Use a co-located feature store (e.g., in-memory or a low-latency KV store with per-shard batching) and batch all candidates in a single call, not N calls.
+
+Caching
+
+Query-level cache for head queries (the top ~1% of queries drive ~30% of traffic). Cache the final ranked list with a short TTL (minutes) keyed by (query, locale). Invalidate on model pushes and on editorial changes.
+
+Embedding cache for query embeddings of common queries.
+
+Feature cache for hot apps.
+
+Horizontal Scale
+
+Retrieval, ranker, and feature store are all stateless and shard cleanly.
+
+ANN index replicas shard by app hash; each query hits all shards and merges top-K.
+
+Feature store shards by app id.
+
+Cold Start for New Apps
+
+A brand-new app has no engagement features (CTR, install rate). Handle explicitly:
+
+Content features only. The two-tower model still produces an embedding from title, description, icon, and category, so semantic retrieval works on day one.
+
+Priors. Substitute category-level priors for missing CTR/install-rate features (e.g., "new fitness app with developer reputation X typically has CTR in this range").
+
+Exploration slots. Reserve a small fraction of result slots or a dedicated "Fresh" shelf for new apps, controlled by epsilon-greedy or Thompson sampling. This seeds engagement data so the main ranker has signal within days instead of weeks.
+
+Monitoring and Safety
+
+Drift and quality. Daily NDCG on a held-out set; alert on regression. Monitor feature distributions for drift (KL divergence against the training distribution).
+
+Abuse. Detect keyword stuffing (ratio of keywords to description length), fake review patterns (review velocity anomalies, reviewer graph clustering), and install farms (geographic and device-fingerprint clustering of installs).
+
+Fairness. Track impression and install share for small developers; alert on sudden drops after model pushes.
+
+Editorial overrides are always logged and auditable; never applied silently.
+
+Common Pitfalls
+
+Skipping the retrieval / ranking split. Proposing a single monolithic model that scores all 2M apps per query is infeasible at 50K QPS. Always frame retrieval and ranking as separate stages with different objectives (recall vs. NDCG) and different latency budgets.
+
+Choosing lexical OR semantic, not both. Lexical BM25 crushes semantic on navigational brand-name queries; semantic crushes lexical on intent queries. Real systems run both and let the ranker weight them. Picking one is a signal of missing nuance.
+
+Personalizing navigational queries. If a user types "instagram" and gets a personalized result that's not Instagram at position 1, the search feels broken. Gate personalization on the intent classifier and default to deterministic results for brand-name queries.
+
+Training only on click data. Click is noisy and easy to game. A ranker trained solely on clicks will surface clickbait apps. Train on install and retention labels too, even though they are sparser and delayed.
+
+Ignoring train/serve skew. The most common silent model regression is feature values diverging between training and serving. Log the features used at serving time and train on those exact values, not recomputed ones.
+
+Forgetting cold start. A design that has no answer for "how does a brand-new app get its first impression?" fails the fairness bar and slowly decays the catalog. Explicitly reserve exploration slots and use content-only features for new apps.
+
+Skipping counterfactual evaluation. Logged data is biased by the current ranker. Naively evaluating a new model on logged impressions overestimates wins. Use IPS or doubly-robust estimators, or be explicit that offline wins need online confirmation.
+
+Treating offline metrics as truth. NDCG gains often do not translate to install-rate gains. Always require an online A/B test on the install and retention guardrails before launching.
+
+Interview Checklist
+
+Problem Framing
+
+  Identified mixed intent, multi-objective, cold start, long tail, localization, adversarial behavior
+
+  Framed as two-stage retrieval + ranking with different objectives (recall vs. NDCG)
+
+  Called out the privacy constraint on user-level features
+
+Data and Features
+
+  Multi-task labels: click, install, post-install engagement, retention, uninstall
+
+  Feature families: app static/dynamic, query, query-app interaction, user/context, editorial
+
+  Feature store shared between training and serving to avoid skew
+
+Retrieval
+
+  BM25 over field-weighted inverted index
+
+  Two-tower model with ANN (HNSW/ScaNN) for semantic retrieval
+
+  Hybrid union of lexical and semantic candidates
+
+  Freshness handled via incremental lexical updates and a fresh-delta ANN index
+
+Ranking
+
+  Two-stage: cheap GBDT first pass, neural multi-task second pass
+
+  Multi-task heads (click, install, retention) combined by tuned weights
+
+  Personalization gated on navigational vs. exploratory intent
+
+  LambdaRank or pairwise loss on the composite score
+
+Training and Evaluation
+
+  NDCG/MAP/MRR offline plus counterfactual evaluation
+
+  Online A/B on install rate, retention, revenue with latency and fairness guardrails
+
+  Human-rated relevance as a sanity check on head queries
+
+Serving and Scaling
+
+  Latency budget breakdown, feature fetch as the dominant cost
+
+  Query-level cache for head queries
+
+  Cold start via content features, category priors, and exploration slots
+
+  Monitoring for drift, abuse (keyword stuffing, install farms), and fairness
+
+Summary
+
+ConcernDecision
+FramingTwo-stage retrieval + ranking, different objectives per stage
+RetrievalHybrid: BM25 inverted index + two-tower ANN (HNSW/ScaNN)
+RankingGBDT first pass (~1K to ~100), DNN multi-task second pass (~100 to ~20)
+ObjectiveMulti-task: click, install, retention, uninstall; tuned weights via A/B
+PersonalizationGated on intent; off for navigational, on for exploratory
+Cold startContent features from the two-tower, category priors, exploration slots
+FreshnessStreaming lexical updates, fresh-delta ANN index, daily ranker retrains
+EvaluationNDCG offline, counterfactual IPS, A/B on install/retention online
+Serving~200 ms p99 budget, batched feature fetch, query-level cache for head queries
+SafetyAbuse detection for stuffing/fake reviews/install farms, fairness monitoring, auditable editorial overrides
+
+The defining property of this design: retrieval optimizes for recall at 1K, ranking optimizes for a business-weighted composite of click, install, and retention. Lexical and semantic retrieval run in parallel and feed a two-stage ranker whose weights are tuned by online experiments. Everything else (cold start, freshness, fairness, caching) hangs off this core.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,410 @@
+===H1===
+System Design — Coinbase Explore (Real-Time Price Dashboard)
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/sd-coinbase-explore-realtime-price
+===BODY===
+Coinbase
+System Design·60 minMembers
+System Design — Coinbase Explore (Real-Time Price Dashboard)
+Design the Coinbase Explore page (coinbase.com/explore), which streams real-time prices for hundreds of crypto assets to every visitor. The discussion centers on push vs pull delivery (WebSocket / SSE vs polling), fan-out on millions of subscribers, cache layering between exchange feeds and the browser, and how to degrade gracefully when one upstream feed is delayed.
+SWE
+websocket
+sse
+fan-out
+caching
+scaling
+pubsub
+frontend
+backend
+medium
+Frequency
+Medium
+Last asked
+2026-07-11
+Stage
+onsite-system-design
+System Design: Coinbase Explore Realtime Market Data
+
+Design the backend for Coinbase Explore. This page displays a list of crypto assets. It shows realtime price changes and aggregated time windows like 1m, 5m, 30m, 1h, and 1d. The data comes from outside exchanges. The system must handle errors gracefully if these data feeds fail.
+
+Phase 1: Problem Requirements
+
+Functional Goals
+
+Browsing: Users can search and view all assets (about 20K symbols).
+
+Streaming: The system sends price updates to clients in near-realtime.
+
+Aggregation: The system calculates price stats for fixed time windows (1m, 5m, 30m, 1h, 1d).
+
+Sorting: Users can sort the list by price change %, market cap, and volume.
+
+Resilience: The system must keep working even if an exchange feed fails. It should mark the data as "stale" (old).
+
+Note: For this interview, do not design long-term historical storage. Focus on getting data in, processing it, sending it to users, and handling errors.
+
+System Performance Goals
+
+RequirementTargetRationale
+FreshnessTick-to-client < 1s p95Market data must be live.
+Read latencySnapshot API < 250ms p95The page must load fast.
+Availability99.95%The page must work even if exchanges have issues.
+ConsistencyEventual consistency (1-2s)Speed and uptime are more important than perfect sync.
+Scalability1M upstream tickers, millions of clientsMust handle many symbols and many users.
+
+Scale Estimates
+
+MetricValue
+Upstream symbols (stress case)1,000,000 tickers
+Avg tick rate1 tick/s per active ticker
+Ingestion throughput~1,000,000 events/s
+Raw ingress bandwidth~120 MB/s
+Explore visible assets~20,000 symbols
+Concurrent clients2,000,000
+Target stream payload modelbatched deltas every 250-500ms
+
+Tip: Tell the interviewer that sending data to millions of users (fanout) is usually harder than storing the data.
+
+Phase 2: Database Schema
+
+Key Data Structures
+
+Asset
+├── symbol: VARCHAR (PK, e.g. "BTC-USD")
+├── base_asset: VARCHAR
+├── quote_asset: VARCHAR
+├── display_name: VARCHAR
+├── status: ENUM (active, halted, delisted)
+├── market_cap_rank: INTEGER
+└── updated_at: TIMESTAMP
+
+ExchangeFeedStatus
+├── exchange_id: VARCHAR (PK)
+├── status: ENUM (healthy, degraded, down)
+├── last_heartbeat_at: TIMESTAMP
+├── error_rate_1m: FLOAT
+└── lag_ms_p95: INTEGER
+
+Tick
+├── symbol: VARCHAR
+├── exchange_id: VARCHAR
+├── sequence_id: BIGINT
+├── trade_price: DECIMAL
+├── trade_size: DECIMAL
+├── event_time: TIMESTAMP
+└── ingest_time: TIMESTAMP
+
+WindowAggregate
+├── symbol: VARCHAR
+├── window: ENUM (1m, 5m, 30m, 1h, 1d)
+├── bucket_start: TIMESTAMP
+├── open: DECIMAL
+├── high: DECIMAL
+├── low: DECIMAL
+├── close: DECIMAL
+├── volume: DECIMAL
+├── change_pct: DECIMAL
+├── is_stale: BOOLEAN
+└── updated_at: TIMESTAMP
+
+MarketSnapshot
+├── symbol: VARCHAR (PK)
+├── last_price: DECIMAL
+├── change_1m_pct: DECIMAL
+├── change_5m_pct: DECIMAL
+├── change_30m_pct: DECIMAL
+├── change_1h_pct: DECIMAL
+├── change_1d_pct: DECIMAL
+├── volume_24h: DECIMAL
+├── source_count: INTEGER
+├── is_stale: BOOLEAN
+└── updated_at: TIMESTAMP
+
+Data Relationships
+
+We convert raw Tick events into a standard format. Then we combine them into a WindowAggregate for each symbol.
+
+MarketSnapshot is a special view built for fast reading. The API list and WebSocket updates use this.
+
+ExchangeFeedStatus helps the system decide which data source to use and if the data is old (stale).
+
+Note: For the interview, keep these aggregates in memory or a hot cache (like Redis).
+
+Phase 3: Interface Design
+
+Communication Protocols
+
+REST: Used for the first page load, searching, sorting, and pagination.
+
+WebSocket: Used for live updates after the first load.
+
+gRPC/Kafka: Used internally to move data fast between services.
+
+Public Endpoints
+
+GET /api/explore/assets?cursor=eyJvZmZzZXQiOjEwMH0=&limit=100&sort=market_cap&order=desc&search=eth
+Response:
+{
+  "items": [
+    {
+      "symbol": "ETH-USD",
+      "last_price": 3120.25,
+      "change_1m_pct": 0.12,
+      "change_5m_pct": -0.09,
+      "change_1d_pct": 2.37,
+      "is_stale": false,
+      "updated_at": "2026-02-10T19:40:01Z"
+    }
+  ],
+  "next_cursor": "..."
+}
+
+GET /api/explore/assets/{symbol}/windows?windows=1m,5m,30m,1h,1d
+Response:
+{
+  "symbol": "BTC-USD",
+  "windows": {
+    "1m": {"open": 67500.1, "close": 67504.2, "change_pct": 0.01},
+    "5m": {"open": 67480.0, "close": 67504.2, "change_pct": 0.04}
+  }
+}
+
+WebSocket API
+
+WS /ws/explore
+
+# client
+{"type":"subscribe","symbols":["BTC-USD","ETH-USD"],"channels":["ticker","window"]}
+
+# server snapshot
+{"type":"snapshot","symbols":[{"symbol":"BTC-USD","last_price":67504.2,"change_1m_pct":0.01}]}
+
+# server batched delta (every ~250-500ms)
+{"type":"delta_batch","updates":[{"symbol":"BTC-USD","last_price":67508.9,"change_1m_pct":0.03,"seq":987654321}]}
+
+Internal Messages
+
+Topic: ticks.raw.{exchange}
+Message: { symbol, exchange_id, sequence_id, price, size, event_time }
+
+Topic: ticks.normalized
+Message: { symbol, sequence_id, price, size, event_time, ingest_time }
+
+Topic: market.snapshots
+Message: { symbol, last_price, change_1m_pct, change_5m_pct, change_30m_pct, change_1h_pct, change_1d_pct, is_stale, updated_at }
+
+Phase 4: System Architecture
+
+Service Roles
+
+Exchange Connectors
+
+Connect to exchange feeds.
+
+Fix symbol names (e.g., change XBT to BTC).
+
+Limit rates so we don't crash the connection.
+
+Normalizer + Sequencer
+
+Check data and remove duplicates using (exchange_id, sequence_id).
+
+Fix timestamps to match our system clock.
+
+Drop bad data (like negative prices).
+
+Stream Aggregator
+
+Group data by symbol hash to scale horizontally.
+
+Calculate rolling windows for 1m/5m/30m/1h/1d.
+
+Send out MarketSnapshot updates.
+
+Hot Store
+
+Keep the latest snapshot and window data in memory/Redis.
+
+Mark data as "stale" if updates stop coming.
+
+Snapshot API + WebSocket Gateways
+
+The API sends the initial list of assets.
+
+The WebSocket sends updates after subscription.
+
+Backpressure: Group updates together and send them every few milliseconds.
+
+Replay/Reconciliation Jobs
+
+Reload data from logs if the system restarts.
+
+Recalculate data if gaps are found.
+
+Handling Exchange Failures
+
+It is better to show users that data is old (stale) than to pretend it is fresh. If an exchange fails, the UI should show a warning.
+
+UI Strategy (Frontend)
+
+Load the page using REST (good for SEO and caching).
+
+Open one WebSocket connection per user.
+
+Only subscribe to the rows the user can see.
+
+Update specific rows in batches to avoid freezing the browser.
+
+Show an is_stale badge and the last update time on the row.
+
+Phase 5: Optimization & Decisions
+
+Achieving Goals
+
+NFRStrategy
+FreshnessProcess streams in parts and send batched updates every 250-500ms.
+LatencyUse a Hot Store (Redis/memory) and pre-calculate window fields.
+AvailabilityUse multiple exchanges and circuit breakers. Fallback to stale data.
+ScalabilitySplit work by symbol. Add more WebSocket gateways.
+CorrectnessUse sequence numbers to remove duplicates. Replay logs to fix errors.
+
+Performance Problems & Fixes
+
+1. Processing 1M events/s
+
+Split the work by hashing the symbol.
+
+Use O(1) window updates with ring buffers.
+
+Allow a small delay (2-3s) for late data.
+
+2. Sending data to millions of users (Fanout)
+
+Only send symbols the user subscribed to.
+
+Combine multiple updates for one symbol into a single message.
+
+Compress data and split WebSocket servers by connection ID.
+
+3. Unstable Exchanges
+
+Use a circuit breaker. Stop asking a broken exchange for a while.
+
+Prefer healthy exchanges with low lag.
+
+Mark data as stale automatically if the feed stops.
+
+Trade-off: Calculate on Read vs. Write
+
+ApproachProsCons
+On-read computeEasy to ingest data.Too slow for large lists and many users.
+On-write precomputeFast API and streaming. Predictable speed.Harder to build stream processing.
+On-write (recommended)Best for live dashboards.Requires good operations team.
+
+Trade-off: Polling vs. Streaming
+
+ApproachProsCons
+Client pollingEasy to build.Wasteful. Data is old between polls.
+Server push (WebSocket)Fast updates. Efficient.Managing connections is hard.
+Hybrid (recommended)Fast first load (REST) + live updates.A bit more complex to connect.
+
+Deep Dive: Delivery Guarantees
+
+Exchanges usually guarantee "at-least-once" delivery.
+
+"Exactly-once" is very expensive and hard.
+
+Recommendation: Use "at-least-once". Remove duplicates using (exchange_id, sequence_id).
+
+For a dashboard, seeing a duplicate price occasionally is better than missing data entirely.
+
+Mistakes to Avoid
+
+Calculating windows (1m/1h) on every API read: This is too slow and expensive. Calculate them in the background stream.
+
+Sending all 20K symbols to every client: This will not scale. Only send what the user is looking at.
+
+Ignoring exchange failures: If you don't plan for timeouts or bad feeds, the market data will be wrong. Use health checks.
+
+Skipping monitoring: You need metrics for feed lag, dropped ticks, and stale symbols to fix bugs.
+
+Interview Checklist
+
+Requirements Phase
+
+  Mentioned both scales: ~20K visible assets vs. ~1M upstream tickers.
+
+  Confirmed realtime goals and time windows.
+
+  Explained what happens when an exchange fails.
+
+Data Model Phase
+
+  Defined Tick, WindowAggregate, MarketSnapshot, and ExchangeFeedStatus.
+
+  Explained why a hot cache is enough for this specific interview.
+
+API Design Phase
+
+  Suggested REST for the first load + WebSocket for updates.
+
+  Included pagination and sorting.
+
+  Defined the message format for updates.
+
+System Architecture Phase
+
+  Drew the pipeline: Ingestion -> Normalization -> Aggregation -> Fanout.
+
+  Discussed replaying logs and handling stale data.
+
+  Explained how the frontend handles large tables.
+
+Optimization Phase
+
+  Explained partitioning and batching to improve speed.
+
+  Compared calculating on-write vs. on-read.
+
+  Discussed observability (monitoring) for exchange health.
+
+Quick Review
+
+AreaRecommended ChoiceWhy
+Client data pathREST snapshot + WebSocket deltasFast initial load + fast updates.
+Aggregation modelStream precompute for fixed windowsPredictable speed at scale.
+Hot data servingRedis/in-memory storeVery fast list API (<250ms).
+ReliabilityMulti-exchange + stale fallbackKeeps working when feeds fail.
+OpsFull monitoring (logs/metrics/alerts)Finds and fixes problems faster.
+
+Candidate-Report Notes
+
+Push, not poll, for the real-time channel. WebSocket is the canonical choice; SSE is a strong alternative when one-way server-to-client is enough and you want to ride HTTP/2 multiplexing through CDNs. Be ready to defend the choice on connection cost, NAT/firewall friendliness, and reconnect semantics.
+
+Fan-out architecture: a price-ingestion layer normalizes ticks from exchanges, writes the canonical "latest tick per symbol" into Redis (or an in-memory pub/sub), and a tier of edge price-relay nodes subscribes and broadcasts to all connected clients. The edge tier is what scales out to millions of connections; the canonical store stays small.
+
+Avoid pricing inconsistency by serving the initial page load from the same canonical cache the WebSocket layer reads — otherwise the snapshot in the HTML disagrees with the first WebSocket tick.
+
+Batch and coalesce updates per symbol. At quiet times the upstream feed may tick 10×/sec; the user doesn't need every tick, so batch into 250–500ms windows. This dramatically cuts outbound bandwidth.
+
+Personalization layer is separate. The watchlist is a per-user message routed by user-id; design it as a smaller, slower-fanout channel on the same WebSocket connection (room / subscription primitives).
+
+Failure modes the interviewer will probe: one exchange feed lagging or down (mark stale, serve last-known with a freshness timestamp); WebSocket reconnect storms after a region failover (jittered backoff, sticky session affinity, capacity headroom).
+
+Clarify A/B testing concerns — the recurring follow-up signal Coinbase interviewers care about. Define how a sparkline rendering change would be rolled out behind a percentage flag, how metrics (engagement on clicked symbols) would be attributed, and how guardrails (perceived latency) would be measured.
+
+Preparation
+
+Be fluent on the canonical price-fanout stack: exchanges → kafka → in-memory pub/sub → WebSocket relays → browser. Drill it once on a whiteboard until each layer's responsibility is clear.
+
+Pre-load the WebSocket-vs-SSE-vs-long-poll trade-off in a 60-second pitch — most candidates lose minutes here.
+
+Have a rough capacity model ready: 5M concurrent connections × ~8 KB/s per connection = ~330 Gbps outbound. This forces the conversation toward edge fanout and away from a single backend pool.
+
+Practice answering "what would change if Coinbase had to be SEC-compliant in displaying these prices?" — a recurring curveball that tests whether you can reason about freshness contracts and audit trails on top of a streaming architecture.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

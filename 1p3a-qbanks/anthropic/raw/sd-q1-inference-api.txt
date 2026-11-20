@@ -1,0 +1,136 @@
+===H1===
+System Design Q1 — Inference API / Batched GPU Serving
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/sd-q1-inference-api
+===BODY===
+Anthropic
+System Design·55 minMembers
+System Design Q1 — Inference API / Batched GPU Serving
+The default Anthropic system-design round. Design an LLM inference API that batches requests across GPUs efficiently. Interviewers dive deep on a few areas — GPU utilization, scale-out under traffic spikes, prefill/decode separation — rather than walk a full BBYE-style template.
+SWE
+MLE
+Infra Eng
+llm-inference
+batching
+kv-cache
+gpu
+scaling
+hard
+Frequency
+Very high
+Last asked
+2026-08-31
+Stage
+phone-screen · onsite-system-design
+Requirements
+
+Functional
+
+Accept user requests (streaming or non-streaming) for token generation.
+
+Route to a pool of model replicas across GPUs.
+
+Batch requests at the model layer to maximize GPU utilization while keeping tail latency bounded.
+
+Multi-model / multi-version coexistence; cold-start handling for inactive models.
+
+Non-functional / scale
+
+Throughput vs. latency tradeoff.
+
+KV-cache mechanics and why decode is the bottleneck.
+
+Cost per token; GPU memory vs. compute.
+
+Long-context impact on latency, tail-latency mitigation.
+
+Decision points the interviewer probes
+
+Continuous batching (in-flight requests can join an existing decode batch) vs. fixed micro-batches.
+
+Prefill / decode separation onto different replicas or different schedulers.
+
+Auto-scaling when GPU startup time is on the order of minutes — what backpressures the front door in the interim? Reported answers: queue at the aggregator layer, monitor SQS/Kafka queue depth, dynamically tighten rate limits.
+
+Rate limiting tiers (paid vs. free, per-key vs. per-account).
+
+Failure handling: GPU drop-outs, partial batches, retries, idempotency keys.
+
+Safety / guardrails position in the pipeline — pre-model, post-model, both.
+
+A design-review follow-up fixes the available pool at eight GPUs and asks for a scheduling algorithm for two models: one requires a single GPU, while the other requires all eight together.
+
+Notes
+
+The canonical KV-cache management technique to name-check is paged attention — block-paged allocation of the KV cache so requests of widely varying lengths share GPU memory without fragmentation. Pair it with continuous (in-flight) batching to overlap prefill of new requests with decode of in-progress ones; together they are the architectural baseline production serving stacks have converged on. Tensor parallelism + flash-attention kernels are the standard accelerator-side complements.
+
+The round runs in a plain Google Doc. The interviewer often provides a partial 3-box diagram (client → API → GPU pool) and asks you to type your reasoning rather than draw.
+
+Interviewers focus on one or two depth areas and skim the rest. Do not walk a generic template (functional reqs → non-functional → entities → API → schema → scale). Lead with the depth area for this team — capacity planning, prefill/decode, KV-cache, or rate limiting.
+
+Common stumble: failing to estimate GPU count from QPS × tokens × per-token-latency. Pre-write the back-of-envelope formula.
+
+Multiple candidates report being grilled on rate limiting under burst traffic — the expected answer is dynamic throttling tied to observed queue depth, not a static token bucket.
+
+Design-review delivery format
+
+The inference-API round is increasingly delivered as a design-doc review rather than a blank-page design: the interviewer shares an existing inference-server design with planted weaknesses and asks you to critique it before driving follow-ups. Candidates report the interviewer mostly cares about the batching strategy — don't over-invest in annotating every box on the diagram; get to the batch / KV-cache tradeoffs quickly or you run out of time on follow-ups. "How would you bring GPU machines up faster?" is a commonly probed follow-up.
+
+Alternate canonical variant in rotation — fixed-batch GPU API
+
+A narrower rotation pins the GPU contract to a specific, unchangeable batch function and asks you to design only the dispatch / collation layer around it. The exact signature reported across loops:
+
+def batchstring(inputs: list[str]) -> list[str]: ...
+    # Constraints (you CANNOT change any of these):
+    #   - Input size: 1 <= len(inputs) <= 100 strings per batch.
+    #   - Output: exactly one string per input, in the same order.
+    #   - Latency: ~100 ms per batch, FIXED — does not scale with batch size.
+    #   - Concurrency: each GPU instance can process exactly ONE batch at a time.
+
+Design targets the interviewer pins explicitly:
+
+Synchronous HTTP from the client side; client waits for its answer. P95 latency budget is typically 500 ms end-to-end.
+
+Scale anchors: "100 vs 10,000 RPS" — be ready for both regimes. At 10K RPS with 100-ms fixed per-batch latency and batch size 100, the steady-state GPU floor is RPS / (batch_size / batch_latency) = 10_000 / (100 / 0.1) = 10 GPUs.
+
+Free vs paid tiering enforced by separate priority queues feeding the same batcher.
+
+Failure model: if a GPU crashes mid-batch, the request-to-batch mapping table lets you re-route the in-flight batch to another worker; idempotency on the user-facing request id.
+
+The core implementation trick of this variant: a size-or-time triggered batcher — flush as soon as the in-memory pending queue reaches 100 OR a timeout (e.g., 50 ms) elapses, whichever comes first. The fixed 100-ms GPU latency makes the timeout the dominant lever for the small-batch / low-RPS regime.
+
+The fixed-batch variant also shows up in the design-doc-review delivery: the doc pins the batch contract and the interviewer explicitly rules out continuous batching, GPU auto-scaling, and rate limiting, keeping the entire round inside the dispatch / collation layer. Some interviewers run it as a pressure round — few hints, follow-ups arriving only once you land the expected answer — so keep proposing concrete mechanisms instead of waiting for steering.
+
+Capacity-planning and GPU-dispatch probes
+
+Expect to calculate theoretical maximum throughput, then explain why a latency-bounded online service realizes less throughput than an offline benchmark. State the tail-latency target and connect the gap to achievable batch fill rather than treating peak hardware throughput as the production operating point.
+
+Caching may be challenged as unnecessary when the hit ratio is low. Estimate reuse and memory cost before adding it; a defensible decision to omit a low-value cache is stronger than including one by habit.
+
+GPU load balancing is an explicit decision point. Simple random or round-robin dispatch needs a defense against unequal queue depth and worker capacity; be ready to make the routing signal load-aware.
+
+An August 2026 review explicitly covered batching, load shedding and rate limiting, caching, and idempotency. Another specified 10,000 QPS and 100 ms per batch, then probed server count, overload handling, and allocation across models. These variants allow a broader review than the constrained dispatch-only version; clarify which parts of the design may change.
+
+For the eight-GPU scheduling variant, reserve all eight GPUs atomically before dispatching a large-model batch; small-model batches each reserve one. Once the policy selects a waiting large batch, stop admitting new small batches and let active finite-duration work drain, then launch the large batch. Use bounded turns or aging between the model queues so neither class is indefinitely postponed; explain the utilization cost of draining rather than claiming this policy is throughput-optimal.
+
+For capacity planning, let B be the achieved requests per batch and C the number of independent simultaneous batch slots per server. With 0.1 seconds per batch, ideal server throughput is B * C / 0.1 requests/sec, so 10,000 QPS requires at least ceil(1000 / (B * C)) servers. Ask for B, C, and model-specific GPU requirements before choosing a number; account for batch fill, queueing, headroom, and failures beyond this ideal floor. Do not assume the all-eight-GPU model has eight independent batch slots.
+
+Preparation
+
+Memorize the inference-server architecture canonically: scheduler, KV-cache pool, continuous batching, prefill/decode workers, auto-scaler.
+
+Practice GPU-count back-of-envelopes: given target QPS × prompt length × tokens-per-second per GPU, derive the needed pool.
+
+Read at least one of vLLM's, TensorRT-LLM's, and Triton Inference Server's design docs. The interviewer will follow you into whichever one you reference.
+
+Prepare a one-paragraph answer for "GPU half the cluster just died — how do you protect the SLA?" Backpressure at the aggregator, tighten rate limits per tier, drop free-tier traffic first.
+
+In 15 minutes, trace a mixed queue of one-GPU and eight-GPU batches; show every reservation, the drain before a large batch, and how a waiting small batch eventually runs.
+
+In 10 minutes, derive the server-count lower bound from batch size and independent batch concurrency, then identify which missing parameters prevent a numerical answer and where latency headroom enters.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,534 @@
+===H1===
+Design a Pickup Area Driver Queue
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/pickup-area-driver-queue-design
+===BODY===
+Uber
+System DesignMembers
+Design a Pickup Area Driver Queue
+Design an internal pickup area driver queue service that maintains, in real time, an ordered queue of eligible drivers for each geofenced pickup zone (such as an airport staging lot). The core challenge is real-time geofence membership and ordered state management: deciding when a driver is in an area, keeping queue order stable under continuous movement and noisy events, and serving fast queue reads.
+SWE
+system-design
+geofence
+location
+streaming
+kafka
+redis
+idempotency
+state-machine
+scaling
+Frequency
+Single report
+Last asked
+2026-01-29
+Stage
+onsite-system-design
+Design a Pickup Area Driver Queue
+
+Problem Statement
+
+Design an internal pickup area driver queue service. Given a pickup area such as an airport staging lot or a geofenced pickup zone, internal systems should be able to fetch the current driver queue for that area. When a driver enters the area, they join the queue. When they leave the area, go offline, or become ineligible, they are removed.
+
+At minimum, the system should support:
+
+maintaining queue membership for many pickup areas in real time
+
+adding drivers when they enter a pickup area
+
+removing drivers when they leave, go offline, or get matched elsewhere
+
+returning the current ordered queue for a pickup area
+
+preserving correct ordering even with duplicate, delayed, or out-of-order events
+
+This is not the same as a heatmap or global dispatch optimizer. The core challenge is closer to a real-time geofence membership and ordered state management system:
+
+how you decide a driver is "in" a pickup area
+
+how you maintain a stable queue order under continuous movement
+
+how you make queue reads fast while processing event streams correctly
+
+how you keep the queue consistent across driver status changes, reassignment, and failures
+
+Phase 1: Requirements (~5 minutes)
+
+Functional Requirements
+
+Track pickup area membership: The system determines when a driver enters or leaves a configured pickup area.
+
+Maintain an ordered driver queue per area: Each eligible driver inside the area appears at exactly one position in that area's queue.
+
+Serve queue reads quickly: Internal consumers can fetch the current queue, queue length, and the next few drivers for an area.
+
+Remove ineligible drivers promptly: Drivers should leave the queue when they exit the area, go offline, accept a trip, or otherwise become ineligible.
+
+Handle queue mutations safely: Duplicate or out-of-order events should not corrupt queue membership or ordering.
+
+Keep the first version narrow: one queue per pickup area, FIFO ordering by qualified entry time, and one active membership per driver. Priority tiers, area capacity rules, and manual overrides can be layered on later if the interviewer asks.
+
+Non-Functional Requirements
+
+RequirementTargetWhy it matters
+Scale100K online drivers near managed pickup zones, 10K pickup areas globallyEnough scale that polling-based designs break down
+Mutation throughput20K membership/status events per second peakAirports, concerts, and city hubs can burst
+Read latencyP95 under 100ms for queue lookupDispatch systems need a fresh answer quickly
+FreshnessQueue updates visible within 1-3 secondsStale queue position causes unfairness and bad dispatch
+CorrectnessNo duplicate memberships, stable ordering, prompt removalsQueue trust matters operationally
+Availability99.9%+ for internal useMatching and airport operations depend on it
+
+Clarifying Questions
+
+These are the questions worth asking before you draw the system:
+
+What determines queue order?
+A strong default is FIFO by qualified entry time, where "qualified" means the driver is available and has crossed into the area cleanly.
+
+What counts as leaving the queue?
+Reasonable defaults: leaving the geofence, going offline, accepting a trip, being manually removed, or becoming ineligible for that area's queue.
+
+How do we handle GPS jitter on boundaries?
+Use hysteresis: do not flip membership on every noisy point. Require a short dwell time or separate enter/exit thresholds.
+
+Can a driver be in multiple pickup-area queues at once?
+Default answer: no. A driver can belong to at most one active pickup-area queue at a time.
+
+Can pickup areas overlap?
+A practical default is to avoid overlaps operationally. If overlaps exist, resolve them with a deterministic priority rule so one driver still maps to at most one effective queue.
+
+Do reads need the full queue or just the front?
+Default: return queue metadata plus the first N drivers. Full queue export is allowed for internal tooling but should not be the hot path.
+
+Capacity Estimation
+
+Assumptions:
+- 10,000 managed pickup areas globally
+- 100,000 drivers near or inside those areas at busy times
+- Average 2 queue-relevant events per driver per minute
+- Peak 10x burst in hotspot cities or airports
+
+Write path:
+- 100,000 * 2 / 60 ~= 3,333 events/second average
+- Peak ~= 20,000-30,000 events/second after bursts and retries
+
+Read path:
+- Assume 5,000 internal queue reads/second globally
+- Most reads ask for queue length + first 10-50 drivers
+
+State size:
+- Membership record ~= 200 bytes
+- 100,000 active memberships ~= 20 MB raw
+- Even with indexes, replicas, and metadata, hot queue state is modest enough for Redis/state-store caching
+
+The hard part is not raw storage volume. The hard part is maintaining the correct ordered queue state under noisy real-time events.
+
+Phase 2: Data Model (~5 minutes)
+
+Core Entities
+
+PickupArea {
+  area_id: String
+  city_id: String
+  area_name: String
+  polygon: GeoJSON
+  queue_policy: JSON
+  status: Enum (active, paused)
+}
+
+DriverLocationEvent {
+  event_id: UUID
+  driver_id: UUID
+  event_ts: Timestamp
+  lat: Double
+  lng: Double
+  availability_status: Enum (available, on_trip, offline)
+}
+
+DriverQueueMembership {
+  driver_id: UUID
+  area_id: String
+  state: Enum (queued, removed)
+  joined_at: Timestamp
+  enqueue_seq: Long | null
+  last_event_ts: Timestamp
+  last_location: Point
+  removal_reason: Enum (left_area, offline, matched, manual, expired) | null
+}
+
+AreaQueueSnapshot {
+  area_id: String
+  queue_version: Long
+  queue_length: Integer
+  generated_at: Timestamp
+  head_driver_ids: Array<UUID>
+}
+
+DriverAssignmentEvent {
+  assignment_id: UUID
+  driver_id: UUID
+  area_id: String
+  event_ts: Timestamp
+  action: Enum (reserved, matched, canceled)
+}
+
+Key Modeling Decisions
+
+Separate raw location events from derived queue membership
+Location is noisy input. Queue membership is interpreted state.
+
+Treat membership as stateful, not append-only business logic
+The hot problem is "what is true now?" per driver and per area.
+
+Persist a monotonic queue version
+This helps consumers reason about freshness and makes debugging easier.
+
+Use explicit removal reasons
+Operators and downstream systems need to know whether a driver left voluntarily, got matched, or was expired due to stale heartbeats.
+
+Storage Choices
+
+Kafka / PubSub for durable ingestion of location, status, and assignment events
+
+Stream processor state store for per-driver membership state and event ordering logic
+
+Redis for fast serving of the current queue per area
+
+Relational DB for pickup area configuration and operational audit trails
+
+Object storage / warehouse for raw event archival and replay
+
+You do not want to rebuild the live queue by scanning raw location events on every read. The queue should be continuously materialized.
+
+Phase 3: API Design (~5 minutes)
+
+Protocol Choice
+
+gRPC or Kafka events for high-volume internal driver state ingestion
+
+REST or gRPC for queue reads by dispatch and operations tooling
+
+Admin REST APIs for area configuration or manual queue actions
+
+Queue Read API
+
+GET /internal/pickup-areas/{area_id}/queue?limit=20
+
+Response:
+{
+  "area_id": "sfo_t1_staging",
+  "queue_version": 1842201,
+  "generated_at": "2026-03-12T10:30:02Z",
+  "queue_length": 137,
+  "drivers": [
+    {
+      "driver_id": "drv_101",
+      "position": 1,
+      "joined_at": "2026-03-12T10:11:02Z"
+    },
+    {
+      "driver_id": "drv_202",
+      "position": 2,
+      "joined_at": "2026-03-12T10:11:19Z"
+    }
+  ]
+}
+
+Membership Update Contract
+
+{
+  "event_id": "evt_123",
+  "driver_id": "drv_101",
+  "event_ts": "2026-03-12T10:29:58Z",
+  "lat": 37.6165,
+  "lng": -122.3862,
+  "availability_status": "available"
+}
+
+Optional Queue Head Reservation API
+
+POST /internal/pickup-areas/{area_id}/reserve-next-driver
+
+Response:
+{
+  "area_id": "sfo_t1_staging",
+  "queue_version": 1842202,
+  "driver_id": "drv_101",
+  "reservation_expires_at": "2026-03-12T10:30:10Z"
+}
+
+If the interviewer wants to connect this to dispatch, adding a short-lived "reserve head of queue" API is a clean extension. It prevents two consumers from simultaneously taking the same driver.
+
+Phase 4: High-Level Design (~15-25 minutes)
+
+End-to-End Flow
+
+1. Ingest queue-relevant events
+
+We ingest three event classes:
+
+driver location heartbeats
+
+driver availability/status changes
+
+assignment or trip-state changes
+
+Partitioning by driver_id is the clean default. It ensures all queue-relevant events for a driver are processed in order by the same stream partition, which greatly simplifies deduplication and state transitions.
+
+2. Evaluate pickup-area membership
+
+The geofence evaluator maps each location event to zero or more candidate pickup areas, then resolves that to at most one effective queue assignment.
+
+Key details:
+
+use configured polygons or circles per area
+
+apply hysteresis so drivers do not flap in and out due to GPS noise
+
+optionally require a short dwell threshold such as 3-5 seconds before converting a raw enter into a queue join
+
+if areas overlap, apply a deterministic tie-break such as configured priority or smallest-area wins
+
+The output is not just "driver is inside polygon." It is a cleaner semantic event such as:
+
+entered_area
+
+left_area
+
+still_inside
+
+outside_all_areas
+
+3. Maintain per-driver membership state
+
+The membership processor keeps the latest state for each driver:
+
+driver:{driver_id} -> {
+  current_area_id,
+  joined_at,
+  last_event_ts,
+  availability_status,
+  membership_state
+}
+
+This is where we enforce core invariants:
+
+a driver belongs to at most one active pickup queue
+
+duplicate entered_area does not create duplicate queue entries
+
+out-of-order older events are ignored if event_ts < last_event_ts
+
+a driver who becomes offline or matched is removed immediately
+
+4. Maintain the ordered queue per area
+
+For each area, materialize the current queue in Redis or an equivalent low-latency store:
+
+area_queue:{area_id} -> ordered driver ids
+area_meta:{area_id} -> { queue_version, queue_length, updated_at }
+
+For strict FIFO, the simplest mental model is:
+
+when a driver transitions from not_queued to queued, append them to the tail
+
+when a driver transitions out of queued, remove them from the ordered structure
+
+Implementation choices:
+
+Redis sorted set using an area-scoped monotonic enqueue_seq as score
+
+Custom linked-list plus hash index if removals and head pops need stricter O(1) behavior
+
+Using a logical enqueue sequence assigned by the queue mutator is safer than relying on raw wall-clock timestamps because it avoids tie ambiguity and gives deterministic ordering.
+
+In an interview, a sorted set is usually good enough unless the interviewer asks for very high churn plus exact position updates.
+
+5. Serve queue reads
+
+The Queue API reads directly from the materialized queue store, not from Kafka and not from raw DB tables.
+
+Typical reads:
+
+queue length
+
+first N drivers
+
+queue version and last update timestamp
+
+maybe a specific driver's current position
+
+This keeps reads fast and isolated from the heavier stream-processing path.
+
+6. Handle stale memberships
+
+Some drivers will stop sending heartbeats without a clean leave event. We need expiry:
+
+keep last_event_ts per driver
+
+run a timer-based expiry or lazy reconciliation
+
+if no qualifying heartbeat arrives for a threshold such as 15-30 seconds, remove the driver
+
+Without expiry, dead devices remain stuck in the queue forever.
+
+Phase 5: Scaling & Trade-offs (~15-20 minutes)
+
+1. Duplicate and out-of-order events
+
+This is one of the main interview traps.
+
+Practical defenses:
+
+partition by driver_id
+
+store last_event_ts or a monotonic source sequence
+
+ignore older events
+
+make join/remove operations idempotent
+
+Example:
+
+if a driver is already queued in area_a, another duplicate entered_area(area_a) should be a no-op
+
+if a delayed left_area arrives after the driver already re-entered with a newer timestamp, ignore it
+
+2. Boundary jitter and fairness
+
+If GPS points wobble around the edge, a naive design repeatedly removes and re-adds the driver, unfairly resetting queue position.
+
+Mitigations:
+
+enter and exit hysteresis bands
+
+minimum dwell time before first join
+
+short grace period before removal if the driver briefly exits by a few meters
+
+This is an important trade-off: too much smoothing delays truth, too little smoothing creates unfair queue churn.
+
+3. Queue data structure choice
+
+You need both:
+
+ordered reads by position
+
+arbitrary removal when a driver leaves or becomes ineligible
+
+Options:
+
+Sorted set: simple and operationally friendly; good default
+
+Linked list + hash map: better for O(1) arbitrary removal, but more custom logic
+
+Relational DB only: too slow and contention-heavy for the hot path
+
+For an onsite answer, I would start with a Redis sorted set plus per-driver membership map, then discuss alternatives if removal churn becomes the bottleneck.
+
+4. Single-writer per area vs per-driver partitioning
+
+Partitioning by driver_id gives clean event ordering for each driver, but the queue itself is area-scoped shared state.
+
+Two reasonable approaches:
+
+Driver-partitioned processors update a shared external queue store
+Simpler conceptually, but external store contention must be managed.
+
+Repartition semantic area-change events by area_id before queue mutation
+Better single-writer semantics per queue, but adds another streaming stage.
+
+In an interview, it is strong to acknowledge this explicitly. A practical design is:
+
+first stage keyed by driver_id computes clean membership transitions
+
+second stage keyed by area_id applies ordered queue mutations
+
+That gives you deterministic queue updates without giving up per-driver event ordering.
+
+5. Fast position lookup
+
+Sometimes downstream systems want "what is driver X's current position?"
+
+Reads against the ordered queue alone can be expensive. A common optimization is to maintain:
+
+driver_membership:{driver_id} -> {
+  area_id,
+  joined_at,
+  queue_version
+}
+
+Then either:
+
+compute exact position from rank queries in Redis, or
+
+cache periodic position snapshots for the first N entries
+
+If the interviewer presses on exact position at large scale, discuss the trade-off between freshness and extra write amplification.
+
+6. Reservation and race conditions
+
+If another system pops the head driver for assignment, you need to avoid double assignment.
+
+The usual approach is:
+
+reserve the head with a short TTL
+
+mark the driver as reserved
+
+remove permanently only once assignment succeeds
+
+return them to the head or near-head if reservation expires, based on business policy
+
+This is where queue service design starts to merge with dispatch semantics.
+
+7. Failure recovery and replay
+
+Because queue state is derived from event streams, recovery should come from replay:
+
+persist raw events in Kafka/object storage
+
+rebuild state stores after failure
+
+periodically snapshot materialized queues to reduce recovery time
+
+This also helps when queue rules change and you need to backfill from historical events.
+
+Common Pitfalls
+
+Treating this as a plain database CRUD problem: if your design does SELECT drivers WHERE inside_area = true ORDER BY joined_at on every request, it will break under real-time churn.
+
+Ignoring jitter near boundaries: without hysteresis or dwell logic, the queue becomes unfair and unstable.
+
+Forgetting non-location removals: a driver who goes offline or gets matched elsewhere must leave the queue even if their GPS point is still inside the area.
+
+No idempotency strategy: duplicate enter or leave events are normal in distributed systems. If you do not design for them, queue corruption is inevitable.
+
+Interview Checklist
+
+Clarify whether queue order is strict FIFO or policy-based.
+
+Define exactly when a driver joins and when they are removed.
+
+Call out geofence jitter and stale-heartbeat expiry early.
+
+Explain why the queue is continuously materialized rather than computed on read.
+
+Show how you prevent duplicate membership and out-of-order event corruption.
+
+If time permits, discuss head reservation and replay/recovery.
+
+Summary Table
+
+LayerChoiceWhy
+Event ingestionKafka / PubSubDurable, replayable driver event stream
+Membership logicStateful stream processorClean handling of enter/leave/order semantics
+Hot queue storeRedis sorted sets plus membership mapFast queue reads and updates
+Config storeRelational DBSource of truth for pickup area definitions
+RecoveryEvent replay plus snapshotsRebuildable derived queue state
+
+The core insight is that this problem is really about maintaining a correct, real-time ordered membership view for each pickup area. Once you frame it that way, the architecture naturally becomes: ingest events, compute clean membership transitions, materialize per-area queues, and serve them from a hot store.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

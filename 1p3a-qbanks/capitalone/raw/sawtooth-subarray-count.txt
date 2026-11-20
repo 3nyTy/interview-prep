@@ -1,0 +1,63 @@
+===H1===
+Sawtooth (Alternating Parity) Subarray Count
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/sawtooth-subarray-count
+===BODY===
+Capital One
+Coding·70 minMembers
+Sawtooth (Alternating Parity) Subarray Count
+Count contiguous subarrays whose elements alternate parity (even-odd-even-... or odd-even-odd-...). Single-element subarrays always count. A brute-force O(n²) solution times out on the hidden tests.
+SWE
+MLE
+array
+sliding-window
+medium
+oa
+codesignal
+Frequency
+Low
+Last asked
+2026-01-19
+Stage
+oa
+Requirements
+
+Input: an integer array arr of length up to ~10^5.
+
+A subarray is sawtooth if every adjacent pair has different parity (one even, one odd).
+
+Single-element subarrays count.
+
+Return the total number of sawtooth contiguous subarrays.
+
+Examples
+
+arr = [1, 3, 5, 7, 9]       -> 5   (only single-element subarrays qualify)
+arr = [1, 2, 1, 2, 1]       -> 15  (all 15 contiguous subarrays alternate)
+arr = [1, 2, 3, 7, 6, 5]    -> 12
+
+For the third example, the qualifying subarrays are [1], [1,2], [1,2,3], [2], [2,3], [3], [7], [7,6], [7,6,5], [6], [6,5], [5].
+
+Notes
+
+Linear scan: maintain a run counter equal to the length of the current sawtooth run ending at index i. Initialise run = 1. For each i ≥ 1, if arr[i] % 2 != arr[i-1] % 2 then run += 1 else reset run = 1. Add run to the answer at every step. Total contribution is sum(run_i) and runs in O(n).
+
+Why it works: the number of subarrays ending at index i that are sawtooth equals run_i (the run can start anywhere from i - run_i + 1 to i).
+
+Brute-force O(n²) double loop is what the hidden tests target; if the OA judges report a partial 100-200 point penalty, this is almost always the culprit.
+
+This pattern (count subarrays satisfying a local monotone / alternating predicate) generalises to alternating sign, alternating monotonic, and the canonical 'count subarrays with all elements satisfying property P' problem.
+
+Preparation
+
+Memorise the run-length-extending pattern: it solves a whole family of OA problems and is worth practising on a fresh sheet of paper until it is automatic.
+
+Hand-trace the third example step by step; the answer 12 should fall out from the run contributions 1+2+3+1+2+3.
+
+Add a fourth case where all elements have the same parity ([2,4,6] → 3) to catch the off-by-one where run resets to 0 instead of 1.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

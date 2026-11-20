@@ -1,0 +1,60 @@
+===H1===
+Minimum-Point Redemption Across Programs
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/minimum-points-redemption
+===BODY===
+Amazon
+CodingMembers
+Minimum-Point Redemption Across Programs
+Given reward programs with a name, available point balance, and dollar value per point, cover a fixed dollar target while consuming the fewest total points. Return failure if the available balances cannot cover the target.
+SWE
+greedy
+sorting
+medium
+Frequency
+Single report
+Last asked
+2026-08-21
+Stage
+onsite-coding
+Requirements
+
+Input: a target dollar amount and a list of reward programs.
+
+Each program provides its name, available point balance, and current dollar value per point.
+
+Choose how many points to use from each program without exceeding any balance.
+
+Cover the target amount while minimizing the total number of points spent.
+
+Return failure when all available balances together cannot cover the target.
+
+Examples
+
+Target: $168
+Programs:
+  (airline, 36000 points, $0.012 / point)
+  (store, 12000 points, $0.009 / point)
+  (credit_card, 25000 points, $0.0085 / point)
+
+Notes
+
+Clarify whether overpayment is allowed and how fractional cents are rounded; both choices affect the final allocation.
+
+Exchange rates may change daily, so treat them as inputs rather than constants embedded in program types.
+
+If overpayment is allowed and points are indivisible, sort programs by descending dollar value per point. Spend from the best rate up to its balance, using ceil(remaining / rate) for the final program; an exchange argument shows that replacing a lower-rate point with an available higher-rate point never increases the point count.
+
+If exact coverage is required, greedy is not generally sufficient. Scale values to integer currency units and use a bounded knapsack / dynamic program, with the chosen rounding rule made explicit.
+
+Preparation
+
+Practice deriving an allocation under finite balances and explain how the ordering changes when the best-rate balance is exhausted.
+
+Add tests for exact coverage, unavoidable overpayment, insufficient total value, equal rates, and floating-point rounding.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

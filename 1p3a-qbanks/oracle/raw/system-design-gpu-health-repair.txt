@@ -1,0 +1,64 @@
+===H1===
+System Design — GPU Health and Repair
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/system-design-gpu-health-repair
+===BODY===
+Oracle
+System DesignMembers
+System Design — GPU Health and Repair
+Design GPU health monitoring and repair triggering for 100,000 hosts. Explain GPU-specific signal collection, aggregate events into a host dashboard with pseudocode, and handle failed repair workflows.
+SWE
+Infra Eng
+gpu
+metrics
+scaling
+distributed-systems
+Frequency
+Single report
+Last asked
+2026-09-03
+Stage
+onsite-system-design
+Requirements
+
+Support a fleet of 100,000 hosts and determine whether their GPUs are healthy.
+
+Explain how GPU health signals enter the system; a successful host ping does not establish that its GPUs work correctly.
+
+Trigger a repair workflow based on GPU health status.
+
+Write pseudocode that aggregates events into a host dashboard so unhealthy hosts can be identified.
+
+Explain how to handle a failed repair workflow.
+
+Choose and justify how GPU-specific health evidence is obtained rather than relying on host reachability.
+
+Notes
+
+The interviewer explicitly probed GPU operational experience. Logs and published metrics were proposed by the candidate; no particular GPU telemetry interface was prescribed.
+
+This round also included a behavioral question about aligning multiple teams.
+
+A possible design separates node agents, durable event ingestion, a per-GPU state store, a host dashboard, and a repair controller. Track GPU identity and signal freshness as well as host identity. Missing or stale telemetry means unknown health, not healthy.
+
+GPU-specific evidence can include memory errors, driver faults, interconnect errors, and thermal or power warnings. Separate passive checks during running jobs from invasive diagnostics that require exclusive GPU access. These are preparation options, not a prescribed interview interface.
+
+For aggregation, keep the latest accepted observation per GPU and signal using a comparable version such as a fenced agent epoch plus sequence number. Ignore duplicates and older observations. Summarize a host as unhealthy if any GPU has a critical failure, unknown if expected GPUs lack fresh evidence, and healthy only when all required evidence is fresh and acceptable. A fresh signal must not hide a stale different signal.
+
+Model repair as a persisted workflow: quarantine or drain, diagnose, attempt repair, validate, then return to service. Use an atomic per-target claim and an idempotency key per incident so duplicate events do not launch overlapping repairs. Retry transient failures with bounded backoff; keep persistent failures quarantined and escalate for manual intervention. Successful command execution alone is insufficient to declare the GPU healthy.
+
+Estimate ingestion from host count multiplied by GPUs per host, signals per GPU, and sampling frequency. These last three quantities are clarification inputs, not given constants. Partition updates by host and serve the dashboard from materialized state rather than rescanning raw history.
+
+Preparation
+
+In 20 minutes, write aggregation pseudocode and trace duplicate events, an older event arriving late, one failed GPU among healthy peers, and a missing GPU heartbeat. Verify stale telemetry cannot produce a healthy host.
+
+Draw the repair state machine and trace a worker crash after issuing a repair, retry exhaustion, and a failed post-repair diagnostic. Explain how a persisted claim and idempotent actions prevent overlapping work.
+
+Build a symbolic capacity estimate for the 100,000-host fleet, then label any assumed GPU count and sampling interval before calculating event rate and retention storage.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

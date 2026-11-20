@@ -1,0 +1,82 @@
+===H1===
+Nested-List Iterator
+===URL===
+https://www.1point3acres.com/interview/problems/company/airbnb/nested-list-iterator-with-remove
+===BODY===
+Airbnb
+CodingMembers
+Nested-List Iterator
+Implement a Python iterator over an array of integer arrays with `hasNext()`, `next()`, and `remove()`. Traversal is row-major, and `remove()` must delete the last returned value from the original nested list without causing the following value to be skipped.
+SWE
+iterator
+data-structure
+object-design
+simulation
+medium
+Frequency
+Single report
+Last asked
+2026-07-26
+Stage
+phone-screen
+Requirements
+
+Implement a Python iterator class over a nested list of integers.
+
+Traverse each inner list from left to right and the outer list from top to bottom.
+
+Support three methods:
+
+hasNext() returns whether another integer exists after the current cursor.
+
+next() returns the next integer in traversal order.
+
+remove() deletes the last value returned by next() from the original nested-list object.
+
+Skip empty inner lists.
+
+Allow hasNext() to be called repeatedly without advancing the iterator.
+
+Allow remove() at most once after each successful next().
+
+Raise an exception when remove() is called before next(), when it is called twice for the same returned element, or when next() is called after exhaustion.
+
+After a removal, preserve the cursor so the next element in the same inner list is not skipped.
+
+Examples
+
+Starting data:
+
+[[], [1, 2, 3], [4, 5], [], [], [6], [7, 8], [], [9], [10], []]
+
+If next() returns 2 from:
+
+[[], [1, 2, 3], [4, 5]]
+
+then remove() must mutate the original data to:
+
+[[], [1, 3], [4, 5]]
+
+The following next() call must return 3.
+
+Notes
+
+Removal mutates the object supplied to the iterator; it is not a detached traversal view.
+
+The state must distinguish the cursor for the next candidate from the position of the last returned value.
+
+Deleting an element before the current cursor in the same row shifts the remaining indices and must not skip the successor.
+
+Preparation
+
+Implement the iterator against the full nested-list example and verify row transitions across consecutive empty lists.
+
+Write unit tests for repeated hasNext(), removal before the first next(), double removal, removal of the final item in a row, and calls after exhaustion.
+
+Practice explaining the iterator state and every cursor update before coding.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,61 @@
+===H1===
+Hospital Appointment Booking API
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/hospital-appointment-booking-api
+===BODY===
+Oracle
+Coding·60 minMembers
+Hospital Appointment Booking API
+Design and implement an appointment-booking REST API for a hospital with 1,000 doctors, each working 9 AM–5 PM in 15-minute slots. The API books the first available slot for a given doctor on a given date and must maintain state across calls. Asked as a coding-design hybrid round in an OCI virtual onsite.
+SWE
+Infra Eng
+design
+data-structure
+concurrency
+mini-project
+medium
+Frequency
+Single report
+Last asked
+2026-02-04
+Stage
+onsite-coding
+Requirements
+
+1,000 doctors. Each doctor works 9:00 AM–5:00 PM in 15-minute appointment slots — 32 slots per doctor per day.
+
+API: book the first available slot for a given doctor on a given date.
+
+Return the booked time slot, or an error if no availability remains for that doctor on that date.
+
+Must maintain state across API calls (POST semantics; the booked slot stays booked across subsequent calls).
+
+Implementation expected end-to-end — endpoint handler + storage of bookings.
+
+Notes
+
+Minimal in-memory model: bookings: Map<(doctorId, date), BitSet32> — 32 bits per doctor-day, one per slot. firstFree(bs) = lowest_zero_bit(bs). Book by setting that bit. O(1) per booking.
+
+Endpoint shape: POST /appointments {doctorId, date} → {slotStart, slotEnd} on success, 409 / structured error on no availability.
+
+Concurrency: under any realistic deployment, two POSTs for the same doctor-day must serialise; otherwise two clients can claim the same slot. The cleanest answer in a 45-60-minute onsite is a per-doctor lock (Map<doctorId, Lock>) or a single CAS update on the per-day bitset (atomic compare-and-swap).
+
+Persistence: extending to a DB-backed store, the natural schema is appointments(doctor_id, date, slot_index, patient_id, status) with a unique constraint on (doctor_id, date, slot_index). Idempotency on firstFree becomes: INSERT ... WHERE NOT EXISTS (slot_index) returning the chosen index.
+
+For 1,000 doctors × N days, total state is small. The point of the prompt is to talk through concurrency and persistence, not to scale.
+
+Likely follow-ups: cancellation, rescheduling, patient binding, doctor-side blocked time (vacations), date validation (no booking in the past).
+
+Preparation
+
+Sketch the in-memory bitset implementation in the first 10 minutes; get a working endpoint coded next.
+
+Talk through the concurrency story explicitly — pick one of (per-doctor lock, CAS on bitset, DB unique constraint) and articulate the trade-off.
+
+Be ready to extend to cancellation and date validation in the follow-up window. The round was 60 minutes total, with project deep-dive + coding interleaved.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

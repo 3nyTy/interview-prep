@@ -1,0 +1,30 @@
+===H1===
+Design a URL Shortener
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/design-url-shortener
+===BODY===
+OpenAI
+System DesignMembers
+Design a URL Shortener
+Design a URL shortener that converts a long web address into a short alias and redirects clients to the original page (Bit.ly / TinyURL style). Surfaces key generation / hashing, the redirect path, storage, caching, and scale.
+SWE
+hashing
+caching
+scaling
+database
+Frequency
+Low
+Last asked
+2026-01-10
+Stage
+onsite-system-design
+URL Shortener
+
+A URL shortener takes a long web address and turns it into a short link. When a user clicks the short link, they are redirected to the original page. Services like Bit.ly and TinyURL are examples of this.
+
+The basic idea is simple, but there is enough depth to challenge a senior design: short-key generation (counter + base62, or hashing with collision handling), the read-heavy redirect path, durable mapping storage, caching the hottest links, and scaling reads globally.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

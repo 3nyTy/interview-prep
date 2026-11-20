@@ -1,0 +1,42 @@
+===H1===
+ML Coding: Debug a NumPy / Tensor Framework
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/ml-coding-tensor-framework-debug
+===BODY===
+Waymo
+Coding·45 minMembers
+ML Coding: Debug a NumPy / Tensor Framework
+MLE onsite coding round framed as a debugging task: the interviewer hands over a small NumPy / tensor framework that is subtly broken, and the candidate has to read it, reproduce the failures, and fix them. Reported bugs cluster around array-construction aliasing, a missing reduction axis, and integer truncation in a conversion helper.
+MLE
+numpy
+debugging
+code-reading
+array
+medium
+Frequency
+Single report
+Last asked
+2026-05-22
+Stage
+onsite-coding
+Requirements
+
+Read an existing NumPy / tensor-framework codebase (matrix and tensor classes, conversion helpers, a distributed-ish path) and fix several planted bugs.
+
+The round is live and time-boxed (~45 min); finding and explaining the bugs matters as much as patching them.
+
+Notes
+
+Array-construction aliasing. A Matrix.zeros-style constructor that builds rows by replicating a single list object leaves every row pointing at the same underlying buffer, so writing one cell mutates the whole column. Fix by allocating an independent buffer per row (or going through a real np.zeros). This is the classic Python [[0]*n]*m aliasing trap dressed up in a framework.
+
+Missing reduction axis. A to_ndarray / reduction helper omits axis=1 (or the wrong axis), so a per-row operation silently collapses the wrong dimension. Reproduce with a non-square input where row- and column-reductions give different shapes — square test inputs hide the bug.
+
+Integer truncation on conversion. A from_ndarray conversion truncates remainders (integer division / dtype downcast) instead of preserving values, so fractional or large entries come back wrong. Check the dtype and rounding behavior at the boundary.
+
+General approach. Before patching anything, write a tiny failing example per suspected bug (non-square, fractional, and shared-reference cases) — the planted bugs are specifically chosen to pass naive square / integer smoke tests. Candidates report losing the round by editing code without first reproducing the failure.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,65 @@
+===H1===
+Type-Ahead / Autocomplete Suggestions
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/sd-typeahead-autocomplete
+===BODY===
+LinkedIn
+System Design·60 minMembers
+Type-Ahead / Autocomplete Suggestions
+Design a type-ahead service that returns the top-K most relevant completions for a query prefix in `< 100 ms`. Recurring follow-ups: personalisation, multi-region freshness, and tail-latency budget when the trie spans hundreds of millions of phrases.
+SWE
+MLE
+search
+trie
+ranking
+caching
+ann
+scaling
+medium
+Frequency
+Low
+Last asked
+2026-04-16
+Stage
+onsite-system-design
+Requirements
+
+Functional:
+
+Given a query prefix, return the top-K most relevant completions ranked by a learned score (frequency-weighted at the simplest level).
+
+Updates from a phrase-and-frequency stream propagate to the index within minutes.
+
+Personalization on user features (recently searched, role, region) when available.
+
+Non-functional:
+
+P99 latency < 100 ms end-to-end.
+
+Coverage: hundreds of millions of phrases globally.
+
+Multi-region read replicas; writes from a single primary region.
+
+Notes
+
+The expected high-level shape: in-memory trie sharded by prefix prefix-of-prefix (e.g. first three characters), each shard holding a precomputed top-K per node. Read path walks to the prefix node and returns its cached top-K.
+
+Personalization is best handled as a re-rank on top of the static top-K — pull more than K candidates from the trie and run a lightweight ranker (gradient-boosted tree or two-tower retrieval) over the user × candidate join.
+
+Eventual consistency on the write path is acceptable; the interviewer expects an explicit articulation that exact freshness is not worth the latency cost.
+
+For multi-region, the typical answer is "cache top-K snapshots regionally; reconcile via async log shipping." Strong consistency on writes is over-engineering.
+
+Preparation
+
+Implement a trie with per-node top_k_cache in code on paper; the cache-update logic during writes is the load-bearing detail.
+
+Prepare numbers for the capacity discussion: average phrase length, average completions per prefix, K = 5 or 10, memory per node estimate.
+
+Brush up on two-tower retrieval and approximate nearest neighbor (ANN) for the personalisation re-rank discussion — even if the round stays at trie level, naming ANN signals depth.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

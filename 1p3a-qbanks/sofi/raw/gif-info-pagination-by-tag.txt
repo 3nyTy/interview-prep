@@ -1,0 +1,43 @@
+===H1===
+GIF Info Pagination by Tag
+===URL===
+https://www.1point3acres.com/interview/problems/company/sofi/gif-info-pagination-by-tag
+===BODY===
+SoFi
+CodingFree preview
+GIF Info Pagination by Tag
+Parse a flat list of GIF records, deduplicate records, filter by tag, and return a specific page while preserving the original input order.
+SWE
+array
+hashmap
+dedup
+api-integration
+medium
+Frequency
+Low
+Last asked
+2025-11-12
+Stage
+onsite-coding
+Requirements
+
+Input is a flat List<String> whose order is fixed in triples: id, name, tag, then the next GIF's id, name, tag.
+
+Implement a function that accepts a target tag and page.
+
+Deduplicate GIF records before pagination.
+
+Return all GIF records matching the target tag on the requested page.
+
+Preserve the same relative order as the original input.
+
+Notes
+
+One onsite variant forced Java initially, then allowed another language after the candidate asked.
+
+The prompt is easy to overcomplicate; the important parts are parsing triples correctly, preserving stable order after deduplication, and making pagination boundaries explicit.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

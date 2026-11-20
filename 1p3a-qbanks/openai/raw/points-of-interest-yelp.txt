@@ -1,0 +1,209 @@
+===H1===
+Points of Interest (POI) System / Yelp
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/points-of-interest-yelp
+===BODY===
+OpenAI
+System DesignMembers
+Points of Interest (POI) System / Yelp
+Design a scalable location-based service that allows users to discover nearby points of interest (POIs) such as restaurants, shops, and businesses. The system must handle 500 million locations worldwide, 100,000 queries per second (read-heavy), and return results in under 100 milliseconds. Geospatial indexing using Geohash or QuadTree is central to the solution.
+SWE
+location
+geohash
+scaling
+sharding
+caching
+schema-design
+database
+Frequency
+Low
+Last asked
+2025-10-07
+Stage
+onsite-system-design
+Problem Requirements
+
+You need to design a system like Google Maps or Yelp. The goal is to help users find nearby points of interest (POIs) like restaurants, shops, or businesses. The system must find the closest locations quickly.
+
+Scale requirements:
+
+Data: 500 million locations worldwide.
+
+Traffic: 100,000 queries per second (mostly reading data).
+
+Speed: Answers must load in less than 100 milliseconds.
+
+Location: Users are all over the world.
+
+Variant Prompts
+
+This problem has appeared in several forms:
+
+Basic Location Search — "Design a system to store and find points of interest (POI) for a map app. Explain how you store the data, how you find it quickly, and how you handle many users at once."
+
+Nearest K Locations — "Design a system to find the exactly K nearest locations (e.g., the top 10 closest coffee shops). Explain Geohash and indexing in detail. Also explain how to handle edge cases where a user is near a boundary line."
+
+Index + Sharding — "How do you build an index for locations? How do you shard (split) this index across servers to make it fast?"
+
+Updates and Freshness — "Design a review site like Yelp. Focus on how to update restaurant data efficiently (like changing opening hours)."
+
+Full Design (Pre-Announced) — "Prepare a system design for a POI service (like Yelp/Uber). Make sure it is robust and scalable." (Topic given in advance — higher expectations for completeness and fault tolerance.)
+
+Geohash vs. QuadTree Comparison — "Design a get_poi feature. Explain how to use Geohash AND QuadTree. Compare them: what is good and bad about each?"
+
+QuadTree Deep Dive — "Design a QuadTree to find the EXACT nearest N points. How would you optimize this?"
+
+Geo Index Deep Dive — Extremely detailed questions about Geohash or QuadTree internals (base32 encoding, precision-6 block size in km, North/South pole handling, storing a QuadTree in a database).
+
+Key Topics
+
+1. Geo Indexing (Most Critical)
+
+You must explain Geohash or QuadTree precisely.
+
+Geohash:
+
+Converts lat/lon into a string; similar strings = nearby locations.
+
+Example: San Francisco ≈ "9q8yy".
+
+Precision 5 ≈ 5 km × 5 km; Precision 6 ≈ 1.2 km × 0.6 km.
+
+The boundary problem: if a user stands on the edge of a cell, the closest POI may be in the adjacent cell.
+
+Solution: Query the user's cell + the 8 surrounding neighbor cells.
+
+QuadTree:
+
+Recursively splits space into quadrants; handles dense cities better (splits busy areas into smaller squares).
+
+No inherent boundary problem — neighbors are reachable by tree traversal.
+
+Harder to build and balance when data changes.
+
+Comparison:
+
+GeohashQuadTree
+IntegrationEasy with SQLCustom implementation
+BoundaryMust check 9 cellsTree traversal
+DensityFixed gridAdaptive
+Typical useStandard SQL backendsExact-nearest-N, uneven density
+
+2. Database Schema
+
+CREATE TABLE pois (
+  poi_id BIGINT PRIMARY KEY,
+  name VARCHAR(255),
+  latitude DECIMAL(9,6),
+  longitude DECIMAL(9,6),
+  geohash_4 CHAR(4),
+  geohash_5 CHAR(5),
+  geohash_6 CHAR(6),
+  category VARCHAR(50),
+  rating DECIMAL(2,1)
+);
+
+-- Index for fast searching
+CREATE INDEX idx_geohash_6_category ON pois(geohash_6, category);
+
+Store multiple Geohash precisions (4, 5, 6) for different zoom levels.
+
+3. Query Logic
+
+User is at (37.77, -122.41) → compute Geohash: "9q8yy".
+
+SELECT * FROM pois WHERE geohash_5 = '9q8yy'.
+
+Also query the 8 neighbor hashes.
+
+Calculate exact distances for results, sort, return top K.
+
+For QuadTree nearest-N:
+
+Start at the user's location leaf node.
+
+If that node has fewer than N points, move up and check neighboring nodes.
+
+Use a priority queue / bounding circle to prune irrelevant branches.
+
+Sort by real distance.
+
+4. Sharding Strategy
+
+Shard by Geohash prefix so nearby places land on the same server.
+
+Hot Shard problem: Dense cities (NYC) have far more POIs than rural areas.
+
+Fix: Consistent hashing with virtual nodes; or split high-traffic shards further.
+
+5. Scaling & Caching
+
+System is read-heavy (≈95% reads, 5% writes).
+
+One primary (master) for writes, many read replicas.
+
+Cache popular query results in Redis (e.g., "coffee shops near Times Square").
+
+CDN for map tiles and static assets.
+
+6. Updates & Freshness
+
+Business owners update hours/info via API → written to master DB.
+
+Cache invalidation: evict stale entries so users see fresh data.
+
+Bulk updates (chain with 500 locations): batch write job.
+
+Eventual consistency is acceptable (a new restaurant not appearing for 5 minutes is fine).
+
+7. Fault Tolerance (for pre-announced / full-design variants)
+
+Database failover: replica promotion if master dies.
+
+Multi-region replicas for global users.
+
+Service redundancy: load balancer → multiple service instances.
+
+Common Interview Pitfalls
+
+Being vague: Say "Geohash Index on precision 6," not just "index."
+
+Forgetting the boundary problem: Always mention querying the 8 neighbors — bring it up proactively.
+
+Ignoring Hot Shards: Explain what happens when everyone searches "Times Square" at once and how to handle it.
+
+Not knowing Geohash internals: Be ready for follow-ups on base32 encoding, block size at each precision, and pole handling.
+
+Suggested Walkthrough Structure
+
+Step 1 — Clarify (5 min): Confirm 500M POIs, 100k QPS, exact-nearest or approximate, update frequency.
+
+Step 2 — High-Level Design (5 min): Client → Load Balancer → POI Service → DB + Cache. Note read-heavy.
+
+Step 3 — Geo Indexing Deep Dive (20 min): Geohash algorithm, precision choice, schema, boundary handling, or QuadTree alternative.
+
+Step 4 — Scaling (10 min): Sharding by Geohash prefix, hot-shard mitigation, read replicas, Redis caching.
+
+Step 5 — Updates (5 min): Write path, cache eviction, eventual consistency.
+
+Notes
+
+Topic frequency across interview rounds
+
+Across the reported rounds, the topics cluster by how often they surface — use this to budget prep time:
+
+Geo indexing — nearly every round. Explaining Geohash or QuadTree precisely is the central skill; expect it in almost all variants and the one area you cannot fake.
+
+Sharding strategy — roughly a third of rounds. Splitting 500M POIs by Geohash prefix plus the hot-shard mitigation (consistent hashing / virtual nodes for dense cities vs. rural areas).
+
+Updates & freshness — a minority of rounds. Owner-driven edits to hours/info, with eventual consistency explicitly acceptable.
+
+Caching — a minority of rounds. CDN for map tiles, Redis for popular query results; lead with the 95% read / 5% write split.
+
+Boundary problem — a minority of rounds, but disqualifying if missed. Even when not the focus, raise the 8-neighbor query proactively; failing to mention it reads as inexperience.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

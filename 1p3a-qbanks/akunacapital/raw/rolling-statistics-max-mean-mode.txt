@@ -1,0 +1,64 @@
+===H1===
+Rolling Statistics: Max, Mean, and Mode
+===URL===
+https://www.1point3acres.com/interview/problems/company/akunacapital/rolling-statistics-max-mean-mode
+===BODY===
+Akuna Capital
+CodingMembers
+Rolling Statistics: Max, Mean, and Mode
+Implement a streaming statistics class with insert, max, mean, and mode; then extend it to the most recent K numbers with efficient expiry.
+SWE
+Infra Eng
+streaming
+sliding-window
+monotonic-stack
+hashmap
+heap
+medium
+Frequency
+Medium
+Last asked
+2025-11-11
+Stage
+phone-screen
+Requirements
+
+Build the problem in stages:
+
+Remove duplicates from an input sequence using a hash table.
+
+Define a class that supports insert(x), get_max(), get_mean(), and get_mode() over all inserted numbers.
+
+Extend the class to keep only the most recent K numbers while preserving the same query APIs.
+
+Expected implementation details:
+
+get_mean() should be O(1) from a running sum and count.
+
+get_max() for the rolling window should use a monotonic queue.
+
+get_mode() for the rolling window should track frequencies and handle expired elements, commonly with lazy deletion or a frequency-indexed structure.
+
+Notes
+
+For the all-time version, keep count_by_value, running_sum, n, max_value, and enough state to return a mode. For the rolling version, store the last K values in a FIFO queue. When inserting a new value past capacity, pop the oldest value and decrement its frequency.
+
+The max structure is the classic decreasing deque of candidate values or (value, index) pairs. Each insert removes smaller tail values; expiry removes the head when it falls out of the window.
+
+Mode is the tricky part. A practical interview answer is a lazy max-heap keyed by (-frequency, value) plus a frequency hashmap; when the heap top's frequency no longer matches the hashmap, pop it. If deterministic tie-breaking is required, state the tie rule before coding.
+
+This is the single most-reported Akuna screen question, and it appears across Junior QD, Junior QS, and quant-strategist phone screens. Two details recur. First, some sittings ask for the median instead of (or in addition to) the mean; if so, maintain two heaps (a max-heap of the lower half and a min-heap of the upper half) and rebalance on insert, or a count array when the value range is small. Second, interviewers explicitly point out which methods are called most often and demand low latency on those, so push work into insert versus the queries depending on the call mix. A memory follow-up asks how much space the structure uses: when values are bounded (one screen fixed the range to 1..1001), a direct count array is only on the order of a gigabyte and will not overflow, so an exact frequency table beats an approximation. The round is often graded on whether you produce optimal complexity for every method including the rolling-window follow-up, and strong candidates have still been rejected, so treat clean code plus crisp complexity narration as the bar, not just a working solution.
+
+Preparation
+
+Implement the non-windowed class in under 10 minutes; it is the warm-up.
+
+Then add the rolling window and test repeated values, mode ties, and expiry of the current max.
+
+Practice the monotonic-queue invariant out loud: values in the deque are always decreasing, and only indices within the current window are valid.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

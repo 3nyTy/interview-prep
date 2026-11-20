@@ -1,0 +1,64 @@
+===H1===
+Longest Subsequence of X That Is a Substring of Y
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/longest-subsequence-substring
+===BODY===
+Salesforce
+Coding·30 minMembers
+Longest Subsequence of X That Is a Substring of Y
+Second problem on Salesforce's SMTS HackerRank OA: given strings `x` and `y`, find the length of the longest subsequence of `x` that also appears as a contiguous substring of `y`.
+SWE
+string
+dp
+two-pointer
+subsequence
+medium
+Frequency
+Low
+Last asked
+2026-01-20
+Stage
+oa
+Requirements
+
+Input: two strings x and y over lowercase English letters.
+
+A subsequence of x deletes zero or more characters while preserving order.
+
+A substring of y is contiguous in y.
+
+Return the length of the longest string that is both a subsequence of x and a substring of y.
+
+Examples
+
+x = "abcd", y = "abdc"
+→ 3        # "abd" is a subsequence of "abcd" and a substring of "abdc"
+
+x = "hackerranks", y = "hackers"
+→ 7        # "hackers" is a subsequence of x and (trivially) a substring of y
+
+Notes
+
+The right formulation: fix a starting index j in y. Walk x left-to-right with a moving pointer i; greedily match y[j], y[j+1], ... consuming characters of x whenever they equal the current target character of y. The longest run achieved over all j is the answer.
+
+Inner greedy is correct because y[j..k] is a substring (forced contiguous) and we're searching for the longest prefix-of-y[j..] that survives as a subsequence of x. There is no benefit to skipping a matched character in x.
+
+Time: O(|x| · |y|) two nested loops; space O(1). DP formulations (dp[i][j] = longest substring of y[..j] that is subseq of x[..i] ending at j) also work and have the same complexity.
+
+Edge cases: identical strings (answer = |x|); empty x or empty y (answer = 0); no shared characters (answer = 0).
+
+Be explicit that subsequence ≠ substring — interviewers occasionally watch for candidates who reverse the constraints.
+
+Preparation
+
+Implement the two-pointer-per-start version end-to-end (one outer loop on j, inner greedy on i). Verify on the two examples above.
+
+Write a DP version too — interviewers may ask which one generalises if the substring constraint relaxes.
+
+Be ready for the follow-up "return the actual string, not just its length" — track best (j, k) window and the matching characters, or reconstruct from the DP table.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

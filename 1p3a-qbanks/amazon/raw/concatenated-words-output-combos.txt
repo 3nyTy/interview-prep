@@ -1,0 +1,46 @@
+===H1===
+Concatenated Words (LC 472) — Extended Variant
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/concatenated-words-output-combos
+===BODY===
+Amazon
+CodingMembers
+Concatenated Words (LC 472) — Extended Variant
+Phone-screen hard in the LC 472 family: given a word list, find the words that are concatenations of other list words — but output the actual combinations rather than a boolean. The prompt is left vague on reuse rules; the interviewer may narrow scope to exactly-two-word concatenations and steers toward a Trie over the backtracking + hashset approach.
+SWE
+string
+trie
+backtracking
+ambiguous-spec
+hard
+Frequency
+Single report
+Last asked
+2026-07-07
+Stage
+phone-screen
+Requirements
+
+Input: a list of words. Identify the words that can be formed by concatenating other words, and output the concrete combinations, not a yes/no answer.
+
+Clarify before coding — the prompt leaves open whether component words must come from the list, whether a component may repeat, and how many segments a decomposition may have. Anchor your understanding on the interviewer's worked example.
+
+Scope negotiation is part of the round: the problem may be reduced to exactly two words concatenated per combination — settle the target scope explicitly.
+
+Notes
+
+The word-break-style backtracking + hashset approach can draw time-complexity pushback before any code is written; interviewers steer toward a Trie over the word list. Be ready to articulate what the Trie buys (shared-prefix pruning during segmentation) even if the final code stays recursive.
+
+Clarifying questions may get thin answers — be ready to pin the semantics down from the worked example, and ask for one early.
+
+Preparation
+
+Solve the public concatenated-words problem, then modify it to return decompositions instead of booleans — the path-accumulation plumbing is the delta this round drills.
+
+Practice the two-word restricted version separately: hashset of the list, then for each word try every split point.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

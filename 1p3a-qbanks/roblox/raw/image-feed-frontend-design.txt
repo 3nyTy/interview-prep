@@ -1,0 +1,543 @@
+===H1===
+Image Feed (Frontend System Design)
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/image-feed-frontend-design
+===BODY===
+Roblox
+System Design·60 minMembers
+Image Feed (Frontend System Design)
+Frontend-leaning system design: build an infinite-scroll image feed (no like / comment surface) against a fixed backend API. The deep-dive concentrates on infinite-load mechanics, offline support, and testability — the three axes the interviewer scores on explicitly.
+SWE
+system-design
+frontend
+react
+caching
+testing
+medium
+Frequency
+Single report
+Last asked
+2026-05-07
+Stage
+phone-screen · onsite-system-design
+Problem Statement
+
+Design a frontend photo album app with left/right swiping and an infinite carousel feel. Users should be able to browse photos smoothly, swipe or click to move between photos, and continue navigating without obvious boundaries. Assume the backend is already complete; focus on frontend design, page interactions, component responsibilities, state management, preloading, gestures, accessibility, and failure handling.
+
+This is a Roblox frontend system design prompt. Treat it like a client architecture interview, not a distributed storage interview. You can define the minimum API contract the client needs, but spend most of the time on UI behavior and state.
+
+Clarify what "infinite" means. For a finite album, infinite carousel usually means circular navigation from last photo to first photo. For an unbounded album/feed, it means paginated loading while the user swipes. The base design below supports both.
+
+Phase 1: Requirements (~5-7 minutes)
+
+Functional Requirements
+
+Users should be able to view photos in an album one at a time.
+
+Users should be able to navigate with left/right swipe, arrow buttons, and keyboard keys.
+
+The carousel should feel infinite, either by wrapping finite albums or preloading additional pages for larger albums.
+
+The app should show loading, error, empty, and offline states.
+
+The app should preserve position when users rotate the device, leave and return, or open a photo from a shared URL.
+
+Optional follow-ups:
+
+Thumbnail strip or grid overview.
+
+Pinch-to-zoom and pan.
+
+Captions, likes, comments, or tags.
+
+Upload and edit flows.
+
+Shared deep links to a specific photo.
+
+Video items mixed into the album.
+
+Product Scope
+
+Assume:
+
+Web or mobile web client.
+
+Backend provides album metadata and paginated photo metadata.
+
+Image bytes are served by CDN URLs.
+
+The frontend owns gestures, rendering, preloading, local cache, and UI states.
+
+Out of scope unless asked:
+
+Photo upload pipeline.
+
+Image processing and CDN internals.
+
+Permissions and sharing backend.
+
+ML sorting or face recognition.
+
+Non-Functional Requirements
+
+RequirementTargetWhy it matters
+Swipe responseVisual movement starts within one frameGesture lag makes the carousel feel broken
+Next-photo readinessAdjacent photos should usually be decoded before navigationSmooth swiping depends on preloading
+Layout stabilityNo major layout shift when images loadPhoto viewing should feel polished
+Memory controlKeep a small render window and bounded image cacheLarge albums can exhaust browser memory
+AccessibilityKeyboard and screen-reader navigation supportedSwiping cannot be the only interaction
+ResiliencePer-photo errors do not break the carouselA single bad image should not stop browsing
+
+Clarifying Questions
+
+Is the album finite or unbounded?
+Assume finite albums wrap circularly. If the backend returns more pages, append/prepend as the user approaches edges.
+
+Should we support deep linking?
+Yes. A URL like /albums/{album_id}/photos/{photo_id} should open directly at that photo.
+
+Do we need zoom?
+Not in the base design. Mention it as a follow-up because zoom changes gesture handling.
+
+How many photos can an album contain?
+Assume from a few photos to thousands. Use a virtualized/windowed carousel, not a DOM node for every photo.
+
+Do images have known dimensions?
+Require width, height, and placeholder metadata from the API to reserve layout before image load.
+
+Quick Capacity Sanity Check
+
+Client-facing assumptions:
+- Album sizes: 1 to 10,000 photos
+- Page size: 30-50 photo metadata records
+- Render window: current photo, 2 previous, 2 next
+- Preload window: 2-5 photos in each direction depending on network
+- Image variants: thumbnail, medium, large
+
+Client implication:
+- Fetch metadata in pages
+- Render only a small carousel window
+- Preload adjacent images and decode before transition when possible
+- Evict decoded images outside the window
+
+For frontend interviews, turn scale into concrete client decisions: windowed rendering, image variant selection, preloading, decode scheduling, and cache eviction.
+
+Phase 2: Data Model (~8-10 minutes)
+
+Core Client Entities
+
+Album
+- album_id
+- title
+- owner_id
+- photo_count
+- initial_photo_id
+- sort_order: created_at_asc | created_at_desc | custom
+
+Photo
+- photo_id
+- album_id
+- index_hint
+- caption
+- created_at
+- width
+- height
+- dominant_color
+- blurhash
+- variants:
+  - thumbnail_url
+  - medium_url
+  - large_url
+- alt_text
+- status: ready | processing | failed | deleted
+
+AlbumPage
+- album_id
+- cursor
+- photo_ids
+- next_cursor
+- prev_cursor
+- has_next
+- has_prev
+
+CarouselState
+- active_photo_id
+- active_index
+- loaded_photo_ids
+- current_page_cursors
+- drag_offset_px
+- transition_state: idle | dragging | animating | settling
+- direction: previous | next
+
+ImageLoadState
+- photo_id
+- variant
+- status: idle | loading | decoded | failed
+- retry_count
+- object_url_or_cache_key
+
+Screen Data Needs
+
+UI SurfaceData Needed
+Main Photo Stageactive photo URL, dimensions, placeholder, caption, alt text
+Previous/Next Slidesadjacent photo metadata and medium/large image preload state
+Controlsactive index, photo count if known, can go previous/next
+Thumbnail Stripthumbnail URLs, active photo ID, scroll position
+Error Overlayphoto ID, retry action, fallback thumbnail or placeholder
+Deep Link Loaderalbum ID, target photo ID, surrounding photos
+
+Normalized Client Store
+
+entities:
+  albums_by_id: album_id -> Album
+  photos_by_id: photo_id -> Photo
+
+queries:
+  album_page:{album_id,cursor} -> photo_ids[], cursors
+  photo_context:{album_id,photo_id} -> previous_ids[], current_id, next_ids[]
+
+ui:
+  carousel:{album_id} -> CarouselState
+  image_load:{photo_id,variant} -> ImageLoadState
+
+Use IDs instead of array offsets as the durable identity. Array indexes can shift if the album changes or new pages are loaded.
+
+Do not make the active slide depend only on an array index from the current page. Deep links, pagination, wrapping, and album updates are much easier if active_photo_id is the source of truth.
+
+Phase 3: API Design (~15-20 minutes)
+
+The backend is assumed complete, but the frontend still needs a clear API contract.
+
+Album Metadata API
+
+GET /api/v1/albums/{album_id}
+
+{
+  "album": {
+    "album_id": "album_123",
+    "title": "Roblox Moments",
+    "owner_id": "user_456",
+    "photo_count": 248,
+    "sort_order": "created_at_desc"
+  }
+}
+
+Paginated Photos API
+
+GET /api/v1/albums/{album_id}/photos?limit=40&cursor=opaque_cursor
+
+{
+  "photos": [
+    {
+      "photo_id": "photo_001",
+      "album_id": "album_123",
+      "index_hint": 0,
+      "caption": "First screenshot from the event",
+      "created_at": "2025-09-22T10:15:00Z",
+      "width": 1600,
+      "height": 900,
+      "dominant_color": "#34495e",
+      "blurhash": "LKO2?U%2Tw=w]~RBVZRi};RPxuwH",
+      "variants": {
+        "thumbnail_url": "https://cdn.example.com/photo_001/thumb.jpg",
+        "medium_url": "https://cdn.example.com/photo_001/medium.jpg",
+        "large_url": "https://cdn.example.com/photo_001/large.jpg"
+      },
+      "alt_text": "Screenshot from a Roblox event.",
+      "status": "ready"
+    }
+  ],
+  "next_cursor": "cursor_next",
+  "prev_cursor": null,
+  "has_next": true,
+  "has_prev": false
+}
+
+Photo Context API for Deep Links
+
+For a URL that opens directly to a photo, the client needs surrounding context.
+
+GET /api/v1/albums/{album_id}/photos/{photo_id}/context?before=10&after=10
+
+{
+  "album": {
+    "album_id": "album_123",
+    "photo_count": 248
+  },
+  "photos": ["...metadata for surrounding photos..."],
+  "active_photo_id": "photo_120",
+  "prev_cursor": "cursor_before_120",
+  "next_cursor": "cursor_after_120"
+}
+
+Important API Requirements
+
+Return stable photo_id values.
+
+Return image dimensions to prevent layout shift.
+
+Return multiple image variants for responsive loading.
+
+Return placeholder metadata such as dominant color or blurhash.
+
+Use cursor pagination, not offset-only pagination.
+
+Include photo_count if known, but allow unknown count for dynamic albums.
+
+Use CDN URLs with cache headers for image bytes.
+
+Error Shape
+
+{
+  "error": {
+    "code": "PHOTO_DELETED",
+    "message": "This photo is no longer available.",
+    "retryable": false
+  }
+}
+
+Even when the backend is "done," specify what the frontend needs from it. Width, height, variants, stable IDs, cursors, and context-loading endpoints are what make the UI robust.
+
+Phase 4: High-Level Frontend Design (~10-15 minutes)
+
+Component Responsibilities
+
+ComponentResponsibilityState Owned
+AlbumRouteParses album/photo route params and loads initial contextroute params only
+CarouselControllerOwns active photo, navigation, wrapping, page fetch triggerscarousel state
+GestureLayerConverts pointer/touch/keyboard events into navigation intentsdrag offset, velocity
+WindowedSlidesRenders current, previous, and next slidesno durable data
+PhotoSlideReserves aspect ratio, loads image, shows placeholder/errorimage load display state
+ImagePreloaderPreloads and decodes adjacent image variantspreload queue
+ControlsArrow buttons, counter, play/pause if addedfocused control
+ThumbnailStripShows nearby thumbnails and jump navigationthumbnail scroll position
+AlbumDataLayerFetches metadata pages, dedupes, retries, cachesquery cache
+
+Carousel Navigation State Machine
+
+idle
+-> dragging
+-> settling_to_next
+-> idle
+
+idle
+-> dragging
+-> settling_to_previous
+-> idle
+
+idle
+-> animating_button_next
+-> idle
+
+idle
+-> loading_more
+-> idle
+
+idle
+-> image_error
+-> idle_after_skip_or_retry
+
+Swipe Gesture Handling
+
+On pointer down, capture the pointer and record start position.
+
+While dragging, translate the slide window with transform, not layout properties.
+
+On pointer up, decide based on distance and velocity:
+
+move next if dragged left past threshold or velocity is high
+
+move previous if dragged right past threshold or velocity is high
+
+snap back otherwise
+
+During animation, ignore additional navigation or queue one intent.
+
+Support keyboard arrows and visible buttons with the same navigation commands.
+
+Infinite Feel
+
+For a finite album:
+
+current index = 0
+previous photo = last photo
+next photo = index 1
+
+current index = last
+previous photo = last - 1
+next photo = first photo
+
+Use cloned edge slides only as a rendering trick. The durable active item should remain the real photo_id.
+
+For a large or dynamic album:
+
+User approaches right edge of loaded window
+-> prefetch next metadata page
+-> merge photo IDs into store
+-> preload image variants for upcoming photos
+-> continue swiping without showing page boundary
+
+Image Loading Strategy
+
+Current photo:
+- load best variant for viewport and device pixel ratio
+- reserve aspect ratio with width/height
+- show dominant color or blurhash while loading
+- call image.decode() when supported before swapping in
+
+Adjacent photos:
+- preload 2-3 in each direction on good network
+- reduce to 1 on slow network or save-data mode
+
+Far photos:
+- keep metadata, evict decoded image resources
+- rely on browser/CDN cache if revisited
+
+The carousel should render only a small window. Rendering thousands of hidden slides is both slow and memory-heavy.
+
+Phase 5: Deep Dive & Trade-offs (~8-10 minutes)
+
+Circular Carousel vs. Paginated Infinite Carousel
+
+DesignProsConsUse When
+Circular finite carouselSimple mental model, instant wrapCan surprise users if album has clear start/endSmall albums or story-like browsing
+Paginated infinite carouselScales to large albums, natural continuationNeeds prefetch and edge loading statesLarge albums or feed-like photo streams
+HybridWrap when all photos are known; page when notMore state casesBest default for ambiguous prompt
+
+State Management Decisions
+
+Keep these as global or route-level state:
+
+active_photo_id
+
+loaded photo metadata
+
+page cursors
+
+image preload status
+
+Keep these local:
+
+current drag offset
+
+temporary animation state
+
+focused control
+
+thumbnail strip scroll position
+
+This split prevents unrelated UI gestures from forcing data refetches while still preserving meaningful navigation state.
+
+Preloading Trade-offs
+
+Aggressive preloading:
+
+Better swipe smoothness.
+
+Higher bandwidth and memory.
+
+Can be wasteful if users leave quickly.
+
+Adaptive preloading:
+
+Use navigator.connection when available.
+
+Respect save-data mode.
+
+Increase preload window after repeated swipes.
+
+Decrease preload window after image failures or memory pressure.
+
+Failure Handling
+
+Failure cases:
+- Album metadata fails: show page-level retry
+- One image fails: show per-slide error and allow skip/retry
+- Next page fails: keep current photos usable and show edge retry
+- Photo deleted: remove from local sequence and move to nearest neighbor
+- Offline: show cached photos and disable loading new pages
+- Deep link target missing: show "photo unavailable" and album fallback
+
+Performance Details
+
+Animate with transform: translate3d(...).
+
+Avoid changing layout during drag.
+
+Use passive listeners carefully; pointer events may need preventDefault after gesture recognition.
+
+Use stable dimensions and object-fit to avoid layout shift.
+
+Memoize slides by photo_id and variant URL.
+
+Avoid keeping many full-size decoded images in memory.
+
+Use route state or URL replacement to update the active photo without adding noisy history entries on every swipe.
+
+Accessibility Details
+
+Provide arrow buttons in addition to swipe.
+
+Support left/right keyboard navigation.
+
+Announce active photo changes with a polite live region.
+
+Use alt_text from the API and fall back to a safe generic label.
+
+Ensure focus does not disappear when slides unmount.
+
+Respect reduced-motion preferences by shortening or disabling transitions.
+
+Testing Strategy
+
+Cover:
+
+Initial load by album ID.
+
+Deep link load by photo ID.
+
+Swipe thresholds and velocity behavior.
+
+Button and keyboard navigation.
+
+Finite album wrap from last to first and first to last.
+
+Paginated next-page prefetch at edge.
+
+Per-image error and retry state.
+
+Offline cached viewing.
+
+Reduced-motion behavior.
+
+Common Pitfalls
+
+Do not spend the whole answer on photo storage or CDN internals if the interviewer says the backend is complete. Focus on frontend state, gestures, rendering, and client API needs.
+
+Do not render every photo in the DOM. Use a small slide window and keep the rest as metadata.
+
+Do not use array index as the only source of truth. Use stable photo IDs so deep links, pagination, deletion, and wrapping are manageable.
+
+Interview Checklist
+
+  Clarify finite wrap versus unbounded pagination.
+
+  Define core UI components and responsibilities.
+
+  Specify API needs: stable IDs, dimensions, variants, placeholders, cursors, context endpoint.
+
+  Explain active photo state and slide windowing.
+
+  Discuss gesture thresholds, animation state, and keyboard controls.
+
+  Cover preloading, decoding, and memory bounds.
+
+  Include loading, error, deleted, offline, and deep-link states.
+
+  Mention accessibility and tests.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,77 @@
+===H1===
+VWAP Analytic Provider
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/vwap-analytic-provider
+===BODY===
+Bloomberg
+System Design·60 minMembers
+VWAP Analytic Provider
+Team-loop system-design round: ingest trade ticks from 100 exchanges (100K–1M symbols each, ~100 ticks/sec per symbol, ~20 bytes per tick), maintain per-(symbol, window) VWAP in a sharded stateful engine, and serve ~100K screen users via push and ~1K enterprise users via API. Expected beats: per-exchange feed handlers normalizing to a canonical tick, symbol sharding with running sums, snapshot/changelog recovery, and a pub/sub → WebSocket / Redis / query-API delivery tier.
+SWE
+streaming
+sharding
+pubsub
+websocket
+ingestion
+hard
+Frequency
+Single report
+Last asked
+2026-07-07
+Stage
+onsite-system-design
+Requirements
+
+Design a VWAP (Volume-Weighted Average Price) analytic provider. VWAP is computed per symbol over a specified time window from continuously arriving trade ticks, and published values update periodically.
+
+Functional requirements:
+
+Ingest trade ticks from 100 exchanges in real time.
+
+Maintain the VWAP for every (symbol, time window) pair as ticks arrive.
+
+Update published VWAP values periodically.
+
+Serve the computed values to two distinct user populations.
+
+Scale anchors given by the interviewer:
+
+100 exchanges, each listing 100K–1M symbols.
+
+Roughly 100 ticks per second per symbol, ~20 bytes per tick.
+
+User populations:
+
+Screen users (~100K): real-time display, updates can be pushed.
+
+Enterprise users (~1K): API-driven queries with stricter data-integrity expectations.
+
+Context the interviewer feeds in during the round: each exchange has its own data format, so ticks pass through a per-exchange feed handler / adapter that normalizes them into a canonical tick format.
+
+Discussion arc the interviewer drives:
+
+VWAP engine design — stateful or not, sharding by symbol, maintaining running sums.
+
+Fault recovery for the stateful computation — snapshots and changelog replay.
+
+Delivery — pub/sub fan-out, a WebSocket gateway for screen users, a cache (e.g. Redis) holding the latest VWAP per symbol, and a query API for enterprise users.
+
+Notes
+
+A standard streaming + stateful-computation design in Bloomberg's home domain (market-data pipelines). The graded axes are tick ingestion at volume, per-symbol sharded aggregation, recovery of in-flight state, and serving push and pull consumers from the same computed stream.
+
+The interviewer supplies background incrementally rather than all up front — expect the requirements to grow mid-design and keep the architecture open to the normalization tier and the second user population.
+
+Preparation
+
+Drill windowed streaming aggregation: running sums of price×volume and volume per (symbol, window), window advancement, and periodic emission.
+
+Run the back-of-envelope — up to 100 exchanges × 1M symbols × 100 ticks/s × 20 bytes — and use it to justify per-exchange feed handlers, symbol-hash sharding, and why a single aggregator cannot hold the state.
+
+Rehearse a stateful-stream recovery story (periodic snapshots plus changelog replay) and how the delivery tier — pub/sub into a WebSocket gateway for screens, cached-latest plus a query API for enterprise — hangs off the engine.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

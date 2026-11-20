@@ -1,0 +1,56 @@
+===H1===
+LRU Cache
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/lru-cache
+===BODY===
+Meta
+Coding·40 minMembers
+LRU Cache
+LeetCode 146. O(1) get/put with capacity eviction. Doubly-linked list + hashmap is the canonical implementation; an MLE/SDE onsite warm-up.
+SWE
+MLE
+data-structure
+hashmap
+linked-list
+medium
+Frequency
+Single report
+Last asked
+2026-01-13
+Stage
+phone-screen · onsite-coding
+Requirements
+
+LRUCache(capacity), get(key) -> int, put(key, value) -> void.
+
+Both ops must be O(1) amortized.
+
+On capacity overflow, evict the least-recently-used entry.
+
+Implementation: hashmap from key → doubly-linked-list node; LL maintains recency (head = most recent).
+
+Examples
+
+Standard LC examples; one common edge case: putting an existing key should refresh its position, not just overwrite the value.
+
+Notes
+
+Python: collections.OrderedDict gives a one-liner — interviewer usually wants the hand-rolled version unless asked. Have both ready.
+
+Common bugs: not unlinking the old node before re-inserting at head; forgetting to delete from the hashmap on eviction.
+
+Frequent follow-ups: thread-safe variant (coarse lock vs lock-free linked list), LFU variant (LC 460), TTL variant.
+
+Preparation
+
+Write the hand-rolled DLL + hashmap version from memory in under 12 min.
+
+Have a 2-sentence pitch for the thread-safety follow-up: "coarse lock for correctness, segmented hashtable for throughput."
+
+LC 460 (LFU) is the natural follow-up — drill it as a stretch goal.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

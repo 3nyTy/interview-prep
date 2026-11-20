@@ -1,0 +1,61 @@
+===H1===
+Fulfillment-Center Inventory Transfer
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/fulfillment-center-inventory-transfer
+===BODY===
+Amazon
+CodingMembers
+Fulfillment-Center Inventory Transfer
+Given bidirectional routes between fulfillment centers, a destination, a maximum hop count, and per-center inventory, return every non-destination center with positive inventory whose shortest path to the destination uses at most the allowed number of routes.
+SWE
+graph
+shortest-path
+medium
+Frequency
+Single report
+Last asked
+2026-07-22
+Stage
+onsite-coding
+Requirements
+
+connections is a list of pairs [u, v], each representing a bidirectional delivery route between fulfillment centers.
+
+destination is the center that needs inventory, and maxStep is the maximum number of routes a transfer may traverse.
+
+inventory maps each center ID to its current item count.
+
+Return every center ID that is not destination, has inventory greater than zero, and has a shortest-path distance to destination no greater than maxStep.
+
+The result may be returned in any order.
+
+Examples
+
+connections = [[1, 2], [1, 3], [2, 4], [3, 4], [4, 5]]
+destination = 4
+maxStep = 1
+inventory = {1: 2, 2: 0, 3: 5, 4: 3, 5: 6}
+
+output = [3, 5]
+
+Notes
+
+Run the search once from destination rather than from every candidate center: a level-bounded BFS answers all centers in one pass, stopping expansion when the depth reaches maxStep. Overall O(V + E) time with a visited set.
+
+Build the adjacency structure from the pair list first (hash map of ID → neighbor list) and insert both directions — the routes are bidirectional.
+
+Filter as you collect: skip destination itself and any center whose inventory is zero or missing. In the worked example center 2 is reachable within one hop but holds zero inventory, which is exactly the trap the eligibility rules encode.
+
+Edge cases to state before coding: maxStep = 0 (empty result), centers that appear in inventory but not in connections (unreachable), and duplicate route pairs.
+
+Preparation
+
+Implement a level-bounded BFS from a single source that returns every node within k hops, and check it against the worked example (expect [3, 5]).
+
+Drill restating a domain prompt in graph vocabulary before coding — centers as nodes, routes as undirected edges, maxStep as BFS depth — so the eligibility rules become filters over a plain traversal.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

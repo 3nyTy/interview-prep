@@ -1,0 +1,49 @@
+===H1===
+Balanced Permutation Prefix Check
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/balanced-permutation-prefix
+===BODY===
+Microsoft
+Coding·45 minMembers
+Balanced Permutation Prefix Check
+OA prompt also seen on Uber. For each k in [1..n], decide whether some contiguous subarray of permutation p contains exactly the multiset {1..k}. Return a binary string.
+SWE
+array
+greedy
+medium
+oa
+Frequency
+Low
+Last asked
+2026-03-26
+Stage
+oa
+Requirements
+
+Given a permutation p of length n (each integer in 1..n exactly once), call k balanced if there exist indices 1 ≤ l ≤ r ≤ n such that {p[l], p[l+1], ..., p[r]} == {1, 2, ..., k} as a multiset.
+
+For every k in 1..n, output '1' if k is balanced and '0' otherwise. Concatenate into a length-n binary string.
+
+Notes
+
+The trick is to avoid enumerating intervals. Track, for each k, the minimum and maximum positions occupied by the values 1..k.
+
+Precompute pos[v] = the index where value v appears. Maintain a running L = min(pos[1..k]) and R = max(pos[1..k]). The values 1..k occupy exactly the positions [L, R] iff R - L + 1 == k (because there are exactly k distinct values and they all fall inside [L, R], so by pigeonhole there is no other value in that range).
+
+Iterate k = 1..n, updating L = min(L, pos[k]) and R = max(R, pos[k]) in O(1), then test R - L + 1 == k.
+
+Total: O(n) time, O(n) space.
+
+Preparation
+
+Drill the min/max running positions insight on paper for n = 5 until the invariant clicks.
+
+Practice articulating "if there are exactly k distinct values inside [L, R] and R - L + 1 == k, then by pigeonhole there are no others" — interviewers want the proof step aloud.
+
+Pair with the Equations OA prompt in the same bank — they appear together in 90-min Microsoft OAs.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

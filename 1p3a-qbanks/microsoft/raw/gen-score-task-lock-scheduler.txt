@@ -1,0 +1,57 @@
+===H1===
+Gen / Score Task Lock Scheduler
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/gen-score-task-lock-scheduler
+===BODY===
+Microsoft
+Coding·60 minMembers
+Gen / Score Task Lock Scheduler
+Implement a `TaskLock` so that a pool of `gen` and `score` tasks executes in parallel but `score` tasks of a given id only run after their matching `gen` task completes. Pure Python threading.
+MLE
+Infra Eng
+concurrency
+threading
+hard
+Frequency
+Single report
+Last asked
+2026-02-26
+Stage
+onsite-coding
+Requirements
+
+A SampleTask dataclass exposes task_id: int, task_type: Literal["gen", "score"], and duration: int. The provided task_fn(task, lock) body acquires the lock, sleeps duration seconds, then releases. Many threads run task_fn concurrently.
+
+Implement TaskLock.acquire(task) and TaskLock.release(task) so that:
+
+A score task with task_id == k blocks until the gen task with the same task_id has completed.
+
+Multiple tasks across different task_ids run in parallel as much as possible (no global serialization).
+
+The same task_id may have multiple gen tasks and multiple score tasks — every score(k) may begin only after all outstanding gen(k) have released.
+
+Use only threading.Lock / threading.Condition (no async, no asyncio).
+
+Notes
+
+The clean pattern is a Condition variable per task_id guarding a single counter: pending_gen[k] increments in gen.acquire, decrements in gen.release. score.acquire waits on the condition until pending_gen[k] == 0. score.release is a no-op (or notifies any other score waiters if you also want score-after-score ordering — but the problem does not require this).
+
+A global dict task_id → (lock, condition, counter) is held under a single dict_lock that you acquire only long enough to look up / insert the per-id entry; the actual wait happens on the per-id condition so unrelated task ids never block each other.
+
+The most common bug surfaced in the room: not notifying after gen.release, leaving score permanently asleep. The second-most-common bug: holding the dict-level lock while waiting on the per-id condition, causing global deadlock.
+
+Numerics — when the interviewer cranks up parallelism, candidates with a global lock degrade linearly; the per-id condition pattern scales with the number of distinct ids.
+
+Preparation
+
+Pre-write the per-key Condition pattern on paper; the global defaultdict(Condition) plus a defaultdict(int) counter is reusable across most parallel-bookkeeping interview problems.
+
+Practice releasing the dict-lookup lock before calling condition.wait(); missing this is the canonical thread-safety failure.
+
+Test with at least three concurrent gen and three score tasks per id to surface the "release-without-notify" bug.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

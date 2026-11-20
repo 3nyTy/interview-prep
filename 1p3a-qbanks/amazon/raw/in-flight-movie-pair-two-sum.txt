@@ -1,0 +1,66 @@
+===H1===
+In-Flight Movie Pair (Two Sum Variant)
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/in-flight-movie-pair-two-sum
+===BODY===
+Amazon
+Coding·25 minMembers
+In-Flight Movie Pair (Two Sum Variant)
+Recommend two movies whose runtimes sum exactly to the flight duration (12 hours). Standard two-sum with a hashmap.
+SWE
+array
+hashmap
+easy
+Frequency
+Single report
+Last asked
+2026-03-17
+Stage
+onsite-coding
+Requirements
+
+Input: ArrayList<int> runtimes (minutes), plus the target flight duration.
+
+Return a pair of indices (or the runtimes themselves — confirm) whose sum equals the target.
+
+Handle empty / no-pair / multiple-pair cases — interviewer typically wants the first valid pair.
+
+Examples
+
+runtimes = [90, 85, 75, 60, 120, 150, 125]
+target   = 720  # 12 hours in minutes
+# 600 + 120 not present; 720 itself not a pair; check pairs that sum to 720
+
+Notes
+
+One-pass hashmap of target - current is the canonical solution at O(n) / O(n).
+
+The original Amazon "in-flight movies" prompt is LC 1010 (pairs of durations divisible by 60); the hashmap variant generalizes the residual trick to arbitrary modulus.
+
+Common follow-ups: return all pairs (handle duplicates), return pairs whose runtime sums leave a 30-minute buffer for ads, or extend to three movies.
+
+This was paired with an "AI-enabled coding" round that gave a line-intersection problem (see Line Intersection Points).
+
+Single-pass hashmap seen[target - x] = index is O(n) time and space. The cleanest contract: iterate once, for each x check seen for target - x, then insert x. This ordering guarantees you never pair an element with itself.
+
+The LC 1010 (mod-60) variant generalizes via residual buckets: count[r % 60] and pair r with (60 - r) % 60. The trick for r == 0 and r == 30 is to count combinations within the bucket (n*(n-1)/2), not across — a frequent off-by-one source.
+
+For "all pairs" follow-ups with duplicates, switch to sort + two pointers. The hashmap pass produces one valid pair per element pair only if you carefully de-duplicate, which is more bug-prone than the sorted-array approach.
+
+Preparation
+
+LC 1 (Two Sum) and LC 1099 (Two Sum Less Than K) are the closest LC parallels.
+
+Practice the duplicates follow-up: returning all unique pairs requires sorting plus two pointers, not a single hashmap pass.
+
+Pre-rehearse the runtime-buffer follow-up: the question becomes "largest pair sum less than or equal to target," which switches the data structure to a sorted list + two pointers.
+
+Layered drill: (1) reproduce LC 1 (Two Sum) and LC 1010 (Pairs of Songs ÷ 60) back-to-back to internalize the residual trick; (2) extend to "all unique pairs" with sort + two pointers; (3) practice the runtime-buffer follow-up ("largest pair sum at most target") to switch comfortably between hashmap and two-pointer mental models.
+
+Dry-run the r == 0 and r == 30 self-pair counting on paper before you trust the formula in code.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

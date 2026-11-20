@@ -1,0 +1,57 @@
+===H1===
+System Design — LeetCode / Online Judge + Contest Leaderboard
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/system-design-leetcode-online-judge
+===BODY===
+Meta
+System Design·45 minMembers
+System Design — LeetCode / Online Judge + Contest Leaderboard
+Design an online code-judge with a contest leaderboard. Sandbox execution, judging pipeline, and real-time leaderboard updates are the three drill-down zones.
+SWE
+Infra Eng
+sandbox
+queue
+leaderboard
+redis
+medium
+Frequency
+Low
+Last asked
+2026-04-21
+Stage
+onsite-system-design
+Requirements
+
+Functional: submit code, run test cases, return verdict; live contest leaderboard.
+
+Decisions:
+
+Sandbox: Docker / Firecracker per submission; resource caps (CPU, memory, wall-clock).
+
+Judge queue: pub/sub queue with worker pool; idempotent retry on timeout.
+
+Storage: submission code in object store, results in relational DB.
+
+Leaderboard: Redis sorted set keyed by (contest_id, score, tiebreak_timestamp); sharded for global contests; consider approximate ranking for top-N at scale.
+
+Notes
+
+One reported failure mode: spent too long on NFR / data schema, no time for the leaderboard half — budget 15 min per half.
+
+Common follow-up: "how does Docker actually execute the code?" — be ready to explain container start, fs isolation, seccomp/cgroup limits.
+
+Leaderboard variant: friends-only top-10 instead of global — requires a separate per-user friends-set aggregation.
+
+Preparation
+
+Pre-budget 15 min: 5 NFR + schema, 5 submission path, 5 leaderboard. Set a timer in practice.
+
+Memorize the Redis sorted-set leaderboard pattern + tiebreak encoding (score * 1e10 - submit_ms).
+
+Be ready to compare per-language sandboxes (gVisor vs Firecracker vs nsjail).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,45 @@
+===H1===
+Best Time to Buy and Sell Stock
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/best-time-to-buy-sell-stock
+===BODY===
+Meta
+Coding·20 minMembers
+Best Time to Buy and Sell Stock
+LC 121 — maximum profit from a single buy / sell of a stock price array. Asked in a recent E5 onsite coding round, with a follow-up extending to multiple transactions.
+SWE
+array
+dp
+greedy
+easy
+Frequency
+Single report
+Last asked
+2026-05-16
+Stage
+onsite-coding
+Requirements
+
+Input: integer array prices where prices[i] is day i's price.
+
+Return the maximum profit from at most one buy followed by one sell. If no profit is possible, return 0.
+
+Follow-up reported on-loop: extend to unlimited transactions (LC 122) or at most k transactions (LC 188).
+
+Notes
+
+Single-pass: track min_price so far and the best profit seen against that minimum.
+
+For the unlimited-transactions follow-up: sum every positive prices[i] - prices[i-1]; the greedy proof is short and worth practicing aloud.
+
+For the k-transaction follow-up: 2D DP indexed by day and remaining transactions, then the O(k·n) rolling-array trick.
+
+Preparation
+
+Write the one-pass solution in under 5 minutes; rehearse the follow-up extension verbally so the interviewer doesn't have to pull it out of you.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

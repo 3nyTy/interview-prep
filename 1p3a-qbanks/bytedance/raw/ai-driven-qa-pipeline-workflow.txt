@@ -1,0 +1,68 @@
+===H1===
+AI-Driven QA Pipeline Workflow
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/ai-driven-qa-pipeline-workflow
+===BODY===
+ByteDance / TikTok
+System Design·60 minMembers
+AI-Driven QA Pipeline Workflow
+Design an AI-oriented QA workflow that turns a PRD into test cases, test data, automation scripts, execution, and a final report. The interviewer expects collaborating role-specific agents rather than merely inserting model calls into conventional CI stages, and asks how the system operates when CI has no GPU capacity.
+SWE
+testing
+agentic-workflow
+llm-agent
+ci-cd
+hard
+Frequency
+Single report
+Last asked
+2026-08-25
+Stage
+phone-screen
+Requirements
+
+Accept a product-requirement document and derive accurate, high-adoption test cases.
+
+Convert manual cases into maintainable automated scripts.
+
+Generate or acquire the required test data for each case.
+
+Execute functional and regression testing and produce a final test report.
+
+Compose existing PRD-to-case, case-to-data, and data-to-script capabilities into one end-to-end workflow.
+
+Model collaboration among PM, development, and QA responsibilities rather than treating each model call as an isolated CI stage.
+
+Explain evaluation and control points that protect case accuracy, relevance, and adoption.
+
+Operate when the CI/CD environment itself has no GPU resources.
+
+Preserve extensibility and maintainability as product requirements and test skills evolve.
+
+Examples
+
+For a TikTok Shop feature, a creator uploads image-and-text content, associates an anchor and product link, and a consumer follows that link to view and purchase the product. Walk from the PRD through case design, data generation, automation, execution, and the final report.
+
+Notes
+
+A traditional Jenkins-style chain of independent stages is insufficient unless the design explains how specialized agents exchange plans, artifacts, feedback, and completion state.
+
+Accuracy and adoption require grounding in requirements and business rules, coverage checks, executable validation, traceability from failures back to requirements, and human approval points for risky changes.
+
+GPU absence is a deployment constraint, not permission to omit the AI layer; separate orchestration and CI execution from remotely hosted or shared inference capacity.
+
+The design portion occupied about thirteen minutes before a long coding block, so lead with the workflow contract and decision points before expanding infrastructure.
+
+Preparation
+
+Draw the artifact and control flow from PRD to report, labeling ownership, validation gates, retries, and human approvals.
+
+Define measurable quality signals for generated cases and scripts, then explain how failures feed back into the responsible component.
+
+Rehearse two deployment shapes for GPU-constrained CI: remote inference behind a service boundary and an asynchronously scheduled shared model pool.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

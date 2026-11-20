@@ -1,0 +1,89 @@
+===H1===
+Menu Tree Diff — Count Changed Nodes
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/code-craft-menu-tree-diff
+===BODY===
+DoorDash
+CodingMembers
+Menu Tree Diff — Count Changed Nodes
+DoorDash phone-screen coding prompt. Given an existing menu tree (in our system) and a new menu tree sent by a merchant, count how many nodes changed. Nodes are matched by key and position: a value change on a matching node counts as 1; a removed or added subtree counts every node inside it; and moving a node under a different parent counts as one removal plus one addition. The clean solution is a recursive co-traversal that matches children by key. Two worked examples leaked verbatim.
+SWE
+tree
+recursion
+hashmap
+medium
+Frequency
+Single report
+Last asked
+2026-01-30
+Stage
+phone-screen
+Requirements
+
+Each menu is a tree. Every node has a key (e.g. a, b) and a value (written a(1) = key a, value 1). The existing tree is what is currently in the system; the new tree is what the merchant just sent. Count how many nodes changed between the two.
+
+A node counts as changed in any of these cases:
+
+Value change — a node with the same key in the same position exists in both trees but its value differs.
+
+Deactivated — a node present in the existing tree has no counterpart in the new tree (it, and everything under it, is set inactive).
+
+Added — a node present in the new tree has no counterpart in the existing tree.
+
+Node identity is by key and position in the tree (its parent), not by key alone. Moving a node to a different parent therefore counts as one deactivation (old position) plus one addition (new position).
+
+Return the total count of changed nodes.
+
+Examples
+
+Verbatim from the prompt:
+
+Existing tree                 New tree
+       a(1)                       a(1)
+      /    \                          \
+    b(2)   c(3)                       c(3)
+   /  \      \                           \
+ d(4) e(5)  f(6)                       f(66)
+
+Expected Answer: 4
+Explanation: Node b, Node d, Node e are set to inactive. The value of Node f changed as well.
+
+Existing tree                 New tree
+       a(1)                       a(1)
+      /    \                     /     \
+    b(2)   c(3)                b(2)      h(8)
+   /  \      \                / | \         \
+ d(4) e(5)  g(7)           e(5)d(4)f(6)    g(7)
+
+Expected Answer: 5
+Explanation: 5 changed nodes total. Node f is newly added. c(3) and the old g(7) are deactivated; h(8) and the new g(7) are newly added.
+
+Notes
+
+Sibling order does not matter: in the second example d and e swap order under b but neither is counted as a change.
+
+Clean approach is a recursive co-traversal. At each matched node, index both nodes' children by key. For each child key:
+
+present in both → if the values differ, count 1; recurse into the subtree.
+
+present only in the existing tree → the whole subtree is deactivated; count every node in it.
+
+present only in the new tree → the whole subtree is added; count every node in it.
+
+The subtle case is a node that keeps its key but moves to a different parent (the g(7) in example 2). Because identity is position-based, it is counted twice — once as a deactivation at the old position and once as an addition at the new position. Clarify this rule with the interviewer before coding; it is the single most common source of off-by-one answers.
+
+Complexity is O(n + m) over the node counts of the two trees when children are matched via a hashmap per node.
+
+Preparation
+
+Implement the recursive co-traversal cold: a helper taking (old_node, new_node) that matches children by key in a dict and accumulates the three cases. Run it against both leaked examples and confirm the answers are 4 and 5.
+
+Write a count_subtree(node) helper for the add / remove cases and reuse it in both branches.
+
+Practice stating the "key + position" identity rule out loud, including the moved-node double-count, before writing any code — clarifying the diff semantics is half the graded signal.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

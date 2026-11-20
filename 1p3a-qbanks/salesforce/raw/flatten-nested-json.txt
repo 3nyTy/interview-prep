@@ -1,0 +1,90 @@
+===H1===
+Flatten Nested JSON / HashMap to String
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/flatten-nested-json
+===BODY===
+Salesforce
+Coding·45 minMembers
+Flatten Nested JSON / HashMap to String
+Given a nested JSON object (or equivalent nested HashMap), flatten it into a single-level representation. The natural representation is dotted key paths (`a.b.c -> value`) — recursion on values that are themselves objects, base case on scalars.
+SWE
+recursion
+dfs
+json
+hashmap
+string
+medium
+Frequency
+Low
+Last asked
+2026-01-11
+Stage
+onsite-coding · phone-screen
+Requirements
+
+Input is a parsed JSON / nested map whose leaf values are scalars (string / number / boolean / null) and whose interior values are nested objects.
+
+Output is a flat representation. Two common shapes interviewers accept:
+
+A map { dotted.path: scalar, ... }.
+
+A string serialisation of that map (sorted or unsorted as specified).
+
+Array values: not always required. Clarify with the interviewer; if needed, use index-bracket notation (a.b[0].c).
+
+Empty object value: clarify whether to emit the path with null / "{}" or to drop it.
+
+Examples
+
+Input:
+{
+  "a": 1,
+  "b": {
+    "c": 2,
+    "d": { "e": 3 }
+  }
+}
+
+Output (dotted path map):
+{
+  "a":     1,
+  "b.c":   2,
+  "b.d.e": 3
+}
+
+Notes
+
+The standard solution is a recursive DFS:
+flatten(node, prefix, out):
+    for k, v in node.items():
+        path = prefix + "." + k if prefix else k
+        if v is a dict:
+            flatten(v, path, out)
+        else:
+            out[path] = v
+
+Time O(n) where n is the total number of map entries / visited nodes; auxiliary space O(d) for recursion depth d, plus O(number of leaves) for the required output.
+
+An iterative version uses an explicit stack of (prefix, node) pairs — useful when interviewers ask about extremely deep inputs (recursion blows the call stack at d ≈ 10⁴).
+
+Edge cases to surface: keys containing the path separator (a.b as a key collides with nested form — usually resolved by escaping or by clarifying that keys are alphanumeric); duplicate paths (impossible if input is a valid map, but worth stating); empty top-level object (return {}).
+
+For the string-output variant, decide separator semantics up-front: "a.b.c=2;b.d.e=3" is one common form; another is JSON-Pointer (/b/c).
+
+Common interviewer follow-up: write the inverse (unflatten) — take a dotted-key map and rebuild the nested structure. Same recursion in reverse.
+
+Preparation
+
+Write both the recursive and the iterative version. Verify on a deeply nested example (depth 5+) and a single-key example.
+
+Practise the unflatten follow-up — the trick is to split the path at the first separator and recurse on the rest.
+
+Have an answer for: "what if values can be arrays?" — extend the recursion to call flatten on each element with prefix[i].
+
+Walk through correctness out loud — interviewers will pause the candidate at the recursion line to confirm the base case is clearly stated.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

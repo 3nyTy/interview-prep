@@ -1,0 +1,50 @@
+===H1===
+Circular Active Computers Window
+===URL===
+https://www.1point3acres.com/interview/problems/company/jpmorgan/circular-active-computers-window
+===BODY===
+JPMorgan Chase
+Coding·60 minMembers
+Circular Active Computers Window
+Given `n` computers arranged in a circle as 0/1 states, find the maximum number of active computers in any `k` adjacent computers.
+SWE
+sliding-window
+array
+binary-string
+oa
+easy
+Frequency
+Single report
+Last asked
+2025-07-29
+Stage
+oa · tech-screen
+Requirements
+
+Input: a circular array or string of 0 / 1 states and an integer k.
+
+Return the maximum number of 1s among any k adjacent positions on the circle.
+
+Windows can wrap from the end of the array back to the beginning.
+
+Clarify behavior for k > n; the natural answer depends on whether repeated wraparound is allowed.
+
+Notes
+
+Duplicate the array once and run a fixed-size sliding window over starts 0..n-1.
+
+If k <= n, only inspect n windows; scanning all windows in the doubled array creates duplicates but usually still works if bounded carefully.
+
+Prefix sums are also clean: build prefix over arr + arr, then compute each circular window sum in O(1).
+
+Preparation
+
+Implement both sliding-window and prefix-sum versions.
+
+Test k=1, k=n, all zeros, all ones, and a maximum window that wraps across the boundary.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

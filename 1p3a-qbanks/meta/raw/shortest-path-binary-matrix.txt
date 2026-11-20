@@ -1,0 +1,49 @@
+===H1===
+Shortest Path in a Binary Matrix (LC 1091)
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/shortest-path-binary-matrix
+===BODY===
+Meta
+Coding·45 minMembers
+Shortest Path in a Binary Matrix (LC 1091)
+Starting from the LC 1091 binary-grid prompt, find a path from the top-left cell to the bottom-right and then print the route. The follow-up rejects carrying a full path in every queue entry and asks for a more space-efficient reconstruction.
+SWE
+bfs
+grid
+shortest-path
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+phone-screen
+Requirements
+
+Given a binary matrix, move from the top-left cell to the bottom-right; 0 cells are traversable and 1 cells are blocked.
+
+Explain both breadth-first and depth-first search, then implement the approach selected by the interviewer.
+
+Follow-up: print the actual route without copying the full path into every queued state.
+
+Notes
+
+In the canonical LC 1091 version, adjacent cells are eight-directionally connected and path length counts visited cells; confirm whether the interview variant preserves both rules.
+
+Use breadth-first search for the unweighted shortest-path guarantee. Ordinary depth-first search can establish reachability or return a path, but it does not guarantee the shortest path unless it explores and compares all alternatives.
+
+Record each cell's parent when it is first discovered by breadth-first search, then reconstruct the route backward from the destination.
+
+Dry-run empty, single-cell, blocked-destination, and no-path cases before handing the code back.
+
+Preparation
+
+Implement breadth-first search with parent pointers, then reconstruct and reverse the final route.
+
+Practice explaining both why breadth-first search finds the shortest path in an unweighted grid and why storing a complete path per queued state costs more memory than keeping one parent per visited cell.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

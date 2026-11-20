@@ -1,0 +1,48 @@
+===H1===
+Cumulative Views Reach Target Day
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/cumulative-views-target-day
+===BODY===
+Capital One
+Coding·70 minMembers
+Cumulative Views Reach Target Day
+Given a daily-view array and a target, return the 0-indexed day on which the cumulative views first reach or exceed the target. If the target is never met, return `-1`.
+MLE
+array
+prefix-sum
+easy
+oa
+codesignal
+Frequency
+Single report
+Last asked
+2026-04-25
+Stage
+oa
+Requirements
+
+Input: integer array visits[] (visits on day i) and integer target.
+
+Return the smallest i such that sum(visits[0..i]) >= target. Use 0-indexed or 1-indexed per the prompt — clarify.
+
+If no such i exists, return -1.
+
+Notes
+
+One-pass running sum; bail out the moment the threshold is crossed.
+
+Off-by-one: the prompt uses 0-indexed days, and the answer is the first index whose running total is >= target. Confirm before coding.
+
+This is the easiest problem in the recent OA rotation; spending more than 5 minutes is a signal that something is misread.
+
+Preparation
+
+Implement in one line of running-sum logic; do not over-engineer to prefix-sum arrays.
+
+Add a sanity test: visits = [1, 2, 3, 4], target = 6 should return 2 (cumulative at index 2 is 6).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

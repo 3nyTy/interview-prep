@@ -1,0 +1,68 @@
+===H1===
+Core Dump System Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/core-dump-system-design
+===BODY===
+Amazon
+System Design·55 minMembers
+Core Dump System Design
+Design a core-dump collection system: agents upload crash artifacts, the backend stores large binaries and searchable metadata, engineers query and download dumps, and the platform enforces retention, access control, and scale limits.
+SWE
+storage
+distributed-systems
+debugging
+scaling
+medium
+Frequency
+Single report
+Last asked
+2026-07-02
+Stage
+onsite-system-design
+Requirements
+
+Functional requirements:
+
+Collect core dumps / crash artifacts from many hosts or services.
+
+Store large binary dumps durably while extracting searchable metadata such as service, host, version, timestamp, signal, and stack signature.
+
+Let engineers search, group, and download relevant dumps for debugging.
+
+Enforce access control, retention, and deletion policies because dumps may contain sensitive memory.
+
+Scale / resource constraints to clarify:
+
+Dumps can be large, so the write path must avoid putting binaries directly through a metadata database.
+
+Crash spikes can create bursty ingestion after a bad deploy; the upload path needs backpressure and asynchronous processing.
+
+Retention cost matters; storage tiering and TTL are first-class design points.
+
+Key design decisions:
+
+Object storage for dump binaries plus a metadata index / database for search.
+
+Client-side compression / chunking vs server-side processing.
+
+Synchronous upload acknowledgement vs queue-backed async symbolization / stack extraction.
+
+Privacy controls: encryption, scoped access, redaction where possible, audit logs.
+
+Notes
+
+The available prompt only names the system target, so drive the requirement-gathering. Start with users (service owners / on-call engineers), dump size, expected write QPS, retention, and privacy constraints.
+
+A strong answer separates hot metadata search from cold binary storage; treating the dump as a database blob is the obvious scaling trap.
+
+Preparation
+
+Practice a crash-reporting architecture: local agent -> upload service -> object store -> metadata DB / search index -> async processing queue -> engineer UI.
+
+Prepare the cost / privacy trade-off: compression, sampling, retention tiers, encryption, audit logging, and role-based access.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

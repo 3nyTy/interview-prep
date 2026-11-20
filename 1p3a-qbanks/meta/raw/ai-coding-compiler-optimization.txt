@@ -1,0 +1,63 @@
+===H1===
+AI Coding — Compiler Optimization
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/ai-coding-compiler-optimization
+===BODY===
+Meta
+Coding·60 minMembers
+AI Coding — Compiler Optimization
+A new April-2026 AI Coding prompt. Implement `extract_time_and_mem_cost(instruction_file)` for a toy compiler IR. Catch: instruction costs are not given — they must be inferred from the unit-test assertions.
+SWE
+MLE
+Infra Eng
+ai-coding
+parsing
+ambiguous-spec
+hard
+Frequency
+Low
+Last asked
+2026-04-13
+Stage
+onsite-coding
+Requirements
+
+Starter project: a few folders each with a test.py, an instructionN.txt, and a src/ skeleton.
+
+Each instruction file is straight-line three-address code:
+res1 = var1 + var2
+res2 = var3 - var4
+res3 = res2 + var5
+res  = res1 + res3
+
+Implement extract_time_and_mem_cost(instruction) returning (time, mem).
+
+Unit tests look like assert extract_time_and_mem_cost('test/instruction1.txt') == (14, ...).
+
+The per-operator costs (+, -, *, /, =) are deliberately omitted from the prompt. You must back them out from the numeric assertions in the test files.
+
+Examples
+
+Reported pattern matched the assertions when +, -, = cost 1 and *, / cost 5; multiple test files cross-validate the constants. One report notes the interviewer hints toward inferring constants only in the last 5 minutes.
+
+Notes
+
+Underspecified by design — the interviewer expects you to ask clarifying questions and then notice that the cost numbers are encoded in the tests, not in the prompt.
+
+One candidate's session had Opus 4.6 crash mid-round; interviewer asked them to switch to GPT-5.x. Be ready for model swaps without losing context.
+
+Reports note that AI-generated cost values are fabricated unless you give it the assertions; treat the model's first guesses as suspect and re-prompt with the unit-test snippets.
+
+Preparation
+
+Practice parsing simple three-address-code files in Python (split on =, tokenize RHS, recognize operators and operands).
+
+Rehearse the meta-skill of "infer constants from a few labeled examples": given two (file, total_cost) pairs and one operator-count delta, solve a tiny linear system by hand.
+
+Re-check the forum 1-2 weeks before interview — this prompt is new and likely to mutate.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

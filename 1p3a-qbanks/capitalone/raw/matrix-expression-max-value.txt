@@ -1,0 +1,80 @@
+===H1===
+Matrix Expression Max Value
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/matrix-expression-max-value
+===BODY===
+Capital One
+Coding·70 minMembers
+Matrix Expression Max Value
+Each cell of a grid holds either a digit 0-9 or a `+` / `-` symbol. Walking only right or down, find the maximum value of any syntactically valid arithmetic expression that can be read off a monotonic path. Two consecutive operators or two consecutive digits invalidate that path's prefix.
+SWE
+MLE
+grid
+dp
+parsing
+hard
+oa
+codesignal
+Frequency
+Low
+Last asked
+2026-01-19
+Stage
+oa
+Requirements
+
+Input: an n x m grid of characters; each cell is a digit '0'-'9' or one of '+', '-'.
+
+A path moves only strictly right (j -> j+1) or strictly down (i -> i+1). Each cell visited is appended to the running expression.
+
+Invalid prefixes (rejected from candidacy):
+
+two consecutive operators: 0 + + 1, 3 + - 4
+
+two consecutive digits: 1 2 + 3, 5 - 6 3
+
+A single digit is always a valid expression.
+
+Return the maximum value of any valid expression ending at any cell that ends in a digit. The expression does not need to end at (n-1, m-1).
+
+Examples
+
+A path producing 2 + 3 - 1 evaluates to 4; valid sub-expressions along the same path are 2, 3, 1, 2+3=5, 3-1=2, 2+3-1=4. The answer for that path's contributing prefixes is max(2, 3, 1, 5, 2, 4) = 5.
+
+grid = [
+  ['2', '+', '3'],
+  ['+', '5', '-'],
+  ['-', '1', '4'],
+]
+
+The maximum over this grid is 7, reached by reading 2 downward into the + below it and ending on the 5 (the expression 2+5); tracing the three DP tables by hand should reproduce it.
+
+Notes
+
+Three-state DP per cell:
+
+D[i][j] = best value of a valid expression ending at (i,j) with a digit (a complete expression).
+
+P[i][j] = best value of a valid prefix ending at (i,j) with a pending + (digit still owed).
+
+M[i][j] = best value of a valid prefix ending at (i,j) with a pending -.
+
+Transitions from (i-1, j) and (i, j-1): if current cell is a digit d, then D[i][j] = max(d, bestP + d, bestM - d); if current cell is '+', then P[i][j] = bestD; if '-', then M[i][j] = bestD. The global answer is the max over all D[i][j].
+
+Initialise unreachable states to -inf so the max reductions ignore them; a 0 default silently corrupts the answer.
+
+This is the trickiest OA problem in the recent Capital One rotation. Allocate at least 20 minutes and write the three transition tables explicitly — trying to fold all three into a single DP table is what causes most TLE-free incorrect submissions.
+
+Preparation
+
+Implement the three-state DP cleanly. Drill the transition table on paper first; the moment you start writing code without the three states named, the bug rate spikes.
+
+Run it against a hand-traced 2x2 with each of "5", "5+", "5-" end states to confirm the prefix tables behave.
+
+Practice the failure mode: the global answer is the max over D[*][*], not D[n-1][m-1]. A submission that returns the corner cell will pass the worked example and fail half the hidden tests.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

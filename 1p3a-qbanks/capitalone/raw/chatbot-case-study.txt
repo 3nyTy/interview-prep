@@ -1,0 +1,64 @@
+===H1===
+Chatbot Case Study
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/chatbot-case-study
+===BODY===
+Capital One
+Other·60 minMembers
+Chatbot Case Study
+Power Day case study variant focused on deploying a customer-service chatbot at Capital One. Typically under-specified — the round covers product strategy, model selection, evaluation, and rollout risks. Has surfaced in SDE Power Day loops as an alternative to the Virtual Credit Card case.
+SWE
+MLE
+critical-thinking
+open-ended
+llm
+evaluation
+verbal
+ambiguous-spec
+Frequency
+Single report
+Last asked
+2026-02-13
+Stage
+final-round
+Requirements
+
+Prompt: design / discuss the deployment of a customer-service chatbot for Capital One.
+
+Coverage typically includes:
+
+Product framing — which customer interactions is the chatbot replacing? What's in-scope vs deferred to a human agent?
+
+Model choice — fine-tuned LLM vs RAG over Capital One docs vs a smaller intent-classification + retrieval hybrid. Trade-offs in latency, cost, accuracy, and compliance.
+
+Evaluation — what metrics matter (CSAT, deflection rate, escalation rate, hallucination rate, regulatory-non-compliance rate)? How do you measure them pre- and post-launch?
+
+Risks — hallucination on regulated topics (credit decisions, fee disputes), PII handling, adversarial prompts.
+
+Rollout — staged rollout, fallback to human, monitoring and circuit-breakers.
+
+Notes
+
+The prompt is deliberately sparse; this is a structured-thinking round where the candidate is expected to scope the problem before going deep.
+
+Capital One is a regulated financial institution, so the compliance / risk angle is the differentiated signal. Mention the OCC and CFPB exposure explicitly — every chatbot answer about fees or interest rates is potentially a regulated communication.
+
+For model choice, RAG is the safer default for a regulated FAQ-style chatbot because hallucination risk is bounded by the retrieved corpus and citations can be surfaced. A fine-tuned LLM gives smoother answers but loses the citation trail.
+
+Evaluation should distinguish deflection rate (how often the bot resolves the issue without escalation) from CSAT (how often the user is happy with the resolution). Optimising deflection alone leads to dark-pattern bots that suppress escalation; both metrics matter.
+
+Rollout circuit-breaker: monitor escalation rate, hallucination flags, and compliance-violation alerts in real time; auto-revert to the previous model on threshold breach.
+
+Preparation
+
+Build a one-page mental scaffold: product scope → model architecture → eval metrics → risk → rollout → monitoring. Walk it top-down in 45 minutes with 8-9 minutes per stage.
+
+Prepare a RAG vs fine-tune trade-off matrix mentally — accuracy, hallucination, latency, cost, citation. The case round penalises the candidate who can only describe one architecture.
+
+Prep a brief mention of model-card and red-teaming practices; for a financial-services chatbot, this is the kind of detail that turns a 'pass' into a 'strong pass'.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

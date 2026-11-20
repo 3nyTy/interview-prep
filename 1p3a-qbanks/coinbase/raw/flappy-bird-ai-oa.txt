@@ -1,0 +1,220 @@
+===H1===
+Flappy Bird (AI-Assisted Strategy OA)
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/flappy-bird-ai-oa
+===BODY===
+Coinbase
+Coding·70 minMembers
+Flappy Bird (AI-Assisted Strategy OA)
+A newer AI-assisted OA format that replaces the canonical CodeSignal multi-level problem on some loops. Candidates write a `shouldJump(state)` or `shouldBounce(...)` strategy for a Flappy-Bird-like game with an in-IDE AI assistant they can prompt freely; scoring is by how many auto-played simulation tests the strategy passes. The signal is how well you collaborate with the AI under time pressure, not raw algorithm design alone.
+SWE
+simulation
+algorithm-design
+ai-tools
+ai-allowed
+codesignal
+oa
+medium
+new-round
+Frequency
+Medium
+Last asked
+2026-05-19
+Stage
+oa
+Problem Overview
+
+In a simplified Flappy Bird simulator, implement a function shouldJump(...) that decides on every frame whether the bird should jump and apply an upward impulse.
+
+An evaluator runs your function against multiple test cases or levels. Your goal is to survive as long as possible, or pass as many pipes as possible, across those test cases.
+
+Note: The exact input/output format, physics parameters, and scoring rules may vary by prompt instance. Treat this page as a concise statement of the OA task and an approach guide.
+
+Expected Interface
+
+The exact signature may differ, but the task is typically shaped like this:
+
+class FlappyAgent:
+    def __init__(self):
+        pass
+
+    def shouldJump(self, state) -> bool:
+        """
+        Return True to jump on the current frame.
+        Return False to keep the current trajectory.
+        """
+        pass
+
+The simulator should provide enough current-frame state to decide whether a jump is safe. That may include bird position, velocity, screen bounds, and possibly obstacle information. A common coordinate convention is y = 0 at the top of the screen, larger y values moving downward, and positive vertical velocity meaning the bird is falling. Adapt the signs if the prompt uses a different convention.
+
+Possible state fields, if the prompt uses a state-object API:
+
+state = {
+    "bird_y": 120,
+    "bird_v": 3.5,
+    "screen_height": 300,
+    "bird_x": 40,
+    "next_pipe": {
+        "x": 110,
+        "width": 20,
+        "gap_top": 90,
+        "gap_bottom": 160,
+    },
+}
+
+Strategy
+
+A robust solution should avoid relying on a single hard-coded height threshold. Hidden levels may vary gravity, obstacle spacing, gap height, initial velocity, or frame timing.
+
+On each frame:
+
+Reject jumps that would immediately hit the top boundary.
+
+Predict the next few frames if you do not jump.
+
+Predict the next few frames if you jump now.
+
+Prefer the action that survives longer.
+
+If both actions survive the lookahead window, prefer the one that keeps the bird near the next safe target height. If a pipe gap is exposed, use the center of the gap; otherwise use a conservative cruising height.
+
+Tune margins after watching the simulator visualization and failed tests.
+
+Reference Strategy Template
+
+Because the exact OA interface may vary, this code is a template. Rename fields and adjust constants to match the prompt.
+
+class FlappyAgent:
+    def __init__(self):
+        self.gravity = 1.0
+        self.jump_velocity = -8.0
+        self.lookahead_steps = 25
+        self.top_margin = 5.0
+        self.bottom_margin = 5.0
+        self.horizontal_margin = 1.0
+
+    def shouldJump(self, state):
+        s = self._normalize_state(state)
+
+        if self._would_hit_top_after_jump(s):
+            return False
+
+        no_jump = self._simulate(s, do_jump_now=False)
+        jump = self._simulate(s, do_jump_now=True)
+
+        if not no_jump["alive"] and jump["alive"]:
+            return True
+        if no_jump["alive"] and not jump["alive"]:
+            return False
+        if not no_jump["alive"] and not jump["alive"]:
+            return jump["survived_steps"] > no_jump["survived_steps"]
+
+        return jump["score"] > no_jump["score"]
+
+    def _normalize_state(self, state):
+        return {
+            "bird_y": float(state.get("bird_y", state.get("y", 0))),
+            "bird_v": float(state.get("bird_v", state.get("vy", 0))),
+            "bird_x": float(state.get("bird_x", state.get("x", 0))),
+            "screen_height": float(state.get("screen_height", state.get("height", 300))),
+            "next_pipe": state.get("next_pipe"),
+        }
+
+    def _would_hit_top_after_jump(self, s):
+        next_y = s["bird_y"] + self.jump_velocity
+        return next_y <= self.top_margin
+
+    def _simulate(self, s, do_jump_now):
+        y = s["bird_y"]
+        v = s["bird_v"]
+        x = s["bird_x"]
+        pipe = s["next_pipe"]
+
+        if do_jump_now:
+            v = self.jump_velocity
+
+        score = 0.0
+        survived_steps = 0
+
+        for step in range(self.lookahead_steps):
+            y += v
+            v += self.gravity
+
+            if y <= self.top_margin:
+                return {"alive": False, "score": -1000 + survived_steps, "survived_steps": survived_steps}
+            if y >= s["screen_height"] - self.bottom_margin:
+                return {"alive": False, "score": -1000 + survived_steps, "survived_steps": survived_steps}
+
+            if pipe is not None:
+                # This assumes the pipe moves left one unit per frame. Replace
+                # with the prompt's actual pipe speed if it is provided.
+                pipe_x = pipe["x"] - step
+                if self._is_in_pipe_zone(x, pipe_x, pipe["width"]):
+                    if y <= pipe["gap_top"] + self.top_margin:
+                        return {"alive": False, "score": -1000 + survived_steps, "survived_steps": survived_steps}
+                    if y >= pipe["gap_bottom"] - self.bottom_margin:
+                        return {"alive": False, "score": -1000 + survived_steps, "survived_steps": survived_steps}
+
+                    target_y = (pipe["gap_top"] + pipe["gap_bottom"]) / 2.0
+                else:
+                    target_y = (pipe["gap_top"] + pipe["gap_bottom"]) / 2.0
+            else:
+                target_y = s["screen_height"] * 0.45
+
+            score += 10.0 - abs(y - target_y) * 0.1
+            survived_steps += 1
+
+        return {"alive": True, "score": score, "survived_steps": survived_steps}
+
+    def _is_in_pipe_zone(self, bird_x, pipe_x, pipe_width):
+        pipe_left = pipe_x - self.horizontal_margin
+        pipe_right = pipe_x + pipe_width + self.horizontal_margin
+        return pipe_left <= bird_x <= pipe_right
+
+Debugging Tips
+
+Use the visual simulator, if available, to see whether jumps happen too early, too late, or while the bird is already moving upward.
+
+If the bird hits the top, increase top_margin, reduce jump_velocity, or block repeated jumps while velocity is still upward.
+
+If the bird hits the ground, increase lookahead_steps or trigger jumps earlier when the no-jump simulation fails.
+
+If obstacle collision tests fail near edges, increase vertical and horizontal margins.
+
+If tests fail inconsistently across levels, make constants configurable and tune them against each failed level rather than assuming one threshold works everywhere.
+
+Complexity
+
+Let T be the lookahead horizon. Each shouldJump call simulates two choices for T frames, so the time complexity is O(T) and the extra space complexity is O(1).
+
+Candidate-Report Notes
+
+The grading harness runs 20 simulated games. Passing 16–18 has been enough to clear; passing all 20 is not required.
+
+Some candidates receive a 60-minute timer instead of the older 70-minute OA window. Assistant latency and copy/paste friction can consume real time; budget manual simulation checks instead of waiting for the assistant to converge.
+
+The right-side panel renders the game live. Toggle the "auto pilot" / "play" button to watch the bird execute your strategy — this is by far the highest-bandwidth debugging signal and is missed by many candidates until late in the round. Most strategy bugs ("jumped one frame too early") are obvious from a 5-second replay and invisible from the raw test output.
+
+The in-IDE AI assistant is the explicit collaborator for the round; the current OA surface names the assistant Cosmo. Effective patterns:
+
+Paste the failing test's symbolic output ("died at frame 47 height 312") back to the AI and ask for a targeted patch.
+
+Ask the AI to refactor the strategy into named sub-rules (_emergency_jump, _simulate(jump), _simulate(no_jump)) so you can edit one at a time.
+
+Do not let the AI rewrite the whole function on every iteration — pin it to one rule at a time or you will fight regressions for the rest of the timer.
+
+A workable strategy is the "compare futures" pattern: simulate the next N frames once assuming jump-now and once assuming no-jump; pick whichever stays alive longer (and, ties, whichever ends closer to gap-center / collects more coins). Add an emergency rule for the floor/ceiling so you don't wait for the simulation to notice.
+
+Preparation
+
+Build a mental template for "simulate-the-next-N-frames-under-each-action" before the round — once the timer starts, you want to be writing strategy refinements, not the physics loop.
+
+Practice prompting an AI assistant in a constrained, iterative loop: small targeted edits, not full rewrites. The interview scores the loop, not the final code.
+
+Anchor on the live replay panel from minute one. Even on the coin variant where the failure modes are less intuitive, watching a single playthrough beats hours of reading test traces.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

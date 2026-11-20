@@ -1,0 +1,51 @@
+===H1===
+Vowel-Wrapped Substring Middle Reverse
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/vowel-wrap-reverse-middle
+===BODY===
+Capital One
+Coding·70 minMembers
+Vowel-Wrapped Substring Middle Reverse
+Given a string, identify substrings whose first and last characters are both vowels, then reverse the substring between them. The exact selection rule (all such substrings? maximal ones? non-overlapping?) is under-specified in the prompt — clarify or stick to the simplest interpretation.
+SWE
+string
+string-processing
+easy
+oa
+codesignal
+ambiguous-spec
+Frequency
+Single report
+Last asked
+2026-01-19
+Stage
+oa
+Requirements
+
+Input: a string s.
+
+For each contiguous substring of length ≥ 2 whose first and last characters are both vowels (a, e, i, o, u, case-insensitive), reverse the characters between them in place.
+
+Return the resulting string.
+
+The prompt is brief and does not specify whether to apply this to every such substring (which would conflict), only maximal ones, or only the outermost wrapper. The safe interpretation under time pressure is: scan once, for each vowel position find the next vowel position, reverse the strictly-interior characters, then continue from after the second vowel.
+
+Notes
+
+Maintain a vowel set, scan linearly tracking the index of the most recent vowel. When a new vowel is seen at index j and the previous vowel was at index i, reverse s[i+1:j] in a mutable buffer.
+
+The interpretation matters: "every substring whose first/last are vowels" is ill-defined because reversals on overlapping ranges are non-commutative. Most candidates land on the consecutive-vowel-pair rule above; clarify on the spot if possible.
+
+Convert to a list before reversing; Python strings are immutable.
+
+Preparation
+
+Practise the consecutive-vowel-pair sweep on "abcdefg" and "aabbeecciio" to make sure the iteration cursor advances past j and does not double-count.
+
+If asked the ambiguous case during the live attempt, name two interpretations, pick the simpler one with a sentence of justification, and continue — Capital One grades the disambiguation reflex on this category of problem.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

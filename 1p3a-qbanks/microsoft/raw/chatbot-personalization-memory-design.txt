@@ -1,0 +1,65 @@
+===H1===
+Chatbot Personalization / Memory System Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/chatbot-personalization-memory-design
+===BODY===
+Microsoft
+System DesignMembers
+Chatbot Personalization / Memory System Design
+MAI / Copilot onsite system design: design the long-term memory and personalization layer behind a text chatbot — how to store, retrieve, and reconcile per-user history so responses are personalized without re-reading everything each turn.
+MLE
+SWE
+rag
+retrieval
+llm
+mlsd
+personalization
+Frequency
+Single report
+Last asked
+2026-05-21
+Stage
+onsite-system-design
+Requirements
+
+Design the personalization / memory subsystem for a text-only chatbot. Core functional requirements probed in the round:
+
+Persist per-user history and salient facts across sessions.
+
+On each turn, retrieve the relevant slice of a user's history to condition the response — a RAG-style retrieve-then-generate flow is the expected baseline.
+
+Reconcile conflicting information in a user's history: when stored facts contradict, decide what to surface.
+
+Bound the cost of growing history so retrieval stays cheap as a user accumulates months of conversation.
+
+Incorporate a feedback loop so the memory improves from signal on whether personalization helped.
+
+The interviewer drills each of these as a follow-up rather than expecting a full architecture up front.
+
+Notes
+
+The follow-ups candidates were pushed on:
+
+Conflict resolution — given contradictory facts in a user's history, how do you choose which to retrieve: recency, source confidence, explicit user correction, or a reconciliation pass.
+
+Latency — retrieving and re-embedding on every generation is expensive; the interviewer steers toward maintaining a pre-generated per-user summary (a rolling profile) read directly, with full retrieval reserved for the cases the summary does not cover.
+
+History overflow — when per-user history grows unbounded, summarize / compress older turns and keep an embedding index over the rest rather than retrieving raw transcripts.
+
+Feedback loop — close the loop on whether the personalized response landed and feed that back into what gets stored or up-weighted.
+
+No hard scale numbers are given; treat it as an open ML system-design round where stating your own assumptions (users, turns per user, embedding dimension, retrieval budget) is part of the signal.
+
+Preparation
+
+Sketch a RAG memory architecture end-to-end: write path (extract + embed + store salient facts), read path (retrieve top-k + rolling summary), and the generation-prompt assembly.
+
+Prepare a crisp answer for conflict reconciliation and for the summary-vs-full-retrieval latency trade-off — the two follow-ups every candidate hit.
+
+Be ready to bound history growth with hierarchical summarization and to describe the feedback signal you would log.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

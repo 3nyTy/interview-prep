@@ -1,0 +1,1289 @@
+{
+  "company": "goldmansachs",
+  "display_name": "Goldman Sachs",
+  "qbank_count": 39,
+  "questions_scraped": 39,
+  "site_total_count": 111,
+  "oj_count": 72,
+  "external_count": 0,
+  "description": "Goldman Sachs interview loops lean heavily on traditional LeetCode-style coding — the firm publishes its own tagged problem list on LeetCode, and the OA / phone screens recycle from a stable bank that maps closely to it. Behavioral signal is concentrated in a Hirevue video screen with tight 30-second prep windows, and quant-flavored desks (GSAM, Quant Engineering) layer probability and statistics drills on top of the standard coding bar.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/goldmansachs",
+  "scraped_at": "2026-09-20",
+  "source": "1point3acres qbank (logged-in session)",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "max-average-score-per-person",
+      "title": "Highest Average Score Per Person",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-15",
+      "stage": "oa · phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "hashmap",
+        "array",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "hashmap",
+        "array",
+        "easy"
+      ],
+      "overview": "Given a list of `(name, score)` records, return the highest per-person average score. A recurring Goldman warm-up that doubles as a follow-up about handling ties and streaming input.",
+      "source_count": 6,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/max-average-score-per-person"
+    },
+    {
+      "n": 2,
+      "slug": "role-permission-inheritance-overrides",
+      "title": "Role Permission Inheritance and Overrides",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-12",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "access-control",
+        "graph",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "access-control",
+        "graph",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Given a list of roles that may define a parent, an acceptlist, and a denylist, implement getPermission(role) to return the role's effective permissions. A child inherits its parent's permissions and overrides them with its own settings; the follow-up extends the model to multiple parents.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/role-permission-inheritance-overrides"
+    },
+    {
+      "n": 3,
+      "slug": "clay-workspace-resource-tree",
+      "title": "ClayWorkspace Resource Tree",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-06-21",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "object-design",
+        "tree",
+        "filesystem",
+        "data-structure",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "object-design",
+        "tree",
+        "filesystem",
+        "data-structure",
+        "medium"
+      ],
+      "overview": "Implement a `ClayWorkspace` backed by a dictionary of resource ids to `Resource` objects. The initial API creates resources and lists a folder's contents; the follow-ups add recursive deletion and moving a resource either to the home level or under another folder id.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/clay-workspace-resource-tree"
+    },
+    {
+      "n": 4,
+      "slug": "implement-deque",
+      "title": "Implement a Deque",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-06-18",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "linked-list",
+        "queue",
+        "data-structure",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "linked-list",
+        "queue",
+        "data-structure",
+        "easy"
+      ],
+      "overview": "Implement a string deque from scratch with addFirst/addLast, removeFirst/removeLast, peekFirst/peekLast, and getSize, all O(1). A doubly linked list is the expected backing structure; a Python list makes addFirst O(n), which the interviewer probes directly.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/implement-deque"
+    },
+    {
+      "n": 5,
+      "slug": "transaction-authorizer-fraud-checks",
+      "title": "Transaction Authorizer / Fraud Checks",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-02-12",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "object-design",
+        "hashmap",
+        "sliding-window",
+        "payment",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "object-design",
+        "hashmap",
+        "sliding-window",
+        "payment",
+        "medium"
+      ],
+      "overview": "Build an in-memory credit-card transaction authorizer. Start with globally blocked MCCs, add per-user blocked MCCs, then implement a rolling one-hour spend velocity limit.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/transaction-authorizer-fraud-checks"
+    },
+    {
+      "n": 6,
+      "slug": "movement-command-controller",
+      "title": "Movement Command Controller",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-02-05",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "simulation",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "simulation",
+        "easy"
+      ],
+      "overview": "Implement a simple up/down/left/right movement controller from a command string, then adapt it when command characters may mix uppercase and lowercase.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/movement-command-controller"
+    },
+    {
+      "n": 7,
+      "slug": "transaction-segments-increasing-subarrays",
+      "title": "Transaction Segments / Increasing Subarrays of Length K",
+      "category": "coding",
+      "duration": "120 min",
+      "frequency": "Single report",
+      "last_asked": "2025-11-25",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "sliding-window",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "sliding-window",
+        "easy"
+      ],
+      "overview": "Given transaction values over time, count contiguous segments of exactly length k whose values are strictly increasing from left to right. The prompt is a clean one-pass window / run-length counting problem from the 2026 Engineering OA.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/transaction-segments-increasing-subarrays"
+    },
+    {
+      "n": 8,
+      "slug": "ethernet-cable-square-count",
+      "title": "Ethernet Cable Square Count",
+      "category": "coding",
+      "duration": "180 min",
+      "frequency": "Single report",
+      "last_asked": "2025-09-22",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "RS"
+      ],
+      "tags": [
+        "math",
+        "grid",
+        "easy"
+      ],
+      "roles_slug": [
+        "rs"
+      ],
+      "tags_slug": [
+        "math",
+        "grid",
+        "easy"
+      ],
+      "overview": "For each grid query `(rows, columns)`, sum the number of possible `a × a` square selections for every side length `a` from 1 through `min(rows, columns)`.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/ethernet-cable-square-count"
+    },
+    {
+      "n": 9,
+      "slug": "equalize-letter-frequencies",
+      "title": "Equalize Letter Frequencies With Add / Remove",
+      "category": "coding",
+      "duration": "180 min",
+      "frequency": "Single report",
+      "last_asked": "2025-09-10",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "RS"
+      ],
+      "tags": [
+        "string",
+        "hashmap",
+        "greedy",
+        "medium"
+      ],
+      "roles_slug": [
+        "rs"
+      ],
+      "tags_slug": [
+        "string",
+        "hashmap",
+        "greedy",
+        "medium"
+      ],
+      "overview": "Given a lowercase string, each operation may add one letter or remove one existing letter. Return the minimum operations needed so every present letter has the same frequency.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/equalize-letter-frequencies"
+    },
+    {
+      "n": 10,
+      "slug": "encyclopedia-removal-grid",
+      "title": "Encyclopedia Removal Grid",
+      "category": "coding",
+      "duration": "180 min",
+      "frequency": "Single report",
+      "last_asked": "2025-09-08",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "grid",
+        "graph",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "grid",
+        "graph",
+        "medium"
+      ],
+      "overview": "A library shelf is an `n × m` grid of encyclopedias, each labeled by author. Selecting one encyclopedia removes all books by the same author in its row and column; minimize selections to clear the shelf.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/encyclopedia-removal-grid"
+    },
+    {
+      "n": 11,
+      "slug": "first-missing-positive",
+      "title": "First Missing Positive",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-06-09",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "hard"
+      ],
+      "overview": "Find the smallest positive integer missing from an unsorted array, in O(n) time and O(1) extra space. The cyclic-sort trick is the expected solution.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/first-missing-positive"
+    },
+    {
+      "n": 12,
+      "slug": "queue-extension-min-size-min-sum",
+      "title": "Extend Queue: Min-Size & Min-Sum Selector",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-06-09",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-structure",
+        "object-design",
+        "heap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "object-design",
+        "heap",
+        "medium"
+      ],
+      "overview": "Extend a basic `Queue` class with two selectors over a collection of queues: find the queue with the minimum size, and find the queue with the minimum sum of elements. Tests data-structure design and operation-cost trade-off discussion.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/queue-extension-min-size-min-sum"
+    },
+    {
+      "n": 13,
+      "slug": "longest-same-letter-substring",
+      "title": "Longest Substring of All Same Letter",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2024-11-21",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "two-pointer",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "two-pointer",
+        "easy"
+      ],
+      "overview": "Given a string, return the length of the longest contiguous substring consisting of a single repeated character. A simple linear-scan warm-up in VP-level phone screens.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/longest-same-letter-substring"
+    },
+    {
+      "n": 14,
+      "slug": "spiral-matrix-output",
+      "title": "Spiral Matrix Traversal",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2024-11-15",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "grid",
+        "simulation",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "grid",
+        "simulation",
+        "easy"
+      ],
+      "overview": "Output the elements of an `m × n` matrix in spiral order, walking from the outside layer to the innermost. A warm-up problem in GSAM Infra phone screens.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/spiral-matrix-output"
+    },
+    {
+      "n": 15,
+      "slug": "matrix-max-sum-path-no-repeat",
+      "title": "Maximum-Sum Path in a Matrix (No Revisits)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2024-11-15",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "grid",
+        "dfs",
+        "backtracking",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "grid",
+        "dfs",
+        "backtracking",
+        "hard"
+      ],
+      "overview": "Find the maximum-sum path through a matrix where cells may contain negative numbers and the path cannot revisit any cell. The hard follow-up to the spiral-matrix warm-up in GSAM Infra.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/matrix-max-sum-path-no-repeat"
+    },
+    {
+      "n": 16,
+      "slug": "second-smallest-unique-element",
+      "title": "Second-Smallest Unique Element",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2024-11-14",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "hashmap",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "hashmap",
+        "easy"
+      ],
+      "overview": "Return the second-smallest value among elements that occur exactly once in the input array. Intern-level Superday warm-up.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/second-smallest-unique-element"
+    },
+    {
+      "n": 17,
+      "slug": "longest-subarray-sum-at-most-k",
+      "title": "Longest Subarray With Sum ≤ K",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2024-10-26",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "sliding-window",
+        "array",
+        "two-pointer",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "sliding-window",
+        "array",
+        "two-pointer",
+        "easy"
+      ],
+      "overview": "Classic two-pointer / sliding-window: given an array of non-negative integers and a bound K, return the length of the longest contiguous subarray whose sum does not exceed K.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/longest-subarray-sum-at-most-k"
+    },
+    {
+      "n": 18,
+      "slug": "min-max-product-stream",
+      "title": "Min × Max Product After Push / Pop",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2024-10-26",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-structure",
+        "bst",
+        "streaming",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "bst",
+        "streaming",
+        "medium"
+      ],
+      "overview": "Maintain a multiset under a stream of push / pop operations and, after each operation, output the product of the current minimum and maximum elements. Tests whether the candidate reaches for a balanced BST / `TreeMap` rather than re-scanning.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/min-max-product-stream"
+    },
+    {
+      "n": 19,
+      "slug": "valid-triangle-point-inclusion",
+      "title": "Valid Triangle + Point Inclusion",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2024-10-26",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "math",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "math",
+        "medium"
+      ],
+      "overview": "Geometry OA: validate that three points form a real triangle, then classify whether each of two query points lies inside it. A coordinate-geometry exercise testing the area-sum invariant.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/valid-triangle-point-inclusion"
+    },
+    {
+      "n": 20,
+      "slug": "plus-multiply-even-odd-parity",
+      "title": "Plus-Multiply Even / Odd Parity",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2024-10-26",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "simulation",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "simulation",
+        "medium"
+      ],
+      "overview": "Walk the input array splitting it into even-index and odd-index streams; alternate `+` and `*` operations within each stream; compare the final parity of the two sums and return EVEN / ODD / NEUTRAL.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/plus-multiply-even-odd-parity"
+    },
+    {
+      "n": 21,
+      "slug": "chairs-restaurant-simulation",
+      "title": "Chairs / Restaurant Order Simulation",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2024-10-26",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "simulation",
+        "string",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "simulation",
+        "string",
+        "medium"
+      ],
+      "overview": "Given a sequence of customer / chair events (`C`, `R`, `U`, `L`), simulate the chairs required to seat every customer. The OA-bank version of an order-simulation problem Goldman has recycled across cycles.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/chairs-restaurant-simulation"
+    },
+    {
+      "n": 22,
+      "slug": "unique-pairs-difference-k",
+      "title": "Count Unique Pairs With Difference K",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2024-10-26",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "hashmap",
+        "set",
+        "array",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "hashmap",
+        "set",
+        "array",
+        "easy"
+      ],
+      "overview": "Count the number of unique pairs `(a, b)` in an integer array such that `b - a = k`. The variant where `k` may be zero is a common trip-up.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/unique-pairs-difference-k"
+    },
+    {
+      "n": 23,
+      "slug": "anagram-queries",
+      "title": "Anagram Queries on Word List",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2024-10-26",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "hashmap",
+        "sorting",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "hashmap",
+        "sorting",
+        "easy"
+      ],
+      "overview": "For each query string, return every word from a given word list that is an anagram of the query, sorted lexicographically.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/anagram-queries"
+    },
+    {
+      "n": 24,
+      "slug": "compliance-alert-sliding-window",
+      "title": "Compliance Alert / Trailing-Average Sliding Window",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2024-10-26",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "sliding-window",
+        "array",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "sliding-window",
+        "array",
+        "easy"
+      ],
+      "overview": "A compliance system raises an alert whenever the trailing-window average of call volumes exceeds a threshold. Count how many such alerts are raised over the full input. A sliding-window staple that recurs in Goldman's OA bank.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/compliance-alert-sliding-window"
+    },
+    {
+      "n": 25,
+      "slug": "palindromic-substrings",
+      "title": "Count Palindromic Substrings",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-08-29",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "RS"
+      ],
+      "tags": [
+        "string",
+        "palindromes",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "rs"
+      ],
+      "tags_slug": [
+        "string",
+        "palindromes",
+        "medium"
+      ],
+      "overview": "Count the total number of palindromic substrings in the input string. The canonical expand-around-center problem appears verbatim in both engineering and Quant Strats OAs, including a 30-minute coding segment for the 2027 summer-intern cycle.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/palindromic-substrings"
+    },
+    {
+      "n": 26,
+      "slug": "largest-tree-in-forest",
+      "title": "Largest Tree in a Forest",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-08-12",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "bfs",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "bfs",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Given a dict mapping child node id -> parent node id that encodes a forest, return the root id of the tree with the most nodes; on a tie, return the smallest root id. Build a parent->children adjacency list, find roots (ids that appear as a value but never as a key), and count each tree's size (e.g. BFS) in O(n). A newer variant supplies parent->child associations directly, so confirm the edge direction and whether the original tie-break still applies.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/largest-tree-in-forest"
+    },
+    {
+      "n": 27,
+      "slug": "first-unique-character",
+      "title": "First Unique Character",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2025-12-12",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "hashmap",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "hashmap",
+        "easy"
+      ],
+      "overview": "Return the first non-repeating character in a string. Recent CoderPad screens use it as the warm-up before Highest Average Score.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/first-unique-character"
+    },
+    {
+      "n": 28,
+      "slug": "efficient-tasks-three-server-difficulty",
+      "title": "Efficient Tasks / Three-Server Difficulty Split",
+      "category": "coding",
+      "duration": "120 min",
+      "frequency": "Low",
+      "last_asked": "2025-11-25",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "RS"
+      ],
+      "tags": [
+        "array",
+        "greedy",
+        "math",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "rs"
+      ],
+      "tags_slug": [
+        "array",
+        "greedy",
+        "math",
+        "medium"
+      ],
+      "overview": "Partition task difficulties across three servers, then each server chooses one task to minimize `|d1-d2| + |d2-d3|`; maximize that minimized value over all valid partitions. Multiple 2026 OA candidates describe this as the harder coding problem.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/efficient-tasks-three-server-difficulty"
+    },
+    {
+      "n": 29,
+      "slug": "process-starvation-time",
+      "title": "Process Starvation Time",
+      "category": "coding",
+      "duration": "180 min",
+      "frequency": "Low",
+      "last_asked": "2025-09-22",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "RS"
+      ],
+      "tags": [
+        "array",
+        "monotonic-stack",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "rs"
+      ],
+      "tags_slug": [
+        "array",
+        "monotonic-stack",
+        "medium"
+      ],
+      "overview": "Given process priorities executed from right to left, compute each process's starvation time: how long it waits after the earliest lower-priority process to its right starts running.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/process-starvation-time"
+    },
+    {
+      "n": 30,
+      "slug": "decode-ways",
+      "title": "Decode Ways / Alphanumeric Combination",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2025-07-11",
+      "stage": "oa · phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "dp",
+        "string",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "dp",
+        "string",
+        "medium"
+      ],
+      "overview": "Classic decode-ways DP: given a digit string, count the number of ways to decode it using the mapping A=1, B=2, …, Z=26. Appears verbatim on Goldman's OA bank.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/decode-ways"
+    },
+    {
+      "n": 31,
+      "slug": "merge-k-sorted-lists",
+      "title": "Merge K Sorted Lists (incl. K = 3)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2025-06-09",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "linked-list",
+        "heap",
+        "merge",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "linked-list",
+        "heap",
+        "merge",
+        "medium"
+      ],
+      "overview": "Merge K sorted linked lists into a single sorted linked list. Goldman has asked both the general K-list form and an explicit K=3 variant (\"merge three sorted lists in one go\").",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/merge-k-sorted-lists"
+    },
+    {
+      "n": 32,
+      "slug": "trapping-rain-water",
+      "title": "Trapping Rain Water",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2024-12-27",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Free preview",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "two-pointer",
+        "monotonic-stack",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "two-pointer",
+        "monotonic-stack",
+        "hard"
+      ],
+      "overview": "Given non-negative heights of bars, compute the total volume of water that can be trapped between them after rain. The single most recurring Goldman coding question — featured on its own tagged LeetCode list.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/trapping-rain-water"
+    },
+    {
+      "n": 33,
+      "slug": "string-compression",
+      "title": "String Compression (Run-Length)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2024-12-27",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "two-pointer",
+        "compression",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "two-pointer",
+        "compression",
+        "medium"
+      ],
+      "overview": "Run-length-encode a character array in place: `[a,a,b,b,c,c,c]` becomes `[a,2,b,2,c,3]`. Goldman's interviewers consistently expect the in-place version, not a fresh-allocation string output.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/string-compression"
+    },
+    {
+      "n": 34,
+      "slug": "hirevue-behavioral-six-questions",
+      "title": "Hirevue Behavioral Bank (6 Questions)",
+      "category": "behavioral",
+      "duration": "30 min",
+      "frequency": "Medium",
+      "last_asked": "2025-11-06",
+      "stage": "recruiter-screen",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "All"
+      ],
+      "tags": [
+        "bq",
+        "values",
+        "culture-fit",
+        "screening",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe",
+        "all-roles"
+      ],
+      "tags_slug": [
+        "bq",
+        "values",
+        "culture-fit",
+        "screening",
+        "easy"
+      ],
+      "overview": "The Goldman Hirevue is a 6-question recorded video interview, 30s prep + 2 min answer per question. Five questions rotate from a small behavioral bank focused on integrity, deadlines, teamwork, and ethics; the sixth is an engineering-specific closer.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/hirevue-behavioral-six-questions"
+    },
+    {
+      "n": 35,
+      "slug": "explain-recursion-no-cs-audience",
+      "title": "Explain Recursion to a Non-CS Audience",
+      "category": "behavioral",
+      "duration": "30 min",
+      "frequency": "Low",
+      "last_asked": "2024-12-05",
+      "stage": "recruiter-screen",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "All"
+      ],
+      "tags": [
+        "bq",
+        "verbal",
+        "cs-fundamentals",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe",
+        "all-roles"
+      ],
+      "tags_slug": [
+        "bq",
+        "verbal",
+        "cs-fundamentals",
+        "easy"
+      ],
+      "overview": "The engineering-specific closer of the Goldman Hirevue. Explain recursion to someone with no CS background — what it is, why one might use it, and an everyday analogy.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/explain-recursion-no-cs-audience"
+    },
+    {
+      "n": 36,
+      "slug": "quant-oa-math-probability-bank",
+      "title": "Quant OA Math / Probability Multiple Choice Bank",
+      "category": "other",
+      "duration": "180 min",
+      "frequency": "Medium",
+      "last_asked": "2026-08-29",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "RS",
+        "SWE"
+      ],
+      "tags": [
+        "probability",
+        "math-reasoning",
+        "verbal",
+        "medium"
+      ],
+      "roles_slug": [
+        "rs",
+        "swe"
+      ],
+      "tags_slug": [
+        "probability",
+        "math-reasoning",
+        "verbal",
+        "medium"
+      ],
+      "overview": "Goldman quant / engineering OAs include multiple-choice calculus, probability, statistics, and linear-algebra questions alongside coding. Recent examples cover constrained optimization, Laplace-style densities, covariance bounds, coin-run expectations, arc length, matrix inverses, rank inequalities, conditional probability, and standard errors.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/quant-oa-math-probability-bank"
+    },
+    {
+      "n": 37,
+      "slug": "horse-race-25",
+      "title": "25 Horses, 5 Lanes Puzzle",
+      "category": "other",
+      "duration": "30 min",
+      "frequency": "Single report",
+      "last_asked": "2025-06-09",
+      "stage": "onsite-coding · onsite-bq",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "math-reasoning",
+        "verbal",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "math-reasoning",
+        "verbal",
+        "medium"
+      ],
+      "overview": "25 horses, 5 lanes per race, no timer — only relative order within a race is observable. What is the minimum number of races needed to identify the top 3 fastest horses?",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/horse-race-25"
+    },
+    {
+      "n": 38,
+      "slug": "hash-collision-fundamentals",
+      "title": "Hash Collision: Causes, Resolution, Complexity",
+      "category": "other",
+      "duration": "30 min",
+      "frequency": "Single report",
+      "last_asked": "2024-11-21",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "cs-fundamentals",
+        "hashmap",
+        "verbal",
+        "complexity-analysis",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "cs-fundamentals",
+        "hashmap",
+        "verbal",
+        "complexity-analysis",
+        "easy"
+      ],
+      "overview": "Verbal CS-fundamentals question: explain time complexity of hashmap operations, the cause of hash collisions, and the standard collision-resolution strategies. Common in VP-level phone screens as a fit-and-fundamentals warm-up.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/hash-collision-fundamentals"
+    },
+    {
+      "n": 39,
+      "slug": "quant-strat-superday-probability-fixed-income",
+      "title": "Quant Strat Superday Probability + Fixed Income Drill",
+      "category": "other",
+      "duration": "45 min",
+      "frequency": "Low",
+      "last_asked": "2026-05-13",
+      "stage": "onsite-research · onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "RS"
+      ],
+      "tags": [
+        "probability",
+        "math-reasoning",
+        "domain-knowledge",
+        "verbal",
+        "medium"
+      ],
+      "roles_slug": [
+        "rs"
+      ],
+      "tags_slug": [
+        "probability",
+        "math-reasoning",
+        "domain-knowledge",
+        "verbal",
+        "medium"
+      ],
+      "overview": "Quant Strat Superday rounds combine probability brainteasers, short coding around stochastic processes, and fixed-income domain knowledge. The interview is verbal-heavy and rewards clear variable definitions and assumptions.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/goldmansachs/quant-strat-superday-probability-fixed-income"
+    }
+  ]
+}

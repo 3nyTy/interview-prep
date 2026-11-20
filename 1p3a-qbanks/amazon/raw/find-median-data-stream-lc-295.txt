@@ -1,0 +1,51 @@
+===H1===
+Find Median from Data Stream (LC 295)
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/find-median-data-stream-lc-295
+===BODY===
+Amazon
+CodingMembers
+Find Median from Data Stream (LC 295)
+The DSA round used LeetCode 295, Find Median from Data Stream: support inserting values from an ongoing stream and querying the current median.
+SWE
+data-structure
+streaming
+heap
+hard
+Frequency
+Low · New
+Last asked
+2026-09-01
+Stage
+onsite-coding
+Requirements
+
+Implement the LeetCode 295 data structure.
+
+Accept numbers from a stream one at a time.
+
+Return the median of all values inserted so far when queried.
+
+Notes
+
+Asked as the second problem in a DSA round that also included two Leadership Principles questions.
+
+Canonical structure: two heaps — a max-heap holding the lower half and a min-heap holding the upper half, rebalanced so their sizes never differ by more than one. Insert is O(log n); the median reads off the heap tops in O(1) — the larger heap's top on an odd count, the mean of both tops on an even count.
+
+Return the even-count median as a floating-point mean of the two tops; answers within 1e-5 are accepted, so plain float division is fine.
+
+Standard extensions to have ready: if all values fall in a small bounded range, counting buckets over that range replace the heaps; if only 99% do, keep the buckets and add two overflow containers for the tails.
+
+A Vancouver NG loop frames this as writing an API in an LLD round, following a Leadership Principles question.
+
+Preparation
+
+Implement the two-heap structure and test an interleaved add/query sequence by hand; in Python remember heapq is min-heap only, so negate values for the lower half.
+
+Rehearse the size-invariant argument in two sentences: which heap absorbs each new element, and when one element moves across to restore balance.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

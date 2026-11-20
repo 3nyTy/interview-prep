@@ -1,0 +1,42 @@
+===H1===
+Find Missing and Repeated Element
+===URL===
+https://www.1point3acres.com/interview/problems/company/akunacapital/find-missing-and-repeated-element
+===BODY===
+Akuna Capital
+CodingMembers
+Find Missing and Repeated Element
+Given an array of 1..n with exactly one value missing and one duplicated, return both. A long prose setup hides a missing-and-repeated-number problem; the expected approach is XOR in O(1) extra space, then write your own tests and discuss alternative (sum / sum-of-squares) methods.
+SWE
+bit-manipulation
+math
+array
+testing
+medium
+Frequency
+Single report
+Last asked
+2025-09-23
+Stage
+phone-screen
+Requirements
+
+A single-question Junior phone screen. After a long prose description, the task reduces to: given numbers that should be 1..n but with exactly one value missing and one value repeated, find the missing and the repeated value. Write your own test cases, then discuss alternative mathematical methods.
+
+Notes
+
+The XOR approach uses constant extra space: XOR all array elements with all of 1..n to get missing XOR repeated, then use the lowest set bit to split the numbers into two groups and recover each value. Be ready to compare it with the algebraic approach (set up two equations from the difference in sums and the difference in sums of squares, then solve for the two unknowns), and to discuss trade-offs in overflow and clarity.
+
+Because the round explicitly asks for your own tests, budget time to cover the missing-at-end, repeated-at-start, and single-element edge cases.
+
+Preparation
+
+Implement both the XOR partition method and the sum / sum-of-squares method.
+
+Write the tests first; the interviewer treats test design as part of the signal.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

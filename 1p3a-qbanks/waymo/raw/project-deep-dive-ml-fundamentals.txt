@@ -1,0 +1,78 @@
+===H1===
+Project Deep-Dive + ML Fundamentals Discussion
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/project-deep-dive-ml-fundamentals
+===BODY===
+Waymo
+Behavioral·60 minMembers
+Project Deep-Dive + ML Fundamentals Discussion
+MLE / senior loop round: walk through one or two past projects with an experienced interviewer who interrupts continuously to probe data scale, model choices, ablation results, and failure modes. Frequently bleeds into an ML fundamentals oral covering the candidate's stated areas of expertise.
+MLE
+RS
+behavioral
+deep-dive
+ml-knowledge
+presentation
+open-ended
+medium
+Frequency
+Low
+Last asked
+2026-05-13
+Stage
+onsite-deep-dive
+Requirements
+
+Present 1–3 past projects in depth, typically the projects listed on the candidate's resume.
+
+Interviewer drives the conversation — expect interruptions every 1–3 minutes with clarification or challenge questions.
+
+ML fundamentals overlay: derivations, loss design, evaluation metrics, debugging strategies, alternative approaches considered and rejected.
+
+For senior loops (L5+), be ready to discuss organizational context — who decided what, what tradeoffs were rejected, what would you do differently.
+
+Requirements (continued)
+
+No formal slide deck — the round is verbal. A whiteboard / shared doc is usually available for sketches.
+
+Notes
+
+Pick projects with depth. One deep project beats three shallow ones. The interviewer will spend 20+ minutes on a single project; choose projects where you can sustain a 'why did you choose X over Y' interrogation through 5 levels of detail.
+
+Number-anchor everything. Data scale (rows, GB, tokens), model size (params, FLOPS), training cost ($, GPU-hours), ablation deltas (point gains / regressions). Vague claims get probed mercilessly.
+
+Ablations are the strongest signal. A clean ablation table proves you ran the experiment yourself rather than reading about the result. Have 2–3 ablation findings memorized per project.
+
+Failure modes. Be transparent about what didn't work and why. 'We tried X, it underperformed because Y, so we switched to Z' is the strongest narrative shape.
+
+Boundary between your work and the team. Senior interviewers calibrate scope sensitively. Use 'I did X, the team owned Y, we collectively decided Z' — claiming team work as personal is a recurring red flag.
+
+ML fundamentals to refresh ahead of the round (selection depends on resume topics):
+
+Loss function derivations: cross-entropy + softmax, MSE, focal loss, contrastive losses.
+
+Optimizer behavior: SGD-momentum vs Adam, weight decay, warmup schedules.
+
+Regularization: dropout, weight decay, augmentation, early stopping.
+
+Evaluation: precision / recall / F1, calibration (ECE, reliability diagrams), distributional metrics (KS, Wasserstein).
+
+Common bug shapes: data leakage, label noise, train-test contamination, ablation confounds, evaluation distribution shift.
+
+Common round dynamics reported at Waymo. Interviewer politely re-directs ('that's an interesting tangent — let me bring you back to X'); time-box yourself accordingly. One reported failure mode is the interviewer re-directing repeatedly and the candidate not adjusting cadence.
+
+Preparation
+
+Prepare a 1-page outline per project: problem, data, approach, key decisions, ablations, results, lessons. Rehearse cold so you can hit any bullet within 30 seconds.
+
+Practice with a peer who interrupts aggressively; train yourself to context-switch without losing the thread.
+
+Refresh the ML fundamentals list above one week before the loop. Skim and re-derive on paper anything that doesn't snap back instantly.
+
+Pre-stage 2–3 'what would I do differently' reflections per project. These are the questions L5+ interviewers care most about.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

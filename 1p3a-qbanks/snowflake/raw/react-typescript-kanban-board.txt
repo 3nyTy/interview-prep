@@ -1,0 +1,118 @@
+===H1===
+React / TypeScript Kanban Board
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/react-typescript-kanban-board
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+React / TypeScript Kanban Board
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+Members
+React / TypeScript Kanban Board
+
+Build a React and TypeScript kanban board where tasks move between statuses through left/right controls rather than drag-and-drop. A required follow-up moves every just-updated task to the bottom of its destination status, followed by a scale discussion for 100,000 tasks.
+
+SWE
+react
+frontend
+typescript
+scaling
+medium
+Frequency
+Single report
+Last asked
+2026-08-15
+Stage
+onsite-coding
+Requirements
+Use React and TypeScript to build a small kanban board whose tasks are grouped by status.
+Do not implement drag-and-drop. Each task instead has left and right controls for moving to an adjacent status.
+Hide a direction control when the task cannot move farther in that direction.
+Implement the first follow-up: whenever a task's status changes, place that task at the bottom of its destination status.
+Discuss the second follow-up: how the design changes when the board contains 100,000 tasks, including rendering and state-update costs.
+Notes
+Keep the status order in one constant and route every left / right click through a single reducer action. Reject moves past either boundary, remove the task ID from its source list, update its status once, and append the ID to the destination list; the destination-append invariant implements the ordering follow-up directly.
+Normalize state as tasksById plus one ordered task-ID list per status. This avoids filtering the full task collection for every column and confines a move to the source list, destination list, and one task record. Use stable task IDs as React keys and keep reducer updates immutable.
+At 100,000 tasks, render only the visible rows in each column, memoize task rows, and profile reducer and rendering costs separately. Virtualization controls DOM size; normalized state controls update work, so one does not replace the other.
+Preparation
+Implement a pure MOVE_TASK reducer, then unit-test left and right moves, hidden controls at both outer statuses, and the rule that a moved task becomes the last ID in its destination list.
+Seed 100,000 synthetic tasks, add per-column virtualization, and use the React profiler to compare one move before and after normalization; verify that unaffected task rows do not all re-render.
+Trace two consecutive moves of the same task by hand to catch stale closures and accidental duplicate IDs before wiring the reducer to the UI.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Preparation
+Related discussions · 1
+🔑snowflake fullstack 写代码和系统设计
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Frontend Grid: Robot Eats Candies
+Single report
+frontend
+medium
+bfs
++2
+Serialize and Deserialize Dictionary Trie
+Single report
+medium
+trie
+compression
++2
+Word Search
+Single report
+medium
+grid
+backtracking
++1
+Forest Parent Array Delete Node
+Single report
+medium
+tree
+array
++1
+Throne Inheritance
+Single report
+medium
+tree
+hashmap
++1
+Code editor

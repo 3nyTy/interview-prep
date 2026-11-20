@@ -1,0 +1,154 @@
+===H1===
+Onsite System Design: Top-K Popular Items (Restaurant / Search)
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/onsite-sd-top-k-popular-items
+===BODY===
+Uber
+System Design·60 minMembers
+Onsite System Design: Top-K Popular Items (Restaurant / Search)
+Recurring onsite SD prompt. Design a service that returns the top-K most-popular items (food items per restaurant, restaurants per city, search queries) over a rolling window. Variants ask for offline batch, near-realtime, or per-restaurant slicing.
+SWE
+system-design
+streaming
+scaling
+storage
+hard
+Frequency
+Medium
+Last asked
+2026-03-24
+Stage
+onsite-system-design
+Requirements
+
+Functional:
+
+Ingest item-view / item-order events at high rate.
+
+Answer queries: "top K items for restaurant_id over the last N minutes / hours / days."
+
+Some variants ask for top K across an entire city or for the global Uber Eats search query distribution.
+
+A common sibling framing is "popular products for a shopping homepage": rank top K products by recent click count for homepage display, optionally segmented by market / category / device.
+
+Scale:
+
+1M+ events/sec aggregated globally.
+
+p99 query latency: 100–500 ms.
+
+K is small (10–100); N varies from 5 min to 30 days.
+
+Design decisions:
+
+Lambda architecture (batch + stream) vs pure streaming.
+
+Approximate top-K (Count-Min Sketch + min-heap) vs exact top-K.
+
+Per-restaurant slicing strategy.
+
+Notes
+
+Lambda architecture is the most-cited correct answer:
+
+Batch layer — daily MapReduce / Spark job on the event log produces an accurate top-K per restaurant per day.
+
+Speed layer — a streaming pipeline (Kafka + Flink) maintains a min-heap of size K per restaurant per recent time window using Count-Min Sketch for approximate counts.
+
+Serving layer — merges batch and streaming on read.
+
+For per-restaurant top-K with millions of restaurants, store the heap in Redis keyed by restaurant_id; partition by restaurant_id % shard_count.
+
+Approximation trade-off: Count-Min Sketch is O(width × depth) memory per restaurant. For high-cardinality keys (millions of items), this is the only tractable option; for low-cardinality keys (a single restaurant's menu) a plain hashmap works. At the tens-of-thousands-eps shopping-homepage scale, exact top-K in Flink state is a reasonable default unless pushed toward web-scale ad-click volumes.
+
+Hot key: a viral item in NYC can swamp a single shard. Mitigate with key-prefix sharding (restaurant_id + random_prefix) and client-side merge on read. At the stream layer, salt heavily-skewed keys in intermediate aggregation and use two-stage aggregation (below) so one overloaded top-K operator does not become the bottleneck.
+
+The interviewer frequently asks about API design follow-ups: pagination on K > 100, language localization (item name vs item id), and how to handle a delete (item removed from menu mid-window).
+
+Concrete sizing to anchor the round: at ~1M events/sec, batching writes in Flink at the minute grain cuts DB TPS by ~60×, which is what turns a single Postgres into a viable serving layer. Pair each per-restaurant min-heap with a Count-Min Sketch of width ~1000 × depth 5 for sub-1% error on the long tail.
+
+Window mechanics — minute buckets + rolling sum
+
+Avoid a naive "scan the last N hours of raw events on every update" design. The interview-ready window mechanism is:
+
+Compute 1-minute tumbling buckets per (segment_key, item_id).
+
+Maintain a rolling sum over the last N buckets (e.g. trailing 24h = 1,440 minute buckets), advancing the window by dropping the oldest bucket and adding the newest each minute.
+
+Publish refreshed rankings on a fixed cadence (every 1 minute).
+
+This keeps state bounded and avoids recomputing from raw logs per request. State is far easier to manage than a giant per-event sliding window — this is the answer to give when the interviewer pushes on sliding-window implementation detail. Window-size options to offer: 1h (trending, more volatile), 24h (stable popularity), or a blended score such as 0.7 * last_1h + 0.3 * last_24h. 7d is usually too stale for a homepage.
+
+Two-stage aggregation
+
+For segment-level top-K, prefer two keyed stages over a single operator:
+
+Stage 1 — key_by (segment_key, item_id) → maintain per-item windowed counts.
+
+Stage 2 — key_by segment_key → feed count updates into a top-K heap per segment, write the snapshot to Redis (popular:{segment_key}:trailing_24h -> [{item_id, score, rank}, …]).
+
+This isolates the high-cardinality counting from the low-cardinality ranking and naturally absorbs skew. Use event time (not processing time) for the windows so late / replayed events still land in the correct bucket.
+
+Segmentation
+
+Beyond global / per-restaurant / per-city, rankings are commonly sliced by market, category, device type, or anonymous-vs-signed-in. Encode the slice as a composite segment_key such as country:US:category:electronics; the read API maps query params to that key, and Flink flat_maps each event into all segments it belongs to before keying.
+
+Correctness — dedup, bots, weighted signals
+
+Dedup by event_id; filter known bot / internal traffic; optionally count only one event per user/session per item within a short interval (per-session throttling) so rankings can't be gamed.
+
+Popularity need not be raw clicks — support weighted engagement when asked: e.g. purchase = 10, add_to_cart = 3, click = 1, summed per item per window.
+
+Availability filtering on read
+
+A ranked item can go out of stock / be removed from the menu mid-window. Simplest robust answer: fetch more than K candidates from Redis (e.g. top 2K), then filter on read against the catalog availability cache and trim to K — otherwise a top-20 list can shrink below 20 when several ranked items are unavailable. Alternatively prefilter in the stream using catalog updates.
+
+Batch layer must not clobber fresh state
+
+When merging the lambda layers, the batch recomputation must not blindly overwrite the hot Redis ranking with delayed output. Pick one explicit policy and state it:
+
+batch is used for backfill / repair only;
+
+batch seeds a baseline and the speed layer applies fresh deltas on top;
+
+the serving layer merges batch truth with speed-layer freshness using a watermark.
+
+This prevents stale batch output from regressing fresher streaming results. Retain raw events in the lake so the batch layer can replay after logic bugs, recompute when ranking rules change, and rebuild Redis after an outage.
+
+Read API and event contract
+
+Interviewers frequently expect an explicit serving API, not just the pipeline — several candidates were prompted for it after skipping it. Sketch a precomputed-read API plus the ingestion event contract:
+
+# Homepage / top-K read — served from Redis snapshot, never computed on the request path.
+def get_top_k(segment: str, limit: int, window: str = "trailing_24h") -> list[dict]: ...
+    # GET /v1/home/popular-products?segment=global&limit=20
+    # Returns [{item_id, score, rank}, …] enriched with title/image/price; limit capped at K.
+    # Reads popular:{segment_key}:{window} from Redis, then filters out unavailable inventory.
+
+# Ingestion contract (Kafka): one event per engagement.
+# { event_id, item_id, user_id|null, session_id, country_code, category_id,
+#   device_type ∈ {web, ios, android}, event_ts }
+# Kafka partition key: item_id (keeps a product's events ordered together);
+#   repartition by segment_key inside Flink for the ranking stage.
+
+Examples
+
+Homepage request for segment=global, limit=20 → API computes segment_key, reads popular:global:trailing_24h from Redis, over-fetches ~40 candidates, drops any out-of-stock, returns the top 20 enriched with metadata — all without touching Flink.
+
+Preparation
+
+Memorize the Lambda architecture diagram (event source → Kafka → batch layer + streaming layer → serving layer → query API). Draw it in <3 minutes.
+
+Practice the Count-Min Sketch + min-heap pattern in code, even though the round is design-only — interviewers occasionally ask for pseudocode of the speed-layer update.
+
+Have one concrete numeric estimate ready: 1M events/sec × 1KB = 1GB/sec ingest, ~86TB/day raw — drives storage and retention decisions. For the shopping-homepage framing, anchor instead on ~200M clicks/day → ~2,300 eps average, ~46k eps peak (20×), ~9 MB/s raw ingress.
+
+Be ready to sketch both the tumbling and sliding window variants and explain why sliding requires minute-grain retention for decrements — interviewers flip between the two depending on whether the prompt is hourly trending or rolling 24h. Lead with minute buckets + rolling sum as the scalable implementation of the sliding variant.
+
+Rehearse the clarification opener: align on (1) popularity = clicks vs purchases vs weighted, (2) recency window, (3) global vs segmented — before drawing anything. Starting too fast and skipping requirement/API clarification is the most-reported trap.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

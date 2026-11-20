@@ -1,0 +1,139 @@
+===H1===
+Wiki Page Shortest-Click Path
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/wiki-page-shortest-path
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Wiki Page Shortest-Click Path
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+·
+50 min
+Members
+Wiki Page Shortest-Click Path
+
+Use a linked-page API to traverse an implicit web graph. Variants ask either for the shortest click distance to a target or for every reachable page, followed by a multithreaded traversal discussion.
+
+SWE
+bfs
+graph
+api-integration
+medium
+Frequency
+Low
+Last asked
+2026-07-21
+Stage
+phone-screen · onsite-coding
+Requirements
+A helper API is provided: get_linked_pages(uri: str) -> List[str] returns every page that the page at uri links out to.
+Implement: shortest number of clicks from start_uri to target_uri. Returning only the count is sufficient; the path itself is optional.
+The graph is implicit (only revealed by the API); pages can link back to each other, so the BFS must dedupe visited URIs.
+Some loops add a simulator follow-up: write your own toy get_linked_pages that serves from an in-memory adjacency dict, so the BFS implementation can be tested end-to-end.
+Examples
+get_linked_pages("A") -> ["B", "C"]
+get_linked_pages("B") -> ["D"]
+get_linked_pages("C") -> ["D", "E"]
+get_linked_pages("D") -> []
+
+shortest_clicks("A", "D")  # → 2
+
+Notes
+Canonical BFS: queue holds (uri, distance), a visited set prevents re-enqueueing the same URI. Return distance the first time target_uri is dequeued.
+Don't forget the special case start == target → 0 clicks.
+The API is the only way to read edges, so each get_linked_pages call is the expensive operation; minimizing the number of API calls is the natural complexity target. BFS calls the API exactly once per visited URI.
+Edge cases: target unreachable (return -1 or None per the interviewer's convention), cycles, self-link, target equals start.
+Bidirectional BFS is a reasonable optimization to mention but rarely required in the screen; it does help if both reverse-link enumeration and forward-link enumeration are available, which is typically not the case here.
+Alternate canonical variant — crawl all reachable pages
+Given one starting webpage and an API that returns its outgoing links, return every reachable page rather than a shortest-click count to a target.
+Explain the failure modes of a depth-first traversal and why a breadth-first traversal may be preferable for this version.
+Follow-up: parallelize the breadth-first traversal across multiple threads while preserving deduplication.
+Use a shared frontier queue and a thread-safe visited structure; make the visited check-and-add atomic before enqueueing so two workers cannot schedule the same page.
+Track queued plus in-flight work (or use an equivalent queue-completion primitive) for global termination; an empty queue alone is insufficient while workers may still discover links.
+Preparation
+Implement the BFS with an explicit visited set and (uri, distance) queue.
+Write a toy get_linked_pages backed by a dict-of-lists adjacency, run BFS on a hand-built 6-node graph, and verify against expected click counts.
+Be ready to discuss what changes if the API is rate-limited (batching, caching the linked-pages result) — Snowflake interviewers sometimes ask this as a soft follow-up.
+Implement the crawl-all variant with a bounded worker pool on a graph containing both a cycle and a diamond; assert that each URI is expanded exactly once and that workers terminate after all in-flight discoveries finish.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Examples
+Notes
+Alternate canonical variant — crawl all reachable pages
+Preparation
+Related discussions · 3
+🔑雪花 店面
+🔑雪花VO coding
+🔑雪花店面挂经
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Frontend Grid: Robot Eats Candies
+Single report
+bfs
+medium
+frontend
++2
+DAG Allow / Disallow Propagation
+Medium
+graph
+medium
+topological-sort
++2
+Service Failure Forensics
+Single report
+graph
+medium
+dfs
++2
+Grep With Context Lines
+Single report
+medium
+string-processing
+parsing
++1
+Top-K Search Terms (Per-User Deduped)
+Single report
+medium
+hashmap
+set
++2
+Code editor

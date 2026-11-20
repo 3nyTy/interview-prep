@@ -1,0 +1,81 @@
+===H1===
+Tetris-Style Figure Placement
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/tetris-figure-placement
+===BODY===
+Capital One
+Coding·70 minMembers
+Tetris-Style Figure Placement
+Given five fixed Tetris-like shapes and an arrival order, place each shape on an `n x m` grid at the smallest available row-then-column position and label the occupied cells with the shape's arrival number. Brute-force scan is the intended solution; code volume is the challenge.
+SWE
+MLE
+grid
+simulation
+medium
+oa
+codesignal
+Frequency
+Low
+Last asked
+2026-04-29
+Stage
+oa
+Requirements
+
+Input: grid dimensions n (rows) and m (columns), and an arrival list naming shapes from {A, B, C, D, E} in the order they should be placed.
+
+Shape definitions (1 = occupied cell, 0 = empty):
+
+A = [[1]]
+
+B = [[1, 1, 1]]
+
+C = [[1, 1], [1, 1]]
+
+D = [[1, 0], [1, 1], [1, 0]]
+
+E = [[0, 1, 0], [1, 1, 1]]
+
+For each arriving shape (0-indexed by i), scan the grid row by row, column by column, and place the shape at the first (r, c) where every cell the shape covers is currently 0 and the shape fits inside the grid. Fill the covered cells with i + 1 (so the first shape becomes 1, the second 2, and so on). If no position fits, skip that shape.
+
+Shapes do not rotate.
+
+Return the final grid.
+
+Examples
+
+For n=3, m=3, arrivals ["A", "C"]:
+
+After A: [[1, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]]
+
+After C: [[1, 2, 2],
+          [0, 2, 2],
+          [0, 0, 0]]
+
+Notes
+
+Encode each shape as a list of (dr, dc) offsets that are occupied. Trying to overlay the shape's full bounding box adds bug surface without saving work.
+
+Placement check per (r, c): every offset must satisfy 0 ≤ r+dr < n, 0 ≤ c+dc < m, and grid[r+dr][c+dc] == 0.
+
+The CodeSignal IDE blocks copy-paste, so writing the offset tables five times by hand wastes 5+ minutes. Define one helper place(shape_offsets, label) and call it per arrival.
+
+Complexity is O(arrivals · n · m · cells_per_shape); the constants are small enough that brute force passes all hidden tests at the listed limits.
+
+Total code volume is the largest of any recurring Capital One problem in the current rotation — budget at least 20 minutes and write the shape table first.
+
+Preparation
+
+Write the offset tables once and reuse them; practise typing them under timed conditions without copy-paste.
+
+Drill the placement loop on a 4x4 grid with ["D", "E", "A"]; both D and E are easy to misplace because their bounding boxes contain holes.
+
+Practise the skip behaviour — when an arriving shape does not fit anywhere, do not error out; just continue to the next.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,60 @@
+===H1===
+Odd Zero-Digit Count
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/odd-zero-digit-count
+===BODY===
+Capital One
+Coding·70 minMembers
+Odd Zero-Digit Count
+Given a non-negative integer array, count how many entries contain an odd number of the digit `0` in their decimal representation.
+SWE
+array
+math
+easy
+oa
+codesignal
+Frequency
+Single report
+Last asked
+2026-04-16
+Stage
+oa
+Requirements
+
+Input: a non-negative integer array a.
+
+For each num, count how many of its decimal digits are 0. If that count is odd, increment the answer.
+
+Special case: 0 itself has zero-digit count 1 (odd), so it contributes 1.
+
+Return the answer.
+
+Examples
+
+a = [20, 11, 10, 10070, 7]
+
+20    -> one 0    (odd)
+11    -> no 0s    (even)
+10    -> one 0    (odd)
+10070 -> three 0s (odd)
+7     -> no 0s    (even)
+
+Return 3
+
+Notes
+
+Mod-10 stripping loop is the canonical approach; converting to string and counting also works and is shorter.
+
+Treat num == 0 as a special case before the strip loop, otherwise the loop body never executes and zero-digit count comes out as 0 (even) instead of the intended 1.
+
+Preparation
+
+Two-minute implementation; the value of this problem on the OA is finishing it fast so the remaining 65 minutes go to the heavier problems.
+
+Drill the 0 special case so the muscle memory is automatic.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

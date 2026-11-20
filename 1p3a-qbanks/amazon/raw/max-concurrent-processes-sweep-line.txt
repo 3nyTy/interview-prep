@@ -1,0 +1,53 @@
+===H1===
+Maximum Concurrent Processes from Intervals
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/max-concurrent-processes-sweep-line
+===BODY===
+Amazon
+Coding·45 minMembers
+Maximum Concurrent Processes from Intervals
+Given process running intervals such as `[1,3]`, `[2,5]`, `[3,6]`, return the maximum number of processes running at the same time. Sweep-line endpoint ordering is the main edge case.
+SWE
+interval
+interval-aggregation
+sorting
+medium
+Frequency
+Single report
+Last asked
+2026-07-02
+Stage
+onsite-coding
+Requirements
+
+Input: a list of process runtime intervals, each [start, end].
+
+Return the maximum number of processes running concurrently over the timeline.
+
+Use a sweep line: add +1 at each start, -1 at each end, process events in time order, and track the maximum active count.
+
+Clarify endpoint semantics before coding: whether [1,3] and [3,6] overlap at time 3, and therefore whether starts or ends should be processed first at equal timestamps.
+
+Examples
+
+intervals = [[1,3], [2,5], [3,6]]
+
+Return the maximum active process count under the endpoint convention the interviewer confirms.
+
+Notes
+
+This is the Meeting Rooms / maximum-overlap family, but the process wording makes endpoint inclusivity important. Ask first; otherwise the example can produce different answers depending on whether end times are inclusive or half-open.
+
+A heap of end times also works after sorting by start time, but sweep-line events make the equal-time policy easier to state.
+
+Preparation
+
+Implement both versions: sorted start/end arrays and event sweep with tie-breaking.
+
+Hand-trace intervals that share endpoints so your code and explanation match the chosen interval convention.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

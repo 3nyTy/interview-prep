@@ -1,0 +1,835 @@
+===H1===
+Implement Circuit Breaker Pattern
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/circuit-breaker-pattern
+===BODY===
+Databricks
+CodingMembers
+Implement Circuit Breaker Pattern
+Design and implement circuit breakers for a database topology with one primary and two secondary replicas. Each server has its own breaker; two consecutive failures move it from CLOSED to OPEN, and requests must fall back to a replica when the primary is unavailable. The operation result is supplied through a lambda-style callback.
+SWE
+Infra Eng
+circuit-breaker
+state-machine
+concurrency
+medium
+Frequency
+Single report
+Last asked
+2026-08-28
+Stage
+phone-screen · onsite-coding
+Task Overview
+
+We need to build a Circuit Breaker. This is a design pattern used in systems with many parts (distributed systems). It stops one failure from causing everything else to fail.
+
+Think of it like an electrical circuit breaker in your house. If a service keeps failing, the breaker "opens." This stops requests from going to that service. This gives the service time to fix itself.
+
+Database-Topology Variant
+
+In the database-topology variant, route requests across one primary and two secondary replicas. Maintain an independent breaker for each server. Two consecutive failures open that server's breaker. Try the primary first; if it cannot serve the request, try the secondary replicas in a deterministic order. The operation result arrives through a lambda-style callback, so keep routing and breaker state separate from the database operation itself.
+
+Key Goals:
+
+Thread-safe: Multiple parts of the program can use it at the same time safely.
+
+Three States:
+
+CLOSED: Everything is working fine.
+
+OPEN: The service is broken. Requests are blocked.
+
+HALF_OPEN: We are checking if the service is fixed.
+
+Automatic Changes: It switches states automatically based on how many times it fails and how much time passes.
+
+Generic: It should work with any type of data result.
+
+Requirements
+
+We need to create a class called CircuitBreaker<T>. It wraps around an operation that might fail. It decides whether to run that operation based on the current state.
+
+1. The States
+
+CLOSED: Normal mode. Requests are allowed through.
+
+OPEN: The circuit is broken. Requests are blocked immediately.
+
+HALF_OPEN: Test mode. It lets one request through to see if the service is working again.
+
+2. How States Change
+
+CLOSED → OPEN: Happens when the number of failures hits a specific limit (threshold).
+
+OPEN → HALF_OPEN: Happens after a specific waiting time (timeout) ends.
+
+HALF_OPEN → CLOSED: Happens if the test request succeeds.
+
+HALF_OPEN → OPEN: Happens if the test request fails.
+
+3. Settings
+
+failureThreshold: How many failures in a row cause the circuit to open.
+
+recoveryTimeout: How long to wait before trying to recover.
+
+4. Public Methods (API)
+
+T call(Supplier<T> supplier): Runs the operation through the circuit breaker.
+
+String getState(): Returns the current state (CLOSED, OPEN, or HALF_OPEN).
+
+5. Database-Topology Variant
+
+Create one breaker per server rather than one breaker for the whole topology.
+
+Use a fixed threshold of two consecutive failures for each server.
+
+Attempt the primary first and fall back to the two secondary replicas when the primary cannot serve the request.
+
+Accept the database operation as a callback and use its outcome to update only the selected server's breaker.
+
+Usage Examples
+
+Example 1: Basic Failure Handling
+
+CircuitBreaker<String> breaker = new CircuitBreaker<>(3, Duration.ofSeconds(5));
+
+// First 3 failures
+for (int i = 0; i < 3; i++) {
+    try {
+        breaker.call(() -> {
+            throw new RuntimeException("Service down");
+        });
+    } catch (Exception e) {
+        System.out.println("Failed: " + e.getMessage());
+    }
+}
+
+// 4th attempt - circuit is now OPEN
+try {
+    breaker.call(() -> "Success");
+} catch (Exception e) {
+    System.out.println(e.getMessage()); // "Circuit is OPEN. Request blocked."
+}
+
+Example 2: Recovery After Waiting
+
+CircuitBreaker<Integer> breaker = new CircuitBreaker<>(2, Duration.ofSeconds(2));
+
+// Trigger failures to open circuit
+breaker.call(() -> { throw new RuntimeException("Fail"); }); // Fail 1
+breaker.call(() -> { throw new RuntimeException("Fail"); }); // Fail 2, circuit OPEN
+
+// Wait for recovery timeout
+Thread.sleep(2100);
+
+// Next call transitions to HALF_OPEN and tries the request
+Integer result = breaker.call(() -> 42); // Success! Circuit → CLOSED
+System.out.println(result); // 42
+
+Example 3: Failed Recovery
+
+CircuitBreaker<String> breaker = new CircuitBreaker<>(1, Duration.ofSeconds(1));
+
+// Open the circuit
+breaker.call(() -> { throw new RuntimeException("Fail"); });
+
+// Wait for timeout
+Thread.sleep(1100);
+
+// Recovery attempt fails - circuit goes back to OPEN
+try {
+    breaker.call(() -> {
+        throw new RuntimeException("Still failing");
+    });
+} catch (Exception e) {
+    System.out.println("Recovery failed");
+}
+
+// Circuit is OPEN again
+System.out.println(breaker.getState()); // "OPEN"
+
+Rules and Limits
+
+failureThreshold will be between 1 and 100.
+
+recoveryTimeout will be between 1ms and 1 hour.
+
+The code must be thread-safe (handle multiple users at once).
+
+It must work with any data type (T).
+
+Errors from the service must be passed back to the caller.
+
+Solution Approach
+
+How It Works
+
+To make this thread-safe without slowing things down, we use Atomic Variables. These allow us to update values safely without locking the whole system.
+
+Key Parts:
+
+Atomic Variables:
+
+We use AtomicReference for the State (OPEN/CLOSED).
+
+We use AtomicInteger to count failures.
+
+We use AtomicReference to store the time of the last failure.
+
+Changing States:
+
+Before running a task, we check the current state.
+
+We use "Compare-And-Set" (CAS). This ensures only one thread can change the state at a time.
+
+Handling Timeouts:
+
+We check the current time against the last failure time.
+
+If enough time has passed, we try to switch from OPEN to HALF_OPEN.
+
+Topology Orchestration
+
+Keep the server order and breaker state in separate structures. For each request, visit [primary, secondary_1, secondary_2] in order. Skip a server whose breaker rejects the attempt; otherwise invoke the callback for that server, record success or failure on that server's breaker, and return the first success. If all three attempts are rejected or fail, surface an unavailable result. A success resets only that server's consecutive-failure count. This preserves independent failure domains and deterministic failover.
+
+Complexity Analysis
+
+Time Complexity: O(1)
+
+Every operation (checking state, calling the function) takes constant time.
+
+Atomic operations are very fast and do not block.
+
+Space Complexity: O(1)
+
+We only store a few variables. The memory usage does not grow.
+
+Code Implementation
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.concurrent.atomic.*;
+import java.util.function.Supplier;
+
+public class CircuitBreaker<T> {
+
+    private enum State {
+        CLOSED, OPEN, HALF_OPEN
+    }
+
+    private final AtomicReference<State> state = new AtomicReference<>(State.CLOSED);
+    private final AtomicInteger failureCount = new AtomicInteger(0);
+    private final AtomicReference<Instant> lastFailureTime = new AtomicReference<>(null);
+
+    private final int failureThreshold;
+    private final Duration recoveryTimeout;
+
+    public CircuitBreaker(int failureThreshold, Duration recoveryTimeout) {
+        this.failureThreshold = failureThreshold;
+        this.recoveryTimeout = recoveryTimeout;
+    }
+
+    /**
+     * Execute the given supplier through the circuit breaker.
+     *
+     * @param supplier The operation to execute
+     * @return The result from the supplier
+     * @throws Exception If the circuit is OPEN or the supplier throws
+     */
+    public T call(Supplier<T> supplier) throws Exception {
+        Instant now = Instant.now();
+        State currentState = state.get();
+
+        // Check if circuit is OPEN
+        if (currentState == State.OPEN) {
+            Instant lastFailure = lastFailureTime.get();
+            if (lastFailure != null &&
+                Duration.between(lastFailure, now).compareTo(recoveryTimeout) > 0) {
+                // Try to transition from OPEN → HALF_OPEN
+                if (!state.compareAndSet(State.OPEN, State.HALF_OPEN)) {
+                    // Another thread beat us to it, reject this request
+                    throw new RuntimeException("Circuit is OPEN. Request blocked.");
+                }
+                // Successfully transitioned to HALF_OPEN, proceed with call below
+            } else {
+                // Timeout hasn't expired yet
+                throw new RuntimeException("Circuit is OPEN. Request blocked.");
+            }
+        }
+
+        // Execute the request
+        try {
+            T result = supplier.get();
+            onSuccess();
+            return result;
+        } catch (Exception e) {
+            onFailure();
+            throw e;
+        }
+    }
+
+    /**
+     * Handle successful execution.
+     * Reset failure count and close circuit if in HALF_OPEN state.
+     */
+    private void onSuccess() {
+        failureCount.set(0);
+        if (state.get() == State.HALF_OPEN) {
+            state.compareAndSet(State.HALF_OPEN, State.CLOSED);
+        }
+    }
+
+    /**
+     * Handle failed execution.
+     * Increment failure count and potentially open the circuit.
+     */
+    private void onFailure() {
+        int failures = failureCount.incrementAndGet();
+        lastFailureTime.set(Instant.now());
+
+        if (failures >= failureThreshold) {
+            state.set(State.OPEN);
+        } else if (state.get() == State.HALF_OPEN) {
+            // Recovery attempt failed, go back to OPEN
+            state.compareAndSet(State.HALF_OPEN, State.OPEN);
+        }
+    }
+
+    /**
+     * Get the current state of the circuit breaker.
+     *
+     * @return String representation of current state
+     */
+    public String getState() {
+        return state.get().name();
+    }
+}
+
+Why Use Atomic Operations?
+
+Alternative: Synchronized Methods
+
+We could use the synchronized keyword, like this:
+
+public synchronized T call(Supplier<T> supplier) throws Exception {
+    // State checking and execution
+}
+
+Comparison:
+
+ApproachProsCons
+Atomic OperationsDoesn't block threads (Lock-free). Faster when many people use it at once.The logic is harder to write because of CAS operations.
+SynchronizedEasier to understand. Guarantees safety.Threads have to wait in line. Slower when busy.
+
+Advice: Use atomic operations for production systems. The speed benefit is worth the extra effort.
+
+Unit Tests
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+public class CircuitBreakerTest {
+
+    @Test
+    public void testClosedState_successfulCalls() throws Exception {
+        CircuitBreaker<String> breaker = new CircuitBreaker<>(3, Duration.ofSeconds(5));
+
+        String result = breaker.call(() -> "success");
+
+        assertEquals("success", result);
+        assertEquals("CLOSED", breaker.getState());
+    }
+
+    @Test
+    public void testOpenState_afterThresholdFailures() {
+        CircuitBreaker<String> breaker = new CircuitBreaker<>(3, Duration.ofSeconds(5));
+
+        // Trigger 3 failures
+        for (int i = 0; i < 3; i++) {
+            try {
+                breaker.call(() -> {
+                    throw new RuntimeException("Service unavailable");
+                });
+            } catch (Exception e) {
+                // Expected
+            }
+        }
+
+        assertEquals("OPEN", breaker.getState());
+
+        // Next call should be blocked
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            breaker.call(() -> "test");
+        });
+        assertTrue(exception.getMessage().contains("Circuit is OPEN"));
+    }
+
+    @Test
+    public void testHalfOpen_successfulRecovery() throws Exception {
+        CircuitBreaker<Integer> breaker = new CircuitBreaker<>(2, Duration.ofMillis(100));
+
+        // Open the circuit
+        for (int i = 0; i < 2; i++) {
+            try {
+                breaker.call(() -> {
+                    throw new RuntimeException("Fail");
+                });
+            } catch (Exception e) {
+                // Expected
+            }
+        }
+
+        assertEquals("OPEN", breaker.getState());
+
+        // Wait for recovery timeout
+        Thread.sleep(150);
+
+        // Successful call should close the circuit
+        Integer result = breaker.call(() -> 42);
+
+        assertEquals(42, result);
+        assertEquals("CLOSED", breaker.getState());
+    }
+
+    @Test
+    public void testHalfOpen_failedRecovery() throws Exception {
+        CircuitBreaker<String> breaker = new CircuitBreaker<>(1, Duration.ofMillis(100));
+
+        // Open the circuit
+        try {
+            breaker.call(() -> {
+                throw new RuntimeException("Fail");
+            });
+        } catch (Exception e) {
+            // Expected
+        }
+
+        assertEquals("OPEN", breaker.getState());
+
+        // Wait for timeout
+        Thread.sleep(150);
+
+        // Failed recovery attempt
+        try {
+            breaker.call(() -> {
+                throw new RuntimeException("Still failing");
+            });
+        } catch (Exception e) {
+            // Expected
+        }
+
+        // Should be OPEN again
+        assertEquals("OPEN", breaker.getState());
+    }
+
+    @Test
+    public void testConcurrentAccess() throws InterruptedException {
+        CircuitBreaker<Integer> breaker = new CircuitBreaker<>(5, Duration.ofSeconds(1));
+        AtomicInteger successCount = new AtomicInteger(0);
+        AtomicInteger failureCount = new AtomicInteger(0);
+
+        // Simulate concurrent access
+        List<Thread> threads = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            final int id = i;
+            Thread thread = new Thread(() -> {
+                try {
+                    breaker.call(() -> {
+                        if (id % 3 == 0) {
+                            throw new RuntimeException("Simulated failure");
+                        }
+                        return id;
+                    });
+                    successCount.incrementAndGet();
+                } catch (Exception e) {
+                    failureCount.incrementAndGet();
+                }
+            });
+            threads.add(thread);
+            thread.start();
+        }
+
+        // Wait for all threads
+        for (Thread thread : threads) {
+            thread.join();
+        }
+
+        // Verify state is consistent
+        assertTrue(successCount.get() + failureCount.get() >= 10);
+    }
+
+    @Test
+    public void testResetFailureCountOnSuccess() throws Exception {
+        CircuitBreaker<String> breaker = new CircuitBreaker<>(3, Duration.ofSeconds(5));
+
+        // 2 failures (below threshold)
+        for (int i = 0; i < 2; i++) {
+            try {
+                breaker.call(() -> {
+                    throw new RuntimeException("Fail");
+                });
+            } catch (Exception e) {
+                // Expected
+            }
+        }
+
+        // Successful call should reset count
+        breaker.call(() -> "success");
+
+        assertEquals("CLOSED", breaker.getState());
+
+        // Should take 3 more failures to open
+        for (int i = 0; i < 2; i++) {
+            try {
+                breaker.call(() -> {
+                    throw new RuntimeException("Fail");
+                });
+            } catch (Exception e) {
+                // Expected
+            }
+        }
+
+        // Still closed after 2 failures
+        assertEquals("CLOSED", breaker.getState());
+    }
+}
+
+Bonus 1: Tracking Performance
+
+Question: How do we measure if the circuit breaker is working well in production?
+
+Solution: We can add a metrics system. This records when things succeed, fail, or get blocked.
+
+public interface CircuitBreakerMetrics {
+    void recordSuccess(long durationMs);
+    void recordFailure(long durationMs, Throwable error);
+    void recordRejection();
+    void recordStateTransition(String fromState, String toState);
+}
+
+public class CircuitBreaker<T> {
+    private final CircuitBreakerMetrics metrics;
+
+    public CircuitBreaker(int failureThreshold,
+                         Duration recoveryTimeout,
+                         CircuitBreakerMetrics metrics) {
+        this.failureThreshold = failureThreshold;
+        this.recoveryTimeout = recoveryTimeout;
+        this.metrics = metrics;
+    }
+
+    public T call(Supplier<T> supplier) throws Exception {
+        long startTime = System.currentTimeMillis();
+        State currentState = state.get();
+
+        if (currentState == State.OPEN) {
+            if (!shouldAttemptRecovery()) {
+                metrics.recordRejection();
+                throw new RuntimeException("Circuit is OPEN");
+            }
+            transitionTo(State.HALF_OPEN);
+        }
+
+        try {
+            T result = supplier.get();
+            long duration = System.currentTimeMillis() - startTime;
+            metrics.recordSuccess(duration);
+            onSuccess();
+            return result;
+        } catch (Exception e) {
+            long duration = System.currentTimeMillis() - startTime;
+            metrics.recordFailure(duration, e);
+            onFailure();
+            throw e;
+        }
+    }
+
+    private void transitionTo(State newState) {
+        State oldState = state.getAndSet(newState);
+        if (oldState != newState) {
+            metrics.recordStateTransition(oldState.name(), newState.name());
+        }
+    }
+}
+
+Important things to track:
+
+Success rate: How often calls work.
+
+Failure rate: How often calls crash.
+
+Rejection rate: How often the breaker blocks a call.
+
+Latency: How long calls take.
+
+Bonus 2: Deciding What Counts as a Failure
+
+Question: Currently, any error opens the circuit. What if we only want to open it for specific errors?
+
+Solution: We can pass a rule (Predicate) to the constructor. This rule decides if an error should count as a failure.
+
+import java.util.function.Predicate;
+
+public class CircuitBreaker<T> {
+    private final Predicate<Throwable> shouldCountAsFailure;
+
+    public CircuitBreaker(int failureThreshold,
+                         Duration recoveryTimeout,
+                         Predicate<Throwable> shouldCountAsFailure) {
+        this.failureThreshold = failureThreshold;
+        this.recoveryTimeout = recoveryTimeout;
+        this.shouldCountAsFailure = shouldCountAsFailure;
+    }
+
+    public T call(Supplier<T> supplier) throws Exception {
+        // ... state checking logic ...
+
+        try {
+            T result = supplier.get();
+            onSuccess();
+            return result;
+        } catch (Exception e) {
+            // Only count as failure if predicate matches
+            if (shouldCountAsFailure.test(e)) {
+                onFailure();
+            }
+            throw e;
+        }
+    }
+}
+
+// Usage examples:
+// Only count timeout exceptions
+CircuitBreaker<String> timeoutBreaker = new CircuitBreaker<>(
+    3,
+    Duration.ofSeconds(5),
+    e -> e instanceof TimeoutException
+);
+
+// Count all exceptions except validation errors
+CircuitBreaker<String> validationBreaker = new CircuitBreaker<>(
+    3,
+    Duration.ofSeconds(5),
+    e -> !(e instanceof ValidationException)
+);
+
+// Count only 5xx server errors for HTTP clients
+CircuitBreaker<HttpResponse> httpBreaker = new CircuitBreaker<>(
+    5,
+    Duration.ofSeconds(10),
+    e -> e instanceof HttpException && ((HttpException) e).getStatusCode() >= 500
+);
+
+Why do this?
+
+We can ignore user mistakes (like bad passwords).
+
+We focus on real system problems (like the server being down).
+
+Bonus 3: Smarter Failure Counting (Sliding Window)
+
+Question: Instead of counting consecutive failures, can we say "5 failures out of the last 10 requests"?
+
+Solution: Use a "Ring Buffer." This effectively keeps a list of the last X results.
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicReferenceArray;
+import java.util.function.Supplier;
+
+public class SlidingWindowCircuitBreaker<T> {
+
+    private enum State {
+        CLOSED, OPEN, HALF_OPEN
+    }
+
+    private static class CallResult {
+        final boolean success;
+        final Instant timestamp;
+
+        CallResult(boolean success, Instant timestamp) {
+            this.success = success;
+            this.timestamp = timestamp;
+        }
+    }
+
+    private final AtomicReferenceArray<CallResult> window;
+    private final AtomicInteger index = new AtomicInteger(0);
+    private final int windowSize;
+    private final int failureThreshold;
+    private final Duration recoveryTimeout;
+    private final AtomicReference<State> state = new AtomicReference<>(State.CLOSED);
+    private final AtomicReference<Instant> lastFailureTime = new AtomicReference<>(null);
+
+    public SlidingWindowCircuitBreaker(int windowSize,
+                                       int failureThreshold,
+                                       Duration recoveryTimeout) {
+        this.windowSize = windowSize;
+        this.failureThreshold = failureThreshold;
+        this.recoveryTimeout = recoveryTimeout;
+        this.window = new AtomicReferenceArray<>(windowSize);
+    }
+
+    public T call(Supplier<T> supplier) throws Exception {
+        // State checking logic (similar to before)
+        State currentState = state.get();
+
+        if (currentState == State.OPEN) {
+            if (!shouldAttemptRecovery()) {
+                throw new RuntimeException("Circuit is OPEN");
+            }
+            state.compareAndSet(State.OPEN, State.HALF_OPEN);
+        }
+
+        try {
+            T result = supplier.get();
+            recordResult(true);
+
+            if (state.get() == State.HALF_OPEN) {
+                state.compareAndSet(State.HALF_OPEN, State.CLOSED);
+            }
+
+            return result;
+        } catch (Exception e) {
+            recordResult(false);
+            checkAndUpdateState();
+            throw e;
+        }
+    }
+
+    private void recordResult(boolean success) {
+        int currentIndex = index.getAndIncrement() % windowSize;
+        window.set(currentIndex, new CallResult(success, Instant.now()));
+    }
+
+    private void checkAndUpdateState() {
+        int failureCount = 0;
+        int totalCount = 0;
+
+        for (int i = 0; i < windowSize; i++) {
+            CallResult result = window.get(i);
+            if (result != null) {
+                totalCount++;
+                if (!result.success) {
+                    failureCount++;
+                }
+            }
+        }
+
+        // Only evaluate if window has enough samples
+        if (totalCount >= windowSize && failureCount >= failureThreshold) {
+            lastFailureTime.set(Instant.now());
+            state.set(State.OPEN);
+        }
+    }
+
+    private boolean shouldAttemptRecovery() {
+        Instant lastFailure = lastFailureTime.get();
+        if (lastFailure == null) return true;
+
+        return Duration.between(lastFailure, Instant.now())
+                      .compareTo(recoveryTimeout) > 0;
+    }
+}
+
+// Usage:
+// Open circuit if 5 failures occur in last 10 requests
+SlidingWindowCircuitBreaker<String> breaker = new SlidingWindowCircuitBreaker<>(
+    10,  // window size
+    5,   // failure threshold
+    Duration.ofSeconds(5)
+);
+
+Pros: It is more accurate and handles random, one-off failures better.
+Cons: It uses more memory because we have to store the history.
+
+Bonus 4: Fallback Plans (Plan B)
+
+Question: What should we do when the circuit is open?
+
+Solution: We can define a "Fallback" strategy. This is a default action to take if the main action fails.
+
+import java.util.Optional;
+import java.util.function.Function;
+
+public class CircuitBreakerWithFallback<T> {
+    private final CircuitBreaker<T> circuitBreaker;
+    private final Function<Exception, Optional<T>> fallbackStrategy;
+
+    public CircuitBreakerWithFallback(
+            CircuitBreaker<T> circuitBreaker,
+            Function<Exception, Optional<T>> fallbackStrategy) {
+        this.circuitBreaker = circuitBreaker;
+        this.fallbackStrategy = fallbackStrategy;
+    }
+
+    public T callWithFallback(Supplier<T> supplier) {
+        try {
+            return circuitBreaker.call(supplier);
+        } catch (Exception e) {
+            Optional<T> fallbackResult = fallbackStrategy.apply(e);
+            if (fallbackResult.isPresent()) {
+                return fallbackResult.get();
+            }
+            throw new RuntimeException("Circuit breaker open and fallback failed", e);
+        }
+    }
+}
+
+// Usage examples:
+
+// 1. Return cached value
+CircuitBreakerWithFallback<UserProfile> cachedFallback =
+    new CircuitBreakerWithFallback<>(
+        breaker,
+        e -> cache.get(userId)
+    );
+
+// 2. Return default value
+CircuitBreakerWithFallback<List<Product>> defaultFallback =
+    new CircuitBreakerWithFallback<>(
+        breaker,
+        e -> Optional.of(Collections.emptyList())
+    );
+
+// 3. Chain multiple fallbacks
+Function<Exception, Optional<String>> chainedFallback = e -> {
+    // Try cache first
+    return cache.get(key)
+        // Then try secondary service
+        .or(() -> secondaryService.get(key))
+        // Finally return default
+        .or(() -> Optional.of("default"));
+};
+
+Where This Is Used
+
+Circuit breakers are very common in real software:
+
+Microservices: To stop one service failure from breaking the whole app.
+
+Databases: To stop sending requests to a database that is already overloaded.
+
+External APIs: To manage limits when calling other companies' APIs.
+
+Message Queues: To stop processing messages if the system meant to receive them is down.
+
+Preparation
+
+Draw the state table for one server, then trace two consecutive failures, an open-breaker rejection, and a later successful probe.
+
+Build a deterministic test harness with one primary and two secondary callbacks; verify primary success, primary-to-secondary fallback, all-server failure, and independent breaker counters.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

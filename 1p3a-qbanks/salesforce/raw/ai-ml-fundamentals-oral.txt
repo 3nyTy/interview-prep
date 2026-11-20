@@ -1,0 +1,74 @@
+===H1===
+AI / ML Fundamentals Oral Round (AI Engineer)
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/ai-ml-fundamentals-oral
+===BODY===
+Salesforce
+Other·45 minMembers
+AI / ML Fundamentals Oral Round (AI Engineer)
+Third virtual interview in the Salesforce AI Engineer (SMTS) loop. Verbal ML / LLM fundamentals quiz covering ML basics, model-serving practicalities, and LLM-specific concepts (Transformers, context engineering, RAG, grounding, guardrails). No coding; structured Q&A.
+MLE
+ml-knowledge
+llm
+transformer
+attention
+rag
+evaluation
+inference
+cs-fundamentals
+medium
+Frequency
+Single report
+Last asked
+2026-03-10
+Stage
+phone-screen · tech-screen
+Requirements
+
+Verbal-only round; no whiteboard coding expected (but be ready to sketch on shared whiteboard if asked).
+
+Three loose buckets of questions:
+
+ML basics: classification vs regression, F1 vs precision vs recall, what F1 means and when to prefer it, benchmarking methodology, train/val/test split discipline, common loss functions.
+
+Model serving / pipeline: model-inference optimisation (quantisation, batching, KV-cache, latency-throughput trade-offs), how to ship an AI agent as a service (state management, idempotency, observability, rollback).
+
+LLM-specific: Transformer architecture, attention mechanism intuition, context engineering vs prompting, retrieval-augmented generation (RAG) architecture, grounding (factuality / source-attribution), guardrails (content filters, jailbreak resistance, output validation).
+
+Notes
+
+The round rewards concept fluency over depth. Interviewers prefer a candidate who can string three related ideas together coherently (e.g. "context length grows quadratically in attention compute; we cache KV state across tokens to amortise; sliding-window attention bounds the active context") over one-word answers.
+
+F1-score: harmonic mean of precision and recall, 2PR/(P+R). Prefer over accuracy when classes are imbalanced. Know macro vs micro vs weighted variants.
+
+Classification vs Regression: discrete vs continuous output; different losses (CE vs MSE); different metrics. Be ready to give one example of each from a Salesforce-adjacent domain (lead-scoring, churn-prediction, sentiment).
+
+Benchmarking: held-out test set with the same distribution as production; track multiple metrics not just one; check for leakage between train and test; report confidence intervals when sample is small.
+
+Inference optimisation: batching (latency-throughput trade-off), KV-cache (avoid recomputing past attention), quantisation (FP16 / INT8 / INT4 — accuracy vs speed), speculative decoding, prompt caching.
+
+AI agent serviceization: stateful (conversation history) vs stateless (per-turn) request model; idempotency on retried tool calls; observability (per-turn trace, tool-call audit); rollback strategy (versioned prompts, A/B routing).
+
+Transformer: attention(Q,K,V) = softmax(QK^T / √d_k) V; multi-head splits the channel dim; positional encoding (sinusoidal vs learned vs RoPE); decoder uses causal mask. Know the d_model / d_k / h relationship.
+
+RAG: retriever (sparse BM25, dense embeddings, or hybrid) → top-k chunks → stuffed into prompt → LLM generates with citations. Know chunk-size trade-offs, the role of reranking, and how to evaluate (faithfulness, relevance, answer correctness).
+
+Grounding: tying outputs back to retrieved evidence; reduces hallucination; usually implemented as citations + source-attribution in the response.
+
+Guardrails: input filters (prompt-injection detection, PII scrubbing), output filters (toxicity, jailbreak detection, format validation), retrieval gating. Know one open-source library (NeMo Guardrails, Guardrails AI, Llama Guard) by name.
+
+Preparation
+
+Build a 1-page cheat-sheet covering each of the three buckets and rehearse a 60-90 second answer for each headline concept.
+
+For LLM specifically, refresh: attention formula, KV-cache mechanics, RAG end-to-end, grounding vs guardrails distinction, evaluation metrics (faithfulness, helpfulness, harmlessness).
+
+Practise narrating the inference-optimisation stack from scratch ("raw model → quantised → batched → KV-cached → speculative-decoded") — this is the question that most distinguishes prepared vs unprepared candidates.
+
+Read one current production LLM-serving guide and extract a concrete latency, throughput, batching, and rollback checklist.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

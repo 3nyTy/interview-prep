@@ -1,0 +1,66 @@
+===H1===
+ML Fundamentals & Model Debugging Drill
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/ml-fundamentals-and-model-debugging
+===BODY===
+Apple
+Other·45 minMembers
+ML Fundamentals & Model Debugging Drill
+Apple MLE loops repeatedly include verbal drills on model choice, evaluation, data processing, LLM concepts, ranking / ads models, GPU OOM, and production metric drops.
+MLE
+SWE
+ml-knowledge
+llm
+transformer
+evaluation
+ads
+debugging
+ab-testing
+medium
+Frequency
+Medium
+Last asked
+2026-09-01
+Stage
+phone-screen · onsite-deep-dive · onsite-system-design · final-round
+Requirements
+
+Be ready for a rapid-fire MLE round covering:
+
+Classification pipeline: data cleaning, feature construction, model choice, training, offline eval, online eval, and monitoring.
+
+LLM concepts: Transformer structure, SFT, DPO, prompt engineering, agents, MCP, knowledge distillation, and evaluation.
+
+Ads / ranking concepts: binary CTR prediction, DCN v1 vs v2, bidding objectives, CPA design, and A/B testing.
+
+Production debugging: online performance drops, GPU OOM, bad embeddings, metric regressions, and data drift.
+
+Domain adaptation: audio processing, image / video compression, multimodal embeddings, and model optimization.
+
+Inference & deployment: LLM latency and memory bottlenecks (KV cache, quantization, batching), and vision-encoder training basics for multimodal and video roles.
+
+For an ML-oriented SDE internship, discuss résumé research and Qwen fine-tuning experience, then answer LLM, traditional ML, and mathematics/statistics questions, including permutations and combinations.
+
+Notes
+
+The round often behaves like a checklist. Short, precise answers beat long tutorials. For every model or metric, connect it to the data shape and product objective: what is the label, what is delayed, what is biased, what can be measured online, and what failure would page the team.
+
+When asked to debug a model, structure the answer as data -> training -> serving -> metric -> user segment. For GPU OOM, mention batch size, activation checkpointing, mixed precision, sequence length, model parallelism, and memory leaks in the training loop.
+
+The summer 2026 internship variant placed this discussion in the second and final interview. The interview took place in 2025; its September 2026 publication date does not indicate a newly introduced round.
+
+Preparation
+
+Build a one-page ML system checklist you can recite: data, labels, model, loss, offline metrics, online metrics, serving, monitoring.
+
+Prepare compact explanations for Transformer attention, SFT vs DPO, distillation, embeddings, and prompt evaluation.
+
+Practice two debugging narratives: online CTR drops after deploy, and training crashes with GPU OOM.
+
+For ads roles, review calibration, delayed labels, auction objectives, and why offline AUC may diverge from business metrics.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

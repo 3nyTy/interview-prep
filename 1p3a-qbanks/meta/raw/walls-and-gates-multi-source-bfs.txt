@@ -1,0 +1,65 @@
+===H1===
+Walls and Gates / Max Area of Island
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/walls-and-gates-multi-source-bfs
+===BODY===
+Meta
+Coding·40 minMembers
+Walls and Gates / Max Area of Island
+LeetCode 286 (Walls and Gates) and LC 695 (Max Area of Island). Multi-source BFS for the distance-fill variant; matrix DFS for the area variant. Both surface as standard grid-traversal warm-ups at Meta.
+SWE
+MLE
+Infra Eng
+grid
+bfs
+dfs
+medium
+Frequency
+Low
+Last asked
+2026-04-21
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Walls and Gates (LC 286)
+
+Grid of INF (empty), -1 (wall), 0 (gate).
+
+Fill every empty cell with the distance to the nearest gate.
+
+Multi-source BFS from all gates simultaneously is O(mn); single-source BFS per gate is O(mn × #gates) and rejected.
+
+Max Area of Island (LC 695)
+
+Grid of 0/1; return the area of the largest 4-connected island of 1s.
+
+DFS / BFS per unvisited 1, tally cells, take the max.
+
+Examples
+
+LC 286: a 4×4 grid with two gates fills empty cells with their Manhattan-distance-to-nearest-gate.
+
+LC 695: [[0,1,1],[1,1,0],[1,0,1]] → 5.
+
+Notes
+
+The multi-source BFS pattern (start all sources in the initial queue) is the Meta-signature variant — drill it.
+
+Common bug in DFS: not marking visited until after the recursive call returns, causing redundant work.
+
+Walls and Gates extends naturally to LC 542 (01-matrix) and LC 994 (rotting oranges).
+
+Preparation
+
+Write multi-source BFS from memory in under 10 min.
+
+Drill LC 286 + 542 + 994 as a triplet (all multi-source BFS).
+
+For Max Area, practice both DFS and BFS implementations.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

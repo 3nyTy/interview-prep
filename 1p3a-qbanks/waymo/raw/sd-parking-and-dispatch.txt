@@ -1,0 +1,69 @@
+===H1===
+System Design: Parking Lot + Robotaxi Dispatch
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/sd-parking-and-dispatch
+===BODY===
+Waymo
+System Design·60 minMembers
+System Design: Parking Lot + Robotaxi Dispatch
+Onsite system design: model a parking lot for an autonomous fleet, with vehicles cycling between charging spots, maintenance bays, and idle spots. Riders arrive at the lot entrance and the system dispatches the next available vehicle. Discuss performance metrics that capture both rider experience and fleet utilization.
+SWE
+system-design
+scheduling
+queueing
+data-modeling
+hard
+Frequency
+Single report
+Last asked
+2025-09-29
+Stage
+onsite-system-design
+Requirements
+
+Model an AV depot containing N parking spots, of which some are charging-enabled, some are maintenance bays, and the rest are idle spots.
+
+Vehicles transition between states: in-service → idle → charging → maintenance → idle, with constraints on dwell times and resource availability.
+
+Riders arrive at the depot exit and are matched to the next available vehicle; the matching policy must minimize rider wait while keeping the fleet healthy (battery, maintenance schedule).
+
+Define and rank the metrics that should govern the operating policy.
+
+Notes
+
+Entities and state machine. Vehicle states (in-service, idle-no-charge, idle-charging, idle-maintenance, out-of-service). Transitions are driven by battery level, scheduled maintenance, rider demand. Sketch the state machine before the dispatch logic.
+
+Spot allocation. Treat the depot as a resource pool partitioned by spot type. Use priority queues per spot type (charging, maintenance, idle) ordered by 'time the vehicle has waited.' On arrival, place the vehicle in the highest-priority resource it needs and is eligible for.
+
+Dispatch logic. When a rider arrives, pick the candidate vehicle that minimizes a cost function: cost(v, rider) = wait_time + battery_penalty(v) + spot_disruption(v). The battery penalty deprioritizes near-empty vehicles; spot_disruption penalizes pulling a vehicle out of charging too early.
+
+Charging strategy. Two regimes: opportunistic (charge whenever spot is free) vs scheduled (charge during forecasted demand troughs). Opportunistic is simpler but causes contention at peak times; scheduled requires demand forecasting. Recommend a hybrid: always charge when battery < threshold, otherwise opportunistic.
+
+Maintenance scheduling. Periodic plus on-demand. Forecast maintenance windows from the on-board diagnostic stream and pre-allocate maintenance slots so a sudden flag doesn't block dispatch.
+
+Metrics.
+
+Rider-facing: median wait, P95 wait, abandonment rate.
+
+Fleet-facing: utilization (in-service vehicle-hours / available vehicle-hours), battery floor breaches, maintenance compliance rate.
+
+System-facing: depot turnover rate, queue depths per spot type.
+Surface the trade-off explicitly: aggressive dispatch maximizes rider experience but starves charging.
+
+Failure modes. A vehicle stuck in maintenance longer than scheduled, a charging spot offline, a rider arriving with no eligible vehicle. Each requires either a fallback (assign to next closest depot) or a graceful UX (push wait estimate + cancel option).
+
+Observability. Per-spot occupancy, per-vehicle state-duration histogram, dispatch decision audit log.
+
+Preparation
+
+Build the state machine first, dispatch logic second, metrics third. Most failures in this style of question come from jumping to the dispatch algorithm without explicit state modeling.
+
+Pre-stage 3–4 metrics per category (rider / fleet / system) and rank them; interviewers reliably ask 'which metric do you optimize first?'.
+
+Read one applied writeup on ride-hailing dispatch (Uber, Lyft, DiDi blog posts) to borrow the cost-function vocabulary.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

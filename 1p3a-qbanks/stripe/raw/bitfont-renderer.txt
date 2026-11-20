@@ -1,0 +1,105 @@
+===H1===
+BitFont / Bitmap Renderer
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/bitfont-renderer
+===BODY===
+Stripe
+Coding·60 minMembers
+BitFont / Bitmap Renderer
+Onsite coding. Take a bitmap-style ASCII glyph alphabet and render a string. Part 2 enforces a line-wrap width; later parts add a decoder/encoder that converts an arbitrary input through the bitmap glyphs.
+SWE
+string
+simulation
+medium
+Frequency
+Medium
+Last asked
+2026-05-01
+Stage
+onsite-coding
+Requirements
+
+You are building a text rendering system that displays characters using bitmap fonts. A bitmap font stores each character as a grid of pixels where a pixel is either on (filled) or off (empty). A character grid is a list of equal-length strings containing only 0 (off) and 1 (on); a font is a dict mapping each character name to its grid, e.g. {"face": "Simple Font", "chars": {"H": ["10001", ...], ...}}.
+
+Part 1 — render one character: convert a 0/1 grid into a picture, mapping 0 → . (empty) and 1 → # (filled). Returns a list of strings. Must work for any grid size.
+
+Part 2 — render a word: join the per-character grids side-by-side (no inter-letter spacing) into a single multi-row grid, then convert to symbols. All characters in a font share one height but may have different widths.
+
+Part 3 — compressed (RLE) fonts: decode Run-Length-Encoded rows back into full 0/1 strings, then render as in Part 1. Each row stores alternating run lengths starting from off: digits 0-9 mean lengths 0–9, letters a-z mean lengths 10–35 (a=10). Candidates rarely finish all three parts.
+
+Canonical signatures
+
+def render_character(grid: list[str]) -> list[str]: ...
+    # Map each cell: "0" -> ".", "1" -> "#". Any other char is invalid.
+    # Empty grid -> [], empty row -> "".
+
+def render_word(text: str, font: dict) -> list[str]: ...
+    # Empty text -> []. Height = len of the first char's grid.
+    # Concatenate the binary rows of every glyph FIRST (no spacing),
+    # THEN convert to "."/"#" via render_character. Glyphs may differ in width.
+
+def char_to_length(c: str) -> int: ...
+    # "0"-"9" -> 0..9 ; "a"-"z" -> 10..35 (ord(c) - ord('a') + 10).
+
+def decode_rle(encoded_rows: list[str]) -> list[str]: ...
+    # Each row: runs alternate off->on->off..., ALWAYS starting off (0).
+    # Emit char_to_length(c) copies of the current pixel, then flip.
+    # A run of length 0 emits nothing but STILL flips the next pixel state.
+    # All decoded rows end up the same width.
+
+def render_word_rle(text: str, font: dict) -> list[str]: ...
+    # decode_rle each glyph, concatenate row-by-row, then render_character.
+
+Examples
+
+Part 1: render_character(["0001000", "0101000"]) → ["...#...", ".#.#..."].
+
+Part 2: with glyphs H = ["10001","10001","11111","10001","10001"] and I = ["111","010","010","010","111"], render_word("HI", font) produces the two glyphs flush side-by-side ("#...####", "#...#.#.", …).
+
+Part 3: decode_rle(["532", "19"]) → ["0000011100", "0111111111"] (5 off, 3 on, 2 off; then 1 off, 9 on).
+
+Notes
+
+One report says the round requires cloning a repo to your laptop, fixing a GitHub issue, and writing test cases — only ~30 minutes of coding time after setup.
+
+Whether the round shows up as a self-contained editor task or as a repo task with pytest varies by interviewer.
+
+One report says "BitFont rarely appears" — so skipping it is risky; prep at least Parts 1 and 2.
+
+Clarifying questions worth asking
+
+Is there any spacing between letters? (Canonical: no — glyphs are flush.)
+
+Are all glyph heights equal? (Canonical: yes.)
+
+What if a letter is missing from the font, or the text contains newlines?
+
+Part 2 wrap variant
+
+Minority variant: some reports describe Part 2 as a phrase printer that wraps at a configured line width (e.g. 72 columns), breaking to a new line when the next glyph would exceed the limit — rather than the flush side-by-side concatenation above. The wrap logic is the most common trap: candidates frequently end up off by a column or fail the boundary case where one glyph exactly hits the width. Clarify before coding which Part-2 shape applies.
+
+Part 3 zero-length run trap
+
+A run length of 0 (digit 0, e.g. encoded "05" → ##### is 0 off then 5 on) emits no pixels but still consumes a turn — the state must flip to the next pixel value. Don't special-case zero by skipping the flip, or every subsequent run in that row inverts. Rows like "a0" (10 off, 0 on) and "05" (0 off, 5 on) exercise this directly.
+
+Part 2 / Part 3 height robustness
+
+The canonical contract is uniform glyph height, but a defensive render_word derives height from the first glyph and pads any shorter glyph's missing rows with "0" * glyph_width rather than indexing out of range. Mentioning this guard reads well even when the inputs are guaranteed uniform.
+
+Bonus — dispatch by font type
+
+A follow-up may ask for a single entry point that inspects the font and routes raw-binary fonts to render_word vs RLE fonts to render_word_rle, raising on unsupported fonts. The canonical dispatcher branches on the font's face name against a known set (raw-binary faces vs the RLE face) and raises ValueError on anything else; checking an encoding key instead is an equivalent shape — clarify which the font schema exposes.
+
+Preparation
+
+Pre-write a function that turns a 5-row glyph dictionary into a printable phrase, with width-based wrapping.
+
+Practice tight string-manipulation with carriage-free formatting — many candidates lose time debugging trailing spaces / newlines.
+
+Write a tiny test harness that compares your output to an expected multiline string with splitlines() to surface column-level diffs.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

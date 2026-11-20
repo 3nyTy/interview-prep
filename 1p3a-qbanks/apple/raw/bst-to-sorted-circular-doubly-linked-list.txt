@@ -1,0 +1,56 @@
+===H1===
+BST to Sorted Circular Doubly Linked List (LC 426)
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/bst-to-sorted-circular-doubly-linked-list
+===BODY===
+Apple
+CodingMembers
+BST to Sorted Circular Doubly Linked List (LC 426)
+Convert a binary search tree in place into a sorted circular doubly linked list, using each node's left pointer as `prev` and right pointer as `next`. Handle an empty tree, connect the final head and tail, and explain or sketch an iterative version.
+SWE
+tree
+bst
+linked-list
+tree-traversal
+recursion
+stack
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-coding
+Requirements
+
+Given the root of a binary search tree, convert the existing nodes in place into a sorted circular doubly linked list.
+
+Reuse left as the previous pointer and right as the next pointer.
+
+Preserve sorted order.
+
+Connect the head and tail in both directions so the result is circular.
+
+Return null for an empty tree.
+
+Follow up with an iterative version using an explicit stack.
+
+Notes
+
+An in-order traversal visits the nodes in sorted order. Keep head as the first visited node and previous as the most recently linked node. For each current node, set previous.right = current and current.left = previous when previous exists, then advance previous. After traversal, connect head.left to the final previous node and previous.right back to head.
+
+Do not run the circular-linking step on an empty tree. The iterative version keeps the same previous-node linking invariant while replacing recursion with an explicit stack. Both versions take O(n) time and O(h) traversal space, where h is the tree height.
+
+Preparation
+
+Implement recursive and iterative in-order versions.
+
+Dry-run empty, one-node, left-skewed, and right-skewed trees.
+
+Verify all four boundary links: head-to-next, tail-to-prev, head-to-tail, and tail-to-head.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

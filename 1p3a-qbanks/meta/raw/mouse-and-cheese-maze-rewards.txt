@@ -1,0 +1,67 @@
+===H1===
+Mouse and Cheese / Maze Rewards
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/mouse-and-cheese-maze-rewards
+===BODY===
+Meta
+Coding·40 minMembers
+Mouse and Cheese / Maze Rewards
+Meta-classic DP-on-grid: maximize reward collected along a path from corner to corner. Two confirmed variants — a memo-DP version, and an API-exploration version where only `move()` / `canMove()` are exposed (no global view).
+SWE
+MLE
+grid
+dp
+dfs
+backtracking
+medium
+Frequency
+Low
+Last asked
+2026-03-19
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Variant A — DP on grid
+
+m × n grid where each cell contains a reward (possibly 0 or negative).
+
+Path from (0, 0) to (m-1, n-1), moving right or down each step.
+
+Return the maximum total reward.
+
+dp[i][j] = grid[i][j] + max(dp[i-1][j], dp[i][j-1]).
+
+Variant B — API-exploration
+
+Maze is unknown; only move(dir) and canMove(dir) are exposed; isCheese() reveals the goal.
+
+Use DFS + backtracking with a relative coordinate system; restore robot pose every recursion (turn 180, move, turn 180).
+
+Examples
+
+Variant A: [[1,3,1],[1,5,1],[4,2,1]] → 12 (1→3→5→2→1 or 1→1→5→1→1, etc.).
+
+Variant B: standard 4-direction DFS with a visited: set[(x, y)] plus pose restoration.
+
+Notes
+
+Variant A is the more common ask; Variant B (API exploration) appears in MLE phone screens where Robot Room Cleaner is the inspiration.
+
+Common bug in B: forgetting to restore the robot's heading on the way back up the recursion.
+
+Follow-up to expect on A: "now you can move in 4 directions" — switches from DP to Dijkstra or Bellman-Ford (rewards can be negative).
+
+Preparation
+
+Write Variant A from memory in under 8 min.
+
+Drill Variant B's pose-restoration recursion pattern — write it twice.
+
+Practice the 4-direction follow-up: argue why DP breaks and Dijkstra is needed.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,79 @@
+===H1===
+Max Stack
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-max-stack
+===BODY===
+LinkedIn
+Coding·55 minMembers
+Max Stack
+LeetCode 716: implement a stack with `push`, `pop`, `top`, `peekMax`, and `popMax`. The `popMax` operation is the discriminator — the optimal answer is a doubly-linked list of nodes plus a TreeMap (or skip list) keyed on value, giving `O(log N)` for `popMax` and `O(1)` for the rest.
+SWE
+stack
+hashmap
+linked-list
+data-structure
+medium
+Frequency
+Low
+Last asked
+2026-03-02
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Implement:
+
+class MaxStack {
+    void push(int x);
+    int pop();
+    int top();
+    int peekMax();   // does not remove
+    int popMax();    // removes the maximum; if duplicates, removes the most recently pushed
+}
+
+The interviewer expects two solutions discussed:
+
+Two-stacks baseline — a value stack and a running-max stack. push/pop/peekMax are O(1); popMax is O(N) because the value has to be located and the stack rebuilt around it.
+
+Optimal — doubly-linked list + TreeMap. Each node is (value, prev, next). The TreeMap maps value -> stack of nodes with that value (use a TreeMap<Integer, Stack<Node>> in Java, SortedDict in Python). popMax is O(log N) — look up the tree's largest key, take the top of its node-stack, splice it out of the linked list.
+
+The interviewer aggressively probes whether every operation (including push) is keeping self.max consistent — a frequent bug is recomputing the max only inside peekMax and missing updates after pop/popMax.
+
+Follow-ups reported:
+
+popMax is not a frequent call. Discuss whether the design should change to favor cheaper push — the answer is generally no; the two-stacks baseline is already cheap on push, the question is whether the popMax worst-case is acceptable.
+
+Concurrency. Walk through which mutations need to be wrapped in a lock together to preserve invariants.
+
+Examples
+
+push 5    -> stack [5],         max = 5
+push 1    -> stack [5, 1],      max = 5
+push 5    -> stack [5, 1, 5],   max = 5
+peekMax() -> 5
+popMax()  -> 5  (removes the most recent 5; stack [5, 1], max = 5)
+top()     -> 1
+popMax()  -> 5  (stack [1], max = 1)
+top()     -> 1
+
+Notes
+
+"Most recently pushed" is the tiebreaker for duplicates — verify with the interviewer if not stated. This is what forces the per-value node-stack instead of a flat sorted set.
+
+LinkedIn-flavored grading watches whether self.max is updated on every operation; ad-hoc fixes during popMax only are penalized.
+
+The doubly-linked-list-plus-TreeMap pattern is reused in the LFU and rank-eviction cache problems — having one template covers all three.
+
+Preparation
+
+Implement the two-stacks baseline in < 6 minutes; treat it as the warm-up version you state out loud before coding.
+
+Implement the optimal version with linked list + TreeMap from scratch at least twice — the pointer surgery in popMax is where most candidates stumble under time pressure.
+
+Verbalize the invariant self.max == max(value for value in stack) and walk through each operation to show it holds.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

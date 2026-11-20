@@ -1,0 +1,87 @@
+===H1===
+Design a Collaborative Spreadsheet (Google Sheets)
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/google-sheets-design
+===BODY===
+Salesforce
+System Design·60 minMembers
+Design a Collaborative Spreadsheet (Google Sheets)
+Salesforce AI Engineer onsite system-design round. Design a web service like Google Sheets, with the interviewer steering focus onto the backend and data model — concurrency control for simultaneous editors, storage of large sheets, snapshot / version backup.
+MLE
+SWE
+system-design
+google-sheets
+concurrency
+data-modeling
+schema-design
+versioning
+snapshot
+websocket
+storage
+hard
+Frequency
+Single report
+Last asked
+2026-03-10
+Stage
+onsite-system-design
+Requirements
+
+Web-based spreadsheet: rows × columns of cells, each cell holds a value or a formula referencing other cells.
+
+Multi-user collaboration: many editors on the same sheet concurrently; edits propagate to all viewers in near-real-time.
+
+Persistence: a sheet survives server restarts; full history accessible (versioning / snapshots).
+
+Scale: very large sheets (millions of cells); some sheets are tiny.
+
+Interviewer explicitly emphasises backend + data models — frontend rendering and offline sync are out of scope.
+
+Notes
+
+Concurrency model is the load-bearing decision. Two well-known approaches:
+
+Operational Transformation (OT) — original Google Wave / Docs lineage. Each edit is a typed operation; the server transforms incoming ops against concurrent ops to converge replicas. High complexity, requires a central authority for ordering.
+
+CRDT (Conflict-free Replicated Data Types) — each cell modelled as a register/list CRDT; ops commute, allowing decentralised resolution. Higher metadata cost, simpler reasoning.
+State the trade-off explicitly and pick one. For a Sheets-class product, server-coordinated OT is the typical answer; CRDT shines when offline editing is in scope.
+
+Cell-level locking: an alternative for high-write cells is short-lived row/cell locks via Redis. Cheaper than OT/CRDT but creates contention on hot cells (the "total" cell with many incoming formulas).
+
+Data model: do not store a sheet as a dense rectangle. Use a sparse representation — (sheet_id, row, col) → value/formula. Most sheets are mostly empty. Index on (sheet_id, row) for row-range reads.
+
+Storage tiering: hot sheets in an in-memory store (Redis / Memcached) for low-latency reads; cold sheets in the primary DB; very-cold archives in object storage. Promotion / demotion driven by access frequency.
+
+Formulas are a deep dive: build a DAG of cell dependencies, recompute only the affected subtree on each change, detect cycles and surface as #REF errors. Use topological order for recompute; cache the DAG per sheet.
+
+Snapshot / version backup: append every committed op to a per-sheet log. Take a coalesced snapshot of the cell store at coarse intervals (every N ops or T minutes). Version restore = nearest snapshot + replay of subsequent ops.
+
+DB schema (sketch):
+
+sheets(id, owner_id, name, created_at, ...)
+
+cells(sheet_id, row, col, value, formula, updated_at) — PK (sheet_id, row, col), partition by sheet_id.
+
+sheet_ops(sheet_id, op_id, author_id, op_json, applied_at) — append-only op log for OT and version history.
+
+sheet_snapshots(sheet_id, snapshot_id, taken_at, blob_ref) — pointers to object storage.
+
+Real-time delivery: WebSocket per active session, fanned out from a per-sheet pub/sub channel. Server batches ops within a small window to reduce chatter.
+
+Permissions: read / write / share ACLs at the sheet level (and optionally cell-range level). Enforce on every op write.
+
+Preparation
+
+Draw the OT vs CRDT comparison so you can pick one in 60 seconds with a defensible reason.
+
+Practise the DAG-recompute logic on a 4-cell example with a cycle (so you can show cycle detection).
+
+Be ready for the snapshot-frequency calculation — given an op rate, what's the right snapshot cadence to keep restore time bounded?
+
+Prepare a one-line answer for hot-cell contention — "merge consecutive numeric updates server-side within a small window".
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

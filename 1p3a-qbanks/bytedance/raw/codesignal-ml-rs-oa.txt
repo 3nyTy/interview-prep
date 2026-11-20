@@ -1,0 +1,77 @@
+===H1===
+CodeSignal ML / Research Scientist OA (10-Problem Battery)
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/codesignal-ml-rs-oa
+===BODY===
+ByteDance / TikTok
+Coding·70 minMembers
+CodeSignal ML / Research Scientist OA (10-Problem Battery)
+10-question, 70-minute CodeSignal battery for ByteDance Research Scientist intern: a mix of ML multiple-choice on classical model trade-offs, a hand-computed forward pass, a local-maximum array algorithm, and from-scratch implementations of Bagging and k-Means.
+MLE
+RS
+ml-knowledge
+classification
+linear-algebra
+codesignal
+oa
+scikit-learn
+hard
+Frequency
+Single report
+Last asked
+2026-01-04
+Stage
+oa
+Requirements
+
+10 questions, mix of multiple-choice and code. Reported breakdown:
+
+Confusion matrix — choose the matrix satisfying Recall > 90% and FPR < 10%.
+
+Ensemble learning — multi-select on when ensembling helps vs. hurts (interpretability, training cost, overfitting, mixed-linearity datasets).
+
+Decision tree impurity — pick valid impurity measures (Entropy, Gini, Classification Error, etc.).
+
+Training loss diverges — multi-select rationale (regularization too high/low, step size too large, etc.).
+
+Overfitting diagnosis — given a fit-vs-validation plot, choose mitigations.
+
+GBM vs. Random Forest — for fast-baseline training, identify true comparative statements.
+
+NN forward pass by hand — compute the output of a 3-layer net with linear-linear-sigmoid activations and given weights, round to three decimals.
+
+Local maximum on a 1-D stream — given rawData and localArea, return every index i where the localArea neighbors on each side form strictly decreasing subsequences. If fewer than localArea neighbors exist on a side, use whatever is available.
+
+Bagging from scratch — fill in a template that bootstraps training samples for each base classifier, fits each independently, and combines predictions by majority vote. No library imports beyond what is given.
+
+k-Means from scratch — given input data, an integer k, initial centroids, and a number of iterations, return a cluster label per point. Standard assign-then-update loop.
+
+Notes
+
+The ML multiple-choice portion (Q1–Q6) is the canonical interview drill: bias-variance, ensembling cost vs. benefit, impurity measures, divergence diagnostics. Spend prep time here rather than trying to memorize new tricks.
+
+For Q7, write out each layer's arithmetic on scratch paper: z1 = W1·x, h1 = f1(z1), repeat, sigmoid the final logit. Three-decimal rounding catches careless arithmetic.
+
+For Q8 (local max), the brute-force O(n * localArea) scan suffices in the time budget; a monotonic-stack speedup is unnecessary for OA pass.
+
+For Q9 (Bagging), the assigning-by-majority-vote step is typically np.argmax(np.bincount(predictions)) per test point but watch for the "no external libraries" caveat — the template may restrict to base Python.
+
+For Q10 (k-Means), the assign step is argmin over k of squared distance; the update is per-cluster mean. Loop the requested number of iterations, do not stop early.
+
+Total budget is tight (70 min, 10 problems). Spend ≤ 5 min per MCQ and front-load the two from-scratch implementations.
+
+Preparation
+
+Brush up on the canonical ML conceptual quiz topics: bias-variance, overfit indicators, ensemble trade-offs, impurity functions, gradient-descent failure modes.
+
+Drill from-scratch implementations of Bagging classifier, k-Means clustering, and a 2-3 layer manual forward pass — each in ≤ 10 minutes from a blank file.
+
+Write a manual confusion-matrix calculator and an FPR / Recall reader so you can rapidly answer MCQ Q1.
+
+Practice the "local maximum on a stream" two-sided scan separately; the asymmetric-edge case (fewer than localArea neighbors on one side) is the most common source of wrong answers.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

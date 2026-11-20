@@ -1,0 +1,529 @@
+===H1===
+Notification System
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/notification-system
+===BODY===
+Roblox
+System DesignMembers
+Notification System
+Design a notification system with user preferences, fan-out, delivery channels, retries, and observability.
+SWE
+Infra Eng
+notification
+push-notification
+queueing
+scaling
+Frequency
+Single report
+Last asked
+2026-06-04
+Stage
+onsite-system-design
+Problem Statement
+
+Design a frontend notification system for user action items. The app should show notifications for things like expired passwords, friend activity, address updates, or other tasks the user may need to handle. Users should see an unread count, open a page with all notifications, and have a notification disappear when the related action item is completed. If the action item is not completed, the notification should persist.
+
+This is a frontend system design prompt. Assume backend services can create notification records and know when action items are completed, but design the client experience, API contract, state model, and component architecture in enough detail that a frontend team could implement it.
+
+Separate two concepts: read means the user has seen the notification, while resolved means the underlying action item is complete. The prompt says unresolved action-item notifications should persist even after being viewed.
+
+At staff / principal frontend level the same prompt is sometimes framed as "design a real-time notification system," and the interviewer pushes hard into the backend delivery path — fan-out on write vs. read, real-time push transport (WebSocket / SSE), delivery and de-duplication guarantees, and how the unread count stays consistent across devices. Be ready to defend the backend contract behind the client, not just the component tree.
+
+Phase 1: Requirements (~5-7 minutes)
+
+Functional Requirements
+
+Users should be able to see an unread notification count in the app shell.
+
+Users should be able to open a notifications page with all active notifications.
+
+Users should be able to view notification details and navigate to the related action.
+
+The system should mark notifications as read when viewed or explicitly dismissed from the unread bucket.
+
+The system should remove or hide action-item notifications only after the related action item is completed.
+
+Optional follow-ups:
+
+Real-time push updates while the user is online.
+
+Notification grouping by type or source.
+
+Per-type preferences.
+
+Archiving informational notifications.
+
+Cross-device read and resolved sync.
+
+Product Scope
+
+Assume these in scope:
+
+In-app notification bell and count.
+
+Notifications list page.
+
+Actionable notification rows with CTA buttons.
+
+Read/unread state.
+
+Resolved/persistent state.
+
+Client-side optimistic updates for read actions.
+
+Out of scope unless asked:
+
+Email, SMS, and push notification delivery infrastructure.
+
+Full backend event ingestion pipeline.
+
+ML ranking of notifications.
+
+Admin moderation tools.
+
+Non-Functional Requirements
+
+RequirementTargetWhy it matters
+Unread count latencyApp shell count loads under 300 ms after authUsers notice stale badges immediately
+List latencyP95 under 500 ms for first pageNotifications are a frequent navigation surface
+FreshnessNew action items appear within seconds to a minuteAction-required notifications should not lag too long
+CorrectnessResolved notifications should disappear across devicesUsers should not chase completed tasks
+ReliabilityRead state retries should be idempotentUsers may click, navigate, or refresh quickly
+AccessibilityBadge, row states, and CTAs usable by keyboard/screen readersCounts and urgency cannot rely on color alone
+
+Clarifying Questions
+
+Does opening a notification mark it read?
+Assume yes for the base design. The item can remain in the active list if unresolved.
+
+Can users dismiss unresolved action items?
+Assume no for required action items. Informational notifications can be archived as an extension.
+
+What removes a notification?
+The backend resolves it when the underlying action item is completed, for example password changed or address updated.
+
+Should notifications be real-time?
+Use initial fetch plus periodic refresh for the base design. Add SSE/WebSocket or push as a follow-up.
+
+Do notifications sync across devices?
+Yes. Read and resolved state are server state; client cache is only a local projection.
+
+Quick Capacity Sanity Check
+
+Client-facing assumptions:
+- A user may have 0-200 active notifications
+- The app shell only needs unread_count and maybe highest severity
+- The page loads 20-50 notifications per request
+- New notifications are low-frequency compared with normal app traffic
+
+Client implication:
+- Fetch a compact count endpoint in the shell
+- Fetch paginated notification records only on the notifications page
+- Merge real-time or polling updates into a normalized store
+
+The key product distinction is count versus list. The app shell should not download the full notifications list just to render a badge.
+
+Phase 2: Data Model (~8-10 minutes)
+
+Core Entities
+
+Notification
+- notification_id
+- user_id
+- type: password_expired | friend_activity | address_update | security | system
+- title
+- body
+- severity: info | warning | critical
+- created_at
+- read_at
+- resolved_at
+- expires_at
+- persistence_policy: until_resolved | until_read | until_expired
+- action_item_id
+- action_url
+- action_label
+- source
+- dedupe_key
+
+ActionItem
+- action_item_id
+- type
+- status: open | completed | canceled
+- target_entity_id
+- required: true | false
+- completed_at
+
+NotificationCount
+- unread_count
+- active_count
+- critical_count
+- generated_at
+
+ClientNotificationState
+- notification_id
+- pending_read: boolean
+- pending_archive: boolean
+- last_error
+
+State Semantics
+
+Unread:
+- read_at is null
+- Counts in the app-shell unread badge
+
+Read but unresolved:
+- read_at is set
+- resolved_at is null
+- Remains visible in the active list if persistence_policy is until_resolved
+
+Read informational:
+- read_at is set
+- resolved_at is null
+- Optional extension for persistence_policy until_read
+- Leaves the default active list after read because no required action remains
+
+Resolved:
+- resolved_at is set
+- Hidden from the default active list
+- May appear in history if product requires it
+
+Archived:
+- User-hidden informational notification
+- Not allowed for required action items in base design
+
+Screen Data Needs
+
+ScreenData Needed
+App Shell Bellunread count, critical count, latest timestamp
+Notifications Pagetitle, body, type, severity, read state, action CTA, created time
+Notification Rowaction URL/label, resolved/read status, icon type, loading state
+Action Flow Returnaction item status, related notification ID, updated counts
+
+Normalized Client Store
+
+entities:
+  notifications_by_id: notification_id -> Notification
+
+queries:
+  notification_page:{filter,cursor} -> notification_ids[], next_cursor
+  notification_count:{user_id} -> NotificationCount
+
+ui:
+  bell_popover_open
+  selected_notification_id
+  optimistic_read_ids
+  pending_navigation_action
+
+Do not remove a required action-item notification just because the user clicked it. Clicking can mark it read, but only action completion should resolve it.
+
+Phase 3: API Design (~15-20 minutes)
+
+Count API
+
+GET /api/v1/notifications/count
+
+{
+  "unread_count": 7,
+  "active_count": 12,
+  "critical_count": 1,
+  "generated_at": "2025-08-12T16:02:00Z",
+  "sync_token": "notif_sync_123"
+}
+
+List API
+
+GET /api/v1/notifications?filter=active&limit=30&cursor=opaque_cursor
+
+{
+  "notifications": [
+    {
+      "notification_id": "notif_123",
+      "type": "password_expired",
+      "title": "Update your password",
+      "body": "Your password has expired and must be updated.",
+      "severity": "critical",
+      "created_at": "2025-08-12T15:45:00Z",
+      "read_at": null,
+      "resolved_at": null,
+      "persistence_policy": "until_resolved",
+      "action_item_id": "action_password_123",
+      "action": {
+        "label": "Update password",
+        "url": "/settings/security/password"
+      }
+    },
+    {
+      "notification_id": "notif_456",
+      "type": "address_update",
+      "title": "Confirm your address",
+      "body": "Your saved address needs to be updated before your next purchase.",
+      "severity": "warning",
+      "created_at": "2025-08-12T15:30:00Z",
+      "read_at": null,
+      "resolved_at": null,
+      "persistence_policy": "until_resolved",
+      "action_item_id": "action_address_456",
+      "action": {
+        "label": "Update address",
+        "url": "/settings/address"
+      }
+    }
+  ],
+  "next_cursor": "cursor_2",
+  "sync_token": "notif_sync_124"
+}
+
+Mark Read API
+
+Use a bulk endpoint because users may open the page or mark multiple rows read at once.
+
+POST /api/v1/notifications/mark-read
+Content-Type: application/json
+Idempotency-Key: client_generated_uuid
+
+{
+  "notification_ids": ["notif_123", "notif_456"]
+}
+
+{
+  "updated": [
+    { "notification_id": "notif_123", "read_at": "2025-08-12T16:03:00Z" },
+    { "notification_id": "notif_456", "read_at": "2025-08-12T15:35:00Z" }
+  ],
+  "unread_count": 5
+}
+
+Resolve Update Path
+
+The client usually does not resolve directly. The related feature resolves the action item, then notification state updates from the server.
+
+POST /api/v1/account/password
+Content-Type: application/json
+
+{
+  "old_password": "...",
+  "new_password": "..."
+}
+
+{
+  "status": "updated",
+  "resolved_action_items": ["action_password_123"],
+  "notification_updates": [
+    {
+      "notification_id": "notif_123",
+      "resolved_at": "2025-08-12T16:05:00Z"
+    }
+  ]
+}
+
+The notifications page can also refresh after navigation:
+
+GET /api/v1/notifications/updates?since=notif_sync_124
+
+{
+  "updates": [
+    {
+      "notification_id": "notif_123",
+      "read_at": "2025-08-12T16:03:00Z",
+      "resolved_at": "2025-08-12T16:05:00Z"
+    }
+  ],
+  "unread_count": 5,
+  "active_count": 11,
+  "sync_token": "notif_sync_125"
+}
+
+Error Shape
+
+{
+  "error": {
+    "code": "NOTIFICATION_NOT_FOUND",
+    "message": "This notification is no longer active.",
+    "retryable": false
+  }
+}
+
+In the interview, narrate one concrete flow: the app shell fetches count, the user opens notifications, the client marks visible rows read, the user completes the password action, and the notification disappears only after the server returns a resolved state.
+
+Phase 4: High-Level Frontend Design (~10-15 minutes)
+
+Component Responsibilities
+
+ComponentResponsibilityState Owned
+AppShellLoads count after auth and displays global bellno notification entities
+NotificationBellShows unread count, critical indicator, optional mini previewpopover open/closed
+NotificationsPageOwns filters and paginationfilter, selected tab
+NotificationListRenders active notifications and load-more statevisible page window
+NotificationRowShows title, body, severity, read state, CTAtransient button loading
+NotificationDataLayerFetches count/list, retries, merges updatescache and request state
+Action DestinationCompletes password/address/etc. actionfeature-specific form state
+
+Client State Machine
+
+Notification row:
+unread_active -> marking_read -> read_active
+unread_active -> marking_read -> unread_active_with_error
+read_active -> action_in_progress -> read_active
+read_active -> resolved -> removed_from_active_list
+
+Count:
+unknown -> loading -> loaded
+loaded -> background_refreshing -> loaded
+loaded -> background_refreshing_failed -> stale_loaded
+
+App Shell Flow
+
+User signs in.
+
+AppShell requests /notifications/count.
+
+NotificationBell renders count and severity indicator.
+
+If count fetch fails, hide the number and expose a retry on popover open rather than blocking the app.
+
+Background refresh count on route changes, app focus, or a short interval.
+
+Notifications Page Flow
+
+Page requests first active notifications page.
+
+Rows render with severity, read state, timestamps, and CTA.
+
+When rows become visible or the page opens, call bulk mark-read if product chooses auto-read.
+
+Keep required action items visible after read.
+
+If the user clicks CTA, navigate with notification_id or action_item_id in route state when useful.
+
+When the user returns from the action flow, request notification updates and reconcile resolved rows.
+
+Optimistic Read Updates
+
+Optimistically updating read state is acceptable because read state is reversible from the user's perspective and does not affect the underlying action item.
+
+Click/open row
+-> set local read_at to now and decrement count optimistically
+-> POST mark-read
+-> if success: keep server timestamp and count
+-> if failure: restore unread state or refresh count
+
+Do not optimistically resolve required action items unless the action endpoint has actually succeeded.
+
+Optimistic read is fine. Optimistic resolution is risky because it can hide a password, address, or security action that the user still needs to complete.
+
+Phase 5: Deep Dive & Trade-offs (~8-10 minutes)
+
+Read vs. Resolve Trade-off
+
+State ChangeCan Be Optimistic?Why
+Mark readUsually yesLow-risk UI state; server can correct count
+Archive informational notificationSometimesAcceptable if undo/history exists
+Resolve required action itemNoHiding incomplete required work is a product correctness bug
+Unread count decrementYes, with reconciliationBadge should feel responsive but must sync across devices
+
+Polling vs. Real-Time Updates
+
+Base design:
+
+Fetch count on app load.
+
+Refresh count on app focus and route changes.
+
+Poll every 30-60 seconds if the product requires freshness.
+
+Fetch deltas after completing an action.
+
+Real-time follow-up:
+
+Use SSE for one-way notification updates while the app is open.
+
+Send events for notification.created, notification.read, and notification.resolved.
+
+Reconnect with Last-Event-ID or sync token.
+
+Fall back to polling when the connection fails.
+
+Grouping and Dedupe
+
+Some notification types should be grouped:
+
+Examples:
+- 12 friend activity events -> one grouped row
+- Multiple address reminders -> one persistent action row
+- Repeated password warnings -> one row updated with latest timestamp
+
+The backend should expose a stable notification_id and dedupe_key; the client should not infer grouping from title text.
+
+Cross-Device Consistency
+
+Read and resolved state are server-owned:
+
+Device A marks a notification read.
+
+Device B should see the updated unread count on the next count refresh or real-time update.
+
+If the same notification is resolved elsewhere, it should disappear from Device A's active list after sync.
+
+The client should tolerate 404 or already_resolved responses when acting on stale rows.
+
+Accessibility and UX Details
+
+Badge should have an accessible label such as "7 unread notifications."
+
+Critical notifications should use text/icon labels, not color alone.
+
+Rows should expose keyboard-focusable actions.
+
+Relative timestamps should include exact time in tooltips or accessible text.
+
+Loading skeletons should preserve row layout to avoid jumps.
+
+Testing Strategy
+
+Cover:
+
+Count loading, failed count, and stale count.
+
+Read versus resolved state transitions.
+
+Required action item remains visible after being read.
+
+Notification disappears after action completion update.
+
+Bulk mark-read idempotency and retry behavior.
+
+Cross-device update simulation with mocked delta events.
+
+Keyboard and screen-reader behavior for badge and rows.
+
+Common Pitfalls
+
+Treating read and resolved as the same state will produce the wrong product behavior. The prompt explicitly requires unresolved notifications to persist.
+
+Fetching the full notifications page just to render the app-shell badge is wasteful. Use a compact count endpoint.
+
+Letting the frontend directly decide that an action item is complete can hide required work. The feature-specific action endpoint or backend action-item service should resolve it.
+
+Interview Checklist
+
+  Define read, unread, active, resolved, archived, and required-action semantics.
+
+  Scope app shell count separately from notifications page.
+
+  Provide count, list, mark-read, and updates APIs.
+
+  Explain persistence until action completion.
+
+  Discuss optimistic read but server-confirmed resolution.
+
+  Cover polling versus SSE.
+
+  Include cross-device reconciliation.
+
+  Mention accessibility and tests.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

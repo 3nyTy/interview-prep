@@ -1,0 +1,142 @@
+===H1===
+Meeting Rooms / Interval Scheduling Variants
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/meeting-rooms-variants
+===BODY===
+Google
+Coding·45 minMembers
+Meeting Rooms / Interval Scheduling Variants
+LC 253 (Meeting Rooms II) appears in many forms across phone screen and onsite coding rounds — minimum number of rooms, room assignment, cyclic time, daily server jobs, gate entry/exit. Common follow-ups push toward sweep line, min-heap, or distributed processing.
+SWE
+MLE
+interval
+heap
+greedy
+medium
+Frequency
+High
+Last asked
+2026-09-01
+Stage
+phone-screen · tech-screen · onsite-coding
+Requirements
+
+The base task in every variant: given a list of intervals (start, end) — or pickup/return pairs, meeting time pairs, server job runs — answer one or more of:
+
+Min rooms / cars / servers needed to honor all intervals concurrently (the canonical min-meeting-rooms problem).
+
+Assignment: which interval goes to which room/car, so the caller can use the rental record.
+
+Single-interval overlap test between two intervals.
+
+Variant: parking-lot capacity
+
+Arrival and departure intervals represent cars occupying a parking lot. Compute the peak simultaneous occupancy using the same interval-overlap model.
+
+Variant: cyclic time (24h wrap)
+
+Intervals wrap around midnight; if an interval ends after the day boundary, it carries into the next day.
+
+Follow-up: "if N is huge, how do you optimize?" — expect a sweep-line discussion.
+
+Variant: daily-recurring server jobs
+
+Same set of jobs runs every day. If a job can't finish in one day, truncate at midnight and resume next day.
+
+A server can run multiple identical jobs that overlap on the same machine; different jobs need separate servers.
+
+Follow-up: a single job that runs many days needs its own dedicated server.
+
+Variant: on-call rotation consolidation
+
+Input: on-call rotations {name, start, end} using half-open intervals.
+
+Output maximal contiguous segments during which the active on-call set does not change; omit gaps with nobody on call.
+
+Segments are sorted by start, and names in each segment are the active set for that time range.
+
+Clean approach: sort starts, keep a min-heap by end time, and emit a segment whenever the next start or next end changes the active set.
+
+Variant: gate entry / exit with priority rules
+
+Array of (timestamp, action) where action ∈ {enter, exit}; each index is a different person.
+
+Return for each person what time they actually enter/exit, applying tie-break rules:
+
+If the prior tick had an enter, enter wins on a tie.
+
+If the prior tick had an exit, exit wins on a tie.
+
+If the prior tick had no activity, exit wins.
+
+Within the winning class, lower index wins.
+
+Optimization: instead of stepping time tick-by-tick, jump through the sorted input timestamps to reach O(n).
+
+Variant: Google Calendar free-time intersection
+
+Input: requested attendees plus each person's busy calendar intervals.
+
+Return every time range where all requested attendees are free.
+
+Normalize each person's busy blocks into free gaps, then intersect the candidate ranges across attendees.
+
+Variant: car-rental assignment
+
+Input: rental orders containing an order ID, pickup time, and return time.
+
+Assign every order to a car so that no assigned intervals overlap, minimize the number of cars, and return each car's complete order list. Model each car explicitly with its own rental record.
+
+A current output variant instead returns a dictionary from each reservation ID to its assigned car ID; the follow-up asks for the final fleet size.
+
+A return at time t and another pickup at time t may reuse the same car.
+
+Follow-up: if the fleet is capped at K cars and all requests cannot be served, define how the allocator detects and handles the failure.
+
+Variant: exact-concurrency intervals
+
+Compute the maximum number of simultaneously active meetings.
+
+Given a target concurrency X, also return every maximal time range during which exactly X meetings are active.
+
+Define the event ordering when one meeting starts at the same timestamp another ends; this choice controls whether a zero-width overlap is counted.
+
+On-call employee metadata variant
+
+Each duty record includes employee ID, employee name, start time, and end time. Return the employee count and identifying information for each time segment.
+
+Examples
+
+Canonical min-meeting-rooms example: [[0,30],[5,10],[15,20]] → 2.
+
+On-call consolidation: A[10,50], B[20,60], C[30,40], D[30,40] → [10,20]: A, [20,30]: A,B, [30,40]: A,B,C,D, [40,50]: A,B, [50,60]: B.
+
+Single-interval overlap: intervalsOverlap([1,5],[4,7]) → true.
+
+Long-running job: a 36-hour daily job is impossible under the truncate rule; reserve a separate server.
+
+Notes
+
+Asked in Round 1 coding, Round 2 onsite coding, phone screen, and as a warm-up in the FDE loop. Almost every other coding loop contains some flavor of this family.
+
+Interviewer commonly chains two follow-ups: (1) reconstruct assignment, (2) scale out to many shards / regions.
+
+For the assignment follow-up, min-heap keyed on end time is the clean answer: pop the earliest-ending room, push the new interval.
+
+For "distributed across shards", expect open-ended discussion: per-shard sweep, cross-shard merge, reconciliation; the interviewer often acknowledges the question is intentionally vague.
+
+The on-call metadata variant includes detailed complexity follow-ups: account for heap operations, stored employee information, and output size separately, and explain each symbol in the complexity expression.
+
+Preparation
+
+Drill three solutions cold: sweep-line / prefix delta, min-heap on end time, sort + greedy room assignment.
+
+Be ready to convert between the three when interviewers add follow-ups ("give me the assignment", "now handle cyclic days").
+
+Prepare a 1-minute pitch on map-reduce style sharding (per-shard intervals → merged timeline → global max).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

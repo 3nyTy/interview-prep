@@ -1,0 +1,44 @@
+===H1===
+Caesar Cipher with Case Preservation
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/caesar-cipher
+===BODY===
+Amazon
+CodingMembers
+Caesar Cipher with Case Preservation
+Onsite coding. Implement a Caesar cipher: shift each letter by a fixed amount, wrapping within A-Z and a-z separately and preserving case; leave non-letter characters (digits, symbols) unchanged. Follow-up: for very long strings (thousands of chars) the per-character `% 26` is repeated work and any given letter always maps to the same output, so precompute a 26-entry (or 52-entry) translation table once and index into it.
+SWE
+string
+string-processing
+easy
+Frequency
+Single report
+Last asked
+2026-06-22
+Stage
+onsite-coding
+Requirements
+
+Shift every alphabetic character by a fixed shift, wrapping within its own case band: A-Z wraps to A-Z, a-z wraps to a-z.
+
+Preserve case; leave non-letter characters (digits, punctuation, spaces) unchanged.
+
+Notes
+
+Per character: ('A' + (c - 'A' + shift) % 26) for uppercase, the analogous 'a' band for lowercase, passthrough otherwise. Normalize shift with shift % 26 (and handle negative shifts if decryption is in scope).
+
+Follow-up — long input: for thousands of characters, recomputing % 26 per character is redundant because every occurrence of a given letter maps to the same target. Precompute a fixed translation table once (26 entries per case band, or a full 256-entry byte map) and index into it per character — O(1) per char with no modulo in the hot loop.
+
+Mention that with a full byte/char lookup table the passthrough characters fall out for free (they map to themselves), simplifying the inner loop to a single array index.
+
+Preparation
+
+Write the modular version first, then refactor to a precomputed lookup table and articulate why it removes repeated work on long inputs.
+
+Cover edge cases in tests: shift larger than 26, negative shift, wrap at z/Z, and a mixed string with digits and symbols.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,240 @@
+===H1===
+Online Token Processing, Embeddings, and Classification
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/online-token-processing-embeddings-and-classification
+===BODY===
+Apple
+CodingMembers
+Online Token Processing, Embeddings, and Classification
+This is an Apple Machine Learning Engineer phone screen (Round 2). The interviewer gives you a stream of labeled text records and asks you to build an end-to-end pipeline that:.
+MLE
+medium
+streaming
+classification
+ml-knowledge
+Frequency
+Single report
+Last asked
+2025-12-11
+Stage
+phone-screen
+Problem Overview
+
+This is an Apple Machine Learning Engineer phone screen (Round 2). The interviewer gives you a stream of labeled text records and asks you to build an end-to-end pipeline that:
+
+Processes tokens online (one record at a time, no "pre-read the whole corpus" shortcut)
+
+Generates embeddings for each token / document
+
+Builds a classification model that trains on the stream and predicts for new records
+
+The shared-editor round is testing whether you can design a streaming training loop on the fly. The interviewer wants to see that you:
+
+Know the difference between offline batch training and an online update
+
+Can build a fixed-size hashed vocabulary so you do not need to see the whole corpus up front
+
+Can wire embedding lookup + a linear classifier + an online optimizer (SGD) in clean code
+
+Handle unseen tokens (hash collisions or OOV buckets) gracefully
+
+It is not asking you to pretrain word2vec or train a Transformer. Keep it simple: hashed token ids, an embedding table you update online, mean-pool for document vector, linear softmax head, SGD.
+
+Clarify Before Coding
+
+Streaming contract. Do you see each (text, label) once and must update immediately, or can you replay the stream? Assume single-pass online learning unless told otherwise.
+
+Label set. Binary or multi-class? Known ahead of time, or growing? Assume known fixed num_classes = C.
+
+Vocabulary growth. If tokens are not known ahead of time, you cannot allocate a dense embedding table. Two options: grow the vocab lazily (hash map + resize), or use a fixed-size hash bucket (feature hashing). Hashing is the online-friendly choice.
+
+Embedding dim. Small. 32 or 64 for a phone screen. Say why: online updates on a huge table are wasted compute.
+
+Optimizer. Plain SGD is fine. Mention Adagrad / Adam if pushed; Adagrad is the classic pick for online sparse features.
+
+Metrics. Running accuracy or log loss computed before each update gives you progressive validation without a held-out set.
+
+Problem Statement
+
+Implement a class with this shape:
+
+class OnlineTextClassifier:
+    def __init__(self, num_classes: int, vocab_size: int = 2**15, embed_dim: int = 32, lr: float = 0.1):
+        ...
+
+    def predict(self, text: str) -> int:
+        """Return predicted class id."""
+        ...
+
+    def observe(self, text: str, label: int) -> float:
+        """Update the model on (text, label). Return the loss before the update."""
+        ...
+
+observe is the streaming entry point. The training driver will call:
+
+model = OnlineTextClassifier(num_classes=C)
+for text, label in stream:
+    model.observe(text, label)
+
+Recommended Solution
+
+The pipeline: tokenize with a regex, hash each token into a fixed bucket, mean-pool the bucket embeddings into a document vector, linear layer to logits, softmax cross-entropy, backprop one step of SGD. NumPy is plenty; no frameworks needed.
+
+import re
+import numpy as np
+
+_TOKEN_RE = re.compile(r"[a-z0-9]+")
+
+class OnlineTextClassifier:
+    def __init__(
+        self,
+        num_classes: int,
+        vocab_size: int = 2**15,
+        embed_dim: int = 32,
+        lr: float = 0.1,
+        seed: int = 0,
+    ):
+        rng = np.random.default_rng(seed)
+        # Small init so early predictions are near-uniform.
+        self.E = rng.normal(0, 0.01, size=(vocab_size, embed_dim))     # (V, D)
+        self.W = np.zeros((embed_dim, num_classes))                    # (D, C)
+        self.b = np.zeros(num_classes)                                 # (C,)
+        self.vocab_size = vocab_size
+        self.embed_dim = embed_dim
+        self.num_classes = num_classes
+        self.lr = lr
+
+    # ---- feature extraction ----
+
+    @staticmethod
+    def _tokenize(text: str) -> list[str]:
+        return _TOKEN_RE.findall(text.lower())
+
+    def _token_ids(self, text: str) -> list[int]:
+        # Feature hashing: stable, no growing vocab, handles OOV by construction.
+        return [hash(tok) % self.vocab_size for tok in self._tokenize(text)]
+
+    def _doc_vector(self, ids: list[int]) -> np.ndarray:
+        if not ids:
+            return np.zeros(self.embed_dim)
+        return self.E[ids].mean(axis=0)                                # (D,)
+
+    # ---- forward ----
+
+    def _forward(self, ids: list[int]) -> tuple[np.ndarray, np.ndarray]:
+        x = self._doc_vector(ids)                                      # (D,)
+        logits = x @ self.W + self.b                                   # (C,)
+        # Numerically stable softmax.
+        logits = logits - logits.max()
+        exp = np.exp(logits)
+        probs = exp / exp.sum()                                        # (C,)
+        return x, probs
+
+    def predict(self, text: str) -> int:
+        _, probs = self._forward(self._token_ids(text))
+        return int(probs.argmax())
+
+    # ---- online update (SGD on cross-entropy) ----
+
+    def observe(self, text: str, label: int) -> float:
+        ids = self._token_ids(text)
+        x, probs = self._forward(ids)
+
+        loss = -np.log(probs[label] + 1e-12)
+
+        # d logits = probs - onehot(label)
+        dlogits = probs.copy()
+        dlogits[label] -= 1.0                                          # (C,)
+
+        # Gradients for the linear head.
+        dW = np.outer(x, dlogits)                                      # (D, C)
+        db = dlogits                                                   # (C,)
+
+        # Gradient flowing back into the doc vector, then into each token row.
+        dx = self.W @ dlogits                                          # (D,)
+
+        # SGD updates.
+        self.W -= self.lr * dW
+        self.b -= self.lr * db
+        if ids:
+            # Mean-pool: each token gets 1/|ids| share of dx.
+            share = dx / len(ids)
+            # np.add.at handles repeated ids correctly (accumulates rather than overwrites).
+            np.add.at(self.E, ids, -self.lr * share)
+
+        return float(loss)
+
+Walk through the pieces while you type:
+
+Tokenize with a regex. Lowercase, keep word characters. Trivial but names the step.
+
+Feature hashing. hash(tok) % vocab_size sidesteps the "I have not seen all tokens yet" problem. Collisions are rare at 32k buckets and the model learns around them.
+
+Mean-pool embeddings. Document vector = average of the token rows. Simple, order-free, and the gradient math is clean (each token gets an equal share of the doc-level gradient).
+
+Linear + softmax head. C logits, softmax, cross-entropy. Standard closed-form gradient: d logits = p - y.
+
+np.add.at for the embedding update. Critical detail. If the same token appears multiple times in a document, plain self.E[ids] -= ... only applies the last assignment. np.add.at accumulates. Skip this and the round can hinge on it.
+
+Return the pre-update loss. This gives the driver a progressive validation signal: the loss on each example before the model sees it. Averaging this over the stream is a legitimate online metric.
+
+Driver and Evaluation
+
+A minimal training loop plus running log-loss:
+
+def train_stream(stream, num_classes):
+    model = OnlineTextClassifier(num_classes=num_classes)
+    running_loss = 0.0
+    n = 0
+    for text, label in stream:
+        loss = model.observe(text, label)
+        running_loss += loss
+        n += 1
+        if n % 1000 == 0:
+            print(f"step {n}: avg loss {running_loss / n:.4f}")
+    return model
+
+No train/test split: progressive validation is the evaluation. Say this out loud. It is the standard framing for online learning and is exactly what the interviewer wants to hear.
+
+Variants the Interviewer Might Push
+
+Adagrad instead of SGD. Keep a running sum of squared gradients per parameter and scale the step size by its reciprocal square root. Helps a lot when token frequencies are very skewed, which is always true in text.
+
+TF-IDF weighted pooling. Replace the mean with a TF-IDF weighted average. Requires maintaining running IDF counters online; use log((1 + N_docs) / (1 + df)) + 1.
+
+N-grams via hashed bigrams. Append hash(tok_i + "_" + tok_{i+1}) % V to the id list. Captures a little word order at zero structural change.
+
+Multi-label. Swap softmax for independent sigmoids and binary cross-entropy per class.
+
+Growing label set. Append a column of zeros to W and a zero to b when a new label appears. Mention briefly, do not implement under time pressure.
+
+Complexity
+
+Per observed example, let T be tokens in the doc, D the embedding dim, C the number of classes.
+
+Forward: O(T * D + D * C)
+
+Backward: O(T * D + D * C)
+
+Memory: O(V * D + D * C) for the model; V is vocab_size, independent of corpus size.
+
+Everything per-example. That is the definition of online: no O(corpus) term anywhere.
+
+What to Say Out Loud
+
+"I will hash tokens into a fixed bucket so the model is truly online and never needs to see the whole vocabulary."
+
+"Document vector is a mean pool of token embeddings. Order is thrown away; good enough for a bag-of-tokens baseline."
+
+"Linear softmax head with cross-entropy. The gradient at the logits is p - y, which gives me a two-line backprop."
+
+"I evaluate with progressive validation: the loss on each example before the update."
+
+"If the interviewer wants better numbers, the upgrades are Adagrad, TF-IDF pooling, and hashed bigrams, in that order."
+
+That sequence covers the full round. The implementation is maybe 40 lines; the signal is that you built a streaming pipeline end-to-end without reaching for PyTorch or scikit-learn.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

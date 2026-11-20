@@ -1,0 +1,50 @@
+===H1===
+Contiguous Memory Allocator
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/memory-allocator
+===BODY===
+Microsoft
+CodingMembers
+Contiguous Memory Allocator
+MAI / Copilot phone-screen coding: implement a fixed-size contiguous memory pool supporting allocate-by-size and free-a-region, then defend your allocation strategy.
+MLE
+SWE
+linked-list
+data-structure
+simulation
+medium
+Frequency
+Single report
+Last asked
+2026-05-21
+Stage
+phone-screen
+Requirements
+
+You are given a single contiguous block of memory of n units. Implement two operations:
+
+allocate(size) — reserve a contiguous run of size free units and return a handle / offset to it, or signal failure if no run is large enough.
+
+free(region) — release a previously allocated region back to the pool.
+
+You write your own test cases; the interviewer does not supply them.
+
+Notes
+
+A doubly linked list of free / used blocks is the natural structure: allocate walks the list and takes the first block large enough (first-fit), splitting it when it is larger than requested; free returns the region and coalesces with adjacent free blocks. First-fit is accepted, but be ready to contrast it with best-fit and the external fragmentation it causes, and to explain how coalescing on free mitigates that. A size-bucketed free list (or a boundary-tag / buddy scheme) is the natural follow-up if asked to speed allocate up.
+
+The graded signals are correct splitting on allocate, correct coalescing on free, and a clean out-of-memory path — not the raw data-structure choice.
+
+Preparation
+
+Implement a first-fit allocator over a doubly linked free list end-to-end, including block splitting and adjacent-block coalescing on free.
+
+Be able to contrast first-fit / best-fit / buddy allocation and name which one you would reach for under heavy fragmentation.
+
+Pre-write test cases: fill the pool exactly, fragment then request a run that only fits after coalescing, and an allocation that must fail.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

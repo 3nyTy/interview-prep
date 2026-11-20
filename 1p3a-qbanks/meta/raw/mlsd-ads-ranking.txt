@@ -1,0 +1,57 @@
+===H1===
+MLSD — Ads Ranking
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/mlsd-ads-ranking
+===BODY===
+Meta
+System Design·45 minMembers
+MLSD — Ads Ranking
+Design the Meta ads-ranking system. Feature engineering, model architecture, and calibration are the three deep-dive zones reported.
+MLE
+RS
+mlsd
+ads
+ranking
+calibration
+hard
+Frequency
+Medium
+Last asked
+2026-05-30
+Stage
+onsite-system-design
+Requirements
+
+Functional: given a user impression slot, select and rank ads to show; optimize for advertiser value (bid × pCTR × pCVR) while respecting user experience.
+
+Pipeline: candidate retrieval (per advertiser targeting) → light pre-rank → heavy ranker (multi-task: pCTR, pCVR, pDwell) → auction (eCPM = bid × predicted value) → re-rank with diversity / frequency cap.
+
+Feature engineering: user (demographics, recent activity), ad (creative, advertiser, vertical), context (slot, time, device), cross features, sequence features.
+
+Model architecture: DCN-V2 / DLRM for ranker; embedding-based two-tower for retrieval; MMoE for multi-task heads.
+
+Calibration: critical for ads — predicted probabilities feed the bid auction. Platt scaling / isotonic regression on a held-out set; per-segment calibration when traffic mix shifts.
+
+Metrics: revenue / 1k impressions, advertiser ROI, CTR, conversion lift; long-term user retention guardrail.
+
+Notes
+
+Multiple candidates report MLSD interviewer focus on feature engineering + calibration over architecture novelty.
+
+Calibration is the differentiator vs Reels recommendation — be ready to defend why a well-calibrated model matters for the bid mechanism.
+
+One MLE loop spent the entire round on data collection — how training data is sourced, logged, and labeled — rather than model architecture. Be ready to go deep on the data pipeline feeding the ranker, not just the model.
+
+Preparation
+
+Memorize the eCPM = bid × P(click) × P(conv | click) decomposition.
+
+Prep a 3-sentence calibration pitch: why it matters, how to measure (reliability diagram, ECE), how to fix (Platt / isotonic).
+
+Pre-write the feature taxonomy (user × ad × context × cross × sequence) so you can list them in 60 seconds.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

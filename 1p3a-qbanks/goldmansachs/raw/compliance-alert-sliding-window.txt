@@ -1,0 +1,61 @@
+===H1===
+Compliance Alert / Trailing-Average Sliding Window
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/compliance-alert-sliding-window
+===BODY===
+Goldman Sachs
+Coding·60 minMembers
+Compliance Alert / Trailing-Average Sliding Window
+A compliance system raises an alert whenever the trailing-window average of call volumes exceeds a threshold. Count how many such alerts are raised over the full input. A sliding-window staple that recurs in Goldman's OA bank.
+SWE
+sliding-window
+array
+easy
+Frequency
+Single report
+Last asked
+2024-10-26
+Stage
+oa
+Requirements
+
+A compliance system monitors incoming and outbound calls. At each time T, average the call volumes over the trailing precedingMinutes minutes, i.e. T - (precedingMinutes - 1) through T. An alert is sent if this average is strictly greater than alertThreshold. No alerts are sent until at least T = precedingMinutes because there are not enough values to consider yet.
+
+Return the total number of alerts raised over the full input.
+
+public static int calculateAlert(int[] numCalls, int alertThreshold, int precedingTime)
+
+Examples
+
+n = 8
+numCalls = [2, 2, 2, 2, 5, 5, 5, 8]
+alertThreshold = 4
+precedingMinutes = 3
+
+No alerts until T = 3. From T = 3 to T = 8, the trailing averages are
+  2, 2, 3, 4, 5, 6.
+Values strictly greater than 4: 5 and 6 → 2 alerts.
+
+Notes
+
+Single sliding-window pass: maintain a running sum; on each step add numCalls[i] and subtract numCalls[i - precedingTime] once the window is full.
+
+Off-by-one is the main trap: the first valid window ends at index precedingTime - 1, not at precedingTime. Make sure the very first window is also evaluated against the threshold.
+
+Use integer comparison sum > alertThreshold * precedingTime rather than floating-point division to avoid precision issues. Goldman's hidden tests do not always reveal this, but the safer form is what interviewers expect when asked to discuss complexity / precision.
+
+O(n) time, O(1) space.
+
+Preparation
+
+Write the brute-force O(n * precedingTime) form first, then refactor to the rolling sum — interviewers like to see both.
+
+Replace the float comparison with the integer-product form and walk through why floating point would matter at scale.
+
+Practice closely-related LC: "Maximum Average Subarray I" (LC 643) is the same skeleton with a different return.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

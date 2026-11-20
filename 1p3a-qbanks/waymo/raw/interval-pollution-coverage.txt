@@ -1,0 +1,63 @@
+===H1===
+Streaming Interval Coverage on a Number Axis
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/interval-pollution-coverage
+===BODY===
+Waymo
+Coding·45 minMembers
+Streaming Interval Coverage on a Number Axis
+Phone screen for SRE / SWE. Points stream in onto an axis `[0, 50]`; each point pollutes a length-1 interval centered at it (±0.5). Implement a function that ingests one point at a time and returns whether the full axis is polluted.
+SWE
+Infra Eng
+interval
+interval-aggregation
+streaming
+data-structure
+medium
+Frequency
+Low
+Last asked
+2026-04-01
+Stage
+phone-screen
+Requirements
+
+Maintain state for an axis on the interval [0, 50] (real-valued).
+
+Function signature: bool ingest(double point) — each call lands one pollution event at point ± 0.5.
+
+Once a sub-interval is polluted, it stays polluted forever.
+
+Return true from ingest when the entire [0, 50] axis has been fully covered; otherwise false.
+
+Pollution intervals may overlap or duplicate.
+
+Notes
+
+Standard approach: maintain a sorted, disjoint set of polluted intervals (e.g. a TreeSet<[start, end]> or std::set<pair<double,double>> ordered by start). On each insertion:
+
+Find the first interval whose start > new.start and walk backward to discover any neighbor that overlaps or abuts the new interval.
+
+Merge all overlapping neighbors into the new interval.
+
+Track the running sum of covered length; when it equals 50, return true.
+
+Per-insert cost is O(log N) amortized — each interval can only be merged once, so the merge work across the lifetime of the structure is O(N) total.
+
+Real-valued endpoints (0.5 granularity) preclude the cheap boolean[51] trick — use a sorted structure rather than a fixed-resolution bit array unless the interviewer agrees to round.
+
+Edge cases to surface: points outside [0, 50] (clip to axis or reject), repeated identical points (no-op merge), points exactly at the boundary, floating-point comparison.
+
+Preparation
+
+Implement the merge-on-insert pattern in a sorted set; rehearse the 'find left neighbor, find right neighbor, collapse' walk until it runs without lookup.
+
+Pre-write the running-covered-length counter — most candidates forget to update it during merge and reach for an O(N) scan to answer the boolean.
+
+Be ready to discuss the alternative bit-array implementation, including why it fails on real-valued offsets without rounding.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

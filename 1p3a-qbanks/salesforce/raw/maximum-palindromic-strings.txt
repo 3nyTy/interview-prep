@@ -1,0 +1,76 @@
+===H1===
+Maximum Number of Palindromic Strings (OA)
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/maximum-palindromic-strings
+===BODY===
+Salesforce
+Coding·30 minMembers
+Maximum Number of Palindromic Strings (OA)
+First problem on a recent Salesforce fulltime OA (HackerRank, 2 problems / 60 min). Given an array of lowercase strings, you may swap characters between any two distinct strings any number of times. Return the maximum number of strings you can make palindromic.
+SWE
+string
+greedy
+palindromes
+hashmap
+medium
+Frequency
+Single report
+Last asked
+2026-03-19
+Stage
+oa
+Requirements
+
+Input: array arr of n strings over lowercase English letters (1 ≤ n ≤ 1000; 1 ≤ len(arr[i]) ≤ 1000).
+
+Operation: choose two distinct strings x ≠ y and swap any one character from each (1-based indexing in the prompt).
+
+Apply the operation any number of times.
+
+Return the maximum number of strings that can be palindromes simultaneously.
+
+Function signature (Python): def countPalindromes(arr: List[str]) -> int.
+
+Examples
+
+arr = ["pass", "sas", "asps", "df"]
+→ 3            # one optimal sequence yields ["paap", "sas", "ssss", "df"]
+
+arr = ["xy", "tz", "abab"]
+→ 2            # achievable: ["aa", "bb", "xtyz"]
+
+Notes
+
+Characters are conserved across the whole array because swaps preserve multiset counts. So the problem reduces to a global counting / packing problem on a single character-count vector pooled over all strings.
+
+For a string of length L to be a palindrome:
+
+If L is even, every character class must have even count within that string.
+
+If L is odd, exactly one character class may have an odd count (the middle character); the rest must be even.
+
+Count the global supply of character pairs: pairs = sum(count[ch] // 2). A palindrome of length L consumes exactly L // 2 pairs; an odd-length palindrome also needs one center character, which is always available after reserving those pairs because the original total length is unchanged.
+
+Sort the target string lengths ascending. For each length L, if pairs >= L // 2, consume that many pairs and count the string as achievable; otherwise stop. Sorting is optimal because a shorter palindrome never consumes more pairs than a longer one, so choosing it cannot reduce the number completed.
+
+Complexity: O(total input characters + n log n) time and O(alphabet size + n) space for counts and sorted lengths.
+
+Example 1 has five global pairs. Sorted lengths [2,3,4,4] need [1,1,2,2] pairs, so the first three consume four pairs and the fourth cannot be completed: answer 3. Example 2 has two pairs and requirements [1,1,2], so the answer is 2.
+
+Edge cases: a string of length 1 is trivially a palindrome. All-identical input is trivially fully palindromic. Be careful about the global vs per-string parity confusion — the constraint is global.
+
+Preparation
+
+Re-derive the parity argument from scratch — it's easy to misstate the bound under time pressure.
+
+Walk through both examples with the pair-budget greedy and track the remaining pair count after every chosen length.
+
+Implement in <15 min: count global characters, compute the pair budget, sort lengths, and greedily consume L // 2 pairs.
+
+Be ready to defend the greedy in a closing chat — interviewers occasionally probe whether the candidate can articulate the conservation argument cleanly.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

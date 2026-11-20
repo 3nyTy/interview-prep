@@ -1,0 +1,53 @@
+===H1===
+Nested List Weight Sum II (LC 364)
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-nested-list-weight-sum-ii
+===BODY===
+LinkedIn
+CodingMembers
+Nested List Weight Sum II (LC 364)
+Compute the inverse-depth-weighted sum of integers in a nested list. The candidate explicitly identified this as unchanged LeetCode 364.
+SWE
+recursion
+Frequency
+Single report
+Last asked
+2026-09-04
+Stage
+phone-screen
+Requirements
+
+Given a nested list whose elements are integers or further nested lists, return the sum of all integers weighted by inverse depth.
+
+Let maxDepth be the maximum depth of any integer. An integer at depth depth has weight maxDepth - depth + 1; the outermost integers have depth 1.
+
+Examples
+
+Input: nestedList = [[1,1],2,[1,1]]
+Output: 8
+
+The four nested ones have weight 1, and the outermost 2 has weight 2.
+
+Notes
+
+The candidate explicitly confirmed the original LC 364 problem without modifications.
+
+This was the second coding question in the phone screen. No additional follow-up was specified.
+
+Traverse the structure with depth starting at 1 for outermost integers. Track the maximum depth of integers only, the unweighted integer sum S, and the depth-weighted sum T = sum(value * depth). Return (maxDepth + 1) * S - T, which expands to the required inverse-depth weights.
+
+Empty lists do not contribute to maxDepth; a zero-valued integer still does. If there are no integers, return 0. Negative integers require no special weighting rule.
+
+With N counting all visited integer and list elements and D the nesting depth, a recursive traversal takes O(N) time and O(D) stack space. For deeply nested input, an explicit stack of iterator frames avoids the language recursion limit with the same depth-dependent space bound.
+
+Preparation
+
+In 15 minutes, implement the depth traversal and verify it against direct weighted summation on the existing example.
+
+In 10 minutes, test outermost-only integers, mixed depths, negative integers, zero-valued deepest integers, and nested empty lists. Explain why empty lists must not increase the maximum integer depth.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,83 @@
+===H1===
+MinStack, MaxStack and Streaming Median
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/streaming-median-min-max-stack
+===BODY===
+ByteDance / TikTok
+Coding·60 minMembers
+MinStack, MaxStack and Streaming Median
+Three linked structures in a single MLE round: `MinStack` with O(1) min, `MaxStack`, and a streaming-median follow-up that pushes you to two heaps — then asks how to retrofit `MaxStack` to maintain the running median.
+MLE
+SWE
+stack
+heap
+data-structure
+streaming
+hard
+Frequency
+Low
+Last asked
+2026-08-17
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Three sub-problems delivered in escalating difficulty:
+
+MinStack: standard stack with push, pop, top, plus getMin in O(1) time.
+
+MaxStack: same but with getMax in O(1) (typical LC-extension is also peekMax and popMax).
+
+Streaming Median: data flows in one value at a time; after each insertion, return the current running median in O(log n).
+
+Composite follow-up: how would you modify your MaxStack implementation if you also need the running median maintained?
+
+Bounded-domain follow-up: if every value is an integer from 0 through 100, replace the general structure with one tailored to the fixed value range.
+
+Memory-bound follow-up: explain how the design changes when the full stream no longer fits in memory and an approximate quantile is acceptable.
+
+Deletion follow-up: support removal while preserving correct median queries.
+
+Concurrency follow-up: explain synchronization for a read-heavy multithreaded workload and the limits of partitioning the state.
+
+class MinStack: ...
+class MaxStack: ...
+class MedianFinder:
+    def addNum(self, num: int) -> None: ...
+    def findMedian(self) -> float: ...
+
+Notes
+
+MinStack is solved with a paired stack: each entry is (value, current_min), or with a secondary stack that only stores running minimums.
+
+MaxStack is symmetric; if popMax is required, the O(1) invariant breaks down and the standard answer is "two stacks + lazy rebalance" or "tree-based ordered set + linked list" for O(log n).
+
+Streaming median is the two-heap pattern: a max-heap for the lower half, min-heap for the upper half. Keep sizes balanced within 1; median is the top of the larger heap, or the average of the two tops.
+
+For the composite "MaxStack + running median" follow-up, the cleanest answer is to keep your MaxStack as-is for the stack interface and run a side two-heap structure that observes every push/pop event. Discuss the cost of removing arbitrary elements from a heap (O(log n) with a hashmap-indexed lazy-deletion heap, or O(n) with naive rebuild).
+
+A fixed 0-100 domain permits an insertion-time counter array and a bounded scan for each median query.
+
+The large-stream variant accepts a summary such as sampling or t-digest rather than storing every value.
+
+Deletion requires tracking valid element counts separately from physical heap contents; stale heap tops must be removed before answering.
+
+A read-write lock is the baseline concurrency answer. Sharded partial statistics are harder to merge for medians than for additive aggregates.
+
+Common bug: in the two-heap median, forgetting to negate values for Python's heapq (which is min-heap only) when used as a max-heap.
+
+Preparation
+
+Code MinStack with both the paired-stack and secondary-stack approaches; be able to switch between them.
+
+Drill the two-heap median template until you can write it without thinking, including the rebalance rules.
+
+Practice the lazy-deletion heap pattern — heap plus to_delete counter dict — for the composite follow-up.
+
+Walk through a 5-element stream by hand, naming the median at every step, to make sure rebalancing is right.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

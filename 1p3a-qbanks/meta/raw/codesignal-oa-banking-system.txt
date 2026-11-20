@@ -1,0 +1,74 @@
+===H1===
+CodeSignal OA — Banking System (Progressive OOD)
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/codesignal-oa-banking-system
+===BODY===
+Meta
+Coding·90 minMembers
+CodeSignal OA — Banking System (Progressive OOD)
+CodeSignal 90-minute, 4-level Progressive OOD. Banking-system variant: create accounts, deposit, transfer; top-spenders ranking; scheduled payments; merge accounts with historical-balance queries.
+SWE
+MLE
+codesignal
+ood
+state-machine
+hard
+Frequency
+High
+Last asked
+2026-05-26
+Stage
+oa
+Requirements
+
+4 levels build on the same Bank class.
+
+Level 1 — Basic ops
+
+create_account(timestamp, account_id) -> bool — false if exists.
+
+deposit(timestamp, account_id, amount) -> int | None — returns post-deposit balance; None if account missing.
+
+transfer(timestamp, source, target, amount) -> int | None — returns source post-balance; None if either account missing, source==target, or insufficient funds.
+
+Level 2 — Ranking
+
+top_spenders(timestamp, n) -> list[str] — top n accounts by total outgoing (transfer source side only; deposits don't count). Format "account_id(total_outgoing)", ties broken by account_id ascending.
+
+Level 3 — Scheduled payments
+
+schedule_payment(timestamp, account_id, amount, delay) -> str | None — returns global payment id payment1, payment2, ...; executes at timestamp + delay.
+
+cancel_payment(timestamp, account_id, payment_id) -> bool.
+
+Level 4 — Merge + historical balance
+
+merge_accounts(timestamp, id1, id2) -> bool — balances + outgoing + scheduled payments merged into id1; id2 deleted.
+
+get_balance(timestamp, account_id, time_at) -> int | None — balance at time_at; None if account didn't exist yet.
+
+Notes
+
+Theme rotates across cycles. Recent Q2-2026 themes also reported: Tetris Simulator (place A/B/C/D/E shapes by top-left priority, no overlap, no rotation — brute-force simulation with offsets), Longest Continuous Houses (process build-house queries, return max contiguous run — Union-Find), Rating Calculator (start at 1500, apply diffs, return max and final rating — single pass), Array Reduction (loop array, find leftmost non-zero x, subtract x rightward until smaller value — simulation), Memory Allocator, Mountain Climber, CloudFile (file storage with users, capacity, prefix top-N, merge_user).
+
+Effective passing bar in Q2 2026 is essentially full AC. Multiple candidates report "35/44 unit tests passing" → rejection. The OOD nature plus Level 4's historical-balance log makes time the binding constraint.
+
+One thread asks whether failing OA triggers the 1-year cooldown; community consensus is yes for SWE pipeline.
+
+Outcomes on an incomplete Level 4 are not uniformly fatal — at least one recent banking-theme candidate advanced with Level 4 not fully passing — but treat full AC as the planning bar; partial credit is unreliable.
+
+Preparation
+
+Drill the canonical OOD pattern: lazy-process scheduled events on every call (sweep up to timestamp); event log per account for historical balance.
+
+Memorize the top_spenders tiebreak rule and the merge semantics.
+
+For other themes (Tetris, Memory Allocator), practice writing append-only state-machine code with replay-from-log support.
+
+Aim for first 3 levels in ~50 min, leaving 40 min for Level 4's edge cases.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

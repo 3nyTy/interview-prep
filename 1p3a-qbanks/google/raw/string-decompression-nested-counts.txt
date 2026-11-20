@@ -1,0 +1,66 @@
+===H1===
+String Decompression with Nested Counts
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/string-decompression-nested-counts
+===BODY===
+Google
+Coding·45 minMembers
+String Decompression with Nested Counts
+NYC onsite coding round 2: decode a custom compressed string format where parenthesized groups are repeated using a `{k}` suffix. Variant of LC 394 with different bracketing and an explicit assumption that input is well-formed.
+SWE
+string
+recursion
+medium
+Frequency
+Single report
+Last asked
+2026-02-04
+Stage
+onsite-coding
+Requirements
+
+Input: a string using the format <literals>(<group>){k}<literals>... where:
+
+(...) marks a repeatable group; the immediately following {k} means repeat k times.
+
+Groups may be nested arbitrarily.
+
+Literal characters outside of any group are concatenated as-is.
+
+k is an integer in [2, 99].
+
+Output: the fully decompressed string.
+
+Assume input is well-formed: every { follows a ), and parentheses are properly balanced.
+
+Examples
+
+Input:  "a(abc){3}"
+Output: "aabcabcabc"
+
+Input:  "a(b(c){2}){3}d"
+Output: "abccbccbccd"
+
+Notes
+
+Recursion with an index pointer is the cleanest implementation: each call returns the decoded substring of a single (...){k} block plus literals up to its terminator.
+
+An iterative stack-based approach also works: push (StringBuilder, repeatCount) on (, pop and append on ){k}.
+
+The 2-digit k matters only for parsing — read until non-digit.
+
+Watch out for literals between two groups: a(b){2}c(d){3} → abbcddd.
+
+Preparation
+
+Drill the canonical k[group] decode-string problem to muscle memory; the input grammar there is k[group] instead of (group){k}, but the algorithm is identical.
+
+Practice both recursive and iterative versions — the iterative stack version generalizes more cleanly if the interviewer asks about iterative streaming.
+
+Test with: deeply nested groups, groups containing only literals, two-digit counts ({12}).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

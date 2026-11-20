@@ -1,0 +1,52 @@
+===H1===
+Gold Chain Split into Two Equal Halves
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/gold-chain-split-equal
+===BODY===
+Google
+Coding·45 minMembers
+Gold Chain Split into Two Equal Halves
+Onsite coding interview 1: given a gold chain represented by an array of segment weights, remove exactly one segment and check whether the remaining segments — when reconnected — can be cut once more to give two halves of equal total weight. Follow-up: enumerate all valid (remove, cut) pairs.
+SWE
+array
+hashmap
+medium
+Frequency
+Single report
+Last asked
+2026-04-21
+Stage
+onsite-coding
+Requirements
+
+Input: array a[] representing the linked weights of a gold chain (each a[i] is one link).
+
+Step 1: remove exactly one link, then reconnect the remaining links into a single chain (the array shortens by one).
+
+Step 2: cut the reconnected chain at exactly one position, producing two contiguous pieces; the two pieces must have equal total weight.
+
+Return: true if at least one (remove, cut) pair satisfies the equal-weight condition.
+
+Follow-up: return all valid (remove, cut) pairs.
+
+Notes
+
+Precompute prefix sums; for each candidate removed index r, the remaining total is S - a[r]. If that is odd, skip. Otherwise check if there is a split point achieving (S - a[r]) / 2.
+
+Use a hashmap from prefix-sum value to index for O(1) lookups → overall O(N) for the boolean answer, O(N²) worst case for enumerating all pairs (output-bound).
+
+Watch out for cut positions adjacent to the removed link — must still respect contiguous-chain semantics.
+
+Preparation
+
+Drill The equal-subset-sum and partition-to-k-equal-sum-subsets problems are the standard drill partners.
+
+Practice enumerating all valid cut positions, not just one — interviewers commonly add the follow-up after the boolean version works.
+
+Watch the boundary: remove + cut should not yield an empty side.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

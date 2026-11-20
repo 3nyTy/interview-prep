@@ -1,0 +1,54 @@
+===H1===
+Implement a Rate Limiter
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/rate-limiter-implementation
+===BODY===
+Waymo
+Coding·45 minMembers
+Implement a Rate Limiter
+Phone screen with ~10 minutes of behavioral up front, then implement a rate limiter. Interviewer expected the candidate to pick an algorithm (fixed window / sliding window / token bucket), justify the choice, and discuss thread-safety and distributed extensions.
+SWE
+rate-limiting
+concurrency
+throttling
+object-design
+medium
+Frequency
+Single report
+Last asked
+2026-01-23
+Stage
+phone-screen
+Requirements
+
+Implement a rate limiter object exposing roughly bool allow(client_id) semantics.
+
+Candidate picks the algorithm and justifies the trade-offs.
+
+Behavioral component runs ~10 minutes at the top of the round — keep the technical work to ~30 minutes.
+
+Notes
+
+Token bucket is the strongest default: per client store (tokens, last_refill_time); on each request refill min(capacity, tokens + elapsed · rate), then decrement on success. O(1) state per client, naturally smooths bursts, simple to extend with per-tier policies.
+
+Fixed window counter is the simplest baseline but exposes burst at window boundaries; mention it as the strawman so the trade-off is on record.
+
+Sliding window log gives exact accuracy by storing per-client timestamp queues, at the cost of O(R) memory for R requests in window — usually rejected on memory grounds for production.
+
+Thread-safety: wrap the read-calculate-update sequence atomically. In-process: a ConcurrentHashMap of per-client locks, or AtomicLong token state. Distributed: a Lua script in Redis to keep read → refill → decrement atomic; sharded Redis instances behind consistent hashing.
+
+Failure mode: 'fail closed' (reject when state store is unreachable) protects downstream services; 'fail open' optimizes for availability. Surface the choice and let the interviewer steer.
+
+Preparation
+
+Implement single-process token bucket from scratch in under 15 minutes; verify the refill math against an expected drip rate.
+
+Write the same algorithm with the distributed contract — a RedisRateLimiter wrapper backed by a Lua script — and be able to talk through the atomicity argument.
+
+Drill the trade-off table (token bucket vs sliding window log vs fixed window) verbally; the interviewer in this round graded heavily on the discussion.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

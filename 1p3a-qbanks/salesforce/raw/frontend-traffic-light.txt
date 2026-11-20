@@ -1,0 +1,101 @@
+===H1===
+Frontend Traffic Light (HTML / CSS / JS)
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/frontend-traffic-light
+===BODY===
+Salesforce
+Coding·30 minMembers
+Frontend Traffic Light (HTML / CSS / JS)
+Salesforce's signature frontend coding round, asked even of generalist / backend candidates applying to fullstack-titled roles. Build a traffic light that cycles red 4s → green 1s → yellow 1s using only HTML, CSS, and vanilla JavaScript (no React allowed in the CoderPad sandbox).
+SWE
+frontend
+traffic-light
+javascript
+state-machine
+medium
+Frequency
+Low
+Last asked
+2026-01-30
+Stage
+phone-screen · tech-screen
+Requirements
+
+Render three circular lights stacked vertically: red on top, yellow middle, green bottom.
+
+Only one light is "on" at any time; the other two are dimmed (typically faded colour or low opacity).
+
+Cycle: red (4 seconds) → green (1 second) → yellow (1 second) → red (4 seconds) → … (order may vary by interviewer; clarify).
+
+Vanilla JS only — setInterval / setTimeout rather than React component state.
+
+The CoderPad environment used does not recognise React imports; do not start from a React skeleton.
+
+Common interviewer follow-ups:
+
+Configurable durations passed in as an object: { red: 4000, green: 1000, yellow: 1000 }.
+
+Pause / resume control (button click → freeze the current light).
+
+Reset to red.
+
+Accessibility tweak (announce the colour change via aria-live region).
+
+Examples
+
+Minimal vanilla-JS skeleton (renders three divs and rotates the .on class):
+
+<div id="light" class="traffic-light">
+  <div class="bulb red on"></div>
+  <div class="bulb yellow"></div>
+  <div class="bulb green"></div>
+</div>
+
+<style>
+  .bulb { width: 60px; height: 60px; border-radius: 50%; opacity: 0.2; margin: 8px; }
+  .red.on    { background: red;    opacity: 1; }
+  .yellow.on { background: gold;   opacity: 1; }
+  .green.on  { background: green;  opacity: 1; }
+</style>
+
+<script>
+  const order   = ['red', 'green', 'yellow'];
+  const dur     = { red: 4000, green: 1000, yellow: 1000 };
+  let idx       = 0;
+  function tick() {
+      document.querySelectorAll('.bulb').forEach(b => b.classList.remove('on'));
+      const next = order[idx];
+      document.querySelector('.bulb.' + next).classList.add('on');
+      idx = (idx + 1) % order.length;
+      setTimeout(tick, dur[next]);
+  }
+  tick();
+</script>
+
+Notes
+
+Use setTimeout chained on itself, not setInterval — the per-state duration is different, so a single interval cannot drive the cycle correctly.
+
+Avoid React. If React imports fail in the CoderPad sandbox, lose another 5 minutes restarting in vanilla JS. Practise the vanilla skeleton until it's automatic.
+
+Time the interviewer is willing to spend: ~20 minutes for the base implementation, then 10 minutes of follow-ups. Implement quickly so the follow-ups land.
+
+The pause/resume follow-up requires tracking the in-flight setTimeout handle and the remaining time — clearTimeout on pause, recalculate remaining on resume. Be ready to draw this on a whiteboard if asked.
+
+Some interviewers run this as a state machine — explicit { red: 'green', green: 'yellow', yellow: 'red' } transition table is cleaner than an order[] array when follow-ups change the order.
+
+Preparation
+
+Pre-write the vanilla skeleton (HTML + CSS + JS in ~30 lines) and re-type it from scratch until it takes under 5 minutes.
+
+Drill the pause/resume follow-up — most candidates can do the base case but fumble the remaining-time calculation under pressure.
+
+Drill the vanilla HTML/CSS/JS version with unequal per-state durations, then add pause/resume and reset without changing the base state machine.
+
+Clarify with the interviewer up-front: cycle order, pause/resume, accessibility — the spec is deliberately under-stated.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

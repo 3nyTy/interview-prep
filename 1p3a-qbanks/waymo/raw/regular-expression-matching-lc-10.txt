@@ -1,0 +1,59 @@
+===H1===
+Regular Expression Matching (LC 10)
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/regular-expression-matching-lc-10
+===BODY===
+Waymo
+CodingMembers
+Regular Expression Matching (LC 10)
+Canonical LeetCode 10: determine whether an entire input string matches a pattern containing ordinary characters plus `.` and `*`, where `.` matches any single character and `*` repeats the preceding element zero or more times.
+SWE
+string
+dp
+recursion
+hard
+Frequency
+Single report
+Last asked
+2026-07-31
+Stage
+onsite-coding
+Requirements
+
+Inputs: a string s and a pattern p.
+
+. matches any single character.
+
+* matches zero or more occurrences of the immediately preceding element.
+
+Return whether the pattern matches the entire string, not merely a substring.
+
+Examples
+
+s = "aa", p = "a" returns false.
+
+s = "aa", p = "a*" returns true.
+
+s = "ab", p = ".*" returns true.
+
+Notes
+
+The interview identified the problem as LC 10, with no Waymo-specific modification stated.
+
+It was one of two hard coding rounds in the virtual onsite.
+
+Define dp(i, j) as whether s[i:] matches p[j:]. If p[j + 1] is *, either skip that atom with dp(i, j + 2) or, when the first characters match, consume one input character with dp(i + 1, j). Otherwise consume one character from both strings.
+
+The terminal state is j == len(p), which succeeds only when i == len(s). Memoizing the state pairs yields O(len(s) * len(p)) time and space. Guard both string and pattern indexes before reading them.
+
+Preparation
+
+Implement the canonical problem from scratch and explain the meaning of every state or recursive subproblem before coding.
+
+Drill empty-string cases, zero-occurrence * cases, repeated starred elements, and patterns that match a prefix but not the full string.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

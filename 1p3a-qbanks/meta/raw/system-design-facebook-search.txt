@@ -1,0 +1,72 @@
+===H1===
+System Design — Facebook Search (Mini Elasticsearch)
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/system-design-facebook-search
+===BODY===
+Meta
+System Design·45 minMembers
+System Design — Facebook Search (Mini Elasticsearch)
+Design Facebook post search — given query terms, return all matching posts. The exercise is essentially "build a mini Elasticsearch": inverted index, ranking, top-K per query, real-time ingestion.
+SWE
+Infra Eng
+search
+retrieval
+ranking
+scaling
+sharding
+medium
+Frequency
+Medium
+Last asked
+2026-08-20
+Stage
+onsite-system-design
+Requirements
+
+Functional: ingest posts, index them, answer keyword queries with relevance-ranked top-K results.
+
+Scale: ~10B posts indexed, ~10K QPS at peak, <200 ms p95.
+
+Decisions:
+
+Inverted index: term → posting list (post IDs sorted by recency + score).
+
+Ranking: TF-IDF or BM25 as a baseline; layer a learned-to-rank model on top.
+
+Sharding: by term (locality) vs by document (parallelism) — Meta's answer is doc-sharded with broadcast queries.
+
+Real-time ingestion: streaming pipeline appends to a memtable; periodic flush to immutable segments; background compaction (Lucene-style).
+
+Caching: query-result cache for hot queries; per-shard posting-list cache.
+
+Notes
+
+Doc-sharding wins at Meta scale because per-query latency stays bounded even when one term hits a long posting list.
+
+Real-time vs near-real-time trade-off: "how fresh is fresh?" Common answer is 5-30 seconds.
+
+Common follow-up: "how do you rank?" → name TF-IDF / BM25 first, then layer LTR + personalization.
+
+Alternate canonical variant — Boolean status search
+
+Index plain-text user statuses and support multi-term queries with explicit AND and OR operators; ranking and relevance are out of scope.
+
+Keep posting lists ordered so intersections and unions can be merged efficiently; skip pointers are a possible acceleration.
+
+On each new status, send the document through a queue-backed tokenization, normalization, and indexing pipeline.
+
+Compare term sharding with document sharding. Term sharding localizes each posting list but turns multi-term queries into scatter-gather work.
+
+Preparation
+
+Memorize the doc-sharded inverted-index diagram.
+
+Pre-compute scale estimates (avg posting list length, total index size).
+
+Drill the broadcast-query latency analysis: fan-out to N shards, take the slowest.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

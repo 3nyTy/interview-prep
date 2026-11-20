@@ -1,0 +1,275 @@
+===H1===
+Web URL Crawler at Scale
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/web-url-crawler-at-scale
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Web URL Crawler at Scale
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+System Design
+Members
+Web URL Crawler at Scale
+
+You are given helper APIs: fetchpage(url) -> str returns page content parseurls(content) -> list[str] returns outgoing URLs from that page Design traversal and failure handling for crawling problems.
+
+SWE
+web-crawler
+distributed-systems
+queueing
+scaling
+medium
+Frequency
+Single report
+Last asked
+2026-01-22
+Stage
+onsite-system-design
+Web URL Crawler at Scale
+Overview
+
+You have access to these two helper functions:
+
+fetch_page(url) -> str: Gets the text content of a web page.
+parse_urls(content) -> list[str]: Finds all links on that page.
+
+Your task is to design a system to visit these links. You must also handle errors properly.
+
+The interview has three parts:
+
+Crawl URLs on a single website.
+Scale the solution for large systems.
+Handle API errors robustly.
+Phase 1: Basic Crawling
+The Goal
+
+Start at a given start_url. Find all other URLs you can reach that belong to the same domain.
+
+Rules:
+
+Same Domain: Only visit links where the hostname is the same as the start_url.
+No Duplicates: Do not process the same URL twice.
+Tools: Use fetch_page and parse_urls.
+
+You can use BFS (Breadth-First Search) or DFS (Depth-First Search). The solution below uses BFS.
+
+Phase 1 Code
+from collections import deque
+from urllib.parse import urlparse
+
+def same_host(url: str, host: str) -> bool:
+    # Check if the URL belongs to the target hostname
+    return urlparse(url).hostname == host
+
+def crawl_bfs(start_url: str, fetch_page, parse_urls) -> list[str]:
+    host = urlparse(start_url).hostname
+    visited = {start_url}
+    q = deque([start_url])
+
+    while q:
+        cur = q.popleft()
+        content = fetch_page(cur)
+        for nxt in parse_urls(content):
+            if nxt in visited:
+                continue
+            if not same_host(nxt, host):
+                continue
+            visited.add(nxt)
+            q.append(nxt)
+
+    return list(visited)
+
+
+Any traversal method works as long as you filter by domain and track visited pages.
+
+Phase 1 Analysis
+
+For BFS:
+
+Metric	Complexity
+Time	O(V + E) (visiting pages and checking links)
+Space	O(V) (storing visited URLs and the queue)
+Phase 2: Scaling Up
+The Challenge
+
+What if the website is huge and has millions of URLs? The basic approach will be too slow.
+
+Key Concepts
+Concurrency: Use a "worker pool" with a limit. This lets you process multiple pages at once without crashing your machine.
+Thread Safety: Make sure multiple threads check for duplicates safely.
+Network: Use multithreading or async I/O because waiting for the internet is the slowest part.
+Distributed Systems: If one machine is not enough, split the work across many machines based on URL hash.
+Phase 2 Code
+
+Here is a plan using multiple threads and a lock to stay safe.
+
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
+from threading import Lock
+from urllib.parse import urlparse
+
+def crawl_concurrent(start_url: str, fetch_page, parse_urls, max_workers: int = 16) -> list[str]:
+    host = urlparse(start_url).hostname
+    visited = {start_url}
+    lock = Lock()
+
+    def worker(url: str) -> list[str]:
+        # Fetch content and filter links
+        content = fetch_page(url)
+        out = []
+        for nxt in parse_urls(content):
+            if urlparse(nxt).hostname != host:
+                continue
+            out.append(nxt)
+        return out
+
+    with ThreadPoolExecutor(max_workers=max_workers) as pool:
+        futures = {pool.submit(worker, start_url)}
+        while futures:
+            # Wait for at least one task to finish
+            done, pending = wait(futures, return_when=FIRST_COMPLETED)
+            futures = set(pending)
+
+            for fut in done:
+                for nxt in fut.result():
+                    with lock:
+                        if nxt in visited:
+                            continue
+                        visited.add(nxt)
+                    # Add new task for the new URL
+                    futures.add(pool.submit(worker, nxt))
+
+    return list(visited)
+
+Phase 2 Analysis
+Metric	Complexity
+Time	O(V + E) (visits all nodes and edges)
+Space	O(V) (visited set) + O(max_workers) (active tasks)
+Phase 3: Handling Failures
+The Problem
+
+Sometimes fetch_page or parsing fails. This might happen due to timeouts, server errors (5xx), or temporary blocks. How do you stop the crawler from crashing?
+
+Phase 3 Code
+
+We use "exponential backoff." This means we retry, but wait longer after each failure. We also add "jitter" (randomness) so threads don't all retry at the exact same split second.
+
+import random
+import time
+
+def fetch_with_retry(fetch_page, url: str, max_attempts: int = 5) -> str:
+    base = 0.2
+    for attempt in range(max_attempts):
+        try:
+            return fetch_page(url)
+        except Exception:
+            if attempt == max_attempts - 1:
+                # Give up if we tried too many times
+                raise
+            sleep_s = base * (2 ** attempt)
+            # Add random time to avoid threads colliding
+            sleep_s = sleep_s * (0.5 + random.random())
+            time.sleep(sleep_s)
+
+
+Use this wrapper inside your worker function:
+
+def worker(url: str):
+    content = fetch_with_retry(fetch_page, url, max_attempts=5)
+    return parse_urls(content)
+
+Important Tips
+Transient Errors Only: Only retry temporary errors (like timeouts). Do not retry if the URL is broken or invalid.
+Circuit Breakers: If a website fails too often, stop hitting it for a while.
+Dead-Letter Queue: If a URL fails after all retries, save it to a special list (dead-letter queue) to inspect later.
+Phase 3 Analysis
+Big-O: Time and space complexity stay the same.
+Latency: Retrying takes time, so the system will be slower when errors occur. Throughput depends on how often failures happen.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Web URL Crawler at Scale
+Overview
+Phase 1: Basic Crawling
+The Goal
+Phase 1 Code
+Phase 1 Analysis
+Phase 2: Scaling Up
+The Challenge
+Key Concepts
+Phase 2 Code
+Phase 2 Analysis
+Phase 3: Handling Failures
+The Problem
+Phase 3 Code
+Important Tips
+Phase 3 Analysis
+Related discussions · 0
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Service Failure Forensics
+Single report
+distributed-systems
+medium
+graph
++2
+Frontend Grid: Robot Eats Candies
+Single report
+medium
+frontend
+bfs
++2
+Grep With Context Lines
+Single report
+medium
+string-processing
+parsing
++1
+Top-K Search Terms (Per-User Deduped)
+Single report
+medium
+hashmap
+set
++2
+Recipe as Contiguous Ingredient Subsequence
+Single report
+medium
+string
+hashing
++4
+Code editor

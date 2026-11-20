@@ -1,0 +1,61 @@
+===H1===
+Print All Root-to-Leaf Tree Paths
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/print-tree-paths
+===BODY===
+Capital One
+Coding·60 minMembers
+Print All Root-to-Leaf Tree Paths
+MLE / Applied Research Set B opener. Given a binary tree (or general tree, depending on variant), print every root-to-leaf path. Standard recursive DFS — the round uses it as a warm-up before the deployment / latency discussion.
+MLE
+RS
+tree
+dfs
+tree-traversal
+recursion
+easy
+Frequency
+Low
+Last asked
+2026-02-04
+Stage
+onsite-coding
+Requirements
+
+Input: the root of a binary tree (each node has val, left, right).
+
+Return a list of all root-to-leaf paths. Each path is the sequence of node values from the root down to a leaf.
+
+Edge cases: empty tree returns []; a single-node tree returns [[root.val]].
+
+Examples
+
+    1
+   / \
+  2   3
+   \
+    5
+
+Return [[1, 2, 5], [1, 3]]
+
+Notes
+
+Canonical recursive DFS: carry a running path as a list, append at each recursive call, recurse into left and right, and emit a copy when a leaf is hit. The classic LeetCode 257 Binary Tree Paths shape.
+
+Iterative variant uses an explicit stack of (node, path_so_far) tuples — useful if the interviewer asks about deep trees and recursion limits.
+
+Common bug: appending the live path reference into the result list instead of a copy. Use result.append(list(path)) or result.append(path[:]).
+
+This round is paired with ML-deployment questions immediately after the coding finishes; budget ≤ 20 minutes here so the deployment discussion has room.
+
+Preparation
+
+Write both recursive and iterative variants from scratch; the recursive version should fit in 8 lines.
+
+Prepare a clean way to format the paths as strings if asked ("1->2->5"), since the LeetCode version returns strings and some interviewers ask for that shape.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

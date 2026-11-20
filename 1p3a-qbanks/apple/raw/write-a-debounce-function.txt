@@ -1,0 +1,244 @@
+===H1===
+Write a Debounce Function
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/write-a-debounce-function
+===BODY===
+Apple
+CodingMembers
+Write a Debounce Function
+Implement a debounce(fn, wait) utility in JavaScript.
+SWE
+medium
+javascript
+async
+state-machine
+Frequency
+Single report
+Last asked
+2026-02-27
+Stage
+phone-screen
+Problem
+
+Implement a debounce(fn, wait) utility in JavaScript.
+
+A debounced function delays invoking fn until wait milliseconds have elapsed since the last time the debounced function was called. If the debounced function is called again before the timer fires, the timer resets.
+
+const log = debounce((msg) => console.log(msg), 300);
+
+log("a"); // scheduled for t + 300
+log("b"); // cancels the previous timer, reschedules for new t + 300
+log("c"); // cancels again, reschedules
+// ... 300ms with no calls ...
+// prints "c"
+
+This is the classic "search-as-you-type" primitive: you don't want to hit the API on every keystroke — you want to wait until the user has paused typing.
+
+Debounce vs Throttle
+
+Interviewers often probe this distinction first. Know the difference cold:
+
+DebounceThrottle
+FiresOnce, after the user stopsAt most once per window, while the user is active
+Use caseSearch input, resize-end, form validationScroll handler, drag, mousemove
+Think of it as"Wait for quiet""Rate limit"
+
+Basic Solution
+
+function debounce(fn, wait) {
+  let timerId = null;
+
+  return function debounced(...args) {
+    clearTimeout(timerId);
+    timerId = setTimeout(() => {
+      fn.apply(this, args);
+      timerId = null;
+    }, wait);
+  };
+}
+
+Why this works:
+
+timerId is captured in a closure — each debounced function has its own private timer.
+
+Every call clears the pending timer (if any) and starts a fresh one. The callback only fires if no new call arrives within wait ms.
+
+fn.apply(this, args) preserves both the receiver (so obj.method still sees obj as this) and the latest arguments. Use a regular function — not an arrow — so this binding works.
+
+Complexity: O(1) per call; O(1) extra space.
+
+TypeScript version
+
+Most frontend teams write TS, so be ready to type it:
+
+function debounce<A extends unknown[]>(
+  fn: (...args: A) => void,
+  wait: number,
+): (...args: A) => void {
+  let timerId: ReturnType<typeof setTimeout> | null = null;
+
+  return function debounced(this: unknown, ...args: A) {
+    if (timerId !== null) clearTimeout(timerId);
+    timerId = setTimeout(() => {
+      fn.apply(this, args);
+      timerId = null;
+    }, wait);
+  };
+}
+
+Two TS-specific things worth calling out:
+
+ReturnType<typeof setTimeout> — number in the browser, NodeJS.Timeout in Node. This type works in both.
+
+this: unknown on the debounced function — tells TS "this function cares about this, but the caller decides what it is." Without it, this in strict mode is void and fn.apply(this, args) errors.
+
+Real-World Usage
+
+// Search input — fire the API call only after the user pauses typing.
+const input = document.querySelector("#search");
+const onInput = debounce((e) => {
+  fetch(`/api/search?q=${encodeURIComponent(e.target.value)}`);
+}, 300);
+input.addEventListener("input", onInput);
+
+// Window resize — compute layout once the user stops dragging.
+window.addEventListener("resize", debounce(recomputeLayout, 150));
+
+Common Follow-Ups
+
+1. Add a .cancel() method
+
+Useful when a component unmounts, the user navigates away, or you want to abandon a pending call (e.g., the user cleared the search box). Without cancel, a stale callback can fire after the component's state is already gone, leading to wrong network requests or acting on outdated this/args.
+
+function debounce(fn, wait) {
+  let timerId = null;
+
+  function debounced(...args) {
+    clearTimeout(timerId);
+    timerId = setTimeout(() => {
+      fn.apply(this, args);
+      timerId = null;
+    }, wait);
+  }
+
+  debounced.cancel = () => {
+    clearTimeout(timerId);
+    timerId = null;
+  };
+
+  return debounced;
+}
+
+2. Leading edge (fire immediately, then wait)
+
+"Fire on the first call, then ignore further calls until wait ms of quiet." Good for buttons you want to respond instantly but not double-fire.
+
+function debounce(fn, wait, { leading = false } = {}) {
+  let timerId = null;
+
+  return function debounced(...args) {
+    const callNow = leading && timerId === null;
+    clearTimeout(timerId);
+    timerId = setTimeout(() => {
+      timerId = null;
+      if (!leading) fn.apply(this, args);
+    }, wait);
+    if (callNow) fn.apply(this, args);
+  };
+}
+
+3. Leading + trailing
+
+Lodash-style: fire once at the start and once at the end if there were calls in between.
+
+function debounce(fn, wait, { leading = false, trailing = true } = {}) {
+  let timerId = null;
+  let lastArgs = null;
+  let lastThis = null;
+
+  return function debounced(...args) {
+    const callNow = leading && timerId === null;
+    lastArgs = args;
+    lastThis = this;
+
+    clearTimeout(timerId);
+    timerId = setTimeout(() => {
+      timerId = null;
+      if (trailing && lastArgs && !callNow) {
+        fn.apply(lastThis, lastArgs);
+      }
+      lastArgs = lastThis = null;
+    }, wait);
+
+    if (callNow) fn.apply(this, args);
+  };
+}
+
+Note: if leading is true and only one call happens in the window, don't fire again on the trailing edge — that's why we track callNow.
+
+What the Interviewer is Watching For
+
+this and arguments. Forgetting fn.apply(this, args) is the #1 mistake. Writing fn() drops the arguments; fn(args) passes the array as a single param instead of spreading it. Neither preserves this, which matters the moment the debounced function is called as a method.
+
+Closure over the timer. The timerId must be in the closure, not on the returned function as a property — otherwise multiple callers share state in surprising ways.
+
+Arrow vs function. The returned function should be function (not arrow) so this is bound by the call site.
+
+Clearing the old timer. clearTimeout(null) is a no-op, so no guard needed — but the candidate should know that.
+
+Cancellation. A senior candidate will bring up .cancel() unprompted — it's what you wire into useEffect cleanup to kill a pending call when the component unmounts.
+
+Testing It
+
+// Rough behavior check — real tests would use fake timers.
+const calls = [];
+const fn = (x) => calls.push(x);
+const d = debounce(fn, 100);
+
+d(1); d(2); d(3);
+// After ~100ms of quiet: calls === [3]
+
+setTimeout(() => d(4), 200); // fires again at ~300ms
+// Final: calls === [3, 4]
+
+In a real test suite, use jest.useFakeTimers() / vi.useFakeTimers() and jest.advanceTimersByTime(100) to drive the clock deterministically.
+
+React-Specific Gotchas
+
+Expect a follow-up like "now use this in a React component" — there are two classic traps:
+
+1. Don't call debounce() in the render body without memoizing. Every render creates a fresh debounced function with its own timer, so you never actually debounce anything.
+
+// ❌ Broken — new debounced fn every render, timer never coalesces calls
+function Search() {
+  const [q, setQ] = useState("");
+  const onChange = debounce((e) => setQ(e.target.value), 300);
+  return <input onChange={onChange} />;
+}
+
+// ✅ Memoize it, and clean up on unmount
+function Search() {
+  const [q, setQ] = useState("");
+  const debounced = useMemo(
+    () => debounce((value) => setQ(value), 300),
+    [],
+  );
+  useEffect(() => () => debounced.cancel(), [debounced]);
+  return <input onChange={(e) => debounced(e.target.value)} />;
+}
+
+2. Stale closures. If the debounced callback closes over state or props, you'll see stale values when it fires. Either pass the value as an arg (as above), or use a ref to read the latest value at fire time.
+
+Further Follow-Ups
+
+maxWait: a hybrid where the callback is guaranteed to fire at least every maxWait ms even if calls never stop arriving. This is debounce with an upper bound — useful for infinite-scroll containers that never go quiet.
+
+Promise-returning debounce: return a promise from the debounced function that resolves with the eventual result. Trickier — you have to decide what happens to the promises of superseded calls (reject? resolve with the later result? leave pending forever?).
+
+Why not just use lodash.debounce? In production, yes. In the interview, the point is to show you understand setTimeout, closures, and this — a one-line lodash import tells the interviewer nothing.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

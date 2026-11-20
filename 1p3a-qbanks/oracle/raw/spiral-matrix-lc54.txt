@@ -1,0 +1,44 @@
+===H1===
+Spiral Matrix (LC 54)
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/spiral-matrix-lc54
+===BODY===
+Oracle
+CodingMembers
+Spiral Matrix (LC 54)
+Traverse a rectangular matrix in clockwise spiral order. The onsite exercise included a test-case walkthrough and complexity analysis.
+SWE
+array
+grid
+medium
+Frequency
+Single report
+Last asked
+—
+Stage
+onsite-coding
+Requirements
+
+Solve the LC 54 coding exercise.
+
+Walk through test cases and explain the time and space complexity.
+
+Notes
+
+The canonical task takes a rectangular matrix and returns its elements clockwise, spiraling inward from the top-left corner.
+
+Maintain inclusive top, bottom, left, and right bounds for the unvisited rectangle. While both ranges are nonempty, emit the top row left-to-right and increment top; emit the right column top-to-bottom and decrement right. If top is still at most bottom, emit the bottom row right-to-left and decrement bottom. If left is still at most right, emit the left column bottom-to-top and increment left. These guards avoid revisiting a remaining single row or column.
+
+Each cell is emitted once: O(mn) time and O(1) auxiliary space, excluding the O(mn) result. Empty input may return an empty result as a defensive extension; the canonical task uses a nonempty rectangular matrix.
+
+Preparation
+
+Implement the boundary traversal in 15 minutes and trace single-cell, single-row, single-column, and rectangular matrices; check that every coordinate is emitted exactly once.
+
+Explain the shrinking-rectangle invariant and account separately for the result list and auxiliary space. Practice the walkthrough without executing the code.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

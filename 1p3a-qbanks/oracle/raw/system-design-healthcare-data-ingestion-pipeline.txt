@@ -1,0 +1,65 @@
+===H1===
+System Design — Healthcare Data Ingestion Pipeline
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/system-design-healthcare-data-ingestion-pipeline
+===BODY===
+Oracle
+System DesignMembers
+System Design — Healthcare Data Ingestion Pipeline
+Design a healthcare data-ingestion pipeline that efficiently handles millions of records. Cover ingestion, queue or message-broker selection, storage, processing, fault tolerance, scalability, monitoring and alerting, and the handling of failed or unprocessed records.
+SWE
+ingestion
+messaging
+storage
+scaling
+distributed-systems
+medium
+Frequency
+Single report
+Last asked
+2026-08-19
+Stage
+onsite-system-design
+Requirements
+
+Design a healthcare data-ingestion pipeline that can efficiently handle millions of records.
+
+Define the data-ingestion path and the processing pipeline.
+
+Select a queue or message broker and justify the choice.
+
+Define the storage strategy.
+
+Make the system fault-tolerant and horizontally scalable.
+
+Provide monitoring and alerting for pipeline health.
+
+Explain how failed or unprocessed records are retained and handled.
+
+Notes
+
+Start by clarifying peak arrival rate, average record size, freshness target, retention period, ordering needs, and delivery semantics; a record count without a time window is not enough for capacity planning.
+
+A defensible baseline is stateless ingestion that validates each record, assigns an idempotency key, durably stores the raw payload, and publishes an identifier plus processing metadata to a partitioned broker. This separates accepting data from slower downstream work.
+
+Prefer at-least-once delivery with idempotent consumers and checkpointed progress. Partition by a stable domain key when per-entity ordering matters, and address hot partitions with enough partitions, backpressure, and controlled rebalancing.
+
+Separate storage by purpose: immutable raw records for replay and audit, a metadata store for processing state, and a serving store shaped for downstream queries. Protect sensitive data with encryption, least-privilege access, and auditable reads and writes.
+
+Bound transient retries with exponential backoff, move exhausted records to a dead-letter path with the original payload and failure metadata, and run reconciliation against accepted-but-incomplete records so silent stalls are recoverable.
+
+Monitor acceptance and processing rates, queue lag, end-to-end freshness, error and retry rates, dead-letter growth, and oldest unprocessed-record age. Alert on sustained SLO breaches rather than isolated failures.
+
+Preparation
+
+Practice drawing the end-to-end ingestion, queueing, processing, storage, and recovery path before discussing individual components.
+
+Prepare a short comparison of at least two broker choices and two storage strategies against throughput, durability, and operational complexity.
+
+Define the observability signals and rehearse the recovery flow for failed or unprocessed records.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

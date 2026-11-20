@@ -1,0 +1,432 @@
+===H1===
+Implement a CD Command
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/implement-cd-command
+===BODY===
+OpenAI
+CodingMembers
+Implement a CD Command
+Implement a cd() method that behaves like running cd <destination> in a terminal and then calling pwd. The problem builds from relative-path normalization (handling .., ., repeated slashes, trailing slashes) through absolute paths and ~ expansion, to full symbolic-link resolution with cycle detection. A final follow-up explores why cd must be a shell built-in and how Linux resolves paths via inodes.
+SWE
+string-processing
+stack
+parsing
+medium
+Frequency
+Single report
+Last asked
+2025-12-27
+Stage
+onsite-coding
+Problem Overview
+
+Implement a cd() method that behaves like running cd <destination> in a terminal and then calling pwd.
+
+The base version takes two inputs:
+
+current_dir: the current working directory
+
+destination: a relative path to navigate to
+
+Return the final normalized path as a string.
+
+Your solution should handle special path components such as:
+
+.. to move to the parent directory
+
+. to stay in the current directory
+
+repeated slashes like foo//bar
+
+trailing slashes such as ../A/B/
+
+mixed navigation such as ./A/ and ../A/B/../
+
+The core of the problem is string processing: parse the path, simplify it, and rebuild the final canonical path.
+
+Part 1: Normalize a Relative Destination
+
+Write:
+
+def cd(current_dir: str, destination: str) -> str:
+    ...
+
+Assume:
+
+current_dir is already an absolute normalized path such as "/usr/local/bin"
+
+destination is relative for the base problem
+
+the result should always be an absolute normalized path
+
+navigating above / should keep you at /
+
+Examples
+
+cd("/usr/local", "bin")                 # "/usr/local/bin"
+cd("/usr/local", "../bin")              # "/usr/bin"
+cd("/usr/local", "../A/B/")             # "/usr/A/B"
+cd("/usr/local", "./A/")                # "/usr/local/A"
+cd("/usr/local", "../A/B/../")          # "/usr/A"
+cd("/usr/local", "../../..")            # "/"
+cd("/", "..")                           # "/"
+cd("/a/b/c", "../../x/./y//")           # "/a/x/y"
+
+Clarifications
+
+Treat empty path segments created by // as no-ops.
+
+Treat . as a no-op.
+
+Treat .. as "pop one directory" if possible.
+
+Do not access the real file system in the base version. This is purely path resolution.
+
+Expected Approach
+
+The cleanest solution is usually a stack (or dynamic array):
+
+Split current_dir into path segments and seed a stack with them.
+
+Split destination on /.
+
+For each token:
+
+skip "" and .
+
+pop for .. if the stack is non-empty
+
+otherwise push the directory name
+
+Join the stack back into an absolute path.
+
+Reference Implementation
+
+def cd(current_dir: str, destination: str) -> str:
+    stack = [segment for segment in current_dir.split("/") if segment]
+
+    for token in destination.split("/"):
+        if token == "" or token == ".":
+            continue
+        if token == "..":
+            if stack:
+                stack.pop()
+            continue
+        stack.append(token)
+
+    return "/" + "/".join(stack)
+
+Complexity
+
+Time: O(n + m) where n and m are the lengths of the two input strings
+
+Space: O(k) for the path segments stored in the stack
+
+Part 2: Add Support for Absolute Paths and ~
+
+Now extend the function so it can also handle:
+
+absolute destinations such as "/etc/nginx"
+
+the ~ symbol representing the user's home directory
+
+Example signature:
+
+def cd(current_dir: str, destination: str, home_dir: str) -> str:
+    ...
+
+Examples
+
+cd("/usr/local", "/etc/nginx", "/home/alice")   # "/etc/nginx"
+cd("/usr/local", "~", "/home/alice")            # "/home/alice"
+cd("/usr/local", "~/projects", "/home/alice")   # "/home/alice/projects"
+cd("/tmp", "../docs", "/home/alice")            # "/docs"
+
+Part 2 Solution
+
+Reuse the Part 1 stack-based normalizer, but first convert the input into an absolute path:
+
+If destination starts with ~, expand it to home_dir
+
+Else if it starts with /, use it directly
+
+Else append it to current_dir
+
+Then normalize the resulting absolute path.
+
+def normalize_absolute_path(path: str) -> str:
+    stack: list[str] = []
+
+    for token in path.split("/"):
+        if token == "" or token == ".":
+            continue
+        if token == "..":
+            if stack:
+                stack.pop()
+            continue
+        stack.append(token)
+
+    return "/" + "/".join(stack)
+
+def cd(current_dir: str, destination: str, home_dir: str) -> str:
+    if destination == "~":
+        path = home_dir
+    elif destination.startswith("~/"):
+        path = home_dir.rstrip("/") + "/" + destination[2:]
+    elif destination.startswith("~"):
+        raise ValueError("Only ~ and ~/... are supported")
+    elif destination.startswith("/"):
+        path = destination
+    else:
+        path = current_dir.rstrip("/") + "/" + destination
+
+    return normalize_absolute_path(path)
+
+Complexity
+
+Time: O(L) where L is the length of the combined path string
+
+Space: O(k) for the normalized path segments
+
+Part 3: Add Support for Symbolic Links
+
+Assume you are given a mapping from symlink paths to their real targets:
+
+symlinks = {
+    "/shortcut": "/var/data/archive",
+    "/home/alice/latest": "/mnt/releases/2026-03-01",
+}
+
+Extend the function:
+
+def cd(
+    current_dir: str,
+    destination: str,
+    home_dir: str,
+    symlinks: dict[str, str],
+) -> str:
+    ...
+
+Example
+
+current_dir = "/home/alice"
+destination = "latest/logs/../config"
+home_dir = "/home/alice"
+symlinks = {
+    "/home/alice/latest": "/mnt/releases/2026-03-01",
+}
+
+# Result: "/mnt/releases/2026-03-01/config"
+
+Part 3 Solution
+
+For symlink support, the order of operations matters.
+
+You should not fully normalize the whole path before resolving symlinks, because cases like:
+
+latest/../config
+
+depend on whether latest is a symlink. If latest points to "/mnt/releases/2026-03-01", then the physical path should become:
+
+/mnt/releases/config
+
+So the correct approach is:
+
+Build the destination path while preserving . and ..
+
+Process tokens from left to right
+
+After adding each normal directory name, check whether the current prefix is a symlink
+
+If so, replace that prefix with the symlink target and continue processing the remaining tokens
+
+This matches physical path resolution much more closely.
+
+def split_path(path: str) -> list[str]:
+    return [token for token in path.split("/") if token != ""]
+
+def normalize_absolute_path(path: str) -> str:
+    stack: list[str] = []
+
+    for token in split_path(path):
+        if token == ".":
+            continue
+        if token == "..":
+            if stack:
+                stack.pop()
+            continue
+        stack.append(token)
+
+    return "/" + "/".join(stack)
+
+def build_initial_state(
+    current_dir: str,
+    destination: str,
+    home_dir: str,
+) -> tuple[list[str], list[str]]:
+    if destination == "~":
+        return [], split_path(home_dir)
+    if destination.startswith("~/"):
+        return [], split_path(home_dir) + split_path(destination[2:])
+    if destination.startswith("~"):
+        raise ValueError("Only ~ and ~/... are supported")
+    if destination.startswith("/"):
+        return [], split_path(destination)
+    return split_path(current_dir), split_path(destination)
+
+def cd(
+    current_dir: str,
+    destination: str,
+    home_dir: str,
+    symlinks: dict[str, str],
+) -> str:
+    stack, remaining = build_initial_state(current_dir, destination, home_dir)
+    seen_symlinks: set[str] = set()
+
+    i = 0
+    while i < len(remaining):
+        token = remaining[i]
+
+        if token == ".":
+            i += 1
+            continue
+
+        if token == "..":
+            if stack:
+                stack.pop()
+            i += 1
+            continue
+
+        stack.append(token)
+        current_path = "/" + "/".join(stack)
+
+        if current_path in symlinks:
+            if current_path in seen_symlinks:
+                raise ValueError(f"Symlink cycle detected at {current_path}")
+
+            seen_symlinks.add(current_path)
+            target = normalize_absolute_path(symlinks[current_path])
+            stack = []
+            remaining = split_path(target) + remaining[i + 1 :]
+            i = 0
+            continue
+
+        i += 1
+
+    return "/" + "/".join(stack)
+
+Complexity
+
+Without symlinks, the complexity stays linear in the number of path segments.
+
+With symlink expansion, worst-case time depends on how many expansions occur and whether prefixes are repeatedly reprocessed.
+
+A reasonable way to express the worst-case time is O(n + s * r) where:
+
+n is the number of path tokens
+
+s is the number of symlink expansions
+
+r is the amount of path reprocessing after each expansion
+
+Space is O(k) for the working stack plus the visited-symlink set.
+
+Part 4: How Would Real cd Work in a Shell?
+
+This follow-up is less about string processing and more about systems knowledge.
+
+Why cd Is a Shell Built-in
+
+cd must change the current working directory of the current shell process. If it ran as a separate child process, only the child would change directories and the parent shell would stay where it was. That is why shells implement cd as a built-in command.
+
+High-Level Shell Flow
+
+Parse the command line and expand shell syntax such as ~, environment variables, and quotes.
+
+Resolve the destination path, including logical vs physical path behavior.
+
+Call the OS interface that changes the process working directory, typically chdir(...).
+
+If successful, update shell state like PWD and OLDPWD.
+
+If the directory does not exist or permissions fail, surface an error to the user.
+
+Linux File System Tree and Inodes
+
+Linux directories form a hierarchical tree rooted at /.
+
+A directory is a special file that maps names to inode numbers.
+
+An inode stores file metadata such as ownership, permissions, timestamps, size, and pointers to data blocks.
+
+File names are not stored "inside" the inode as the lookup key. Instead, the parent directory maps a name like "bin" to an inode.
+
+Path resolution walks the tree one segment at a time:
+
+start from / or the current working directory
+
+look up each component in the current directory
+
+follow the inode for the next directory or file
+
+Symbolic links are special files whose contents point to another path, so the kernel may restart or continue path resolution at the symlink target.
+
+Notes
+
+Output-format invariants to lock down before coding
+
+These are the contract details interviewers probe with off-by-one outputs:
+
+The result is always an absolute, normalized path — it starts with /, contains no . or .., no empty (//) segments, and no trailing slash.
+
+The root is the literal string "/", never "". Watch the edge case where the stack is empty after popping: "/" + "/".join([]) correctly yields "/", so emit the leading slash by construction rather than join-ing it in.
+
+.. at or above root is a clamped no-op (stays at /), not an error and not an underflow — this holds in every part, including after a symlink jump in Part 3 where the rebuilt stack can be shorter than the .. count.
+
+. and any empty segment (from //, a leading /, or a trailing /) are dropped silently; a trailing slash never produces a trailing-slash result.
+
+~ expansion corner cases
+
+~ alone → expands to exactly home_dir.
+
+~/... → home_dir joined with the remainder; the remainder is then subject to the same ./../// normalization.
+
+~user (a tilde immediately followed by a non-slash name, i.e. another user's home) is out of scope — reject it (ValueError) rather than treating ~user as a literal directory name. Confirm this with the interviewer; real shells consult the password database, which the problem deliberately excludes.
+
+~ is only special as the first character of destination. A literal ~ appearing mid-path (e.g. a/~b) is an ordinary directory name, not an expansion.
+
+Symlink resolution semantics (Part 3)
+
+Resolve symlinks incrementally, left to right — do not pre-normalize the whole path. The check happens the moment a normal directory token is appended and the running prefix matches a symlink key; only then is the prefix swapped for the target. This is what makes latest/../config resolve through the target of latest (/mnt/releases/config) rather than collapsing latest/.. away first. This mirrors physical (cd -P) resolution; a purely lexical cd -L shell would instead cancel latest/.. textually and never consult the symlink.
+
+.. is applied to the post-expansion stack, i.e. relative to where the symlink target landed you — not to the logical pre-symlink directory. That is the crux of the Part 3 example.
+
+Cycle detection: track visited symlink prefixes in a set and raise on re-entry, so a → b → a terminates instead of looping forever. A real kernel bounds this with ELOOP after a fixed number of hops (commonly 40); the set-based guard is the in-memory analogue.
+
+Targets can themselves be relative or contain symlinks. Normalize each target before splicing, and keep processing the spliced tokens so a target that lands on another symlink prefix is resolved in turn (handled by resetting the scan index after each expansion).
+
+Symlink keys are matched as whole absolute prefixes (/home/alice/latest), not as substrings — a partial-component match like /home/alice/latest-backup must not trigger the /home/alice/latest rule.
+
+Common bugs candidates report
+
+Forgetting to filter empty segments, so a leading / or // injects "" into the stack and the join produces //....
+
+Producing "" for the root case instead of "/".
+
+In Part 3, normalizing the full path up front (collapsing .. lexically) and thereby getting the wrong answer for symlink/../x.
+
+Re-checking the symlink prefix only at the very end instead of after each pushed segment, missing mid-path symlinks.
+
+Follow-ups interviewers extend into
+
+Distinguish logical vs physical path resolution (cd -L vs cd -P) and explain when pwd of each differs.
+
+How a real shell updates PWD/OLDPWD and supports cd - (jump to OLDPWD).
+
+Where the OS boundary is: lexical resolution is pure string work, but the actual directory change is a chdir() syscall that can fail with ENOENT/EACCES/ENOTDIR.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

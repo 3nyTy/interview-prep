@@ -1,0 +1,81 @@
+===H1===
+Working Hours Register
+===URL===
+https://www.1point3acres.com/interview/problems/company/airbnb/oa-working-hours-register
+===BODY===
+Airbnb
+Coding·90 minMembers
+Working Hours Register
+Build a four-level Working Hours Register that records employee entry and exit, ranks employees by accumulated work time, activates pending promotions on a later entry, calculates pay using historical compensation, and applies double-pay grant periods.
+SWE
+data-structure
+state-machine
+interval-aggregation
+sorting
+payroll
+codesignal
+oa
+hard
+Frequency
+Low · New
+Last asked
+2026-08-17
+Stage
+oa
+Requirements
+
+Complete four progressively unlocked levels within 90 minutes.
+
+Level 1 — employee and attendance basics:
+
+Add an employee.
+
+Record entry and exit badge events.
+
+Query an employee's total worked time.
+
+Level 2 — ranking:
+
+Return the top n employees ordered by worked time.
+
+Level 3 — promotions and salary:
+
+Schedule a promotion with a new position and compensation without immediately changing the current role.
+
+Keep the promotion pending until the employee next badges into the office, then activate it.
+
+Calculate salary across historical compensation periods; each completed work session is priced using the compensation active for that session.
+
+Level 4 — grant periods:
+
+Register periods during which qualifying work is paid at double rate.
+
+Apply the multiplier only when an entire work session falls within a grant period.
+
+Query the total amount of double-pay compensation issued.
+
+Notes
+
+Promotion scheduling and activation are separate state transitions; the next entry event is the activation boundary.
+
+Historical payroll cannot be reconstructed from only the employee's current compensation. Preserve the compensation associated with each session.
+
+Grant-period eligibility uses full containment of a session, not partial overlap.
+
+Later levels depend on the correctness of the earlier attendance and session model.
+
+Preparation
+
+Build the attendance state machine first and test duplicate entry, exit without entry, and total-time aggregation across multiple sessions.
+
+Add a pending-promotion transition and verify that compensation changes only on the next entry.
+
+Drill salary aggregation over sessions with different compensation values, then add full-containment checks for double-pay intervals.
+
+Practice extending the same data model level by level without rewriting earlier methods.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

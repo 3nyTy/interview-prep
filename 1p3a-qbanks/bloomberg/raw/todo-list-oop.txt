@@ -1,0 +1,68 @@
+===H1===
+Todo List OOP Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/todo-list-oop
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Todo List OOP Design
+Design a small Todo-list service supporting `add`, `delete`, `get_todo` (pending only), and `get_all`, given a `check_todo(id)` predicate that tells you whether an entry is already done. Coding-flavored OOD round — pick data structures that make every operation cheap.
+SWE
+oop-design
+hashmap
+linked-list
+data-structure
+medium
+Frequency
+Single report
+Last asked
+2026-01-04
+Stage
+onsite-coding
+Requirements
+
+Design a class supporting:
+
+class TodoList:
+    def add(self, entry: str) -> int          # returns id
+    def delete(self, id: int) -> bool
+    def get_todo(self) -> List[str]           # only pending
+    def get_all(self) -> List[str]            # both pending and done
+
+Assume an external helper check_todo(id) -> bool (returns True iff the entry has been marked done) is callable in O(1). The class controls only add / delete / get; completion state is externally maintained.
+
+Grade dimensions interviewers stated:
+
+add and delete should be O(1) amortized.
+
+get_todo and get_all should each be O(n) in their output size (no extra full scans).
+
+Ids should be stable across delete; existing ids must not be reused.
+
+Iteration order is insertion order.
+
+Notes
+
+The clean shape: a HashMap<int, Entry> for O(1) add / delete, plus a LinkedHashMap (or insertion-ordered map equivalent) to preserve iteration order. If the language has no built-in, pair the hash map with a doubly linked list of (id, entry) nodes.
+
+get_todo filters the linked list by check_todo(id) lazily — no separate index needed if check_todo is O(1).
+
+Id allocation: a monotonically increasing counter, never reset. This keeps deletes from accidentally re-issuing live ids.
+
+Time and space: O(1) for add / delete, O(n) for get_all, O(n) worst case for get_todo (when no entries are done).
+
+Bloomberg interviewers in this slot want clean separation of concerns: the TodoList is a container; completion is a property fetched on demand. Mixing them by caching done-state inside the class invites stale-data follow-ups.
+
+Preparation
+
+Sketch the data structures on paper before writing code; this round is graded as much on layout as on correctness.
+
+Implement once in a language with an ordered map (Java / Python) and once in a language without (C++), to confirm the DLL-with-HashMap fallback is fluent.
+
+Practice articulating the separation argument out loud: "check_todo is the source of truth for done-state; this class owns insertion / deletion / order, nothing else."
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

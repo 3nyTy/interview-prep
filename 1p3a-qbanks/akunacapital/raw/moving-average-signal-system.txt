@@ -1,0 +1,63 @@
+===H1===
+Moving Average Signal System
+===URL===
+https://www.1point3acres.com/interview/problems/company/akunacapital/moving-average-signal-system
+===BODY===
+Akuna Capital
+CodingMembers
+Moving Average Signal System
+Design a system that computes a moving average from market data and uses a fixed threshold to generate a trading signal.
+SWE
+Infra Eng
+streaming
+sliding-window
+trading
+state-machine
+medium
+Frequency
+Single report
+Last asked
+2026-01-23
+Stage
+onsite-coding
+Requirements
+
+Build a system to generate a moving average and then use the moving average to produce a signal.
+
+Assumptions stated in the prompt:
+
+The threshold is fixed.
+
+Market data is available.
+
+The moving-average window is fixed.
+
+Clarify before coding:
+
+Input event shape: timestamp plus price, or just a price stream.
+
+Window definition: last N ticks, last T seconds, or both.
+
+Signal rule: price crossing moving average by threshold, moving average crossing another value, or absolute deviation from the moving average.
+
+Output: boolean signal, enum such as BUY/SELL/HOLD, or callback/event.
+
+Notes
+
+For a fixed-count window, use a queue plus running sum: push new price, add to sum, evict old price when size exceeds N, and compute sum / size. For a time window, evict while timestamp <= now - window.
+
+If the signal is based on deviation from moving average, define hysteresis to avoid flickering around the threshold. In a trading-engine discussion, also mention stale data, out-of-order ticks, duplicate timestamps, and whether the calculation should use trade price, mid-price, or best bid/ask.
+
+Preparation
+
+Implement count-window and time-window moving averages from scratch.
+
+Add tests for empty stream, exactly full window, overfull eviction, and repeated identical prices.
+
+Prepare one sentence on production concerns: market-data ordering, clock source, stale ticks, and signal debounce.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,85 @@
+===H1===
+DNA Shotgun Sequencing
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/dna-shotgun-sequencing
+===BODY===
+Microsoft
+Coding·60 minFree preview
+DNA Shotgun Sequencing
+Reconstruct a DNA string from fragments tagged at both ends. Three-part: ordered chain → undirected chain (Eulerian path) → multi-chain decomposition. The signature MAI "platform" coding problem.
+MLE
+SWE
+graph
+hard
+string-processing
+dfs
+Frequency
+Medium
+Last asked
+2026-05-28
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Each input fragment is a Sequence(start_id, end_id, payload) where start_id and end_id are short tag strings (e.g. "AAA", "AAC") and payload is an arbitrary string contributing to the reconstructed DNA. All tags within a part are unique unless the prompt explicitly allows reuse.
+
+Part 1 — Directed chain
+
+A fragment's end_id equals the next fragment's start_id. There is exactly one valid ordering using all fragments. Implement:
+
+String shotgunSequence(List<Sequence> sequences)
+
+Concatenate the payloads in the recovered order. Example input → output:
+
+[("AAA","AAC","AAAA"),
+ ("AGG","ACC","GGGG"),
+ ("AAC","ACT","TTTT"),
+ ("ACT","AGG","CCCC")]
+→ "AAAATTTTCCCCGGGG"
+
+Part 2 — Undirected chain (Eulerian path)
+
+The two tags on each fragment are no longer labelled start / end. A fragment can be traversed in either direction, and two fragments connect whenever they share any tag. A valid traversal still exists and still uses every fragment. Same return type — the assembled payload string.
+
+[("A","B","AAAA"),
+ ("B","C","TTTT"),
+ ("C","D","CCCC"),
+ ("D","B","GGGG")]
+A → B → C → D → B
+→ "AAAATTTTCCCCGGGG"
+
+Part 3 — Multi-chain decomposition
+
+Input fragments may form multiple disjoint chains (each fragment still has a unique direction within its chain, but no global order exists). Return every assembled chain. Several candidates also report a variant where the prompt asks you to detect whether a clean decomposition exists at all and surface ambiguous fragments separately.
+
+Notes
+
+Part 1 reduces to walking a directed multigraph where every node has in-degree = out-degree = 1 along the unique path: build a start_id → fragment index, find the head (the start_id that never appears as any end_id), then chase pointers in O(N).
+
+Part 2 is the canonical Eulerian path on an undirected multigraph: each tag becomes a vertex, each fragment becomes an undirected edge carrying the payload. A valid traversal exists when exactly zero or two vertices have odd degree; start from one of the odd-degree vertices (or any vertex if all are even) and run Hierholzer's algorithm, splicing sub-cycles into the main path. When walking the path, emit payload if you traverse the edge in its declared tag1 → tag2 direction and reverse(payload) if you traverse the other way — interviewers do not always volunteer this, candidates have had to ask.
+
+Part 3 is connected-component decomposition followed by Hierholzer per component. Multi-chain detection is just "how many components produced a non-empty walk".
+
+Common failure modes reported:
+
+Treating Part 2 as another directed walk and missing the reversal of payload on the return leg.
+
+Using DFS recursion for Hierholzer on long chains and blowing the call stack — write the iterative version.
+
+Not deduplicating edges when the same fragment appears twice in the input (interviewers occasionally insert this).
+
+Preparation
+
+Implement Hierholzer iteratively on a paper before the loop; the recursive version is easy to memorize and easy to fail under pressure.
+
+Drill the directed Part 1 in under 8 minutes using a single hashmap walk so you bank time for Parts 2-3.
+
+Pre-rehearse the question "does payload flip when the edge is traversed in reverse?" — asking it costs nothing and saves you from rewriting Part 2.
+
+Read the in-memory DB and beam search prompts in the same loop family; they share the multi-follow-up cadence.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

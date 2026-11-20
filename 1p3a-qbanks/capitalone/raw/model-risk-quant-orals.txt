@@ -1,0 +1,70 @@
+===H1===
+Model Risk: VaR & Monte Carlo Orals
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/model-risk-quant-orals
+===BODY===
+Capital One
+Other·60 minMembers
+Model Risk: VaR & Monte Carlo Orals
+Model Risk Validation Manager loop — niche finance / risk-theory round. Recurring questions: VaR for long vs short positions, Monte Carlo path-count convergence. The interviewer probes one layer deeper on each surface answer; precision in terminology is the graded signal.
+EM
+verbal
+math-reasoning
+probability
+cs-fundamentals
+open-ended
+Frequency
+Single report
+Last asked
+2026-03-15
+Stage
+final-round
+Requirements
+
+The round spans model-validation orals and applied risk reasoning:
+
+VaR for long vs short positions. "If you're long $1M in a stock with VaR = $100K, what's the VaR if you short the same amount?" The answer is not simply $100K. Discuss:
+
+Return distributions are asymmetric — stocks drift upward historically, so the short loss tail differs from the long loss tail in magnitude and frequency.
+
+Short positions carry margin-call risk; LTV breaches force additional collateral, increasing effective exposure beyond the initial position.
+
+Always simulate returns, not prices — returns are stationary; prices are not.
+
+Short VaR is typically larger than long VaR when liquidity and margin risk are properly accounted for.
+
+Monte Carlo path count. "How many paths do you need?" Frame it as a convergence problem, not a fixed number:
+
+Stability of quantile estimates improves with √N — diminishing returns.
+
+At 95% confidence with 200K paths → 10K tail observations → stable estimate.
+
+Distinguish CLT / t-stats for parameter estimation (mean and σ from historical returns) from Monte Carlo path count for convergence of the quantile estimate.
+
+Validate by plotting VaR estimates across increasing path counts; stop when the change is within tolerance.
+
+Model-validation methodology. Be ready to discuss backtesting frameworks, traffic-light tests, model performance under stress scenarios, the Capital One / Discover merger context (additional model-validation complexity from combining institutions).
+
+Notes
+
+The round is at a level that expects production model-validation experience; this is a senior / specialist loop, not an entry-level role.
+
+Precision in terminology matters: know the difference between parameter estimation and simulation convergence; synthetic control method vs geo test; expected shortfall vs VaR; historical simulation vs parametric vs Monte Carlo VaR.
+
+For the VaR long-vs-short question, name the asymmetry up front — most candidates give the textbook $100K answer and lose the round in the first 30 seconds.
+
+Mention the regulatory context (Basel III, Fed CCAR / DFAST) when relevant; Capital One is regulated and the model-risk function reports up through the regulatory chain.
+
+Preparation
+
+Refresh the VaR / ES / parametric-vs-historical / Monte Carlo trade-offs; know the formulas and assumptions for each.
+
+Drill the convergence-of-quantile-estimates argument; this is the second-most-common probe in the round.
+
+Read the Federal Reserve's SR 11-7 model risk management guidance once before the loop; it is the regulatory anchor every Capital One model-risk conversation references implicitly.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

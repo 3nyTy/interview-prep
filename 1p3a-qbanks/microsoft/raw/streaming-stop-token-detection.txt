@@ -1,0 +1,67 @@
+===H1===
+Streaming Stop-Token Detection
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/streaming-stop-token-detection
+===BODY===
+Microsoft
+Coding·60 minMembers
+Streaming Stop-Token Detection
+Decode an LLM token stream and stop emission the instant a forbidden stop sequence appears — including when the stop sequence straddles chunk boundaries. No full-stream buffering allowed.
+MLE
+trie
+string-processing
+streaming
+hard
+Frequency
+Low
+Last asked
+2026-03-03
+Stage
+phone-screen · onsite-coding
+Requirements
+
+You are given a generator-like source that yields string chunks one at a time (each chunk is an arbitrary slice — could be one character, could be 200). You are also given a set of stop tokens (multi-character strings, e.g. ["<|im_end|>", "###"]).
+
+Implement a function that consumes the stream and outputs everything emitted before the first stop-token occurrence. The stop token must be detected even when it spans the boundary of two chunks (e.g. one chunk ends with <|im and the next chunk starts with _end|>...).
+
+Hard constraints surfaced during follow-ups:
+
+You may not concatenate the entire stream and run substring search at the end; the function must emit non-stop output as soon as it is safe to do so.
+
+You may not delay output until the stream completes — output is itself a stream consumed by a downstream caller, and unbounded buffering is a failure mode the interviewer probes.
+
+Stop tokens have differing lengths; the longest stop token bounds the maximum required look-back.
+
+A typical follow-up adds the constraint that the function should also report which stop token fired (multi-stop bookkeeping).
+
+Notes
+
+The canonical pattern is Aho-Corasick over the union of stop tokens, advanced one character at a time. Maintain at most L-1 characters of pending output (where L is the longest stop token); emit any character once the trailing window can no longer be the start of a stop-token match. When the automaton reaches an accept state, drop the suffix matching the stop token and return.
+
+Trie-only solutions (without failure links) work for small stop-token sets but become quadratic when a near-miss prefix forces re-scanning — interviewers often add a stop token like aab plus an input like aaaaaab to surface that bug. Aho-Corasick failure links collapse this to linear.
+
+Single-stop variants reduce to KMP partial-match failure function — same idea, simpler bookkeeping. If you start with KMP and the interviewer adds a second stop token, the failure function generalizes naturally to Aho-Corasick.
+
+Common reported bugs:
+
+Implementing the buffer as a Python str and re-allocating on every append (O(N²)). Use a bytearray or collections.deque[char].
+
+Forgetting that the emit step must drain everything outside the current automaton suffix, not only the most recent character.
+
+Emitting partial stop-token prefix bytes during the look-back window.
+
+Preparation
+
+Implement KMP from scratch in under 15 minutes; write the prefix-function table by hand on a paper trace of "abcab" until it is muscle memory.
+
+Extend KMP to multi-pattern Aho-Corasick by drilling ["he", "she", "his", "hers"] against "ushers".
+
+Practice the chunk-boundary case: feed the same input as 1-char-at-a-time, 5-char chunks, and full-string chunks; all three must produce the same emission stream.
+
+Pair this prep with the beam search and DNA sequencing problems — MAI bundles them into the same coding session.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,42 @@
+===H1===
+Coin Change (LC 322)
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/coin-change
+===BODY===
+Pinterest
+CodingMembers
+Coin Change (LC 322)
+The topic is Coin Change (LC 322). Practice the canonical minimum-coin formulation; the exact onsite contract and any modifications remain unspecified.
+dp
+medium
+Frequency
+Single report
+Last asked
+—
+Stage
+onsite-coding
+Requirements
+
+The onsite topic is Coin Change (LC 322). The precise interview contract and any modifications are unspecified.
+
+Notes
+
+Canonical practice contract: given positive integer denominations and a nonnegative target amount, find the minimum number of coins whose values sum to the target. Each denomination may be reused without limit; return -1 if the target is unreachable. These are the public practice semantics, not independently confirmed onsite details.
+
+Let dp[x] be the minimum coins for amount x. Initialize dp[0] = 0 and other entries as unreachable. Visit amounts in increasing order; for each denomination c no larger than x, relax dp[x] from dp[x-c] + 1 when that predecessor is reachable.
+
+Positive denominations make every dependency smaller than the current amount. Amount zero needs no coins; an unreachable final state returns -1.
+
+For m denominations and target A, the nested loops take O(mA) time and the table uses O(A) space. This is pseudo-polynomial in the numeric target.
+
+Preparation
+
+Implement the recurrence from a blank file, checking zero amount, unreachable amounts, and repeated use of one denomination.
+
+Compare the table result with a breadth-first search over reachable amounts for small targets; explain why choosing the largest coin first need not minimize the count.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,64 @@
+===H1===
+ClayWorkspace Resource Tree
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/clay-workspace-resource-tree
+===BODY===
+Goldman Sachs
+CodingMembers
+ClayWorkspace Resource Tree
+Implement a `ClayWorkspace` backed by a dictionary of resource ids to `Resource` objects. The initial API creates resources and lists a folder's contents; the follow-ups add recursive deletion and moving a resource either to the home level or under another folder id.
+SWE
+object-design
+tree
+filesystem
+data-structure
+medium
+Frequency
+Single report
+Last asked
+2026-06-21
+Stage
+phone-screen
+Requirements
+
+Implement a workspace/resource manager with a dictionary mapping resource ids to Resource objects. The initial interface is:
+
+class ClayWorkspace:
+    def __init__(self):
+        ...
+
+    def create_resource(self, resource_name: str, resource_type: ResourceType, parent_folder_id: str):
+        ...
+
+    def list_resources(self, folder_id: str):
+        ...
+
+Follow-ups:
+
+Given a resource id, delete that resource and every nested resource below it recursively.
+
+Given a resource id and any additional parameters you need, move that resource either to the home level or into another folder referenced by id.
+
+Notes
+
+Model each resource with at least an id, name, type, parent pointer or parent id, and a collection of child ids for folder resources.
+
+create_resource should update both the global id-to-resource dictionary and the parent folder's child collection.
+
+Recursive delete must remove descendants from the global dictionary as well as detach the deleted root from its parent.
+
+Move semantics need cycle protection: a folder should not be movable into itself or one of its descendants.
+
+Clarify whether list_resources returns ids, names, Resource objects, or a stable ordering before coding.
+
+Preparation
+
+Implement the base class with parent and child pointers, then add delete and move as separate methods without changing the data model.
+
+Test root-level creation, nested folders, deleting a folder with multiple descendants, moving a leaf, moving a subtree, invalid parent ids, and self/descendant moves.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

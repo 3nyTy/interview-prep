@@ -1,0 +1,117 @@
+===H1===
+Social Network / Follow Graph
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/social-network-follow-graph
+===BODY===
+OpenAI
+Coding·60 minMembers
+Social Network / Follow Graph
+Build a follower/followee data structure with timestamped queries and friend-of-friend recommendations.
+SWE
+RE
+algorithm
+graph
+hashmap
+medium
+Frequency
+Very high
+Last asked
+2026-08-14
+Stage
+phone-screen · onsite-coding
+Requirements
+
+update(A, B, t): A starts following B at time t
+
+check(A, B, t): at time t, is A following B?
+
+2-hop recommendation: if A → B → C, A → B → D, A → M → C, recommend [C, D] to A — C ranks higher because it has 2 intermediaries.
+
+Notes
+
+Evaluation explicitly covers comprehensive unit tests and a clear explanation of state transitions.
+
+A compact phone-screen version combines the follow graph with versioned/snapshot semantics: maintain follower/followee state, answer whether a follows b, then extend to follower lists and top-K recommendations.
+
+Each edge carries a timestamp; recommendation sorts by intermediary count.
+
+The follow + timestamped-feed half is the canonical "design Twitter" skeleton: maintain follows: defaultdict(set) and per-user post lists, then merge the K followee post-streams via a max-heap (or heapq.merge) to read the most recent items in O(K + N log K). The 2-hop recommendation extension is a Counter over neighbors-of-neighbors with the followee set subtracted out; rank by count, break ties by recency.
+
+Alternate canonical variant — snapshot-based social network
+
+A different rotation drops the timestamp-on-edges framing and asks for an immutable snapshot object instead. The problem is typically staged in three progressive parts, layered onto the same Snapshot class:
+
+Part 1 — users, follows & snapshots: add_user / follow / create_snapshot, plus Snapshot.is_following. The immutability requirement (a snapshot must not observe later follow() calls) is introduced here.
+
+Part 2 — follower/following lists: extend Snapshot with get_following / get_followers, motivating the eager reverse index.
+
+Part 3 — follow recommendations: add Snapshot.recommend (top-k 2-hop).
+
+The canonical shape:
+
+class SocialNetwork:
+    def add_user(self, user_id: str) -> None: ...
+        # Raises ValueError if the user already exists.
+
+    def follow(self, follower: str, followee: str) -> None: ...
+        # Raises ValueError if either user is missing.
+        # Self-follow is a no-op; duplicate follow is a no-op.
+
+    def create_snapshot(self) -> 'Snapshot': ...
+        # Returns an object that does NOT observe subsequent follow() mutations
+        # (deep-copy the adjacency map).
+
+class Snapshot:
+    def is_following(self, follower: str, followee: str) -> bool: ...
+    def get_following(self, user_id: str) -> list[str]: ...
+    def get_followers(self, user_id: str) -> list[str]: ...
+        # get_followers is efficient when the snapshot eagerly builds a reverse index at construction time.
+    def recommend(self, user_id: str, k: int) -> list[str]: ...
+        # Top-k 2-hop suggestions: count how many of `user_id`'s followees follow each
+        # candidate; exclude `user_id` itself and anyone already followed; rank by count
+        # desc and return the first k.
+
+The trap is treating the snapshot as a shallow view; subsequent follow() calls must not bleed into earlier snapshots, so the snapshot constructor must copy each followee set rather than alias it.
+
+A minimal recommend walkthrough: A follows B and C; B follows D and E; C follows D and F. D is reached by two of A's followees (B and C), E and F by one each, so recommend("A", 2) returns D first, then one of the count-1 candidates (e.g. ["D", "E"]). Already-followed users and user_id itself are excluded before ranking.
+
+Complexity for the snapshot variant:
+
+MethodTimeSpace
+add_userO(1)O(1)
+followO(1)O(1)
+create_snapshotO(U + E)O(U + E)
+is_followingO(1)O(1)
+get_followingO(F)O(F)
+get_followersO(F)O(F)
+recommendO(F × G + C log K)O(C)
+
+U = users, E = total follow edges, F = friends of the given user, G = average friends per user, C = candidates found, K = top-K limit.
+
+get_followers uses a reverse index (follower → set of users who follow them) built eagerly in the Snapshot constructor at O(U + E) time/space; this makes per-call get_followers O(F) rather than O(U + E).
+
+For recommend, Counter.most_common(k) is typically sufficient (it uses a heap internally); a min-heap of size K (O(F × G + C log K)) is preferable when C is very large. With a plain Counter, most_common(k) costs O(C log C).
+
+Follow-up topics interviewers raise
+
+Snapshot immutability at scale: deep-copy is the simplest implementation; for large graphs, Copy-on-Write (persist each followee set as an immutable frozen structure, update by replacing) or edge-level versioning ([created_at, deleted_at] per edge) eliminates redundant copying.
+
+Scaling to millions of users: store only deltas between snapshots rather than full copies; or use time-ranged edges so any historical state can be reconstructed by filtering on a timestamp.
+
+Concurrency: a read-write lock lets many snapshot reads proceed in parallel while serializing follow() writes.
+
+Richer recommendations: weight by recency of interaction; extend to 3-hop / friends-of-friends-of-friends or weighted BFS.
+
+Preparation
+
+defaultdict(set) for follow relations + sorted timestamp list (binary search for 'as of t')
+
+Recommendation: 2-hop BFS, count intermediaries with Counter; subtract direct follows + the user themselves before ranking
+
+Warm up on the canonical "design Twitter" skeleton (heap-merge of K follow streams) — the interview adds the timestamp-aware check(A, B, t) and the 2-hop rank on top of that base
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

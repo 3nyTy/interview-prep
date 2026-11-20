@@ -1,0 +1,45 @@
+===H1===
+Max-Sum Window over a Compressed Array
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/max-sum-window-run-length-segments
+===BODY===
+Amazon
+CodingMembers
+Max-Sum Window over a Compressed Array
+OA Q1 at the hard tier: a sparse array is given as run-length segments ([1,3,4] means indices 1-3 hold value 4; uncovered indices are 0) and the task is the maximum sum over any window of length k. Hidden tests enforce memory — expanding the array (or prefix sums over the expansion) fails; the window must be computed over the segments directly.
+SWE
+array
+sliding-window
+prefix-sum
+hard
+Frequency
+Single report
+Last asked
+2026-07-08
+Stage
+oa
+Requirements
+
+Input: a sparse array in run-length form — each segment [start, end, value] means indices start..end (inclusive) hold value; indices not covered by any segment are 0. Return the maximum sum over any contiguous window of length k.
+
+Hidden tests enforce a memory bound: materializing the expanded array, or building prefix sums over it, fails. All computation has to stay on the segment list.
+
+Notes
+
+The window sum, viewed as a function of the window's start index, changes linearly between segment boundaries, so only windows whose left or right edge aligns with a segment boundary can be optimal. That cuts the candidates from array-length to segment-count.
+
+Each candidate window's sum assembles from whole segments plus partial overlaps at the two ends; prefix sums over the segments (not the expansion) make each candidate O(log n) or O(1) with a moving pointer.
+
+State the memory constraint out loud before coding — recognizing why the expanded-array approach is disallowed is part of the graded signal.
+
+Preparation
+
+Implement max-sum length-k window twice: once over a plain array, once over [start, end, value] segments with zero-filled gaps, and cross-check both on random small inputs.
+
+Drill the boundary argument until you can state it in two sentences: between boundary events the window sum changes at a constant rate, so the maximum sits at an alignment point.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

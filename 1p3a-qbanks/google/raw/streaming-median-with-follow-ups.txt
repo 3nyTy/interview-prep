@@ -1,0 +1,54 @@
+===H1===
+Streaming Median (LC 295) with Follow-ups
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/streaming-median-with-follow-ups
+===BODY===
+Google
+CodingMembers
+Streaming Median (LC 295) with Follow-ups
+A near-canonical LC 295 streaming-median implementation using two heaps, followed by two design extensions: exploit a very small value domain, then support an arbitrary k-th-smallest query instead of only the median.
+SWE
+heap
+streaming
+medium
+Frequency
+Single report
+Last asked
+2026-08-03
+Stage
+tech-screen
+Requirements
+
+Implement the canonical streaming-median data-stream interface: accept values incrementally and return the current median.
+
+Use the two-heap design, dry-run the implementation, and state time and space complexity.
+
+Follow-up 1: if the value domain is very small, explain how the representation and query path can change; pseudocode is sufficient.
+
+Follow-up 2: generalize the query from the median to the k-th-smallest value and discuss the required data-structure changes.
+
+Notes
+
+Keep the lower half in a max-heap and the upper half in a min-heap. Maintain a size difference of at most one and keep every lower-half value no greater than every upper-half value. For an even-sized stream, average the two heap roots.
+
+Each insertion costs O(log n), a median query costs O(1), and the heaps use O(n) space.
+
+For a small bounded domain, a frequency array gives O(1) updates and an O(U) order-statistic scan, where U is the domain size. For arbitrary k-th-smallest queries, use an order-statistic tree or a Fenwick/segment tree over a known or compressed domain for logarithmic update and selection.
+
+The base problem required complete working code plus a dry run and complexity analysis.
+
+The first follow-up stopped at design and pseudocode; the second was discussion-only because the round ran out of time.
+
+Preparation
+
+Implement the two-heap median structure and dry-run odd and even stream lengths.
+
+Sketch a bounded-domain alternative and state its update and query costs.
+
+Compare what must change when the requested order statistic is an arbitrary k rather than a fixed median.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

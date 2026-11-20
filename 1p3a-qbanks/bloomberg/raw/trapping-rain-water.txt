@@ -1,0 +1,65 @@
+===H1===
+Trapping Rain Water
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/trapping-rain-water
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Trapping Rain Water
+Given an elevation map of non-negative bar heights, compute how much water can be trapped after raining. Bloomberg interviewers commonly insist on the two-pointer `O(1)`-space solution after a stack or DP answer.
+SWE
+two-pointer
+array
+monotonic-stack
+dp
+hard
+Frequency
+Single report
+Last asked
+2025-11-24
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Given an integer array height[] representing an elevation map where the width of each bar is 1, return the total units of water that can be trapped after raining.
+
+Function signature:
+
+int trap(int[] height)
+
+Follow-ups:
+
+Walk through three solutions: precomputed leftMax / rightMax arrays (O(n) time, O(n) space), monotonic stack of decreasing heights (O(n) / O(n)), and two pointers (O(n) / O(1)). Be ready to argue why the two-pointer version works.
+
+Extend to 2-D (Trapping Rain Water II): how does the answer change? (Priority-queue boundary BFS.) Discuss but typically not implemented.
+
+Discuss what happens if the elevation array is streaming and you must answer incremental queries.
+
+Examples
+
+height = [0,1,0,2,1,0,1,3,2,1,2,1]
+trap(height) -> 6
+
+Notes
+
+The two-pointer invariant: maintain left, right, leftMax, rightMax. Whichever side has the smaller current max is the bottleneck for that column, so trap max - height[i] water there and advance that pointer. Iteration ends when the pointers cross.
+
+The monotonic-stack solution is the most intuitive when the candidate has seen Trapping Rain Water as part of the Largest Rectangle in Histogram family. Time and space O(n).
+
+The DP-with-arrays solution is the easiest to derive from first principles; use it as the warm-up answer before pivoting to two pointers.
+
+Bloomberg explicitly probes the O(1)-space requirement. Going to two pointers without being asked is a positive signal.
+
+Preparation
+
+Implement all three solutions from scratch in one sitting. The two-pointer correctness argument is the one most candidates struggle to articulate; practice saying it out loud.
+
+Hand-trace the two-pointer algorithm on [0,1,0,2,1,0,1,3,2,1,2,1] so the invariant is internalized.
+
+Be ready to extend the two-pointer pattern to related problems (Container With Most Water) and to discuss why the same move the smaller side heuristic works there too.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

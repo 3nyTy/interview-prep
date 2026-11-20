@@ -1,0 +1,63 @@
+===H1===
+Streaming Insert + Find K-th Largest
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/insert-find-kth-largest
+===BODY===
+Google
+Coding·45 minMembers
+Streaming Insert + Find K-th Largest
+Onsite coding round 1 in NYC: design a class with `insert(num)` and `findLargest(k)` where `findLargest(k)` returns the `(k+1)`-th largest value with ties allowed. Time complexity of find should be as low as possible.
+SWE
+data-structure
+tree
+medium
+Frequency
+Single report
+Last asked
+2026-02-04
+Stage
+onsite-coding
+Requirements
+
+insert(num: int) — add num to the structure (duplicates allowed).
+
+findLargest(k: int) — return the (k+1)-th element when the inserted values are sorted descending (ties keep duplicates).
+
+findLargest(0) = the maximum.
+
+findLargest(1) = the second value in the sorted-descending list (may equal findLargest(0) if there were duplicates).
+
+Optimize findLargest first; insert cost is secondary.
+
+Examples
+
+insert(3)
+insert(3)
+insert(2)
+findLargest(0) → 3
+findLargest(1) → 3
+findLargest(2) → 2
+
+Notes
+
+An order-statistics structure (size-augmented BST / balanced tree / skiplist) gives O(log n) for both ops.
+
+An order-statistics Fenwick tree over a coordinate-compressed value range gives O(log V).
+
+A naive sorted array gives O(log n) find but O(n) insert; mention as a baseline.
+
+Two heaps (the canonical streaming-median pattern) only work for a fixed k; the interviewer wants arbitrary k per call.
+
+Preparation
+
+Sketch the size-augmented BST node (left subtree count + duplicate count) on paper before the interview.
+
+Practice the Fenwick-tree order-statistics trick (find k-th by binary search on prefix sums).
+
+Be ready to defend the chosen data structure: balanced BST is clean but verbose; Fenwick is short but assumes bounded values.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

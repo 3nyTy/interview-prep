@@ -1,0 +1,68 @@
+===H1===
+Array Left / Right Duplicate Check (Binary Strings)
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/array-left-right-duplicate-check
+===BODY===
+Salesforce
+Coding·20 minMembers
+Array Left / Right Duplicate Check (Binary Strings)
+First problem on the Salesforce Futureforce 2026 Coding Challenge (intern OA). For each index of an integer array, output whether the value appears earlier in the array and whether it appears later. Encode both answers as binary strings of length n.
+SWE
+array
+hashmap
+string
+binary-string
+easy
+Frequency
+Single report
+Last asked
+2025-12-25
+Stage
+oa
+Requirements
+
+Input: integer array nums of length n.
+
+Output: a pair [string1, string2] of binary strings:
+
+string1[i] = '1' if nums[i] appears at some index < i, else '0'.
+
+string2[i] = '1' if nums[i] appears at some index > i, else '0'.
+
+Examples
+
+nums = [1, 2, 1, 3, 2]
+string1 = "00101"        # index 2 saw a prior 1; index 4 saw a prior 2
+string2 = "11000"        # index 0 has a later 1; index 1 has a later 2
+
+Notes
+
+Two single-pass solutions are equivalent in cost:
+
+Pass 1 (left → right): maintain a seen set. For each nums[i], set string1[i] = '1' if nums[i] in seen else '0'; then add nums[i] to seen.
+
+Pass 2 (right → left): same idea with a fresh set, producing string2.
+
+Two passes: O(n) time, O(n) space.
+
+One-pass alternative: pre-compute count[v] over the whole array; walk left to right tracking left_count[v] seen so far. Then string1[i] = '1' if left_count[nums[i]] > 0 else '0'; string2[i] = '1' if count[nums[i]] - left_count[nums[i]] - 1 > 0 else '0'. Same complexity, slightly tighter constants.
+
+Edge cases: n = 1 → "0", "0". All-distinct array → both outputs are all 0. All-same array → string1 = "0111...1", string2 = "111...10".
+
+The wording "出现过" (appears) is asking about any prior/later occurrence, not the immediate neighbour — clarify if unsure.
+
+Preparation
+
+Write the two-pass solution from scratch in under 5 minutes.
+
+Write the one-pass alternative — useful for interviewers who push on "can you do better".
+
+Verify on the example above and on a 1-element input.
+
+Pair this with the synchronous binary-string swap exercise since both reward careful one-pass state tracking.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

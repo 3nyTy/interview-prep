@@ -1,0 +1,69 @@
+===H1===
+Laser Grid Robot Max Safe Run
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/laser-grid-robot-max-safe-run
+===BODY===
+Capital One
+Coding·70 minMembers
+Laser Grid Robot Max Safe Run
+On a rectangular board, lasers destroy their entire row and column. Starting from a protected cell, return the maximum number of cells a robot can safely move in one straight direction before hitting a destroyed cell or border.
+SWE
+grid
+simulation
+array
+medium
+oa
+codesignal
+Frequency
+Single report
+Last asked
+2026-05-31
+Stage
+oa
+Requirements
+
+Input: numRows, numColumns, curRow, curColumn, and laserCoordinates.
+
+Each laser coordinate is [row, column]; a laser destroys every cell in the same row and every cell in the same column.
+
+The robot starts at (curRow, curColumn). The initial cell is protected even if it lies on a destroyed row or column, and no laser starts on the robot's cell.
+
+The robot may choose one straight direction: left, right, up, or down. It keeps moving in that direction until the next step would enter a destroyed cell or leave the board.
+
+Return the maximum number of safe cells the robot can move through in any one direction.
+
+Constraints: 8 <= numRows <= 20, 8 <= numColumns <= 20, 0 <= laserCoordinates.length <= 5; row/column coordinates are 1-indexed in the statement.
+
+Examples
+
+numRows = 8
+numColumns = 8
+curRow = 5
+curColumn = 3
+laserCoordinates = [[1, 6], [2, 8]]
+
+Return 3
+
+The lasers block rows 1 and 2 and columns 6 and 8. From (5, 3), the longest safe straight-line move is 3 cells.
+
+Notes
+
+With the stated limits, direct simulation in four directions is enough: build blocked row and blocked column sets, then step until out of bounds or row in blocked_rows or col in blocked_cols. Exclude the start cell from the count; count only cells the robot moves into.
+
+The protected-start rule matters: do not reject the start cell if its row or column appears in a laser's blast line. Begin checking destruction only on candidate next cells.
+
+A faster closed-form variant is also simple: for horizontal movement, the nearest blocked column on each side limits the distance; for vertical movement, the nearest blocked row on each side limits the distance. The direct version is less error-prone under the small bounds.
+
+Preparation
+
+Implement both direct stepping and closed-form nearest-barrier versions; compare them on random small boards.
+
+Test a start cell whose row is blocked by a laser elsewhere to confirm the protected-start rule.
+
+Test no-laser and all-four-directions-blocked cases to lock down whether the returned count excludes the starting cell.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

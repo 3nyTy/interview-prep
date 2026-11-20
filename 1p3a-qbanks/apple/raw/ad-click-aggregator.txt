@@ -1,0 +1,75 @@
+===H1===
+Ad Click Aggregator
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/ad-click-aggregator
+===BODY===
+Apple
+System Design·45 minMembers
+Ad Click Aggregator
+Design an ads click aggregation pipeline. The Apple version emphasizes multiple data sources such as web, mobile, and TV, plus click-count accuracy.
+SWE
+Infra Eng
+MLE
+ads
+data-engineering
+streaming
+kafka
+idempotency
+medium
+Frequency
+Low
+Last asked
+2026-04-18
+Stage
+phone-screen · onsite-system-design
+Requirements
+
+Design a click aggregation system for ads.
+
+Functional requirements:
+
+Ingest click events from web, mobile, and TV sources.
+
+Produce near-real-time counts for dashboards and campaign decisions.
+
+Preserve accurate click data for billing / audit use cases.
+
+Deduplicate retries and handle late / out-of-order events.
+
+Support queries by campaign, creative, source, and time window.
+
+Scale / constraints:
+
+Assume high write throughput, bursty traffic, and hot campaigns.
+
+Accuracy matters more than a best-effort dashboard because the data may affect billing or ranking decisions.
+
+Design decisions:
+
+Streaming path vs batch correction path.
+
+Event-time windows and watermarking vs processing-time simplicity.
+
+Idempotent event keys and dedupe storage.
+
+OLAP store / cube materialization vs raw-log replay.
+
+Notes
+
+A strong answer uses a raw immutable event log as the source of truth, a streaming processor for fast aggregates, and a batch reconciliation path for correctness. Hot keys need salting or hierarchical aggregation. Exactly-once is usually achieved practically through at-least-once delivery plus idempotent sinks, not by assuming the whole pipeline is magically exactly-once.
+
+Preparation
+
+Whiteboard the pipeline in five boxes: edge collector, durable log, stream processor, aggregate store, batch reconciliation.
+
+Prepare a dedupe key: (event_id, source, campaign_id) or a server-issued impression / click id.
+
+Practice the late-event story: event time, watermark, correction event, and dashboard vs billing semantics.
+
+Be ready to explain how you detect drift between real-time aggregates and batch truth.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

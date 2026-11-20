@@ -1,0 +1,134 @@
+===H1===
+In-Memory File System
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/in-memory-file-system
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+In-Memory File System
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+·
+50 min
+Members
+In-Memory File System
+
+Design and implement an in-memory file system supporting `ls`, `mkdir`, `addContentToFile`, `readContentFromFile` (LC 588).
+
+SWE
+data-structure
+trie
+filesystem
+design-implementation
+medium
+Frequency
+Single report
+Last asked
+2025-12-27
+Stage
+phone-screen · onsite-coding
+Requirements
+ls(path) — if path is a directory, return the sorted list of files and directories in it; if path is a file, return a single-element list containing the file name.
+mkdir(path) — create all intermediate directories in path if they don't exist.
+addContentToFile(filePath, content) — append content to the file, creating it if missing.
+readContentFromFile(filePath) — return the entire content of the file.
+All paths are absolute, separated by /. The root is /.
+Notes
+The canonical implementation is a trie keyed on path components. Each node owns:
+A map children: name -> Node.
+An is_file flag.
+A content string (only meaningful when is_file).
+ls, mkdir, add, and read all reduce to walking the path components from the root, creating nodes on the way down for mkdir / add.
+Sorting on ls is over the immediate children's names — keep children as a hash map and sort on read, or use a sorted map for O(log N) inserts and O(N) reads.
+Edge cases: ls("/") on an empty FS (empty list), mkdir on an existing path (no-op), addContentToFile on an existing file (append, don't overwrite), invalid paths (the LC problem assumes well-formed input; in an interview, ask).
+Common stumbling points: forgetting that ls on a file path must return the file name itself (not its parent's contents), and forgetting that addContentToFile must create intermediate directories.
+Preparation
+Implement the trie-node + path-split walker in one pass; verify against the LC 588 test set.
+Drill the sorted-vs-hash trade-off; for an interview the hash + sort-on-read is faster to write and matches the LC time budget.
+Be ready to extend with delete and mv if the interviewer pushes for follow-ups.
+Exact API surface
+class FileSystem:
+    def ls(self, path: str) -> list[str]: ...
+    def mkdir(self, path: str) -> None: ...
+    def addContentToFile(self, filePath: str, content: str) -> None: ...
+    def readContentFromFile(self, filePath: str) -> str: ...
+
+ls(file_path) returns a one-element list containing the file name; ls(directory_path) returns immediate child names sorted lexicographically.
+mkdir creates missing parent directories. addContentToFile creates a missing file or appends to an existing file.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Preparation
+Exact API surface
+Related discussions · 1
+🔑Snowflake 店面两轮挂经
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Serialize and Deserialize Dictionary Trie
+Single report
+trie
+data-structure
+medium
++2
+Filter System with Dynamic Blacklist
+Single report
+data-structure
+medium
+oop-design
++3
+Frontend Grid: Robot Eats Candies
+Single report
+medium
+frontend
+bfs
++2
+Copy List with Random Pointer
+Single report
+medium
+linked-list
+hashmap
+Grep With Context Lines
+Single report
+medium
+string-processing
+parsing
++1
+Code editor

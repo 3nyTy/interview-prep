@@ -1,0 +1,87 @@
+===H1===
+Ticket Booking / Ticketmaster System Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/ticket-booking-system-design
+===BODY===
+Microsoft
+System Design·60 minMembers
+Ticket Booking / Ticketmaster System Design
+Azure / Office VO SD prompt. The core question is seat-locking under concurrency for high-traffic event drops.
+SWE
+distributed-lock
+redis
+concurrency
+scaling
+caching
+medium
+Frequency
+Low
+Last asked
+2026-01-20
+Stage
+onsite-system-design
+Requirements
+
+Functional
+
+Browse events; view venue seat map.
+
+Reserve seat(s) — atomic across concurrent users.
+
+Pay within a reservation window; on payment success, ticket becomes permanent.
+
+On window expiry without payment, seat returns to available pool.
+
+Non-functional
+
+Hot drops: 100K concurrent users hammering one event at sale open.
+
+No double-booking under any concurrency scenario.
+
+Browse and search remain low-latency during sale events.
+
+Notes
+
+Seat-locking — three approaches in escalating quality.
+
+Pessimistic DB lock (poor): SELECT FOR UPDATE on the seat row for the entire reservation window. Holds an open transaction for minutes — DB connection pool saturates, deadlock risk under high concurrency. Do not propose this as the main design; mention it as the strawman you reject.
+
+Status field + TTL sweep (acceptable): seat row carries available | reserved | booked + reserved_until. Reservation transitions to reserved with reserved_until = now + 10 min. Background sweep (or lazy check on read) flips expired reserved back to available. Simple, but the sweep introduces lag and the row is locked at write time during status flips.
+
+Redis distributed lock with TTL (best): atomic SET key value NX EX seconds (NX = only-if-not-exists) acquires a per-seat lock with auto-expiry. No DB transaction held open; Redis handles the concurrency primitive at high throughput. On payment success, write to durable storage and release the Redis lock; on expiry, Redis releases automatically.
+
+Virtual waiting room for hot drops. Pre-sale admission gate using a Redis sorted set as a FIFO queue. Users land on a waiting page; the gate releases batches of M users / second into the actual seat-selection flow so the system is never overwhelmed. The queue position is communicated back to the client for UX.
+
+Storage layout.
+
+Event metadata in PostgreSQL.
+
+Seat inventory in PostgreSQL with the status field for durable record; Redis layer for the live reservation locks.
+
+Search / browse path uses Elasticsearch with CDC sync from PostgreSQL for inverted-index queries.
+
+Cache invalidation. Seat map cached at the CDN / edge with short TTL (10-60s) during browse; on reservation, write-through invalidates the affected event's cache key.
+
+Trade-offs to call out.
+
+DecisionPickWhy
+Concurrency primitiveRedis lock with TTLAvoids long-held DB transactions
+Hot-drop absorptionVirtual waiting queue (Redis sorted set)Bounded admission rate
+Search pathElasticsearch + CDCDecouples browse from booking pressure
+Payment finalizationTwo-phase: Redis lock → DB write → lock releaseEnsures durability before lock release
+
+Preparation
+
+Memorize the Redis SET key value NX EX seconds pattern; it is the answer to every concurrency-control SD round.
+
+Pre-write the virtual-waiting-room sketch (Redis sorted set + admission batch).
+
+Drill the strawman → improvement rhetorical pattern: "pessimistic DB lock has these problems → status + TTL improves → Redis lock is the production answer".
+
+Pair with the rate-limiter SD prep — both use Redis as the concurrency primitive store.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

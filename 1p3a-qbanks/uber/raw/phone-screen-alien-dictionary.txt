@@ -1,0 +1,73 @@
+===H1===
+Phone Screen: Alien Dictionary (LC 269)
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/phone-screen-alien-dictionary
+===BODY===
+Uber
+Coding·60 minMembers
+Phone Screen: Alien Dictionary (LC 269)
+Phone-screen / onsite coding prompt, verbatim LeetCode 269. Given words sorted by an alien lexicographical order, recover any valid character order. Topological sort on adjacent-word constraints.
+SWE
+graph
+topological-sort
+string
+hard
+Frequency
+Low
+Last asked
+2026-03-04
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input: list of non-empty strings sorted lexicographically in some unknown alien alphabet order.
+
+Output: any string of distinct characters representing a valid order, or "" if no valid order exists.
+
+Lexicographic rule for the alien order: string a is smaller than b when either (1) at the first differing position the letter is smaller in a, or (2) a is a strict prefix of b (a.length < b.length).
+
+Characters are lowercase 'a'–'z'; 1 <= words.length <= 100 and 1 <= words[i].length <= 100.
+
+def alien_order(words: list[str]) -> str: ...
+    # Returns one valid letter order, or "" if no valid order exists
+    # (cycle in the constraint graph, or a longer word precedes its own prefix).
+
+Notes
+
+For each adjacent pair, find the first differing character — that pair contributes an edge a → b in the constraint graph.
+
+Topological sort (Kahn's algorithm or DFS) on the constraint graph.
+
+Catch the edge case where a longer prefix precedes its prefix (["abc", "ab"] is invalid — return "").
+
+Time O(C) where C is the total number of characters across all input strings.
+
+Common follow-up: "What if some characters never appear in any constraint?" — include them anywhere in the output.
+
+Some senior phone-screens chain LC 953 (Verifying an Alien Dictionary) as a warm-up before LC 269 — be ready for the back-to-back format.
+
+Alternate canonical variant — verify-only (given order)
+
+Instead of deriving the order, the alien order is given as a 26-char permutation and you check whether words is already sorted under it. Different API shape (returns a boolean), not a value diff on the derive variant.
+
+def is_alien_sorted(words: list[str], order: str) -> bool: ...
+    # order: a permutation of the 26 lowercase letters defining the alien alphabet.
+    # Returns True if words is sorted lexicographically under `order`, else False.
+    # Map each letter -> its rank in `order`; compare consecutive words position by
+    # position; a strict prefix must come first (["apple","app"] is NOT sorted).
+
+Constraints: 1 <= words.length <= 100, 1 <= words[i].length <= 20, order.length == 26, all lowercase English letters.
+
+Time O(C) over the total characters; only adjacent pairs need comparing.
+
+Preparation
+
+Drill LC 269 and LC 953 in one session.
+
+Implement both Kahn's and DFS-based topological sort; pick the cleaner one in the moment based on what edge handling you anticipate.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

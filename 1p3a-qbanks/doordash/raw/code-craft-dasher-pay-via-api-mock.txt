@@ -1,0 +1,79 @@
+===H1===
+Code Craft: Dasher Pay via Mock Service API
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/code-craft-dasher-pay-via-api-mock
+===BODY===
+DoorDash
+Coding·60 minMembers
+Code Craft: Dasher Pay via Mock Service API
+Variant of the Dasher Pay round in which the dasher's order data is exposed by a mock service. The candidate must call the service, compute pay, and (mid-round) be told to also write a mock API wrapper around the underlying function. Tests whether the candidate can keep the algorithmic core decoupled from the API plumbing.
+SWE
+interval
+interval-aggregation
+api-integration
+object-design
+medium
+Frequency
+Low
+Last asked
+2026-09-02
+Stage
+phone-screen
+Requirements
+
+Input: a mock DasherService that takes a dasher ID and returns the list of completed order intervals (start, end).
+
+Compute the dasher's pay given a per-minute wage rate.
+
+Mid-round, the interviewer asks the candidate to wrap the function call in an API mock — essentially, define a small client class that calls the service and returns the computed pay.
+
+Follow-up: if a dasher accepts multiple overlapping orders, do not double-count time — bill for the actual elapsed time, not the sum of per-order durations.
+
+Notes
+
+Two-layer structure:
+
+Core algorithm: take a list of intervals and a rate; return total pay. Use interval-merge or sweep to compute total elapsed time without double-counting.
+
+API wrapper: a thin class with a getPay(dasher_id) method that calls DasherService.fetchOrders(dasher_id), runs the core algorithm, and returns the result.
+
+Keep the core pure; do not pass the API client into the algorithm function. This is exactly what the interviewer is grading when they bring up the API mock mid-round.
+
+The overlap follow-up is the source of the round's reported friction — one candidate was told a double-counted result was wrong, then told the corrected single-count was also wrong. Be ready to defend the interval-merge logic with a worked example.
+
+Interval-merge: sort intervals by start, sweep to compute total covered length.
+
+Edge cases: empty order list (pay = 0), zero-length orders, orders that are subsets of one another.
+
+Alternate canonical variant — payout endpoint with per-order accrual
+
+A service-building version starts from a monolith-to-microservices migration and requires a payout endpoint from the outset. Its contract is:
+
+POST payout
+Input: dasherId
+Output: dollar amount the dasher gets paid
+
+The endpoint retrieves delivery information from a separate upstream endpoint and calculates pay from the dasher's sequence of order activities for one day. Its payment rules are:
+
+base pay rate: $0.3 per minute
+multi order pay rate: # ongoing deliveries * base pay rate
+
+Test coverage is required. This version multiplies the rate by ongoing deliveries, while the interval-based mock-service version counts overlapping time once; clarify the payment model before coding.
+
+For per-order accrual, sweep the chronological order activities with active_count initially zero. Before applying each activity, add (current_time - previous_time) * active_count * base_rate, with time expressed in minutes; then update the count for the order starting or ending. Do not merge overlapping order intervals for this variant: each ongoing order contributes to pay. Equal timestamps add zero pay. The scan is O(n) for chronological input; sorting unordered activities first costs O(n log n). Keep this calculation separate from the upstream client and endpoint handler.
+
+Preparation
+
+Drill the interval-merge / covered-length pattern (LC 56 "Merge Intervals" + total-covered-length variant).
+
+Practice writing a small API wrapper class in 5 minutes that decouples the algorithm from the data source.
+
+For the interval-based mock-service variant, have a worked example ready showing why double-counted time is wrong (two orders overlapping for 10 minutes should bill for 10 minutes of wage, not 20).
+
+Implement the per-order payout scan in 15 minutes and test empty input, overlapping orders, and simultaneous starts or completions. Compare its result against summing each completed order's duration times the base rate; verify that the interval-based mock-service variant instead counts overlapping time once.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

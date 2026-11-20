@@ -1,0 +1,54 @@
+===H1===
+Highest Average Score Per Person
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/max-average-score-per-person
+===BODY===
+Goldman Sachs
+Coding·60 minMembers
+Highest Average Score Per Person
+Given a list of `(name, score)` records, return the highest per-person average score. A recurring Goldman warm-up that doubles as a follow-up about handling ties and streaming input.
+SWE
+hashmap
+array
+easy
+Frequency
+Medium
+Last asked
+2026-07-15
+Stage
+oa · phone-screen
+Requirements
+
+Input: an array of (name, score) records (each score is numeric).
+
+Output: the highest per-person average across all names.
+
+The exact tie-breaking and output format (single number vs (name, avg)) was not pinned down in the prompts — clarify with the interviewer.
+
+Notes
+
+Recent CoderPad screens pair it with First Unique Character / LC 387 as a two-coding-question set, after one or two behavioral questions.
+
+In 2026 experienced-hire loops, a second CoderPad can follow a first live-coding screen that used this prompt. Treat the extra CoderPad as a possible normal continuation rather than an automatic rejection signal.
+
+Mid-2026 CoderPad rounds also pair it with a segment-sorting problem, and both problems must be fully accepted — passing only the visible cases or finishing one of the two is not enough.
+
+Single pass with a Map<name, (sum, count)>. After the pass, iterate the map and track the best average. O(n) time, O(U) space where U is the number of unique names.
+
+Use a running (sum, count) instead of storing all scores per name — the explicit list adds memory without changing the answer.
+
+Be careful with integer overflow on the sum if many scores are accumulated; use long or double defensively.
+
+Streaming follow-up: "now process records one at a time and report the current top-average after each record." Solution is to maintain the same map plus a max-heap keyed by current average, with lazy invalidation when a person's running average changes.
+
+Preparation
+
+Implement the batch form in one pass; then walk through the streaming variant verbally.
+
+Discuss the tie-breaking rule (alphabetical? first-reported? all of them?) before coding — Goldman interviewers care that you ask.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

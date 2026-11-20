@@ -1,0 +1,71 @@
+===H1===
+Frontend Tech Execution — Reusable Dropdown Component
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/fe-dropdown-tech-execution
+===BODY===
+Coinbase
+Coding·60 minMembers
+Frontend Tech Execution — Reusable Dropdown Component
+Frontend Tech Execution round (staff level): build a reusable React dropdown component to a unit-test specification. Bar is reusable-from-day-one: controlled vs uncontrolled, accessible keyboard handling, viewport-aware placement. Production-readiness articulation (what you'd cover with more time) matters as much as the code that lands.
+SWE
+react
+frontend
+object-design
+testing
+ux
+hard
+Frequency
+Single report
+Last asked
+2026-05-08
+Stage
+onsite-coding
+Requirements
+
+Implement a <Dropdown> React component:
+
+Renders a trigger (button) that opens / closes the menu.
+
+Items list passed in via props.
+
+Selection emits an onChange callback.
+
+Should be usable both controlled (parent owns selected value) and uncontrolled (component manages internal state).
+
+Unit tests are provided / run as you go; passing all tests is necessary but not sufficient.
+
+Notes
+
+Controlled vs uncontrolled is the architectural axis the interview grades on. Implement uncontrolled as the default, accept optional value / defaultValue / onChange props, and switch internally based on whether value is provided.
+
+Look at the props of a real headless component (Radix DropdownMenu, Ant Design Select, Headless UI's Listbox) before the round — your API should resemble theirs. Interviewers explicitly mention this.
+
+Things to articulate even if you don't ship them:
+
+Viewport-edge detection (flip placement when the menu would overflow the viewport).
+
+Keyboard navigation (Arrow / Home / End / Enter / Esc) and focus management on open / close.
+
+ARIA roles (role=listbox, aria-activedescendant) for screen-reader support.
+
+Portal rendering to escape overflow-hidden ancestors.
+
+Type-ahead search (jump to first item starting with the typed letter).
+
+Performance angle: virtualization once the items list exceeds ~200; memoizing the rendered items to prevent re-renders on selection.
+
+Staff bar — interviewer will not be impressed by a working dropdown alone. Explicitly call out 3–4 production concerns you would handle next.
+
+Preparation
+
+Build a dropdown from scratch in ~45 minutes using a vanilla React playground — measure where you over- or under-spend.
+
+Read the Radix DropdownMenu source (~400 lines) for a canonical reference on portal + focus management + a11y.
+
+Pre-rehearse the "production-readiness checklist" verbal: viewport flip / keyboard nav / a11y / portaling / virtualization / type-ahead. Aim for 60 seconds covering all six.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

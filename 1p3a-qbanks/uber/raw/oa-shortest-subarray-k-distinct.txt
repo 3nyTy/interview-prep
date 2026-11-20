@@ -1,0 +1,67 @@
+===H1===
+OA: Shortest Subarray with At Least K Distinct
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/oa-shortest-subarray-k-distinct
+===BODY===
+Uber
+Coding·90 minMembers
+OA: Shortest Subarray with At Least K Distinct
+Hack2Hire OA problem. Given an array `arr` and integer `k`, find the length of the shortest contiguous subarray that contains at least `k` distinct integers. Return `−1` if no such subarray exists.
+SWE
+two-pointer
+hashmap
+medium
+Frequency
+Low
+Last asked
+2026-04-01
+Stage
+oa
+Requirements
+
+Input: integer array arr of positive integers, integer k.
+
+A subarray is good if it contains at least k distinct values.
+
+Output: the length of the shortest good subarray, or −1 if the array has fewer than k distinct values.
+
+Constraints: 1 ≤ arr.length ≤ 10^5, 1 ≤ arr[i] ≤ 10^6, 1 ≤ k ≤ arr.length.
+
+def shortest_good_subarray(arr: list[int], k: int) -> int: ...
+    # Returns the length of the shortest subarray with at least k distinct values,
+    # or -1 if arr has fewer than k distinct values overall.
+
+Examples
+
+arr = [1, 2, 2, 3, 1, 4], k = 3
+Shortest good subarray = [2, 3, 1] or [1, 4] is invalid (only 2 distinct)
+                       = [2, 3, 1]  → length 3
+Output: 3
+
+arr = [2, 2, 1, 1, 3], k = 3
+Duplicates don't add distinct count, so the window can't shrink past [2, 1, 1, 3]
+Output: 4
+
+arr = [1, 1, 1], k = 2   → Output: -1   (only 1 distinct value in the whole array)
+
+Notes
+
+Standard sliding-window with a hashmap of counts. Maintain left, right, and a freq dict.
+
+Expand right to add arr[right] to the window. While the window has ≥ k distinct keys, update the answer with right − left + 1 and shrink left.
+
+Edge case: if the global distinct count of arr is less than k, return −1.
+
+This is the "at-least-k" variant, simpler than LC 992 (exactly-k); the answer is monotone in the window length.
+
+Preparation
+
+Drill LC 992 (subarrays with exactly K distinct) — once that pattern is solid, this becomes a 5-minute write-up.
+
+Practice the shrink loop boundary: while distinct >= k (not >), and don't forget the final shrink can drop the window below k distinct — guard with the update before decrementing.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

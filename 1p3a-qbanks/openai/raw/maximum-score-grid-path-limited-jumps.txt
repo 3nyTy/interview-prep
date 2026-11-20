@@ -1,0 +1,61 @@
+===H1===
+Maximum-Score Grid Path with Limited Jumps
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/maximum-score-grid-path-limited-jumps
+===BODY===
+OpenAI
+CodingMembers
+Maximum-Score Grid Path with Limited Jumps
+Given an integer grid, a top-row starting column, and a budget of at most K two-row jumps, maximize the score on a path to the bottom; then reconstruct an optimal path, count all optimal paths modulo 1e9+7, and incorporate adjacency-based bonuses.
+SWE
+dp
+grid
+combinatorics
+hard
+Frequency
+Single report
+Last asked
+2026-07-08
+Stage
+phone-screen
+Requirements
+
+Input: an N x M integer grid board, a starting column p, and a jump budget K. Start at (0, p) and remain within the grid.
+
+From (i, j), move to (i+1, j-1), (i+1, j), (i+1, j+1), or use the special move (i+2, j). The special move may be used at most K times over the full path.
+
+The base score is the sum of all visited cell values.
+
+Part 1: return the maximum score obtainable when reaching the last row.
+
+Part 2: return one path that obtains the maximum score.
+
+Part 3: return the number of distinct maximum-score paths modulo 10^9 + 7.
+
+Part 4: incorporate two additional scoring rules: consecutive equal-valued cells add X, and three consecutively visited cells with strictly increasing values add Y.
+
+Examples
+
+board = [[1, 2, 3, 4], [5, 6, 1, 2], [7, 8, 9, 1], [3, 2, 5, 6]], p = 1, K = 1.
+
+One valid path is (0,1) -> (1,1) -> (2,2) -> (3,3).
+
+A valid path using the special jump is (0,1) -> (2,1) -> (3,2).
+
+Notes
+
+A two-row jump from row N-3 to the last row is valid; any move that would land outside the grid is invalid. For Part 4, the state must preserve enough recent path information to decide both the equal-pair and increasing-triple bonuses.
+
+Preparation
+
+Implement score maximization first, then add parent tracking without changing the score recurrence.
+
+Extend the state to count ties modulo 10^9 + 7 and test cases with several equal-score paths.
+
+Practice adding bonuses that depend on the previous one or two visited values while retaining the jump budget.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

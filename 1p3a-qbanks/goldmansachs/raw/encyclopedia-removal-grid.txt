@@ -1,0 +1,46 @@
+===H1===
+Encyclopedia Removal Grid
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/encyclopedia-removal-grid
+===BODY===
+Goldman Sachs
+Coding·180 minMembers
+Encyclopedia Removal Grid
+A library shelf is an `n × m` grid of encyclopedias, each labeled by author. Selecting one encyclopedia removes all books by the same author in its row and column; minimize selections to clear the shelf.
+SWE
+grid
+graph
+medium
+Frequency
+Single report
+Last asked
+2025-09-08
+Stage
+oa
+Requirements
+
+Input: an n × m grid. Each cell contains an author id from 1 to k.
+
+Operation: select a cell (i, j). Every encyclopedia by the same author in row i or column j is removed along with the selected one.
+
+Output: the minimum number of selected cells needed to remove every encyclopedia.
+
+Notes
+
+Full constraints were not included, so clarify n, m, and k before choosing between brute force, matching / cover formulations, or per-author decomposition.
+
+The operation is author-specific: selecting author a in a row/column does not remove different-author cells in that row/column.
+
+The prompt was paired with Process Starvation Time as the harder 2026 Engineering OA question.
+
+Preparation
+
+Model a single author as a bipartite row-column incidence graph and reason about what a selected occupied cell covers.
+
+Prepare a fallback brute-force / backtracking explanation for small grids, then discuss how constraints would change the approach.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

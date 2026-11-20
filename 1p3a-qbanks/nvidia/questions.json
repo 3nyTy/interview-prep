@@ -1,0 +1,758 @@
+{
+  "company": "nvidia",
+  "display_name": "NVIDIA",
+  "qbank_count": 20,
+  "questions_scraped": 20,
+  "site_total_count": 68,
+  "oj_count": 48,
+  "external_count": 0,
+  "description": "NVIDIA interviews are highly team-specific and much less LeetCode-bank-driven than most large tech loops. System Software, Linux, Tegra, DGX AI infra, and Deep Learning roles lean toward engineering scenarios: C/C++ debugging, graph validation, GPU / inference fundamentals, small utility coding, and project deep dives; some design and product-facing AI roles add system-design or technical-marketing discussions.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/nvidia",
+  "scraped_at": "2026-09-20",
+  "source": "1point3acres qbank (logged-in session)",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "reaching-points",
+      "title": "Reaching Points",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-07-14",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "infra-eng"
+      ],
+      "tags": [
+        "math",
+        "greedy",
+        "hard"
+      ],
+      "roles_slug": [
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "math",
+        "greedy",
+        "hard"
+      ],
+      "overview": "Given positive start and target coordinates, determine whether repeated transformations from (x, y) to either (x + y, y) or (x, x + y) can reach the target. The interview used LeetCode 780 without a s...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/nvidia/reaching-points"
+    },
+    {
+      "n": 2,
+      "slug": "count-substrings-without-repeating-characters",
+      "title": "Count Substrings Without Repeating Characters",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-07-14",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "infra-eng"
+      ],
+      "tags": [
+        "string",
+        "sliding-window",
+        "easy"
+      ],
+      "roles_slug": [
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "string",
+        "sliding-window",
+        "easy"
+      ],
+      "overview": "Given a string, count its non-empty contiguous substrings whose characters are all distinct. The interview used LeetCode 2743 without a stated modification.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/nvidia/count-substrings-without-repeating-characters"
+    },
+    {
+      "n": 3,
+      "slug": "fp32-to-int8-quantization",
+      "title": "FP32 Tensor to Int8 Quantization",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-02-12",
+      "stage": "phone-screen",
+      "access": "Free preview",
+      "roles": [
+        "SWE",
+        "MLE",
+        "Perf Eng"
+      ],
+      "tags": [
+        "numpy",
+        "inference",
+        "numerical-stability",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "perf-eng"
+      ],
+      "tags_slug": [
+        "numpy",
+        "inference",
+        "numerical-stability",
+        "medium"
+      ],
+      "overview": "Given an FP32 tensor and a floating-point scale, convert the tensor to INT8. Follow-ups add asymmetric quantization with zero point and ask how scale / zero point should change when the input distribution is not symmetric.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/nvidia/fp32-to-int8-quantization"
+    },
+    {
+      "n": 4,
+      "slug": "graph-validation-and-pruning",
+      "title": "Computation / Dependency Graph Validation and Pruning",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-02-12",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe",
+        "mle",
+        "infra-eng"
+      ],
+      "tags": [
+        "graph",
+        "topological-sort",
+        "dfs",
+        "inference",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "graph",
+        "topological-sort",
+        "dfs",
+        "inference",
+        "medium"
+      ],
+      "overview": "Implement graph operations such as inserting nodes, configuring dependencies, validating structural requirements, detecting cycles, and pruning unneeded branches from a neural-network computation grap...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/nvidia/graph-validation-and-pruning"
+    },
+    {
+      "n": 5,
+      "slug": "cpp-debugging-with-ai-tools",
+      "title": "C++ Project Debugging with AI Tools",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-02-12",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags": [
+        "debugging",
+        "concurrency",
+        "ai-tools",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "debugging",
+        "concurrency",
+        "ai-tools",
+        "hard"
+      ],
+      "overview": "A larger C++ project is split into stages, each containing a logical bug, memory bug, or race condition. The candidate runs the program, observes output, debugs, and may use GPT / Gemini under screen ...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/nvidia/cpp-debugging-with-ai-tools"
+    },
+    {
+      "n": 6,
+      "slug": "systems-utility-coding",
+      "title": "Systems Utility Coding: Temperature Spike, Logs, Brackets",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-02-05",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags": [
+        "heap",
+        "parsing",
+        "testing",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "heap",
+        "parsing",
+        "testing",
+        "easy"
+      ],
+      "overview": "System Software rounds use short utility tasks: detect a temperature spike from `(timestamp, cpu_temp)` pairs, validate brackets in an expression, aggregate logs by status code and latency, or minimiz...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/nvidia/systems-utility-coding"
+    },
+    {
+      "n": 7,
+      "slug": "string-encoding-decoding",
+      "title": "String Encoding / Decoding Variants",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Low",
+      "last_asked": "2026-04-26",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "string-processing",
+        "parsing",
+        "compression",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string-processing",
+        "parsing",
+        "compression",
+        "easy"
+      ],
+      "overview": "Two string parsing variants appear: encode/decode a list of strings using length prefixes and delimiters, and decode a compact alphabet-count expression where `#` forms two-digit letters and `(k)` rep...",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/nvidia/string-encoding-decoding"
+    },
+    {
+      "n": 8,
+      "slug": "storage-manager-and-kv-setall",
+      "title": "Disk Space Manager / KV Store with setAll",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Low",
+      "last_asked": "2026-04-15",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags": [
+        "oop-design",
+        "caching",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "oop-design",
+        "caching",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Implement storage-like APIs: a disk-space manager with `put(datasetId, size)` and `get(id)` under capacity / eviction constraints, or a KV store supporting `set`, `get`, and O(1) `setAll`.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/nvidia/storage-manager-and-kv-setall"
+    },
+    {
+      "n": 9,
+      "slug": "matrix-transpose-memory-layout",
+      "title": "2-D Matrix Transpose with Memory-Layout Discussion",
+      "category": "coding",
+      "duration": "120 min",
+      "frequency": "Low",
+      "last_asked": "2026-04-15",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe",
+        "infra-eng",
+        "perf-eng"
+      ],
+      "tags": [
+        "grid",
+        "performance-modeling",
+        "memory-bounded",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng",
+        "perf-eng"
+      ],
+      "tags_slug": [
+        "grid",
+        "performance-modeling",
+        "memory-bounded",
+        "medium"
+      ],
+      "overview": "Transpose an `n x n` or general 2-D matrix, then discuss row-major vs column-major layout, cache locality, in-place constraints, and large-matrix performance. This appears in Linux / System Software-s...",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/nvidia/matrix-transpose-memory-layout"
+    },
+    {
+      "n": 10,
+      "slug": "ml-coding-conv-attention-training-loop",
+      "title": "ML Coding: 2-D Convolution, Decaying Attention, Training Loop",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Low",
+      "last_asked": "2025-12-10",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "mle",
+        "swe",
+        "rs"
+      ],
+      "tags": [
+        "numpy",
+        "pytorch",
+        "attention",
+        "gradient-descent",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "swe",
+        "rs"
+      ],
+      "tags_slug": [
+        "numpy",
+        "pytorch",
+        "attention",
+        "gradient-descent",
+        "medium"
+      ],
+      "overview": "Deep Learning and AI product roles ask small ML implementation tasks: write 2-D convolution in NumPy, implement decaying attention `softmax(q @ k + b) @ v`, and fill a standard training loop with a pr...",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/nvidia/ml-coding-conv-attention-training-loop"
+    },
+    {
+      "n": 11,
+      "slug": "telemetry-collector-and-gpu-utilization-dashboard",
+      "title": "Telemetry Collector and GPU Utilization Dashboard",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-07-03",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "ds",
+        "infra-eng"
+      ],
+      "tags": [
+        "data-engineering",
+        "metrics",
+        "analytics-dashboard",
+        "gpu",
+        "storage",
+        "data-modeling",
+        "medium"
+      ],
+      "roles_slug": [
+        "ds",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "data-engineering",
+        "metrics",
+        "analytics-dashboard",
+        "gpu",
+        "storage",
+        "data-modeling",
+        "medium"
+      ],
+      "overview": "Design a data collector and analytics dashboard for GPU-cluster telemetry. The system must ingest both 30-second and 1-second resolution metrics, show 3-month utilization trends, and allow drill-down ...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/nvidia/telemetry-collector-and-gpu-utilization-dashboard"
+    },
+    {
+      "n": 12,
+      "slug": "llm-sql-chatbot-access-control-and-query-safety",
+      "title": "LLM SQL Chatbot Access Control and Query Safety",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-07-03",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "ds",
+        "infra-eng"
+      ],
+      "tags": [
+        "llm",
+        "sql",
+        "access-control",
+        "query-optimization",
+        "security",
+        "medium"
+      ],
+      "roles_slug": [
+        "ds",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "llm",
+        "sql",
+        "access-control",
+        "query-optimization",
+        "security",
+        "medium"
+      ],
+      "overview": "Design an LLM chatbot for SQL query generation over internal data. The discussion focuses on ensuring users can only query data they are allowed to access and preventing hallucinated or expensive quer...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/nvidia/llm-sql-chatbot-access-control-and-query-safety"
+    },
+    {
+      "n": 13,
+      "slug": "hpc-host-control-plane-and-job-coordination",
+      "title": "HPC Host Control Plane and Job Coordination",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-30",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "infra-eng",
+        "perf-eng"
+      ],
+      "tags": [
+        "distributed-systems",
+        "presence",
+        "job-system",
+        "redis",
+        "concurrency",
+        "database",
+        "medium"
+      ],
+      "roles_slug": [
+        "infra-eng",
+        "perf-eng"
+      ],
+      "tags_slug": [
+        "distributed-systems",
+        "presence",
+        "job-system",
+        "redis",
+        "concurrency",
+        "database",
+        "medium"
+      ],
+      "overview": "Design a central service that tracks many hosts, knows their current state, and coordinates job assignment. The prompt explicitly focuses on communication between hosts and the central service, databa...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/nvidia/hpc-host-control-plane-and-job-coordination"
+    },
+    {
+      "n": 14,
+      "slug": "real-time-fraud-detection-system",
+      "title": "Real-Time Fraud Detection System",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-03-25",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "swe",
+        "mle",
+        "infra-eng"
+      ],
+      "tags": [
+        "system-design",
+        "mlsd",
+        "scaling",
+        "ml-infra",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "system-design",
+        "mlsd",
+        "scaling",
+        "ml-infra",
+        "medium"
+      ],
+      "overview": "Design a real-time fraud evaluation system for millions of daily transactions, 10,000+ requests per second, 50 ms decision latency, and zero-downtime ML model updates. Black Friday-style bursts and tr...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/nvidia/real-time-fraud-detection-system"
+    },
+    {
+      "n": 15,
+      "slug": "rate-limiter-algorithm-design",
+      "title": "Rate Limiter Algorithm Design",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-09-23",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags": [
+        "system-design",
+        "rate-limiting",
+        "distributed-systems",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "system-design",
+        "rate-limiting",
+        "distributed-systems",
+        "medium"
+      ],
+      "overview": "A system-design round focused less on drawing a distributed architecture and more on rate-limit algorithms: token bucket, leaky bucket, fixed window, sliding window, state storage, and trade-offs.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/nvidia/rate-limiter-algorithm-design"
+    },
+    {
+      "n": 16,
+      "slug": "culture-fit-motivation-and-learning-habits",
+      "title": "Culture Fit, Motivation, and Learning Habits",
+      "category": "behavioral",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-07-13",
+      "stage": "onsite-bq",
+      "access": "Members",
+      "roles": [
+        "all-roles"
+      ],
+      "tags": [
+        "behavioral",
+        "culture-fit",
+        "values",
+        "why-company",
+        "medium"
+      ],
+      "roles_slug": [
+        "all-roles"
+      ],
+      "tags_slug": [
+        "behavioral",
+        "culture-fit",
+        "values",
+        "why-company",
+        "medium"
+      ],
+      "overview": "A culture-fit or hiring-manager round can probe integrity, motivation and demotivation, recent technical habits, the hardest problem the candidate has solved, and how they handle disagreement with a c...",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/nvidia/culture-fit-motivation-and-learning-habits"
+    },
+    {
+      "n": 17,
+      "slug": "gpu-and-inference-systems-fundamentals",
+      "title": "GPU and Inference Systems Fundamentals",
+      "category": "other",
+      "duration": "45 min",
+      "frequency": "Medium",
+      "last_asked": "2026-08-01",
+      "stage": "phone-screen · onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "mle",
+        "swe",
+        "perf-eng",
+        "rs"
+      ],
+      "tags": [
+        "gpu",
+        "kernel",
+        "inference",
+        "matmul",
+        "transformer",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "swe",
+        "perf-eng",
+        "rs"
+      ],
+      "tags_slug": [
+        "gpu",
+        "kernel",
+        "inference",
+        "matmul",
+        "transformer",
+        "medium"
+      ],
+      "overview": "DevTech, Deep Learning, and AI Software rounds ask GPU / inference fundamentals: Amdahl's Law, HBM vs SRAM, matmul complexity and tiling, CPU vs GPU matmul, tensor / pipeline parallelism, transformer ...",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/nvidia/gpu-and-inference-systems-fundamentals"
+    },
+    {
+      "n": 18,
+      "slug": "data-platform-pipeline-and-ml-operations-fundamentals",
+      "title": "Data Platform, Pipeline, and ML Operations Fundamentals",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-07-03",
+      "stage": "onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "ds",
+        "infra-eng"
+      ],
+      "tags": [
+        "data-engineering",
+        "etl",
+        "streaming",
+        "metrics",
+        "debugging",
+        "medium"
+      ],
+      "roles_slug": [
+        "ds",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "data-engineering",
+        "etl",
+        "streaming",
+        "metrics",
+        "debugging",
+        "medium"
+      ],
+      "overview": "Senior data-engineering candidates can face a one-hour technical assessment covering a small coding warmup plus production data-platform operations: Kinesis, Prometheus / Grafana, idempotency, Spark p...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/nvidia/data-platform-pipeline-and-ml-operations-fundamentals"
+    },
+    {
+      "n": 19,
+      "slug": "hardware-adjacent-project-deep-dive",
+      "title": "Hardware-Adjacent Project Deep Dive",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-07-03",
+      "stage": "phone-screen · onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "infra-eng",
+        "perf-eng",
+        "ds"
+      ],
+      "tags": [
+        "gpu",
+        "data-engineering",
+        "metrics",
+        "infra",
+        "domain-knowledge",
+        "medium"
+      ],
+      "roles_slug": [
+        "infra-eng",
+        "perf-eng",
+        "ds"
+      ],
+      "tags_slug": [
+        "gpu",
+        "data-engineering",
+        "metrics",
+        "infra",
+        "domain-knowledge",
+        "medium"
+      ],
+      "overview": "Project deep-dive rounds can focus heavily on prior HPC / GPU / hardware-adjacent projects. Candidates were asked to walk through CV projects, LSF CPU / GPU clusters, DCGM, workflow analysis for GPU u...",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/nvidia/hardware-adjacent-project-deep-dive"
+    },
+    {
+      "n": 20,
+      "slug": "deep-learning-fundamentals",
+      "title": "Deep Learning Fundamentals: Optimization, Drift, Calibration",
+      "category": "other",
+      "duration": "45 min",
+      "frequency": "Low",
+      "last_asked": "2026-01-29",
+      "stage": "phone-screen · onsite-research",
+      "access": "Members",
+      "roles": [
+        "mle",
+        "rs"
+      ],
+      "tags": [
+        "ml-knowledge",
+        "optimization",
+        "calibration",
+        "distribution",
+        "behavioral"
+      ],
+      "roles_slug": [
+        "mle",
+        "rs"
+      ],
+      "tags_slug": [
+        "ml-knowledge",
+        "optimization",
+        "calibration",
+        "distribution",
+        "behavioral"
+      ],
+      "overview": "Deep Learning / Research screens can be pure fundamentals: gradient descent, batch vs SGD, convexity, sharp vs flat minima, bias-variance, calibration, model drift, and business framing of ML quality ...",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/nvidia/deep-learning-fundamentals"
+    }
+  ]
+}

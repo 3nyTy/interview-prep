@@ -1,0 +1,75 @@
+===H1===
+Mars Rover / Robot Controller (CLI)
+===URL===
+https://www.1point3acres.com/interview/problems/company/shopify/mars-rover-robot-controller
+===BODY===
+Shopify
+Coding·75 minFree preview
+Mars Rover / Robot Controller (CLI)
+Build a command-line app that controls a robot/rover on a 2D grid: it starts at a position facing a direction and accepts commands to turn left/right and move forward, reporting its position and heading. The single most common Shopify pair-programming prompt; difficulty comes from the follow-ups and the design discussion, not the base problem.
+MLE
+SWE
+oop-design
+simulation
+state-machine
+ai-tools
+ai-allowed
+testing
+python
+medium
+Frequency
+High
+Last asked
+2026-08-28
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Model a robot/rover on a 2D grid. It starts at a known position (e.g. (0, 0)) facing a direction (e.g. North).
+
+Support a command set: turn left, turn right, move forward one cell in the current heading.
+
+Expose a command-line interface: the user types commands interactively; after each command, report the rover's current position and direction.
+
+Accept both single commands and batches of commands, with a clear input/output contract and usable CLI feedback.
+
+The base spec is deliberately thin ("develop an app to control a Mars rover") — clarify the grid bounds, command syntax, and reporting format before coding.
+
+Design for extensibility of the command set: new valid commands should be easy to add. Interviewers probe how commands are received and dispatched (an Enum for directions and a command/dispatch pattern are well received).
+
+Write unit tests for each method and aim for high coverage; manually exercise the CLI as well.
+
+Notes
+
+Common follow-ups, usually layered one at a time:
+
+Obstacles — if a cell ahead is blocked, the move should fail / be skipped.
+
+Multiple rovers — manage several rovers with create / delete / select, moving each in turn; add collision avoidance so a rover can't move into a cell occupied by another.
+
+Large rover fleet — discuss how the bookkeeping changes when the system has 1M+ rovers instead of a handful; avoid scans over all rovers and keep lookup/update paths keyed by rover id and occupied coordinate.
+
+3D grid — extend the world to x/y/z axes and generalize movement.
+
+One recent round stacked all three (obstacles → multiple rovers → 3D); historically interviewers asked two.
+
+A frequently-noted twist: the interviewer asks you to implement one follow-up (often collision avoidance or the auto-portion) without AI, so be ready to write the movement/bookkeeping logic by hand — it's simple (track each rover's position) but catches people who leaned entirely on the assistant.
+
+The base spec mirrors a well-known public Ruby "robot challenge" exercise; candidates who practice that structure beforehand handle the live round comfortably.
+
+This is graded on design and communication: discuss Robot class structure, how to test systematically, and what you'd optimize, even though the AI writes most of the code.
+
+Configure the assistant's model size and thinking level before the round; an overly heavy setting can make the coding loop noticeably slow.
+
+Preparation
+
+Implement the base rover yourself once (Enum for Direction, a Robot class with turn_left / turn_right / move / report, and a small CLI loop) so you can narrate the design without the AI.
+
+Pre-write the obstacle, multi-rover (create/delete/select + collision), and 3D extensions so you can slot them in fast; rehearse doing one of them with the AI turned off.
+
+Practice a clean test suite: per-method unit tests plus CLI edge cases (invalid command, moving off-grid, blocked move), and be ready to run a coverage report on demand.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

@@ -1,0 +1,55 @@
+===H1===
+Multiply Strings (LC 43)
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/multiply-strings
+===BODY===
+Microsoft
+Coding·45 minMembers
+Multiply Strings (LC 43)
+Classic big-integer multiplication on string inputs without using built-in big-int types. HE coding round; complexity follow-up is expected.
+SWE
+array
+string-processing
+math
+medium
+Frequency
+Single report
+Last asked
+2026-02-01
+Stage
+onsite-coding
+Requirements
+
+Given two non-negative integers as strings num1 and num2, return their product as a string. You may not convert them to native int / BigInteger types and you may not use a library big-int. Both strings can have up to ~200 digits. Examples:
+
+"2", "3"     -> "6"
+"123", "456" -> "56088"
+"0", "9999"  -> "0"
+
+Edge cases the interviewer probes: leading zeros in the result ("0" * "123" must return "0", not "0000"), and one operand being "0".
+
+Notes
+
+The canonical pattern is grade-school long multiplication with a length-m+n result array:
+
+result[i+j+1] += int(num1[i]) * int(num2[j])
+
+Iterate i and j from right to left, then sweep once more left-to-right to propagate carries (result[k-1] += result[k] // 10; result[k] %= 10). Finally strip leading zeros, special-casing the all-zero result.
+
+Time complexity is O(m·n); space O(m+n). The trick most candidates miss is initializing the result array to length m + n — the product of an m-digit and an n-digit number has at most m + n digits, which exactly matches.
+
+Karatsuba is the standard follow-up answer for "how would you speed this up?" — O(n^log₂3) ≈ O(n^1.58). Interviewers do not expect you to implement it, just to name it.
+
+Preparation
+
+Memorize the result[i + j + 1] += d1 * d2 placement trick — this is the entire problem.
+
+Drill the carry propagation as a separate single-line loop; mixing it into the multiplication loop is the common bug.
+
+Pre-rehearse the "leading zeros + all-zero result" edge case explanation; interviewers test it deliberately.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

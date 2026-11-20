@@ -1,0 +1,56 @@
+===H1===
+Property Combination for Group Size
+===URL===
+https://www.1point3acres.com/interview/problems/company/airbnb/property-combination-min-capacity
+===BODY===
+Airbnb
+Coding·45 minMembers
+Property Combination for Group Size
+Given properties (each with a capacity) in a neighborhood and a target group size, find the combination that fits the group while minimizing total capacity, breaking ties by fewest properties. A long-standing Airbnb onsite coding problem.
+SWE
+backtracking
+optimization
+medium
+Frequency
+Single report
+Last asked
+2026-05-25
+Stage
+onsite-coding
+Requirements
+
+Input: a list of properties, each with a capacity (optionally filtered to a given neighborhood); a target groupSize.
+
+Find a combination of properties whose combined capacity is at least groupSize.
+
+Priority among valid combinations:
+
+Minimize total capacity (least over-provisioning).
+
+On a tie, pick the combination using the fewest properties.
+
+Enumerate combinations with pruning; return the best combination.
+
+Notes
+
+A long-circulating Airbnb onsite coding problem (the "booking / reservation system" prompt). The algorithm is combinatorial subset search with pruning once a partial total already exceeds the best total found.
+
+The ranking order is the most common bug: minimize total capacity first, then fewest properties. Candidates routinely flip the two keys — confirm the order with the interviewer.
+
+Debug- and edge-case-heavy. Candidates consistently report running out of time on test cases after over-investing in small helper functions. Budget time to finish the main logic and tests, not polish.
+
+Edge cases: no combination reaches groupSize, exact fit, multiple combinations with identical capacity and count.
+
+Preparation
+
+Implement the subset enumeration with branch-and-bound pruning in under 25 minutes, leaving time for tests.
+
+Encode the comparator as an explicit tuple key (total_capacity, property_count) to avoid flipping the priority.
+
+Write tests for: exact fit, no valid combination, and a tie on capacity broken by count.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

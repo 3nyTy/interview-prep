@@ -1,0 +1,45 @@
+===H1===
+Minimum Window Substring
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/minimum-window-substring
+===BODY===
+Meta
+Coding·25 minMembers
+Minimum Window Substring
+LC 76 — find the shortest substring of `s` that contains every character of `t` (counts respected). Asked as the second phone-screen problem in a recent SWE loop; missing the optimal-window approach gets the candidate dropped.
+SWE
+string
+sliding-window
+hashmap
+hard
+Frequency
+Single report
+Last asked
+2026-04-15
+Stage
+phone-screen
+Requirements
+
+Inputs: strings s and t.
+
+Return the minimum-length substring of s that contains every character of t (including duplicate counts). If none exists, return "".
+
+Notes
+
+Sliding-window with two hashmaps (need for t, have for the current window) and a matched counter that tracks how many distinct characters meet their needed count. Expand right, contract left whenever matched == len(need).
+
+Common slip: incrementing matched only when have[c] == need[c], not every time have[c] changes — otherwise the window won't contract correctly.
+
+Phone-screen graders explicitly look for the O(|s| + |t|) solution; the brute-force O(|s|² · |t|) version is a fail signal.
+
+Preparation
+
+Practice writing the window contraction loop without bugs: it's where most candidates blow time.
+
+Memorize the matched-counter pattern; it generalizes to LC 438 (Find All Anagrams) and LC 567 (Permutation in String).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

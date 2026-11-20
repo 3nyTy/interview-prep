@@ -1,0 +1,81 @@
+===H1===
+LoRA and PEFT Variants
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/lora-and-peft-variants
+===BODY===
+Amazon
+Other·30 minMembers
+LoRA and PEFT Variants
+Concept round on LoRA and its variants — the rank parameterization, how it composes with full fine-tuning, QLoRA quantization, DoRA, AdaLoRA, and practical hyperparameter trade-offs.
+RS
+MLE
+ml-knowledge
+transformer
+medium
+Frequency
+Low
+Last asked
+2026-03-29
+Stage
+phone-screen · onsite-deep-dive
+Requirements
+
+Explain LoRA: replace W with W + B A where A is r x d_in, B is d_out x r. Train only A, B, freeze W. Parameter savings vs full fine-tune.
+
+Discuss rank r selection and the alpha scaling factor.
+
+Cover variants: QLoRA (4-bit weights + LoRA adapters), DoRA (decomposing weight magnitude and direction), AdaLoRA (rank scheduled during training).
+
+Articulate when LoRA underperforms full fine-tune (large distribution shift, math reasoning tasks).
+
+Examples
+
+Common question stems:
+
+"What is LoRA? Walk me through the math."
+
+"What are LoRA variants? Compare QLoRA and DoRA."
+
+"How would you pick rank? What's a good default for a 7B model?"
+
+Notes
+
+LoRA's appeal at Amazon scale is mostly the multi-tenant serving pattern — one base model + many adapter checkpoints. Be ready to mention this.
+
+The interviewer often pivots to "how does this interact with RLHF / PPO?" — adapters are usually frozen during PPO unless you're explicitly fine-tuning the policy.
+
+Don't confuse LoRA's alpha (scaling) with r (rank). Standard practice: alpha = 2 * r.
+
+Variant taxonomy in one breath: LoRA adds B A to a frozen W. QLoRA = LoRA on top of 4-bit NF4-quantized base weights, with adapters kept in bf16 — buys roughly a third of the memory at a cost of roughly forty percent more wall-clock time. DoRA decomposes W into magnitude and direction, applies LoRA only to the direction — closes most of the gap to full fine-tune at the same rank. AdaLoRA schedules rank per layer during training and prunes less-useful directions via SVD-based importance. IA³ is not a low-rank update at all — it learns per-channel rescaling vectors injected into K, V, and the FFN; far fewer parameters, but lower ceiling.
+
+The 2× alpha rule (alpha = 2*r) is a starting point, not a law; at high rank (r ≥ 128) sub-1× scaling often wins. The rank-stabilized variant (use_rslora=True) replaces alpha/r with alpha/sqrt(r), which keeps the effective update magnitude stable as r grows.
+
+Target-module choice matters more than rank in practice: {q_proj, v_proj} is the cheap baseline; adding {k_proj, o_proj} plus the MLP {gate_proj, up_proj, down_proj} typically wins on instruction-tuning quality, at the cost of a few extra GB.
+
+Multi-tenant serving pattern: keep one quantized base in GPU memory, swap LoRA adapters per request (set_adapter / add_weighted_adapter), and only merge_and_unload when you have a stable single tenant — merging removes the per-request overhead but loses adapter swappability.
+
+Failure modes to call out: LoRA underperforms full fine-tune on (a) tasks requiring large distribution shift from the base, (b) capabilities present in the base but absent from the fine-tune data (the model can forget them), and (c) long-horizon reasoning where the rank ceiling caps representational change.
+
+Preparation
+
+Derive on paper the LoRA parameter count: for a d_in × d_out weight, full fine-tune is d_in × d_out; LoRA is r × (d_in + d_out). Compute the savings ratio for d=4096, r=8.
+
+Practice a 2-minute pitch covering the math, savings, variant taxonomy (QLoRA / DoRA / AdaLoRA), and when each wins.
+
+Memorize the standard hyperparameter defaults: r ∈ {8, 16, 32}, alpha = 2 * r, target modules = q_proj, v_proj (sometimes k_proj, o_proj and MLP).
+
+Prep one concrete project story: data, base model, rank you chose, observed loss curve, and a failure mode you debugged.
+
+Drill ladder: (1) on paper, compute LoRA's parameter count for a 4096 × 4096 weight at r=8 and the savings ratio (16 × 4096 / 4096² ≈ 0.4%); (2) write a 20-line LoRALinear(nn.Module) from scratch (frozen W, trainable A, B, scale by alpha/r); (3) attach it to a tiny transformer and confirm only A, B show up in parameters() with requires_grad=True; (4) repeat for DoRA — same skeleton but factor out ||W + BA|| / ||W|| as the magnitude scalar.
+
+Memorize the variant cheat-sheet (LoRA / QLoRA / DoRA / AdaLoRA / IA³) — each in one sentence covering what it changes, what it costs, and when to use it.
+
+Prep one concrete project anecdote: base model, rank chosen, target modules, alpha, observed loss curve, one failure mode (e.g. capability erosion) and the fix.
+
+Read LoraLayer.forward and add_weighted_adapter in the PEFT source — the multi-adapter serving question is a common pivot and the API surface is the answer.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

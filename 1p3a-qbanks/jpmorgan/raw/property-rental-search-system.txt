@@ -1,0 +1,77 @@
+===H1===
+Property Rental Search System
+===URL===
+https://www.1point3acres.com/interview/problems/company/jpmorgan/property-rental-search-system
+===BODY===
+JPMorgan Chase
+System Design·45 minMembers
+Property Rental Search System
+Redesign a property-rental website for global customers on cloud infrastructure. The prompt names payment, view, guest, search, and update services, with emphasis on fast, secure search and property browsing.
+SWE
+search
+payment
+caching
+storage
+scaling
+medium
+Frequency
+Single report
+Last asked
+2026-02-08
+Stage
+onsite-system-design
+Requirements
+
+Functional requirements:
+
+Display property details including photos, location, and rent details.
+
+Let international guests search across properties quickly and securely.
+
+Support online payments.
+
+Maintain guest state such as favorites and recently checked records.
+
+Support property updates from the owner / dealer workflow.
+
+Scale / constraints:
+
+Global users need low-latency reads.
+
+Photos and property metadata have different storage and caching needs.
+
+Search should remain responsive as listings grow.
+
+Design decisions to discuss:
+
+split of payment, view, guest, search, and update services
+
+search index freshness vs write complexity
+
+CDN / object storage for photos
+
+authentication and secure payment handoff
+
+observability for failed searches, payment failures, and stale listings
+
+Notes
+
+Interviewer interest can center on search. Prepare filtering by location, rent, availability, and favorites, plus indexing and cache invalidation after listing updates.
+
+Treat payments as a separate service boundary with idempotent payment attempts and clear failure states.
+
+Do not leave a generic box named "process" in the workflow; replace it with concrete read, search, guest-state, update, and payment flows.
+
+Preparation
+
+Sketch a component diagram with CDN/object storage, property metadata store, search index, guest profile store, payment service, and update pipeline.
+
+Prepare one answer for global read latency: regional edge cache for photos and metadata, backed by a central source of truth and async search-index updates.
+
+Practice the failure paths: payment timeout, listing updated while a guest is viewing, unavailable property in search results, and stale favorites.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

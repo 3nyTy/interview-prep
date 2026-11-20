@@ -1,0 +1,54 @@
+===H1===
+ML System Design: Bad / Unsafe Content Detection
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/ml-system-design-content-safety
+===BODY===
+Pinterest
+System Design·60 minMembers
+ML System Design: Bad / Unsafe Content Detection
+Design a content-understanding pipeline that flags unsafe / bad pins (or bad images) at upload time and at re-evaluation time. Used by Trust & Safety / Content Signal teams; the framing changes between teams but the underlying ML system is recognizably one design.
+MLE
+mlsd
+moderation
+integrity
+vlm
+weak-supervision
+classification
+hard
+Frequency
+Low
+Last asked
+2026-04-18
+Stage
+onsite-system-design
+Requirements
+
+Design an end-to-end content-safety pipeline for pins. Cover image, text, and metadata features; labeling and human review; multi-label training; policy-specific calibration; synchronous and asynchronous inference; historical re-scoring; and reviewer feedback.
+
+Notes
+
+Use image and text encoders plus an explicit fusion layer and policy heads. State how missing modalities and board context are handled.
+
+Build labels from human review, weak signals, and a stable gold set. Track precision/recall and calibration per policy because action thresholds differ by harm category.
+
+For model updates, emit content ids to a versioned re-scoring queue, shard by content id, make writes idempotent, and retain model/version provenance for appeals.
+
+Break metrics down by language, region, and relevant subgroups; combine offline evaluation with reviewer disagreement and appeal outcomes.
+
+A transaction-fraud form uses the same feature → score → calibrated threshold → action skeleton, but changes the feature surface, latency budget, and cost of false positives.
+
+Preparation
+
+Draw image encoder, text encoder, fusion, policy heads, and human-review feedback.
+
+Specify positive, weak, and gold labels plus one active-learning rule.
+
+Choose a calibration method and work through two policy thresholds with different costs.
+
+Walk a versioned historical re-score and an appeal that must reproduce the original decision.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

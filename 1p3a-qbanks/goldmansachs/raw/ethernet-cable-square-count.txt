@@ -1,0 +1,52 @@
+===H1===
+Ethernet Cable Square Count
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/ethernet-cable-square-count
+===BODY===
+Goldman Sachs
+Coding·180 minMembers
+Ethernet Cable Square Count
+For each grid query `(rows, columns)`, sum the number of possible `a × a` square selections for every side length `a` from 1 through `min(rows, columns)`.
+RS
+math
+grid
+easy
+Frequency
+Single report
+Last asked
+2025-09-22
+Stage
+oa
+Requirements
+
+Input: a list of grid-size queries (rows, columns).
+
+For each query, count all possible square subgrids of every side length a, where 1 <= a <= min(rows, columns).
+
+Return one total per query.
+
+Examples
+
+query = [5, 3]
+1 x 1 squares: 5 * 3 = 15
+2 x 2 squares: 4 * 2 = 8
+3 x 3 squares: 3 * 1 = 3
+return 15 + 8 + 3 = 26
+
+Notes
+
+Direct formula for a fixed side length: (rows - a + 1) * (columns - a + 1).
+
+A simple loop over a is enough unless query counts or dimensions are very large; then derive the closed form for the sum of a quadratic sequence.
+
+Preparation
+
+Implement the loop version first and test rectangular grids where rows != columns.
+
+Practice deriving the closed form from sum((r-a+1)(c-a+1)) in case the follow-up asks for O(1) per query.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

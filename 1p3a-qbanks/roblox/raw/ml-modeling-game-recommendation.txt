@@ -1,0 +1,63 @@
+===H1===
+ML Modeling: Recommend Games to a Roblox User
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/ml-modeling-game-recommendation
+===BODY===
+Roblox
+Other·60 minMembers
+ML Modeling: Recommend Games to a Roblox User
+Open-ended ML / recommendation round for MLE candidates: "how would you recommend games to a Roblox user?" The interviewer expects end-to-end coverage of the recommender pipeline rather than depth on any single component. Used as the MLE onsite modeling slot.
+MLE
+mlsd
+recommendation
+two-tower
+ranking
+ml-knowledge
+evaluation
+ab-testing
+feature-engineering
+hard
+Frequency
+Low
+Last asked
+2026-05-19
+Stage
+onsite-system-design
+Problem Statement
+
+Design a recommendation / ranking system for Roblox game discovery. The exact surface can vary, but the core problem is the same: recommend the most relevant games or experiences to a user using play history, game metadata, social signals, real-time popularity, and feedback from previous recommendations.
+
+Common interview variants include:
+
+Design a game recommendation system
+
+Design a real-time game recommendation system
+
+Design YouTube home page recommendation
+
+Design search box recommendations
+
+Recommendation system modeling
+
+In practice, the interviewer is usually less interested in one fixed product UI and more interested in whether you can structure the end-to-end ML system clearly: objective definition, candidate generation, feature selection and preprocessing, model choice, training samples, loss function, optimization, online serving, evaluation, A/B testing, and feedback loops.
+
+Solution Resources
+
+We do not provide a full in-repo solution for this question because there are already many strong recommendation-system walkthroughs online and the exact Roblox prompt can be narrowed in several directions during the interview.
+
+Useful adjacent references:
+
+Design an ML Recommendation Engine
+
+Interview Context
+
+This question has been observed at Roblox across Machine Learning Engineer and Software Engineer interviews, including phone screens, video interviews, onsites, and virtual onsites. The prompt may be phrased broadly as "design a recommendation system" and then narrowed into game recommendations, home-page ranking, search-box recommendations, or real-time ranking at scale.
+
+One observed variant focused on recommending games to users and then expanded into standard recommender-system topics: feature selection and preprocessing, model choice, training samples, loss function, optimization, evaluation, and A/B testing. Another variant asked candidates to match users and games using lifetime average playtime, including how to compute per-user and per-game average playtime from play sessions.
+
+The round is a hard one hour and time pressure is real: candidates routinely run out of time before reaching deployment and monitoring. Once the interviewer starts mining a single component, expect deep follow-ups on handling the long tail (cold-start games, sparse-interaction users) and on precisely defining the training objective and loss. Budget time to at least name the serving and monitoring stages even if you cannot fully develop them — leaving the pipeline visibly incomplete reads as weaker than a thinner-but-complete end-to-end pass.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

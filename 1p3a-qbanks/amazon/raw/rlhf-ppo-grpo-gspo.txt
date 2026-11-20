@@ -1,0 +1,87 @@
+===H1===
+RLHF: PPO vs GRPO vs GSPO
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/rlhf-ppo-grpo-gspo
+===BODY===
+Amazon
+Other·30 minMembers
+RLHF: PPO vs GRPO vs GSPO
+Applied Scientist deep-dive into RLHF training: PPO objective, the GRPO/GSPO group-relative variants, and the practical differences that drive choice between them.
+RS
+MLE
+ml-knowledge
+math-reasoning
+hard
+Frequency
+Low
+Last asked
+2026-03-29
+Stage
+onsite-deep-dive · onsite-research
+Requirements
+
+Explain the PPO objective with the clipped surrogate loss and the role of the KL penalty against a reference policy.
+
+Compare GRPO (group relative policy optimization) and GSPO — what changes, why recent reasoning-tuned LLMs prefer GRPO.
+
+Discuss reward model construction, reward hacking failure modes, and KL-control tuning.
+
+Tie back to system requirements: rollout cost, on-policy vs off-policy, distributed training topology.
+
+Examples
+
+Common stems:
+
+"Compare PPO, GRPO, and GSPO. When would you choose each?"
+
+"How is the advantage estimated in GRPO?" (group-wise normalization, no value network needed)
+
+"How do you mitigate reward hacking when fine-tuning a reasoning model?"
+
+Notes
+
+GRPO removes the value/critic network — advantage is computed per group of sampled completions. Cheap, but high-variance.
+
+The interviewer wants "practically how do you do it" answers, not just paper recitations. Have a concrete pipeline story (rollouts → reward → KL clip → advantage estimate).
+
+Expect follow-up on context length blow-up during rollouts and how you'd shard.
+
+PPO's clipped surrogate: L^CLIP(θ) = E[min(r_t * A_t, clip(r_t, 1-ε, 1+ε) * A_t)] where r_t = π_θ(a|s) / π_old(a|s). The clip prevents a single update from moving the policy too far in one shot; the KL-to-reference penalty is a separate term in the full loss and controls drift across updates.
+
+GRPO's structural change: drop the value/critic network entirely. For each prompt, sample G completions (typically 4–16), score each with the reward function, and standardize within the group: A_i = (r_i - mean(r)) / (std(r) + ε). This is the advantage every token in completion i receives. Net effect: one fewer LLM in memory, but variance increases with smaller G.
+
+GSPO (Group Sequence Policy Optimization, ByteDance) extends GRPO by computing the importance ratio at the sequence level rather than token level — addresses a stability issue where token-level ratios compound noisily over long completions. Pick GSPO when reasoning chains run long (≥1k tokens) and you see GRPO loss spike.
+
+Reward-hacking mitigations seen in production: prefer rule-based / verifier rewards (math correctness, unit-test pass) over neural reward models; keep the KL coefficient β non-trivial (typical 0.01–0.1) so the policy can't drift into adversarial regions of the reward; cap completion length so the model can't "talk forever" to game length-biased rewards.
+
+Rollout cost dominates RLHF wall-clock: for GRPO with G=8 and 2k-token completions, a single update consumes ~16k tokens of generation per prompt. Sharding strategy: rollouts on inference-optimized replicas (vLLM / TGI), gradient updates on training replicas, sync weights every N steps.
+
+Preparation
+
+On the whiteboard, write the clipped surrogate L^CLIP(θ) = E[min(r_t(θ) * A_t, clip(r_t(θ), 1 - ε, 1 + ε) * A_t)] from memory and explain each term in 60 seconds.
+
+Re-derive the GRPO advantage as the per-group standardized reward ((r_i - mean(r)) / std(r) over the sampled group) — no value network involved.
+
+Implement a 50-line toy PPO loop on a tiny bandit task; rerun once with the KL term removed to feel the divergence.
+
+Prep a 90-second story about a real RLHF / preference-tuning run you've seen or built, even if it's a small toy experiment.
+
+Drill ladder: (1) whiteboard the clipped surrogate from memory in 60 seconds, naming each term; (2) write the GRPO advantage formula and explain in one sentence why no value network is needed; (3) implement a 50-line toy GRPO loop on a tiny verifiable task (e.g. "output the sum of two integers") — sample G=4, score by exact match, standardize, apply policy gradient with KL penalty; (4) ablate the KL term and watch the policy collapse.
+
+Memorize the three-way comparison: PPO = critic + token-level ratio + clip; GRPO = no critic + group-relative advantage + token-level ratio + clip + KL; GSPO = no critic + group-relative advantage + sequence-level ratio + KL.
+
+Prep a 90-second pipeline story: prompt set → rollouts (inference fleet) → reward scoring → advantage computation → policy update with KL → eval. Naming a concrete bottleneck (rollout throughput, reward-model latency, KL coefficient tuning) is what separates a real story from a paper recitation.
+
+Read trl/trainer/grpo_trainer.py end-to-end once — the _compute_advantages and KL-handling code are the parts interviewers fish for.
+
+GRPO-centric deep-dive probes (AI-team phone screen)
+
+An AI-org phone screen drives the whole round off GRPO and the DeepSeek-style training stack: walk the paper's motivation, then list the parallel-computing strategies used, why the critic is dropped (and its pros/cons), and what goes wrong during training and how you fix it. Surface answers ("bad hyperparameters → overfit") read as not-hands-on; concrete answers come from having actually run a GRPO job.
+
+Expect adjacent systems probes in the same breath: MLA design rationale, DualPipe parallelism, how nodes communicate during distributed training, and how the reward is designed and why. Pair this with the DeepSeek-V3 paper-read prep if you are interviewing for a frontier-research org.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

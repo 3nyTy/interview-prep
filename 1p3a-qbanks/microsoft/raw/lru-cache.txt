@@ -1,0 +1,75 @@
+===H1===
+LRU Cache (LC 146) + Multithreading Variant
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/lru-cache
+===BODY===
+Microsoft
+Coding·45 minMembers
+LRU Cache (LC 146) + Multithreading Variant
+Microsoft's most repeated cache implementation prompt: O(1) get/put on a bounded cache, with follow-ups spanning thread safety, TTL, LFU, and cross-machine sharding.
+SWE
+MLE
+linked-list
+hashmap
+data-structure
+concurrency
+medium
+Frequency
+Medium
+Last asked
+2026-08-16
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Implement an LRUCache(capacity) with O(1) get(key) and put(key, value). On eviction, drop the least-recently-used entry. get counts as a use.
+
+Follow-ups, in order of frequency:
+
+Strict O(1). Multiple interviewers explicitly reject OrderedDict.move_to_end based solutions on the grounds that internal reordering is O(log N) under Python's hash table assumption; the expected answer is hashmap + doubly-linked-list.
+
+Thread safety (MAI variant). Multiple concurrent get / put callers; protect with a single RLock or with reader-writer locks if performance is probed.
+
+LFU (one VO round): same shape as LRU but evict the least-frequently-used; on frequency ties, fall back to LRU.
+
+Expiration / TTL: attach an expiration timestamp to each entry, reject expired values during get, and discuss periodic background cleanup.
+
+Cross-machine operation: partition keys across cache nodes and preserve the single-node data structure within each shard.
+
+Notes
+
+The canonical hashmap + doubly-linked-list pattern:
+
+Dict maps key → Node.
+
+Doubly-linked list ordered MRU → LRU. Head sentinel for MRU, tail sentinel for LRU.
+
+get(key): O(1) lookup, splice node to head.
+
+put(key, value): insert at head; if over capacity, unlink tail.prev and pop from dict.
+
+Use sentinel nodes at both ends to make every splice a four-pointer reassignment with no special cases.
+
+For thread safety, the simplest correct answer is a single threading.RLock wrapping every public method. Interviewers who push on this expect you to acknowledge the contention cost and discuss sharding the cache (split into N independent shards by hash(key) % N, each with its own lock) — the same pattern as ConcurrentHashMap. This improves concurrency but gives only per-shard approximate LRU rather than one strict global recency order.
+
+TTL can be implemented with lazy expiration checks on reads plus a background sweeper for stale entries. For a distributed cache, consistent hashing is the natural partitioning discussion; each node can retain the same hashmap-and-list implementation locally.
+
+LFU is LRU + a freq → DLL index: each get / put bumps the node from its current frequency bucket into the next; eviction targets the LRU node within the lowest-frequency bucket. Track the minimum frequency to find the eviction bucket in O(1).
+
+Preparation
+
+Write the LRU skeleton from scratch under 12 minutes; type the sentinel-node pattern until it is automatic.
+
+Drill the four splice operations (unlink, push-to-head, unlink-tail, pop-from-dict) on paper.
+
+Pre-rehearse the thread-safety extension: "wrap with RLock for correctness; shard for throughput".
+
+Extend the same implementation with TTL and explain lazy cleanup versus a background sweeper.
+
+For LFU, write it once end-to-end the night before; the bucket bookkeeping is the part candidates lose time on.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

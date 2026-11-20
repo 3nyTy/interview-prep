@@ -1,0 +1,86 @@
+===H1===
+System Design — Event Ingestion + Top-K Aggregation
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/system-design-event-ingestion-topk
+===BODY===
+Oracle
+System Design·45 minMembers
+System Design — Event Ingestion + Top-K Aggregation
+An originally-single-server event-reporting system must scale to a much higher request volume, and must additionally compute top-K aggregations across the event stream. OHAI onsite SD round with a heavy emphasis on the scale-up narrative.
+SWE
+Infra Eng
+system-design
+streaming
+top-k
+scaling
+distributed-systems
+ingestion
+kafka
+medium
+Frequency
+Single report
+Last asked
+2025-01-15
+Stage
+onsite-system-design
+Requirements
+
+Original setup: a single server receiving event reports from clients.
+
+New scale: request volume has grown sharply (orders of magnitude); the single-server bottleneck must be removed.
+
+Additional capability: compute top-K aggregations over the event stream (e.g. top-K event types, top-K clients, top-K resources).
+
+Round time: 45 minutes after a 10-minute behavioural opener.
+
+Notes
+
+Ingestion scale-out
+
+Front the system with a stateless load balancer; ingestion nodes are themselves stateless. Events land on a durable log (Kafka / Kinesis / OCI Streaming) keyed by a partition field (event type or client ID).
+
+Consumers downstream read the log for further processing — aggregation, storage, downstream notification.
+
+Back-pressure: the log absorbs upstream bursts; consumers scale independently.
+
+Top-K aggregation
+
+For an exact top-K over the full stream:
+
+Map-side: per partition / per consumer, maintain a counter heap of size K (heap-based top-K).
+
+Reduce-side: merge per-partition heaps periodically to produce the global top-K.
+
+For an approximate top-K (sub-linear memory):
+
+Count-Min Sketch for frequency estimation + heap of top-K candidates. Standard streaming top-K pattern.
+
+Space-Saving algorithm (Misra-Gries / Metwally) maintains exactly K counters with bounded over-estimation error.
+
+Time-windowed top-K (last hour, last day): use a tumbling-window or sliding-window aggregation framework (Flink, Spark Structured Streaming). Each window emits its top-K snapshot.
+
+Common deep dives
+
+Exactly-once vs at-least-once delivery for the top-K accuracy story.
+
+Late-arriving events and watermarks for time-windowed top-K.
+
+Storage of historical top-K snapshots for trend analysis.
+
+Hot-key handling: a single event type dominating traffic forces a per-key partition scheme.
+
+Preparation
+
+Sketch the Kafka-style log architecture in 5 minutes; have the producer / consumer / log layer named explicitly.
+
+Drill streaming top-K: heap-based (exact) and Count-Min Sketch (approximate). Be able to articulate the memory trade-off.
+
+Know the Flink / Spark Streaming windowing model well enough to discuss tumbling vs sliding windows in two sentences each.
+
+Read Hello Interview's "top-K problem" article for the standard streaming-top-K talking points.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

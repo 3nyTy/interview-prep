@@ -1,0 +1,52 @@
+===H1===
+Shortest Directed Cycle Through a Node
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/shortest-cycle-through-node
+===BODY===
+Google
+Coding·40 minMembers
+Shortest Directed Cycle Through a Node
+Round 4 of a 4-round NG loop. BFS from the target node in a directed graph; return the moment BFS re-enters the node.
+SWE
+graph
+bfs
+medium
+Frequency
+Single report
+Last asked
+—
+Stage
+onsite-coding
+Requirements
+
+Directed graph; given a node v, return the length of the shortest cycle containing v.
+
+BFS from v over the directed edges; the first time v is rediscovered (as a target), the BFS depth is the answer.
+
+Handle no-cycle case (return -1 or infinity).
+
+Examples
+
+Edges [(0,1),(1,2),(2,0)], v = 0 → 3.
+
+Edges [(0,1),(1,2)], v = 0 → -1.
+
+Notes
+
+Strictly directed; do not relax to undirected.
+
+BFS layer 0 is v itself; the first re-discovery during expansion is the cycle length.
+
+Common bug: marking v as visited immediately blocks the re-entry.
+
+Preparation
+
+Write the directed BFS-from-source version from memory in under 12 min.
+
+Practice the "re-entry detection" pattern (don't mark v visited until after pop).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

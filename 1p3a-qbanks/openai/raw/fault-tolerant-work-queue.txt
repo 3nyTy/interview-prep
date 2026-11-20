@@ -1,0 +1,49 @@
+===H1===
+Fault-Tolerant Work Queue
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/fault-tolerant-work-queue
+===BODY===
+OpenAI
+CodingMembers
+Fault-Tolerant Work Queue
+Implement a work queue with `reserve`, `complete`, and `fail` operations, then extend it with reservation timeouts, retries, and a dead-letter queue. Timeout behavior and retry limits are intentionally underspecified, so clarify them before coding.
+Infra Eng
+queue
+state-machine
+retry
+medium
+Frequency
+Single report
+Last asked
+2026-08-13
+Stage
+onsite-coding
+Requirements
+
+Implement a work queue with public operations to reserve, complete, and fail work items.
+
+Support reservation timeouts, retries, and a dead-letter queue.
+
+Clarify timeout behavior, the retry budget, and the dead-letter transition before coding.
+
+Notes
+
+The concrete method signatures, task payload shape, clock behavior, and retry limit are not fixed in the available prompt.
+
+Model each item with explicit ready, reserved, completed, and dead-letter states. A reservation records a lease deadline and increments an attempt counter; complete is terminal, while fail or lease expiry returns the item to ready only while attempts remain. Normalize the ambiguous retry limit to a clearly named max_attempts (or document that it counts retries) to avoid an off-by-one transition.
+
+Give each reservation an opaque token or version. complete and fail must match the item's current reservation, so a worker holding an expired lease cannot finalize an item that has already been re-reserved.
+
+A ready deque handles dispatch, a map keyed by item ID stores authoritative state, and a min-heap keyed by lease deadline finds expirations. Ignore stale heap entries by comparing their token/version with the current record. Queue operations and record lookups are expected O(1); each lease-heap insertion or removal is O(log n).
+
+Preparation
+
+Implement the queue as a small explicit state machine and narrate every allowed transition.
+
+Write deterministic tests for reserve, complete, fail, timeout, retry, and dead-letter behavior.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,61 @@
+===H1===
+SQL: Cloud Resource Utilization Dashboard
+===URL===
+https://www.1point3acres.com/interview/problems/company/akunacapital/sql-cloud-resource-utilization-dashboard
+===BODY===
+Akuna Capital
+CodingMembers
+SQL: Cloud Resource Utilization Dashboard
+Write one SQL query merging CPU and memory metric tables into a unified utilization view: resource_type, application_id, and rounded average usage, filtered to a month and a >50% average threshold.
+SWE
+sql
+data-engineering
+easy
+Frequency
+Single report
+Last asked
+2026-05-25
+Stage
+oa
+Requirements
+
+Write a single SQL query that merges CPU and memory utilization into one unified view for a cloud resource dashboard.
+
+The result must have these columns:
+
+resource_type — the literal CPU or Memory indicating which metric the row describes.
+
+application_id — the application with recorded metrics.
+
+average_usage_percentage — the average usage as a percentage, rounded to two decimal places including trailing zeros (e.g. 35.00).
+
+Rules:
+
+Include only metrics recorded in February 2024.
+
+Include only applications whose average usage for that specific resource type is greater than 50%.
+
+Sort ascending by application_id, then ascending by resource_type.
+
+Schema (both tables share the same shape):
+
+cpu_metrics(application_id INT, dt VARCHAR(19), usage_percentage DECIMAL(5,2))
+memory_metrics(application_id INT, dt VARCHAR(19), usage_percentage DECIMAL(5,2))
+
+Notes
+
+The shape is two grouped aggregates combined with UNION ALL: one branch over cpu_metrics labeled CPU, one over memory_metrics labeled Memory. Each branch filters to February 2024, groups by application_id, and keeps groups with HAVING AVG(usage_percentage) > 50. Use ROUND(AVG(usage_percentage), 2) for the two-decimal output.
+
+dt is a VARCHAR(19) timestamp string, so the month filter is a half-open range on dt >= '2024-02-01' AND dt < '2024-03-01' rather than a numeric comparison. Apply the final ORDER BY application_id, resource_type to the combined result, not inside each branch.
+
+Preparation
+
+Write the two-branch UNION ALL query and confirm the HAVING filter applies per resource type, not across the union.
+
+Test an application that exceeds 50% on CPU but not memory to confirm it appears once, only in the CPU branch.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

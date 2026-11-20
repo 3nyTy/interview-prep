@@ -1,0 +1,112 @@
+===H1===
+Recipe Management System OA
+===URL===
+https://www.1point3acres.com/interview/problems/company/airbnb/oa-recipe-management-system
+===BODY===
+Airbnb
+CodingMembers
+Recipe Management System OA
+Implement a progressive recipe-management service. Levels 1–3 cover recipe CRUD with case-insensitive name uniqueness, ingredient search and deterministic listing, then user creation and user-scoped recipe edits; the final level has not yet been exposed.
+SWE
+object-design
+hashmap
+sorting
+testing
+hard
+Frequency
+Single report
+Last asked
+2026-07-29
+Stage
+oa
+Requirements
+
+Each level unlocks only after every test in the current level passes.
+
+Level 1 — recipe CRUD
+
+add_recipe(name: str, ingredients: list[str], steps: list[str]) -> str | None
+
+Add a recipe and return an ID formatted as "recipe" + n, with n increasing from 1.
+
+Return None when another recipe already has the same name, ignoring case.
+
+get_recipe(recipe_id: str) -> list[str]
+
+Return [name, ingredients_as_string, steps_as_string].
+
+Join each stored list with commas; preserve the original ingredient order.
+
+Return an empty list when the recipe does not exist.
+
+update_recipe(recipe_id: str, name: str, ingredients: list[str], steps: list[str]) -> bool
+
+Replace the stored recipe and return True.
+
+Return False when the recipe does not exist or the new name conflicts with another recipe, ignoring case.
+
+delete_recipe(recipe_id: str) -> bool
+
+Delete the recipe and return True; return False when it does not exist.
+
+Level 2 — search and listing
+
+search_recipes_by_ingredient(ingredient: str) -> list[str]
+
+Return IDs for every recipe containing the ingredient, ignoring case.
+
+Sort first by ingredient count ascending, then by recipe ID ascending.
+
+list_recipes(sort_by: str) -> list[str]
+
+Return all recipe IDs.
+
+With sort_by="ingredient_count", sort by ingredient count ascending and then recipe ID ascending.
+
+With sort_by="name", sort by name lexicographically and then recipe ID ascending.
+
+An invalid sort_by value defaults to name order.
+
+Level 3 — users and edits
+
+add_user(user_id: str) -> bool
+
+Add a user and return True; return False when the user already exists.
+
+edit_recipe(user_id: str, recipe_id: str, new_name: str, new_ingredients: list[str], new_steps: list[str]) -> bool
+
+Any existing user may edit any recipe; there is no ownership restriction.
+
+Return True after a successful edit.
+
+Return False when the user or recipe does not exist, or when the new name conflicts with another recipe, ignoring case.
+
+Notes
+
+Keep a primary recipes_by_id map plus a case-folded name_to_id index. Route add, update, edit, and delete through shared mutation helpers so failed validation leaves both structures unchanged and successful renames or deletions keep the index synchronized.
+
+A direct implementation can scan the recipe map and sort matches by the contract's tuple key. If repeated ingredient queries require an inverted index, update it in the same mutation helpers so edits and deletions cannot leave stale IDs.
+
+Name uniqueness and ingredient matching are case-insensitive across every operation.
+
+Recipe IDs are assigned from a monotonic sequence beginning at 1.
+
+Deterministic secondary ordering by recipe ID is part of both Level 2 contracts.
+
+The complete Level 4 contract has not yet been exposed.
+
+Preparation
+
+Implement the Level 1 CRUD contract and test duplicate names with mixed case, missing IDs, and preservation of list order.
+
+Add both Level 2 query paths and drill every primary and secondary sort key.
+
+Extend the same recipe store with users and edits while regression-testing the uniqueness rules from Level 1.
+
+Practice completing each level without rewriting earlier methods, because all tests must pass before the next contract unlocks.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,66 @@
+===H1===
+Minimum Direction Violations in a Directed Graph
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/minimum-direction-violations-directed-graph
+===BODY===
+Google
+CodingMembers
+Minimum Direction Violations in a Directed Graph
+Given directed edges that may be traversed forward at cost 0 or backward at cost 1, return the minimum number of direction violations from a start node to an end node. The expected solution models both directions and applies 0-1 BFS, with Dijkstra as a valid alternative.
+SWE
+graph
+bfs
+dijkstra
+medium
+Frequency
+Single report
+Last asked
+2026-07-19
+Stage
+onsite-coding
+Requirements
+
+Input: n nodes, directed edges u -> v, a start node, and an end node.
+
+Every original edge can be traversed in either direction:
+
+Moving from u to v costs 0.
+
+Moving from v to u costs 1.
+
+Return the minimum total cost needed to reach end from start.
+
+Explain why an ordinary unweighted BFS is not sufficient and compare the specialized traversal with Dijkstra.
+
+Examples
+
+n = 5
+edges = [[0, 1], [2, 1], [2, 3], [4, 3]]
+start = 0
+end = 4
+
+path: 0 -> 1 -> 2 -> 3 -> 4
+cost: 0 + 1 + 0 + 1 = 2
+output: 2
+
+Notes
+
+Represent each original edge twice: the forward direction with weight 0 and the reverse direction with weight 1.
+
+A regular BFS minimizes the number of edges, not the number of direction violations.
+
+The linear-time target is O(n + m) time and space.
+
+Preparation
+
+Implement 0-1 BFS from memory and rehearse the deque invariant for zero-weight versus one-weight transitions.
+
+Compare the proof and complexity with Dijkstra on the same transformed graph.
+
+Test unreachable destinations, parallel edges, cycles, and start == end.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

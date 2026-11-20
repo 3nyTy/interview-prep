@@ -1,0 +1,47 @@
+===H1===
+Segregate Binary String (Move Ones to End)
+===URL===
+https://www.1point3acres.com/interview/problems/company/akunacapital/segregate-binary-string-move-ones
+===BODY===
+Akuna Capital
+CodingMembers
+Segregate Binary String (Move Ones to End)
+Given a binary string, move each '1' right (until it hits the end or another '1') so all 1s end up segregated to the right. Return the total cost, where cost is the number of positions each '1' moves. Equivalent to counting (1,0) inversions / adjacent swaps to group the ones.
+SWE
+RS
+greedy
+prefix-sum
+binary-string
+string
+medium
+Frequency
+Low
+Last asked
+2025-08-26
+Stage
+oa
+Requirements
+
+Given a binary string s, repeatedly move a '1' to the right until it reaches the end of the string or another '1', so that the 1s and 0s become segregated (all 1s to the right). Return the total cost, where the cost is the number of positions each '1' moves.
+
+Examples
+
+s = "01010"  ->  "00011"
+
+Notes
+
+The total cost equals the number of (1, 0) pairs where the 1 appears before the 0 — i.e. the number of adjacent swaps needed to push every 1 past every 0 to its right. Scan left to right keeping a running count of 1s seen; each time you encounter a 0, add the current count of 1s to the answer. This is O(n) with no simulation.
+
+Variant: a related sitting frames it as "maximum number of operations to move ones to the end," where one operation moves a whole run of leading 1s past a single 0, and asks for the count of operations rather than total displacement. It is solved with the same left-to-right counter (track ones seen, act on each 0), but the return value differs — read the prompt to see whether it wants displacement cost or operation count.
+
+Preparation
+
+Implement the single-pass ones-counter and verify it on "01010" and a few hand cases.
+
+Code both return modes (displacement cost vs operation count) so either phrasing is covered.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

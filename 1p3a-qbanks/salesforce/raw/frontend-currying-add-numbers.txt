@@ -1,0 +1,90 @@
+===H1===
+Frontend Curry: addTwoNumbers → addThreeNumbers(a)(b)(c)
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/frontend-currying-add-numbers
+===BODY===
+Salesforce
+Coding·30 minMembers
+Frontend Curry: addTwoNumbers → addThreeNumbers(a)(b)(c)
+Salesforce's recurring fullstack phone-screen warm-up. Given `addTwoNumbers(a, b) = a + b`, implement a curried `addThreeNumbers(a)(b)(c)` that returns `a + b + c`. Frequently extended into a generic `curry` or `addN` variadic version.
+SWE
+currying
+frontend
+javascript
+easy
+Frequency
+Low
+Last asked
+2026-01-30
+Stage
+phone-screen · tech-screen
+Requirements
+
+Implement addThreeNumbers such that addThreeNumbers(1)(2)(3) === 6.
+
+Same (arg)(arg)(arg) chain shape — each call returns either another function (more args expected) or the final number.
+
+JavaScript / TypeScript only; no React allowed in CoderPad.
+
+Common follow-ups asked in the same round:
+
+Generalise to addN(a)(b)(c)... for arbitrary arity (i.e. the curried function is variadic until called with zero args, where it returns the sum).
+
+Implement a general curry(fn) that transforms any fixed-arity fn into its curried form.
+
+Examples
+
+addThreeNumbers(1)(2)(3);        // 6
+addThreeNumbers(10)(20)(30);     // 60
+
+// follow-up: generic curry
+const sum3 = curry((a, b, c) => a + b + c);
+sum3(1)(2)(3);                   // 6
+sum3(1, 2)(3);                   // 6 (curry should accept partial application)
+sum3(1)(2, 3);                   // 6
+
+Notes
+
+The 3-arg version is one-liner: const addThreeNumbers = a => b => c => a + b + c;.
+
+Generic curry:
+function curry(fn) {
+    return function curried(...args) {
+        if (args.length >= fn.length) return fn.apply(this, args);
+        return (...next) => curried.apply(this, [...args, ...next]);
+    };
+}
+
+Uses fn.length (arity declared by the parameter list) as the terminator.
+
+The variadic / infinite-add version uses an explicit zero-argument call as its terminator:
+function addN(initial) {
+    let total = initial;
+    function next(...args) {
+        if (args.length === 0) return total;
+        total += args.reduce((sum, value) => sum + value, 0);
+        return next;
+    }
+    return next;
+}
+addN(1)(2)(3)();   // 6
+
+A valueOf / toString coercion variant is a separate contract; only use it when the interviewer explicitly asks for arithmetic coercion instead of () termination.
+
+This is often paired with a traffic-light frontend exercise in the same screen — practise both back-to-back.
+
+Preparation
+
+Memorise the three forms — fixed-3-arg, generic curry, infinite-add — and be able to switch between them based on the interviewer's follow-up.
+
+Practise typing the generic curry from scratch in under 3 minutes.
+
+Drill a generic curry exercise that accepts mixed partial application such as (1, 2)(3) and (1)(2, 3).
+
+Pre-test on coderpad-like environments because import / require behaviour and console output differ from a local Node REPL.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

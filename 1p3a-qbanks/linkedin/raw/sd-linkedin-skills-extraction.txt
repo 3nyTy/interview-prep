@@ -1,0 +1,77 @@
+===H1===
+LinkedIn Skills — Data Mining & ML System Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/sd-linkedin-skills-extraction
+===BODY===
+LinkedIn
+System Design·60 minMembers
+LinkedIn Skills — Data Mining & ML System Design
+Design the pipeline behind LinkedIn's Skills graph: how skill phrases are extracted from resumes / job posts, normalized into a canonical taxonomy, ranked per profile, and continually updated as new skills emerge. The round is graded as much on data collection / labeling strategy as on modeling.
+MLE
+mlsd
+data-engineering
+data-mining
+retrieval
+classification
+feature-engineering
+evaluation
+medium
+Frequency
+Low
+Last asked
+2026-02-23
+Stage
+onsite-system-design
+Requirements
+
+Functional:
+
+Build / maintain the canonical skills taxonomy (Java, Kubernetes, LLM Fine-Tuning, …).
+
+For each profile, output a ranked list of skills with confidence scores.
+
+For each job posting, extract required and preferred skills.
+
+New skills must surface as the language evolves — "RAG", "MoE", "Vector DB" did not exist five years ago.
+
+Non-functional:
+
+Profile coverage: a billion+ profiles, incremental updates as users edit content.
+
+Job posting coverage: tens of millions live, refreshed daily.
+
+Skill-prediction precision matters more than recall — false skill claims hurt user trust.
+
+Notes
+
+The expected structure:
+
+Mining layer — parse resumes / posts, surface skill candidate tokens (NER + dictionary lookup + LLM-assisted candidate expansion).
+
+Normalization — map surface form to canonical entity in the taxonomy (e.g. "Pytorch", "PyTorch", "pytorch" → canonical id).
+
+Per-profile scoring — features = mention frequency, recency, endorsements, role-keyword co-occurrence; output a confidence score per skill.
+
+Taxonomy maintenance — emerging-skill detection (token frequency over time, embedding-space novelty).
+
+Active learning loop: send low-confidence candidates to annotators, retrain.
+
+The interviewer expects an explicit conversation on labeling strategy — programmatic weak labels from co-occurrence vs annotator-curated seeds vs LLM-generated labels with a confidence threshold.
+
+Reported as an open question with the interviewer steering toward whichever sub-component the candidate hand-waves; treat each sub-component as 5 minutes of detail.
+
+Preparation
+
+Walk the four-layer pipeline (mining → normalization → scoring → taxonomy maintenance) end-to-end without prompting.
+
+Pre-load the data-collection discussion: weak labels, annotator throughput numbers, LLM-judge calibration.
+
+Be ready to discuss how the per-profile feature vector is constructed and what model produces the final score (gradient-boosted tree on a few hundred features is the canonical answer).
+
+For the emerging-skill follow-up, propose an embedding-novelty detector — new tokens whose embedding lies far from any current taxonomy node and whose frequency is rising.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

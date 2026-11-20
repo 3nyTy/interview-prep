@@ -1,0 +1,59 @@
+===H1===
+Siri Grounded Response Generation
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/siri-grounded-response-generation
+===BODY===
+Apple
+System Design·60 minFree preview
+Siri Grounded Response Generation
+Design or case-study a Siri response-generation system where answers must stay grounded in tool results, avoid hallucination, fit a voice-chat length budget, and remain evaluable as context grows.
+MLE
+llm
+rag
+tool-use
+evaluation
+prompting
+medium
+Frequency
+Low
+Last asked
+2026-03-28
+Stage
+phone-screen · onsite-system-design
+Requirements
+
+Design a Siri response-generation flow for an assistant that calls tools and then speaks a concise answer.
+
+You should cover:
+
+How the system grounds the response in tool output instead of unsupported model memory.
+
+How to evaluate factuality, usefulness, and voice-chat length.
+
+Why hallucination happens and what product / model guardrails reduce it.
+
+How to handle long context from conversation history, user state, and tool payloads.
+
+How to keep the answer short enough for spoken interaction without dropping required facts.
+
+Notes
+
+A strong answer separates retrieval / tool execution, evidence selection, response generation, verification, and final voice formatting. Treat the tool result as the source of truth; the model should summarize, transform, or ask for clarification rather than invent missing data.
+
+Evaluation should mix offline labeled sets, adversarial queries, tool-result consistency checks, human preference review, and online metrics such as correction rate, repeat-query rate, and user abandonment. For long context, discuss summarization with citations to retained evidence, recency windows, structured memory, and hard limits on what the generator may rely on.
+
+Preparation
+
+Practice a 10-minute whiteboard flow: user query -> intent -> tool call -> evidence extraction -> grounded generation -> verifier -> voice response.
+
+Prepare a compact hallucination taxonomy: missing evidence, stale memory, ambiguous tool result, prompt injection, and over-compression.
+
+Drill eval metrics for conversational assistants: factuality, helpfulness, latency, answer length, and user-correction signals.
+
+Be ready to explain why voice UX changes the design: shorter responses, explicit uncertainty, and follow-up questions beat long text-style answers.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

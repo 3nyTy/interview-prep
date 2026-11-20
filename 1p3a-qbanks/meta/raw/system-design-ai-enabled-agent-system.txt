@@ -1,0 +1,72 @@
+===H1===
+AI-Enabled System Design — Agent System
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/system-design-ai-enabled-agent-system
+===BODY===
+Meta
+System Design·45 minMembers
+AI-Enabled System Design — Agent System
+New round introduced April 16, 2026 in the AI-Native full loop. Design an LLM-agent system for an automation task (auto-ticket-triage and code-review agent are confirmed prompts). ReAct-loop vs multi-agent decomposition + cost / memory / tool design are the live drill-downs.
+SWE
+MLE
+Infra Eng
+llm-agent
+react
+tool-use
+evaluation
+hard
+Frequency
+Medium
+Last asked
+2026-05-05
+Stage
+onsite-system-design
+Requirements
+
+Confirmed prompts so far: (a) ticket-triage agent — read alert, gather context, propose resolution; (b) code-review agent — review a PR diff and produce structured comments.
+
+Reported deep-dive axes (every reported loop hit several):
+
+Agent shape: single ReAct loop vs multi-agent pipeline (e.g. triage → investigate → resolve). Interviewer may push you off your first choice.
+
+Which parts need an LLM vs deterministic code. The candidate is expected to justify each LLM call rather than wrap everything in one.
+
+Tool catalog: how tools are registered, described, rate-limited, authorized.
+
+Memory: short-term scratchpad vs long-term vector store; eviction policy.
+
+Orchestrator design: planning loop, retries, max-iteration cap.
+
+Validation of agent outputs: golden-set replay, structured validators, human-in-the-loop on write actions.
+
+Cost accounting: per-call token cost, expected cost per ticket / PR; budget cap and degradation strategy.
+
+Operational concerns: hallucination detection, idempotent tool retries, observability.
+
+Notes
+
+One candidate reports the interviewer steering them from a triage→investigate→resolve multi-agent design toward a ReAct loop. Confirm topology preference before committing.
+
+Another candidate's loop reported "AI assist" listed in the prep materials but absent in the actual interview environment — interviewer said "move on without it." Be ready to whiteboard the design without live AI hands-on.
+
+Sister round to traditional System Design — same 45-min budget, agent-specific evaluation rubric.
+
+Coverage is still thin; expect prompt mutation through Q3 2026.
+
+Preparation
+
+Study published agent designs: ReAct, Reflexion, AutoGen multi-agent, Anthropic's Claude tool-use patterns.
+
+Pre-write a single-page template: tools, memory, planning loop, validators, cost, guardrails.
+
+Memorize a per-LLM-call cost model: tokens-in × tokens-out × rate; back-of-envelope cost per ticket.
+
+Rehearse defending both single-agent ReAct AND multi-agent pipeline for the same prompt.
+
+Re-check the forum 1-2 weeks pre-interview; this round is new and detail keeps surfacing.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

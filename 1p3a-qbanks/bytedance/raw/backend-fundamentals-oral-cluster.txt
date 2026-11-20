@@ -1,0 +1,70 @@
+===H1===
+CAP / DB Indexing / Concurrency / Logging Oral 八股
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/backend-fundamentals-oral-cluster
+===BODY===
+ByteDance / TikTok
+OtherMembers
+CAP / DB Indexing / Concurrency / Logging Oral 八股
+Backend oral cluster covering schema and index choices, CAP trade-offs, cache failure modes, messaging, web transport, SQL-versus-document storage, concurrency, and production logging.
+SWE
+database
+distributed-systems
+concurrency
+verbal
+medium
+Frequency
+Medium
+Last asked
+2026-09-06
+Stage
+phone-screen · onsite-deep-dive
+Requirements
+
+Be ready to answer a backend oral cluster spanning connected production topics:
+
+Explain a project's data schema and justify its indexing choices against actual query patterns.
+
+Explain composite-index left-prefix behavior, covering indexes, and whether specific SQL predicates can hit an index.
+
+Explain cache-aside consistency, cache breakdown / avalanche failure modes, and their mitigations.
+
+Compare Kafka and message-queue behavior, including delivery and consumer trade-offs.
+
+State RESTful API conventions and compare WebSocket with Server-Sent Events for concrete workloads.
+
+Compare MySQL with MongoDB and defend a migration using workload fit and measurable performance outcomes.
+
+Explain CAP, concurrency control, locking, deadlock prevention, and production-safe logging.
+
+Backend-intern follow-up: why are database indexes necessary, and why should every column not be indexed?
+
+Notes
+
+Start schema and index answers from the workload: access paths, selectivity, ordering, update rate, and latency target. Every additional index adds write amplification and storage cost.
+
+For composite indexes, connect column order to equality, range, and ordering predicates. Be ready to modify a SQL statement to add the index, then reason about whether sample queries use it.
+
+State CAP precisely around behavior during a network partition; do not frame it as a permanent two-of-three choice during healthy operation.
+
+Cache answers should connect the named failure mode to traffic concentration, expiry timing, and recovery behavior rather than stop at definitions.
+
+Protocol choices must follow interaction shape. Explain why a request/response AI-agent runtime may prefer ordinary web calls even when bidirectional sockets are available.
+
+A database-migration answer needs an explicit before/after workload, operational trade-offs, and a quantified result; naming SQL versus NoSQL traits is not enough.
+
+Preparation
+
+Draw one project schema, list its three most important queries, and defend every index against those queries and the write cost.
+
+Rehearse cache-aside inconsistency, breakdown, and avalanche with one failure timeline each.
+
+Build a comparison sheet for Kafka, generic queues, WebSocket, SSE, MySQL, and MongoDB, anchored to workloads rather than feature lists.
+
+Walk through one lost-update or deadlock example and explain how locking, isolation, ordering, or optimistic retries preserve the invariant.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

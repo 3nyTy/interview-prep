@@ -1,0 +1,50 @@
+===H1===
+LED Digit Display Invariant Under 180° Rotation
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/strobogrammatic-led-display
+===BODY===
+Waymo
+Coding·45 minMembers
+LED Digit Display Invariant Under 180° Rotation
+Onsite coding: given an array of digits 0–9 representing an LED-style display, return whether the rendered display reads identically after a 180° rotation. Equivalent to LeetCode 246 (Strobogrammatic Number) on the digit-string interpretation.
+SWE
+string
+two-pointer
+easy
+Frequency
+Single report
+Last asked
+2026-01-23
+Stage
+onsite-coding
+Requirements
+
+Input: a sequence of digits 0–9 representing the LED display from left to right.
+
+Output: true iff the display, rotated 180°, reads as the same sequence.
+
+Notes
+
+Build a fixed digit-rotation map: 0→0, 1→1, 2→×, 3→×, 4→×, 5→×, 6→9, 7→×, 8→8, 9→6. Any digit mapping to × immediately disqualifies the input.
+
+Two-pointer walk from both ends inward: at each step, both left and right digits must be invertible, and rotation[left] == right.
+
+Middle character (odd-length): must map to itself (only 0, 1, 8).
+
+Watch the digit-vs-character mismatch: if the input is given as integers, no ord() conversion is needed; if it's a string, parse to ints up front.
+
+Common follow-up: list all strobogrammatic numbers of length n — recursion that grows the string from both ends with the invertible pair set per level, plus the middle base case.
+
+Preparation
+
+Memorize the digit rotation map.
+
+Practice writing the two-pointer check and the recursive enumeration in the same sit-down — interviewers often ask for both in sequence.
+
+Sketch the rotated form of each digit on paper at least once so the mapping survives interview stress.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

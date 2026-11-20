@@ -1,0 +1,59 @@
+===H1===
+Minimum Swaps to Sort (Cycle Decomposition)
+===URL===
+https://www.1point3acres.com/interview/problems/company/akunacapital/minimum-swaps-to-sort-cycle
+===BODY===
+Akuna Capital
+CodingMembers
+Minimum Swaps to Sort (Cycle Decomposition)
+Return the minimum number of swaps (any two positions) needed to sort the array. Some sittings sort ascending, some descending, and some include duplicates. Answer = n minus the number of cycles in the permutation that maps each element to its target position.
+SWE
+RS
+cycle-detection
+sorting
+array
+greedy
+medium
+Frequency
+Medium
+Last asked
+2025-12-20
+Stage
+oa
+Requirements
+
+Given an array, return the minimum number of swaps required to sort it, where a swap exchanges the values at any two positions. Variants seen across sittings:
+
+Sort ascending (smallest to largest).
+
+Sort descending (largest to smallest).
+
+Arrays may contain duplicate values.
+
+Examples
+
+Descending variant:
+
+[3, 4, 1, 2] -> [4, 3, 1, 2] -> [4, 3, 2, 1]
+
+2 swaps.
+
+Notes
+
+Build the permutation that sends each element to the index it must occupy in the sorted order, then decompose it into cycles. A cycle of length L needs L - 1 swaps, so the answer is n - (number of cycles). For the descending variant, target positions are the ranks from largest to smallest.
+
+Duplicate values: when equal elements can map to several valid target positions, assign each duplicate to the nearest unused target (or process equal values left-to-right) so cycles do not get split unnecessarily; clarify the tie rule before coding if the grader is strict.
+
+Preparation
+
+Implement the position-map plus cycle-count approach for both ascending and descending orders.
+
+Add a duplicate-heavy test and confirm the swap count stays minimal.
+
+Recall the small invariant out loud: a 2-cycle costs 1 swap, a 3-cycle costs 2, an L-cycle costs L - 1.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

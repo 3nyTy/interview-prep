@@ -1,0 +1,68 @@
+===H1===
+Order Book Pair Coding
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/order-book-pair-coding
+===BODY===
+Citadel / Citadel Securities
+Coding·60 minMembers
+Order Book Pair Coding
+Open-ended order book implementation appears in Citsec phone screens (EQR Python QD) and Singapore HFT onsite round 1. The interviewer expects the candidate to enumerate the required APIs first, then implement add / cancel / view-best mechanics. Scope varies by round: a 45-minute first-round CoderPad variant requires a matching engine, while another round explicitly excludes matching.
+SWE
+data-structure
+trading
+oop-design
+complexity-analysis
+medium
+Frequency
+Low
+Last asked
+2026-07-26
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Design and implement a single-symbol order book. Common surface area asked across rounds:
+
+add_order(side, price, quantity, order_id) — register a resting limit order. This is the universal entry point across the cited variants.
+
+cancel_order(order_id) — remove a resting order by id.
+
+best_bid() / best_ask() — peek the top of book.
+
+top_of_book_volume() — aggregated quantity at the best bid / best ask price level.
+
+Matching is out of scope on at least one round — the interviewer explicitly excluded the trade-matching half so the discussion can focus on storage layout and complexity.
+
+Matching-in-scope variant: a 45-minute first-round CoderPad screen asks for a matching engine. The contract is terse, so establish the required behavior before coding.
+
+The interviewer expects the candidate to drive the API enumeration phase. "What APIs do you need?" is treated as the opening question, not a hint.
+
+Notes
+
+Canonical storage: per side, a sorted price-keyed map (e.g. std::map<price, PriceLevel>) where each PriceLevel holds a FIFO queue of orders at that price. Bid side iterates in descending price order, ask side in ascending.
+
+Order id index: a separate std::unordered_map<order_id, OrderLocation> stores the side, price, and order-list iterator. Cancellation uses the side and price to find the price level, erases the order in O(1) through its iterator, and removes an empty price level. With a price-key lookup, cancellation is O(log P) for P active price levels; storing the price-level map iterator in OrderLocation makes the erase path amortized O(1).
+
+Best bid / best ask: O(1) through map.begin() when each side uses the appropriate comparator (descending bids, ascending asks). Cache the top-of-book only if the chosen container does not expose its extreme directly.
+
+Add: O(log P) to find or insert the price level, plus O(1) for the FIFO append.
+
+Matching extension (when in scope): on each new aggressive order, iterate the opposite side from the best price inward, executing against resting volume until either the new order is fully filled, the opposing side has no better price, or the new order's price limit is breached. State the matching policy (price-time priority is the default).
+
+Common slip: storing orders in a flat list keyed by id and recomputing the best price on every query. Acceptable for a 5-line first-pass but the interviewer escalates immediately.
+
+Preparation
+
+Write a from-scratch limit order book in C++ or Python with O(log P) add / cancel and O(1) best-of-book queries, where P is the number of active price levels. Re-implement until the price-level + FIFO + id-index layout is automatic.
+
+Drill the API enumeration warmup: given "design an order book," produce a 4-6 method API in under 60 seconds. The interviewer explicitly grades this on the HFT onsite.
+
+Have a 30-second tradeoff pitch ready for std::map vs std::unordered_map vs flat array indexed by ticks: sorted map is the textbook answer; tick-indexed array is faster for known fixed price ranges (HFT integer ticks) but wastes memory on sparse books.
+
+Read enough about price-time priority and FIFO at each level to defend it as the default policy; be ready to extend to pro-rata or hybrid policies if asked.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

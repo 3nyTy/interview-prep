@@ -1,0 +1,81 @@
+===H1===
+OA: Feature Rollout with Dependency Cycle Detection
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/oa-feature-rollout-dependency-cycle-report
+===BODY===
+Google
+Coding·60 minMembers
+OA: Feature Rollout with Dependency Cycle Detection
+SDE II Early-Career HackerRank OA, problem 2 of 2 (90 min total). A multi-stage feature-gating system: first reject users by country and OS-version rules, then evaluate per-feature dependencies that may themselves be pending rollout, while detecting and *naming every member of* dependency cycles. Most of the work is fixing a buggy parser and extending an `evaluate()` function across several missing branches. AI helper enabled inside HackerRank.
+SWE
+graph
+dfs
+topological-sort
+hard
+Frequency
+Single report
+Last asked
+2026-05-17
+Stage
+oa
+Requirements
+
+A ResultDecision is returned per (user, feature) pair containing enable: bool and a reason: string. The evaluation must run the checks in this order, short-circuiting at the first failure:
+
+Country gate — if the user's country is not in the allow-set for this feature, return enable=False with the country-rejection reason string. Use the system-provided allow-set helper rather than re-implementing the check.
+
+OS version gate — Android and iOS each have a minimum version. Return enable=False with the version-rejection reason if the user is below the floor.
+
+Combined rejection — if both the country and the OS version fail, the reason string must use the dedicated combined-rejection string, not either single-rule string.
+
+Dependency evaluation — only if gates pass:
+
+Parse the dependency manifest (text file). The provided parser has a bug when a feature has more than one dependency: it concatenates them into a single string entry in the list instead of one entry per dependency. Fix the parser (split on the delimiter, flatten properly).
+
+Update evaluate(feature, user) to handle every case below — the starter only supports the trivial "no dependency" case:
+
+(I) feature has exactly one dependency
+
+(II) the dependency itself is in the current rollout batch (recurse, don't reject)
+
+(III) direct cycle A → B → A — report it
+
+(IV) A depends on B and B participates in a cycle further down — propagate the cycle report up to A
+
+(V) for a longer cycle A → B → C → D → A, the cycle report must include the entry feature (A) — not just the rediscovered loop start
+
+(VI) the same long cycle must enumerate every member (B, C, D) in the report, not just the entry
+
+Notes
+
+The natural shape for (III)–(VI) is iterative DFS with a visiting (gray) / visited (black) coloring. When a recursive call encounters a gray node, walk back through the recursion stack to extract the full cycle (entry node + every member) — pure 3-color DFS gives both (V) and (VI) without extra bookkeeping.
+
+The starter evaluate() likely returns booleans; widen it to return a structured result that carries the cycle list so the caller can format the report without re-running the search.
+
+(II) is the trap: a dependency that is itself being rolled out should not auto-reject. Recurse into that feature's own evaluation under the same user and propagate its result.
+
+Several reported pitfalls:
+
+Calling string methods on None after the parser fix — guard the empty-dependency-line case explicitly.
+
+Over-broad if conditions in evaluate() that swallow legitimate single-dependency cases; keep the branches narrow and recurse early.
+
+The starter has a separate file that still calls a method on a potentially-None object; the visible 2 test cases may pass without fixing it. Decide whether to chase it (safer) or submit (the candidate's choice, since hidden tests are not run live).
+
+AI-assistant tactics that worked in this OA: paste failing test output verbatim into the AI panel and let it localize the bug. The AI was not helpful for: Python str.split / str.strip shape questions (refuses), and None-attribute traces (poor at root cause).
+
+Preparation
+
+Drill 3-color (white/gray/black) iterative DFS until you can extract the full cycle from the recursion stack in one shot. The canonical course-schedule problem only needs to detect a cycle; this OA needs to name every member — practice the extraction explicitly.
+
+Practice reading a buggy parser and patching it without rewriting from scratch — the bug is intentional and the time pressure rewards minimal-diff fixes.
+
+Spend 5 minutes before the timed OA exercising the HackerRank AI panel on the sample problem: learn its refusal patterns (won't quote stdlib method signatures, won't trace None-attribute errors) so you don't waste live minutes pinging it for things it won't answer.
+
+The structured return value from evaluate() (decision + optional cycle list) is worth sketching on paper before touching code — it's the single design decision that makes (III)–(VI) collapse into one branch instead of four.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

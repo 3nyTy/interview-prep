@@ -1,0 +1,162 @@
+===H1===
+Dataset Join (joinDataSet OA)
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/dataset-join-oa
+===BODY===
+Stripe
+Coding·60 minMembers
+Dataset Join (joinDataSet OA)
+OA. Implement a 4-part SQL-style join over two CSV-style string lists keyed by a configurable field, progressing from inner join through left join, one-to-many, and skipUnmatched.
+SWE
+string
+hashmap
+medium
+Frequency
+Low
+Last asked
+2026-04-09
+Stage
+oa
+Requirements
+
+Function signature: joinDataSet(fieldName: String, customerFile: List<String>, processorFile: List<String>, skipUnmatched: bool) -> List<String>.
+
+Input shape: first row of each file is the header, subsequent rows are data; columns are comma-separated.
+
+Output shape: header row first; data rows in the order described below. Output column order is [Customer Columns] + [Processor Columns].
+
+The canonical OA shape exposes:
+
+def join_data_set(field_name, customer_file, processor_file, skip_unmatched) -> list[str]: ...
+    # field_name is guaranteed to appear in BOTH headers, but NOT necessarily
+    #   at the same column index — resolve the index on each side independently
+    #   (c_idx = customer_header.index(field_name); p_idx = processor_header.index(field_name)).
+    # Combined header = customer_header + processor_header VERBATIM. The join column
+    #   therefore appears TWICE in the output header — do NOT de-duplicate it.
+    # Every output row must have len(customer_header) + len(processor_header) columns.
+
+Parts
+
+Part 1 (Inner Join, test cases 0–3): keep only rows where the key value appears in both files. This part guarantees every customer row has exactly one processor match, so the join/left/many distinctions don't surface yet.
+
+Part 2 (Left Join, test cases 4–7): for every customer row, if no processor match exists, emit one row with empty values for processor columns. An "empty" value is the literal empty string, so an orphan row renders as the customer columns followed by len(processorHeader) trailing commas (e.g. p_999,Orphan,50,,,).
+
+Part 3 (One-to-Many, test cases 8–11): for every customer row, emit one combined row per matching processor row.
+
+Part 4 (skipUnmatched, test cases 12–15): when skipUnmatched=true, drop any customer row with no processor match instead of emitting the empty-processor row. The matched-row path and the header are unchanged.
+
+Row ordering
+
+Outer order follows the customer file's original row order.
+
+Inner order (when a customer has multiple processor matches) follows the processor file's original row order. Indexing processor rows into a defaultdict(list) during a single pass preserves this secondary order for free; iterating that list when emitting keeps total work at O(N + M + K) (K = emitted rows) instead of O(N · M).
+
+Examples
+
+Part 2 left-join, skipUnmatched=false:
+
+join_data_set(
+    "payment_id",
+    ["payment_id,customer_name,amount", "p_001,Alice,100", "p_999,Orphan,50"],
+    ["processor_ref,payment_id,status", "r_a1,p_001,SETTLED"],
+    False,
+)
+# -> ["payment_id,customer_name,amount,processor_ref,payment_id,status",
+#     "p_001,Alice,100,r_a1,p_001,SETTLED",
+#     "p_999,Orphan,50,,,"]
+
+Notes
+
+Prompt is long; the details about column-order and row-order are easy to miss and grade-critical.
+
+One report finished 4 parts in 60 min; another ran out of time before finishing Part 4.
+
+Progressive solution skeleton
+
+The four parts share one structure; only the per-customer-row branch grows across parts. Parse each header once, resolve the join column's index on each side independently, pre-split the data rows once, and build a processor index keyed by the join value.
+
+Part 1 — the index holds a single processor row per key; every customer row is guaranteed a match:
+
+def join_data_set(field_name, customer_file, processor_file, skip_unmatched):
+    customer_header = customer_file[0].split(",")
+    processor_header = processor_file[0].split(",")
+    c_idx = customer_header.index(field_name)
+    p_idx = processor_header.index(field_name)  # may differ from c_idx
+
+    customer_rows = [r.split(",") for r in customer_file[1:]]
+    processor_rows = [r.split(",") for r in processor_file[1:]]
+
+    processor_by_key = {row[p_idx]: row for row in processor_rows}
+
+    result = [",".join(customer_header + processor_header)]
+    for c_row in customer_rows:
+        p_row = processor_by_key[c_row[c_idx]]  # guaranteed present in Part 1
+        result.append(",".join(c_row + p_row))
+    return result
+
+Part 2 — switch the lookup to .get() and pad misses with a pre-computed empty-processor list:
+
+    empty_processor = [""] * len(processor_header)
+    ...
+    for c_row in customer_rows:
+        p_row = processor_by_key.get(c_row[c_idx])
+        if p_row is not None:
+            result.append(",".join(c_row + p_row))
+        else:
+            result.append(",".join(c_row + empty_processor))  # left-join padding
+
+Part 3 — make the index a defaultdict(list) (appending preserves processor-file order as the secondary sort key for free) and emit one row per match:
+
+    from collections import defaultdict
+    processor_by_key = defaultdict(list)
+    for row in processor_rows:
+        processor_by_key[row[p_idx]].append(row)
+    ...
+    for c_row in customer_rows:
+        matches = processor_by_key.get(c_row[c_idx], [])
+        if matches:
+            for p_row in matches:               # list is already ordered
+                result.append(",".join(c_row + p_row))
+        else:
+            result.append(",".join(c_row + empty_processor))
+
+Part 4 — only the unmatched branch changes; the else becomes elif not skip_unmatched, so an unmatched customer row is silently dropped when the flag is on:
+
+        if matches:
+            for p_row in matches:
+                result.append(",".join(c_row + p_row))
+        elif not skip_unmatched:
+            result.append(",".join(c_row + empty_processor))
+        # else: skip_unmatched is True and no match → drop the row entirely
+
+The matched-row branch and the header are identical across all four parts, so each part is a localized edit to the previous one.
+
+Part 3 ordering — worked reasoning
+
+With customers [p_001, p_002] and processor rows in file order [r_b1/p_002, r_a1/p_001, r_b2/p_002, r_a2/p_001], the emitted match order is r_a1, r_a2, r_b1, r_b2. Outer order is customer order (p_001 before p_002); within p_001, r_a1 (processor index 1) precedes r_a2 (index 3); within p_002, r_b1 (index 0) precedes r_b2 (index 2). The defaultdict(list) built in a single forward pass over the processor file produces this secondary order without an explicit sort.
+
+Edge cases worth verifying
+
+Empty files — a file with only a header row contributes no data rows; the combined header still appears as the first output element.
+
+Join column at different indices — resolve field_name's index per side; never assume c_idx == p_idx.
+
+Duplicate keys on the customer side — not forbidden; iterating the customer list (not the processor index) makes each such customer row emit its own set of matches correctly.
+
+Empty-string join values — they index and match like any other string; no special case.
+
+skipUnmatched=true with an empty processor file — every customer row is unmatched and dropped, so the result is just the combined header.
+
+Preparation
+
+Drill SQL-style join semantics with explicit ordering rules; do not lean on database semantics for stability.
+
+Pre-write a 4-step skeleton: parse header → index by fieldName → iterate customers → emit combined rows.
+
+Practice writing the join without using pandas or any join library.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

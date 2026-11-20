@@ -1,0 +1,68 @@
+===H1===
+Course Schedule and Topological Sort on a Directed Graph
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/course-schedule-topo-sort
+===BODY===
+ByteDance / TikTok
+Coding·60 minMembers
+Course Schedule and Topological Sort on a Directed Graph
+Detect whether a directed-graph schedule is satisfiable (cycle detection on a DAG), then extend to producing a valid order — used both as a SWE coding question and as the warmup before a word-ladder shortest-path follow-up.
+SWE
+Infra Eng
+graph
+bfs
+dfs
+topological-sort
+medium
+Frequency
+Medium
+Last asked
+2026-08-17
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Two canonical forms appear:
+
+Feasibility: given numCourses and an array of prerequisite pairs [a, b] meaning b → a, return whether a valid completion order exists.
+
+Order: same input, return any valid completion order — empty if impossible.
+
+def canFinish(numCourses: int, prerequisites: List[List[int]]) -> bool: ...
+def findOrder(numCourses: int, prerequisites: List[List[int]]) -> List[int]: ...
+
+Reported variants:
+
+SRE coding round: same problem framed as "directed-graph cycle check"; the prerequisite list is given as edges in a custom format.
+
+DAG execution-order variant: print a valid execution order for a DAG, then add cycle detection with DFS as the follow-up.
+
+Multi-step follow-up: the course-schedule warmup is paired with a word-ladder shortest-path question — i.e., produce the shortest transformation sequence after demonstrating cycle awareness on the warmup.
+
+Notes
+
+Kahn's algorithm (BFS topological sort) is the cleanest pattern: maintain in-degree counts, enqueue zero-in-degree nodes, decrement neighbors as you pop. If the output length equals numCourses, no cycle exists.
+
+DFS with three colors (white / gray / black) also works and is easier to extend to "find any cycle and print it" follow-ups.
+
+The interviewer may push for both algorithms — be ready to articulate why Kahn's is preferred when you also need the order, and why DFS is preferred when you need to print the cycle.
+
+Time O(V + E), space O(V + E) for the adjacency list.
+
+For the word-ladder follow-up, the right structure is BFS over the implicit word graph with on-the-fly neighbor generation; do not pre-build the full edge list when the dictionary is large.
+
+Preparation
+
+Drill Kahn's algorithm from scratch on a blank file — adjacency list, in-degree array, queue, ordered output.
+
+Practice the DFS three-color variant separately; be able to switch between them on request.
+
+Walk through a small example with a cycle ([[1,0],[0,1]]) and one without ([[1,0],[2,1]]) to nail down the early-termination logic.
+
+Pair-drill with word-ladder: warmup with course-schedule, then move directly to BFS-shortest-path on a word graph.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

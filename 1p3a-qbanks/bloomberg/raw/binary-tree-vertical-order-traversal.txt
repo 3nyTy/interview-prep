@@ -1,0 +1,71 @@
+===H1===
+Binary Tree Vertical Order Traversal
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/binary-tree-vertical-order-traversal
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Binary Tree Vertical Order Traversal
+Group binary-tree node values by their column index (left of root negative, right positive) and return columns left-to-right, with each column's values in top-to-bottom level order. Watch the tie-break rule for nodes at the same column and row.
+SWE
+tree
+bfs
+tree-traversal
+hashmap
+medium
+Frequency
+Single report
+Last asked
+2026-01-04
+Stage
+onsite-coding
+Requirements
+
+Given the root of a binary tree, return its vertical order traversal: a list of lists where each inner list contains node values that share the same column index (root is column 0, left child is column - 1, right child is column + 1). Columns are returned ordered from leftmost to rightmost. Within a column, values appear top-to-bottom in level-order; for two nodes at the same column and same level, the order follows their left-to-right appearance in BFS.
+
+Function signature:
+
+List<List<Integer>> verticalOrder(TreeNode root)
+
+Follow-ups:
+
+Why is BFS preferred over DFS here? (DFS visits nodes in depth-first order, which can violate the top-to-bottom requirement for nodes that share a column.) Be ready to discuss how to recover the order with DFS if forced.
+
+Generalize to LeetCode 987 (Vertical Order Traversal II), where the tie-break within a column at the same level is by value, not by left-to-right BFS appearance. Walk through the small change to a tuple sort.
+
+Discuss how to stream the column boundaries (min / max column index) on the fly so the result list does not require a re-sort at the end.
+
+Examples
+
+Input:
+        3
+       / \
+      9   8
+     /\  /\
+    4 0 1 7
+
+verticalOrder(root) -> [[4],[9],[3,0,1],[8],[7]]
+
+Notes
+
+The clean solution is BFS with a queue of (node, column) and a HashMap<column, List<value>>. Track minColumn and maxColumn as you go, then materialize columns from minColumn to maxColumn. Time O(n), space O(n).
+
+Using a TreeMap<column, List<value>> removes the need for min / max tracking at the cost of a log n factor — fine for an interview but worth calling out.
+
+BFS preserves the top-to-bottom within-column ordering naturally; DFS does not unless each entry is annotated with (row, value) and the column is sorted at the end.
+
+The variant LeetCode 987 changes the tie-break rule from "BFS appearance order" to "value ascending" within the same (column, row). The same skeleton applies; you swap the per-column list for a list of (row, value) and sort by both keys when emitting.
+
+Preparation
+
+Implement the BFS + HashMap solution and the BFS + TreeMap variant once each; argue out loud which you would ship and why.
+
+Hand-trace a small tree where two nodes share a column at the same level to confirm the tie-break behavior.
+
+Be ready to extend to LeetCode 987 — interviewers often ask for the change live after the initial solution works.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

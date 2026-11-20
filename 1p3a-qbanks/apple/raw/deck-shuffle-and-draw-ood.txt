@@ -1,0 +1,87 @@
+===H1===
+Deck Shuffle and Draw OOD
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/deck-shuffle-and-draw-ood
+===BODY===
+Apple
+Coding·45 minMembers
+Deck Shuffle and Draw OOD
+Design `Card` and `Deck` classes that support shuffle and draw with correct probabilities. The prompt is OOD-shaped but the algorithmic core is random sampling without replacement.
+SWE
+oop-design
+sampling
+array
+medium
+Frequency
+Single report
+Last asked
+2026-02-26
+Stage
+phone-screen
+Design a standard 52-card playing-card deck. Each card is identified by a two- or three-character string {rank}{suit}:
+
+Ranks (low → high): 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K, A
+
+Suits (ascending for tie-breaking): C (clubs), D (diamonds), H (hearts), S (spades)
+
+For example, the 3 of clubs is "3C" and the ace of spades is "AS".
+
+Implement the Deck class:
+
+Deck() Initializes a fresh 52-card deck. Cards must start in canonical order: sorted first by rank (low to high), then by suit (alphabetical: C, D, H, S). The very first card in a fresh deck is "2C".
+
+void shuffle() Randomly permutes the remaining cards in place so that every permutation is equally likely.
+
+string draw() Removes and returns the card currently at the top of the deck. Returns "" (empty string) if the deck is empty.
+
+string[] order() Returns a snapshot of the remaining cards sorted canonically (by rank, then by suit). This does NOT mutate the internal draw order — subsequent draw() calls still honor the current shuffled order.
+
+int size() Returns the number of cards still remaining in the deck.
+
+Because shuffle() is randomized, the auto-grader does not assert specific post-shuffle orderings. Instead, test cases exercise draw(), order(), and size() — order() is deterministic regardless of prior shuffles, so it can be used to verify that shuffle() does not add or lose any cards.
+
+Examples
+
+Example 1:
+
+Input: ["Deck", "order"] [[], []]
+
+Output: [null, ["2C","2D","2H","2S","3C","3D","3H","3S","4C","4D","4H","4S","5C","5D","5H","5S","6C","6D","6H","6S","7C","7D","7H","7S","8C","8D","8H","8S","9C","9D","9H","9S","10C","10D","10H","10S","JC","JD","JH","JS","QC","QD","QH","QS","KC","KD","KH","KS","AC","AD","AH","AS"]]
+
+Explanation:
+
+A fresh deck has all 52 cards, and order() returns the canonical sorted snapshot.
+
+Example 2:
+
+Input: ["Deck", "draw", "draw", "size", "order"] [[], [], [], [], []]
+
+Output: [null, "2C", "2D", 50, ["2H","2S","3C","3D","3H","3S","4C","4D","4H","4S","5C","5D","5H","5S","6C","6D","6H","6S","7C","7D","7H","7S","8C","8D","8H","8S","9C","9D","9H","9S","10C","10D","10H","10S","JC","JD","JH","JS","QC","QD","QH","QS","KC","KD","KH","KS","AC","AD","AH","AS"]]
+
+Explanation:
+
+Fresh deck starts in canonical order, so the first two draws return 2C then 2D. The remaining 50 cards appear in sorted order.
+
+Example 3:
+
+Input: ["Deck", "shuffle", "order", "size"] [[], [], [], []]
+
+Output: [null, null, ["2C","2D","2H","2S","3C","3D","3H","3S","4C","4D","4H","4S","5C","5D","5H","5S","6C","6D","6H","6S","7C","7D","7H","7S","8C","8D","8H","8S","9C","9D","9H","9S","10C","10D","10H","10S","JC","JD","JH","JS","QC","QD","QH","QS","KC","KD","KH","KS","AC","AD","AH","AS"], 52]
+
+Explanation:
+
+shuffle() permutes internal order but does not add/lose cards, so order() still produces the full 52-card canonical list.
+
+Constraints
+
+Always exactly 52 distinct cards at initialization
+
+At most 1000 total method calls per test
+
+order() does not mutate draw order
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

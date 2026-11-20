@@ -1,0 +1,51 @@
+===H1===
+Valid Sudoku
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/valid-sudoku
+===BODY===
+Apple
+Coding·45 minMembers
+Valid Sudoku
+Validate whether a partially filled Sudoku board is legal by checking every row, every column, and every 3x3 sub-grid for duplicate digits.
+SWE
+grid
+set
+hashmap
+easy
+Frequency
+Single report
+Last asked
+2026-06-24
+Stage
+phone-screen
+Requirements
+
+Given a 9x9 Sudoku board, determine whether the filled cells obey Sudoku rules. You do not need to solve the puzzle; only validate the current board.
+
+Check all three constraints:
+
+No row contains the same digit twice.
+
+No column contains the same digit twice.
+
+No 3x3 sub-grid contains the same digit twice.
+
+Empty cells should be ignored.
+
+Notes
+
+Use sets for rows, columns, and boxes. The box index for cell (r, c) is (r // 3) * 3 + (c // 3). While scanning each non-empty cell, build a key for its row, column, and box; if any key was seen before, return false. Otherwise finish the scan and return true.
+
+Preparation
+
+Write the single-pass version with three arrays of sets.
+
+Be precise about what counts as empty input.
+
+Test duplicates in the same row, same column, same box, and a valid board with repeated digits in different boxes.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

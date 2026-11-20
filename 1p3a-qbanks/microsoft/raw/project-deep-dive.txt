@@ -1,0 +1,79 @@
+===H1===
+Project Deep Dive
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/project-deep-dive
+===BODY===
+Microsoft
+Behavioral·60 minMembers
+Project Deep Dive
+Mandatory across MAI and most traditional loops. 30-60 minutes of unstructured drilling on one project the candidate picks. Interviewers probe ownership, decision rationale, and what would change in hindsight.
+SWE
+MLE
+RS
+deep-dive
+behavioral
+leadership
+impact
+Frequency
+High
+Last asked
+2026-09-01
+Stage
+onsite-deep-dive · onsite-bq · phone-screen · tech-screen
+Requirements
+
+Pick one project from your resume and present it end-to-end. The interviewer drives 30-60 minutes of follow-ups testing:
+
+End-to-end ownership: did you scope, build, ship, and measure — or did you parachute into one slice. Candidates who narrate slide-deck overviews without owning low-level decisions fail fast.
+
+Decision rationale: every architectural and product choice gets a "why this, not that" probe. Be specific about the alternatives you weighed.
+
+Trade-offs in hindsight: "what would you change". The interviewer is looking for technical maturity, not contrition.
+
+Impact quantification: numbers (latency, cost, conversion, accuracy lift) with the methodology behind them. Order-of-magnitude is fine; "improved performance" without numbers is not.
+
+Team contribution clarity: "what did you personally write / decide vs the team". Microsoft interviewers are unusually direct about this and will ask the question explicitly.
+
+Layer-by-layer performance accounting: break down latency across the full request path and defend where the budget is spent. MAI interviewers may drill deeply into inference infrastructure and optimization decisions even when those systems sit outside the role's day-to-day scope.
+
+The MAI loop version of this round is harder — multiple interviewers spend 30-45 minutes each on this format, drilling different angles. The Azure / Office HE version is shorter and more about scoping.
+
+Notes
+
+The interviewer will not let you stay at the architecture-overview level. After 5 minutes of high-level narration, the questions converge on:
+
+"Walk me through the specific code path that did X."
+
+"What was on the other side of the trade-off you mentioned in step 3."
+
+"Show me the back-of-envelope numbers that motivated the choice."
+
+"What broke in production and how did you debug it."
+
+Project selection matters more than narration polish. Pick a project where you owned at least one non-obvious decision (eviction policy, schema migration, model architecture, latency budget allocation) and can defend the alternatives.
+
+For MAI specifically: AI-collaboration questions surface naturally — "how do you use AI to debug" / "did you use AI when writing this". Interviewers are reading for fluency, not for whether you used AI. The interviewer may also steer the review toward their own specialty rather than the advertised role; state system boundaries clearly, make assumptions explicit, and still defend the adjacent infrastructure decisions that affected your project.
+
+In team-specific phone screens, the project discussion can occupy the opening 15 minutes before two coding questions. An L5 technical screen also opens with current-work discussion and a resume-project walkthrough before coding.
+
+Preparation
+
+Pick one primary project and one backup. The primary should be the one where you owned the most non-obvious decisions, not the most impressive one on paper.
+
+Pre-write a one-page outline: problem, constraints, key design decisions (with alternatives), implementation highlights, results with numbers, what you would change.
+
+Practice the "what would you change in hindsight" answer; this is the question most candidates fumble.
+
+Be ready to draw the system on a whiteboard from memory in 2 minutes; do not depend on slides.
+
+Have direct links to 1-2 representative PRs ready to paste — some MAI deep-dive interviewers ask you to send a PR link and walk the live diff.
+
+Pre-rehearse the explicit "what did I personally do" delineation — Microsoft loops ask this directly.
+
+Build a latency budget for the primary project, including the inference path when applicable, and rehearse the justification for each optimization decision.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,125 @@
+===H1===
+DAG Allow / Disallow Propagation
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/dag-allow-disallow-letters
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+DAG Allow / Disallow Propagation
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+·
+45 min
+Members
+DAG Allow / Disallow Propagation
+
+Each node in a DAG carries an `allow` set and a `disallow` set of letters. Allow / disallow propagates transitively along edges. For every node, compute the effective (allowed minus disallowed) letter set.
+
+SWE
+graph
+topological-sort
+bitmask
+set
+medium
+Frequency
+Medium
+Last asked
+2026-08-17
+Stage
+phone-screen
+Requirements
+Input: a DAG of nodes, each annotated with a set of allowed letters and a set of disallowed letters.
+Both allow and disallow propagate transitively from a node to all of its descendants.
+Output: for each node, the set difference (union of allow from self and all ancestors) − (union of disallow from self and all ancestors).
+A letter that appears in both allow and disallow along the same path resolves to disallowed (disallow wins). Some interviewers clarify this as "once disallowed always disallowed."
+Notes
+The natural traversal is topological order: at each node, take the union of all parent results, then add the node's own allow and remove the node's own disallow.
+Bitmask the letter sets if the alphabet is small (typical interview framing limits it to 26 lowercase letters) — allow_mask | parent_allow_mask, disallow_mask | parent_disallow_mask, effective = allow_mask & ~disallow_mask.
+Complexity: O((V + E) × σ / w) with bitmask, where σ is alphabet size and w is the word width; effectively linear in graph size for small alphabets.
+Edge cases: nodes with no parents, nodes with conflicting allow / disallow from different parents (the bitmask formulation handles this naturally), isolated nodes.
+Once-disallowed-always-disallowed makes the propagation monotonic in disallow, which means caching per-node results is safe.
+A common allow-only framing drops the disallow set entirely: a privileges list gives role i's own privileges and a grants list of [parent, child] pairs forms the DAG edges, so each role inherits the union of its ancestors' privileges. Example: privileges [['A'], ['B'], ['C']] with grants [[0,1],[1,2],[2,3]] yields [['A'], ['A','B'], ['A','B','C']]. Same topological pass — accumulate parent_allow ∪ self_allow — without the disallow mask. Clarify up front that the graph is acyclic.
+Preparation
+Implement topological sort with Kahn, then walk in order computing per-node allow / disallow bitmasks.
+Verify on a small DAG by hand: a 5-node diamond where one branch disallows a letter the other branch allows is the standard test.
+Be ready to defend the disallow-wins resolution if the interviewer asks why a single disallowing path overrides all allowing paths.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Preparation
+Related discussions · 4
+🔑Snowflake VO
+雪花IC2 phone screen + VO 一套挂经
+🔑雪花店面 coding和sd(奇怪的问题)
+🔑雪花店面
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Service Failure Forensics
+Single report
+graph
+medium
+dfs
++2
+Wiki Page Shortest-Click Path
+Low
+graph
+medium
+bfs
++1
+Serialize and Deserialize Dictionary Trie
+Single report
+medium
+trie
+compression
++2
+Frontend Grid: Robot Eats Candies
+Single report
+medium
+frontend
+bfs
++2
+Word Search
+Single report
+medium
+grid
+backtracking
++1
+Code editor

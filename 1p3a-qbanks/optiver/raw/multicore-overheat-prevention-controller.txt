@@ -1,0 +1,89 @@
+===H1===
+Multicore Overheat Prevention Controller
+===URL===
+https://www.1point3acres.com/interview/problems/company/optiver/multicore-overheat-prevention-controller
+===BODY===
+Optiver
+Coding·90 minMembers
+Multicore Overheat Prevention Controller
+Implement an OverheatPreventionController with lazy load changes, time-based thermal evolution under shared passive and per-core active cooling, automatic shutdown and restart rules, and status-delta output. The central complication is a cascading cooling decision: engaging active cooling reduces shared passive efficiency and can force additional cores over the engagement threshold.
+SWE
+oop-design
+simulation
+state-machine
+hard
+Frequency
+Low
+Last asked
+2026-08-18
+Stage
+oa
+Requirements
+
+Implement an OverheatPreventionController for a multicore processor with no temperature sensors. The controller must derive every core's temperature from its configured load and the available passive and active cooling.
+
+init(passive_cooling_capacity, active_cooling_capacity_per_core, core_ids) initializes 1 to 1,023 uniquely identified cores. Every core starts at 20.0°C, running with load 0, active cooling off, and status idle. Both cooling-capacity values are positive.
+
+SetCoreLoad(timestamp, core_id, load_watts) records a pending load in [0, 2^15] without advancing temperature. A pending value takes effect only at the next Tick; if the same core is updated repeatedly between ticks, only the last value survives.
+
+Tick(timestamp) advances thermal state, processes shutdowns and pending loads, selects active cooling for the next interval, and returns status changes.
+
+A SetCoreLoad call on a shut-down core is also a one-shot restart attempt. At the next Tick, restart it with the new load only when its observed temperature is strictly below 50°C. Otherwise discard the request, leave the core shut down at load 0, and require a new call for any later attempt.
+
+Thermal dynamics
+
+For an elapsed interval of dt seconds, each core changes temperature linearly by 0.02 * net_heat_watts * dt degrees Celsius. Net heat is configured load minus all passive and active cooling allocated to that core. Cooling cannot take a core below the 20.0°C ambient floor.
+
+Each core's passive-cooling demand is load + 2 W. Let the effective shared passive capacity be C:
+
+If total demand is at most C, every core receives its full demand.
+
+Otherwise, distribute C proportionally to each core's demand.
+
+Active cooling selected by the previous tick applies during the interval being advanced. If k cores had active cooling engaged, each selected core receives exactly active_cooling_capacity_per_core additional watts, while the shared passive capacity is reduced by vibration_penalty(k) percent:
+
+vibration_penalty(0) = 0
+
+vibration_penalty(k) = sum(10 / Fib_i for i = 1..k)
+
+The Fibonacci terms begin 1, 2, 3, 5, 8, 13, ....
+
+Tick ordering and status
+
+Each Tick(timestamp) must perform these steps in order:
+
+Advance every core's temperature to timestamp in one step using the loads and cooling that applied during the elapsed interval.
+
+Shut down every core whose temperature has reached 80°C and clear its load to 0.
+
+Apply pending load changes, including the strict-below-50°C restart check for shut-down cores.
+
+Select the smallest set of running cores that needs active cooling for the upcoming interval. A core must be selected when its temperature is above 60°C or its current temperature rise rate is greater than 0.5°C/s. Recompute the shared passive capacity as cores are selected: the added vibration penalty can raise another core's rate above the threshold and trigger a cascade during the same decision.
+
+Return only cores whose status changed relative to the previous tick (or diverged from the initial state). Status is idle for a running core without active cooling, cooling for a running core selected for the upcoming interval, and shutdown otherwise. Format entries as core_id=status, sorted alphabetically by core_id; return an empty list when nothing changed.
+
+All operation timestamps are positive, globally increasing Unix timestamps with millisecond precision and fit in 32 bits. Loads and cooling capacities have up to three decimal places. Threshold comparisons are exact, and test data stays far enough from boundaries to avoid floating-point ambiguity. The complete operation sequence contains more than 1 and fewer than 1,024 operations.
+
+Notes
+
+SetCoreLoad is deliberately lazy: thermal arithmetic happens only in Tick. Mixing the pending load into the interval that just elapsed changes the result.
+
+Active cooling is also interval-based. The prior selection affects the temperature update; the new selection is made only after shutdowns and pending changes and applies until the next tick.
+
+The active-cooling choice is coupled across cores. Selecting one core changes passive cooling for all cores, so a single pass over the original rates is insufficient.\n- Treat the cooling decision as a monotone fixed point: start the upcoming interval with an empty selected set; with k selected cores, recompute effective passive capacity and the passive share and rise rate for every running core, add every unselected core that meets either trigger, and repeat until a full pass adds none. The set only grows, so it stabilizes after at most one growth round per running core.
+
+The evaluation emphasizes state management, core logic, edge cases, and scalability. Deterministic output ordering and the restart, ambient-floor, and threshold boundaries are part of correctness.
+
+Preparation
+
+Write the tick event order and per-core transition table before coding, including pending-load overwrite, shutdown, failed restart, successful restart, and all three output statuses.
+
+Build focused tests for the 20°C floor, 50°C restart boundary, 60°C temperature trigger, 80°C shutdown boundary, simultaneous status changes, and repeated load updates between ticks.
+
+Exercise the cooling-selection cascade with several cores so that each additional active channel changes the vibration penalty and forces a fresh rate calculation.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

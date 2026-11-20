@@ -1,0 +1,70 @@
+===H1===
+Recent Like Count and Top Posts in a Sliding Window
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/recent-like-count-and-top-posts
+===BODY===
+ByteDance / TikTok
+System Design·60 minMembers
+Recent Like Count and Top Posts in a Sliding Window
+Design the last-minute like-count backend for a social platform: exact count for one post, global top posts over the last minute, and region-based top posts over the same window.
+SWE
+feed
+ranking
+streaming
+sliding-window
+redis
+kafka
+top-k
+scaling
+medium
+Frequency
+Single report
+Last asked
+2026-06-11
+Stage
+onsite-system-design
+Requirements
+
+Design a social-platform service supporting three read APIs:
+
+Given post_id, return that post's like count in the past 60 seconds.
+
+Return the globally most-liked posts in the past 60 seconds.
+
+Return the most-liked posts per region in the past 60 seconds.
+
+Assume peak write scale around 1M likes/sec and average write scale around 100K-300K likes/sec. Clarify whether the 60-second window is sliding or tumbling, whether exactness is required, how region is derived, and whether unlike events subtract from the count.
+
+One viable split:
+
+Exact point query: Redis hash buckets keyed by post and second, e.g. likes:{post_id} with fields for recent seconds. Sum the latest 60 buckets at read time.
+
+Top-K: stream likes through Kafka into a Flink sliding-window job, aggregate by post and region, then publish precomputed snapshots into Redis sorted sets such as trending:global and trending:{region}.
+
+Write path: client → Like Service auth/dedup → Kafka → Redis bucket incrementer and Flink consumer group.
+
+Read path: point query reads bucket hash; top-K reads sorted-set snapshots with no per-read heavy computation.
+
+Notes
+
+Exact counts and approximate trending can use different paths. The point query is user-visible and should be closer to exact; top-K is a product ranking surface and can tolerate approximation.
+
+Deduplicate repeated likes by the same user before publishing count events. If unlike is supported, the event stream must carry negative deltas and late-event handling.
+
+Region partitioning needs a product decision: IP geolocation, registered country, or current device region all produce different semantics.
+
+The hot-key problem is real for celebrity posts. Discuss partitioning by post_id, local aggregation, and snapshot write frequency.
+
+Preparation
+
+Practice drawing the dual-path design: exact point counters plus streaming top-K.
+
+Be ready to explain sliding-window bucketing, TTL cleanup, and why top-K should be precomputed.
+
+Prepare trade-offs for exact vs approximate counts, Flink vs Redis-only designs, and global vs region partition keys.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

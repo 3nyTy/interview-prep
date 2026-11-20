@@ -1,0 +1,130 @@
+===H1===
+Top-K Search Terms (Per-User Deduped)
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/top-k-search-terms-deduped
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Top-K Search Terms (Per-User Deduped)
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+·
+45 min
+Members
+Top-K Search Terms (Per-User Deduped)
+
+Return the top-K most popular search terms across all users. A single user searching the same term multiple times counts only once for that term.
+
+SWE
+hashmap
+set
+heap
+top-k
+medium
+Frequency
+Single report
+Last asked
+2026-02-09
+Stage
+phone-screen
+Requirements
+Stream / batch of (user_id, search_term) events.
+Build a top_k(k) function that returns the K most popular terms by distinct-user count.
+Ties are broken lexicographically by the hashtag / term in ascending order when the prompt specifies hashtag ranking; clarify only if the interviewer leaves tie-breaking open.
+Time complexity for top_k is part of the signal; the candidate is expected to articulate it.
+Notes
+The dedup constraint changes the natural data structure: per-term counter is wrong because it inflates with repeated searches by the same user. Per-term set<user_id> is correct; the count is len(set).
+Two layouts work:
+term -> set<user_id>. top_k walks the map, computes len(set) per term, runs a min-heap of size K. O(T × log K) where T is unique terms.
+Two-level: term -> set<user_id> for membership plus term -> int for count. The int is incremented only when the set actually grew on a new insert. top_k becomes O(T × log K) without the per-term len() call.
+For very large unique-user sets, replace set<user_id> with HyperLogLog (approximate distinct count, fixed memory per term). Acceptable trade-off when an interviewer asks about memory at scale.
+Edge cases: K larger than the number of distinct terms (return all terms), no events, single user searching everything (every term has count 1).
+Common stumbling point: candidates first reach for the LC 692 (top-K frequent words) heap-of-counts template without realizing the dedup requirement invalidates the count.
+Preparation
+Implement the term -> set<user_id> + min-heap version. Drill the complexity articulation.
+Add the two-level version with the cached count, and explain why the cache is needed for repeated top_k calls.
+Be ready to discuss HyperLogLog as the scale-out story: ~1.5 KB per term for ±1% accuracy.
+Tie-breaking and exact event shape
+def topKHashtags(events: list[list[str]], k: int) -> list[str]: ...
+# Each event is [userId, hashtag]. Popularity is distinct users per hashtag.
+# Sort by descending popularity, then lexicographically ascending hashtag.
+
+If k exceeds the number of unique hashtags, return every hashtag in sorted order.
+The lexicographic tie-breaker means a heap key should be based on (-distinct_count, hashtag) for a full sort, or carefully inverted when using a size-k min-heap.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Preparation
+Tie-breaking and exact event shape
+Related discussions · 1
+🔑Snowflake店面挂经
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+K Top Selling Books
+Single report
+top-k
+heap
+hashmap
++2
+Throne Inheritance
+Single report
+hashmap
+medium
+tree
++1
+Copy List with Random Pointer
+Single report
+hashmap
+medium
+linked-list
+DAG Allow / Disallow Propagation
+Medium
+set
+medium
+graph
++2
+Meeting Rooms II
+Single report
+heap
+medium
+interval
++1
+Code editor

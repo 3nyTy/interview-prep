@@ -1,0 +1,47 @@
+===H1===
+Find the Celebrity
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/find-the-celebrity
+===BODY===
+Salesforce
+CodingMembers
+Find the Celebrity
+Given `n` people and a helper `knows(a, b)`, return the celebrity if one exists, otherwise return `-1`. A celebrity knows nobody, while everyone else knows the celebrity.
+SWE
+graph
+medium
+Frequency
+Single report
+Last asked
+2026-08-24
+Stage
+onsite-coding
+Requirements
+
+Input: the number of people n.
+
+Use the provided helper knows(a, b), which returns whether person a knows person b.
+
+A valid celebrity does not know anyone else, and every other person knows the celebrity.
+
+Return the celebrity when one exists; otherwise return -1.
+
+Notes
+
+Eliminate impossible candidates in one pass. Start with one candidate; when knows(candidate, i) is true, the current candidate cannot be the celebrity, so replace it with i. Otherwise i cannot be the celebrity.
+
+The elimination pass produces only a candidate, not a proof. Verify it against every other person: the candidate must know nobody, and everybody else must know the candidate. Return -1 on the first failed condition.
+
+The two passes use O(n) relationship queries and O(1) extra space. Skipping verification is the common correctness bug because the input may contain no celebrity.
+
+Preparation
+
+Implement the elimination-and-verification approach from memory, then count the worst-case helper calls and explain why each eliminated person cannot be the answer.
+
+Test it against one-person input, no-celebrity matrices, and matrices where the final elimination candidate fails only one side of the verification condition.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,64 @@
+===H1===
+Pub-Sub Messaging System (OOD)
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/pub-sub-system-ood
+===BODY===
+Amazon
+System Design·60 minMembers
+Pub-Sub Messaging System (OOD)
+Object-oriented design for an in-process publish/subscribe broker — topics, subscribers, fan-out delivery, and the usual concurrency / delivery-guarantee follow-ups.
+SWE
+oop-design
+pubsub
+messaging
+concurrency
+medium
+Frequency
+Low
+Last asked
+2026-05-22
+Stage
+onsite-coding
+Requirements
+
+Functional:
+
+subscribe(subscriber, topic) and unsubscribe(subscriber, topic) register interest in a named channel.
+
+publish(topic, message) broadcasts the payload to every current subscriber of that topic.
+
+Support multiple topics, multiple subscribers per topic, and a subscriber that lives on more than one topic.
+
+A reported single-machine variant adds per-subscription priority — higher-priority subscribers receive a published message first.
+
+Non-functional follow-ups the interviewer pushed on:
+
+Concurrency: publishers and subscribers run on different threads; describe the locking strategy that keeps the subscriber list consistent without serializing every publish.
+
+Delivery semantics: at-most-once vs at-least-once; what happens when a subscriber callback throws.
+
+Memory: how to bound the broker when one slow subscriber lags behind the publishers.
+
+Notes
+
+Standard class shape: Broker owns Map<Topic, Set<Subscriber>>; Subscriber exposes an onMessage(topic, payload) callback; Topic is usually just a string but call out a Topic class if filtering / hierarchical topics come up.
+
+Concurrency baseline is a ConcurrentHashMap<Topic, CopyOnWriteArraySet<Subscriber>> (Java) or an RWLock around per-topic subscriber sets (C++/Python). Walk through why a single global lock would not scale.
+
+For back-pressure, the common follow-ups are (a) per-subscriber bounded queue with a drop / block policy, (b) async dispatch via a thread pool so a slow subscriber cannot stall the publish path.
+
+Be ready to extend to durable / cross-process pub-sub if the interviewer pivots — same class skeleton plus a write-ahead log and a consumer-offset table.
+
+Preparation
+
+Draw the class diagram in under three minutes: Broker, Subscriber interface, Topic, Message. Practice naming the ownership boundaries before any code lands.
+
+Pre-write an async dispatch pattern (executor + per-subscriber queue) so the back-pressure follow-up is a 90-second extension, not a rewrite.
+
+Rehearse the two delivery-semantics speeches (at-most-once with fire-and-forget callback vs at-least-once with subscriber-side dedup) so you can pivot when the interviewer chooses one.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

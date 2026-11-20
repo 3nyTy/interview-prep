@@ -1,0 +1,95 @@
+===H1===
+Communications Handler (CommsHandler)
+===URL===
+https://www.1point3acres.com/interview/problems/company/akunacapital/communications-handler
+===BODY===
+Akuna Capital
+CodingMembers
+Communications Handler (CommsHandler)
+Implement a CommsHandler (subclassing an abstract base) plus a custom exception that manage one active call between exactly two Callers. Support connect, hangup, and clear_all, raising on self-connect, a busy line, or hanging up a pair that is not connected; return exact status strings.
+SWE
+oop-design
+simulation
+state-machine
+python
+medium
+Frequency
+Medium
+Last asked
+2025-11-04
+Stage
+oa
+Requirements
+
+Implement an object model for a one-at-a-time communication channel.
+
+Classes to implement:
+
+ConnectionException(Exception) (some sittings name it CommunicationException) — a custom exception whose constructor accepts a single error-message string.
+
+CommsHandlerABC — an abstract base class declaring three abstract methods.
+
+CommsHandler(CommsHandlerABC) — the concrete implementation that tracks the current active call (if any).
+
+Caller is already provided, with a unique name.
+
+Method contracts:
+
+connect(user1, user2) -> str
+
+If user1 and user2 are the same, raise with message "{user1.name} cannot connect with {user2.name}".
+
+If the line is already in use, raise with message "Connection in use. Please try later".
+
+Otherwise store the pair and return "Connection established between {user1.name} and {user2.name}".
+
+hangup(user1, user2) -> str
+
+If the two are currently communicating, disconnect them and return "{user1.name} and {user2.name} are disconnected".
+
+Otherwise raise with message "{user1.name} and {user2.name} not found in the communication channel".
+
+clear_all() -> None — force-clear any existing call regardless of who is connected.
+
+Examples
+
+Sample input:
+
+7
+connect Alice Bob
+connect Carol Dave
+hangup Alice Bob
+connect Carol Dave
+hangup Carol Dave
+connect Eve Eve
+hangup Alice Bob
+
+Sample output:
+
+Success: Connection established between Alice and Bob
+Error: Connection in use. Please try later
+Success: Alice and Bob are disconnected
+Success: Connection established between Carol and Dave
+Success: Carol and Dave are disconnected
+Error: Eve cannot connect with Eve
+Error: Alice and Bob not found in the communication channel
+
+Notes
+
+Only one pair can be connected at any time, so the entire state is a single optional pair. The grader compares the returned strings (and the Success: / Error: prefixes) literally, so reproduce the exact wording — including which method raises versus returns — rather than paraphrasing.
+
+The exact class name varies between ConnectionException and CommunicationException across sittings; read the prompt and match it. This task is one item in a five-question OA that also includes a LeetCode-style warm-up (e.g. break-a-palindrome / most-frequent-character) and a few SQL and data-structure multiple-choice questions.
+
+Preparation
+
+Implement the abstract base with @abstractmethod and a concrete handler storing the active pair as a tuple or None.
+
+Drill the exact error strings; write them as format templates so self-connect, busy-line, and not-connected cases all match.
+
+Test the full sample transcript, then add double-hangup and connect-after-clear_all cases.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

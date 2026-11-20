@@ -1,0 +1,67 @@
+===H1===
+Merge Two Sorted Arrays In-Place
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/merge-sorted-arrays-in-place
+===BODY===
+Amazon
+Coding·25 minMembers
+Merge Two Sorted Arrays In-Place
+Classic two-pointer merge of two ascending arrays into the first one, with no auxiliary array. Follow-ups generalize the direction of the input and what happens when the inputs are unsorted.
+SWE
+array
+two-pointer
+easy
+Frequency
+Single report
+Last asked
+2026-02-08
+Stage
+onsite-coding · phone-screen
+Requirements
+
+Two ascending arrays arr1 and arr2. arr1 has enough trailing capacity to hold arr2's elements (LC 88-style).
+
+Merge in place so arr1 ends ascending. No extra array.
+
+Follow-up 1: same problem but both arrays are descending.
+
+Follow-up 2: the inputs are not sorted — discuss approach and complexity.
+
+Examples
+
+arr1 = [1, 3, 5, 0, 0, 0]
+arr2 = [2, 4, 6]
+# after merge
+arr1 = [1, 2, 3, 4, 5, 6]
+
+Notes
+
+The reference solution writes from the back: two pointers at the end of each input, one write pointer at the end of arr1. Reverse the comparison when both arrays are descending.
+
+For the unsorted follow-up, the candidate is expected to discuss the sort-then-merge tradeoff versus an in-place insertion (O((n+m) log (n+m)) vs O(n*m)), not necessarily to code it.
+
+Some interviewers add a third follow-up about handling duplicates and de-duplicating in the same pass.
+
+The back-to-front pointer pattern works because the trailing zeros in nums1 are exactly the safe write region; writing forward would clobber unread values from nums1 itself. State this invariant out loud — interviewers grade whether you justify the direction rather than just typing it.
+
+After one input exhausts, the leftover from nums1 is already in place; only the leftover from nums2 still needs to be copied. Many candidates write a redundant second loop for the nums1 tail and lose a minute.
+
+For the unsorted follow-up, the canonical answer is sort the concatenation in O((n+m) log(n+m)) — nums1 already has the capacity, so the only allocation is the sort's. Mention insertion-style O(n*m) only as a contrast for tiny n.
+
+Preparation
+
+Reproduce LC 88 from scratch in under 8 minutes, using the back-to-front pointer pattern.
+
+Practice swapping the comparison operator and reversing pointer direction so you can pivot to the descending follow-up without rewriting.
+
+Pre-rehearse a one-paragraph tradeoff answer for the unsorted variant: sort+merge (O((n+m) log) time, O(1) extra) vs insertion-style (O(n*m) time, O(1) extra).
+
+Layered drill: (1) write the back-to-front three-pointer merge in under 6 minutes with no scratch work; (2) practice the descending-input variant by flipping the comparison only; (3) verbalize the sort-then-merge tradeoff for the unsorted follow-up without writing code.
+
+Edge-case checklist to dry-run on paper: n=0, m=0, all of nums2 smaller than all of nums1, all of nums2 larger, duplicates across the two arrays.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

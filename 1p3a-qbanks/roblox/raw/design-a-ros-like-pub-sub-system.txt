@@ -1,0 +1,537 @@
+===H1===
+Design a ROS-like Pub/Sub System
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/design-a-ros-like-pub-sub-system
+===BODY===
+Roblox
+System DesignMembers
+Design a ROS-like Pub/Sub System
+Design a ROS-like publish/subscribe system for topics, publishers, subscribers, delivery guarantees, and scaling.
+SWE
+Infra Eng
+pubsub
+messaging
+distributed-systems
+backend
+Frequency
+Single report
+Last asked
+2026-02-16
+Stage
+onsite-system-design
+Problem Statement
+
+Design a ROS-like publish/subscribe system for a local runtime. Components can publish typed messages to topics, and other components can subscribe to those topics without direct coupling to the publishers. The system should support multiple message types, subscriptions, dispatch, buffering, backpressure, and basic quality-of-service controls.
+
+This prompt is often a local-memory system design prompt. You are not necessarily designing Kafka or a global cloud pub/sub service. Think about an engine process, robotics runtime, simulation runtime, or game client/server process where subsystems communicate through a local broker.
+
+Common variants of this prompt include:
+
+Design a ROS-like pub/sub system
+
+Design local pub/sub for engine components
+
+Design a typed topic bus
+
+Design a message broker inside one process
+
+Clarify process boundaries immediately. A local in-process pub/sub system has different trade-offs from a distributed message broker. In this answer, the base design is in-process, with a short note on how to extend across processes.
+
+Phase 1: Requirements (~5 minutes)
+
+Functional Requirements
+
+Components should be able to publish typed messages to named topics.
+
+Components should be able to subscribe and unsubscribe from topics.
+
+The system should dispatch messages to all matching subscribers.
+
+Subscribers should be able to configure queue depth and delivery policy.
+
+The system should expose diagnostics for slow subscribers, dropped messages, and topic activity.
+
+Optional follow-ups:
+
+Wildcard topic subscriptions.
+
+Request/response services in addition to pub/sub.
+
+Cross-process transport.
+
+Replay or latched topics where new subscribers receive the last message.
+
+Recording and playback for debugging.
+
+Non-Functional Requirements
+
+RequirementTargetWhy it matters
+Low publish overheadMicroseconds to low milliseconds for common topicsPub/sub may be used in hot runtime paths
+Predictable orderingPer-topic publisher order should be preserved where configuredSubscribers need coherent state
+IsolationOne slow subscriber should not block all publishersRuntime stability
+Memory safetyBounded queues and cleanup on unsubscribePrevent leaks and unbounded growth
+Type safetyTopic message type should be known and validatedAvoid runtime casting failures
+prompt safetyPublishers/subscribers may run on different threadsEngine systems are concurrent
+ObservabilityMetrics for latency, drops, queue depth, and slow callbacksDebugging message systems is hard
+
+Clarifying Questions
+
+Is this in-process only?
+Assume yes for the base design. Cross-process transport is an extension.
+
+Do subscribers need every message?
+Support configurable QoS: best effort with drops for high-rate telemetry, reliable bounded queues for important state.
+
+Can callbacks run on the publisher prompt?
+Default no. Dispatch through executors so slow callbacks do not block publishers.
+
+Do topics have fixed schemas?
+Yes. A topic is registered with one message type.
+
+Do we need persistence?
+No durable storage for the base local system. Add recording/playback as a debugging extension.
+
+Capacity Estimation
+
+Example local runtime:
+- 100-1,000 topics
+- 1-100 publishers per busy process
+- 1-50 subscribers per topic
+- High-rate topics: 60-240 messages/sec
+- Low-rate topics: state changes, a few messages/sec
+
+Message size:
+- Small events: 100 bytes-2 KB
+- State snapshots: 10 KB-1 MB
+
+Memory implication:
+- 500 subscriptions * queue depth 100 * average 2 KB = 100 MB
+- Queue depth and drop policy must be bounded and explicit
+
+The capacity estimate should push you toward bounded subscriber queues, not infinite in-memory buffers.
+
+Phase 2: Data Model (~5 minutes)
+
+Core Entities
+
+Topic
+- topic_name
+- message_type
+- qos_default
+- publishers
+- subscribers
+- last_retained_message: nullable
+- created_at
+
+Publisher
+- publisher_id
+- topic_name
+- message_type
+- owner_component
+- sequence_number
+- active
+
+Subscriber
+- subscriber_id
+- topic_name
+- message_type
+- owner_component
+- callback
+- executor_id
+- queue_depth
+- delivery_policy: best_effort | reliable_bounded
+- overflow_policy: drop_oldest | drop_newest | block_publisher
+- active
+
+MessageEnvelope
+- topic_name
+- message_type
+- publisher_id
+- sequence_number
+- timestamp
+- payload
+
+SubscriberQueue
+- subscriber_id
+- queue_depth
+- pending_messages
+- dropped_count
+- last_delivered_sequence
+
+Executor
+- executor_id
+- thread_pool
+- scheduling_policy
+
+Topic Registry
+
+topics_by_name:
+- topic_name -> Topic
+
+publishers_by_topic:
+- topic_name -> Publisher[]
+
+subscribers_by_topic:
+- topic_name -> Subscriber[]
+
+subscriber_queues:
+- subscriber_id -> bounded queue
+
+type_registry:
+- message_type -> serializer/deserializer/schema validator
+
+QoS Model
+
+Keep QoS small and interview-friendly.
+
+Delivery policy:
+- best_effort: drop messages when subscriber queue is full
+- reliable_bounded: retain up to queue depth and signal backpressure
+
+History:
+- keep_last(N): queue depth N
+- latch_last: store last message for new subscribers
+
+Ordering:
+- preserve per-publisher sequence order per topic
+- do not guarantee total order across multiple publishers unless a sequencer is added
+
+Modeling Decisions
+
+Topics are typed to prevent one component from publishing Transform while another expects ChatMessage.
+
+Each subscriber has its own queue so slow subscribers do not block fast subscribers.
+
+Message envelopes carry sequence numbers for ordering diagnostics and gap detection.
+
+QoS is per subscription because telemetry and critical state have different needs.
+
+Executors own callback threading so dispatch policy is explicit.
+
+Phase 3: API Design (~5 minutes)
+
+API Shape
+
+This is an in-process library API.
+
+interface PubSubBus {
+  advertise<T>(topic: string, messageType: MessageType<T>, options?: PublisherOptions): Publisher<T>;
+  subscribe<T>(
+    topic: string,
+    messageType: MessageType<T>,
+    callback: (message: T, meta: MessageMeta) => void,
+    options?: SubscribeOptions
+  ): Subscription;
+  publish<T>(publisher: Publisher<T>, message: T): PublishResult;
+  unsubscribe(subscription: Subscription): void;
+  getTopicStats(topic: string): TopicStats;
+}
+
+interface SubscribeOptions {
+  queueDepth?: number;
+  deliveryPolicy?: "best_effort" | "reliable_bounded";
+  overflowPolicy?: "drop_oldest" | "drop_newest" | "block_publisher";
+  executor?: string;
+  latchLast?: boolean;
+}
+
+Example Usage
+
+const positionPublisher = bus.advertise(
+  "/players/position",
+  PlayerPositionMessage
+);
+
+const subscription = bus.subscribe(
+  "/players/position",
+  PlayerPositionMessage,
+  (message, meta) => {
+    movementSystem.updateRemotePosition(message.playerId, message.position);
+  },
+  {
+    queueDepth: 32,
+    deliveryPolicy: "best_effort",
+    overflowPolicy: "drop_oldest",
+    executor: "gameplay"
+  }
+);
+
+bus.publish(positionPublisher, {
+  playerId: "u123",
+  position: { x: 10, y: 4, z: 8 }
+});
+
+Error Semantics
+
+advertise(topic, type)
+- succeeds if topic is new or already registered with same type
+- fails if topic exists with a different type
+
+subscribe(topic, type, callback)
+- succeeds if type matches topic type
+- creates bounded subscriber queue
+- if latch_last is enabled and a last message exists, enqueue it
+
+publish(publisher, message)
+- validates type
+- wraps message in envelope
+- attempts enqueue to each subscriber queue
+- returns delivered/dropped/backpressure stats
+
+Explicit return stats from publish give you a clean way to talk about backpressure and drops without pretending every subscriber always receives every message.
+
+Phase 4: High-Level Design (~15-25 minutes)
+
+Advertise Flow
+
+Component calls advertise(topic, messageType).
+
+Bus checks topic registry.
+
+If topic does not exist, create a topic record with message type.
+
+If topic exists with the same type, add the publisher.
+
+If topic exists with a different type, reject the publisher.
+
+Return a publisher handle with a sequence counter.
+
+Subscribe Flow
+
+Component calls subscribe(topic, messageType, callback, options).
+
+Bus validates message type against the topic registry, or creates a pending topic record with the expected type if no publisher exists yet.
+
+Bus creates a Subscriber record.
+
+Bus creates a bounded SubscriberQueue.
+
+Bus registers the subscriber under subscribers_by_topic.
+
+If latch_last is enabled, enqueue the last retained message.
+
+Return a subscription handle for cleanup.
+
+Publish Flow
+
+Component calls publish(publisher, message).
+
+Bus validates message type and increments publisher sequence.
+
+If the topic is configured as latched, Bus updates last_retained_message.
+
+Router snapshots the subscriber list for the topic.
+
+Router wraps the message in a MessageEnvelope.
+
+Router enqueues the envelope into each subscriber queue based on QoS:
+
+enqueue if capacity exists
+
+drop oldest or newest for best-effort overflow
+
+report backpressure for reliable bounded subscriptions
+
+Executors drain subscriber queues and invoke callbacks.
+
+Metrics update delivered, dropped, queued, and callback latency counters.
+
+Dispatch Threading
+
+Do not call subscriber callbacks inline by default.
+
+Dispatch modelProsCons
+Inline callback on publisher promptLowest overheadSlow subscriber blocks publisher
+Shared executorGood default, isolates publishersCallback ordering must be managed
+Dedicated executor per critical subsystemPredictable latencyMore threads and scheduling overhead
+Main-prompt executorSafe for engine APIs that require main promptCan cause frame hitches if overloaded
+
+Recommended base design:
+
+Router enqueues quickly.
+
+Executors drain queues.
+
+Subscribers choose executor affinity.
+
+Per-subscriber order is preserved by processing one queue in order.
+
+Backpressure Flow
+
+For each subscriber queue:
+
+if queue has space:
+  enqueue
+else if overflow_policy == drop_oldest:
+  drop oldest and enqueue new
+else if overflow_policy == drop_newest:
+  drop new message
+else if overflow_policy == block_publisher:
+  return backpressure or block with timeout
+
+Use block_publisher sparingly. It can create frame hitches or deadlocks in engine code.
+
+Component Responsibilities
+
+ComponentResponsibility
+PubSub APIPublic handles and validation
+Topic RegistryTopic metadata, type checks, publisher/subscriber lists
+Message RouterFanout from publisher to subscriber queues
+Subscriber QueuesBuffering, QoS, overflow policy
+ExecutorsCallback scheduling and prompt affinity
+DiagnosticsMetrics, tracing, slow subscriber detection
+
+Phase 5: Scaling & Trade-offs (~15-20 minutes)
+
+Ordering Guarantees
+
+Base guarantee:
+
+For one publisher on one topic, each subscriber sees messages in publisher sequence order unless its overflow policy drops messages.
+
+Do not promise total ordering across multiple publishers unless you add a central sequencer.
+
+Ordering modelProsCons
+Per-publisher orderSimple and fastConcurrent publishers can interleave differently
+Per-topic sequencerStronger orderingAdds contention and latency
+Timestamp orderUseful for diagnosticsClock skew and ties
+
+Slow Subscribers
+
+Slow subscribers should not collapse the bus.
+
+Mitigations:
+
+Bounded queues.
+
+Drop policies for high-rate topics.
+
+Slow callback warnings.
+
+Subscriber-level metrics.
+
+Optional dedicated executor for slow or blocking subscribers.
+
+Ability to unsubscribe or disable unhealthy subscribers.
+
+Message Copying Versus Shared Ownership
+
+StrategyProsCons
+Copy per subscriberIsolation and mutation safetyExpensive for large messages
+Shared immutable messageEfficient fanoutRequires immutability discipline
+Move to one subscriberEfficientNot compatible with broadcast
+
+Recommended answer:
+
+Use immutable message envelopes with shared ownership for large payloads.
+
+Copy small messages if simpler.
+
+For very large data, publish references to shared buffers with explicit lifetime management.
+
+Type Safety and Schema Evolution
+
+Register each topic with one message type.
+
+Validate publishers and subscribers against the type.
+
+Include schema version in message type if messages evolve.
+
+For debug builds, validate payload shape.
+
+For production hot paths, avoid heavy validation after publisher creation.
+
+Wildcards and Topic Matching
+
+Base design uses exact topic names. If asked for wildcards:
+
+/players/+/position
+/world/**/event
+
+Use a trie over topic path segments to find matching subscriptions. Cache match results for hot exact topics, and invalidate cache when wildcard subscriptions change.
+
+Cross-Process Extension
+
+If the interviewer expands beyond local memory:
+
+Keep the same topic, publisher, subscriber, and QoS abstractions.
+
+Add transport adapters: shared memory, TCP, UDP, or WebSocket.
+
+Add serialization/deserialization through the type registry.
+
+Add discovery so processes can find topics.
+
+Decide durability: still ephemeral like ROS topics, or durable like a message broker.
+
+ROS-like pub/sub is often ephemeral and runtime-oriented. If the interviewer asks for durable replay, call out that this changes the system into a log or broker design.
+
+Failure Handling
+
+FailureHandling
+Publisher uses wrong typeReject at advertise or publish time
+Subscriber callback throwsCatch, record error, optionally disable subscriber
+Queue overflowsApply configured drop/backpressure policy
+Subscriber forgets to unsubscribeTie subscription lifetime to owner/component scope
+Executor overloadedSurface queue depth and callback latency metrics
+Topic has no subscribersPublish can return zero delivered; optionally skip work
+
+Observability
+
+Track:
+
+Publish rate by topic.
+
+Delivered and dropped messages by topic and subscriber.
+
+Queue depth and queue age.
+
+Callback latency.
+
+Slow subscribers.
+
+Type mismatch errors.
+
+Executor utilization.
+
+Diagnostics are central in pub/sub systems because message flow is indirect. Make it easy to answer: who publishes this topic, who subscribes, what is backed up, and what is dropping?
+
+Common Pitfalls
+
+Calling all callbacks inline - This is simple but lets one slow subscriber block publishers and unrelated systems.
+
+Using unbounded queues - It hides backpressure until the process runs out of memory.
+
+Promising global ordering for free - Per-topic total order requires a sequencer or lock, which has a real latency and contention cost.
+
+Interview Checklist
+
+Clarify local in-process scope first.
+
+Define topics, publishers, subscribers, message envelopes, queues, and executors.
+
+Use typed topic registration and validation.
+
+Explain advertise, subscribe, publish, unsubscribe flows.
+
+Draw API, registry, router, per-subscriber queues, executors, and diagnostics.
+
+Discuss bounded queues, QoS, overflow policies, and slow subscribers.
+
+Cover ordering guarantees and what changes for cross-process transport.
+
+Summary
+
+AreaRecommended Answer
+ScopeLocal in-process pub/sub runtime
+Topic modelNamed typed topics
+FanoutRouter enqueues to per-subscriber bounded queues
+DispatchExecutors invoke callbacks outside publisher hot path
+QoSQueue depth, best effort/reliable bounded, drop policy
+OrderingPer-publisher order by default
+Key trade-offLow overhead and isolation versus stronger delivery guarantees
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

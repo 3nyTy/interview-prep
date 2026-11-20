@@ -1,0 +1,80 @@
+===H1===
+Lottery System / Insert Delete GetRandom O(1)
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/lottery-system-insert-delete-getrandom
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Lottery System / Insert Delete GetRandom O(1)
+Design a data structure for a lottery that supports adding a participant, removing a participant, and randomly picking a winner — all in O(1). Appears framed both as the classic LeetCode problem and as a product story about a raffle / random pick.
+SWE
+data-structure
+hashmap
+array
+sampling
+medium
+Frequency
+Low
+Last asked
+2026-01-22
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Design a class that supports three operations, each in O(1) average time:
+
+boolean addParticipant(int id) — add a unique participant. Return true if added, false if the id already exists.
+
+boolean removeParticipant(int id) — remove a participant by id. Return true if removed, false if not present.
+
+int randomPick() — pick one current participant uniformly at random and return its id. Return -1 if empty.
+
+Function signatures usually mirror LeetCode 380's RandomizedSet:
+
+class LotterySystem:
+    def __init__(self): ...
+    def addParticipant(self, id: int) -> bool: ...
+    def removeParticipant(self, id: int) -> bool: ...
+    def randomPick(self) -> int: ...
+
+Follow-up the interviewer drives:
+
+Why is a list alone slow? (Removal by value is O(n).) Why is a TreeSet insufficient? (randomPick becomes O(log n).)
+
+Walk through the swap-with-last-element trick and explain why the index map must be updated for the swapped element, not the removed one.
+
+Discuss what happens if duplicates were allowed (LeetCode 381 variant): the value-to-index map becomes value-to-multiset-of-indices.
+
+Examples
+
+add(1) -> true
+add(2) -> true
+add(1) -> false           # duplicate
+randomPick() -> 1 or 2    # each with probability 1/2
+remove(1) -> true
+randomPick() -> 2
+remove(3) -> false
+
+Notes
+
+The canonical implementation pairs a dynamic array with a hash map from value to its index in the array. add appends and records the new index. remove swaps the last element into the removed slot, pops the tail, and updates the swapped element's index in the map. randomPick returns array[random.randint(0, len(array)-1)].
+
+Time and space: O(1) average for all three operations; O(n) space.
+
+The most common bug is updating the wrong index in the map during removal — interviewers will dry-run a 3-element case to surface this.
+
+The product framing ("lottery") and the LeetCode framing ("RandomizedSet") are the same problem. Interviewers occasionally rename the methods (pick, draw) but the data structure is identical.
+
+Preparation
+
+Implement once for RandomizedSet, then rewrite under the lottery framing with the renamed methods to make sure the structural answer comes out regardless of phrasing.
+
+Be ready to derive the swap-and-pop trick from scratch: "removal must be O(1), so the element to remove must be the tail of an array; therefore swap the target into the tail before popping; therefore I need an index map."
+
+Drill the duplicate-allowed variant (LeetCode 381) — interviewers like to ask it as a follow-up when the first version finishes quickly.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

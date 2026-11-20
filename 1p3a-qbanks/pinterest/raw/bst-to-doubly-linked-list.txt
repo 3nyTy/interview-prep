@@ -1,0 +1,55 @@
+===H1===
+Convert BST to Sorted Doubly Linked List (LC 426)
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/bst-to-doubly-linked-list
+===BODY===
+Pinterest
+Coding·60 minMembers
+Convert BST to Sorted Doubly Linked List (LC 426)
+LeetCode 426 verbatim — convert a BST into a sorted circular doubly-linked list in place — with an insert follow-up: support inserting a new node into the resulting DLL while keeping the sort order.
+MLE
+tree
+bst
+linked-list
+tree-traversal
+recursion
+medium
+Frequency
+Single report
+Last asked
+2026-04-18
+Stage
+onsite-coding
+Requirements
+
+Given the root of a BST, convert it in place into a sorted circular doubly-linked list. The left pointer becomes the predecessor pointer, the right pointer becomes the successor. Return the head (smallest element).
+
+Follow-up: implement insert(head, new_value) that inserts a new node while maintaining the sort order.
+
+Examples
+
+Canonical LC 426 examples apply; no Pinterest-specific framing.
+
+Notes
+
+Standard solution: in-order traversal maintaining a prev pointer; for each visited node, link prev.right = node and node.left = prev, then update prev. After the traversal, close the circular link between the final prev and the head.
+
+The insert follow-up: walk the DLL from the head until the next node's value exceeds the new value, then splice. With a circular DLL this is at most O(n) per insert; an interviewer may push for a balanced-tree maintenance to bring inserts back to O(log n).
+
+Common bug: forgetting to handle the empty tree (return null), and forgetting to close the circular link at the end (the canonical LC test cases will catch this).
+
+Be careful with the in-place reuse of left/right pointers — the tree structure is destroyed during the traversal; recursive calls must complete before you mutate the pointers, or use an iterative in-order with an explicit stack.
+
+Preparation
+
+Implement the recursive in-order with a prev pointer once cleanly. The closing circular-link step is the most-forgotten detail.
+
+Drill the iterative in-order with an explicit stack as an alternative — useful when the interviewer asks about recursion depth on a skewed tree.
+
+Sketch the insert-into-circular-DLL helper before the interview; it doubles as the answer to "what happens after the conversion".
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

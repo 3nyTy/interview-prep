@@ -1,0 +1,57 @@
+===H1===
+When Does `min x'Qx + c'x` Have a Finite Minimum?
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/quadratic-form-finite-min
+===BODY===
+Citadel / Citadel Securities
+Other·30 minMembers
+When Does `min x'Qx + c'x` Have a Finite Minimum?
+Citadel GQS Quant Researcher first round: after 30 minutes of resume discussion, a single technical question on the conditions under which an unconstrained quadratic program over `R^n` attains a finite minimum.
+MLE
+RS
+math-reasoning
+linear-algebra
+optimization
+hard
+Frequency
+Single report
+Last asked
+2026-04-28
+Stage
+phone-screen
+Requirements
+
+Given a real-valued problem:
+
+ minimize  x^T Q x + c^T x
+     x ∈ R^n
+
+with real symmetric Q and real c, characterize the conditions on Q and c under which the minimum value is finite.
+
+Notes
+
+Case 1 — Q positive definite: the problem is strictly convex; minimum exists, is unique, and equals -(1/4) c^T Q^{-1} c attained at x* = -(1/2) Q^{-1} c. Always finite.
+
+Case 2 — Q positive semi-definite (PSD but not PD): the problem is convex but not strictly convex. Minimum exists and is finite if and only if c lies in the column space of Q (equivalently, c ⊥ null(Q)). If c has any component in null(Q), walking along that direction drives the objective to -∞. When the condition holds, the minimum is attained on an affine subspace.
+
+Case 3 — Q has a negative eigenvalue: the objective is unbounded below. Walking along the corresponding eigenvector direction makes x^T Q x arbitrarily negative, dominating any finite c^T x term. No finite minimum regardless of c.
+
+Sanity check: if Q = 0, the objective reduces to c^T x, which is finite (and equal to 0) only if c = 0; otherwise unbounded below by walking along -c.
+
+A compact answer: the minimum is finite if and only if Q is PSD and c ∈ range(Q). The interviewer expects both halves of the characterization.
+
+Preparation
+
+Memorize the closed-form solution and the existence condition for PD vs PSD vs indefinite cases — this is canonical convex-optimization material and appears across quant interviews.
+
+Be able to sketch the proof in 90 seconds using the eigen-decomposition Q = V Λ V^T: in the rotated coordinates y = V^T x, the objective decouples into Σ λ_i y_i^2 + d_i y_i where d = V^T c. Each coordinate has a finite minimum iff λ_i > 0, or λ_i = 0 and d_i = 0, or λ_i < 0 (unbounded). State this decomposition fluently.
+
+Practice the geometric interpretation: PSD Q makes the objective a paraboloid (possibly degenerate); a negative eigenvalue introduces a saddle-with-downward-direction, and the c term cannot stabilize it.
+
+For the follow-up if asked about a constrained version (Ax = b linear constraint), the KKT conditions give a linear system; the constrained problem can have a finite minimum even when Q is not PSD overall, provided Q is PSD on null(A).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

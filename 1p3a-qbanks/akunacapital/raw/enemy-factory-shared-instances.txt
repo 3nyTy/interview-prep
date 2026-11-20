@@ -1,0 +1,40 @@
+===H1===
+Enemy Factory with Shared Instances
+===URL===
+https://www.1point3acres.com/interview/problems/company/akunacapital/enemy-factory-shared-instances
+===BODY===
+Akuna Capital
+CodingMembers
+Enemy Factory with Shared Instances
+Design a factory that returns an enemy instance for a requested color (the enemy's only property). Follow-up: enemy objects are memory-heavy and created in huge numbers — redesign to mitigate. The intended answer is the Flyweight pattern: cache and share one immutable instance per color instead of allocating new ones.
+SWE
+oop-design
+object-design
+medium
+Frequency
+Single report
+Last asked
+2025-11-02
+Stage
+phone-screen
+Requirements
+
+You are building a subsystem for a large online multiplayer game that manages all the enemies. Create a factory that produces enemy instances. For simplicity, assume each enemy has a single property: a color. The caller tells the factory which color of enemy it wants, and the factory returns an instance of that enemy.
+
+Follow-up: the enemy object consumes a lot of memory, and there are huge numbers of enemies to create. How would you redesign the system to mitigate this?
+
+Notes
+
+The base task is a straightforward factory keyed by color. The follow-up is the Flyweight pattern: because color is the only (immutable) intrinsic state, you only ever need one shared instance per color. Keep a cache (map from color to instance) inside the factory, create lazily on first request, and return the shared reference on subsequent requests so memory stays proportional to the number of distinct colors rather than the number of enemies. If enemies later need per-instance (extrinsic) state such as position or health, separate that out and pass it in at use time rather than storing it on the shared object.
+
+Preparation
+
+Implement the color-keyed factory, then refactor it into a flyweight cache and show the memory argument.
+
+Be ready to name what is intrinsic (shareable) versus extrinsic (per-enemy) state and where each lives.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,92 @@
+===H1===
+L6 System Design (Staff Loop)
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/l6-system-design-staff-loop
+===BODY===
+Google
+System Design·60 minMembers
+L6 System Design (Staff Loop)
+L6 (Staff) onsite includes two System Design rounds (one infra-leaning, one product-leaning), each 60 min. Common prompts include distributed rate limiter, global notification system, anomaly detection service, Find-My-Device, dictionary range query store, and global chain restaurant menu sync. Senior bar is on requirements clarification, deep-dives into trade-offs, failure modes, and evolution path.
+SWE
+Infra Eng
+EM
+system-design
+scaling
+storage
+messaging
+rate-limiting
+Frequency
+Medium
+Last asked
+2026-07-06
+Stage
+onsite-system-design · onsite-deep-dive
+Requirements
+
+Common prompts (each is one 60-min round):
+
+Distributed rate limiter as an internal service (10⁵+ QPS, multi-tenant, multi-region).
+
+Quota limiter / Google Drive-style usage quota — clarify whether the requirement is request throttling, per-user/per-tenant resource quota, or storage-usage enforcement before choosing counters, windows, and reconciliation semantics.
+
+Global real-time notification system (push + email + SMS, 10⁸+ users, fan-out + retry + dedup).
+
+Anomaly detection system for an unspecified domain (clarify first: metric stream? user behavior? infra alerts?).
+
+Find-My-Device (Find My iPhone) — explicit privacy, security, efficiency requirements.
+
+Global chain restaurant menu update system — multi-region menu sync, offline-tolerant edge devices, time-of-day variants.
+
+Dictionary range query — store a set of words; support range(a, b) returning all words in lexicographic interval. Discuss trie + sorted index + sharding.
+
+Round structure (universal across prompts)
+
+Requirements clarification (~10 min) — explicitly ask about: internal vs external, peak QPS, latency SLO, precision/recall trade-offs, region geometry, consistency expectations, security model.
+
+High-level architecture (~10 min) — top-level boxes (gateway, service tier, storage, async pipeline). Resist diving into one box too early.
+
+Deep dive (~25 min) — interviewer picks one or two boxes and grills. Expect: hot key handling, cache invalidation, sliding window vs token bucket, hierarchical limiting, sharding scheme, leader election, write quorum.
+
+Failure & trade-off (~10 min) — what breaks when a region disconnects, when storage fails, when a tenant abuses the system. Concrete fail-open vs fail-close decisions.
+
+Evolution path (~5 min) — how does the system grow from MVP → 10× → 100×? Where do you re-architect? How do you roll out the new design?
+
+Notes
+
+L6 interviewers explicitly compare candidates against L5; the differentiator is decision-making depth + cross-team influence reasoning, not architecture novelty.
+
+Common L6 failure modes:
+
+Jumping into architecture without clarifying requirements (the most cited pitfall).
+
+Architecture looks complex but candidate cannot defend each box's necessity.
+
+System design pitched at L5 ("here is a sharded cache") rather than L6 ("here is how I'd choose between sharded cache and Redis Cluster given the consistency requirements, and here is how I'd roll out the change").
+
+For the open-ended product prompt (anomaly detection, find-my-device), the first 10 minutes of clarification is graded — vague answers there poison the rest of the round.
+
+The L6 BQ round in the same loop is the second-largest signal: stories should center on cross-team influence, technical decision rationale, owning outages, and disagreeing with senior peers.
+
+Preparation
+
+Drill 6–8 distinct system design prompts cold (rate limiter, notification, search, chat, payment, ride-sharing, file storage, real-time analytics). For each prompt, prepare:
+
+2 explicit trade-offs you'd present.
+
+1 named failure case + mitigation.
+
+1 evolution path (MVP → 10×).
+
+Build a personal cheatsheet of capacity math: 1M QPS budgets, 99p latency on Redis vs SQL vs Spanner, replication lag numbers, cost per TB on common storage tiers.
+
+Practice the requirements-clarification opener as a 3–5 question script; speak it out loud at the start of every mock.
+
+Read Designing Data-Intensive Applications chapters 1–9; do the exercises.
+
+For each loop, write down a 1-page Past Project Deep Dive (the 5th round) covering: design decision, what was wrong with it, what you'd do today — interviewers grade reflection here.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

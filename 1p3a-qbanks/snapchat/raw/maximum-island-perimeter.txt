@@ -1,0 +1,67 @@
+===H1===
+Maximum Island Perimeter
+===URL===
+https://www.1point3acres.com/interview/problems/company/snapchat/maximum-island-perimeter
+===BODY===
+Snapchat
+Coding·45 minFree preview
+Maximum Island Perimeter
+Given a binary grid, find islands with BFS or DFS and return the largest island perimeter rather than just the island count.
+SWE
+graph
+grid
+bfs
+dfs
+medium
+Frequency
+Low
+Last asked
+2026-04-17
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Implement a function over a 2D grid where land cells form islands through 4-directional adjacency.
+
+You should:
+
+Traverse every connected land component exactly once.
+
+Compute the perimeter for each island while traversing it.
+
+Return the maximum perimeter over all islands.
+
+Handle empty grids, one-cell islands, holes / internal water, and islands touching the boundary.
+
+Be ready to run test cases and explain time / space complexity.
+
+Example shape:
+
+grid = [
+  [1, 1, 0],
+  [1, 0, 0],
+  [0, 1, 1]
+]
+
+The first island has perimeter 8; the second island has perimeter 6, so the answer is 8.
+
+Notes
+
+The cleanest implementation uses the same traversal skeleton as Number of Islands. For each land cell in the current component, inspect four neighbors. Add one perimeter edge when the neighbor is outside the grid or water; otherwise enqueue / recurse into unvisited land.
+
+Do not compute a bounding box and infer perimeter from width and height; that fails on non-rectangular islands and holes. Mutating visited land to water is acceptable if the input can be changed; otherwise keep a visited matrix.
+
+Complexity is O(m * n) time because each cell is processed at most once. Space is O(m * n) in the worst case for visited state and traversal stack / queue.
+
+Preparation
+
+Implement the problem once with BFS and once with DFS.
+
+Write tests for a single land cell, all water, all land, two separate islands, and an island with an internal lake.
+
+Practice explaining why perimeter can be accumulated locally from four neighbor checks.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

@@ -1,0 +1,61 @@
+===H1===
+Large-Scale Interactive Map Visualization
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/interactive-map-100m-datapoints
+===BODY===
+Google
+System DesignMembers
+Large-Scale Interactive Map Visualization
+Design an interactive Google Maps visualization for more than 100 million data points. Use aggregated heatmaps at coarse zoom levels and individual pins at the final zoom, while addressing rendering technology, caching, live updates, client threading, failure recovery, and hardware/network limits.
+SWE
+frontend
+location
+caching
+scaling
+sse
+hard
+Frequency
+Single report
+Last asked
+2026-08-29
+Stage
+onsite-system-design
+Requirements
+
+Visualize more than 100 million geospatial data points on top of Google Maps.
+
+At broad zoom levels, aggregate points into a heatmap; at the final zoom level, render individual data pins.
+
+Map GIS data and aggregation resolution to map zoom level.
+
+Accept live updates over an SSE API and define the data-refresh frequency.
+
+Specify caching and fallback behavior across zoom levels, including how stale or missing data is handled.
+
+Account for client hardware, memory, threading, and network limits.
+
+Defend the rendering stack: SVG vs Canvas vs WebGL, and the trade-offs among libraries such as Chart.js, deck.gl, and D3.
+
+Explain the render cycle, client-worker model, shared-memory buffering, update path, and recovery behavior when live data becomes unavailable.
+
+Notes
+
+The opening prompt may contain almost no requirements beyond the visualization goal. Drive clarification one question at a time and connect each requested capability to a concrete need; the interviewer may challenge every requirement with "why do you need this?"
+
+Expect constraints to change during the discussion, including irrelevant additions intended to test prioritization. State assumptions, defend them, and make the impact of each change explicit instead of silently redrawing the architecture.
+
+A canonical end-to-end shape: pre-aggregate points into a zoom-level tile pyramid on the server so the client never receives the raw dataset; render heatmap tiles as textures and final-zoom pins with WebGL instancing; decode and diff incoming SSE updates in a web worker so the main thread only receives ready-to-draw buffers; cache tiles keyed by tile-and-zoom with fallback to the nearest coarser zoom when a tile is missing or stale; and on stream loss, reconnect from a checkpoint so missed updates replay instead of forcing a full reload.
+
+Preparation
+
+Sketch the zoom-dependent data path from raw GIS points to heatmap tiles and final-zoom pins.
+
+Compare SVG, Canvas, and WebGL for the render cycle, then justify one stack under client hardware and network constraints.
+
+Walk through caching with zoom fallback, live SSE refresh, worker/shared-memory coordination, and failure recovery as one end-to-end flow.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

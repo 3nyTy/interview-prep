@@ -1,0 +1,49 @@
+===H1===
+Outside-In String Reordering
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/outside-in-string-reordering
+===BODY===
+Capital One
+Coding·70 minMembers
+Outside-In String Reordering
+Reorder a string by taking characters alternately from its left and right ends: first character, last character, second character, second-to-last character, and so on until every character is used.
+MLE
+string
+string-processing
+easy
+Frequency
+Single report
+Last asked
+2026-07-19
+Stage
+oa
+Requirements
+
+Input: a string.
+
+Produce a new string by taking the first character, then the last character, then the second character, then the second-to-last character, continuing inward in that order.
+
+Use every input character exactly once. For an odd-length string, append the unpaired center character last.
+
+Examples
+
+input:  abcde
+output: aebdc
+
+Notes
+
+Two-pointer sweep: left starts at 0, right at len(s) - 1; alternately append s[left] (then advance) and s[right] (then retreat) while left < right, and append the single center character once left == right.
+
+The only real bug surface is the odd-length center: emitting it inside the alternating loop double-appends it. Exit the loop on left == right and append once.
+
+Preparation
+
+Reproduce the given example by hand and mark the source index used for each output position.
+
+Implement the inward traversal and verify that the center character is emitted exactly once.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

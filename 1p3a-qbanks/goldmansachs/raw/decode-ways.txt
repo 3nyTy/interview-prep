@@ -1,0 +1,56 @@
+===H1===
+Decode Ways / Alphanumeric Combination
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/decode-ways
+===BODY===
+Goldman Sachs
+Coding·60 minMembers
+Decode Ways / Alphanumeric Combination
+Classic decode-ways DP: given a digit string, count the number of ways to decode it using the mapping A=1, B=2, …, Z=26. Appears verbatim on Goldman's OA bank.
+SWE
+dp
+string
+medium
+Frequency
+Low
+Last asked
+2025-07-11
+Stage
+oa · phone-screen
+Requirements
+
+Input: a non-empty digit string s.
+
+Mapping: "1" → A, "2" → B, …, "26" → Z.
+
+Output: total number of distinct decodings of s.
+
+Constraints: leading 0s and isolated 0s are invalid (e.g. "06" cannot decode); two-digit codes are valid only in [10, 26].
+
+public static int alphanumbericCombination(String s)
+
+Notes
+
+Standard 1-D DP. dp[i] = number of ways to decode the first i characters.
+
+Transition: dp[i] += dp[i-1] if s[i-1] is in 1..9; dp[i] += dp[i-2] if s[i-2..i-1] is in 10..26.
+
+O(n) time, O(1) space if you collapse the array to two scalars.
+
+Edge cases that the visible OA tests do not always catch: "0" alone should return 0; "10", "20" should return 1; "27" returns 1 (only single-digit decoding works).
+
+Equivalent to the canonical LeetCode "Decode Ways" problem; a * wildcard follow-up exists in the LC variant but has not been reported at Goldman.
+
+Preparation
+
+Implement once with a full dp[] array, then refactor to two rolling scalars on the second pass — Goldman interviewers occasionally ask for the space-optimized form.
+
+Drill the leading-zero / standalone-zero edge cases by hand before submitting.
+
+LC 91 (Decode Ways) is the canonical equivalent; LC 639 adds the * wildcard for further practice.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

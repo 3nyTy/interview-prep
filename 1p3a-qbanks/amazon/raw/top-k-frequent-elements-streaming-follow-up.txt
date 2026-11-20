@@ -1,0 +1,50 @@
+===H1===
+Top K Frequent Elements (LC 347) with a Follow-Up Variant
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/top-k-frequent-elements-streaming-follow-up
+===BODY===
+Amazon
+CodingMembers
+Top K Frequent Elements (LC 347) with a Follow-Up Variant
+Return the `k` most frequent values from an array, implementing the bucket-based linear-time version after comparing sorting and heap alternatives. Follow-up: support a live stream whose current top `k` must be available at any time.
+SWE
+hashmap
+bucket-sort
+top-k
+streaming
+medium
+Frequency
+Low · New
+Last asked
+2026-09-01
+Stage
+onsite-coding
+Requirements
+
+Given an integer array and integer k, return the k most frequent values.
+
+Compare three selection strategies: full sort, a size-k heap, and frequency buckets.
+
+Implement the bucket version; a value's frequency is at most the array length, so use n + 1 buckets.
+
+Follow-up: values now arrive as a continuous stream, and the current top k must be available at any time.
+
+Notes
+
+State the trade-off before coding: full sorting is O(n log n), a size-k heap is O(n log k), and the bucket path is linear in the input plus output.
+
+For the streaming follow-up, the discussion centers on maintaining both value-to-frequency state and frequency-group membership as each event increments one value.
+
+Keep equal-frequency behavior explicit: clarify whether any k values are acceptable or whether a deterministic tie-break is required.
+
+Preparation
+
+Implement all three batch variants and explain why the frequency range makes bucket allocation possible.
+
+Extend the state with add(value) and topK() operations, then state the update, query, and memory costs under a tie-heavy stream.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

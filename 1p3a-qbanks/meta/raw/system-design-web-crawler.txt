@@ -1,0 +1,63 @@
+===H1===
+System Design — Web Crawler / Google Flight
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/system-design-web-crawler
+===BODY===
+Meta
+System Design·45 minMembers
+System Design — Web Crawler / Google Flight
+Distributed web crawler at Meta scale, occasionally framed as Google Flight price aggregator. URL frontier, DAG scheduling, politeness rules, and storage are the standard deep-dive zones.
+SWE
+Infra Eng
+scaling
+queue
+scheduling
+storage
+medium
+Frequency
+Low
+Last asked
+2026-04-22
+Stage
+onsite-system-design
+Requirements
+
+Functional: crawl billions of URLs, extract content + links, deduplicate, store for indexing.
+
+Scale: ~1B URLs / day, ~10 KB avg page, ~10 TB / day of new content; political-rate-limit per domain.
+
+Decisions:
+
+URL frontier: priority queue per domain (politeness) + global ranking by importance (PageRank-lite).
+
+DAG scheduling: workers pull from frontier; results stream to parsers; parsers emit new URLs back.
+
+Dedup: content-hash (SHA-1 of normalized HTML) + URL-canonicalization.
+
+Storage: HBase / Cassandra for HTML; object store for blobs; metadata in relational DB.
+
+Politeness: per-domain rate limit (1 req/sec default), robots.txt cache, exponential backoff on 429/503.
+
+Failure handling: dead-letter queue for permanent errors; retry queue with backoff for transient.
+
+Notes
+
+Reported as either pure web-crawler or Google Flight (where the "URLs" are airline route queries and the dedup is on price-snapshot rather than HTML).
+
+E5+ rounds want a sharded distributed design with explicit hot-shard handling; E4 rounds accept a single-master + worker-pool.
+
+Common follow-up: "now crawl JavaScript-rendered pages" → headless Chrome workers + larger machine pool.
+
+Preparation
+
+Memorize the URL-frontier + politeness pattern; draw it in 5 min.
+
+Pre-compute scale estimates so you don't burn time on arithmetic.
+
+Be ready to defend the choice of HBase vs Cassandra for HTML storage (write-amplification vs availability).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

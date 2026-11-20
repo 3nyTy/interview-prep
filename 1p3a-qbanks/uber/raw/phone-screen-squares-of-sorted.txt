@@ -1,0 +1,61 @@
+===H1===
+Phone Screen: Squares of a Sorted Array
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/phone-screen-squares-of-sorted
+===BODY===
+Uber
+Coding·60 minMembers
+Phone Screen: Squares of a Sorted Array
+Recurring warm-up phone-screen prompt, equivalent to LeetCode 977. Given a sorted integer array (negative values possible), return an array of the squares in non-decreasing order. The Senior MLE variant of the round adds a follow-up on the K-th smallest square.
+SWE
+MLE
+two-pointer
+array
+easy
+Frequency
+Low
+Last asked
+2026-03-21
+Stage
+phone-screen
+Requirements
+
+Input: sorted (non-decreasing) integer array nums, possibly containing negatives.
+
+Output: a new array of the squares of each element, in non-decreasing order.
+
+Solve in linear time — do not square then sort.
+
+Constraints: 1 <= nums.length <= 10^4, -10^4 <= nums[i] <= 10^4.
+
+Optimal: O(n) time, O(n) extra space.
+
+Examples
+
+nums = [-4, -1, 0, 3, 10]
+Output = [0, 1, 9, 16, 100]
+
+nums = [-7, -3, 2, 3, 11]
+Output = [4, 9, 9, 49, 121]
+
+Notes
+
+Two-pointer from both ends: compare abs(nums[l]) and abs(nums[r]), write the larger square to the end of the result, move that pointer inward.
+
+A heap-based solution works but is O(n log n) and inferior; mentioning it and then pivoting to two-pointer is a common pattern when the interviewer probes for optimality.
+
+Common follow-up: "Return the K-th smallest square instead." Use the same two-pointer process but stop after k writes; O(k).
+
+Several candidates have reported this prompt at the senior MLE phone-screen with the follow-up tightened to constant extra space — write in-place from the back of the output buffer.
+
+Preparation
+
+Drill LC 977 once; the two-pointer pattern is the dominant solution and transfers to several Uber phone-screen warm-ups.
+
+Pre-script the K-th smallest follow-up so the round doesn't stall.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

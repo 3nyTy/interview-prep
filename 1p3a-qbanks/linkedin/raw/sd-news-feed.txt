@@ -1,0 +1,77 @@
+===H1===
+News Feed / Timeline
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/sd-news-feed
+===BODY===
+LinkedIn
+System DesignMembers
+News Feed / Timeline
+Design a ranked news feed for a read-heavy social product with seconds-level freshness. Use a hybrid fan-out strategy, lightweight per-user inboxes, asynchronous celebrity delivery, bounded history, two-stage ranking, and explicit read-your-writes handling for a user's own posts.
+SWE
+feed
+fan-out
+ranking
+caching
+queueing
+data-modeling
+scaling
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-system-design
+Requirements
+
+Functional:
+
+Build each user's feed from content published by accounts they follow.
+
+Rank results rather than returning a purely reverse-chronological list; the ranking model itself is out of scope.
+
+Keep only a bounded set of recent inbox entries and retrieve older content through the read path.
+
+Guarantee that a user's own newly published content appears immediately in that user's feed.
+
+Scale and latency:
+
+Reads greatly outnumber writes.
+
+Seconds-level delay is acceptable for ordinary follower delivery.
+
+High-fan-out creators may have millions of followers, so synchronously materializing every follower inbox on publish is not acceptable.
+
+Design decisions:
+
+Use fan-out on write for ordinary accounts and fan-out on read for high-fan-out creators. Merge both sources at read time.
+
+Store content IDs and ranking scores in the inbox; fetch the content body separately to keep inbox storage light.
+
+Use an asynchronous queue and batched work to smooth ordinary fan-out.
+
+Compute a base ranking score on write, then combine it with real-time features in a lightweight read-time rerank.
+
+Cache inboxes for active users; load inactive users on demand and apply LRU eviction.
+
+Notes
+
+State the push-versus-pull trade-off before drawing components. The hybrid boundary is the central decision, not an implementation afterthought.
+
+Read-your-writes for a user's own post needs an explicit synchronous path; an asynchronous fan-out queue alone cannot provide it.
+
+Keep the inbox representation separate from the content store so ranking and retention changes do not duplicate large content bodies.
+
+Preparation
+
+Quantify a celebrity fan-out and show where the design switches from write-time to read-time work.
+
+Draw the publish, inbox-materialization, cache, and feed-read paths separately, then explain where they merge.
+
+Rehearse the consistency discussion for ordinary follower delivery versus immediate visibility of the author's own post.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

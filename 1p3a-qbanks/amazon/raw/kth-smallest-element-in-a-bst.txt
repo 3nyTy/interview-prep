@@ -1,0 +1,37 @@
+===H1===
+Kth Smallest Element in a BST (LC 230)
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/kth-smallest-element-in-a-bst
+===BODY===
+Amazon
+CodingMembers
+Kth Smallest Element in a BST (LC 230)
+Return the kth smallest node value in a binary search tree, with k counted from one.
+tree
+Frequency
+Single report
+Last asked
+—
+Stage
+phone-screen
+Requirements
+
+Given the root of a binary search tree and a valid one-based rank k, return the node value at that rank in sorted order.
+
+Notes
+
+Use the canonical public problem contract for practice; company-specific interface changes and follow-ups are unspecified.
+
+Inorder traversal visits BST values in sorted order. Use an explicit stack to descend left, visit one node, then traverse its right subtree; stop at the kth visit. This takes O(h+k) time and O(h) extra space for tree height h, with O(n) worst-case time on a skewed tree.
+
+Preparation
+
+Implement iterative inorder traversal and test first and last valid ranks on balanced and skewed trees.
+
+Trace the stack and visit counter by hand, explaining why each visit advances the rank exactly once.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

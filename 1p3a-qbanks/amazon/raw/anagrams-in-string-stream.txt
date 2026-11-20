@@ -1,0 +1,48 @@
+===H1===
+Find Anagrams in a Character Stream
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/anagrams-in-string-stream
+===BODY===
+Amazon
+CodingMembers
+Find Anagrams in a Character Stream
+Over a stream of characters, report in real time every occurrence of an anagram of a fixed target word using a fixed-size sliding window and a frequency array.
+SWE
+sliding-window
+string
+hashmap
+streaming
+medium
+Frequency
+Single report
+Last asked
+2026-05-22
+Stage
+onsite-coding
+Requirements
+
+Over a stream of characters, report in real time every occurrence of an anagram of a fixed target word.
+
+The window size equals the target length; report each position whose preceding len(target) characters are a permutation of the target.
+
+Notes
+
+Maintain a fixed-size sliding window with a frequency array (or counter) of the last len(target) chars; compare against the target frequency in O(1) per step using a "matches" counter rather than re-comparing the whole map.
+
+Streaming twist: you cannot freely index backward — keep the rolling window state incrementally, adding the incoming char and evicting the one leaving the window.
+
+Mind the boundary before the window is full (fewer than len(target) chars seen) and the eviction step on each advance.
+
+Equivalent to LC 438 (Find All Anagrams in a String) adapted to an online stream.
+
+Preparation
+
+Solve LC 438 with the matched-count optimization, then refactor it into a push(char) streaming interface that emits matches as windows complete.
+
+Drill the window-full boundary and the evict-then-add ordering.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

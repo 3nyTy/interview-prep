@@ -1,0 +1,62 @@
+===H1===
+25 Horses, 5 Lanes Puzzle
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/horse-race-25
+===BODY===
+Goldman Sachs
+Other·30 minMembers
+25 Horses, 5 Lanes Puzzle
+25 horses, 5 lanes per race, no timer — only relative order within a race is observable. What is the minimum number of races needed to identify the top 3 fastest horses?
+SWE
+math-reasoning
+verbal
+medium
+Frequency
+Single report
+Last asked
+2025-06-09
+Stage
+onsite-coding · onsite-bq
+Requirements
+
+25 horses; each race seats exactly 5; outcomes give only the in-race relative order, no times.
+
+Goal: identify the top 3 fastest overall with the fewest races.
+
+Classic interview puzzle — the answer is 7 races.
+
+Notes
+
+The standard derivation:
+
+Races 1-5: Race each disjoint group of 5 horses. Total 5 races. Each horse now has a within-group rank A1 > A2 > A3 > A4 > A5, B1 > B2 > …, etc.
+
+Race 6: Race the 5 group winners (A1, B1, C1, D1, E1). Without loss of generality, A1 > B1 > C1 > D1 > E1. The overall winner is A1.
+
+Eliminations after race 6:
+
+All horses in groups D and E cannot be in the top 3 (their group winners are 4th / 5th in race 6, so every horse below them is at worst 5th).
+
+In group C, only C1 can still be top 3 (since A1, B1 are faster).
+
+In group B, only B1 and B2 can still be top 3.
+
+In group A, A1 is locked in 1st; A2 and A3 can still be top 3.
+
+Race 7: Race A2, A3, B1, B2, C1. The top 2 finishers are the overall 2nd and 3rd.
+
+7 is provably optimal: 6 races give only 30 pieces of ranking info, which is not enough to distinguish all 3-permutations of 25 horses by an information-theoretic argument.
+
+Variants the interviewer may layer on: "top 1 only" (answer: 6 races), "top 5" (answer: harder; typically 9-10 with case analysis).
+
+Preparation
+
+Be ready to walk the elimination logic out loud, layer by layer — the interviewer scores reasoning clarity more than the final number.
+
+Practice the "top 1" and "top 5" variants for follow-ups.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

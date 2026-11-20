@@ -1,0 +1,82 @@
+===H1===
+Rate Limiter (OOD)
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/rate-limiter-ood
+===BODY===
+Amazon
+System Design·45 minMembers
+Rate Limiter (OOD)
+Implement a rate limiter for inbound user requests. The interviewer keeps the prompt sparse — driving clarification on time window and limit is half the round.
+SWE
+oop-design
+system-design
+medium
+Frequency
+Low
+Last asked
+2026-09-10
+Stage
+onsite-coding · onsite-system-design
+Requirements
+
+Method: allow(user_id, timestamp) -> bool — decides whether the request should be accepted.
+
+Time window and request limit are deliberately unspecified; clarify (sliding vs fixed window, requests-per-second vs per-minute, burst tolerance).
+
+Discuss memory growth and how to expire stale state.
+
+NG hiring-manager coding follow-up: after implementing a sliding window with a deque, explain what could replace the deque. Establish the missing requirements before selecting the replacement.
+
+Examples
+
+Token bucket: each user gets a bucket of size B refilled at rate R; on each request, consume a token if available.
+
+Sliding window log: keep a deque of timestamps per user; on each request, pop expired entries, then check size against the limit.
+
+Sliding window counter: bucket counts per second/minute, weighted by overlap.
+
+Notes
+
+Interviewers expect the candidate to volunteer the timeWindow and limit parameters within the first minute. Walking in cold and waiting to be told them costs material score — open with the parameters you'd ask the product team about.
+
+Bring up persistence (in-memory vs Redis), thread safety, and what happens on a node crash.
+
+Discuss the trade-off between sliding-window log (precise but O(window) memory per user) vs sliding-window counter (approximate, O(1) per user).
+
+Class skeleton candidates over-engineer: a RateLimiter facade, a Limiter interface, concrete TokenBucketLimiter / SlidingWindowLogLimiter / FixedWindowLimiter Strategy implementations, and a RateLimitResult { allowed, remaining, retryAfterMs } return type cover both the OOD ask and any "now make it pluggable" follow-up.
+
+Algorithm trade-off cheat sheet to recite verbatim: fixed window — O(1) memory, allows 2x burst at the boundary; sliding window log — exact, O(window) memory per key, GC pressure under bursts; sliding window counter — O(1) memory with weighted overlap of two windows, ~1% error; token bucket — O(1) memory, allows configurable burst, the production default; leaky bucket — same memory as token bucket but smooths output rate rather than capping input, useful when the downstream is rate-sensitive.
+
+The single-node OOD answer must call out thread safety: either a synchronized block / ReentrantLock per bucket, or a ConcurrentHashMap<UserId, AtomicReference<BucketState>> with CAS updates. Mention that the lock granularity is per-key, not global.
+
+For the distributed extension, the canonical answer is Redis with a single Lua script that does read-tokens / compute-refill / decrement / write-back atomically. MULTI/EXEC is not enough because the decision logic lives in the client between GET and SET — two gateways will both decide "allow".
+
+Routing matters: if requests for the same user can land on different gateways, you need the limiter state in a shared store (Redis) and consistent hashing on user_id so the same shard owns the key. Sticky routing at the LB layer is an alternative that lets you keep state in-process but breaks on rebalance.
+
+Clock skew between gateways shows up as spurious denials in sliding-window log implementations — anchor on the Redis server's clock (TIME command or EVAL-side redis.call('TIME')) rather than each gateway's local clock.
+
+Fail-open vs fail-closed is a product question, not an engineering one. Fail-open on Redis outage prevents the limiter from becoming the SPOF; fail-closed is correct for hard quotas (paid API tiers). State which you'd pick and why.
+
+Preparation
+
+Implement at least two of the three classic strategies (fixed window, sliding log, token bucket) in your language of choice; time yourself to under 10 minutes each.
+
+Memorize the GCRA (generic cell rate algorithm) one-liner — tat = max(now, tat) + emission_interval; allow if tat - now <= burst_tolerance — as the production-grade variant for the scale follow-up.
+
+Pre-rehearse a 3-axis comparison: accuracy, memory, latency.
+
+Sketch the distributed version: Redis with a single Lua script for atomic check-and-update; mention key sharding by user_id.
+
+Layered drill: (1) whiteboard single-node token bucket in ~10 lines with tokens, lastRefillMs, capacity, refillPerSec; (2) wrap it behind a Limiter interface and add SlidingWindowLogLimiter as a second Strategy; (3) move the bucket state into Redis behind a Lua script and walk through the atomicity argument; (4) add consistent-hashing routing and fail-open semantics.
+
+Memorize the GCRA one-liner as a production-grade variant: tat = max(now, tat) + emissionInterval; allow iff tat - now <= burstTolerance. It collapses token-bucket math into two scalars.
+
+Time yourself writing the Redis Lua script from memory in under 5 minutes — that script is the most common deep-dive follow-up and candidates who pause to look it up lose momentum.
+
+Pre-rehearse a 3-axis comparison (accuracy, memory, burst) and pick token bucket as the default with one sentence on when you'd switch to sliding-window log ("strict per-second SLA, low key cardinality").
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

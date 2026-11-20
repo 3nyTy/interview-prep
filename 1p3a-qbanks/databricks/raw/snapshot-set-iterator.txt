@@ -1,0 +1,635 @@
+===H1===
+Snapshot Set / MVCC Iterator
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/snapshot-set-iterator
+===BODY===
+Databricks
+Coding·55 minMembers
+Snapshot Set / MVCC Iterator
+Implement a set or key-value structure with snapshot reads. Values retain version history by snapshot id, and an iterator returns a consistent snapshot view.
+SWE
+snapshot
+mvcc
+iterator
+data-structure
+medium
+Frequency
+Medium
+Last asked
+2026-07-26
+Stage
+phone-screen
+Problem Statement
+
+Design a data structure called SnapshotSet<T>. This is like a normal set, but it has a special feature: snapshot-based iterators.
+
+The main rule is simple: When you ask for an iterator, it must take a read-only picture (snapshot) of the set at that exact moment. If you add or remove items from the set after creating the iterator, the iterator should not see those changes.
+
+Methods to Implement
+
+You need to write code for these four methods:
+
+add(x): Put element x into the set. If it is already there, do nothing.
+
+remove(x): Take element x out of the set. If it is not there, do nothing.
+
+contains(x): Return true if x is in the set right now, false if it is not.
+
+iterator(): Return an object that loops through the items in the current snapshot.
+
+Rules for the Iterator
+
+Snapshot Isolation: The iterator remembers the set exactly as it was when created.
+
+Insertion Order: It must return items in the order they were first added.
+
+Immutable View: Changes made later (using add or remove) must not change what the iterator sees.
+
+Standard Interface: It needs hasNext() (is there more?) and next() (get the next item).
+
+Note: The contains() method always checks the real-time state of the set, not the snapshot.
+
+Usage Example
+
+# Start with elements [1, 2, 3]
+ss = SnapshotSet([1, 2, 3])
+
+# Add element 4. Set is now {1, 2, 3, 4}
+ss.add(4)
+
+# Create the first iterator. It freezes the state: {1, 2, 3, 4}
+iter1 = ss.iterator()
+print(iter1.next())            # Output: 1
+print(iter1.next())            # Output: 2
+
+# Remove 3 from the real set. Real set is now {1, 2, 4}
+ss.remove(3)
+
+# The iterator ignores the removal. It still sees the old snapshot.
+print(iter1.next())            # Output: 3 (Still here!)
+print(iter1.next())            # Output: 4
+
+# Create a second iterator. It sees the new state: {1, 2, 4}
+iter2 = ss.iterator()
+
+# Add 6 to the real set. Real set is now {1, 2, 4, 6}
+ss.add(6)
+
+# iter2 sees its own snapshot. It does not see 6.
+print(iter2.next())            # Output: 1
+print(iter2.next())            # Output: 2
+print(iter2.next())            # Output: 4
+print(iter2.hasNext())         # Output: False (6 is not included)
+
+# contains() always checks the real set
+print(ss.contains(3))          # Output: False (It was removed)
+print(ss.contains(6))          # Output: True (It was added)
+
+Technical Constraints
+
+Items can be compared and hashed.
+
+Number of operations is up to 10^5.
+
+Operations should be fast. Avoid O(n) if possible.
+
+Multiple iterators might run at the same time.
+
+Iterators might be at different stages.
+
+Solution 1: Basic Copying Strategy
+
+The Logic
+
+The easiest way to solve this is to copy the entire list every time someone asks for an iterator.
+
+Keep a main list of items to track the order.
+
+When iterator() is called, make a deep copy of that list.
+
+The iterator loops through this new copy, not the original list.
+
+Time Complexity
+
+add(): O(1) (on average).
+
+remove(): O(n) (removing from a list takes time to shift elements).
+
+contains(): O(1).
+
+iterator(): O(n) (copying the whole list takes time).
+
+Space Complexity
+
+O(k × n): You store a full copy for every active iterator.
+
+k = number of iterators.
+
+n = size of the set.
+
+This uses a lot of memory if you have many iterators.
+
+Code Implementation
+
+from typing import TypeVar, Generic, Iterator as TypingIterator
+
+T = TypeVar('T')
+
+class SnapshotSet(Generic[T]):
+    def __init__(self, initial_elements: list[T] = None):
+        """Start the set, optionally with items."""
+        self._elements = []  # Keeps insertion order
+        self._element_set = set()  # Helps check contains() fast
+
+        if initial_elements:
+            for elem in initial_elements:
+                self.add(elem)
+
+    def add(self, x: T) -> None:
+        """Add x to the set."""
+        if x not in self._element_set:
+            self._elements.append(x)
+            self._element_set.add(x)
+
+    def remove(self, x: T) -> None:
+        """Remove x from the set."""
+        if x in self._element_set:
+            self._element_set.remove(x)
+            self._elements.remove(x)  # This is O(n)
+
+    def contains(self, x: T) -> bool:
+        """Is x in the set right now?"""
+        return x in self._element_set
+
+    def iterator(self):
+        """Get an iterator for the current state."""
+        # Make a full copy of the list
+        snapshot = list(self._elements)
+        return self._SimpleIterator(snapshot)
+
+    class _SimpleIterator:
+        """Helper class to loop through the copy."""
+        def __init__(self, elements: list):
+            self.elements = elements
+            self.index = 0
+
+        def next(self) -> T:
+            """Get the next item."""
+            if self.index >= len(self.elements):
+                raise StopIteration("No more elements")
+            result = self.elements[self.index]
+            self.index += 1
+            return result
+
+        def hasNext(self) -> bool:
+            """Are there more items?"""
+            return self.index < len(self.elements)
+
+        def __iter__(self):
+            return self
+
+        def __next__(self) -> T:
+            """Python built-in support."""
+            return self.next()
+
+# Quick Test
+ss = SnapshotSet([1, 2, 3])
+ss.add(4)
+
+iter1 = ss.iterator()
+print(iter1.next())  # 1
+print(iter1.next())  # 2
+
+ss.remove(3)
+print(iter1.next())  # 3 (still in the snapshot copy)
+print(iter1.next())  # 4
+
+iter2 = ss.iterator()
+ss.add(6)
+print(iter2.next())  # 1 (new snapshot has 1, 2, 4)
+
+Why this might fail
+
+Too much memory: If the set is huge, copying it many times crashes the memory.
+
+Slow creation: Copying a large list takes too long.
+
+Solution 2: Tracking Changes (Single Iterator)
+
+The Logic
+
+This method works best if you only have one iterator active at a time.
+
+Main Set: Holds the base data.
+
+Pending Lists: When an iterator is running, we do not touch the Main Set. Instead, we put new adds/removes into "Pending" lists.
+
+Cleanup: When the iterator is done, we apply the pending changes to the Main Set.
+
+How it Works
+
+Start Iterator: Mark the system as "busy". Create a copy for the iterator.
+
+During Iteration:
+
+add(x): Put it in Pending Adds.
+
+remove(x): Put it in Pending Removes.
+
+contains(x): Check Main Set OR Pending Adds (but ignore Pending Removes).
+
+End Iterator: Update Main Set with the pending items. Clear the pending lists.
+
+Time Complexity
+
+add(): O(1) (just add to pending list).
+
+remove(): O(1) (just add to pending remove set).
+
+contains(): O(1).
+
+iterator(): O(n) (still copies the main list).
+
+Cleanup: O(m × n) (applying changes can be slow in worst case).
+
+Space Complexity
+
+O(n + m): Much better than Solution 1 because we only store the differences (m) while the iterator runs.
+
+Code Implementation
+
+from typing import TypeVar, Generic, Iterator as TypingIterator
+
+T = TypeVar('T')
+
+class SnapshotSetOptimized(Generic[T]):
+    def __init__(self, initial_elements: list[T] = None):
+        """Start the set."""
+        self._main_elements = []  # Main list
+        self._main_set = set()  # Main lookup set
+
+        # Lists to hold changes while iterating
+        self._pending_adds = []
+        self._pending_adds_set = set()
+        self._pending_removes_set = set()
+
+        self._iterator_active = False
+
+        if initial_elements:
+            for elem in initial_elements:
+                self.add(elem)
+
+    def add(self, x: T) -> None:
+        """Add x."""
+        if self._iterator_active:
+            # If busy, add to pending list
+            if (x not in self._main_set and
+                x not in self._pending_adds_set):
+                self._pending_adds.append(x)
+                self._pending_adds_set.add(x)
+            # If we planned to remove it, cancel that removal
+            if x in self._pending_removes_set:
+                self._pending_removes_set.remove(x)
+        else:
+            # Not busy? Add directly.
+            if x not in self._main_set:
+                self._main_elements.append(x)
+                self._main_set.add(x)
+
+    def remove(self, x: T) -> None:
+        """Remove x."""
+        if self._iterator_active:
+            # If busy, just mark it for removal
+            if x in self._main_set:
+                self._pending_removes_set.add(x)
+            # If it was in pending adds, remove it from there
+            if x in self._pending_adds_set:
+                self._pending_adds_set.remove(x)
+                self._pending_adds.remove(x)
+        else:
+            # Not busy? Remove directly.
+            if x in self._main_set:
+                self._main_set.remove(x)
+                self._main_elements.remove(x)
+
+    def contains(self, x: T) -> bool:
+        """Check real-time state."""
+        # It's here if in main OR pending add, UNLESS pending remove
+        if x in self._pending_removes_set:
+            return False
+        return x in self._main_set or x in self._pending_adds_set
+
+    def iterator(self) -> TypingIterator[T]:
+        """Get snapshot iterator."""
+        if self._iterator_active:
+            # Simplified rule: Only one iterator at a time
+            raise RuntimeError("Previous iterator must complete first")
+
+        self._iterator_active = True
+        return self._SnapshotIterator(self)
+
+    class _SnapshotIterator:
+        """Iterator that freezes state."""
+        def __init__(self, parent: 'SnapshotSetOptimized'):
+            self.parent = parent
+            self.snapshot = list(parent._main_elements)  # Copy main list
+            self.index = 0
+
+        def __iter__(self):
+            return self
+
+        def next(self) -> T:
+            """Get next item."""
+            if self.index >= len(self.snapshot):
+                # Done iterating, update the parent set now
+                self._finalize()
+                raise StopIteration("No more elements")
+
+            result = self.snapshot[self.index]
+            self.index += 1
+
+            # If we just read the last item, finalize immediately
+            if self.index >= len(self.snapshot):
+                self._finalize()
+
+            return result
+
+        def __next__(self) -> T:
+            """Python support."""
+            return self.next()
+
+        def hasNext(self) -> bool:
+            """Are there more items?"""
+            has_more = self.index < len(self.snapshot)
+            if not has_more:
+                self._finalize()
+            return has_more
+
+        def _finalize(self):
+            """Apply all pending changes to the main set."""
+            if not self.parent._iterator_active:
+                return  # Already done
+
+            # Apply removes
+            for elem in self.parent._pending_removes_set:
+                if elem in self.parent._main_set:
+                    self.parent._main_set.remove(elem)
+                    self.parent._main_elements.remove(elem)
+
+            # Apply adds
+            for elem in self.parent._pending_adds:
+                if elem not in self.parent._main_set:
+                    self.parent._main_elements.append(elem)
+                    self.parent._main_set.add(elem)
+
+            # Clear buffers
+            self.parent._pending_adds.clear()
+            self.parent._pending_adds_set.clear()
+            self.parent._pending_removes_set.clear()
+            self.parent._iterator_active = False
+
+# Usage Example
+ss = SnapshotSetOptimized([1, 2, 3])
+ss.add(4)
+
+iter1 = ss.iterator()
+print(iter1.next())  # 1
+print(iter1.next())  # 2
+
+ss.remove(3)  # Waits in pending list
+print(iter1.next())  # 3 (still visible)
+print(iter1.next())  # 4
+
+# Iterator finishes, updates happen now.
+# Main set is now {1, 2, 4}
+
+iter2 = ss.iterator()
+ss.add(6)  # Waits in pending list
+
+print(iter2.next())  # 1
+print(iter2.next())  # 2
+print(iter2.next())  # 4
+# Iterator finishes, 6 is added to Main Set
+
+Solution 3: Version Control (Best for Concurrency)
+
+The Logic
+
+To handle many iterators at once, we use version numbers (like Git or Database transactions).
+
+Version Counter: Start at version 0. Increase it every time an iterator is created.
+
+Element History: Every element remembers:
+
+When it was Added.
+
+When it was Removed.
+
+Visibility: An iterator with Version V only sees items that:
+
+Were added at or before version V.
+
+Were NOT removed (or removed after version V).
+
+Data Structure
+
+We store each element like this:
+
+Element {
+    value: T
+    added_version: int
+    removed_version: int | None  # None means it is still there
+    insertion_order: int
+}
+
+Time Complexity
+
+add(): O(1).
+
+remove(): O(1) (just update the "removed_version").
+
+contains(): O(1).
+
+iterator(): O(n log n) (We must filter items and sort them by insertion order).
+
+next(): O(1).
+
+Space Complexity
+
+O(n + m):
+
+n = total items ever added.
+
+m = removed items that we keep in memory for old iterators.
+
+Code Implementation
+
+from typing import TypeVar, Generic, Optional, Iterator as TypingIterator
+
+T = TypeVar('T')
+
+class VersionedSnapshotSet(Generic[T]):
+    def __init__(self, initial_elements: list[T] = None):
+        """Start with version 0."""
+        self._version = 0
+        self._insertion_order = 0
+
+        # Map: element -> (added_version, removed_version, order)
+        self._elements: dict[T, tuple[int, Optional[int], int]] = {}
+
+        if initial_elements:
+            for elem in initial_elements:
+                self.add(elem)
+
+    def add(self, x: T) -> None:
+        """Add x."""
+        if x not in self._elements:
+            # New element
+            self._elements[x] = (self._version, None, self._insertion_order)
+            self._insertion_order += 1
+        else:
+            added_ver, removed_ver, order = self._elements[x]
+            if removed_ver is not None:
+                # Re-adding a removed element. Update versions.
+                self._elements[x] = (self._version, None, order)
+
+    def remove(self, x: T) -> None:
+        """Remove x."""
+        if x in self._elements:
+            added_ver, removed_ver, order = self._elements[x]
+            if removed_ver is None:  # If currently present
+                # Mark as removed at current version
+                self._elements[x] = (added_ver, self._version, order)
+
+    def contains(self, x: T) -> bool:
+        """Check real-time state."""
+        if x not in self._elements:
+            return False
+        added_ver, removed_ver, order = self._elements[x]
+        return removed_ver is None
+
+    def iterator(self) -> TypingIterator[T]:
+        """Get versioned iterator."""
+        snapshot_version = self._version
+        self._version += 1  # Next iterator gets a new version
+        return self._VersionedIterator(self, snapshot_version)
+
+    class _VersionedIterator:
+        """Iterator seeing a specific version."""
+        def __init__(self, parent: 'VersionedSnapshotSet', version: int):
+            self.parent = parent
+            self.version = version
+
+            # Find items visible to this version
+            visible = []
+            for elem, (added_ver, removed_ver, order) in parent._elements.items():
+                # Logic: Added BEFORE now, and (Not removed OR removed LATER)
+                if added_ver <= version:
+                    if removed_ver is None or removed_ver > version:
+                        visible.append((order, elem))
+
+            # Sort to match original insertion order
+            visible.sort()
+            self.snapshot = [elem for order, elem in visible]
+            self.index = 0
+
+        def __iter__(self):
+            return self
+
+        def next(self) -> T:
+            """Get next item."""
+            if self.index >= len(self.snapshot):
+                raise StopIteration("No more elements")
+            result = self.snapshot[self.index]
+            self.index += 1
+            return result
+
+        def __next__(self) -> T:
+            """Python support."""
+            return self.next()
+
+        def hasNext(self) -> bool:
+            """Any more items?"""
+            return self.index < len(self.snapshot)
+
+# Usage Example with Multiple Iterators
+ss = VersionedSnapshotSet([1, 2, 3])
+ss.add(4)
+
+iter1 = ss.iterator()  # Version 0: sees {1, 2, 3, 4}
+print(iter1.next())    # 1
+print(iter1.next())    # 2
+
+ss.remove(3)           # Remove happens at Version 0 (stored for Version 1+)
+iter2 = ss.iterator()  # Version 1: sees {1, 2, 4}
+
+print(iter1.next())    # 3 (iter1 still sees it because of version logic)
+print(iter2.next())    # 1 (iter2 skips it)
+
+ss.add(6)
+iter3 = ss.iterator()  # Version 2: sees {1, 2, 4, 6}
+
+# All three iterators work at the same time
+print(iter1.next())    # 4
+print(iter2.next())    # 2
+print(iter3.next())    # 1
+
+Bonus Question 1: Cleaning Up Memory
+
+Question: In Solution 3, removed items stay in memory forever. How do we delete them safely?
+
+Answer: We need "Garbage Collection."
+
+Check which versions of iterators are currently alive.
+
+Find the oldest active version.
+
+If an item was removed before that oldest version, no one can see it anymore. We can safely delete it from memory.
+
+Bonus Question 2: Using Persistent Data Structures
+
+Question: How can we share memory between snapshots efficiently without copying lists?
+
+Answer: Use a Persistent Tree (like a HAMT).
+
+When you change the set, you don't copy the whole tree.
+
+You only copy the path to the node you changed.
+
+The rest of the tree is shared between the old version and the new version.
+
+This is how languages like Clojure handle data. It is very memory efficient.
+
+Bonus Question 3: Making it Thread-Safe
+
+Question: How do we handle multiple threads using this?
+
+Answer:
+
+Reading is safe: Since snapshots are read-only (immutable), many threads can read at the same time without issues.
+
+Writing needs locks: Use a lock when updating the global version number or the element map to prevent conflicts.
+
+Edge Cases
+
+Empty Set: The iterator should just return nothing without crashing.
+
+Adding Duplicates: Should not change the order or add the item twice.
+
+Removing Missing Items: Should do nothing (no error).
+
+Re-adding Removed Items: The item comes back, but usually with a new "Added Version."
+
+Summary & Takeaways
+
+Trade-offs: Copying everything (Solution 1) is simple but slow. Tracking changes (Solution 2/3) is complex but fast.
+
+Versions: Using version numbers is the standard way to handle "Time Travel" queries (like seeing the set as it was in the past).
+
+Real World: This is very similar to how databases use MVCC (Multi-Version Concurrency Control) to let people read data while others are writing to it.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

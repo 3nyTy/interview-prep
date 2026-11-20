@@ -1,0 +1,549 @@
+===H1===
+Design Messenger
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/messenger-design
+===BODY===
+Uber
+System DesignMembers
+Design Messenger
+Design a Messenger-like 1-to-1 chat system similar to Facebook Messenger or WhatsApp, supporting near-real-time delivery, conversation history, offline delivery, and message status (accepted / delivered / read). A common follow-up pushes on whether Redis can really handle the routing throughput and on the exact checkmark semantics.
+SWE
+system-design
+chat
+messaging
+websocket
+kafka
+redis
+presence
+idempotency
+read-receipts
+Frequency
+Low
+Last asked
+2026-06-21
+Stage
+onsite-system-design
+Design Messenger
+
+Problem Statement
+
+Design a Messenger-like 1-to-1 chat system similar to Facebook Messenger or WhatsApp.
+
+At minimum, the system should support:
+
+sending and receiving text messages in near real time
+
+storing conversation history
+
+delivering messages to offline users when they reconnect
+
+showing message status clearly in the UI
+
+A common variant adds explicit checkmark semantics:
+
+one checkmark when the server has accepted the message
+
+two checkmarks when the recipient has read the message
+
+In practice, many chat products separate accepted, delivered, and read. A strong answer starts by clarifying which semantics are wanted, then designs the receipt pipeline accordingly. Clarify scope first: 1-to-1 only or group chat, permanent storage or temporary retention, and whether "double checkmark" means delivered or read.
+
+Phase 1: Requirements (~5 minutes)
+
+Functional Requirements
+
+Send messages: A user can send a text message to another user.
+
+Receive messages in near real time: Online recipients should receive messages quickly through a persistent connection.
+
+Store conversation history: Users can fetch recent and historical messages in a conversation.
+
+Support offline delivery: If the recipient is offline, the message is stored and delivered when they reconnect.
+
+Track message status: The sender sees whether a message was accepted by the server, delivered to the recipient device, and read by the recipient.
+
+Start with 1-to-1 messaging only. Group chat, media attachments, reactions, typing indicators, and end-to-end encryption are natural extensions, but they are below the line unless scope is explicitly broadened.
+
+Non-Functional Requirements
+
+RequirementTargetWhy it matters
+Scale200M DAU, 4B messages/dayLarge enough to require a distributed design
+LatencyP95 under 500ms for online deliveryMessaging should feel real time
+Availability99.99%Users expect chat to work constantly
+OrderingPreserve per-conversation orderConversations must remain readable
+DurabilityNo confirmed message lossA sent checkmark must mean something
+ConsistencyStrong within a conversation, eventual across replicas/regionsThe key trade-off for chat
+
+Clarifying Questions
+
+These are the questions worth asking up front:
+
+Is this only 1-to-1 chat?
+Assume yes unless group fan-out is requested.
+
+How should checkmarks work?
+Clarify whether:
+
+one check = server accepted
+
+two checks = delivered
+
+read is a separate state
+Or whether the simplified variant where two checks mean read is wanted.
+
+Do we need multi-device support?
+Assume yes. Users often have phone plus desktop/web, and this affects delivery semantics.
+
+How long do we store messages?
+For this design, assume durable history instead of WhatsApp's shorter server-side retention model.
+
+Capacity Estimation
+
+Assumptions:
+- 200M daily active users
+- 20 messages sent per user per day
+- 4B messages/day
+
+Average message rate:
+- 4B / 86,400 ~= 46,000 messages/second
+
+Peak message rate:
+- Assume 5x burst over average
+- Peak ~= 230,000 messages/second
+
+Connections:
+- Assume 10% of DAU online at peak
+- 200M * 10% = 20M concurrent connections
+
+Storage:
+- Average text message payload + metadata ~= 300 bytes
+- 4B * 300 bytes = 1.2 TB/day raw
+- ~= 438 TB/year before replication/compression
+
+Status events:
+- Delivery and read receipts are separate write streams
+- Design for another 200,000+ status updates/second during peaks
+
+The important insight is that message status is not free. Once you add accepted, delivered, and read semantics, the receipt pipeline can approach message-write volume.
+
+Phase 2: Data Model (~5 minutes)
+
+Core Entities
+
+User {
+  user_id: UUID
+  display_name: String
+  created_at: Timestamp
+}
+
+DeviceSession {
+  device_id: UUID
+  user_id: UUID
+  device_type: Enum (ios, android, web, desktop)
+  gateway_id: String
+  connection_id: String
+  last_heartbeat_at: Timestamp
+}
+
+Conversation {
+  conversation_id: UUID
+  participant_a: UUID
+  participant_b: UUID
+  last_sequence_number: Long
+  updated_at: Timestamp
+}
+
+Message {
+  message_id: UUID
+  conversation_id: UUID
+  sender_id: UUID
+  client_message_id: String
+  sequence_number: Long
+  body: String
+  accepted_at: Timestamp
+}
+
+MessageDelivery {
+  message_id: UUID
+  device_id: UUID
+  delivered_at: Timestamp | null
+}
+
+ConversationReadCursor {
+  conversation_id: UUID
+  user_id: UUID
+  last_read_sequence: Long
+  updated_at: Timestamp
+}
+
+Key Modeling Decisions
+
+Use per-conversation sequence numbers
+Ordering by timestamp alone is unsafe because of clock skew and retries. A server-assigned sequence_number per conversation is the cleanest answer.
+
+Keep delivery and read separate
+Delivery is per device. Read is better modeled as a high-water mark like last_read_sequence.
+
+Support idempotent sends
+client_message_id should be unique per sender per conversation so a reconnecting client can retry safely without duplicating the message.
+
+Storage Choices
+
+Message store: Cassandra, ScyllaDB, or DynamoDB-style wide-column storage keyed by conversation_id
+
+Kafka / durable log: asynchronous delivery pipeline, replay, analytics, backfill
+
+Redis cluster: hot ephemeral state such as user presence, user_id -> active gateway/device sessions, and optionally lightweight fan-out metadata
+
+Relational store: account metadata and slower-changing conversation metadata if needed
+
+This is the exact place to be precise about Redis. Redis is useful for hot routing state because reads and writes are tiny and in-memory. It should not be presented as the only durable source of truth for message history.
+
+Phase 3: API Design (~5 minutes)
+
+Protocol Choice
+
+WebSocket for real-time bidirectional messaging
+
+REST for conversation list and paginated message history
+
+Kafka/internal async events for downstream delivery, notifications, analytics, and receipts
+
+WebSocket Commands
+
+Client → Server
+
+{
+  "action": "send_message",
+  "conversation_id": "conv_123",
+  "client_message_id": "local_456",
+  "body": "hello"
+}
+
+{
+  "action": "delivery_ack",
+  "message_id": "msg_789"
+}
+
+{
+  "action": "read_receipt",
+  "conversation_id": "conv_123",
+  "last_read_sequence": 42
+}
+
+Server → Client
+
+{
+  "event": "message_accepted",
+  "message_id": "msg_789",
+  "conversation_id": "conv_123",
+  "sequence_number": 42,
+  "accepted_at": "2025-10-12T18:10:00Z"
+}
+
+{
+  "event": "new_message",
+  "message_id": "msg_789",
+  "conversation_id": "conv_123",
+  "sender_id": "user_1",
+  "sequence_number": 42,
+  "body": "hello"
+}
+
+{
+  "event": "message_status",
+  "message_id": "msg_789",
+  "status": "delivered"
+}
+
+{
+  "event": "message_status",
+  "message_id": "msg_789",
+  "status": "read",
+  "last_read_sequence": 42
+}
+
+REST Endpoints
+
+GET /v1/conversations?cursor=...&limit=20
+
+GET /v1/conversations/{conversation_id}/messages?before_sequence=42&limit=50
+
+POST /v1/sync
+
+{
+  "cursors": [
+    { "conversation_id": "conv_123", "last_seen_sequence": 120 }
+  ]
+}
+
+The sender should receive the first acknowledgement only after the message is durably accepted. That is what makes the single checkmark trustworthy.
+
+Phase 4: High-Level Design (~15-25 minutes)
+
+End-to-End Flow
+
+1. Connection establishment
+
+When a user opens the app, the client authenticates and opens a WebSocket to a chat gateway.
+
+The gateway writes a short-lived record into Redis:
+
+user_id -> [gateway_id, connection_id, device_id]
+
+This data is ephemeral and TTL-based. If a gateway dies, the key expires or is refreshed by reconnect.
+
+2. Sending a message
+
+When the sender transmits a message:
+
+The gateway authenticates the user and validates the conversation.
+
+The chat service checks idempotency using client_message_id.
+
+The chat service assigns the next sequence_number for that conversation.
+
+The chat service atomically persists:
+
+the message in the durable message store
+
+an outbox record saying message_created still needs to be published
+
+The sender receives message_accepted.
+
+A background publisher reads the outbox and publishes message_created to Kafka.
+
+That message_accepted event is the cleanest implementation of the single checkmark.
+
+Do not acknowledge the sender after only an in-memory write or before the message is durably persisted. Otherwise a crash can create a false checkmark and lose the message.
+
+3. Delivering to online recipients
+
+The delivery worker consumes message_created events from Kafka.
+
+It looks up the recipient's active device sessions in Redis and forwards the message to the owning gateway(s). The gateway pushes the message over WebSocket to the recipient devices. Because the gateway already knows the authenticated session and device binding, the client does not need to declare a device_id inside every ACK.
+
+If at least one recipient device acknowledges receipt:
+
+the receipt service persists delivered_at
+
+a message_delivered event is emitted
+
+the sender receives a status update
+
+If double checkmarks = delivered, stop here for that state.
+
+4. Offline delivery
+
+If the recipient has no active session in Redis:
+
+the durable message stays in the message store
+
+the system optionally sends a push notification
+
+on reconnect, the client calls the sync/history endpoint and fetches missed messages since its last known sequence
+
+This is why Redis cannot be the only queue. Offline messages must survive gateway crashes and long disconnects.
+
+5. Read receipts
+
+When the recipient opens the conversation and renders messages up to sequence N, the client sends:
+
+{
+  "action": "read_receipt",
+  "conversation_id": "conv_123",
+  "last_read_sequence": 42
+}
+
+The receipt service updates the recipient's read cursor and emits a message_read event. The sender UI can then show:
+
+accepted
+
+delivered
+
+read
+
+If the simplified prompt is used where two checkmarks = read, call that out explicitly and collapse the visible UI state machine.
+
+Why This Design Works
+
+Gateways are mostly stateless: easy to scale horizontally
+
+Redis handles hot routing state: fast lookup of where a user is currently connected
+
+Kafka decouples durable creation from asynchronous delivery
+
+Message store plus outbox protects the write-to-publish handoff
+
+Per-conversation sequencing preserves ordering
+
+Phase 5: Scaling & Trade-offs (~15-20 minutes)
+
+1. Ordering guarantees
+
+The right guarantee is ordering within a conversation, not global ordering across the whole system.
+
+Practical approach:
+
+partition by conversation_id
+
+route all writes for a conversation to the same logical shard
+
+assign sequence numbers on that shard
+
+This avoids cross-shard coordination on every message.
+
+Do not claim "messages are ordered by timestamp." This is usually challenged because clocks skew, retries happen, and multiple servers can write concurrently.
+
+2. Durable write vs event publish
+
+One subtle failure mode in chat systems is:
+
+write message to the database
+
+crash before publishing the message_created event
+
+If you already showed a server-accepted checkmark, that is now a correctness bug.
+
+The clean answer is to use either:
+
+a transactional outbox stored alongside the message write
+
+or a log-first architecture where Kafka itself is the durable entry point and downstream storage is derived from it
+
+The transactional outbox is usually easier to explain because it preserves the "ACK only after durable persistence" rule without hand-waving over exactly-once semantics.
+
+3. How to justify Redis throughput
+
+A likely follow-up, so answer it directly:
+
+Redis is not storing all messages forever.
+
+Redis is serving small, hot lookups like presence and active gateway mapping.
+
+The load is distributed across a Redis cluster, not a single node.
+
+Each send usually becomes:
+
+one durable write to the message store
+
+one Kafka event
+
+one small Redis lookup for recipient session routing
+
+At 230K peak messages/sec, if each message needs a few small in-memory ops spread across many shards, this is very different from asking one Redis instance to durably persist 230K full messages/sec forever.
+
+If Redis is still disliked, you can adapt:
+
+keep Redis only for presence/session discovery
+
+use Kafka for inter-gateway delivery fan-out
+
+keep delivery receipts in the main durable store
+
+That flexibility is usually more important than defending one specific technology.
+
+4. Multi-device delivery semantics
+
+You need to define what "delivered" means:
+
+Any-device delivered: mark delivered when one recipient device ACKs
+
+All-active-devices delivered: stricter but more expensive
+
+Any-device delivered is the simpler and more product-friendly default.
+
+For reads, use a per-user high-water mark rather than per-message read rows.
+
+5. Failure handling
+
+Gateway failure
+
+Clients reconnect through the load balancer
+
+Redis session entries expire or are replaced
+
+Missed messages are recovered from the durable store using the sync API
+
+Kafka consumer lag
+
+Online delivery may degrade slightly
+
+Messages are still accepted and stored durably
+
+The system can catch up asynchronously
+
+Redis failure
+
+Presence and routing may be briefly stale
+
+Message durability is unaffected because Redis is not the source of truth
+
+Fallback can degrade to reconnect + sync from the store until presence is rebuilt
+
+6. Regional architecture
+
+At larger scale, place users in a home region and keep each conversation's write leader in one region.
+
+Trade-off:
+
+better ordering and simpler write path if one conversation has a single primary region
+
+slightly higher latency for cross-region chats
+
+At global scale, preserve ordering within a conversation by pinning it to a home shard and asynchronously replicating elsewhere for DR and faster history reads.
+
+7. Observability and abuse prevention
+
+Track:
+
+message acceptance latency
+
+online delivery latency
+
+sync catch-up latency
+
+receipt lag
+
+Kafka lag and retry rates
+
+reconnect storm rates after outages
+
+Add rate limits for:
+
+message sends per user/device
+
+connection churn
+
+read-receipt floods from buggy clients
+
+Common Pitfalls
+
+Using Redis as the only durable message store. This is the wrong place to put long-term chat history or offline guarantees.
+
+Not clarifying the checkmark semantics. "Accepted", "delivered", and "read" are different states with different storage and acknowledgement rules.
+
+Acknowledging before durable persistence. If the sender sees a checkmark before the message is durably recorded, a crash can create visible data loss.
+
+Skipping idempotency. Without client_message_id, retries can duplicate messages after flaky network reconnects.
+
+Designing global total ordering. That is expensive and unnecessary. Per-conversation ordering is the right target.
+
+Summary
+
+AreaRecommended answer
+Core protocolWebSocket for real-time delivery, REST for sync/history
+Durable source of truthWide-column message store keyed by conversation_id
+Async backboneKafka
+Hot stateRedis cluster for presence and session routing
+OrderingPer-conversation sequence numbers
+ReceiptsAccepted after durable write, delivered on device ACK, read via high-water mark
+
+If you only have time for one strong deep dive, pick this one: explain why the system ACKs the sender after a durable write, but performs recipient delivery asynchronously. That shows good judgment on durability, latency, and user-visible semantics.
+
+Senior onsite version pushed specifically on communication details: justify the realtime stack, routing layer, and why the chosen protocol fits the delivery semantics.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

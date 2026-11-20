@@ -1,0 +1,150 @@
+===H1===
+Chat system similar to Slack
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/slack-chat-system
+===BODY===
+Databricks
+System DesignMembers
+Chat system similar to Slack
+Design a Slack-like chat system from APIs through storage. Deep dives include message and conversation deletion for online and offline users, cache placement and partitioning, cache-miss behavior, and application-memory versus shared-cache trade-offs.
+SWE
+chat
+messaging
+system-design
+medium
+Frequency
+Medium
+Last asked
+2026-07-30
+Stage
+phone-screen · onsite-system-design
+The Challenge
+
+Design a chat system like Slack. Users should be able to send and receive messages in channels. The system needs standard messaging features, but the main goal is to design how to delete messages and conversations correctly.
+
+Core Features
+
+Users can chat in conversations or channels.
+
+Users can delete specific messages.
+
+Users can delete whole conversations.
+
+Important: If a user deletes a conversation, it must disappear for everyone (both online and offline users).
+
+The system must work for users currently online and users who are offline.
+
+Questions for the Interviewer
+
+It is important to ask these questions early to understand what to build:
+
+Latency Needs: Do messages need to arrive instantly (Real-time)? Or is a small delay okay (Eventual Consistency)? This tells you if you need WebSockets or if simple polling is enough.
+
+Scale: How many users are there? How many messages are sent per second?
+
+Deletion Rules: When a conversation is deleted for everyone, should we keep a record (audit log), or is it deleted forever (hard delete)?
+
+Offline Sync: How long should we save deletion data for offline users? What if a user is offline for months?
+
+Delivery Guarantees: Do we need to guarantee that offline users receive messages and deletion updates?
+
+Mistakes to Avoid
+
+Making it too complex: Don't use WebSockets immediately. Ask about Latency first. If speed isn't the top priority, simpler methods are better.
+
+Ignoring the main goal: This problem is about deletion. Don't spend all your time designing basic chat features.
+
+Forgetting offline users: Deleting items for online users is different than for offline users. You need a plan for both.
+
+Recommended Resource
+
+For a clear explanation of how to design a chat system, watch this video:
+
+System Design: Design a Chat System
+
+This video explains the basic architecture, data models, and how to scale a chat app like WhatsApp.
+
+Candidates' Stories
+
+Story 1: Keep It Simple
+
+What happened: The candidate spent too much time talking about WebSockets for real-time chat. However, the interviewer wanted to know how to handle message and conversation deletion. The candidate failed because they focused on the wrong topic.
+
+Lesson: Don't assume you need real-time speed. Ask about Latency requirements first. If the interviewer doesn't need millisecond speed, use a simpler polling system. Save your energy for the part the interviewer cares about: the deletion logic.
+
+Story 2: Handling Online and Offline Users
+
+What happened: The interviewer wanted to see how the candidate handles deletion for both online and offline users. This is a main requirement, not a small detail. Online users get updates fast, but offline users are harder to sync.
+
+Lesson: Treat deletion as a top priority. You need two separate plans:
+
+Online users: Push deletion events to them immediately.
+
+Offline users: Keep a log of deletion events. Sync this when they come back online.
+
+The hard part is Eventual Consistency—making sure an offline user sees the conversation disappear when they reconnect later.
+
+Story 3: Listen to Your Interviewer
+
+What happened: Different interviewers want different things. One might care about Scalability, while another cares about deletion logic.
+
+Lesson: Spend the first 5-10 minutes talking to the interviewer. Clarify the requirements and see what they are interested in.
+
+If they say "let's move on," stop talking about that part.
+
+If they ask follow-up questions, go deeper into that topic.
+
+If they change the subject, follow their lead.
+
+There is no single "right" answer. The right approach is solving what this specific interviewer is asking for.
+
+Story 4: The Hardest Part
+
+What happened: The main challenge is that when one user deletes a conversation, it must vanish for all participants, not just the person who deleted it.
+
+Lesson: This creates specific technical problems:
+
+For online users:
+
+They need to know immediately.
+
+If they are typing or reading, the UI must handle the deletion gracefully.
+
+For offline users:
+
+Do not hard-delete the conversation from the database immediately. Offline users need to know it was removed.
+
+Use a Tombstone pattern: mark the item as deleted with metadata (who deleted it and when) instead of erasing it.
+
+When the user reconnects, sync the deletion event so their app removes the data locally.
+
+You must decide how long to keep Tombstone records.
+
+Race Conditions:
+
+User A deletes a conversation while User B is sending a message.
+
+Network issues: User A thinks it is deleted, but User B hasn't received the event yet.
+
+Syncing across multiple devices.
+
+What Interviewers Want to See
+
+Successful candidates did these things:
+
+Ask Questions: They checked Latency needs before suggesting WebSockets.
+
+Prioritize: They saw that deletion was the main challenge and focused on that instead of basic chat features.
+
+Handle User Status: They had clear plans for both online and offline users.
+
+Discuss Tradeoffs: They talked about using Tombstones versus hard deletes and how long to keep data.
+
+Listen: They changed their focus based on what the interviewer asked.
+
+The key is to treat deletion as a Distributed Systems problem (updating everyone correctly) rather than just a simple database delete.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

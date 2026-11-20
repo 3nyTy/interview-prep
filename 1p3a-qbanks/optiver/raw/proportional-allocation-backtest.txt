@@ -1,0 +1,80 @@
+===H1===
+Proportional Allocation Strategy Backtest
+===URL===
+https://www.1point3acres.com/interview/problems/company/optiver/proportional-allocation-backtest
+===BODY===
+Optiver
+Coding·90 minMembers
+Proportional Allocation Strategy Backtest
+A HackerRank simulation: backtest a momentum strategy that allocates capital each day proportionally to the previous day's positive returns, then report the average daily log return and the standard deviation of daily log returns. Light on algorithms, heavy on careful bookkeeping.
+RS
+SWE
+DS
+simulation
+trading
+array
+oa
+medium
+Frequency
+High
+Last asked
+2026-08-08
+Stage
+oa
+Requirements
+
+You manage a fund and rebalance daily based on the previous day's return of each stock.
+
+Allocation rules:
+
+Invest in a stock only if its last return was positive; the amount is proportional to the size of that positive return.
+
+If a stock's return was negative or zero, invest nothing in it.
+
+If all stocks had non-positive returns, hold 100% cash for that period.
+
+Rebalance holdings daily according to the previous day's behavior.
+
+Input: an N × T array of end-of-day prices (N stocks, T days). You may trade fractional shares; no transaction costs.
+
+Output: a two-element array — [average daily log return, standard deviation of daily log returns] of the portfolio.
+
+# Complete 'BacktestStatistics(timeseries)' -> DOUBLE_ARRAY
+
+Examples
+
+Worked example given in the prompt: stocks A, B with $1M.
+
+Day 0: A=100, B=200 → returns unknown, stay in cash.
+
+Day 1: A=115 (+15%), B=210 (+5%) → allocate 3/4 to A ($750k), 1/4 to B ($250k).
+
+Day 2: A=117.3 (+2%), B=199.5 (−5%) → holdings worth $765k (A) and $237.5k (B); B's return is negative, so sell B and put everything ($1,002,500) into A.
+
+Compact OA example:
+
+Prices = [
+  [100, 115, 117.3],
+  [200, 210, 199.5]
+]
+Output: [0.00125, 0.00125]
+
+Notes
+
+No real algorithmic trick — the difficulty is bookkeeping: track per-day portfolio value, compute daily log returns of the portfolio (not the individual stocks), and only then take mean and standard deviation.
+
+Be careful with the cash days (no positive returns) — they contribute a 0% return, not a skipped day.
+
+Decide up front whether the standard deviation is population or sample; align with the expected output where the prompt pins it down.
+
+Preparation
+
+Write the simulation cleanly: previous-day returns → allocation weights → today's portfolio value → log return; accumulate into mean/variance.
+
+Test the all-negative (all-cash) path and a single-stock path separately, since those are the common edge cases.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

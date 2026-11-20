@@ -1,0 +1,49 @@
+===H1===
+OOD: Random Bingo Card Generator
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/bingo-card-generator
+===BODY===
+Uber
+Coding·60 minMembers
+OOD: Random Bingo Card Generator
+Onsite OOD coding round. Generate a random 3x9 Bingo board where each row has exactly 5 numbers and 4 blanks, each column is constrained to a decade range (1-10, 11-20, ...), and cells are filled probabilistically while keeping the row/column constraints feasible.
+SWE
+oop-design
+simulation
+sampling
+medium
+Frequency
+Single report
+Last asked
+2026-06-06
+Stage
+onsite-coding
+Requirements
+
+Generate a random Bingo board of fixed size 3 rows x 9 columns.
+
+Each row contains exactly 5 numbers and 4 blanks (zeros).
+
+Each column is constrained to a value range, left to right: column 0 holds 1-10, column 1 holds 11-20, column 2 holds 21-30, and so on.
+
+Fill the board cell by cell. When filling a cell, respect how many numbers / blanks the row already has, and choose probabilistically whether to place a number or a blank so that the per-row (5 numbers, 4 blanks) and per-column constraints all remain satisfiable.
+
+Notes
+
+The hard part is keeping the global constraints feasible while filling greedily: track the remaining numbers needed per row and remaining capacity, and bias each random choice so you never reach an infeasible state (e.g. a row that still needs 3 numbers but has only 2 unfilled cells left).
+
+Numbers within a column usually appear in increasing order top-to-bottom in standard Bingo — clarify whether ordering within a column is required.
+
+This belongs to a small family of Uber random-board OOD prompts (Bingo board, minesweeper board) where the signal is constraint-aware random generation, not the data structure itself.
+
+Preparation
+
+Implement the generator and verify by sampling many boards that every row has exactly 5 numbers and every column stays within its decade range.
+
+Practice the "remaining-need vs remaining-capacity" feasibility check so random choices never violate the row / column quotas.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

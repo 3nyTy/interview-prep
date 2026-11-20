@@ -1,0 +1,70 @@
+===H1===
+Word Search in 2D Grid
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/word-search-grid
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Word Search in 2D Grid
+Given an m×n board of characters and a target word, decide whether the word exists in the board as a path of horizontally or vertically adjacent cells, without reusing any cell. Bloomberg interviewers consistently push DFS over BFS here because BFS blows memory on long words.
+SWE
+dfs
+backtracking
+grid
+medium
+Frequency
+Low
+Last asked
+2026-01-01
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Given a 2-D board board[m][n] of lowercase letters and a word word, return true if word can be constructed by walking from cell to cell along the four cardinal directions (up / down / left / right) without revisiting any cell, and false otherwise.
+
+Function signature:
+
+boolean exist(char[][] board, String word)
+
+Follow-ups commonly drilled:
+
+Why is DFS preferred over BFS for this problem? (BFS must enqueue partial paths, which blows out memory on long words; DFS visits one path at a time and backtracks.)
+
+Implement the cell-visit bookkeeping in-place by marking visited cells with a sentinel character and restoring after the recursive call.
+
+Discuss time complexity: O(m * n * 4^L) worst case where L = word.length, since at each step there are up to 4 choices and the path can be of length L.
+
+Generalize to multiple words at once (Word Search II) and discuss when a trie buys you a real speed-up.
+
+Examples
+
+board = [['A','B','C','E'],
+         ['S','F','C','S'],
+         ['A','D','E','E']]
+word  = 'ABCCED'  -> true
+word  = 'SEE'    -> true
+word  = 'ABCB'   -> false (cannot reuse the 'B')
+
+Notes
+
+The canonical solution is DFS + backtracking. For each starting cell, descend matching characters in the word; mark the current cell visited (e.g. set it to '#'), recurse to the four neighbors with the next character, and restore the cell on the way out.
+
+The in-place visited marker is preferred over a separate boolean[][] for cache locality and simplicity; restoring it after recursion is the easiest place to introduce a bug.
+
+Pruning candidates: pre-check that the board contains at least one occurrence of every character in word (a hash count comparison) — useful when word is long and the board is wide.
+
+Interviewers sometimes ask for the path itself, not just a boolean. Carry the path as an explicit list mutated and restored alongside the visit marker.
+
+Preparation
+
+Implement DFS + backtracking once with the in-place sentinel and once with an explicit visited matrix; be able to argue why the sentinel is preferred.
+
+Practice writing the four-direction loop using a (dx, dy) pair list to keep the recursive call clean.
+
+Be ready to extend to Word Search II (a trie of all target words anchored at the root, descended in parallel with the DFS) and to articulate when this is worth the implementation cost.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

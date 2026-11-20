@@ -1,0 +1,50 @@
+===H1===
+Rotate Any m×n 2D Matrix
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/rotate-matrix-rectangle
+===BODY===
+Google
+Coding·40 minMembers
+Rotate Any m×n 2D Matrix
+LeetCode 48 generalized to rectangles. Out-of-place rotation is trivial; in-place rotation for `m ≠ n` is the trap.
+SWE
+array
+grid
+medium
+Frequency
+Single report
+Last asked
+—
+Stage
+onsite-coding
+Requirements
+
+Rotate a 2D matrix 90° clockwise.
+
+Square case: in-place layer-by-layer rotation; O(1) extra space.
+
+Rectangle case (NG follow-up): generally must allocate a new n × m matrix unless you allow cycle-following with bookkeeping (O(m+n) extra).
+
+Common follow-up: rotate by arbitrary multiple of 90°; reflect across an axis.
+
+Examples
+
+[[1,2,3],[4,5,6]] (2×3) rotated 90° CW → [[4,1],[5,2],[6,3]] (3×2).
+
+Notes
+
+The in-place rectangle rotation is essentially cycle-decomposition on the index permutation — explain it but don't burn time implementing.
+
+Reported follow-up: rotate inside a window of a larger matrix while keeping the rest untouched.
+
+Preparation
+
+Write square in-place rotation from memory in under 8 min.
+
+Have a 60-second explanation for why rectangle in-place is hard and what trade-offs you'd take.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

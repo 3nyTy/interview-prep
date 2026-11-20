@@ -1,0 +1,54 @@
+===H1===
+Maximum-Sum Path in a Matrix (No Revisits)
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/matrix-max-sum-path-no-repeat
+===BODY===
+Goldman Sachs
+Coding·60 minMembers
+Maximum-Sum Path in a Matrix (No Revisits)
+Find the maximum-sum path through a matrix where cells may contain negative numbers and the path cannot revisit any cell. The hard follow-up to the spiral-matrix warm-up in GSAM Infra.
+SWE
+Infra Eng
+grid
+dfs
+backtracking
+hard
+Frequency
+Single report
+Last asked
+2024-11-15
+Stage
+phone-screen
+Requirements
+
+Input: an m × n matrix grid where entries can be negative.
+
+Find: a path visiting cells without revisiting any, maximizing the sum of visited cell values.
+
+The exact movement model (4-directional vs 8-directional, start cell, end cell) was not pinned down in the original phone-screen prompt — clarify with the interviewer before writing.
+
+Notes
+
+Because cells can be negative and paths can be arbitrary length, this is exponential in the worst case — there is no polynomial-time exact algorithm without further constraints.
+
+The acceptable approach in the live screen is DFS / backtracking with a visited set, exploring every direction from each cell, and pruning whenever a partial path can't beat the current best. Stating the exponential bound up front earns credit.
+
+Common follow-up optimizations the interviewer may probe:
+
+Bitmask-DP dp[(i,j), visitedMask] for small grids (≤ 20 cells).
+
+Branch-and-bound with a precomputed "max remaining reachable sum" upper bound at each step.
+
+Don't conflate this with the classic "top-left to bottom-right, only right/down" matrix-DP problem; that one is polynomial. Confirm the movement rules and revisit constraint before coding.
+
+Preparation
+
+Sketch the DFS-with-prune solution and the bitmask-DP variant for ≤ 20 cells before the round.
+
+Practice stating the exponential worst case crisply — Goldman expects you to acknowledge that a clean polynomial algorithm doesn't exist here without extra structure.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

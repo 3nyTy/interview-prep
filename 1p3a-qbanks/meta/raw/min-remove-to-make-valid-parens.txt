@@ -1,0 +1,45 @@
+===H1===
+Min Remove to Make Valid Parentheses
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/min-remove-to-make-valid-parens
+===BODY===
+Meta
+Coding·40 minMembers
+Min Remove to Make Valid Parentheses
+LeetCode 1249. Stack-based scan removing minimum parens to make the string valid. Multi-bracket-type extension is the canonical follow-up.
+SWE
+MLE
+string
+stack
+medium
+Frequency
+Medium
+Last asked
+2026-08-21
+Stage
+phone-screen
+Requirements
+
+Remove the minimum number of ( and ) so the resulting string is valid.
+
+Two-pass: forward to mark unmatched ), backward (or stack) to mark unmatched (; build output skipping marked indices.
+
+Follow-up: support multiple bracket types ()[]{} simultaneously. Single stack tracking expected closers handles it.
+
+Notes
+
+One-pass with a stack of indices is the cleanest implementation.
+
+Multi-type follow-up needs careful invariant: stack pops only when type matches, otherwise mark for removal.
+
+Preparation
+
+Write LeetCode 1249 in <8 min.
+
+Drill multi-bracket-type variant: stack of (index, expected_close_char) tuples.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

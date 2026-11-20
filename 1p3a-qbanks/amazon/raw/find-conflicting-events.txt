@@ -1,0 +1,55 @@
+===H1===
+Find Conflicting Events
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/find-conflicting-events
+===BODY===
+Amazon
+Coding·25 minMembers
+Find Conflicting Events
+SDE II onsite coding. Given a list of events, each with a user name, region name, and timestamp, find conflicting events — pairs that satisfy all three: same user, different region, and timestamp difference below a threshold K. Group by user and scan time-ordered events within a window; the K-threshold and the different-region condition are the discriminating constraints.
+SWE
+hashmap
+sorting
+sliding-window
+medium
+Frequency
+Single report
+Last asked
+2026-06-27
+Stage
+onsite-coding
+Requirements
+
+Input: a list of events, each with a user, a region, and a timestamp.
+
+Two events conflict when all of the following hold:
+
+same user,
+
+different region,
+
+timestamp difference is less than a threshold K.
+
+Return the conflicting events (or pairs).
+
+Notes
+
+Group events by user, then sort each user's events by timestamp; within a user, a sliding window over time bounded by K keeps the comparison local instead of all-pairs.
+
+Inside the window, only pairs from different regions count — a user logging repeatedly from the same region is not a conflict.
+
+Clarify the output contract up front: distinct conflicting pairs, the set of involved events, or a boolean — the prompt is reported thin on this.
+
+Define the K boundary precisely (strictly less than vs. ≤) and confirm whether timestamps can tie.
+
+Preparation
+
+Implement the group-by-user + time-sorted sliding-window scan and reason about why it beats the naive O(n²) pairwise check.
+
+Build a small test with one same-region (non-conflicting) pair and one cross-region in-window pair to validate the region and K conditions.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

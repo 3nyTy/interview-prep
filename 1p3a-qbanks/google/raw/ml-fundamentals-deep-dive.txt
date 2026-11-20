@@ -1,0 +1,135 @@
+===H1===
+ML Fundamentals Deep Dive (AI/ML & MLE Roles)
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/ml-fundamentals-deep-dive
+===BODY===
+Google
+Other·60 minMembers
+ML Fundamentals Deep Dive (AI/ML & MLE Roles)
+One round in every MLE / AI/ML loop is a 45-60 minute domain interview: 10 min resume walkthrough, then rapid-fire ML fundamentals, often around the candidate's chosen track (LLM / NLP / CV / Recsys). Interviewers go deep on why each concept works, not just definitions.
+MLE
+RS
+SWE
+RE
+ml-knowledge
+transformer
+rag
+retrieval
+deep-dive
+Frequency
+High
+Last asked
+2026-09-01
+Stage
+onsite-deep-dive · phone-screen · tech-screen · onsite-research
+Requirements
+
+The round is conducted as a Q&A oral exam plus light whiteboard derivations. Candidates pick a track when scheduling; the interviewer tailors questions to that track but always anchors to ML fundamentals.
+
+Core ML fundamentals (asked across most loops)
+
+Bias–Variance tradeoff; how to detect and mitigate each.
+
+Overfitting / underfitting; concrete remedies.
+
+Logistic regression: loss, optimization, decision boundary.
+
+Gradient descent variants: batch / mini-batch / SGD / momentum / Adam — when to use which.
+
+Cross-entropy: derivation, why preferred over MSE for classification.
+
+L1 vs L2 regularization: difference, why L1 produces sparsity (geometric explanation), why L2 is smoother.
+
+Forward / backward propagation: walk through chain rule, gradient flow, parameter update.
+
+Bayesian vs frequentist; likelihood; perplexity.
+
+Why Transformers beat RNNs; complexity of attention vs recurrent step; cost of autoregressive decoding.
+
+LLM / NLP track
+
+L4 add-on AI/ML rounds can concentrate on post-training, fine-tuning, prompt engineering, and base Transformer mechanics.
+
+Fine-tuning methods (full / LoRA / adapters / prefix); pros and cons of each.
+
+Inference: KV cache, top-p / top-k / nucleus / temperature sampling.
+
+MoE architectures.
+
+Tokenization methods compared (BPE / WordPiece / SentencePiece).
+
+Generative AI: autoencoder vs VAE vs VQ-VAE.
+
+Using an LLM to power product features (e.g. LLM for recommendations) — discuss when retrieval vs prompting wins.
+
+Recsys track
+
+Cold-start mitigations: content-based embeddings, collaborative filtering, contextual bandits — give multiple options, not just one.
+
+Two-tower retrieval vs ranking trade-offs.
+
+Online vs offline evaluation; counterfactual eval.
+
+LSH / ANN for retrieval at scale; embedding dimension vs latency.
+
+Human-in-the-loop calibration for moderation false positives.
+
+CV track
+
+ViT vs CNN; when each wins.
+
+Vector DBs for similarity search; product quantization.
+
+Quantization and pruning for production-scale serving.
+
+Post-training and probabilistic-modeling depth
+
+Explain GRPO and pipeline parallelism, including where they fit into an LLM training stack.
+
+Define KL divergence, perplexity, and importance sampling, then connect each concept to how and why it is used in modern LLM training.
+
+Derive the VAE objective: ELBO, the KL term, and the reparameterization trick; justify why each component is needed.
+
+Compare post-training methods by the model stage or problem they target.
+
+Identify concrete reward-hacking behaviors and explain how a post-training pipeline can prevent or detect them.
+
+Project-dive sub-section (~15 min)
+
+Pick one project from the resume; walk through problem framing, modeling choices, why other options were ruled out, results, limitations.
+
+Interviewer fishes for honesty about what didn't work and what you'd do differently — same Googliness signal as the BQ round.
+
+Notes
+
+The interviewer expects you to defend mechanism, not just terminology. "L1 gives sparsity" is not enough — you must show why the L1 ball corners snap weights to 0.
+
+Be ready to derive: softmax + cross-entropy gradient, attention forward pass, gradient flow through a residual block — on the whiteboard.
+
+The interviewer may not know your sub-track deeply. One candidate observed the interviewer keyword-matching against a script rather than engaging with niche ideas. Mention the standard answer first, then the more interesting modern variant — don't lead with niche papers.
+
+ML rounds in the L4 AI/ML loop tend to focus on project deep-dive over textbook fundamentals; L5/L6 lean more on fundamentals + architecture trade-offs.
+
+Cross-checking: research-scientist (RS) loops add 2–5 dedicated research rounds (talk + 1-on-1 deep-dives); MLE loops collapse research into this single ML round.
+
+In the PhD new-graduate AI/ML path, domain questions can align closely with the interviewer's own specialty. Interviewers may provide hints or explain a concept after the candidate reaches a gap in understanding.
+
+Preparation
+
+Print and drill the 3 Blue 1 Brown deep learning + linear algebra series for geometric intuition (L1/L2 ball, gradient field).
+
+Write out attention forward + softmax + cross-entropy gradients by hand 3+ times until automatic.
+
+For LLM track, read the Anthropic and OpenAI fine-tuning / KV-cache / sampling docs; memorize the trade-off table for top-p vs top-k vs temperature.
+
+For Recsys track, study the TIGER / two-tower / FAISS literature; have one paragraph ready for cold-start that combines collaborative filter + content embeddings.
+
+For CV track, drill ViT vs CNN trade-offs and one quantization paper at the level of detail you'd answer on a whiteboard.
+
+Have 1–2 personal projects ready for deep dive; rehearse explaining why you picked the approach over 2 alternatives.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

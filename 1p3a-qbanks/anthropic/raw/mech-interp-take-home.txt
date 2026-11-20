@@ -1,0 +1,56 @@
+===H1===
+Mechanistic Interpretability Take-Home — Sample-Aspect Double Descent
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/mech-interp-take-home
+===BODY===
+Anthropic
+Other·240 minMembers
+Mechanistic Interpretability Take-Home — Sample-Aspect Double Descent
+Mechanistic-interpretability team take-home: design and run an experiment that reproduces sample-aspect double descent on a small model, explain why double descent occurs using theory, and propose a fix. Deliverable is a slide deck or notebook plus a live discussion.
+RE
+RS
+take-home
+interpretability
+double-descent
+linear-regression
+experiment-design
+hard
+Frequency
+Single report
+Last asked
+2026-04-19
+Stage
+take-home
+Requirements
+
+4-hour at-home assignment.
+
+Build the experiment yourself — pick the model class, the data-scaling axis, and the metric.
+
+Show the double-descent curve clearly. Reported successful approach: linear regression with varying training-set size and Random Matrix Theory analysis.
+
+Explain the phenomenon. Why does test error spike near the interpolation threshold and decrease again?
+
+Propose a remediation. Regularization (ridge) is the textbook fix and was reported as the candidate's chosen answer.
+
+Wrap up in a slide deck for the live review.
+
+Notes
+
+Mechanistic-interpretability hiring runs separately from the standard loop; the take-home replaces what would otherwise be a coding round.
+
+Only one detailed report is available publicly. Use this as the structural template; expect the specific phenomenon under study to drift over time.
+
+Preparation
+
+Internalize the classical double-descent setup: model capacity (or sample size) on x-axis, test error on y-axis, peak at n_params ≈ n_samples.
+
+Read at least one Random Matrix Theory primer on the over-parameterized linear-regression regime.
+
+Run the experiment yourself before the interview — generate the U-shape on synthetic data, fit a ridge baseline that smooths it.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

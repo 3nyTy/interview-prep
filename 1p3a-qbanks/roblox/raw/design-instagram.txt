@@ -1,0 +1,555 @@
+===H1===
+Design Instagram
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/design-instagram
+===BODY===
+Roblox
+System DesignMembers
+Design Instagram
+Design Instagram-style media posting, feed generation, follows, likes, comments, and large-scale media serving.
+SWE
+feed
+social-graph
+storage
+scaling
+Frequency
+Single report
+Last asked
+2026-01-22
+Stage
+onsite-system-design
+Problem Statement
+
+Design an Instagram-like image feed. Users publish image posts, follow other users, and open a personalized feed that loads images quickly as they scroll. The system should handle popular creators, media storage, feed pagination, image loading failures, and offline viewing of recently seen content.
+
+variants of this Roblox prompt include:
+
+Classic system design: "Design Instagram", with emphasis on the hot key / celebrity problem and the Alex Xu-style hybrid fanout approach.
+
+Frontend system design: "Design Image Feed" or "Frontend System Design: Image Feed", where likes and comments are explicitly out of scope.
+
+Frontend/full-stack variant: backend APIs and requirements may be provided; focus on API usage, infinite loading, client caching, offline support, loading indicators, error images, and testing.
+
+Clarify the interviewer's intended scope before drawing. If they want backend system design, drive toward feed generation, media storage, CDN, and celebrity fanout. If they want frontend system design, keep the backend as a provided API and go deep on pagination, image loading states, offline cache, and test strategy.
+
+Phase 1: Requirements (~5 minutes)
+
+Functional Requirements
+
+Users should be able to publish image posts with captions and media metadata.
+
+Users should be able to follow other users and see posts from followed accounts.
+
+Users should be able to view a personalized image feed with cursor-based infinite scroll.
+
+Clients should load images reliably with placeholders, progressive loading, retry behavior, and error states.
+
+Clients should support offline viewing for recently loaded feed items and images.
+
+Out of scope unless the interviewer asks:
+
+Likes, comments, saves, shares, stories, direct messages.
+
+ML ranking and recommendation beyond basic chronological or lightweight ranking.
+
+Content moderation, ads, and creator analytics.
+
+Full image-editing pipeline on the client.
+
+Non-Functional Requirements
+
+RequirementTargetWhy it matters
+Feed latencyP95 under 200 ms for metadata responseFeed scroll should feel instant
+Image delivery latencyFirst image bytes from CDN in under 100-300 ms regionallyImages dominate perceived performance
+Availability99.9%+ for feed reads; degrade gracefully when some services failFeed is the primary product surface
+FreshnessNormal posts appear within seconds; celebrity posts can lag or merge on readUsers expect recent posts without bankrupting fanout
+ScalabilityHundreds of thousands of peak feed page reads/secFeed reads are much hotter than post writes
+ConsistencyEventual consistency acceptable for feed order; privacy/deleted posts must be enforcedFeeds can lag, but blocked/deleted content should disappear
+Client resilienceInfinite scroll dedupes items, handles retries, and works after app restartsFrontend variants test this heavily
+
+Clarifying Questions
+
+Is this backend system design or frontend system design?
+Assume backend-first for the base answer, then cover the frontend image-feed variant as a deep dive.
+
+Are likes and comments in scope?
+observed image-feed variants say no. Treat them as optional counters and interaction services.
+
+Is the feed chronological or ranked?
+Start with reverse chronological posts from followed users. Ranking is a follow-up that can sit on top of candidate generation.
+
+Do we need upload flow?
+For "Design Instagram", yes. For "Design Image Feed", the backend may already expose feed APIs and media URLs.
+
+What does offline support mean?
+Assume recently viewed feed metadata and selected image variants are available while offline. Posting offline can be a follow-up.
+
+Capacity Estimation
+
+Assumptions:
+- 100M daily active users
+- Average user opens feed 10 times/day
+- Each feed page returns 20 posts
+- 20M image posts/day
+- Average stored image package after variants: 2-4 MB
+- Average user follows 200 accounts
+
+Feed reads:
+- 100M DAU * 10 opens/day = 1B feed sessions/day
+- 1B/day ~= 11.6K sessions/sec average
+- 20x peak ~= 230K feed page reads/sec
+
+Post writes:
+- 20M posts/day ~= 230 posts/sec average
+- 20x peak ~= 4.6K posts/sec
+
+Media storage:
+- 20M posts/day * 2 MB = 40 TB/day minimum for image variants
+- Raw uploads, thumbnails, backups, and replication can multiply this
+
+Fanout:
+- Normal user with 500 followers -> 500 timeline writes/post
+- Celebrity with 50M followers -> 50M timeline writes/post
+- Need hybrid fanout; pure fanout-on-write creates hot keys and huge write spikes
+
+Use the capacity estimate to motivate the two core decisions: put images behind object storage plus CDN, and use hybrid fanout instead of one feed-generation strategy for every author.
+
+Phase 2: Data Model (~5 minutes)
+
+Core Entities
+
+User
+- user_id
+- username
+- profile_photo_media_id
+- privacy_state
+- created_at
+
+FollowEdge
+- follower_id
+- followee_id
+- state: active | blocked | muted
+- created_at
+
+Post
+- post_id
+- author_id
+- caption
+- media_ids
+- visibility: public | followers_only | deleted
+- created_at
+- sort_key
+
+MediaAsset
+- media_id
+- owner_id
+- object_key_original
+- variants: thumbnail, small, medium, large
+- width
+- height
+- blurhash_or_dominant_color
+- status: uploading | processing | ready | failed
+- created_at
+
+HomeTimelineEntry
+- user_id
+- post_id
+- author_id
+- created_at
+- rank_score
+- fanout_source: normal | celebrity_merge | backfill
+
+ClientFeedCacheEntry
+- viewer_id
+- post_id
+- cursor_position
+- cached_at
+- expires_at
+- image_variant_cached
+
+Relationships
+
+A user can follow many users through FollowEdge.
+
+A post belongs to one author and references one or more MediaAsset records.
+
+A normal author's post is fanned out into followers' HomeTimelineEntry records.
+
+A celebrity author's post is stored in the author's outbox and merged into feeds at read time or through selective fanout.
+
+Client cache entries are a local optimization, not the source of truth.
+
+Storage Layout
+
+users:
+- primary key: user_id
+- unique index: username
+
+follow_edges:
+- primary key: (follower_id, followee_id)
+- secondary index: followee_id -> follower_id list
+- shard celebrity follower lists by (followee_id, shard_id)
+
+posts:
+- primary key: post_id
+- index: (author_id, created_at desc)
+
+media_assets:
+- primary key: media_id
+- object storage key for each image variant
+
+home_timeline:
+- partition key: viewer_id
+- clustering key: created_at desc, post_id
+- TTL or compaction for old timeline entries
+
+celebrity_posts:
+- partition key: author_id
+- clustering key: created_at desc, post_id
+
+Do not store image bytes in the feed database. Store metadata in the database, put image bytes in object storage, and serve variants through a CDN.
+
+Phase 3: API Design (~5 minutes)
+
+Protocol Choice
+
+Use REST for mobile/web client APIs because the operations are resource-oriented and easy to cache. Use CDN HTTP URLs for image bytes. Use an internal event stream such as Kafka, Pub/Sub, or SQS for post-created events, media-processing jobs, and fanout work.
+
+Media Upload API
+
+POST /api/media/uploads
+Content-Type: application/json
+
+{
+  "content_type": "image/jpeg",
+  "size_bytes": 1842000,
+  "width": 1440,
+  "height": 1800
+}
+
+201 Created
+{
+  "media_id": "media_123",
+  "upload_url": "https://upload.example.com/presigned/...",
+  "expires_at": "2026-05-07T18:15:00Z"
+}
+
+Create Post API
+
+POST /api/posts
+Content-Type: application/json
+Idempotency-Key: client_generated_post_789
+
+{
+  "caption": "new level screenshot",
+  "media_ids": ["media_123"]
+}
+
+201 Created
+{
+  "post_id": "post_456",
+  "status": "published"
+}
+
+Feed API
+
+GET /api/feed?limit=20&cursor=opaque_cursor
+
+{
+  "items": [
+    {
+      "post_id": "post_456",
+      "author": {
+        "user_id": "u123",
+        "username": "creator_roblox"
+      },
+      "caption": "new level screenshot",
+      "created_at": "2026-05-07T18:10:00Z",
+      "media": [
+        {
+          "media_id": "media_123",
+          "thumbnail_url": "https://cdn.example.com/media_123/thumb.jpg",
+          "image_url": "https://cdn.example.com/media_123/medium.jpg",
+          "width": 720,
+          "height": 900,
+          "blurhash": "LKO2?U%2Tw=w]~RBVZRi};RPxuwH"
+        }
+      ]
+    }
+  ],
+  "next_cursor": "opaque_cursor_2",
+  "sync_token": "feed_sync_abc"
+}
+
+Follow API
+
+POST /api/users/{author_id}/follow
+DELETE /api/users/{author_id}/follow
+
+Frontend Image-Feed API Variant
+
+If the interviewer gives you APIs and says backend is out of scope, focus on consuming this contract correctly:
+
+GET /api/image-feed?cursor=opaque_cursor&limit=20
+
+The response should include stable item IDs, image dimensions, placeholder data, URLs for multiple image sizes, and an opaque cursor. The client should never rely on array offsets because new posts can arrive between page loads.
+
+Cursor-based pagination is the right default for infinite scroll. Offset pagination can skip or duplicate posts when new content arrives.
+
+Phase 4: High-Level Design (~15-25 minutes)
+
+Write Path: Upload and Publish
+
+Client asks Upload Service for a presigned upload URL.
+
+Client uploads the image bytes directly to object storage.
+
+Upload Service records a MediaAsset row with status uploading or processing.
+
+Image Processing Workers create thumbnail, small, medium, and large variants; strip unsafe metadata; compute width, height, and placeholder data.
+
+Client creates the post by calling Post Service with ready media_ids. If the product allows early posting before variants finish, return status: "processing" and hide or degrade the post until media is ready.
+
+Post Service writes the Post row and emits a PostCreated event.
+
+Fanout Workers distribute the post to home timelines or celebrity outboxes.
+
+Read Path: Open Feed
+
+Client calls GET /api/feed with an optional cursor.
+
+Feed Read Service fetches candidate post IDs from Timeline Store.
+
+It also fetches recent posts from followed celebrity authors and merges them into the candidate list.
+
+It hydrates post metadata, author metadata, and media variant URLs.
+
+It filters deleted, blocked, muted, or private posts.
+
+It returns feed items plus an opaque cursor and sync token.
+
+Client renders placeholders first, lazy-loads images from the CDN, and prefetches the next page near the bottom of the viewport.
+
+Component Responsibilities
+
+ComponentResponsibilityKey design choice
+Upload ServiceIssues presigned URLs and records upload intentAvoid proxying large images through app servers
+Image Processing WorkersGenerate variants and validate imagesAsync pipeline keeps posting responsive
+Post ServiceOwns post metadata and post-created eventsIdempotent writes prevent duplicate posts on retry
+Social Graph ServiceStores follow relationships and follower shardsCelebrity follower lists must be shardable
+Fanout WorkersPopulate home timelines for normal authorsWork queues absorb write bursts
+Timeline StoreRead-optimized per-user feed entriesPartition by viewer ID for fast feed reads
+Celebrity OutboxStores posts from very high-follower authorsAvoids 50M writes for one celebrity post
+Feed Read ServiceMerges, hydrates, filters, and paginates feed itemsKeeps privacy/deletion checks close to read path
+CDNServes image variants globallyRemoves image-byte load from origin services
+Client Feed StoreTracks loaded pages, pending requests, and offline cacheCritical for frontend variants
+
+Hybrid Fanout Strategy
+
+Use two paths:
+
+Normal author:
+- PostCreated event -> fetch follower shards -> write post_id into each follower timeline
+- Feed reads are fast because candidate IDs are precomputed
+
+Celebrity author:
+- PostCreated event -> write to celebrity_posts outbox
+- Feed read fetches recent celebrity posts for followed celebrities and merges them
+- Optional selective fanout to active followers or regional caches
+
+This avoids turning one celebrity post into tens of millions of immediate timeline writes.
+
+Frontend Feed Architecture
+
+For the observed frontend-focused variant, describe the client like a small state machine:
+
+FeedController
+- owns cursor, loaded item IDs, request state, error state
+- dedupes items across pages by post_id
+- prevents overlapping page fetches
+- retries transient network failures with backoff
+
+ImageLoader
+- reserves layout using width/height aspect ratio
+- shows placeholder while loading
+- swaps to full image after decode
+- shows error image after permanent failure
+- chooses image variant based on viewport and device pixel ratio
+
+OfflineCache
+- stores feed metadata in IndexedDB or app database
+- stores selected image variants in Cache Storage or native disk cache
+- maintains LRU quota
+- serves cached feed when offline
+- refreshes with sync_token after reconnect
+
+For frontend system design, the expected answer is not "call the API and render a list." Discuss pagination state, duplicate prevention, request cancellation, image sizing to prevent layout shift, offline persistence, and how you test all of it.
+
+Phase 5: Scaling & Trade-offs (~15-20 minutes)
+
+Deep Dive 1: Celebrity / Hot Key Problem
+
+The hardest backend issue is a creator with millions of followers.
+
+Pure fanout-on-write:
+
+Celebrity post -> 50M followers -> 50M timeline writes
+
+Problems:
+
+One author creates a massive write spike.
+
+Follower graph partitions for that author become hot.
+
+Retries can duplicate timeline entries unless writes are idempotent.
+
+A few celebrity posts can starve normal fanout work.
+
+Hybrid solution:
+
+Mark high-follower or high-QPS authors as celebrity accounts.
+
+Store their posts in a separate celebrity_posts outbox partitioned by author and time.
+
+On feed read, fetch the viewer's followed celebrity IDs and merge their recent posts with the precomputed home timeline.
+
+Cache merged feed pages for active users with a short TTL.
+
+Optionally fan out celebrity posts only to recently active followers or regional caches.
+
+Do not scan all followers of a celebrity synchronously during post creation. Shard follower lists, queue fanout work, and use a pull path for accounts whose fanout cost is too high.
+
+Deep Dive 2: Infinite Scroll Correctness
+
+Use an opaque cursor that encodes the last returned sort key and enough server-side context to continue safely.
+
+cursor = encrypt({
+  viewer_id,
+  last_sort_key,
+  last_post_id,
+  feed_version_or_sync_token,
+  generated_at
+})
+
+Client rules:
+
+Keep a Set<post_id> to dedupe across pages.
+
+Cancel or ignore stale requests when the user refreshes.
+
+Do not issue page N+1 while page N is still loading unless the API supports parallel windows.
+
+Preserve scroll position when returning to the feed.
+
+Use stable item heights or aspect-ratio boxes to avoid layout shift.
+
+Deep Dive 3: Offline Support
+
+Offline support is a product trade-off, not just a cache checkbox.
+
+Cache policy:
+- Metadata: cache recent pages, e.g. first 100-300 feed items
+- Images: cache thumbnails and medium variants first, not originals
+- Eviction: LRU by last viewed time and storage quota
+- Freshness: show cached data immediately, then refresh on reconnect
+- Deletions/privacy: remove blocked/deleted content once online checks complete
+
+For mobile apps, use a local database such as SQLite. For web, use IndexedDB for metadata and Cache Storage for image responses. Avoid relying only on HTTP cache because the app needs indexed metadata, cursor state, and explicit eviction.
+
+Deep Dive 4: Media Delivery
+
+Image delivery should not hit app servers after upload.
+
+Generate multiple variants: thumbnail, small, medium, large.
+
+Store immutable object keys with content hashes.
+
+Serve through CDN with long cache TTLs.
+
+Use signed or tokenized URLs if content is private.
+
+Include dimensions and placeholder data in the feed API so the client can reserve layout before image bytes arrive.
+
+Track processing status so the feed can hide or gracefully show posts whose media failed.
+
+Bottlenecks and Mitigations
+
+BottleneckSymptomMitigation
+Celebrity fanoutMassive write spike from one postHybrid fanout, celebrity outbox, active-user fanout
+Follower graph hot partitionOne followee shard overloadedShard follower lists by (followee_id, shard_id)
+Timeline storage growthPer-user timelines grow without boundTTL old entries, rebuild from author outboxes if needed
+Feed hydration fanoutFeed service calls too many servicesBatch fetch posts/media/authors; cache hot metadata
+CDN miss stormViral image overloads originCDN shielding, pre-warm variants, origin rate limits
+Client duplicate pagesNew posts shift page boundariesCursor pagination and client-side post ID dedupe
+Offline cache bloatDevice storage fills upQuotas, LRU eviction, cache smaller variants first
+
+Trade-offs
+
+Design choiceProsCons
+Fanout on writeVery fast feed readsExpensive for high-follower authors
+Fanout on readCheap writes and fresh author postsMore expensive feed reads
+Hybrid fanoutBalances normal users and celebritiesMore complex merge logic
+Chronological feedEasier to explain and paginateLess engaging than ranked feed
+Ranked feedBetter engagement and personalizationRequires ranking service, feature logging, and explainability
+Cache medium image variants offlineGood user experienceUses device storage
+Cache only thumbnails offlineLow storage costPoor offline detail view
+
+Common Pitfalls
+
+Not clarifying backend vs frontend scope. Roblox reports include both classic system design and frontend image-feed variants. Ask which path the interviewer wants before spending 20 minutes on the wrong architecture.
+
+Ignoring the celebrity problem. A pure fanout-on-write design is easy to draw but breaks when one account has tens of millions of followers. Use hybrid fanout and explicitly call out the threshold.
+
+Using offset pagination for the feed. Offset pagination creates duplicates and gaps when new posts arrive. Use opaque cursors based on stable sort keys.
+
+Serving image bytes through the application API. Feed APIs should return metadata and CDN URLs. Object storage plus CDN should carry image bytes.
+
+Treating offline support as localStorage. Real offline feed support needs metadata persistence, image response caching, quota management, and reconnect behavior.
+
+Skipping frontend testing in the image-feed variant. variants explicitly ask about testing. Cover pagination, retries, image failures, offline mode, and scroll behavior.
+
+Interview Checklist
+
+Use this checklist to keep the answer complete:
+
+  Clarified backend vs frontend scope
+
+  Scoped likes/comments out unless requested
+
+  Defined feed, post, media, follow, and timeline entities
+
+  Chose REST for client APIs and CDN for image delivery
+
+  Used object storage plus async image processing for uploads
+
+  Described cursor-based infinite scroll
+
+  Explained normal-user fanout on write
+
+  Explained celebrity fanout on read or hybrid merge
+
+  Included deleted/private/blocked post filtering
+
+  Covered image loading states and error images
+
+  Covered offline cache and reconnect behavior
+
+  Covered frontend test strategy for the image-feed variant
+
+Summary
+
+AreaRecommended answer
+Core designInstagram-like image feed with posts, media assets, follow graph, and home timelines
+Media storageDirect upload to object storage, async variant generation, CDN delivery
+Feed generationHybrid fanout: write-time timelines for normal users, read-time merge for celebrities
+PaginationOpaque cursor using stable sort keys, client-side dedupe by post ID
+Offline supportPersist recent feed metadata plus selected image variants with LRU eviction
+Frontend focusFeed state machine, image loader, placeholders, retries, error states, testing
+Main interview insightClarify scope, then make the celebrity hot-key problem and infinite-scroll/offline behavior explicit
+
+The strongest answer is a scoped design that can pivot. For backend interviewers, lead with media storage, feed generation, and hybrid fanout. For frontend interviewers, treat the backend as a feed API and go deep on cursor pagination, rendering states, offline cache, and test coverage.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

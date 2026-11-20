@@ -1,0 +1,51 @@
+===H1===
+Longest Subarray With Sum ≤ K
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/longest-subarray-sum-at-most-k
+===BODY===
+Goldman Sachs
+Coding·60 minMembers
+Longest Subarray With Sum ≤ K
+Classic two-pointer / sliding-window: given an array of non-negative integers and a bound K, return the length of the longest contiguous subarray whose sum does not exceed K.
+SWE
+sliding-window
+array
+two-pointer
+easy
+Frequency
+Single report
+Last asked
+2024-10-26
+Stage
+oa
+Requirements
+
+Input: an integer array arr and an integer k.
+
+Return: the length of the longest contiguous subarray with sum ≤ k.
+
+The common variant assumes non-negative values; the canonical two-pointer solution depends on that assumption.
+
+public static int longestSubarray(int[] arr, int k)
+
+Notes
+
+Standard expanding / contracting window: advance right; whenever the running sum exceeds k, advance left until it doesn't.
+
+O(n) time, O(1) space.
+
+If the array can contain negative numbers, two pointers no longer work — switch to prefix sums + sorted structure (or monotonic deque) for the general form. Be ready to flag this distinction; Goldman interviewers occasionally probe whether candidates recognize the assumption.
+
+Edge cases: k < arr[0] and all elements positive → result is 0 (no single element fits) or 1 (smallest element fits), depending on the problem's exact wording; clarify before coding.
+
+Preparation
+
+Implement the two-pointer form, then write out the prefix-sum + sorted-set generalization on paper — interviewers like to see candidates state when their primary approach breaks.
+
+Closely related: LC 209 "Minimum Size Subarray Sum" (sum ≥ target) and LC 862 "Shortest Subarray with Sum at Least K" (negative-allowed variant).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

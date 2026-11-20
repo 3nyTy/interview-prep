@@ -1,0 +1,86 @@
+===H1===
+Quant OA Math / Probability Multiple Choice Bank
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/quant-oa-math-probability-bank
+===BODY===
+Goldman Sachs
+Other·180 minMembers
+Quant OA Math / Probability Multiple Choice Bank
+Goldman quant / engineering OAs include multiple-choice calculus, probability, statistics, and linear-algebra questions alongside coding. Recent examples cover constrained optimization, Laplace-style densities, covariance bounds, coin-run expectations, arc length, matrix inverses, rank inequalities, conditional probability, and standard errors.
+RS
+SWE
+probability
+math-reasoning
+verbal
+medium
+Frequency
+Medium
+Last asked
+2026-08-29
+Stage
+oa
+Requirements
+
+Practice these prompt shapes as short multiple-choice / numeric-answer drills:
+
+Unit circle optimization: P = (Px, Py) is the first-quadrant point on x² + y² = 1 maximizing f(x,y)=4x²y; find Py².
+
+Continuous density: f(x)=0.5e^{-|x|} over all real x; find P(2 <= |X| <= 4) rounded to three decimals.
+
+Continuous density variant: for the same f(x)=0.5e^{-|x|}, find P(1 <= X <= 3).
+
+Covariance bound: given Var(X)=3 and Var(Y)=27, find the maximum possible value of Cov(X,Y).
+
+Conditional cards: a 5-card hand is known to contain at least 3 aces; find the probability it contains all 4 aces.
+
+Dice sum: roll a fair die 5 times; find the probability the sum is a multiple of 5.
+
+Discrete distribution normalization: for R_X={1,2,...,12} and f(x)=k(2x-1), find k.
+
+Coin runs: toss a fair coin 9 times; find the expected number of consecutive same-outcome runs.
+
+Coin-runs variant: toss a coin 21 times and find the expected number of runs of identical outcomes; for example, HHHTTH contains three runs.
+
+Arc length: for y = (2/3)x^(3/2) + 1 on x in [0,1], find the length of the arc.
+
+Matrix inverse: two matrices satisfy AB=I; determine the possible value of BA.
+
+Rank products: for real 4 x 4 matrices A and B with rank(AB)=2, determine the possible range of rank(BA).
+
+Standard error: X1...X100 are iid standard normal, Y is their average; find the standard deviation of Y.
+
+Three-coin game: two players each flip 3 coins; if they have the same number of heads, payout is 2^n, where n is the number of heads. Find expected value.
+
+Dice max: roll three ordinary dice and score the largest face; find the probability the score is 2.
+
+Notes
+
+These are not deep quant puzzles; the speed bar is recognizing standard distributions, conditioning, expectation linearity, calculus identities, and matrix-rank constraints under time pressure.
+
+For the added probability drills, use direct checkpoints: P(1 <= X <= 3) = (e^-1 - e^-3)/2 ≈ 0.159, and Cauchy-Schwarz gives the maximum covariance sqrt(3 * 27) = 9.
+
+For 21 independent fair tosses, write the run count as 1 + sum(I_i) over the 20 adjacent transitions, giving expectation 1 + 20/2 = 11. If the coin has head probability p, the result is instead 1 + 40p(1-p); clarify fairness before calculating.
+
+For the arc-length drill, y' = sqrt(x), so the length is integral_0^1 sqrt(1+x) dx = (2/3)(2sqrt(2)-1) ≈ 1.219.
+
+If A and B are square matrices of the same size, AB=I implies both are invertible and therefore BA=I; for rectangular matrices, dimensions matter and a one-sided inverse need not be two-sided.
+
+With real 4 x 4 matrices and rank(AB)=2, rank(BA) can be any integer from 0 through 3. Rank 4 would make both factors invertible and force rank(AB)=4; the lower values are attainable through singular block constructions.
+
+The OA can mix these math questions with two coding problems in a 180-minute window. A 2027 Quant Strats intern version instead paired five to seven math questions with one 30-minute coding problem.
+
+Preparation
+
+Drill conditional probability with counting formulas, especially poker-hand conditions and dice / coin event partitions.
+
+Re-derive covariance bounds, standard error of the mean, and expectation of runs without notes.
+
+For calculus optimization, practice Lagrange multipliers, one-variable substitution on the unit circle, and the arc-length formula.
+
+Review one-sided inverse implications and rank inequalities for products of square matrices.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

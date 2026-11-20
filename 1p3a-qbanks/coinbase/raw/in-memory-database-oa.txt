@@ -1,0 +1,1453 @@
+===H1===
+In-Memory Database / Cloud Storage (Multi-Level OA)
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/in-memory-database-oa
+===BODY===
+Coinbase
+Coding·70 minMembers
+In-Memory Database / Cloud Storage (Multi-Level OA)
+The other canonical Coinbase CodeSignal rotation: a four-level in-memory key/value store that grows from CRUD to scan / TTL / backup-restore, with a recent variant adding per-user storage quotas and file compression. Same volume-over-insight calibration as the banking-system OA.
+SWE
+hashmap
+data-structure
+object-design
+ttl
+in-memory-database
+codesignal
+oa
+medium
+Frequency
+Medium
+Last asked
+2026-04-28
+Stage
+oa
+In-Memory Database
+
+The Challenge
+
+You need to build an in-memory key-field-value database. Think of this like a nested HashMap. Each "key" holds a collection of "field-value" pairs.
+
+You will build this in four levels. Each level adds new features to the previous one.
+
+Important Rule: Every operation gets a timestamp (a positive integer). This number always gets bigger. No two operations ever have the same timestamp.
+
+Level 1: Basic Operations
+
+Requirements
+
+Create a class called InMemoryDB. It needs to handle these basic tasks:
+
+Set: Save a value for a key and field.
+
+Get: Read a value.
+
+Delete: Remove a field.
+
+Compare and Set: Update a value only if it currently matches a specific value.
+
+class InMemoryDB:
+    def __init__(self):
+        """Start the database."""
+        pass
+
+    def set(self, timestamp: int, key: str, field: str, value: str) -> None:
+        """
+        Save a value.
+        If the field exists, overwrite it.
+        """
+        pass
+
+    def get(self, timestamp: int, key: str, field: str) -> str:
+        """
+        Read the value.
+        Returns "" if the key or field is missing.
+        """
+        pass
+
+    def delete(self, timestamp: int, key: str, field: str) -> bool:
+        """
+        Remove a field.
+        Returns True if deleted, False if it wasn't there.
+        """
+        pass
+
+    def compare_and_set(self, timestamp: int, key: str, field: str,
+                        expected_value: str, new_value: str) -> bool:
+        """
+        Update the value only if the current value is equal to expected_value.
+        Returns True if successful, False otherwise.
+        """
+        pass
+
+Example Usage
+
+db = InMemoryDB()
+
+db.set(1, "user1", "name", "Alice")
+db.set(2, "user1", "age", "30")
+
+db.get(3, "user1", "name")         # "Alice"
+db.get(4, "user1", "email")        # "" (field doesn't exist)
+db.get(5, "user2", "name")         # "" (key doesn't exist)
+
+db.delete(6, "user1", "age")       # True
+db.delete(7, "user1", "age")       # False (already deleted)
+
+db.compare_and_set(8, "user1", "name", "Alice", "Bob")  # True
+db.get(9, "user1", "name")                               # "Bob"
+db.compare_and_set(10, "user1", "name", "Alice", "Eve")  # False (current value is "Bob")
+db.compare_and_set(11, "user1", "zip", "000", "111")     # False (field doesn't exist)
+
+Level 1 Solution
+
+We use a dictionary of dictionaries. The outer dictionary holds the key, and the inner dictionary holds the field and value.
+
+class InMemoryDB:
+    def __init__(self):
+        self.data = {}  # key -> {field -> value}
+
+    def set(self, timestamp: int, key: str, field: str, value: str) -> None:
+        if key not in self.data:
+            self.data[key] = {}
+        self.data[key][field] = value
+
+    def get(self, timestamp: int, key: str, field: str) -> str:
+        if key not in self.data or field not in self.data[key]:
+            return ""
+        return self.data[key][field]
+
+    def delete(self, timestamp: int, key: str, field: str) -> bool:
+        if key not in self.data or field not in self.data[key]:
+            return False
+        del self.data[key][field]
+        if not self.data[key]:
+            del self.data[key]
+        return True
+
+    def compare_and_set(self, timestamp: int, key: str, field: str,
+                        expected_value: str, new_value: str) -> bool:
+        if key not in self.data or field not in self.data[key]:
+            return False
+        if self.data[key][field] != expected_value:
+            return False
+        self.data[key][field] = new_value
+        return True
+
+Complexity Analysis:
+
+MethodTimeSpace
+setO(1)O(1) per field
+getO(1)O(1)
+deleteO(1)O(1)
+compare_and_setO(1)O(1)
+
+Level 2: Search and Filter
+
+Requirements
+
+Now you need to list all fields for a key. You also need to filter these fields using a prefix (the start of the word). The results must be sorted alphabetically by the field name.
+
+def scan(self, timestamp: int, key: str) -> list:
+    """
+    Return all field-value pairs for a key.
+    Format: "field(value)"
+    Order: Alphabetical by field name.
+    """
+    pass
+
+def scan_with_prefix(self, timestamp: int, key: str, prefix: str) -> list:
+    """
+    Return field-value pairs where the field starts with the prefix.
+    Format: "field(value)"
+    Order: Alphabetical by field name.
+    """
+    pass
+
+Example Usage
+
+db = InMemoryDB()
+
+db.set(1, "user1", "name", "Alice")
+db.set(2, "user1", "age", "30")
+db.set(3, "user1", "nickname", "Ali")
+
+db.scan(4, "user1")
+# ["age(30)", "name(Alice)", "nickname(Ali)"]
+
+db.scan_with_prefix(5, "user1", "na")
+# ["name(Alice)"]
+
+db.scan_with_prefix(6, "user1", "n")
+# ["name(Alice)", "nickname(Ali)"]
+
+db.scan_with_prefix(7, "user1", "x")
+# []
+
+db.scan(8, "user999")
+# []
+
+Level 2 Solution
+
+We grab the fields for the key, sort them, and format them as strings. For the prefix search, we only include fields that start with the specific letters.
+
+class InMemoryDB:
+    def __init__(self):
+        self.data = {}  # key -> {field -> value}
+
+    def set(self, timestamp: int, key: str, field: str, value: str) -> None:
+        if key not in self.data:
+            self.data[key] = {}
+        self.data[key][field] = value
+
+    def get(self, timestamp: int, key: str, field: str) -> str:
+        if key not in self.data or field not in self.data[key]:
+            return ""
+        return self.data[key][field]
+
+    def delete(self, timestamp: int, key: str, field: str) -> bool:
+        if key not in self.data or field not in self.data[key]:
+            return False
+        del self.data[key][field]
+        if not self.data[key]:
+            del self.data[key]
+        return True
+
+    def compare_and_set(self, timestamp: int, key: str, field: str,
+                        expected_value: str, new_value: str) -> bool:
+        if key not in self.data or field not in self.data[key]:
+            return False
+        if self.data[key][field] != expected_value:
+            return False
+        self.data[key][field] = new_value
+        return True
+
+    def scan(self, timestamp: int, key: str) -> list:
+        if key not in self.data:
+            return []
+        return [
+            f"{field}({value})"
+            for field, value in sorted(self.data[key].items())
+        ]
+
+    def scan_with_prefix(self, timestamp: int, key: str, prefix: str) -> list:
+        if key not in self.data:
+            return []
+        return [
+            f"{field}({value})"
+            for field, value in sorted(self.data[key].items())
+            if field.startswith(prefix)
+        ]
+
+Complexity Analysis:
+
+MethodTimeSpace
+scanO(F log F)O(F)
+scan_with_prefixO(F log F)O(F)
+
+Here, F is the number of fields. The sorting step causes the O(F log F) time complexity. This is usually okay because read/write operations (O(1)) happen more often than scanning.
+
+Level 3: Expiration Times (TTL)
+
+Requirements
+
+Now, records can expire. You will add a "Time-To-Live" (TTL).
+
+Expiration: A record expires when current_time >= timestamp + ttl.
+
+Behavior: If a record is expired, the database should act like it does not exist.
+
+Clock: The timestamp passed to the function is the current time.
+
+def set_with_ttl(self, timestamp: int, key: str, field: str,
+                 value: str, ttl: int) -> None:
+    """
+    Save a value that expires at time = timestamp + ttl.
+    It overwrites any existing value and TTL.
+    """
+    pass
+
+def compare_and_set_with_ttl(self, timestamp: int, key: str, field: str,
+                              expected_value: str, new_value: str,
+                              ttl: int) -> bool:
+    """
+    Update a value and set a new TTL only if the current value matches.
+    """
+    pass
+
+Example Usage
+
+db = InMemoryDB()
+
+db.set(1, "user1", "name", "Alice")           # No TTL — never expires
+db.set_with_ttl(2, "user1", "session", "abc", 10)  # Expires at time 12
+
+db.get(3, "user1", "session")                  # "abc"
+db.get(11, "user1", "session")                 # "abc" (11 < 12, still good)
+db.get(12, "user1", "session")                 # "" (12 >= 12, expired)
+db.get(13, "user1", "name")                    # "Alice" (no TTL, still valid)
+
+db.set_with_ttl(14, "user2", "token", "xyz", 5)  # Expires at time 19
+db.scan(15, "user2")                              # ["token(xyz)"]
+db.scan(19, "user2")                              # [] (expired)
+
+db.set_with_ttl(20, "user3", "code", "123", 10)  # Expires at time 30
+db.compare_and_set_with_ttl(21, "user3", "code", "123", "456", 5)  # True, new expiry at 26
+db.get(25, "user3", "code")                       # "456"
+db.get(26, "user3", "code")                       # "" (expired)
+
+Level 3 Solution
+
+We will use two dictionaries:
+
+self.data: Stores the actual values.
+
+self.expiry: Stores the expiration time for each field.
+
+We use Lazy Expiration. We do not delete old data immediately. Instead, whenever someone asks for a record (via get or scan), we check if it is expired. If it is, we delete it then.
+
+class InMemoryDB:
+    def __init__(self):
+        self.data = {}     # key -> {field -> value}
+        self.expiry = {}   # key -> {field -> expiry_time}
+
+    def _is_expired(self, key: str, field: str, timestamp: int) -> bool:
+        """Check if time is up for this field."""
+        if key in self.expiry and field in self.expiry[key]:
+            return timestamp >= self.expiry[key][field]
+        return False
+
+    def _clean_field(self, key: str, field: str):
+        """Remove a field and its expiry time."""
+        if key in self.data and field in self.data[key]:
+            del self.data[key][field]
+            if not self.data[key]:
+                del self.data[key]
+        if key in self.expiry and field in self.expiry[key]:
+            del self.expiry[key][field]
+            if not self.expiry[key]:
+                del self.expiry[key]
+
+    def set(self, timestamp: int, key: str, field: str, value: str) -> None:
+        if key not in self.data:
+            self.data[key] = {}
+        self.data[key][field] = value
+        # Clear any existing TTL because set() makes it permanent
+        if key in self.expiry and field in self.expiry[key]:
+            del self.expiry[key][field]
+
+    def set_with_ttl(self, timestamp: int, key: str, field: str,
+                     value: str, ttl: int) -> None:
+        if key not in self.data:
+            self.data[key] = {}
+        self.data[key][field] = value
+        if key not in self.expiry:
+            self.expiry[key] = {}
+        self.expiry[key][field] = timestamp + ttl
+
+    def get(self, timestamp: int, key: str, field: str) -> str:
+        if key not in self.data or field not in self.data[key]:
+            return ""
+        if self._is_expired(key, field, timestamp):
+            self._clean_field(key, field)
+            return ""
+        return self.data[key][field]
+
+    def delete(self, timestamp: int, key: str, field: str) -> bool:
+        if key not in self.data or field not in self.data[key]:
+            return False
+        if self._is_expired(key, field, timestamp):
+            self._clean_field(key, field)
+            return False
+        self._clean_field(key, field)
+        return True
+
+    def compare_and_set(self, timestamp: int, key: str, field: str,
+                        expected_value: str, new_value: str) -> bool:
+        if key not in self.data or field not in self.data[key]:
+            return False
+        if self._is_expired(key, field, timestamp):
+            self._clean_field(key, field)
+            return False
+        if self.data[key][field] != expected_value:
+            return False
+        self.data[key][field] = new_value
+        return True
+
+    def compare_and_set_with_ttl(self, timestamp: int, key: str, field: str,
+                                  expected_value: str, new_value: str,
+                                  ttl: int) -> bool:
+        if key not in self.data or field not in self.data[key]:
+            return False
+        if self._is_expired(key, field, timestamp):
+            self._clean_field(key, field)
+            return False
+        if self.data[key][field] != expected_value:
+            return False
+        self.data[key][field] = new_value
+        if key not in self.expiry:
+            self.expiry[key] = {}
+        self.expiry[key][field] = timestamp + ttl
+        return True
+
+    def scan(self, timestamp: int, key: str) -> list:
+        if key not in self.data:
+            return []
+        result = []
+        for field, value in sorted(self.data[key].items()):
+            if not self._is_expired(key, field, timestamp):
+                result.append(f"{field}({value})")
+        return result
+
+    def scan_with_prefix(self, timestamp: int, key: str, prefix: str) -> list:
+        if key not in self.data:
+            return []
+        result = []
+        for field, value in sorted(self.data[key].items()):
+            if field.startswith(prefix) and not self._is_expired(key, field, timestamp):
+                result.append(f"{field}({value})")
+        return result
+
+Complexity Analysis:
+
+MethodTimeSpace
+set_with_ttlO(1)O(1)
+getO(1)O(1)
+scanO(F log F)O(F)
+
+This approach is efficient because we only do work when needed (lazy). We don't need a background process constantly checking for old data.
+
+Level 4: Save and Restore
+
+Requirements
+
+You need to save the database state at a specific time and restore it later.
+
+Backup: Save everything (values and TTLs). Do not save records that are already expired.
+
+Restore: Reset the database to match a previous backup.
+
+If you ask to restore to a time that doesn't have an exact backup, use the latest backup before that time.
+
+After restoring, the TTLs should work exactly as they did in the backup.
+
+def backup(self, timestamp: int) -> None:
+    """
+    Save the current state of the database.
+    Do not include expired records.
+    """
+    pass
+
+def restore(self, timestamp: int, backup_timestamp: int) -> None:
+    """
+    Restore the database from a backup.
+    Find the latest backup where time <= backup_timestamp.
+    """
+    pass
+
+Example Usage
+
+db = InMemoryDB()
+
+db.set(1, "app", "version", "1.0")
+db.set_with_ttl(2, "app", "cache", "data1", 20)  # Expires at time 22
+
+db.backup(3)
+
+db.set(4, "app", "version", "2.0")
+db.delete(6, "app", "cache")
+
+db.restore(9, 3) # Go back to time 3
+
+db.get(10, "app", "version")  # "1.0" (restored)
+db.get(12, "app", "cache")    # "data1" (restored, TTL still active)
+db.get(22, "app", "cache")    # "" (expired normally)
+
+Level 4 Solution
+
+We store backups in a list and a dictionary.
+
+self.backups: Maps a timestamp to a snapshot of the data.
+
+self.backup_timestamps: A sorted list of backup times. This helps us find the closest backup quickly using binary search.
+
+We use copy.deepcopy to make sure the backup is independent of the live database.
+
+import copy
+import bisect
+
+class InMemoryDB:
+    def __init__(self):
+        self.data = {}     # key -> {field -> value}
+        self.expiry = {}   # key -> {field -> expiry_time}
+        self.backup_timestamps = []  # sorted list of backup times
+        self.backups = {}  # timestamp -> (data_snapshot, expiry_snapshot)
+
+    def _is_expired(self, key: str, field: str, timestamp: int) -> bool:
+        if key in self.expiry and field in self.expiry[key]:
+            return timestamp >= self.expiry[key][field]
+        return False
+
+    def _clean_field(self, key: str, field: str):
+        if key in self.data and field in self.data[key]:
+            del self.data[key][field]
+            if not self.data[key]:
+                del self.data[key]
+        if key in self.expiry and field in self.expiry[key]:
+            del self.expiry[key][field]
+            if not self.expiry[key]:
+                del self.expiry[key]
+
+    def set(self, timestamp: int, key: str, field: str, value: str) -> None:
+        if key not in self.data:
+            self.data[key] = {}
+        self.data[key][field] = value
+        if key in self.expiry and field in self.expiry[key]:
+            del self.expiry[key][field]
+
+    def set_with_ttl(self, timestamp: int, key: str, field: str,
+                     value: str, ttl: int) -> None:
+        if key not in self.data:
+            self.data[key] = {}
+        self.data[key][field] = value
+        if key not in self.expiry:
+            self.expiry[key] = {}
+        self.expiry[key][field] = timestamp + ttl
+
+    def get(self, timestamp: int, key: str, field: str) -> str:
+        if key not in self.data or field not in self.data[key]:
+            return ""
+        if self._is_expired(key, field, timestamp):
+            self._clean_field(key, field)
+            return ""
+        return self.data[key][field]
+
+    def delete(self, timestamp: int, key: str, field: str) -> bool:
+        if key not in self.data or field not in self.data[key]:
+            return False
+        if self._is_expired(key, field, timestamp):
+            self._clean_field(key, field)
+            return False
+        self._clean_field(key, field)
+        return True
+
+    def compare_and_set(self, timestamp: int, key: str, field: str,
+                        expected_value: str, new_value: str) -> bool:
+        if key not in self.data or field not in self.data[key]:
+            return False
+        if self._is_expired(key, field, timestamp):
+            self._clean_field(key, field)
+            return False
+        if self.data[key][field] != expected_value:
+            return False
+        self.data[key][field] = new_value
+        return True
+
+    def compare_and_set_with_ttl(self, timestamp: int, key: str, field: str,
+                                  expected_value: str, new_value: str,
+                                  ttl: int) -> bool:
+        if key not in self.data or field not in self.data[key]:
+            return False
+        if self._is_expired(key, field, timestamp):
+            self._clean_field(key, field)
+            return False
+        if self.data[key][field] != expected_value:
+            return False
+        self.data[key][field] = new_value
+        if key not in self.expiry:
+            self.expiry[key] = {}
+        self.expiry[key][field] = timestamp + ttl
+        return True
+
+    def scan(self, timestamp: int, key: str) -> list:
+        if key not in self.data:
+            return []
+        result = []
+        for field, value in sorted(self.data[key].items()):
+            if not self._is_expired(key, field, timestamp):
+                result.append(f"{field}({value})")
+        return result
+
+    def scan_with_prefix(self, timestamp: int, key: str, prefix: str) -> list:
+        if key not in self.data:
+            return []
+        result = []
+        for field, value in sorted(self.data[key].items()):
+            if field.startswith(prefix) and not self._is_expired(key, field, timestamp):
+                result.append(f"{field}({value})")
+        return result
+
+    def backup(self, timestamp: int) -> None:
+        # Create a clean snapshot without expired items
+        data_snapshot = {}
+        expiry_snapshot = {}
+        for key, fields in self.data.items():
+            clean_fields = {}
+            clean_expiry = {}
+            for field, value in fields.items():
+                if not self._is_expired(key, field, timestamp):
+                    clean_fields[field] = value
+                    if key in self.expiry and field in self.expiry[key]:
+                        clean_expiry[field] = self.expiry[key][field]
+            if clean_fields:
+                data_snapshot[key] = clean_fields
+                if clean_expiry:
+                    expiry_snapshot[key] = clean_expiry
+
+        self.backups[timestamp] = (data_snapshot, expiry_snapshot)
+        bisect.insort(self.backup_timestamps, timestamp)
+
+    def restore(self, timestamp: int, backup_timestamp: int) -> None:
+        # Find the correct backup timestamp
+        idx = bisect.bisect_right(self.backup_timestamps, backup_timestamp) - 1
+        if idx < 0:
+            return  # No valid backup found
+
+        actual_ts = self.backup_timestamps[idx]
+        data_snapshot, expiry_snapshot = self.backups[actual_ts]
+
+        # Use deepcopy so we don't mess up the backup if we edit data later
+        self.data = copy.deepcopy(data_snapshot)
+        self.expiry = copy.deepcopy(expiry_snapshot)
+
+Complexity Analysis:
+
+MethodTimeSpace
+backupO(N)O(N)
+restoreO(N + log B)O(N)
+
+Where N is the amount of data and B is the number of backups. restore uses binary search (log B) to find the backup, and then copies the data (N).
+
+Common Interview Questions
+
+Why use a HashMap instead of a Tree?
+
+HashMap: Very fast for getting or setting single items (O(1)).
+
+Tree/SortedMap: Better if you need to scan fields often (O(F)). But since we set/get more often than we scan, the HashMap is the better choice here.
+
+How else can we handle Expiration (TTL)?
+
+Lazy (used here): Check only when asked. Simple and uses no extra CPU when idle.
+
+Eager: Have a background process that constantly deletes old keys. This saves memory but is harder to code and uses CPU even when no one is using the database.
+
+How can we improve Backups?
+
+Full Snapshot (used here): Easy to implement, but uses a lot of memory because we copy everything.
+
+Incremental: Only save the changes since the last backup. This saves space but makes restoring slower (you have to replay all the changes).
+
+What if multiple people use the DB at the same time?
+
+compare_and_set helps prevent overwriting changes accidentally.
+
+Real databases use "locks" to ensure two people don't write to the same spot at the exact same instant.
+
+Complexity Summary
+
+MethodTimeSpace
+setO(1)O(1)
+getO(1)O(1)
+scanO(F log F)O(F)
+backupO(N)O(N)
+restoreO(N)O(N)
+
+Alternate canonical variant — Cloud File System
+
+The Challenge
+
+Design an in-memory cloud file system. You need to handle files, search for them, manage user storage limits, and save backups.
+
+You will build this system in four parts. Each part adds new features to the previous one.
+
+Part 1: Basic File Management
+
+What You Need to Do
+
+Create a CloudFileSystem class. It must handle these four actions:
+
+Add a file (with a name and size).
+
+Get the size of a file.
+
+Delete a file.
+
+Copy a file to a new name.
+
+class CloudFileSystem:
+    def __init__(self):
+        """Initialize the cloud file system."""
+        pass
+
+    def add_file(self, name: str, size: int) -> bool:
+        """
+        Add a new file to the system.
+
+        Args:
+            name: The name of the file.
+            size: The size of the file (positive integer).
+
+        Returns:
+            True if the file was successfully added,
+            False if a file with the same name already exists.
+        """
+        pass
+
+    def get_file_size(self, name: str) -> int:
+        """
+        Get the size of a file.
+
+        Args:
+            name: The name of the file.
+
+        Returns:
+            The size of the file, or -1 if the file does not exist.
+        """
+        pass
+
+    def delete_file(self, name: str) -> bool:
+        """
+        Delete a file from the system.
+
+        Args:
+            name: The name of the file to delete.
+
+        Returns:
+            True if the file was successfully deleted,
+            False if the file does not exist.
+        """
+        pass
+
+    def copy_file(self, source: str, dest: str) -> bool:
+        """
+        Copy a file to a new name.
+
+        Args:
+            source: The name of the file to copy.
+            dest: The name of the new copy.
+
+        Returns:
+            True if the copy was successful,
+            False if the source file does not exist or a file
+            with the dest name already exists.
+        """
+        pass
+
+How to Use It
+
+fs = CloudFileSystem()
+
+fs.add_file("report.txt", 100)       # True
+fs.add_file("data.csv", 250)         # True
+fs.add_file("report.txt", 50)        # False (duplicate)
+
+fs.get_file_size("report.txt")       # 100
+fs.get_file_size("missing.txt")      # -1
+
+fs.copy_file("report.txt", "report_backup.txt")  # True
+fs.get_file_size("report_backup.txt")             # 100
+fs.copy_file("missing.txt", "new.txt")            # False (source doesn't exist)
+fs.copy_file("data.csv", "report.txt")            # False (dest already exists)
+
+fs.delete_file("data.csv")           # True
+fs.delete_file("data.csv")           # False (already deleted)
+
+Solution for Part 1
+
+class CloudFileSystem:
+    def __init__(self):
+        self.files = {}  # name -> size
+
+    def add_file(self, name: str, size: int) -> bool:
+        if name in self.files:
+            return False
+        self.files[name] = size
+        return True
+
+    def get_file_size(self, name: str) -> int:
+        if name not in self.files:
+            return -1
+        return self.files[name]
+
+    def delete_file(self, name: str) -> bool:
+        if name not in self.files:
+            return False
+        del self.files[name]
+        return True
+
+    def copy_file(self, source: str, dest: str) -> bool:
+        if source not in self.files or dest in self.files:
+            return False
+        self.files[dest] = self.files[source]
+        return True
+
+Complexity Analysis:
+
+MethodTimeSpace
+add_fileO(1)O(1) per file
+get_file_sizeO(1)O(1)
+delete_fileO(1)O(1)
+copy_fileO(1)O(1)
+
+Part 2: Searching Files
+
+New Requirements
+
+Now, add a search feature. You need to find files where the name starts with a specific prefix.
+
+When you return the list of files:
+
+Sort them by size (largest to smallest).
+
+If two files have the same size, sort them alphabetically by name.
+
+Only return the top N results.
+
+def find_files(self, prefix: str, n: int) -> list:
+    """
+    Find up to N files whose names start with the given prefix,
+    sorted by size in descending order.
+
+    Args:
+        prefix: The prefix to match file names against.
+        n: The maximum number of files to return.
+
+    Returns:
+        A list of strings in the format "name(size)", sorted by
+        file size in descending order. If two files have the same
+        size, sort them alphabetically by name. If fewer than n
+        files match the prefix, return all of them.
+    """
+    pass
+
+How to Use It
+
+fs = CloudFileSystem()
+
+fs.add_file("report.txt", 100)
+fs.add_file("report_v2.txt", 250)
+fs.add_file("readme.md", 50)
+fs.add_file("data.csv", 300)
+fs.add_file("report_final.txt", 100)
+
+fs.find_files("report", 2)
+# ["report_v2.txt(250)", "report.txt(100)"]
+# report_v2.txt has size 250. report.txt and report_final.txt both have
+# size 100, but "report.txt" comes before "report_final.txt" alphabetically.
+
+fs.find_files("report", 10)
+# ["report_v2.txt(250)", "report.txt(100)", "report_final.txt(100)"]
+
+fs.find_files("data", 5)
+# ["data.csv(300)"]
+
+fs.find_files("missing", 5)
+# []
+
+Solution for Part 2
+
+class CloudFileSystem:
+    def __init__(self):
+        self.files = {}  # name -> size
+
+    def add_file(self, name: str, size: int) -> bool:
+        if name in self.files:
+            return False
+        self.files[name] = size
+        return True
+
+    def get_file_size(self, name: str) -> int:
+        if name not in self.files:
+            return -1
+        return self.files[name]
+
+    def delete_file(self, name: str) -> bool:
+        if name not in self.files:
+            return False
+        del self.files[name]
+        return True
+
+    def copy_file(self, source: str, dest: str) -> bool:
+        if source not in self.files or dest in self.files:
+            return False
+        self.files[dest] = self.files[source]
+        return True
+
+    def find_files(self, prefix: str, n: int) -> list:
+        matches = [
+            (name, size)
+            for name, size in self.files.items()
+            if name.startswith(prefix)
+        ]
+        matches.sort(key=lambda x: (-x[1], x[0]))
+        return [f"{name}({size})" for name, size in matches[:n]]
+
+Complexity Analysis:
+
+MethodTimeSpace
+find_filesO(F log F)O(F)
+
+Here, F is the number of files that match the prefix. A simple sort is enough.
+
+Part 3: Adding Users and Limits
+
+New Requirements
+
+Now, add user accounts. Each user has a storage limit (capacity).
+
+Here are the rules:
+
+Users: You can add users with a specific storage limit.
+
+Ownership: Files can belong to a user. The total size of their files cannot go over their limit.
+
+Admin: Files created with the old add_file method belong to an "admin". The admin has unlimited space.
+
+Merge: You can merge two users. The first user gets the second user's files and capacity limit. The second user is then removed.
+
+def add_user(self, user_id: str, capacity: int) -> bool:
+    """
+    Create a new user with a given storage capacity.
+
+    Args:
+        user_id: Unique identifier for the user.
+        capacity: The maximum total file size this user can store.
+
+    Returns:
+        True if the user was successfully created,
+        False if a user with the same ID already exists.
+
+    Notes:
+        - The "admin" user is reserved and cannot be created
+          via this method.
+    """
+    pass
+
+def add_file_by(self, user_id: str, name: str, size: int) -> bool:
+    """
+    Add a new file owned by a specific user.
+
+    Args:
+        user_id: The owner of the file.
+        name: The name of the file.
+        size: The size of the file (positive integer).
+
+    Returns:
+        True if the file was successfully added,
+        False if:
+        - The user does not exist, or
+        - A file with the same name already exists, or
+        - Adding the file would exceed the user's capacity.
+    """
+    pass
+
+def merge_user(self, user_id1: str, user_id2: str) -> bool:
+    """
+    Merge user_id2 into user_id1.
+
+    Args:
+        user_id1: The target user (survives the merge).
+        user_id2: The source user (removed after merge).
+
+    Returns:
+        True if the merge was successful,
+        False if either user does not exist, or they are the same user.
+
+    Notes:
+        - user_id2's capacity is added to user_id1's capacity.
+        - All files owned by user_id2 are transferred to user_id1.
+        - user_id2 is removed from the system.
+        - The "admin" user cannot be merged (neither as source
+          nor target).
+    """
+    pass
+
+How to Use It
+
+fs = CloudFileSystem()
+
+fs.add_user("alice", 500)             # True
+fs.add_user("bob", 300)               # True
+fs.add_user("alice", 1000)            # False (duplicate)
+
+fs.add_file_by("alice", "doc.txt", 200)   # True (alice used: 200/500)
+fs.add_file_by("alice", "img.png", 400)   # False (200 + 400 = 600 > 500)
+fs.add_file_by("alice", "img.png", 250)   # True (alice used: 450/500)
+fs.add_file_by("charlie", "x.txt", 10)    # False (user doesn't exist)
+
+fs.add_file_by("bob", "notes.txt", 100)   # True (bob used: 100/300)
+
+# Files added via add_file belong to "admin"
+fs.add_file("global.dat", 999)             # True
+
+fs.merge_user("alice", "bob")
+# True
+# alice capacity: 500 + 300 = 800
+# alice now owns: doc.txt(200) + img.png(250) + notes.txt(100)
+# alice used: 550/800, bob is removed
+
+fs.add_file_by("bob", "x.txt", 10)        # False (bob no longer exists)
+fs.add_file_by("alice", "big.dat", 200)    # True (alice used: 750/800)
+
+Solution for Part 3
+
+class CloudFileSystem:
+    def __init__(self):
+        self.files = {}         # name -> size
+        self.file_owner = {}    # name -> user_id
+        self.users = {}         # user_id -> {"capacity": int, "used": int}
+
+    def add_file(self, name: str, size: int) -> bool:
+        if name in self.files:
+            return False
+        self.files[name] = size
+        self.file_owner[name] = "admin"
+        return True
+
+    def get_file_size(self, name: str) -> int:
+        if name not in self.files:
+            return -1
+        return self.files[name]
+
+    def delete_file(self, name: str) -> bool:
+        if name not in self.files:
+            return False
+        owner = self.file_owner[name]
+        if owner in self.users:
+            self.users[owner]["used"] -= self.files[name]
+        del self.files[name]
+        del self.file_owner[name]
+        return True
+
+    def copy_file(self, source: str, dest: str) -> bool:
+        if source not in self.files or dest in self.files:
+            return False
+        owner = self.file_owner[source]
+        size = self.files[source]
+        # Check capacity for non-admin owners
+        if owner in self.users:
+            if self.users[owner]["used"] + size > self.users[owner]["capacity"]:
+                return False
+            self.users[owner]["used"] += size
+        self.files[dest] = size
+        self.file_owner[dest] = owner
+        return True
+
+    def find_files(self, prefix: str, n: int) -> list:
+        matches = [
+            (name, size)
+            for name, size in self.files.items()
+            if name.startswith(prefix)
+        ]
+        matches.sort(key=lambda x: (-x[1], x[0]))
+        return [f"{name}({size})" for name, size in matches[:n]]
+
+    def add_user(self, user_id: str, capacity: int) -> bool:
+        if user_id == "admin" or user_id in self.users:
+            return False
+        self.users[user_id] = {"capacity": capacity, "used": 0}
+        return True
+
+    def add_file_by(self, user_id: str, name: str, size: int) -> bool:
+        if user_id not in self.users:
+            return False
+        if name in self.files:
+            return False
+        if self.users[user_id]["used"] + size > self.users[user_id]["capacity"]:
+            return False
+        self.files[name] = size
+        self.file_owner[name] = user_id
+        self.users[user_id]["used"] += size
+        return True
+
+    def merge_user(self, user_id1: str, user_id2: str) -> bool:
+        if user_id1 == "admin" or user_id2 == "admin":
+            return False
+        if user_id1 not in self.users or user_id2 not in self.users:
+            return False
+        if user_id1 == user_id2:
+            return False
+
+        # Merge capacity
+        self.users[user_id1]["capacity"] += self.users[user_id2]["capacity"]
+        # Transfer files
+        self.users[user_id1]["used"] += self.users[user_id2]["used"]
+        for name in list(self.file_owner.keys()):
+            if self.file_owner[name] == user_id2:
+                self.file_owner[name] = user_id1
+        # Remove user_id2
+        del self.users[user_id2]
+        return True
+
+Key Design Logic:
+
+Admin is Special: Files made with add_file belong to "admin". The admin has infinite storage and is not in the self.users list.
+
+Copying Files: If you copy a file, the new file keeps the same owner. You must check if the owner has enough space for the copy.
+
+Merging Users: When users merge, the surviving user gets all the files. We update the ownership of those files in the self.file_owner map.
+
+Complexity Analysis:
+
+MethodTimeSpace
+add_userO(1)O(1) per user
+add_file_byO(1)O(1)
+merge_userO(F)O(1)
+
+Here, F is the total number of files. We must scan all files to change ownership during a merge.
+
+Part 4: Backing Up and Restoring Data
+
+New Requirements
+
+Finally, add a way to backup and restore files.
+
+Backup: Saves a snapshot of a user's files. Each user can only have one backup at a time (a new backup overwrites the old one).
+
+Restore: Reverts the user's files to the state in the backup.
+
+If a file is in the backup but missing now, restore it.
+
+If a file exists now but is NOT in the backup, delete it.
+
+If a file exists in both, keep the current version (don't overwrite it).
+
+Capacity Rule: When restoring, you must still obey the user's storage limit. Restore files in alphabetical order. If a file won't fit, skip it.
+
+Backup Cleanup: After a restore, the backup is deleted.
+
+def backup(self, user_id: str) -> int:
+    """
+    Create a backup of all files owned by the given user.
+
+    Args:
+        user_id: The user whose files to back up.
+
+    Returns:
+        The number of files backed up, or -1 if the user
+        does not exist.
+
+    Notes:
+        - If the user already has a backup, the old backup is
+          replaced with the new one.
+        - The backup stores a snapshot of file names and sizes
+          owned by the user at this point in time.
+        - A user with no files can still be backed up (returns 0).
+        - The "admin" user can be backed up.
+    """
+    pass
+
+def restore(self, user_id: str) -> int:
+    """
+    Restore a user's files from their most recent backup.
+
+    Args:
+        user_id: The user whose files to restore.
+
+    Returns:
+        The number of files restored, or -1 if the user
+        does not exist.
+
+    Notes:
+        - If the user has no backup, delete all of the user's
+          current files and return 0.
+        - If a file from the backup still exists with the same
+          name AND is still owned by this user, skip it (do not
+          restore, do not count it, keep the current version).
+        - Files currently owned by the user that are NOT in the
+          backup are deleted.
+        - Files from the backup that no longer exist are re-created
+          with the backed-up size. If a backed-up file name is now
+          taken by a different user, skip it (do not restore).
+        - Restored files must respect the user's capacity. Files
+          from the backup are restored in alphabetical order by
+          name. If restoring a file would exceed capacity, skip it.
+        - The backup is consumed after a restore (cleared).
+        - The "admin" user can be restored (with unlimited capacity).
+    """
+    pass
+
+Tricky Situations (Corner Cases)
+
+No backup found: If you call restore but there is no backup, delete all the user's current files.
+
+File exists: If a file is in the backup, but it also exists right now (same name, same owner), leave it alone. Do not overwrite it.
+
+Name taken: If the backup has a file named "A.txt", but another user now owns a file named "A.txt", skip it. You cannot overwrite another user's file.
+
+Admin: The admin can use backup and restore, but they have no storage limit.
+
+How to Use It
+
+fs = CloudFileSystem()
+
+fs.add_user("alice", 1000)
+fs.add_file_by("alice", "doc.txt", 200)
+fs.add_file_by("alice", "img.png", 300)
+
+fs.backup("alice")                    # 2 (backed up doc.txt and img.png)
+
+# Alice changes her files
+fs.delete_file("doc.txt")
+fs.add_file_by("alice", "new.txt", 150)
+# alice now has: img.png(300), new.txt(150)
+
+fs.restore("alice")
+# Restore logic:
+# - img.png exists and is owned by alice -> Keep it.
+# - new.txt is NOT in backup -> Delete it.
+# - doc.txt is in backup but missing now -> Restore it.
+# alice now has: img.png(300), doc.txt(200)
+# Returns 1 (only doc.txt was restored)
+
+fs.restore("alice")
+# No backup exists (it was deleted after the last restore).
+# Delete all alice's files -> alice now has 0 files.
+# Returns 0
+
+# Backup with empty files
+fs.backup("alice")                    # 0
+fs.add_file_by("alice", "x.txt", 100)
+fs.restore("alice")
+# Backup was empty -> delete all current files.
+# alice now has 0 files.
+# Returns 0
+
+fs.backup("nonexistent")             # -1
+fs.restore("nonexistent")            # -1
+
+Solution for Part 4
+
+class CloudFileSystem:
+    def __init__(self):
+        self.files = {}         # name -> size
+        self.file_owner = {}    # name -> user_id
+        self.users = {}         # user_id -> {"capacity": int, "used": int}
+        self.backups = {}       # user_id -> {name: size} or None
+
+    def add_file(self, name: str, size: int) -> bool:
+        if name in self.files:
+            return False
+        self.files[name] = size
+        self.file_owner[name] = "admin"
+        return True
+
+    def get_file_size(self, name: str) -> int:
+        if name not in self.files:
+            return -1
+        return self.files[name]
+
+    def delete_file(self, name: str) -> bool:
+        if name not in self.files:
+            return False
+        owner = self.file_owner[name]
+        if owner in self.users:
+            self.users[owner]["used"] -= self.files[name]
+        del self.files[name]
+        del self.file_owner[name]
+        return True
+
+    def copy_file(self, source: str, dest: str) -> bool:
+        if source not in self.files or dest in self.files:
+            return False
+        owner = self.file_owner[source]
+        size = self.files[source]
+        if owner in self.users:
+            if self.users[owner]["used"] + size > self.users[owner]["capacity"]:
+                return False
+            self.users[owner]["used"] += size
+        self.files[dest] = size
+        self.file_owner[dest] = owner
+        return True
+
+    def find_files(self, prefix: str, n: int) -> list:
+        matches = [
+            (name, size)
+            for name, size in self.files.items()
+            if name.startswith(prefix)
+        ]
+        matches.sort(key=lambda x: (-x[1], x[0]))
+        return [f"{name}({size})" for name, size in matches[:n]]
+
+    def add_user(self, user_id: str, capacity: int) -> bool:
+        if user_id == "admin" or user_id in self.users:
+            return False
+        self.users[user_id] = {"capacity": capacity, "used": 0}
+        return True
+
+    def add_file_by(self, user_id: str, name: str, size: int) -> bool:
+        if user_id not in self.users:
+            return False
+        if name in self.files:
+            return False
+        if self.users[user_id]["used"] + size > self.users[user_id]["capacity"]:
+            return False
+        self.files[name] = size
+        self.file_owner[name] = user_id
+        self.users[user_id]["used"] += size
+        return True
+
+    def merge_user(self, user_id1: str, user_id2: str) -> bool:
+        if user_id1 == "admin" or user_id2 == "admin":
+            return False
+        if user_id1 not in self.users or user_id2 not in self.users:
+            return False
+        if user_id1 == user_id2:
+            return False
+        self.users[user_id1]["capacity"] += self.users[user_id2]["capacity"]
+        self.users[user_id1]["used"] += self.users[user_id2]["used"]
+        for name in list(self.file_owner.keys()):
+            if self.file_owner[name] == user_id2:
+                self.file_owner[name] = user_id1
+        del self.users[user_id2]
+        return True
+
+    def _is_valid_user(self, user_id: str) -> bool:
+        """Check if user_id is a valid user (either admin or a registered user)."""
+        return user_id == "admin" or user_id in self.users
+
+    def backup(self, user_id: str) -> int:
+        if not self._is_valid_user(user_id):
+            return -1
+        # Snapshot all files owned by this user
+        snapshot = {}
+        for name, owner in self.file_owner.items():
+            if owner == user_id:
+                snapshot[name] = self.files[name]
+        self.backups[user_id] = snapshot
+        return len(snapshot)
+
+    def restore(self, user_id: str) -> int:
+        if not self._is_valid_user(user_id):
+            return -1
+
+        # Get the backup (may be None if no backup exists)
+        snapshot = self.backups.pop(user_id, None)
+
+        # Collect current files owned by this user
+        current_files = [
+            name for name, owner in self.file_owner.items()
+            if owner == user_id
+        ]
+
+        if snapshot is None:
+            # No backup: delete all current files
+            for name in current_files:
+                self.delete_file(name)
+            return 0
+
+        # Determine which current files to keep (exist in backup with same owner)
+        kept = set()
+        for name in current_files:
+            if name in snapshot:
+                # File still exists with same owner — keep current version, skip
+                kept.add(name)
+
+        # Delete current files NOT in the backup
+        for name in current_files:
+            if name not in kept:
+                self.delete_file(name)
+
+        # Restore files from backup that were not kept
+        is_admin = (user_id == "admin")
+        restored = 0
+        for name in sorted(snapshot.keys()):
+            if name in kept:
+                continue  # Already exists with same owner, skip
+            if name in self.files:
+                continue  # File name taken by another user, skip
+            size = snapshot[name]
+            # Check capacity for non-admin users
+            if not is_admin and user_id in self.users:
+                if self.users[user_id]["used"] + size > self.users[user_id]["capacity"]:
+                    continue  # Skip, would exceed capacity
+            # Re-create the file
+            self.files[name] = size
+            self.file_owner[name] = user_id
+            if user_id in self.users:
+                self.users[user_id]["used"] += size
+            restored += 1
+
+        return restored
+
+Key Design Logic:
+
+Single Backup: We only store one backup per user. It is a simple dictionary {name: size}.
+
+Clear Backup: The backup is removed after you call restore. If you call restore again immediately, it will see no backup and delete everything.
+
+Preserve Files: If a file is safe (same name, same owner), we ignore it. If a file name is taken by a different user, we also ignore it to prevent conflicts.
+
+Complexity Analysis:
+
+MethodTimeSpace
+backupO(F)O(B)
+restoreO(F log F)O(F)
+
+Here, F is the total number of files. B is the number of files in the backup. The sort in restore handles the requirement to restore files alphabetically.
+
+Interview Discussion Points
+
+Why use a dictionary?
+
+It gives us O(1) speed for adding, finding, and deleting files.
+
+An alternative would be a Trie, which is faster for prefix searches but harder to build.
+
+Tricky parts of merging users:
+
+You must move all files to the new user.
+
+Capacities are added together. You don't need to re-check if files fit, because old_capacity + new_capacity will always hold old_files + new_files.
+
+Conflict Resolution during Restore:
+
+We keep current files if they match the backup (saves time/data).
+
+We skip restoring a file if someone else has taken that name (avoids errors).
+
+We restore alphabetically to make sure the result is predictable when storage is full.
+
+Complexity Summary
+
+MethodTimeSpace
+add_fileO(1)O(1) per file
+get_file_sizeO(1)O(1)
+delete_fileO(1)O(1)
+copy_fileO(1)O(1)
+find_filesO(F log F)O(F)
+add_userO(1)O(1) per user
+add_file_byO(1)O(1)
+merge_userO(F)O(1)
+backupO(F)O(B)
+restoreO(F log F)O(F)
+
+F = Total number of files in system.
+B = Number of files in the user's backup.
+
+Candidate-Report Notes
+
+For Variant A Level 4, the cleanest model stores each (key, field) as a list of (timestamp, value, expiresAt) tuples — TTL becomes a binary search at read time, backup snapshots a deep copy or just records a timestamp, and restore either rewrites "now" or rebuilds the visible state at targetTimestamp. The "resume TTL from restore point" rule is the corner-case that decides full vs partial credit.
+
+For Variant B Level 4 (updateCapacity), the deletion order is largest-first with lexicographic tiebreak. A per-user SortedSet keyed on (-size, name) makes this O(k log n).
+
+Several recent candidates spent most of Level 3 / 4 fighting their Level 1 data-structure choice. Spend the first 3 minutes drawing the data-structure that survives all four levels; rewriting at Level 3 burns 15 minutes.
+
+Hidden tests are not exhaustive — passing the visible Level-2 tests is not a guarantee you got the spec right. Add your own edge cases for empty prefix / missing user / TTL exactly at the boundary.
+
+Preparation
+
+Solve the canonical 4-level in-memory DB pattern end-to-end at least twice in your interview language. The level-3 (TTL) and level-4 (backup/restore) patterns are common across companies and worth pattern-locking.
+
+For the cloud-storage variant, drill the user-capacity / updateCapacity evict-largest-first pattern — it is the highest-loss-rate level for cold candidates.
+
+For the user-lock variant, get clean about which operations are no-ops vs which throw — the test cases reward both being explicit and consistent.
+
+Open one of the published "level-1 template" gists before the timer starts — most candidates lose Level 1 time to typo'd nested-map boilerplate they could have copied from muscle memory.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

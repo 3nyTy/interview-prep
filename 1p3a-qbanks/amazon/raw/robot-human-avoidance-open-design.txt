@@ -1,0 +1,59 @@
+===H1===
+Robot Human-Avoidance — Open-Ended Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/robot-human-avoidance-open-design
+===BODY===
+Amazon
+Other·60 minMembers
+Robot Human-Avoidance — Open-Ended Design
+Robotics-team intern coding slot that is really an architecture / pseudocode discussion: design how a warehouse robot detects and avoids humans, picking sensors and data structures along the way.
+SWE
+open-ended
+ambiguous-spec
+system-design
+hard
+Frequency
+Single report
+Last asked
+2026-05-16
+Stage
+onsite-coding
+Requirements
+
+Open-ended prompt: "How would you make this robot avoid people?" Interviewer expects pseudocode plus an architecture sketch in plain text, not a compiled solution.
+
+Drives the candidate through three explicit decision axes:
+
+Sensor selection (cameras, depth / LiDAR, ultrasonics) and the latency vs accuracy trade-off.
+
+Data structure for the local world model — occupancy grid vs object list vs trajectory buffer.
+
+Decision loop — perception → planning → actuation, including how often each tier runs.
+
+The interviewer in this loop actively suggested options when the candidate stalled; treat it as a guided design dialogue, not a silent whiteboard.
+
+Notes
+
+Robotics SDE intern loops at Amazon are trending toward this open-design format; the same recruiter screen that promised "BQ + LeetCode" delivered architecture instead, so do not assume the round will be conventional coding.
+
+Strong answers walk through a layered pipeline: low-frequency global planner, mid-frequency local planner with dynamic obstacles, high-frequency reactive controller. Name each loop's hertz target.
+
+A small but explicit safety conversation scores well — fail-stop behavior when sensors disagree, a watchdog that halts motion on perception drop-out.
+
+Bring up evaluation: how do you tell offline that the avoider works? Replaying logged human trajectories against the policy is the standard answer.
+
+Preparation
+
+Sketch a one-page reference architecture (perception → world model → planner → controller) and rehearse narrating it in under five minutes.
+
+Read one published reference on dynamic-obstacle avoidance (the Probabilistic Roadmap + velocity-obstacle family) so the trade-off vocabulary is at your fingertips.
+
+Have a fallback story for sensor failure ready — interviewers in this slot reliably ask "what if the depth camera dies mid-run?"
+
+Practice the dialogue style: pause to ask the interviewer which axis they want depth on (sensors vs planner vs safety) instead of trying to cover everything at once.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

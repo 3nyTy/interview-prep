@@ -1,0 +1,89 @@
+===H1===
+Trade Processor with Subscribe / Unsubscribe
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/trade-processor-subscribe-unsubscribe
+===BODY===
+Bloomberg
+System Design·60 minMembers
+Trade Processor with Subscribe / Unsubscribe
+Implement a `TradeProcessor` that accepts incoming trades, lets clients subscribe to trades matching a filter with a callback, returns a handle for the subscription, and supports unsubscription. A coding-flavored design round where the prompt is deliberately under-specified — clarification is half the work.
+SWE
+oop-design
+design-implementation
+pubsub
+concurrency
+ambiguous-spec
+hard
+Frequency
+Single report
+Last asked
+2025-11-27
+Stage
+onsite-system-design
+Requirements
+
+Implement (in C++ / Java / Python style) a class with the following reported interface:
+
+using HANDLE = int;
+
+struct Trade {
+    string symbol;
+    int size;
+    string flag;
+};
+
+class TradeProcessor {
+public:
+    TradeProcessor();
+    void onNewTrade(Trade& trade);
+    HANDLE subscribe(Trade& tradeFilter, std::function<void(const Trade&)> callback);
+    void unsubscribe(HANDLE handle);
+private:
+    // add what you want here
+};
+
+The semantics the interviewer expects the candidate to clarify before coding:
+
+What does subscribe(tradeFilter, callback) mean? Most likely: register interest in trades whose symbol (and optionally flag) matches the filter; invoke callback(trade) on every matching incoming trade until unsubscribed.
+
+Does tradeFilter use exact match on symbol, prefix match, or some richer pattern? Default to exact match unless told otherwise.
+
+Is onNewTrade called on a single thread or many? Affects whether the subscription registry needs synchronization.
+
+Is callback invocation synchronous (inline in onNewTrade) or queued? Synchronous is simpler; queued is needed when callbacks can be slow.
+
+What does unsubscribe guarantee — that no further callbacks fire after it returns, even mid-dispatch?
+
+Follow-ups:
+
+Scale onNewTrade to high frequency. What changes about the data structures?
+
+Support OR / AND filter combinators (subscribe to "AAPL or MSFT").
+
+Buffer trades that arrive before any subscription matches (replay-on-subscribe).
+
+Notes
+
+The prompt is intentionally vague. Multiple candidates report the round derailing because clarification was skipped — they started coding and discovered halfway through that the data model didn't match the interviewer's intent. Clarify before any code lands.
+
+A clean default layout: unordered_map<string, vector<Subscription>> keyed on symbol; each Subscription carries (handle, callback, optional filter predicate). subscribe returns a monotonically incrementing handle and indexes the subscription by symbol. unsubscribe looks up the symbol bucket and erases by handle.
+
+For the synchronous-callback default, onNewTrade iterates the matching bucket and invokes each callback in turn. Time O(k) per trade where k is the number of subscribers on that symbol.
+
+For thread safety, the simplest correct answer is a single mutex around the subscription map; advanced answers use a copy-on-write snapshot of the bucket per dispatch so callbacks run lock-free.
+
+For richer filters (regex, predicate function), trade the symbol-indexed map for a flat list of subscriptions and walk every one per trade — fine when subscriber count is small.
+
+Preparation
+
+Drill the clarification script: confirm filter semantics, threading model, callback timing, unsubscribe atomicity. Write these four bullets at the top of the scratch pad before any code.
+
+Implement the symbol-indexed default in 30 minutes; leave 10 minutes for at least one follow-up (thread safety or filter extension).
+
+Be ready to defend the data-structure choice in terms of expected QPS and subscriber-per-symbol fanout, not in the abstract.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

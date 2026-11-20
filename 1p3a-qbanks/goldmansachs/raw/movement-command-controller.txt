@@ -1,0 +1,44 @@
+===H1===
+Movement Command Controller
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/movement-command-controller
+===BODY===
+Goldman Sachs
+Coding·45 minMembers
+Movement Command Controller
+Implement a simple up/down/left/right movement controller from a command string, then adapt it when command characters may mix uppercase and lowercase.
+SWE
+string
+simulation
+easy
+Frequency
+Single report
+Last asked
+2026-02-05
+Stage
+onsite-coding
+Requirements
+
+Parse a command string containing movement instructions for up, down, left, and right.
+
+Use a switch / dispatch table to update the current position.
+
+Follow-up: handle mixed uppercase and lowercase command characters.
+
+Notes
+
+Full input/output shape was not specified, so clarify the initial position, coordinate convention, invalid-character behavior, and expected return value before coding.
+
+A clean implementation normalizes each character once, then dispatches through a small mapping from command to (dx, dy).
+
+Preparation
+
+Write the simple coordinate-update version, then refactor to a map of command deltas.
+
+Add tests for lowercase, uppercase, mixed-case, and invalid characters.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

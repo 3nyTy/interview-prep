@@ -1,0 +1,110 @@
+===H1===
+Movie Billboard Rotation Service
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/movie-billboard-rotation-service
+===BODY===
+Movie Billboard Rotation Service
+
+<https://www.1point3acres.com/interview/problems/company/netflix/movie-billboard-rotation-service>
+
+Netflix
+Coding
+
+60 min
+Members
+Movie Billboard Rotation Service
+
+Build a service that chooses the next title for a user's homepage billboard. Titles have relevance scores, but the service should avoid returning the same title twice in a row when alternatives exist.
+
+MLE
+Infra Eng
+SWE
+heap
+ranking
+recommendation
+caching
+data-structure
+medium
+Frequency
+Low
+Last asked
+2026-07-28
+Stage
+onsite-coding
+Requirements
+upsertTitleScore(title_id: str, score: float) adds a title or updates an existing title's score.
+getTopTitle() -> str returns the current title to display.
+Higher-score titles should be preferred.
+If another title is available, avoid returning the same title consecutively.
+If only one title exists, repeated return is allowed.
+Updated scores must affect later selections.
+A canonical variant explicitly disallows heaps and expects two ordered maps.
+Follow-up: make selection and score updates safe under concurrent access.
+Follow-up: discuss production-scale storage, access patterns, and service scaling.
+Notes
+A max-heap by score works well. Keep title -> current score for lazy deletion after updates.
+Store last_returned. On getTopTitle, pop the highest live entry. If it equals last_returned and a second live entry exists, return the second entry and push the first back.
+Tie-breaking should be deterministic: score desc, then title id or insertion time.
+Lazy heap deletion is necessary because score updates leave stale heap entries.
+Make lazy deletion robust by storing a per-title version counter: upsertTitleScore bumps the title's version and pushes (-score, title, version); on pop, discard any entry whose (version, score) no longer matches the live map. This invalidates a stale entry even when an update happens to set the same score value, which a score-only check would miss.
+If the interviewer asks about fairness, this is no longer pure top-one ranking; discuss recency penalties, cooldowns, or weighted sampling.
+Alternate canonical variant  two ordered maps
+Maintain an ordered title_id -> score map for updates and a descending score -> ordered set<title_id> map for ranking. On an update, remove the title from its old score bucket, delete an empty bucket, then insert it under the new score.
+For getTopTitle, inspect the highest score bucket first. If its first title equals last_returned and another title exists, choose the next title in that bucket or the first title in the next-lower score bucket. Keep all titles indexed after selection and update only last_returned.
+With balanced ordered maps, both update and selection are O(log n) and the two indexes use O(n) space. Protect both indexes plus last_returned with one lock, or serialize mutations through a single writer, so readers never observe a half-applied update.
+Preparation
+Implement heap + score map + last-returned in one pass.
+Implement the ordered-map variant without relying on a heap.
+Test single title, score update, stale heap entries, ties, and two-title alternation.
+Practice explaining thread safety, persistence, and per-user scaling.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Alternate canonical variant  two ordered maps
+Preparation
+Related discussions  2
+???VO1
+??? ML Infra VO 1
+Related questions
+
+Other Netflix questions sharing tags with this one
+
+Weighted Cache / Timed Cache
+Medium
+data-structure
+heap
+caching
++3
+Homepage Video Recommendation System
+Single report
+recommendation
+ranking
+medium
++1
+Command Executor with Undo and Tags
+Medium
+data-structure
+medium
+stack
++3
+Homepage Viewport / Shelf Dedupe
+Medium
+caching
+medium
+dedup
++4
+Music Playlist History
+Single report
+data-structure
+medium
+hashmap
++2
+Code editor
+
+---

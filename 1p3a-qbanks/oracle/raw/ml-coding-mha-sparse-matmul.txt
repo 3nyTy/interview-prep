@@ -1,0 +1,85 @@
+===H1===
+ML Coding — Handwritten MHA and Sparse Matmul
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/ml-coding-mha-sparse-matmul
+===BODY===
+Oracle
+Coding·90 minMembers
+ML Coding — Handwritten MHA and Sparse Matmul
+Two ML-coding problems in a 90-minute phone screen for Oracle's AI org: (1) hand-implement multi-head attention from scratch; (2) hand-implement sparse matrix multiplication. Both straightforward; the candidate flagged a mismatch between the senior-principal interviewer's title and demonstrated knowledge.
+MLE
+RS
+pytorch
+numpy
+transformer
+attention
+linear-algebra
+ml-knowledge
+medium
+Frequency
+Single report
+Last asked
+2026-01-22
+Stage
+phone-screen
+Requirements
+
+90-minute phone screen for an Oracle AI org Senior Principal MLE role. Two problems.
+
+Part 1 — Multi-Head Attention (from scratch)
+
+Implement multi_head_attention(Q, K, V, num_heads, mask=None) in numpy or PyTorch tensor ops without using nn.MultiheadAttention / F.scaled_dot_product_attention.
+
+Input shapes: Q, K, V of shape (batch, seq, d_model); num_heads divides d_model.
+
+Output: same shape as input (batch, seq, d_model).
+
+Support optional causal mask.
+
+Part 2 — Sparse Matrix Multiplication
+
+Multiply two matrices A (n × m) and B (m × p) where both are sparse (most entries are zero).
+
+Input representation: list of (row, col, value) triples for each matrix.
+
+Output: the dense (or sparse, candidate's choice) product C = A @ B.
+
+Goal: avoid the O(n × m × p) dense computation when most entries are zero.
+
+Notes
+
+MHA
+
+Canonical structure (one head): attn = softmax((Q K^T) / sqrt(d_k)); out = attn @ V. Multi-head: project Q, K, V into num_heads parallel (d_k = d_model / num_heads)-dimensional spaces, run attention per head, concatenate, project back.
+
+Numerical-stability detail: subtract per-row max before exp in softmax (log-sum-exp trick).
+
+Causal mask: add -inf to upper-triangular positions before softmax.
+
+In numpy, the einsum formulation is the most compact: np.einsum('bhqd,bhkd->bhqk', Q, K) for (Q K^T) after the head-split. In PyTorch, torch.matmul with explicit reshape is the standard pattern.
+
+Common bugs: dropping the 1 / sqrt(d_k) scaling; computing softmax over the wrong axis; forgetting to merge heads back before the final projection.
+
+Sparse matmul
+
+Group A's triples by column; group B's triples by row. For each (a_row, a_col, a_val) in A and each (b_row, b_col, b_val) in B with a_col == b_row, add a_val * b_val to C[a_row, b_col].
+
+Equivalently: index B's triples by row; for each non-zero in A, iterate over the corresponding row in B.
+
+Time O(nnz(A) × avg_row_density(B)); sub-O(n × m × p) whenever sparsity is real.
+
+Edge cases: shape mismatch (A.cols != B.rows); zero-only rows / columns; duplicate triples (sum first, then multiply).
+
+Preparation
+
+Drill MHA from scratch in numpy in 20 minutes. Then redo it in PyTorch with nn.Linear projections.
+
+Drill the sparse-matmul implementation with the index-by-row pattern; cross-check against numpy @ on a small dense version of the same matrices.
+
+Be ready to discuss numerical-stability tricks (log-sum-exp, fp16 → fp32 cast) and complexity bounds at the end — this round had time to spare and the interviewer asked follow-up questions.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

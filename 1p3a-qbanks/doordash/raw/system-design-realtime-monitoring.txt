@@ -1,0 +1,83 @@
+===H1===
+System Design: Realtime Monitoring System
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/system-design-realtime-monitoring
+===BODY===
+DoorDash
+System Design·75 minMembers
+System Design: Realtime Monitoring System
+Design a real-time monitoring system: services emit metrics, the platform ingests at high volume, supports queries / dashboards / alerts. This is the canonical Datadog-style metrics-monitoring prompt (ingest → storage → query → alerting); the DoorDash variant follows that standard structure closely.
+SWE
+distributed-systems
+kafka
+sharding
+storage
+scaling
+medium
+Frequency
+Single report
+Last asked
+2026-04-06
+Stage
+onsite-system-design
+Requirements
+
+Functional
+
+Services emit metrics (counter, gauge, histogram, log lines) at high volume.
+
+Users (engineers, on-call) query metrics for dashboards in seconds.
+
+Alerts fire when a metric crosses a threshold or matches an anomaly rule.
+
+Retention tiered: hot recent data queried often; cold long-term data queried rarely.
+
+Non-functional
+
+Ingestion at ~5M data points per second at peak (canonical scale: 500k hosts × ~100 metrics × emit every 10s ≈ 5M/s, ~1GB/s of raw bytes at 100–200 bytes per point).
+
+Query latency p99 in the 1–2 second range for typical dashboard queries spanning days to weeks.
+
+Alert latency: under 1 minute from metric emission to alert firing.
+
+Cost-conscious storage: downsample aggressively for older data.
+
+Notes
+
+Ingestion. Agent on each host batches and ships metrics over a binary protocol to an ingestion API; the ingestion layer writes to Kafka partitioned by metric_id (or hash of metric_name + tags).
+
+Storage. Time-series DB (InfluxDB / Prometheus / VictoriaMetrics / a custom columnar store) optimized for time-partitioned reads. Per-shard write throughput is the bottleneck; pre-allocate shards by metric cardinality.
+
+Query path. Query engine reads recent data from in-memory hot store, older data from columnar files in object storage (S3 + parquet); fan-out by shard, merge at the coordinator.
+
+Downsampling. Background job rolls 10s → 1m → 5m → 1h aggregates; older tiers stored at lower resolution. Each tier has its own retention TTL.
+
+Alerting. Stream-processing layer (Flink / Kafka Streams) consumes the raw metric topic, evaluates alert rules on sliding windows, emits firing alerts to the notification system. Stateful alert evaluation (e.g. "3 windows in a row above threshold") needs checkpointed state.
+
+Cardinality control. High-cardinality tags (per-request id, per-user id) blow up the index. Reject or sample high-cardinality tags at ingest; promote critical low-cardinality tags via an allowlist.
+
+Multi-tenancy. Per-tenant rate-limits, per-tenant cost dashboards, per-tenant retention configs.
+
+Common follow-up themes
+
+How do you scale ingest from 1M to 10M? (Partition shards by hash; horizontal scale of ingest workers; backpressure to the agent.)
+
+How do you handle a hot metric? (Sub-partition by tag; isolate to dedicated shard.)
+
+How do you do anomaly detection at scale? (Per-metric baseline model trained offline; online comparison via stream processor.)
+
+How do you keep query latency low for a year-old dashboard? (Pre-materialized downsampled tiers; query routes to the appropriate tier automatically.)
+
+Preparation
+
+Drill the canonical metrics-monitoring answer structure (ingest → TSDB → query → alerting) cold — it is the standard arc this round follows.
+
+Drill the partitioning + downsampling story; this is the most commonly probed part of the round.
+
+Have a 60-second answer for cardinality control — every modern interviewer asks about it.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

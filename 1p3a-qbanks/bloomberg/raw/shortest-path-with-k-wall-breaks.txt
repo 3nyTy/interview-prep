@@ -1,0 +1,71 @@
+===H1===
+Shortest Path in Grid with K Wall Breaks
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/shortest-path-with-k-wall-breaks
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Shortest Path in Grid with K Wall Breaks
+Find the shortest path from the top-left to the bottom-right of a binary grid, allowed to eliminate at most `k` obstacle cells along the way. Standard BFS plus a `remaining-breaks` state dimension.
+SWE
+bfs
+grid
+state-machine
+hard
+Frequency
+Low
+Last asked
+2026-08-07
+Stage
+onsite-coding · phone-screen
+Requirements
+
+Given an m x n grid where 0 is an empty cell and 1 is an obstacle, return the minimum number of steps from (0, 0) to (m - 1, n - 1) if you can eliminate at most k obstacles along the way. Return -1 if no such path exists.
+
+Four-directional movement. Eliminating an obstacle counts as one step (entering the cell).
+
+Function signature:
+
+int shortestPath(int[][] grid, int k)
+
+Follow-ups:
+
+Why isn't this just plain BFS? Because the same cell with different remaining k is genuinely a different state.
+
+Walk through the early-exit optimization: if k >= m + n - 3, the answer is m + n - 2 (any path can be taken).
+
+Discuss memory: O(m * n * k) versus the max-k-per-cell trick.
+
+Examples
+
+grid = [[0,0,0],
+        [1,1,0],
+        [0,0,0],
+        [0,1,1],
+        [0,0,0]]
+k = 1
+shortestPath -> 6
+
+Notes
+
+The state is (row, col, remainingBreaks). BFS by step count guarantees the first arrival at the target is the shortest.
+
+Use a visited[m][n] of the max remainingBreaks ever seen at that cell — entering with strictly more breaks remaining is always at least as good as entering with fewer, so the smaller-or-equal arrival can be skipped.
+
+Time O(m * n * k), space O(m * n) with the max-breaks optimization.
+
+The shortcut: if k is large enough to break every wall on the Manhattan-shortest path, the answer is m + n - 2; return immediately.
+
+Preparation
+
+Implement once with full 3-D visited set, then with the max-breaks-per-cell heuristic.
+
+Be explicit about the BFS-vs-Dijkstra choice: since each move has unit cost, BFS suffices and Dijkstra is overkill.
+
+Drill the related state-augmented BFS family (different remaining-resource dimensions: keys collected, gas remaining, walls broken) — they all share the same skeleton.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

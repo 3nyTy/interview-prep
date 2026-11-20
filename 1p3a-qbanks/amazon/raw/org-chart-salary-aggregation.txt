@@ -1,0 +1,49 @@
+===H1===
+Org-Chart Salary Aggregation
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/org-chart-salary-aggregation
+===BODY===
+Amazon
+Coding·30 minMembers
+Org-Chart Salary Aggregation
+Final-round coding (MLE/AS loop). Part 1: from employee–manager–salary records, return the manager whose direct reports have the highest average salary; a hashmap grouping by manager suffices. Part 2: for a given manager, compute the average salary across the reporting hierarchy — the interviewer hints at a tree structure (recurse over the org chart) rather than a flat group-by. Exact aggregation semantics (direct reports vs full subtree) were left thin and worth clarifying.
+MLE
+hashmap
+tree
+tree-traversal
+medium
+Frequency
+Single report
+Last asked
+2026-06-27
+Stage
+onsite-coding · final-round
+Requirements
+
+Given employee records with salary and manager relationships:
+
+Part 1: return the manager whose employees have the highest average salary.
+
+Part 2: for a given manager, compute the average salary of their reports — the interviewer steered toward a tree structure over the reporting hierarchy rather than a single flat group-by.
+
+Notes
+
+Part 1 is a straightforward hashmap group-by: bucket employees under their manager, average each bucket, take the max. A dictionary solution is accepted here.
+
+Part 2 is where the tree framing matters: model the org chart as a tree (each manager points to their reports) and recurse. Whether the average is over direct reports only or the entire subtree was left ambiguous — clarify this before coding, since it changes the recursion (aggregate-and-return subtree sum + count vs. one level).
+
+Returning (sum, count) up the recursion lets you compute any subtree's average in one post-order pass without recomputation.
+
+Watch for cycles / malformed input (an employee listed as their own manager) and employees with no manager (org roots).
+
+Preparation
+
+Implement Part 1 as a manager→[salaries] map, then Part 2 as a post-order recursion returning (subtree_sum, subtree_count).
+
+Prepare a one-line clarifying question on direct-reports-vs-full-subtree averaging; the prompt is deliberately thin on this and the interviewer rewards catching it.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

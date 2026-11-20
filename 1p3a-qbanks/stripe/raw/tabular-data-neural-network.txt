@@ -1,0 +1,293 @@
+===H1===
+Tabular Data Neural Network
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/tabular-data-neural-network
+===BODY===
+Stripe
+Coding·45 minMembers
+Tabular Data Neural Network
+A hands-on ML implementation round: build a neural network that predicts two target labels at once from a table of tabular data. The interviewer grades both your working code and how clearly you explain your data-analysis and modeling choices.
+MLE
+pytorch
+classification
+feature-engineering
+data-cleaning
+ml-experiment
+python
+medium
+Frequency
+Single report
+Last asked
+2025-10-07
+Stage
+phone-screen
+What to Expect
+
+Build a machine learning model live: a neural network that uses a table of data (rows and columns) to predict two different things at the same time. The interviewer wants to see you write code, but they also want to hear how you think — explain your choices clearly.
+
+Interview Setup
+
+Time: 45 minutes
+
+Setup: You code on your own computer and share your screen.
+
+Tools: PyTorch, TensorFlow, or similar libraries.
+
+Rules: Do not use AI helpers (like ChatGPT). You can read official documentation.
+
+Goal: Show good data analysis, clear explanations, and working code.
+
+Main Assignment
+
+Goal: Build a neural network that predicts two output labels at once.
+
+Step 1: Explore the Data
+
+Talk out loud while you look at the data. Say things like:
+
+"The dataset has X rows and Y columns."
+
+"I see missing values in columns A and B."
+
+"The targets look like numbers (continuous) or categories."
+
+"These columns have text, so I need to turn them into numbers."
+
+Step 2: Prepare the Data
+
+Fix data problems and explain why:
+
+Missing values: Check df.isnull().sum(). You can delete these rows, fill them with the average (mean/median), or mark them with a flag.
+
+Choosing features: Remove ID columns or dates that might give away the answer (leakage). Remove columns that are repeats of each other.
+
+Encoding: Change text categories into numbers (One-hot encoding). Scale the numbers so they are in the same range.
+
+Step 3: Build the Model
+
+Create a simple network suitable for table data:
+
+Input layer: Must match the number of features you have.
+
+Hidden layers: Add 1 or 2 layers. 64 or 128 units is usually good.
+
+Output layer: Set this up for your two targets.
+
+Loss function: Choose the right math to measure errors for each target.
+
+Step 4: Check Results
+
+Split your data into training (80%) and testing (20%) sets.
+
+Train the model for 50-100 epochs (rounds).
+
+Print the scores. Use MSE/R² for numbers and Accuracy/F1 for categories.
+
+Important Decisions
+
+The interviewer looks at how you make these choices:
+
+How to Handle Missing Data
+
+ApproachWhen to UseTrade-off
+Drop rowsWhen only a few rows (<5%) are missing.You lose data.
+Mean/median imputeFor number columns.Can change the data shape.
+Mode imputeFor category columns.Makes common items too common.
+Flag + imputeIf "missing" means something specific.Adds more columns.
+
+How to Choose Features
+
+Drop IDs: Index numbers do not help predict new data.
+
+Check for leakage: Remove data that comes from the future or creates a cheat sheet for the answer.
+
+Correlation: If two columns are almost the same (>0.95), delete one.
+
+Variance: Drop columns that contain the same value for every row.
+
+Model Structure Options
+
+Shared layers: Good when the two targets are related.
+
+Separate networks: Good when the targets have nothing to do with each other.
+
+Single output layer: Simple, but only works if both targets are the same type.
+
+Questions After Coding
+
+If you have time, the interviewer might ask:
+
+"How would you improve the settings (hyperparameters)?"
+
+"What if one label is much harder to predict than the other?"
+
+"How would you handle a dataset that is 10 times larger?"
+
+"How would you watch this model after it is live?"
+
+Reference Implementations
+
+Preparing the Data
+
+import pandas as pd
+import numpy as np
+import torch
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.impute import SimpleImputer
+
+# Read data and look at it
+df = pd.read_csv('data.csv')
+print(f"Shape: {df.shape}")
+print(f"Missing values:\n{df.isnull().sum()}")
+print(f"Dtypes:\n{df.dtypes}")
+
+# Decide what each column is
+target_cols = ['label1', 'label2']  # label1=regression, label2=classification
+drop_cols = ['id', 'timestamp']  # Columns that don't help predict
+categorical_cols = ['category_a', 'category_b']  # Adjust for your data
+numerical_cols = [c for c in df.columns
+                  if c not in target_cols + drop_cols + categorical_cols]
+
+# Turn text into numbers (Label Encoding)
+for col in categorical_cols:
+    df[col] = LabelEncoder().fit_transform(df[col].fillna('missing'))
+
+# Split data FIRST to prevent cheating (leakage)
+feature_cols = numerical_cols + categorical_cols
+X = df[feature_cols]
+y_reg = df['label1'].values  # Regression target
+y_cls = df['label2'].values  # Classification target
+
+X_train, X_test, y_reg_train, y_reg_test, y_cls_train, y_cls_test = train_test_split(
+    X, y_reg, y_cls, test_size=0.2, random_state=42
+)
+
+# Fill missing values and scale numbers using only training data
+imputer = SimpleImputer(strategy='median')
+scaler = StandardScaler()
+
+X_train_imputed = imputer.fit_transform(X_train)
+X_train_scaled = scaler.fit_transform(X_train_imputed)
+
+X_test_imputed = imputer.transform(X_test)
+X_test_scaled = scaler.transform(X_test_imputed)
+
+# Convert to PyTorch tensors
+X_train_t = torch.FloatTensor(X_train_scaled)
+X_test_t = torch.FloatTensor(X_test_scaled)
+y_reg_train_t = torch.FloatTensor(y_reg_train).unsqueeze(1)  # Shape: (n, 1)
+y_cls_train_t = torch.FloatTensor(y_cls_train).unsqueeze(1)  # Shape: (n, 1)
+
+Simple PyTorch Network
+
+import torch
+import torch.nn as nn
+
+class TabularNet(nn.Module):
+    def __init__(self, input_dim, hidden_dim=64):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, 2)  # 2 outputs
+        )
+
+    def forward(self, x):
+        return self.net(x)
+
+PyTorch for Two Output Types
+
+Use this if one target is a number (regression) and one is a category (classification):
+
+class MultiTaskNet(nn.Module):
+    def __init__(self, input_dim, hidden_dim=64):
+        super().__init__()
+        self.shared = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.ReLU(),
+        )
+        self.regression_head = nn.Linear(hidden_dim, 1)
+        self.classification_head = nn.Linear(hidden_dim, 1)
+
+    def forward(self, x):
+        shared = self.shared(x)
+        reg_out = self.regression_head(shared)
+        cls_out = torch.sigmoid(self.classification_head(shared))
+        return reg_out, cls_out
+
+# Training loop
+model = MultiTaskNet(input_dim=X_train_t.shape[1])
+mse_loss = nn.MSELoss()
+bce_loss = nn.BCELoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
+for epoch in range(100):
+    model.train()
+    optimizer.zero_grad()
+
+    reg_pred, cls_pred = model(X_train_t)
+    loss = mse_loss(reg_pred, y_reg_train_t) + bce_loss(cls_pred, y_cls_train_t)
+
+    loss.backward()
+    optimizer.step()
+
+    if (epoch + 1) % 20 == 0:
+        print(f"Epoch {epoch+1}, Loss: {loss.item():.4f}")
+
+TensorFlow/Keras Version
+
+import tensorflow as tf
+from tensorflow import keras
+
+# Dual-output model
+input_dim = X_train_scaled.shape[1]
+inputs = keras.Input(shape=(input_dim,))
+x = keras.layers.Dense(64, activation='relu')(inputs)
+x = keras.layers.Dropout(0.2)(x)
+x = keras.layers.Dense(64, activation='relu')(x)
+
+# Two output heads
+reg_output = keras.layers.Dense(1, name='regression')(x)
+cls_output = keras.layers.Dense(1, activation='sigmoid', name='classification')(x)
+
+model = keras.Model(inputs=inputs, outputs=[reg_output, cls_output])
+model.compile(
+    optimizer='adam',
+    loss={'regression': 'mse', 'classification': 'binary_crossentropy'},
+    metrics={'regression': 'mae', 'classification': 'accuracy'}
+)
+
+model.fit(X_train_scaled, [y_reg_train, y_cls_train], epochs=100, batch_size=32, verbose=0)
+
+Checking Performance (PyTorch)
+
+from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, f1_score
+
+model.eval()
+with torch.no_grad():
+    reg_pred, cls_pred = model(X_test_t)
+
+# Change shape from (n, 1) to (n,) for sklearn tools
+reg_pred_np = reg_pred.squeeze().numpy()
+cls_pred_np = cls_pred.squeeze().numpy()
+
+# Regression scores
+print(f"MSE: {mean_squared_error(y_reg_test, reg_pred_np):.4f}")
+print(f"R²: {r2_score(y_reg_test, reg_pred_np):.4f}")
+
+# Classification scores
+cls_binary = (cls_pred_np > 0.5).astype(int)
+print(f"Accuracy: {accuracy_score(y_cls_test, cls_binary):.4f}")
+print(f"F1: {f1_score(y_cls_test, cls_binary):.4f}")
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

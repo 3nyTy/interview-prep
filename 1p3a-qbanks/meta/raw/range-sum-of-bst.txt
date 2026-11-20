@@ -1,0 +1,52 @@
+===H1===
+Range Sum of BST
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/range-sum-of-bst
+===BODY===
+Meta
+Coding·40 minMembers
+Range Sum of BST
+LeetCode 938. DFS through a BST summing nodes whose values fall in `[low, high]`. Pruning via BST property is the discussion point.
+SWE
+MLE
+tree
+bst
+dfs
+easy
+Frequency
+Low
+Last asked
+2026-08-24
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Given the root of a BST and a range [low, high], return the sum of all node values in range.
+
+DFS: prune left subtree when node.val < low; prune right when node.val > high.
+
+Follow-up reported by one L6 onsite: pair with a streaming "product of last K values" interface.
+
+Follow-up: return the average of the in-range values instead of their sum.
+
+Repeated-query follow-up: the tree stays fixed while ranges change; precompute sorted values and prefix sums so each range can be answered without traversing the tree again.
+
+Notes
+
+BST property is what makes this O(log n + count) on average rather than O(n).
+
+Iterative stack version is fine, but recursive is cleaner under time pressure.
+
+Preparation
+
+Write recursive solution in <5 min.
+
+For the L6 paired interface, sketch a circular buffer + running-product class with rebuild on zero-insertion.
+
+Practice deriving a fixed-tree repeated-query interface from an in-order traversal plus prefix sums.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

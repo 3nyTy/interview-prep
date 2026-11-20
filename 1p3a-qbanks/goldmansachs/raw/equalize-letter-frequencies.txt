@@ -1,0 +1,52 @@
+===H1===
+Equalize Letter Frequencies With Add / Remove
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/equalize-letter-frequencies
+===BODY===
+Goldman Sachs
+Coding·180 minMembers
+Equalize Letter Frequencies With Add / Remove
+Given a lowercase string, each operation may add one letter or remove one existing letter. Return the minimum operations needed so every present letter has the same frequency.
+RS
+string
+hashmap
+greedy
+medium
+Frequency
+Single report
+Last asked
+2025-09-10
+Stage
+oa
+Requirements
+
+Input: a string of lowercase English letters.
+
+One operation either adds one new letter or removes one existing letter.
+
+Return the minimum number of operations needed so the frequency of each letter is the same.
+
+Examples
+
+s = "ababc"
+return 1
+
+Notes
+
+Count letter frequencies, then evaluate candidate target frequencies. For a target t, each existing character contributes either removals down to t, additions up to t, or complete removal if keeping it is worse.
+
+Clarify whether letters with zero final frequency count. The prompt wording usually means all remaining / present letters must have equal frequency.
+
+The example can be satisfied by removing c, leaving a:2, b:2. Clarify whether the final string may drop a letter entirely, because that choice changes the target-frequency search.
+
+Preparation
+
+Write a brute-force loop over target frequency 0..maxCount and compute operation cost for each character count.
+
+Ask the interviewer to confirm whether adding a previously absent letter is allowed or whether additions only apply to existing letters.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

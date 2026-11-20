@@ -1,0 +1,68 @@
+===H1===
+Meeting Rooms II
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/meeting-rooms-ii
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Meeting Rooms II
+Given a list of meeting time intervals, return the minimum number of conference rooms required. The canonical sweep / heap problem; Bloomberg likes it in phone screens because the cleanest solution involves either a min-heap of end times or a paired array sweep.
+SWE
+heap
+interval
+sorting
+sliding-window
+medium
+Frequency
+Single report
+Last asked
+2026-01-17
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Given an array of meeting time intervals intervals[i] = [start_i, end_i], return the minimum number of conference rooms required to host all meetings.
+
+Function signature:
+
+int minMeetingRooms(int[][] intervals)
+
+Follow-ups:
+
+Why does the heap-of-end-times approach work? Sort by start, then for each meeting either reuse the room whose end is earliest (if it has ended) or allocate a new one.
+
+Walk through the equivalent sweep-line approach: split into start / end events, sort, scan, track the running count.
+
+What if you also need to return which meeting goes into which room?
+
+Examples
+
+intervals = [[0,30],[5,10],[15,20]]
+minMeetingRooms -> 2
+
+intervals = [[7,10],[2,4]]
+minMeetingRooms -> 1
+
+Notes
+
+Heap solution: sort intervals by start. Maintain a min-heap of end times. For each interval, if heap.top() <= start, pop (reuse a freed room); always push the new end. The heap size at any point is the room count; return its max. Time O(n log n), space O(n).
+
+Sweep-line solution: build two sorted arrays of starts and ends. Walk both with two pointers; on each start, increment the active count if it predates the next end, else advance the end pointer. Track the max. Same O(n log n), space O(n).
+
+Both solutions are accepted. The sweep version is slightly more cache-friendly and is preferred when the candidate volunteers it.
+
+The follow-up that wants room assignments needs the heap variant; pair each end with the room id.
+
+Preparation
+
+Implement both the heap and the sweep solutions; argue the trade-off.
+
+Practice handling tie cases: a meeting ending at the same time another starts does not require a new room (<= start not < start).
+
+Be ready to extend to "can attend all meetings" (LeetCode 252) — same sort, simpler condition.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

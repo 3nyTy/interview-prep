@@ -1,0 +1,71 @@
+===H1===
+Best Time to Buy and Sell Stock — Full DP Ladder
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/stock-trading-dp-ladder
+===BODY===
+Citadel / Citadel Securities
+Coding·60 minFree preview
+Best Time to Buy and Sell Stock — Full DP Ladder
+Phone-screen staple at Citsec: start with the single-transaction max profit, ladder up through unlimited transactions, then bounded-k transactions, and on some loops add cooldown / transaction-fee variants. Interviewers grade as much on the generalization narrative (state definition, complexity, edge cases) as on the final code.
+SWE
+All
+dp
+array
+state-machine
+complexity-analysis
+medium
+Frequency
+Low
+Last asked
+2026-05-07
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Three levels, usually in order. The interviewer escalates only after the previous level is clean.
+
+Level 1 — Single transaction. Given prices[] where prices[i] is the stock price on day i, return the maximum profit from at most one buy / sell pair (buy must precede sell, hold time unbounded).
+
+Level 2 — Unlimited transactions, no concurrent holdings. Same input. You may transact arbitrarily many times but may hold at most one share at any moment. Return the maximum total profit.
+
+Level 3 — At most k transactions. Given prices[] and integer k, return the maximum profit from at most k complete buy / sell pairs.
+
+Examples
+
+Examples below are taken verbatim from candidate-reported sessions.
+
+Level 1 — interviewer asked for the one-pass solution and explicitly probed why tracking min_so_far was sufficient instead of a full two-pointer sweep.
+
+Level 2 — interviewer pushed for an O(1) space optimization after the initial DP solution.
+
+Level 3 — interviewer accepted the dp[i][j][0/1] formulation and probed whether the j-dimension could be compressed, the time / space complexity at large k, and what happens when k >= n / 2 (degenerates to Level 2).
+
+One Citsec onsite reportedly bolted on transaction fees and a one-day cooldown as follow-ups beyond Level 3, asking for the corresponding state-machine updates.
+
+Notes
+
+Level 1 is the canonical one-pass minimum-tracking pattern. Time O(n), space O(1).
+
+Level 2 has two equivalent framings: greedy summation of positive deltas, or two-state DP (hold / not-hold) compressible to two scalars. Most interviewers prefer the DP framing because it generalizes to Level 3 without rewriting.
+
+Level 3 uses dp[j][0/1] where j is transactions used; space is O(k) after compressing the day axis with rolling updates. Watch the buy-side update ordering — not-hold must update before hold when iterating in-place to avoid double-counting.
+
+The fee / cooldown variants add one term or one extra state to the transition; clean state-machine bookkeeping is the discriminator.
+
+Common failure mode: when extending to Level 3, candidates re-derive the DP from scratch rather than naming the state explicitly. Verbalize the state (dp[day][txn_count][holding]) before writing.
+
+Preparation
+
+Drill the full LC 121 / 122 / 123 / 188 / 309 / 714 ladder in one sitting; the Citsec ask reproduces 3-5 rungs in 30 minutes.
+
+Practice giving the generalization talk track in under 90 seconds: state, transition, base case, complexity, space optimization. Interviewers grade this explicitly.
+
+Rehearse the k >= n/2 collapse argument out loud — it is a frequent follow-up.
+
+For Citsec specifically, prepare to switch language mid-round if the interviewer flips from Python to C++ after seeing your resume.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

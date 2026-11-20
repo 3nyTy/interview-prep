@@ -1,0 +1,130 @@
+===H1===
+System Design Q2 — Prompt Playground (Product Design)
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/sd-q2-prompt-playground
+===BODY===
+Anthropic
+System Design·55 minMembers
+System Design Q2 — Prompt Playground (Product Design)
+Despite the SD label, Q2 is closer to product design. Design a prompt playground similar to Anthropic's Console. The interviewer supplies the deployment diagram (client → web server → database) and tells you not to draw architecture — focus on user flows, schema, sharing semantics, and UX edge cases.
+SWE
+MLE
+product-design
+schema-design
+sharing
+ux
+medium
+Frequency
+High
+Last asked
+2026-08-03
+Stage
+onsite-system-design
+Requirements
+
+Setup
+
+The interviewer opens a Google Doc with a pre-drawn three-box architecture (client ↔ web server ↔ database) and explicitly says do not draw a SD diagram. Architecture is fixed; the round is about everything on top of it.
+
+Canonical scale anchors
+
+The reference prompt deliberately pegs the traffic low to push the conversation toward product depth, not infra. Land on these numbers within a constant factor before pivoting to the depth areas:
+
+DimensionValueNotes
+Total users1 MStated.
+DAU10 K1% of total.
+Read / write split80 / 20Reads are view + run; writes are save.
+Read QPS~0.6 / sSub-1 RPS — single-region, no sharding needed.
+Write QPS~0.12 / sSub-1 RPS.
+Avg prompt size1 KBMost prompts.
+Max prompt size10 MBEditor must stay responsive at this size.
+10 MB in tokens~2.5 M tokensFar beyond any single-call context window — store + retrieve, do not assume the model can ingest in one shot.
+Prompts / user~10Stated.
+Hot storage floor~10 GB1M × 10 × 1 KB.
+
+The sub-1-RPS read/write traffic is the round's deliberate trap: candidates who walk a generic capacity-planning template waste 10+ minutes on sharding that the data does not justify. Anchor early on "traffic is small, the interesting part is the 10 MB blob path + sharing semantics."
+
+Expected coverage
+
+User flows. Define the core entities (prompt, conversation, message, share-link, version). Walk through create / edit / save / share flows.
+
+Database schema + indexes. What tables, what fields, what indexes for which queries. Tradeoffs around denormalization.
+
+Sharing. How shareable links work: ACL model (public, link-only, account-only), revoke semantics, viral sharing, scaling DB and server for spikes when a prompt goes viral.
+
+Long prompts (≥ 10 MB). How does the client send them, how does the server store them, what about diff/streaming/compression.
+
+Many concurrent tabs. If a user has many windows open each with multi-megabyte prompts, how does client performance hold up?
+
+Edge cases. Delete propagation, version conflicts, undo, restoring a deleted share, exporting to a real API call.
+
+Notes
+
+Several candidates report being thrown off because the round looks like a SD round but isn't. Stick to your own depth structure — schema first, then sharing, then performance edges. The interviewer often gives only nudges; if you let them drive, you'll run out of time before reaching the depth areas they grade you on.
+
+Type your reasoning into the doc. Interviewers may say "I'll take notes" — do not believe them, write your tradeoffs down yourself so partial credit is on the page.
+
+The fact that this is product-design heavy is the single most common surprise on the loop. Prepare accordingly.
+
+Also appears in virtual onsite loops; interviewers may actively drive the conversation instead of leaving the candidate to run a full free-form design session.
+
+Some interviewers anchor most of the round on the very-large-prompt path — when the body moves to object storage and how that pipeline is optimized — and grade almost entirely there. Read which depth area the interviewer keeps returning to and follow their weighting rather than your rehearsed order.
+
+Canonical entity model to lead with
+
+Four first-class entities + one append-only log are enough to cover every expected sub-topic; lead with this and the interviewer rarely pushes back:
+
+EntityKey fieldsNotes
+promptid, owner_id, title, created_at, updated_at, latest_version_id, content_refcontent_ref points to blob storage when payload > inline threshold (e.g., 64 KB)
+versionid, prompt_id, parent_version_id, author_id, created_at, body_ref, model_settings_jsonVersions are immutable. parent_version_id enables branching / undo without locks
+share_linktoken, prompt_id, version_id?, scope, role, expires_at, revoked_atscope ∈ {public, link-only, account-only}, role ∈ {viewer, commenter, editor}; pinning version_id means "share this exact version"
+acl_entryprompt_id, principal_id, role, expires_atDirect account-to-account permission. Stored separately from share-links so revocation paths don't tangle
+op_logprompt_id, version_id, seq, op_type, op_payload, tsAppend-only event log. Powers history view, undo, and diff-based persistence
+
+Indexes that pay for themselves: (owner_id, updated_at desc) for the user's home feed, (prompt_id, created_at desc) for version history, unique on share_link.token.
+
+Sharing / ACL — defensible model
+
+Three scope tiers: public (anyone with link, no auth), link-only (anyone with link + login), account-only (explicit per-account grant via acl_entry). Have all three on the page; interviewers grade on whether you distinguish them, not on naming.
+
+Revocation paths: hard-delete or set revoked_at on the share-link row; per-account revocation deletes the acl_entry. Cache invalidation: short-TTL (≤30s) permission cache + write-through invalidation on revoke means stale access can persist up to one TTL window — call this out as the explicit tradeoff vs. fully synchronous invalidation.
+
+Signed-URL expiry: blob-storage URLs for the prompt body itself are separately signed with short TTLs (e.g., 5–15 min); a revoked share-link stops issuing new signed URLs immediately but in-flight ones remain valid until expiry. Be ready to discuss this two-layer model.
+
+Viral spike pattern: a popular shared prompt is read-heavy and the body is immutable per version, so cache aggressively — CDN-cache the signed blob, edge-cache the rendered prompt view, cache permission lookups with short TTL. The hot path is share_link.token → version_id → blob_ref; all three are key-value lookups, trivially shardable. Mention an explicit fan-out concern: don't put permission checks on a single DB row that becomes hot — denormalize the public/link-only flag onto the share-link row itself so most reads skip the ACL service entirely.
+
+Large prompts (≥ 10 MB)
+
+Storage split: metadata + small fields stay in the OLTP DB; the prompt body and any large attachments live in object storage. Schema carries a body_ref (object key + content hash), not the bytes.
+
+Upload path: presigned multipart upload directly to blob storage from the client; server only receives the body_ref + content hash on commit. This keeps the web tier out of the bandwidth path.
+
+Diff persistence: don't store every version as a fresh 10 MB blob — use diff-from-parent encoding for version.body_ref past a threshold (e.g., every Nth version a full snapshot, intermediate versions are diffs). The interviewer will ask about reconstruction cost; the answer is bounded by snapshot interval.
+
+Streaming on the client: chunked range-GET from blob storage + virtualized rendering on the client side; only the visible window's tokens are mounted in the DOM. This is the answer to "many tabs each with multi-MB prompts."
+
+Concurrent-tabs edge
+
+Each tab opens a separate session but shares an in-browser cache keyed on (prompt_id, version_id) (IndexedDB or a SharedWorker). Don't load the body N times.
+
+On edit, optimistic write to local + queue op to server; conflict resolution at version-id level — if a remote save bumped latest_version_id, prompt the user with a branch/merge dialog rather than silently losing the local change.
+
+Preparation
+
+Spend a session designing the data model and sharing semantics of a real product like Notion, Figma, or Replit prompts. The interview is essentially a junior version of that.
+
+Pre-write the 5-entity schema above on paper until you can sketch it in <90 seconds. The cost of fumbling the schema in real time is unrecoverable on a 55-minute round.
+
+Pre-write a default ACL model: owner / editor / viewer / link-public / link-private. Be able to discuss revocation latency vs. signed-URL expiry as a deliberate two-layer choice, not a bug.
+
+Have a paragraph ready about handling 10 MB prompts: chunked upload, server-side ref to blob storage, diff-based persistence with snapshot interval, virtualized rendering on the client.
+
+Layered drill order: (1) schema → (2) create/save/share user flow → (3) ACL + revocation → (4) blob storage + diff persistence for 10 MB prompts → (5) cache + CDN strategy for viral spikes → (6) concurrent-tabs / version-conflict UX. Memorize this order so when the interviewer is silent you can still march.
+
+Have a one-line answer for "export to a real API call": render version.model_settings_json + body into the Anthropic Messages API request shape; offer copy-to-clipboard + curl + SDK snippet variants. This is the canonical "close the loop" follow-up.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

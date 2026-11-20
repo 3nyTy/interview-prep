@@ -1,0 +1,89 @@
+===H1===
+URL Shortener / Tiny URL System Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/url-shortener-system-design
+===BODY===
+Microsoft
+System Design·60 minMembers
+URL Shortener / Tiny URL System Design
+Recurring HE / VO / phone-screen prompt. Variants now include vanilla HLD, a higher-scale write-spike design, and a compressed HLD + LLD round where working HackerRank code and AI-generated-code bug review are expected.
+SWE
+distributed-systems
+caching
+sharding
+scaling
+redis
+medium
+design-implementation
+Frequency
+Low
+Last asked
+2026-06-29
+Stage
+phone-screen · onsite-system-design
+Requirements
+
+Functional
+
+create(long_url, optional_expiry, optional_custom_alias) -> short_url
+
+redirect(short_url) -> 302 long_url
+
+Optional analytics (click counts, geo breakdown)
+
+Optional admin dashboard
+
+Non-functional (one HE explicitly stated)
+
+1M creates/day, 1B redirects/day. ~1000× read-skewed.
+
+Redirect p99 latency < 100ms.
+
+Global multi-region availability ≥ 99.99%.
+
+Write spike: handle bursts up to 1000 QPS on the create path without dropping.
+
+Compressed HLD + LLD variant
+
+One phone-screen variant asks for both high-level design and low-level design of the URL shortener, then expects working HackerRank code for the core component. After the candidate solution, the interviewer shows AI-generated code for the same design and asks for bug-finding / review. Treat this as design-plus-implementation: define the API, choose the short-code generation and storage plan, implement a small deterministic core, then review generated code for collisions, missing validation, cache inconsistency, expiry bugs, and non-idempotent create behavior.
+
+Notes
+
+Short-code generation. Counter-based (issued from a centralized Redis or a Snowflake-style ID service, batched per write node to amortize) beats hash-based for this scale. Hashing means collision checks on every write — a centralized counter avoids that entirely. Encode the counter in base-62 (0-9 a-z A-Z) to get 6 chars per ~57 billion IDs. Custom aliases live in the same namespace with a reservation step at create time.
+
+Storage. The mapping table is short_code → long_url plus optional expires_at, created_by, clicks. At 1B URLs × ~500 bytes, ~500 GB — a single horizontally sharded relational store handles it. Shard by short_code so each redirect hits one shard.
+
+Read path. Cache-aside on Redis fronts the storage layer. Cache hit rate is typically > 95% because URLs cluster — the long tail is small. Cache TTL is hours; misses fall through to the DB and warm the cache on the way back.
+
+Write path under spike. A naive synchronous create at 1000 QPS hits the centralized ID service hard. The right answer is: API server enqueues (long_url, requester_id, idempotency_key) to a queue (Kafka / SQS) and returns the short code immediately by allocating from a pre-fetched batch of IDs. Worker pool persists to the durable store asynchronously. The interviewer in the reported round explicitly pushed for "how do you guarantee every create is processed without dropping" — DLQ for repeated failures, idempotency-key dedup on enqueue.
+
+Geo routing. GeoDNS routes the client to the nearest region. Each region runs its own redirect-cache + DB read replica; writes funnel back to the home region (or use multi-region active-active with eventual consistency on the short_code → long_url mapping — acceptable because once minted, mappings are immutable).
+
+Redirect choice. 302 Found keeps the redirect under server control for analytics and link rotation. 301 Moved Permanently is the alternative if you want browser-side caching; it sacrifices analytics fidelity.
+
+Trade-off table to surface explicitly:
+
+DecisionPickWhy
+ID generationCounter (batched)Avoids collision checks; cheap
+StorageSharded SQL by short_codeRead pattern is point-lookup
+CacheRedis cache-aside95%+ hit rate; bounded memory
+Redirect status302Preserves analytics control
+Write-spike absorptionQueue + worker + idempotency keyAvoids dropping on burst
+
+Preparation
+
+Pre-write the requirements table (functional + scale numbers) and the trade-off table; both are quick wins in the first 5 minutes of the round.
+
+Be fluent on the queue-and-worker write-spike pattern — interviewers explicitly probe whether you handle "what if creates burst from 300 to 1000 QPS without losing data".
+
+Know 302 vs 301; expect the question even when the interviewer does not lead with it.
+
+Familiarize with regional read replicas + GeoDNS as the standard low-latency answer.
+
+For the HLD + LLD variant, practice implementing the short-code service skeleton in HackerRank and then reviewing an alternate implementation for collision, expiry, validation, and idempotency bugs.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

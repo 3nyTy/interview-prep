@@ -1,0 +1,57 @@
+===H1===
+Coding: First Unique Restaurant in a Stream
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/coding-first-unique-restaurant-stream
+===BODY===
+DoorDash
+CodingMembers
+Coding: First Unique Restaurant in a Stream
+DoorDash wrapper around LC 1429, First Unique Number. Support `add(restaurant_id)` and return the earliest restaurant ID that has appeared exactly once, preserving arrival order; follow-ups probe unbounded metadata growth and concurrent calls.
+SWE
+data-structure
+streaming
+hashmap
+linked-list
+concurrency
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-coding
+Requirements
+
+Process restaurant IDs as an online stream.
+
+Support add(restaurant_id) for each newly arriving order.
+
+Support showFirstUnique() and return the earliest restaurant ID whose current occurrence count is exactly one.
+
+Preserve first-arrival order among IDs that remain unique.
+
+Follow-up: explain whether metadata grows without bound and what can safely be reclaimed.
+
+Follow-up: support concurrent calls to add without corrupting uniqueness or order.
+
+Notes
+
+Maintain a count map and an order-preserving linked structure containing only IDs whose count is one. Append on the first occurrence, remove the node on the second occurrence, and leave later occurrences out of the linked structure; an ID-to-node map makes add and showFirstUnique constant-time.
+
+The memory discussion distinguishes IDs that are still unique from IDs known to have appeared multiple times. In an unbounded stream, a duplicate marker cannot be reclaimed unless the contract guarantees that ID will never reappear; otherwise a later occurrence could be misclassified as unique.
+
+The concurrency discussion accepts a coarse lock as a baseline, then probes finer-grained coordination or lazy deletion.
+
+Preparation
+
+Implement constant-time updates with a count map plus an order-preserving linked structure, including the second-occurrence removal path.
+
+Stress-test repeated IDs, an empty structure, and an ID that changes from unique to duplicate while at the head.
+
+Compare a global lock with concurrent counts plus lazy removal from the ordered structure.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

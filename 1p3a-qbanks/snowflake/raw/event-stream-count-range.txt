@@ -1,0 +1,146 @@
+===H1===
+Event Stream Count in Time Range
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/event-stream-count-range
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Event Stream Count in Time Range
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+·
+45 min
+Members
+Event Stream Count in Time Range
+
+Stream of `(event_type, timestamp)` events with monotonically increasing timestamps. Implement `Receive(event_type, timestamp)` and `Count(event_type, start_time, end_time)` returning how many events of that type fell in the inclusive window.
+
+SWE
+data-structure
+binary-search
+streaming
+hashmap
+medium
+Frequency
+Low
+Last asked
+2026-08-16
+Stage
+phone-screen
+Requirements
+Receive(event_type, timestamp) -> void. Timestamps are guaranteed non-decreasing across calls.
+Count(event_type, start_time, end_time) -> int returns the number of events of event_type with start_time ≤ timestamp ≤ end_time.
+Multiple event types share the same stream; counts are per-type.
+Expected to handle a large number of events efficiently — naive linear scan per query is not the intended answer.
+Minority variant: retain only the most recent m records from a (timestamp, key) stream, expose one operation to record an event and another to count unique keys before a query timestamp, then extend the query to return the most frequent key. Clarify whether the cutoff is strict, how ties are resolved, and whether frequency is computed only over the retained buffer before coding.
+Examples
+Receive("login", 100)
+Receive("click", 110)
+Receive("login", 120)
+Receive("login", 200)
+Count("login", 100, 150)   # → 2
+Count("login", 100, 250)   # → 3
+Count("click", 0, 1000)    # → 1
+
+Notes
+Keep one sorted (append-only) list of timestamps per event type. Because Receive is monotonic, appending preserves sort order at O(1) amortized.
+Count becomes two binary searches on the per-type list: bisect_left(start_time) and bisect_right(end_time), difference is the count.
+This is the canonical "Time Based Key-Value Store" data-structure pattern (LC 981), reduced to counting instead of value retrieval.
+Edge cases: empty stream, start > end, event type never seen, count over a window where all events are equal to the boundaries (inclusive vs exclusive matters — clarify with the interviewer).
+If the monotonic guarantee were dropped — a follow-up interviewers do ask explicitly — the per-type list needs a balanced BST / TreeMap (or order-statistics tree / segment tree) keyed by timestamp so inserts stay ordered and range counts stay logarithmic.
+For the bounded recent-event variant, keep a deque of (timestamp, key) records. Append each record and evict from the front until at most m remain; this makes the retention invariant explicit and keeps each record's insertion and eviction O(1) amortized.
+Answer a cutoff query by scanning only the retained deque, applying the agreed < query_timestamp or ≤ query_timestamp rule, and accumulating a set for distinct keys or a frequency map for the most frequent key. This uses O(m) query time and O(m) auxiliary space; make the tie-break rule an explicit part of the comparator.
+Preparation
+Implement the per-type sorted-list + binary-search version from scratch.
+Drill the boundary semantics: inclusive on both ends is the most common ask, but write a small test to verify both bisect_left and bisect_right behave as expected at the boundary timestamps.
+Be ready to defend the choice of binary search over a more complex structure when the monotonic-timestamp guarantee is in place.
+Implement the bounded variant as a separate RecentKeyWindow(m) exercise with record, distinct-before-cutoff, and most-frequent-before-cutoff operations so its retention semantics do not get mixed with the base range-count API.
+Table-test buffer rollover, a cutoff equal to an event timestamp, repeated keys, and a frequency tie; write the expected retained deque and query result before running the code.
+Exact class shape
+class EventCounter:
+    def receive(self, eventType: str, timestamp: int) -> None: ...
+    def count(self, eventType: str, startTime: int, endTime: int) -> int: ...
+
+count is inclusive on both ends: [startTime, endTime].
+Unknown event types return 0, and monotonic timestamps across receive calls are part of the intended binary-search solution.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Examples
+Notes
+Preparation
+Exact class shape
+Related discussions · 3
+🔑雪花 店面
+🔑Snowflake第一轮挂经
+🔑snowflake phone screen
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Filter System with Dynamic Blacklist
+Single report
+hashmap
+data-structure
+medium
++3
+Top-K Search Terms (Per-User Deduped)
+Single report
+hashmap
+medium
+set
++2
+Recipe as Contiguous Ingredient Subsequence
+Single report
+streaming
+medium
+string
++4
+Document Target Coverage and Minimum Window
+Single report
+hashmap
+medium
+sliding-window
++1
+Forest Parent Array Delete Node
+Single report
+hashmap
+medium
+tree
++1
+Code editor

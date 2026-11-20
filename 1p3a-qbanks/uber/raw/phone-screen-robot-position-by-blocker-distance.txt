@@ -1,0 +1,73 @@
+===H1===
+Phone Screen: Find Robot Position from Blocker Distances
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/phone-screen-robot-position-by-blocker-distance
+===BODY===
+Uber
+Coding·60 minMembers
+Phone Screen: Find Robot Position from Blocker Distances
+Recurring phone-screen prompt. A 2D grid contains robots `O`, empty cells `E`, and blockers `X`. Given a query `[left, top, bottom, right]` of distances to the nearest blocker (with the grid boundary counted as a blocker), find every robot whose surroundings match the query.
+SWE
+MLE
+array
+simulation
+medium
+Frequency
+Medium
+Last asked
+2026-08-29
+Stage
+phone-screen
+Requirements
+
+Input: 2D character grid (cells: O = robot, E = empty, X = blocker), and a query [d_left, d_top, d_bottom, d_right] of four non-negative integers (the order is exactly left, top, bottom, right).
+
+Grid boundary acts as a blocker — hitting the boundary counts the same as hitting an X.
+
+For each cell containing a robot, compute the distance to the nearest blocker in each of the 4 cardinal directions (cells walked before reaching a blocker; the blocker itself is not included).
+
+Output: the (row, col) positions of all robots whose distance vector matches the query exactly. The output order does not matter.
+
+def matching_robots(board: list[list[str]], distance: list[int]) -> list[list[int]]:
+    ...
+    # distance is [left, top, bottom, right].
+    # Returns every robot coordinate whose 4-direction blocker distances equal `distance`.
+    # Returns [] if no robot matches; order of the returned coordinates is unspecified.
+
+Constraints: board.length >= 1, board[i].length >= 1, every cell is one of "O"/"E"/"X", and distance.length == 4.
+
+Examples
+
+Grid:
+  O E E E X
+  E O X X X
+  E E E E E
+  X E O E E
+  X E X E X
+
+Query: [2, 2, 4, 1]
+The robot at (1, 1) has  left=2, top=2 (boundary), bottom=4, right=1
+         ✓ matches the query.
+Output: [[1, 1]]
+
+Notes
+
+Brute force: for every robot, scan in 4 directions until a blocker or boundary. Worst case O(R · C · (R + C)) — typically fine for screen-sized grids.
+
+Multiple matches: more than one robot can satisfy the same query, so the result is a set of coordinates, not a single position. Return all of them; the grader accepts any ordering. (E.g. on a 3×3 grid [[O,X,O],[E,O,X],[O,X,O]] with query [1,1,1,1], both (0,2) and (2,2) qualify.)
+
+Follow-up 1 — produce a reasonable unit-test set: combinations like robot at corner (two boundary distances), robot adjacent to blocker (distance 0), multiple robots with the same query, all-empty grid, query that no robot satisfies.
+
+Follow-up 2 — sparse grid: precompute 4 distance matrices (left/right/top/bottom) in one pass per direction; then look up each robot in O(1). Total preprocessing O(R · C), query O(robots). This is the answer most interviewers are looking for.
+
+Preparation
+
+Practice the four-pass distance-to-nearest-blocker precomputation — it shows up in LC 542 (01-Matrix) and LC 1162 (As Far from Land as Possible).
+
+Be ready to enumerate at least 5 distinct unit tests on demand; the follow-up explicitly grades that.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,64 @@
+===H1===
+Sum of Good Subarrays (Adjacent Diff ±1)
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/good-subarrays-diff-one
+===BODY===
+Google
+Coding·45 minMembers
+Sum of Good Subarrays (Adjacent Diff ±1)
+MLE L5 coding round: sum over all contiguous subarrays whose elements form a strictly monotonic ±1 step sequence (every adjacent pair differs by exactly +1, OR every adjacent pair differs by exactly -1). Required time complexity is O(N).
+MLE
+SWE
+array
+two-pointer
+medium
+Frequency
+Single report
+Last asked
+2026-02-08
+Stage
+onsite-coding
+Requirements
+
+Input: integer array arr of length N.
+
+A subarray is good if its consecutive differences are either all +1 (monotone increasing by 1) or all -1 (monotone decreasing by 1).
+
+Singleton subarrays are always good.
+
+Output: the sum of element-sums across all good subarrays (each good subarray contributes the sum of its elements once).
+
+Required: O(N) time.
+
+Examples
+
+arr = [3, 5, 6, 7, 6]
+Good subarrays:
+  singletons:           [3], [5], [6], [7], [6]
+  monotone +1 runs:     [5, 6], [6, 7], [5, 6, 7]
+  monotone -1 runs:     [7, 6]
+Not good: [3, 5] (diff 2), [6, 7, 6] (mixes +1 then -1).
+
+Notes
+
+Walk the array maintaining two run lengths: upRun (current trailing run of +1 steps) and downRun (current trailing run of -1 steps). At index i, only one of them is nonzero (the other resets to 1).
+
+Each index i ends upRun + downRun - 1 good subarrays (subtracting the double-counted singleton). For each ending position, contribute the running prefix-sum tail of the active run.
+
+Multiple candidates report getting stuck — verbalize the "contribution per index" framing out loud before coding.
+
+Easy to mis-handle the reset boundary; double-check with a 2-element example before writing the loop.
+
+Preparation
+
+Practice the "contribution-per-index" pattern: the sum-of-subarray-minimums and sum-of-subsequence-widths problems both use the same technique.
+
+Practice splitting an array into maximal monotone-step runs, then computing per-run contributions in O(1) amortized using prefix sums of element values.
+
+Sanity-check with arr = [1, 2, 3] and arr = [3, 2, 1] by hand — both should sum to 20.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

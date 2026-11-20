@@ -1,0 +1,156 @@
+===H1===
+Find Median from Data Stream
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/find-median-from-data-stream
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Find Median from Data Stream
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+Members
+Find Median from Data Stream
+
+The median is the middle value in a sorted list of integers.
+
+SWE
+heap
+data-structure
+streaming
+hard
+Frequency
+Single report
+Last asked
+2026-01-04
+Stage
+phone-screen · onsite-coding
+Find Median from Data Stream
+Problem Explanation
+
+The median is the number found in the exact middle of a sorted list.
+
+If the list has an odd number of items, the median is the middle number.
+If the list has an even number of items, there is no single middle value. In this case, the median is the average (mean) of the two numbers in the center.
+
+Simple Examples:
+
+For arr = [1, 2, 3], the middle is 2. The median is 2.
+For arr = [1, 2], the middle values are 1 and 2. The median is (1 + 2) / 2 = 1.5.
+Task Requirements
+
+You need to write a class called MedianFinder. It must support these actions:
+
+MedianFinder(): Sets up the class object.
+void addNum(int num): Adds the integer num into the data structure.
+double findMedian(): Calculates and returns the median of all the numbers added so far.
+Execution Walkthrough
+
+Example 1:
+
+Input Operations: ["MedianFinder", "addNum", "addNum", "findMedian", "addNum", "findMedian"] [[], [1], [2], [], [3], []]
+
+Output: [null, null, null, 1.5, null, 2.0]
+
+Step-by-Step Logic:
+
+// Initialize the object
+MedianFinder medianFinder = new MedianFinder(); 
+
+// Add number 1. List is now [1]
+medianFinder.addNum(1); 
+
+// Add number 2. List is now [1, 2]
+medianFinder.addNum(2); 
+
+// Find median. The list is [1, 2]. 
+// The average of 1 and 2 is 1.5.
+medianFinder.findMedian(); // return 1.5
+
+// Add number 3. List is now [1, 2, 3]
+medianFinder.addNum(3); 
+
+// Find median. The list is [1, 2, 3]. 
+// The middle element is 2.
+medianFinder.findMedian(); // return 2.0
+
+Operational Limits
+The value of num will be between -100,000 and 100,000.
+The function findMedian is only called when there is at least one number stored in the data structure.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Find Median from Data Stream
+Problem Explanation
+Task Requirements
+Execution Walkthrough
+Operational Limits
+Related discussions · 0
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Transactional KV Store
+Low
+data-structure
+hard
+hashmap
++3
+Merge K Sorted Lists
+Single report
+heap
+hard
+linked-list
++2
+Event Stream Count in Time Range
+Low
+data-structure
+streaming
+binary-search
++2
+Document Store with Predicate Query
+Single report
+data-structure
+hard
+parsing
++4
+Serialize and Deserialize Dictionary Trie
+Single report
+data-structure
+trie
+compression
++2
+Code editor

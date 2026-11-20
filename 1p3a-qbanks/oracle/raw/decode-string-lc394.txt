@@ -1,0 +1,67 @@
+===H1===
+Decode String (k[encoded])
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/decode-string-lc394
+===BODY===
+Oracle
+Coding·45 minMembers
+Decode String (k[encoded])
+Decode a string of the form `k[encoded_string]`, where the bracketed segment repeats exactly `k` times and nesting is allowed. It has appeared as the LC 394 prompt in both an Oracle Health phone screen and a later onsite, where mandatory brackets and live approach changes were central traps.
+SWE
+string
+stack
+recursion
+compression
+medium
+Frequency
+Low
+Last asked
+2026-08-11
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input: an encoded string. The encoding rule is k[encoded_string], where the bracketed segment is repeated exactly k times.
+
+k is a positive integer.
+
+The input is always well-formed: no extra whitespace, brackets are matched, and digits appear only as repeat counts (never as part of encoded_string).
+
+There will never be input like 3a (digit not followed by [) or 2[4] (digit inside brackets).
+
+The decoded output is bounded such that len(output) ≤ 10^5.
+
+Output: the fully decoded string.
+
+Notes
+
+The canonical solution uses a stack of (prefix_string, repeat_count) frames. Scan the input character-by-character:
+
+Digit → accumulate into a numeric buffer.
+
+[ → push (current_string, current_number) onto the stack; reset both.
+
+] → pop (prev_string, repeat); set current_string = prev_string + current_string * repeat.
+
+Letter → append to current_string.
+Time O(n + output_size); space O(stack_depth).
+
+A recursive descent parser is equally accepted: decode(i) returns (decoded_string, next_index). Cleaner if the interviewer asks for nesting support up front; messier if asked for an iterative version mid-round.
+
+Trap: k can be multi-digit (e.g. 100[a]). Do not assume single-character digits.
+
+For Oracle, mention complexity bounds explicitly. The output can be exponential in the input size (bounded only by the 10^5 cap from the problem), so any solution that materialises intermediate strings carries that worst-case footprint.
+
+Preparation
+
+Solve LeetCode 394 ("Decode String") in both the stack-based and recursive-descent forms. Be able to switch between them mid-round.
+
+Drill the multi-digit number parsing and the nested case (3[a2[c]] → accaccacc) by hand before coding.
+
+Be ready for the follow-up sometimes asked: support escaping (a literal [ or ] in the message). Answer: introduce an escape character (\) and gate the [ / ] handling on the previous character.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

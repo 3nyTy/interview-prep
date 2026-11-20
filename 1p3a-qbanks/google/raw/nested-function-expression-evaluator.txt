@@ -1,0 +1,58 @@
+===H1===
+Nested Function Expression Evaluator
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/nested-function-expression-evaluator
+===BODY===
+Google
+Coding·45 minMembers
+Nested Function Expression Evaluator
+Parse and evaluate nested function-style arithmetic expressions such as `add(2, mul(3, pow(4, 5)))`. The follow-up extends fixed-arity operators to variable-length argument lists.
+SWE
+parsing
+recursion
+stack
+medium
+Frequency
+Low
+Last asked
+2026-06-10
+Stage
+onsite-coding
+Requirements
+
+Input: a string expression using function-call syntax, e.g. add(1, sub(1, 0)) or add(2, mul(3, pow(4, 5))).
+
+Supported operators include add, subtract, multiply, divide, and exponentiation.
+
+Return the integer / numeric evaluation result.
+
+The expression can be nested arbitrarily deeply.
+
+Follow-up: support variable-length arguments, e.g. add(1, 2, 3, mul(4, 5, 6)).
+
+Examples
+
+add(1, sub(1, 0)) -> 2
+add(2, mul(3, pow(4, 5))) -> 3074
+
+Notes
+
+Tokenizer + recursive descent is the cleanest approach: parse operator, consume (, parse comma-separated child expressions, consume ), then evaluate.
+
+Iterative parsing works but is easy to make off-by-one errors under interview pressure; one candidate was specifically flagged for minor syntax and bounds issues.
+
+Clarify division behavior for negative values and non-divisible integers.
+
+Preparation
+
+Write a small tokenizer for identifiers, integers, commas, and parentheses.
+
+Practice a recursive parseExpr() that returns both the value and the next index.
+
+Drill the variable-arity follow-up by collecting arguments until ) instead of assuming exactly two.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

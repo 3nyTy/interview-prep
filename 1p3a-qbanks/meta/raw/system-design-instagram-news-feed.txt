@@ -1,0 +1,64 @@
+===H1===
+System Design — Instagram / News Feed
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/system-design-instagram-news-feed
+===BODY===
+Meta
+System Design·45 minMembers
+System Design — Instagram / News Feed
+Classic Meta SD prompt. Design Instagram or Facebook News Feed with personalized ranking. Push vs pull fan-out, hot-key handling, and a ranking layer are the canonical decision points.
+SWE
+MLE
+Infra Eng
+feed
+fan-out
+caching
+ranking
+medium
+Frequency
+Medium
+Last asked
+2026-05-19
+Stage
+onsite-system-design
+Requirements
+
+Functional: post photo/video, follow users, view personalized home feed, like/comment.
+
+Scale: ~2B users, ~1B DAU, hundreds of millions of posts/day, fan-out to followers with celebrity-account skew (millions of followers).
+
+Decisions to lead with:
+
+Fan-out strategy: push (write-time fan-out) for normal users, pull (read-time) for celebrities; hybrid is the expected answer.
+
+Storage tiers: hot timeline cache (Redis sorted sets), cold storage (HBase / Cassandra), CDN for media.
+
+Ranking layer: candidate gen → light ranker → heavy ranker; the more senior the role, the deeper the personalization discussion expected.
+
+Read path latency budget: ~200 ms p95; caching strategy must justify it.
+
+Notes
+
+E5+ rounds explicitly probe trade-offs (push vs pull, consistency vs availability) and personalization layering. Don't just regurgitate canonical writeups; argue choices.
+
+The cleanest hybrid story: precompute feeds for normal users (~2KB / user × 2B users ≈ 4TB cluster-wide), flip a per-edge precomputed=false flag on celebrity follows, and merge their recent posts at read time. Avoids fan-out of one celebrity post to 90M+ feed rows.
+
+Cache hot posts in a replicated (not sharded) Redis tier so viral-post traffic distributes across nodes instead of melting a single hot key.
+
+Eventual consistency with a ~1 minute staleness budget is acceptable and unlocks all the latency wins.
+
+Common drill-down: cache invalidation on unfollow / post delete; thumbnail generation pipeline; abuse detection on the write path.
+
+Preparation
+
+Memorize the hybrid fan-out template and be able to draw it in 5 minutes.
+
+Pre-compute QPS estimates (DAU × posts/user/day × fan-out factor) so you don't burn time on arithmetic.
+
+Practice the ranking-layer pitch: features (recency, affinity, engagement), candidate gen, light vs heavy ranker.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

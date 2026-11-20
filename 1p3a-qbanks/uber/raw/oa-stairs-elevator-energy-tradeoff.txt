@@ -1,0 +1,52 @@
+===H1===
+OA: Stairs vs Elevator Energy Trade-off
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/oa-stairs-elevator-energy-tradeoff
+===BODY===
+Uber
+Coding·90 minMembers
+OA: Stairs vs Elevator Energy Trade-off
+Hack2Hire OA problem. Climb `n` floors using one elevator segment first (collects `e1` energy and costs `t1` time per floor) and then stairs (consumes `e2` per floor, time = `ceil(c / current_energy)`). Find the split that minimizes the absolute difference between elevator-time and stair-time. Energy must stay non-negative on stairs.
+SWE
+algorithm
+simulation
+medium
+Frequency
+Low
+Last asked
+2026-02-02
+Stage
+oa
+Requirements
+
+Input: integers n (total floors), e1 (energy gained per elevator floor), t1 (time per elevator floor), e2 (energy consumed per stair floor), c (constant for stair-time formula).
+
+Choose an integer m in 0..n: the elevator carries you m floors, the stairs cover the remaining n − m.
+
+After the elevator segment, your accumulated energy is m * e1. On each stair floor, energy drops by e2 and time spent = ceil(c / current_energy_before_step).
+
+Energy must remain ≥ (n − m) * e2 at the moment you start the stairs, otherwise stairs cannot complete.
+
+Output: the minimum absolute difference |elevator_time − stair_time| over all valid splits m.
+
+Notes
+
+The energy feasibility check makes the problem monotone in m: larger m means more energy, larger elevator time, smaller stair time.
+
+Binary-search on m over [0, n] looking for the crossover where elevator-time and stair-time meet. Track the minimum gap seen.
+
+For each candidate m, simulating the stairs is O(n − m); combined with binary search, total time is O(n log n).
+
+Watch the divide-by-zero edge case: if current_energy would be 0, the stair step is invalid; treat that candidate as infeasible.
+
+Preparation
+
+The full prompt is paraphrased in community write-ups; the exact wording can vary by OA instance. Read the on-screen problem statement carefully and confirm the rounding rule (ceil vs floor) before coding.
+
+Practice writing a binary-search-the-answer that has a non-trivial feasibility predicate; this is the same family as the Pipeline Throughput problem above.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

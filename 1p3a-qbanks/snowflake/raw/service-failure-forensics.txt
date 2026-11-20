@@ -1,0 +1,308 @@
+===H1===
+Service Failure Forensics
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/service-failure-forensics
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Service Failure Forensics
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+Members
+Service Failure Forensics
+
+You are analyzing service outages using logs and dependency data.
+
+SWE
+graph
+dfs
+troubleshooting
+distributed-systems
+medium
+Frequency
+Single report
+Last asked
+2026-02-24
+Stage
+phone-screen · onsite-coding
+Debugging Service Failures
+Problem Context
+
+You need to investigate a system crash by looking at logs and how services connect to each other.
+
+The interview is divided into three parts:
+
+Find the first error log using Binary Search.
+Find every service that will break using BFS or DFS.
+Find the longest chain of broken services using DFS.
+Part 1: Finding the First Error (Binary Search)
+The Challenge
+
+You have a list of strings called logs. Each line begins with one of these tags:
+
+[Info]
+[Warn]
+[Error]
+
+You must follow these rules:
+
+Once an [Error] appears, every log line after it is also an [Error].
+If there is an error at a specific line, the line right before it must be a [Warn].
+
+Your task is to find the index of the very first [Error]. If there are no errors, return -1.
+
+Example Case
+logs = [
+    "[Info] boot",
+    "[Info] warmup",
+    "[Warn] timeout retries high",
+    "[Error] downstream unavailable",
+    "[Error] service unhealthy",
+]
+# answer = 3
+
+Approach and Solution
+
+The logs follow a strict order: everything before the first error is "safe," and everything from the first error onwards is "error." Because the data is sorted this way, we can use Binary Search to find the exact point where it changes.
+
+def is_error(log_line: str) -> bool:
+    return log_line.startswith("[Error]")
+
+def first_error_index(logs: list[str]) -> int:
+    left = 0
+    right = len(logs) - 1
+    answer = -1
+
+    while left <= right:
+        mid = (left + right) // 2
+        if is_error(logs[mid]):
+            answer = mid
+            right = mid - 1
+        else:
+            left = mid + 1
+
+    return answer
+
+Complexity Analysis (Part 1)
+Metric	Complexity
+Time	O(log n)
+Space	O(1)
+Part 2: Finding All Affected Services (Graph BFS/DFS)
+The Challenge
+
+Now you receive a list showing which service calls which:
+
+calls = {
+    "A": ["B", "C"],  # A calls B and C
+    "B": ["D"],
+    "C": ["D"],
+    "E": ["A"],
+    "F": ["C"],
+}
+
+
+The rule is: If a service crashes, any service that relies on it (directly or indirectly) will also fail.
+
+You are given the name of the first_error_service. You need to return a set of all services that will eventually fail. The order of the output does not matter.
+
+Example Case
+first_error_service = "D"
+# impacted = {"D", "B", "C", "A", "E", "F"}
+
+Approach and Solution
+
+We need to see who depends on the broken service. We can do this by walking backward through the connections:
+
+Build a reverse graph. This maps a service to the ones that call it (callee -> callers).
+Start a Breadth-First Search (BFS) beginning at the first_error_service.
+Visit every service that relies on the current one.
+from collections import defaultdict, deque
+
+def impacted_services(
+    calls: dict[str, list[str]],
+    first_error_service: str,
+) -> set[str]:
+    # Build reverse graph: callee -> list of callers
+    reverse_graph: dict[str, list[str]] = defaultdict(list)
+    for caller, callees in calls.items():
+        for callee in callees:
+            reverse_graph[callee].append(caller)
+
+    impacted: set[str] = {first_error_service}
+    q = deque([first_error_service])
+
+    while q:
+        service = q.popleft()
+        for caller in reverse_graph.get(service, []):
+            if caller in impacted:
+                continue
+            impacted.add(caller)
+            q.append(caller)
+
+    return impacted
+
+Complexity Analysis (Part 2)
+Metric	Complexity
+Time	O(V + E)
+Space	O(V + E)
+
+Here, V is the number of services, and E is the number of connections between them.
+
+Part 3: Finding the Longest Chain of Errors (DFS)
+The Challenge
+
+Building on Part 2, you now need to find one longest path of errors starting from the first_error_service.
+
+For example, if service D fails, a chain of failures might look like this:
+
+D -> B -> A -> E
+
+
+This means D fails first, causing B to fail, which causes A to fail, and finally E.
+
+Approach and Solution
+
+We can use Depth-First Search (DFS) on the same reverse graph we built before.
+
+Since the graph is a Directed Acyclic Graph (DAG), we can make this faster using memoization:
+
+dfs(x) calculates the longest chain starting at service x.
+For each service, we look at its callers and pick the one that results in the longest chain.
+from collections import defaultdict
+
+def longest_error_chain(
+    calls: dict[str, list[str]],
+    first_error_service: str,
+) -> list[str]:
+    # Build reverse graph
+    reverse_graph: dict[str, list[str]] = defaultdict(list)
+    for caller, callees in calls.items():
+        for callee in callees:
+            reverse_graph[callee].append(caller)
+
+    memo: dict[str, list[str]] = {}
+    state: dict[str, int] = {}  # 0/absent=unseen, 1=visiting, 2=done
+
+    def dfs(service: str) -> list[str]:
+        # Check for cycles
+        if state.get(service, 0) == 1:
+            raise ValueError("Cycle detected: longest simple path in general graph is non-trivial.")
+        # Return cached result if available
+        if state.get(service, 0) == 2:
+            return memo[service]
+
+        state[service] = 1
+        best_chain = [service]
+
+        # Try all upstream callers to find the longest path
+        for caller in reverse_graph.get(service, []):
+            candidate = [service] + dfs(caller)
+            if len(candidate) > len(best_chain):
+                best_chain = candidate
+
+        state[service] = 2
+        memo[service] = best_chain
+        return best_chain
+
+    return dfs(first_error_service)
+
+Complexity Analysis (Part 3)
+
+For DAG inputs:
+
+Metric	Complexity
+Time	O(V + E)
+Space	O(V + E)
+Important Considerations
+Cycles: If the dependencies have loops (cycles), you should group them into Strongly Connected Components (SCC) first. Then, run the longest-path logic on the simplified graph.
+Alternative: If the interviewer only wants a "deep" chain rather than the strictly longest one, a simple DFS without memoization is usually acceptable.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Debugging Service Failures
+Problem Context
+Part 1: Finding the First Error (Binary Search)
+The Challenge
+Example Case
+Approach and Solution
+Complexity Analysis (Part 1)
+Part 2: Finding All Affected Services (Graph BFS/DFS)
+The Challenge
+Example Case
+Approach and Solution
+Complexity Analysis (Part 2)
+Part 3: Finding the Longest Chain of Errors (DFS)
+The Challenge
+Approach and Solution
+Complexity Analysis (Part 3)
+Important Considerations
+Related discussions · 0
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Boundary of Binary Tree
+Single report
+dfs
+medium
+tree
++1
+Longest Univalue Path
+Single report
+dfs
+medium
+tree
++1
+DAG Allow / Disallow Propagation
+Medium
+graph
+medium
+topological-sort
++2
+Word Search
+Single report
+dfs
+medium
+grid
++1
+Serialize and Deserialize Dictionary Trie
+Single report
+medium
+trie
+compression
++2
+Code editor

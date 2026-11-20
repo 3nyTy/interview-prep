@@ -1,0 +1,71 @@
+===H1===
+Pin / Board Graph Distance
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/pin-board-shortest-distance
+===BODY===
+Pinterest
+Coding·60 minMembers
+Pin / Board Graph Distance
+Given a bipartite graph of boards and pins (each board owns a list of pins; pins can appear on multiple boards), answer three questions: are two pins related, shortest pin-to-pin distance via shared boards, and shortest distance between two boards via any pin path.
+SWE
+MLE
+graph
+bfs
+hashmap
+medium
+Frequency
+Medium
+Last asked
+2026-08-28
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input: a list of (board, [pins]) entries. A pin can appear in any number of boards. "Distance" is the number of pin-to-pin hops on the inferred pin graph; two pins have distance 1 when they share a board.
+
+Answer:
+
+Given two pins, determine whether they are connected.
+
+Given two pins, return their shortest pin-hop distance.
+
+Given two boards, return the minimum pin-hop distance between any pin on the first board and any pin on the second.
+
+Examples
+
+Board: travel       Pins: mountain, lake, hotel
+Board: decor        Pins: house, pond, hotel
+Board: doodle       Pins: picasso, lake
+Board: cars         Pins: byd, xpeng
+
+mountain - lake = 1   (share "travel")
+mountain - house = 2  (travel -> hotel -> decor)
+pond - picasso = 3    (decor -> hotel -> travel -> lake -> doodle)
+
+Notes
+
+An explicit pin projection connects every pair of pins on the same board with weight 1. Its storage is O(sum of squared board sizes). For large boards, keep the bipartite representation pin → boards and board → pins and expand lazily.
+
+Connectivity and pin-to-pin distance use ordinary BFS on the unweighted pin projection.
+
+For board-to-board distance, initialize a multi-source BFS with every pin on the source board at distance 0 and stop when a target-board pin is reached. This directly counts pin-to-pin hops and avoids mixed edge weights. An augmented graph with zero-cost board-pin edges is also valid, but it requires 0-1 BFS or Dijkstra—not ordinary BFS.
+
+If the interviewer changes pin-to-pin hops into stored variable edge weights, switch to multi-source Dijkstra.
+
+Clarify whether the active vertices are pins, boards, or both before choosing the traversal state; the interview API is not always stated in the same form.
+
+Preparation
+
+Build the bipartite graph and pin projection once on the example by hand.
+
+Implement single-source and multi-source BFS in 10 minutes and verify the three distances above.
+
+Construct a counterexample showing why ordinary BFS fails with mixed 0/1 edges, then implement 0-1 BFS with a deque.
+
+Drill multi-source Dijkstra for a weighted-edge follow-up.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

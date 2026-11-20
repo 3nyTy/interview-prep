@@ -1,0 +1,125 @@
+===H1===
+Jira AI Auto-Fix System
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/jira-ai-auto-fix-system
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Jira AI Auto-Fix System
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+System Design
+·
+60 min
+Members
+Jira AI Auto-Fix System
+
+Design an internal tool that pulls new Jira bug tickets, where each bug corresponds to a test failure, and sends each ticket to an AI system that can generate a fix PR in roughly 30 minutes. The service buffers work with a message queue, tracks ticket state in a DB, and needs schema, sharding, and scaling discussion.
+
+SWE
+distributed-systems
+queueing
+ai-tools
+idempotency
+scaling
+medium
+Frequency
+Single report
+Last asked
+2026-06-22
+Stage
+onsite-system-design
+Requirements
+Existing Jira continuously produces bug tickets; each ticket corresponds to a test failure.
+An AI service accepts a Jira ticket and generates a fix PR.
+AI generation is slow: roughly 30+ minutes per fix PR.
+Build a service that pulls Jira tickets, buffers them, sends work to the AI service, and tracks each ticket's current state.
+Store state in a DB; discuss schema design, sharding, and scaling.
+The workflow must tolerate retries and avoid creating duplicate PRs for the same ticket.
+Notes
+Treat the AI service as a slow asynchronous worker, not a synchronous request path. A queue between Jira ingestion and AI execution is the central buffer.
+Useful state machine: NEW -> QUEUED -> GENERATING -> PR_CREATED -> MERGED | FAILED | NEEDS_REVIEW. Persist state transitions with timestamps and external IDs for Jira issue and PR.
+Idempotency key should be the Jira ticket ID plus generation attempt. Before creating a PR, check whether a PR already exists for that ticket / attempt.
+Shard first by ticket or repository ownership if the system spans many repos; shard by Jira project / team if operational ownership matters more than uniform load.
+Scaling pressure comes from queue backlog and long AI runtime. Track queue age, generation duration, failure rate, duplicate suppression, and PR acceptance rate.
+Clarify whether humans review every generated PR before merge; the answer changes the downstream notification and approval workflow.
+Preparation
+Draw the pipeline: Jira poller/webhook -> dedupe/state DB -> message queue -> AI worker pool -> PR service -> status updater.
+Prepare the ticket-state schema and the idempotency story before discussing sharding.
+Walk through failure cases: Jira webhook replay, AI timeout, worker crash after PR creation, and duplicate ticket updates.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Preparation
+Related discussions · 1
+🔑雪花SDE近期Onsite面经 SD是很独特的一道题
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Service Failure Forensics
+Single report
+distributed-systems
+medium
+graph
++2
+Frontend Grid: Robot Eats Candies
+Single report
+medium
+frontend
+bfs
++2
+Grep With Context Lines
+Single report
+medium
+string-processing
+parsing
++1
+Top-K Search Terms (Per-User Deduped)
+Single report
+medium
+hashmap
+set
++2
+Recipe as Contiguous Ingredient Subsequence
+Single report
+medium
+string
+hashing
++4
+Code editor

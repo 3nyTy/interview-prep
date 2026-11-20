@@ -1,0 +1,49 @@
+===H1===
+Thread-Safe Buy/Sell Without Overselling
+===URL===
+https://www.1point3acres.com/interview/problems/company/optiver/multithreaded-buy-sell-lock
+===BODY===
+Optiver
+Coding·60 minMembers
+Thread-Safe Buy/Sell Without Overselling
+A phone-screen coding round: implement buy and sell functions keyed by client, symbol, and quantity while ensuring concurrent requests can never oversell inventory. The follow-up extends the design to multiple buy/sell systems connected to multiple exchanges.
+SWE
+concurrency
+threading
+oop-design
+distributed-systems
+Frequency
+Low
+Last asked
+2026-08-03
+Stage
+phone-screen
+Requirements
+
+Implement two functions to buy and sell shares of a stock. Each request identifies a client, stock symbol, and quantity.
+
+Under concurrent access from multiple threads, the implementation must guarantee the stock is never oversold (position constraints always hold).
+
+The expected solution uses locking to protect the shared inventory/position state.
+
+Follow-up: discuss how the design changes when k buy/sell systems connect to k exchanges.
+
+Notes
+
+In one process, keep the position for each (client, symbol) key and perform the sell validation and decrement in the same critical section. A global lock is simplest; per-key or striped locks reduce contention while preserving the invariant.
+
+Across k systems, process-local locks no longer coordinate. Route each position key through one authoritative writer or use shared transactional state with an atomic conditional update. Preserve per-key ordering, make requests idempotent, and reconcile rejected or partial exchange fills before releasing reservations.
+
+The interviewer probes the concurrency model rather than algorithmic complexity.
+
+Preparation
+
+Implement a thread-safe inventory with a lock (and discuss lock granularity / atomic alternatives); reason aloud about the race window you're closing.
+
+Extend the design to two service instances: explain why local locks fail, choose single-writer partitioning or a transactional store, and walk through duplicate, out-of-order, rejected, and partially filled requests.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

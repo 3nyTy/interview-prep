@@ -1,0 +1,63 @@
+===H1===
+Airplane Seat Reservation API
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/airplane-seat-reservation-api
+===BODY===
+Apple
+Coding·45 minMembers
+Airplane Seat Reservation API
+Implement a C-style airplane seating API with create, print, free, and reserve functions. The reserve call parses seats like `4B` and may choose an alternate seat when movement is allowed.
+SWE
+caching
+array
+parsing
+design-implementation
+medium
+Frequency
+Single report
+Last asked
+2026-01-06
+Stage
+phone-screen
+Requirements
+
+Implement the following API:
+
+Airplane *createAirplane(int rows, int seats, int isle1, int isle2);
+void printAirplane(Airplane *airplane);
+void freeAirplane(Airplane *airplane);
+int reserveSeat(Airplane *airplane, char seat[], int canMove);
+
+reserveSeat should:
+
+Return 0 on success and -1 on failure.
+
+Parse a 4-byte seat buffer such as 4B or 5H.
+
+Reserve the requested seat if it is valid and available.
+
+If the requested seat is occupied and canMove is true, choose another valid available seat.
+
+Reject invalid row / seat labels and full airplanes.
+
+Notes
+
+The core signal is low-level data modeling and memory hygiene. Define how rows, seats, aisles, and occupied flags are represented before coding. In C, own the allocation story: one allocation for the struct plus contiguous seat bitmap is simpler to free safely than many nested allocations.
+
+Clarify whether isle1 / isle2 are aisle positions that affect printing only or whether aisle letters are not reservable. If the prompt is underspecified, say your assumption and keep the code consistent.
+
+Preparation
+
+Implement a seat-label parser: split numeric row from alphabetic seat letter, validate bounds, map to an index.
+
+Practice a bitmap representation: occupied[row * seats + seat_idx].
+
+Add test cases for invalid labels, occupied seat with canMove=0, occupied seat with canMove=1, and full plane.
+
+Be prepared to discuss memory ownership and why freeAirplane must release every allocation exactly once.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

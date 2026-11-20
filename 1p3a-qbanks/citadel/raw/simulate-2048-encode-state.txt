@@ -1,0 +1,56 @@
+===H1===
+2048 Simulation + Compress State to a `long long`
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/simulate-2048-encode-state
+===BODY===
+Citadel / Citadel Securities
+Coding·60 minMembers
+2048 Simulation + Compress State to a `long long`
+Citadel SWE US-intern onsite round 1: hand-implement the 2048 game's tile-shift mechanic, then design an encoding that packs the 4x4 board state into a single 64-bit integer for compact storage / hashing.
+SWE
+simulation
+bit-manipulation
+grid
+compression
+medium
+Frequency
+Single report
+Last asked
+2026-01-28
+Stage
+onsite-coding
+Requirements
+
+Two parts.
+
+Tile-shift simulation. Given a 4x4 board where each cell stores a power-of-two tile value (or zero for empty), implement the four-direction move (left / right / up / down). For each move, slide all tiles in that direction; pairs of equal adjacent tiles merge into one tile of double value (a single tile can participate in at most one merge per move); empty cells fill from the back.
+
+Encoding. Pack the entire board state into one long long. The interviewer expects the encoding to be reversible and to use the natural tile-value structure (powers of two) to fit within 64 bits.
+
+Notes
+
+Per-row simulation pattern: extract a row / column into a buffer of length 4; drop zeros; merge adjacent equal entries left-to-right (or right-to-left for reverse moves); zero-pad to length 4; write back. Reuse the same routine for all four directions by transposing / reversing as needed.
+
+Watch the merge-once-per-move invariant. After two tiles merge into one, the resulting tile is not eligible for a second merge during the same move sweep — track a per-cell "merged-this-move" flag, or simply advance the write cursor past the freshly-merged slot.
+
+Encoding: 2048 reaches a maximum reachable tile of 2^17 (131072) in practice but for compactness assume the exponent fits in 4 bits (2^15), so each cell uses 4 bits and the 16 cells fit in 4 * 16 = 64 bits exactly. Cell value 0 stays 0; nonzero 2^k is stored as k.
+
+Decoding is the inverse: shift and mask 4 bits at a time, mapping nonzero exponent k back to 1 << k.
+
+Common slip: trying to store tile values directly (8 bits per cell) and overflowing the 64-bit budget. State the exponent-only encoding up front.
+
+Preparation
+
+Implement the 2048 left-shift on a 1D array of length 4 until it is automatic, then build the four-direction wrapper on top with reversal / transposition helpers.
+
+Practice bit-packing exercises: encode an 8x8 chess board into one uint64_t, or pack an L2 cache line worth of small fields into a single word. The 2048 encoding is the same skill at smaller scale.
+
+Be ready to argue the bit-budget out loud: 16 cells * 4 bits = 64 bits exactly; this hits the natural long long boundary and is the reason the prompt is shaped this way.
+
+Have the merge-once invariant talk track ready — it is the most common bug source on this problem.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

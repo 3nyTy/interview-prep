@@ -1,0 +1,53 @@
+===H1===
+Largest Tree in a Forest
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/largest-tree-in-forest
+===BODY===
+Goldman Sachs
+CodingMembers
+Largest Tree in a Forest
+Given a dict mapping child node id -> parent node id that encodes a forest, return the root id of the tree with the most nodes; on a tie, return the smallest root id. Build a parent->children adjacency list, find roots (ids that appear as a value but never as a key), and count each tree's size (e.g. BFS) in O(n). A newer variant supplies parent->child associations directly, so confirm the edge direction and whether the original tie-break still applies.
+SWE
+tree
+bfs
+hashmap
+medium
+Frequency
+Low
+Last asked
+2026-08-12
+Stage
+phone-screen
+Requirements
+
+Input: a dictionary mapping each child node id to its parent node id, encoding a forest (one or more disjoint trees).
+
+Return the root id of the tree containing the most nodes.
+
+Tie-break: if several trees share the maximum node count, return the smallest root id.
+
+An alternate variant supplies a list of parent -> child associations instead of a child -> parent dictionary; clarify the edge direction before coding.
+
+Examples
+
+{1: 2, 3: 8} -> 2. Two trees (2 <- 1 and 8 <- 3), each with 2 nodes; both tie at size 2, so return the smaller root id 2.
+
+Notes
+
+Roots are the ids that appear as a parent (value) but never as a child (key) in the child -> parent form. Reverse that test for the parent -> child form.
+
+Build a parent->children adjacency list, then count each tree's size from its root with BFS (or DFS); both run in O(n) time and space.
+
+Handle the tie-break carefully — track the maximum size and the smallest root id achieving it together.
+
+Preparation
+
+Practice deriving the root set from either edge direction, then counting component sizes from each root.
+
+Test single-node trees, a forest where every tree ties, and a forest with one clearly largest tree.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

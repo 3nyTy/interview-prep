@@ -1,0 +1,58 @@
+===H1===
+Word Segmentation with a Dictionary Helper
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/word-segmentation-dictionary-helper
+===BODY===
+Amazon
+CodingMembers
+Word Segmentation with a Dictionary Helper
+Split a lowercase string with no spaces into valid dictionary words using a provided `isWord` helper. Return any one valid segmentation; the input is guaranteed to have at least one solution.
+SWE
+string
+backtracking
+recursion
+medium
+Frequency
+Single report
+Last asked
+2026-07-22
+Stage
+onsite-coding
+Requirements
+
+Input is one continuous lowercase string with no spaces.
+
+A provided helper, boolean isWord(String str), returns whether a substring is a valid dictionary word.
+
+Segment the input, without reordering characters, into a sequence of valid words.
+
+Return any one valid segmentation; there may be multiple valid answers.
+
+The input is guaranteed to have at least one valid segmentation.
+
+Examples
+
+input:  "myhousehavecat"
+output: ["my", "house", "have", "cat"]
+
+Notes
+
+This is the canonical word-segmentation problem with two twists: the dictionary is reachable only through the isWord helper (no word list to preprocess), and the deliverable is one concrete split rather than a yes/no answer.
+
+Skeleton: DFS from a start index, try each end index whose prefix passes isWord, and recurse from the split point; memoize start indices that lead to dead ends so they are never re-explored. Without that memoization, inputs with many overlapping words go exponential; with it the search stays around O(n²) helper calls.
+
+Greedy longest-match can dead-end — a long word may consume characters the remainder needs — which is why control of the search path matters: backtrack, but never re-enter a failed start index.
+
+A valid segmentation is guaranteed, so return the first complete path found; enumerating every answer is explicitly not required.
+
+Preparation
+
+Implement the boolean segmentation check with memoization first, then extend it to return the actual word list; test on the worked example plus an input where greedy longest-match fails.
+
+Practice writing the memoized recursion in one clean pass: a set of failed start indices plus the current path list is the entire state.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

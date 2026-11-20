@@ -1,0 +1,73 @@
+===H1===
+Lexicographically Largest String via State Flips
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/lex-largest-string-via-state-flips
+===BODY===
+Amazon
+Coding·40 minMembers
+Lexicographically Largest String via State Flips
+Build a length-m string by repeatedly picking the largest currently-available element. After each pick, every `0` directly to the right of a `1` in the state mask flips to `1`, unlocking more elements.
+SWE
+array
+greedy
+heap
+simulation
+hard
+Frequency
+Single report
+Last asked
+2026-04-19
+Stage
+oa
+Requirements
+
+Inputs: values[] (positive integers) and a binary state string state of equal length; an integer m.
+
+An element values[i] is available iff state[i] == '1'.
+
+Operation, repeated m times: pick any available value, append it to result s, then flip every 0 in state that is directly to the right of a 1 to become 1.
+
+Return the lexicographically largest s (compared as a sequence of integers).
+
+Examples
+
+values = [10, 5, 7, 6]
+state  = "0101"
+m      = 2
+# initial available indices = {1, 3}; max = max(values[1], values[3]) = max(5, 6) = 6
+# pick index 3 -> s = [6]; after flip, state = "0111" -> available {1, 2, 3} (3 already used)
+# remaining available {1, 2}; max = max(5, 7) = 7
+# pick index 2 -> s = [6, 7]
+output = [6, 7]
+
+Notes
+
+Greedy on the max available index each step. A max-heap keyed by (value, index) of all currently-available indices, plus a pointer that sweeps right to admit newly unlocked entries, runs in O((n + m) log n).
+
+Index reuse: once picked, an index is consumed; the flip happens on the state mask only, not on the value array.
+
+Confirm with the interviewer whether m <= count('1' in state) or whether the algorithm must handle the case where flips can't keep up.
+
+Canonical structure: a left-to-right sweep pointer advances every iteration to admit newly-unlocked indices into a max-heap keyed on (value, index); pop the max, record it, advance state per the flip rule.
+
+Tombstoning vs lazy deletion: when an index is consumed, mark a used[] boolean and re-pop from the heap until the top is unused — cheaper than supporting heap removal.
+
+Total work is O((n + m) log n); each index is pushed at most once and popped at most twice (once as max, once during tombstone skip).
+
+Preparation
+
+Translate the verbal rule into a stepwise state diagram for short inputs — easier to reason about than the prose.
+
+Practice using a heap with lazy admission: scan from left, pushing every index whose state turns to 1.
+
+Pre-think the lex-comparison semantics — when s is a sequence of integers (not digits), "largest" means index-by-index integer comparison.
+
+Practice the sweep+heap pattern on LC 1942 first, then transpose to this state-flip variant. The mechanical skeleton is identical; only the unlock predicate differs.
+
+Pre-write a 6-line Python heap snippet with (-value, index) negation — flipping sign for max-heap is the single most common bug in this family.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

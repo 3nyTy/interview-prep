@@ -1,0 +1,118 @@
+===H1===
+Mlp Portal Fullstack Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/mlp-portal-fullstack-design
+===BODY===
+Mlp Portal Fullstack Design
+
+<https://www.1point3acres.com/interview/problems/company/netflix/mlp-portal-fullstack-design>
+
+Netflix
+System Design
+
+60 min
+Members
+MLP Portal Full-Stack Design
+
+Design a web portal that gives ML engineers and data scientists one place to record experiments, register models, deploy/promote models, and monitor production model health.
+
+MLE
+Infra Eng
+SWE
+ml-infra
+fullstack
+frontend
+backend
+schema-design
+ml-experiment
+hard
+Frequency
+Single report
+Last asked
+2026-04-03
+Stage
+onsite-system-design
+Requirements
+Record experiments with parameters, metrics, artifacts, owner, and lineage.
+Register models and versions.
+Deploy a model to an environment and promote it to production.
+Monitor model quality, data drift, data quality, percent empty, PSI, and alerts.
+Design REST APIs, database schema, and a UI flow.
+Be ready for GraphQL and JavaScript / frontend questions.
+API Sketch
+POST /experiments
+GET /experiments/{id}
+POST /models
+POST /models/{model_id}/versions
+POST /deployments
+POST /deployments/{id}/promote
+GET /models/{model_id}/monitoring?from=&to=
+
+Data Model
+Experiment(id, owner, project, params_json, metrics_json, artifact_uri, created_at)
+Model(id, name, owner, task_type, status)
+ModelVersion(id, model_id, experiment_id, artifact_uri, schema, created_at)
+Deployment(id, model_version_id, env, status, traffic_percent, created_at)
+MetricSeries(id, deployment_id, metric_name, timestamp, value, slice_key)
+AlertRule(id, model_id, metric_name, threshold, window, severity)
+
+Notes
+The portal is not just CRUD. The value is lifecycle state: experiment ? model version ? staging deployment ? production promotion ? monitoring and rollback.
+PSI is a common drift metric: compare distribution buckets between baseline and current data and alert when divergence is large.
+Time-series query backend matters for monitoring; warehouse tables are fine for offline analysis but too slow for interactive alerts.
+GraphQL can help UI screens fetch nested experiment / model / deployment views, but REST is simpler for workflow commands.
+Preparation
+Draw the main UI screens: experiment list, model detail, deployment history, monitoring dashboard.
+Prepare schema evolution for model input features.
+Practice explaining alert routing and rollback when a model underperforms after deployment.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+API Sketch
+Data Model
+Notes
+Preparation
+Related discussions  1
+??? MLI VO2
+Related questions
+
+Other Netflix questions sharing tags with this one
+
+Compute Resource Scheduling for ML Jobs
+Low
+ml-infra
+hard
+scheduling
++4
+Promotion Posting System Data Model
+Single report
+schema-design
+hard
+data-modeling
++2
+Ads Audience Targeting / Custom Audience System
+Single report
+schema-design
+hard
+ads
++5
+Ads Demand Intake Data Modeling
+High
+schema-design
+hard
+ads
++3
+Ads Frequency Cap / Limiter
+High
+hard
+ads
+rate-limiting
++5
+Code editor
+
+---

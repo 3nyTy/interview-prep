@@ -1,0 +1,68 @@
+===H1===
+OA: Collect Coins on 1D Board
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/oa-collect-coins-1d-board
+===BODY===
+Google
+Coding·90 minMembers
+OA: Collect Coins on 1D Board
+One of two problems in the 90-min Google SWE Early Career / NG OA. A 1D string board contains empty cells `.`, player tokens `T`, and coins `C`; each move slides any token exactly 3 cells right and may land on a coin (collected once). Find the maximum total coins collectable.
+SWE
+array
+greedy
+simulation
+medium
+Frequency
+Medium
+Last asked
+2026-05-07
+Stage
+oa
+Requirements
+
+Input: a single string of ., T, C (length ≤ 100).
+
+Each turn: pick any T and move it exactly 3 positions to the right.
+
+Direction is fixed (only right, never left).
+
+Each token can move any number of times.
+
+A coin C is collected when a token lands on that cell (passing through does not collect).
+
+Each coin can be collected only once.
+
+A token cannot move onto a cell already occupied by another token (collisions are illegal).
+
+Output: the maximum number of coins collectable over any sequence of legal moves.
+
+Examples
+
+Input:  T..C..C..
+Moves:  T moves +3 → ...TC.C.. (lands on first C)
+        T moves +3 → ......TC. (passes over C — does NOT collect again — lands on C)
+Output: 2
+
+Notes
+
+Tokens that share residue class mod 3 with a coin's position (and start to the left of it) are the candidates for collecting it.
+
+Multiple tokens can compete for the same coin; only the one that actually lands counts.
+
+The system in the OA shows only 2 basic test cases; there are no hidden tests, so add your own (multiple tokens on the same residue class, blocked passages, tokens behind another token).
+
+Canonical reduction: instead of maximizing the K coins picked from either end, find the contiguous window of length N-K with minimum sum; answer = total - min_window. O(N) time, O(1) space. The 1D-board variant has a starting position, so the picks form a contiguous segment [L..R] containing the start — slightly different from the two-ends-only framing, but the sliding-window technique still applies.
+
+Preparation
+
+Group cells by index % 3; within each group, scan left-to-right and assign coins to the nearest earlier token, respecting the no-overlap constraint.
+
+Greedy assignment per residue class works because moves are independent across classes.
+
+Practice with: tokens trapped behind another token, all coins on the same residue, no tokens at all.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

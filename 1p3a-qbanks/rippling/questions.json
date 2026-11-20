@@ -1,0 +1,655 @@
+{
+  "company": "rippling",
+  "display_name": "Rippling",
+  "qbank_count": 17,
+  "questions_scraped": 17,
+  "site_total_count": 102,
+  "oj_count": 72,
+  "external_count": 13,
+  "description": "Rippling's engineering loop is unusually concentrated: a small set of OOD coding prompts, two data-heavy system-design prompts, and a practical web API round account for most SWE interviews. The bar is driven by speed through multi-part prompts, clean extensible design, and whether the candidate can collaborate with AI tools without losing ownership of the solution.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/rippling",
+  "scraped_at": "2026-09-20",
+  "source": "1point3acres qbank (logged-in session)",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "delivery-billing-system",
+      "title": "Delivery Billing System",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-09-07",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "oop-design",
+        "heap",
+        "interval",
+        "interval-aggregation",
+        "ai-allowed",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "oop-design",
+        "heap",
+        "interval",
+        "interval-aggregation",
+        "ai-allowed",
+        "hard"
+      ],
+      "overview": "Build an in-memory delivery payout service. Start with driver registration, delivery recording, and O(1) total cost; add effective-dated driver rate changes and pay-up-to cutoff processing; then compu...",
+      "source_count": 15,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/rippling/delivery-billing-system"
+    },
+    {
+      "n": 2,
+      "slug": "task-manager-filter-sort-dedupe",
+      "title": "Task Manager Filter / Sort / Dedupe",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "High",
+      "last_asked": "2026-09-03",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "sorting",
+        "deduplication",
+        "data-modeling",
+        "ai-allowed",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "sorting",
+        "deduplication",
+        "data-modeling",
+        "ai-allowed",
+        "medium"
+      ],
+      "overview": "Given a list of tasks, remove duplicate tasks by description plus due date, filter to open unassigned work, sort by due date, high-priority flag, and creation age, then print each task in a specified ...",
+      "source_count": 9,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/rippling/task-manager-filter-sort-dedupe"
+    },
+    {
+      "n": 3,
+      "slug": "expense-rules-engine",
+      "title": "Expense Rules Engine",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-09-01",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Free preview",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "oop-design",
+        "hashmap",
+        "data-modeling",
+        "streaming",
+        "ai-allowed",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "oop-design",
+        "hashmap",
+        "data-modeling",
+        "streaming",
+        "ai-allowed",
+        "hard"
+      ],
+      "overview": "Design an extensible corporate-card rules engine. Evaluate per-expense and per-trip policies, choose a useful return type, then support composite AND / OR / NOT rules and scale the design to millions of expenses and tens of thousands of rules.",
+      "source_count": 10,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/rippling/expense-rules-engine"
+    },
+    {
+      "n": 4,
+      "slug": "logger-ood",
+      "title": "Logger OOD",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-08-31",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "oop-design",
+        "string-processing",
+        "search",
+        "ai-allowed",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "oop-design",
+        "string-processing",
+        "search",
+        "ai-allowed",
+        "medium"
+      ],
+      "overview": "AI-coding OOD prompt for a configurable logger. Implement output transformations and an internal message store, then add search while discussing read/write trade-offs.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/rippling/logger-ood"
+    },
+    {
+      "n": 5,
+      "slug": "camel-cards-poker-ood",
+      "title": "Camel Cards / Poker OOD",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-08-21",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "oop-design",
+        "hashmap",
+        "simulation",
+        "ai-allowed",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "oop-design",
+        "hashmap",
+        "simulation",
+        "ai-allowed",
+        "medium"
+      ],
+      "overview": "Compare two simplified poker hands. Classify four-card hands by extensible hand types, break ties without sorting, then handle partial hands where network loss makes the result win / loss / tie / unkn...",
+      "source_count": 7,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/rippling/camel-cards-poker-ood"
+    },
+    {
+      "n": 6,
+      "slug": "article-voting-system",
+      "title": "Article Voting / Top-K",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-05-25",
+      "stage": "onsite-coding · phone-screen",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "oop-design",
+        "hashmap",
+        "queue",
+        "top-k",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "oop-design",
+        "hashmap",
+        "queue",
+        "top-k",
+        "medium"
+      ],
+      "overview": "Design an in-memory article voting tracker. Support article creation, user upvotes/downvotes, each user's most recent three opinion flips, and global top-K by score.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/rippling/article-voting-system"
+    },
+    {
+      "n": 7,
+      "slug": "web-api-stack-overflow-quora",
+      "title": "Web API Round: Stack Overflow / Quora-like Service",
+      "category": "coding",
+      "duration": "75 min",
+      "frequency": "Medium",
+      "last_asked": "2026-02-28",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "backend",
+        "http",
+        "api-integration",
+        "database",
+        "access-control",
+        "rate-limiting",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "backend",
+        "http",
+        "api-integration",
+        "database",
+        "access-control",
+        "rate-limiting",
+        "medium"
+      ],
+      "overview": "Implement a runnable REST service live in your own framework. The common product is a Stack Overflow / Quora-like question system with create/query and voting-style operations, followed by backend tri...",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/rippling/web-api-stack-overflow-quora"
+    },
+    {
+      "n": 8,
+      "slug": "currency-exchange",
+      "title": "Currency Exchange / Maximize After Two Days of Conversions",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-02-13",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "mle"
+      ],
+      "tags": [
+        "graph",
+        "dfs",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "graph",
+        "dfs",
+        "medium"
+      ],
+      "overview": "Starting from 1.0 unit of a given currency, maximize the final amount by applying Day 1 exchange rates first, then Day 2 rates, with self-to-self conversion always allowed at 1.0. Each day's pairs for...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/rippling/currency-exchange"
+    },
+    {
+      "n": 9,
+      "slug": "in-memory-kv-store-transactions",
+      "title": "In-Memory Key-Value Store with Transactions",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-01-11",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "in-memory-database",
+        "transactions",
+        "hashmap",
+        "data-structure",
+        "object-design",
+        "python",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "in-memory-database",
+        "transactions",
+        "hashmap",
+        "data-structure",
+        "object-design",
+        "python",
+        "medium"
+      ],
+      "overview": "Design and implement an in-memory key-value datastore backed by a hashmap that supports set/get/delete plus begin/commit/rollback transactions. The round builds incrementally: a plain CRUD store, then...",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/rippling/in-memory-kv-store-transactions"
+    },
+    {
+      "n": 10,
+      "slug": "intern-oa-fixed-set",
+      "title": "Intern OA Fixed Set",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2025-11-16",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "oa",
+        "heap",
+        "dfs",
+        "api-integration",
+        "sliding-window",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "oa",
+        "heap",
+        "dfs",
+        "api-integration",
+        "sliding-window",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Intern OA combining DSA multiple choice and coding. Topics include time complexity, heap validation, DFS path validation, heapify, paginated REST API parsing, and a sliding-window consistent logs prob...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/rippling/intern-oa-fixed-set"
+    },
+    {
+      "n": 11,
+      "slug": "median-of-two-sorted-arrays",
+      "title": "Median of Two Sorted Arrays",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-02-01",
+      "stage": "oa · phone-screen",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "array",
+        "binary-search",
+        "divide-and-conquer",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "binary-search",
+        "divide-and-conquer",
+        "hard"
+      ],
+      "overview": "Given two sorted arrays nums1 and nums2 of sizes m and n, return the median of the combined arrays in O(log(m+n)) time. This is the classic LeetCode-hard problem: the intended solution binary-searches...",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/rippling/median-of-two-sorted-arrays"
+    },
+    {
+      "n": 12,
+      "slug": "music-player-ood",
+      "title": "Music Player OOD",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-01-13",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "oop-design",
+        "hashmap",
+        "set",
+        "heap",
+        "top-k",
+        "complexity-analysis",
+        "python",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "oop-design",
+        "hashmap",
+        "set",
+        "heap",
+        "top-k",
+        "complexity-analysis",
+        "python",
+        "medium"
+      ],
+      "overview": "Design and implement a Spotify-style music-player analytics class across three escalating parts: add songs and record plays with per-song unique-listener counts, return a user's last 3 unique songs wi...",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/rippling/music-player-ood"
+    },
+    {
+      "n": 13,
+      "slug": "google-news-aggregator",
+      "title": "Google News / News Aggregator",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Very high",
+      "last_asked": "2026-09-11",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "swe",
+        "em"
+      ],
+      "tags": [
+        "feed",
+        "fan-out",
+        "ranking",
+        "caching",
+        "search",
+        "top-k",
+        "scaling",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe",
+        "em"
+      ],
+      "tags_slug": [
+        "feed",
+        "fan-out",
+        "ranking",
+        "caching",
+        "search",
+        "top-k",
+        "scaling",
+        "hard"
+      ],
+      "overview": "Design a news aggregator with topic and publisher subscriptions, story clustering across publishers, general top stories, and personalized news. The main follow-ups are push versus pull, celebrity pub...",
+      "source_count": 17,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/rippling/google-news-aggregator"
+    },
+    {
+      "n": 14,
+      "slug": "hotel-booking-system",
+      "title": "Hotel Booking System",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-08-11",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "api-integration",
+        "transactions",
+        "idempotency",
+        "schema-design",
+        "location",
+        "geohash",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "api-integration",
+        "transactions",
+        "idempotency",
+        "schema-design",
+        "location",
+        "geohash",
+        "hard"
+      ],
+      "overview": "Design a hotel booking product integrated with external hotel inventory. The key evaluation point is consistency: search and booking depend on third-party room availability that can change outside Rip...",
+      "source_count": 6,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/rippling/hotel-booking-system"
+    },
+    {
+      "n": 15,
+      "slug": "user-behavior-monitoring-aggregator",
+      "title": "User Behavior / Metrics Monitoring Aggregator",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-06-28",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "swe",
+        "ds"
+      ],
+      "tags": [
+        "data-engineering",
+        "ingestion",
+        "etl",
+        "ads",
+        "database",
+        "schema-design",
+        "scaling",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe",
+        "ds"
+      ],
+      "tags_slug": [
+        "data-engineering",
+        "ingestion",
+        "etl",
+        "ads",
+        "database",
+        "schema-design",
+        "scaling",
+        "hard"
+      ],
+      "overview": "Design an event monitoring and enrichment platform for product behavior. Collect browser/mobile events, power low-latency dashboards, keep raw events for offline analytics, and enrich data with geo or...",
+      "source_count": 6,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/rippling/user-behavior-monitoring-aggregator"
+    },
+    {
+      "n": 16,
+      "slug": "frontend-news-feed",
+      "title": "Frontend News Feed",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-06",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "frontend",
+        "react",
+        "feed",
+        "caching",
+        "performance-modeling",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "frontend",
+        "react",
+        "feed",
+        "caching",
+        "performance-modeling",
+        "medium"
+      ],
+      "overview": "Design a Facebook/X-style news feed frontend. Cover rich text, mention and hashtag hover cards, API and local data models, pagination, offline behavior, list virtualization, component boundaries, and ...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/rippling/frontend-news-feed"
+    },
+    {
+      "n": 17,
+      "slug": "project-deep-dive-and-bq",
+      "title": "Project Deep Dive / HM BQ",
+      "category": "behavioral",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-08-11",
+      "stage": "onsite-deep-dive · onsite-bq · final-round",
+      "access": "Members",
+      "roles": [
+        "all-roles"
+      ],
+      "tags": [
+        "deep-dive",
+        "presentation",
+        "behavioral",
+        "bq",
+        "impact",
+        "mentorship",
+        "medium"
+      ],
+      "roles_slug": [
+        "all-roles"
+      ],
+      "tags_slug": [
+        "deep-dive",
+        "presentation",
+        "behavioral",
+        "bq",
+        "impact",
+        "mentorship",
+        "medium"
+      ],
+      "overview": "HM and onsite deep-dive rounds center on a past project presentation plus behavioral follow-ups. Senior/staff loops now probe AI practice, cross-team influence, platform ownership, business impact, me...",
+      "source_count": 12,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/rippling/project-deep-dive-and-bq"
+    }
+  ]
+}

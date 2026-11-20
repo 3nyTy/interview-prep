@@ -1,0 +1,135 @@
+===H1===
+Music Playlist History
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/music-playlist-history
+===BODY===
+Music Playlist History
+
+<https://www.1point3acres.com/interview/problems/company/netflix/music-playlist-history>
+
+Netflix
+Coding
+
+60 min
+Members
+Music Playlist History
+
+Design a MusicPlaylist storing (song, timestamp) plays: add, getAll sorted by timestamp (ties by insertion order), remove a single record, and removeAll records of a song.
+
+SWE
+data-structure
+hashmap
+sorting
+object-design
+medium
+Frequency
+Single report
+Last asked
+2026-01-26
+Stage
+phone-screen  onsite-coding
+Problem Requirements
+
+We need to build a data structure that keeps a history of songs listened to. Each entry must store the song name and the timestamp when it was played.
+
+You need to create a class called MusicPlaylist with the following features:
+
+MusicPlaylist(): Sets up the playlist object.
+void add(String song, int timestamp): Saves a record that a specific song was played at a specific time.
+List<String> getAll(): Returns a list of all songs played.
+The list must be sorted by timestamp (earliest to latest).
+If two songs share the same timestamp, return them in the order they were originally added.
+boolean remove(String song, int timestamp): Deletes the record of a specific song played at a specific time.
+Returns true if the record existed and was deleted.
+Returns false if the record was not found.
+int removeAll(String song): Deletes every record of a specific song, no matter when it was played.
+Returns the total number of records deleted.
+Example Walkthrough
+
+Input Operations: ["MusicPlaylist", "add", "add", "add", "getAll", "remove", "getAll", "removeAll", "getAll"]
+
+Expected Output: [null, null, null, null, ["song1", "song2", "song1"], true, ["song1", "song1"], 2, []]
+
+Step-by-Step Explanation:
+
+// 1. Initialize the playlist
+MusicPlaylist playlist = new MusicPlaylist(); 
+
+// 2. Add songs with timestamps
+playlist.add("song1", 1); // Listen to song1 at time 1
+playlist.add("song2", 2); // Listen to song2 at time 2
+playlist.add("song1", 3); // Listen to song1 again at time 3
+
+// 3. Get all songs sorted by time
+playlist.getAll(); 
+// Returns ["song1", "song2", "song1"]
+
+// 4. Remove a specific record
+playlist.remove("song2", 2); // Remove song2 played at time 2
+// Returns true
+
+// 5. Check the list again
+playlist.getAll(); 
+// Returns ["song1", "song1"]
+
+// 6. Remove all instances of a song
+playlist.removeAll("song1"); // Remove all records of song1
+// Returns 2
+
+// 7. Check the list one last time
+playlist.getAll(); 
+// Returns []
+
+Input Limits
+Song Name Length: 1 <= song.length <= 100
+Timestamp Range: 0 <= timestamp <= 10^9
+Total Operations: At most 10^4 calls will be made to the methods (add, getAll, remove, and removeAll).
+Characters: Song names will only contain lowercase English letters and digits.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Problem Requirements
+Example Walkthrough
+Input Limits
+Related discussions  0
+Related questions
+
+Other Netflix questions sharing tags with this one
+
+Count Disjoint String Pairs
+Low
+hashmap
+medium
+bitmask
++1
+Movie Billboard Rotation Service
+Low
+data-structure
+medium
+heap
++3
+Command Executor with Undo and Tags
+Medium
+data-structure
+medium
+stack
++3
+Weighted Cache / Timed Cache
+Medium
+data-structure
+medium
+heap
++3
+JSON Path Query / Inverted Index
+Low
+hashmap
+medium
+json
++4
+Code editor
+
+---

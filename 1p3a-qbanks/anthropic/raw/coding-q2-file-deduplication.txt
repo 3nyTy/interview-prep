@@ -1,0 +1,84 @@
+===H1===
+Coding Q2 — File Deduplication
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/coding-q2-file-deduplication
+===BODY===
+Anthropic
+Coding·55 minMembers
+Coding Q2 — File Deduplication
+Walk a directory tree and group duplicate files. Two-layer dedup: first by file size, then by content hash. The base problem is short; the follow-ups about IO/CPU bounds, hash choice, and scale dominate the round.
+SWE
+MLE
+Infra Eng
+filesystem
+hashing
+python
+medium
+Frequency
+Very high
+Last asked
+2026-09-02
+Stage
+phone-screen · onsite-coding
+Requirements
+
+The canonical signature:
+
+def find_duplicate_files(root_path: str) -> list[list[str]]: ...
+    # Walks root_path recursively and returns groups of paths whose file
+    # contents are byte-identical. Each inner list has length >= 2;
+    # files with no duplicate (singletons) are EXCLUDED from the result.
+
+Walk the tree (os.walk is fine).
+
+Bucket by os.path.getsize first; files with unique sizes are trivially unique.
+
+Within each size bucket, the canonical optimisation is a 3-tier filter: (1) size match, (2) hash of the first 1024 bytes to filter most false candidates cheaply, (3) full-content hash to confirm. The mid-tier prefix-hash cuts the bytes read for non-matching files of equal size by orders of magnitude.
+
+Hash candidates within each size bucket (default to SHA-256; MD5 is acceptable but be ready to defend the collision risk).
+
+Group files sharing the same (size, full_hash) and return the groups.
+
+Edge cases the interviewer probes: empty files (all 0-byte files collide and form one group), symbolic links (resolve or skip?), and unreadable files (permission errors should not crash the walk).
+
+Candidates create their own test files in CodeSignal — make a small fixture with two duplicate pairs, one unique file, and one empty file.
+
+Follow-up tree
+
+IO vs CPU bound. Hashing 1 GB files is IO-bound on a typical NVMe, CPU-bound on slow disks; the answer is "measure, then choose." Be ready to argue for ThreadPoolExecutor (IO-bound) vs. ProcessPoolExecutor (CPU-bound) and explain how you'd benchmark.
+
+All files identical and huge. Every file lands in one bucket, so you must hash all of them. Optimization: read+hash in chunks and short-circuit as soon as two streams diverge.
+
+Hash collisions. Use SHA-256 by default. If asked about speed, mention xxHash or Blake3. Discuss the chance of a real-world collision vs. a verification re-read.
+
+Distribute across machines. Shard by size bucket, send each shard to a worker, dedupe locally, merge groups at the end. Watch for stragglers when one bucket is much bigger.
+
+Realtime detection. Use inotify / fsnotify for newly-written files, maintain a (size, hash) index, and check at write-completion.
+
+Notes
+
+The interviewer often picks a Python idiom to grill on — pathlib vs. os, generator-vs-list, context-manager hygiene around file handles.
+
+One pitfall: hashing the entire file when a length-prefix or first-block hash would already separate buckets. State the optimization out loud — interviewers reward it without requiring you to implement it.
+
+Q2 has been migrating: older loops always asked file-dedup; from late 2025 onward some Q2 rounds use the LRU-cache durability problem instead. Prepare both.
+
+Canonical output shape: list[list[str]] where each inner list is one duplicate group (≥2 paths). Files with no duplicate are excluded entirely — singletons do not appear in the result. Walk the tree with os.walk() rooted at the provided path; do not assume a flat file list.
+
+No-helper rotation
+
+Recent phone-screen rotations ship only a main() stub — no directory-walking or file-reading helpers are provided, so hand-writing os.walk + chunked reads from scratch is part of the timed work. Java and other non-Python candidates in particular flag the unfamiliar standard-library surface (manual directory recursion, streamed hashing) as the main time sink; the problem statement itself is often only a few lines, so do not wait for a detailed spec. Looking up library docs is allowed, and copying a code snippet the interviewer can see on screen-share is explicitly fine.
+
+Preparation
+
+Practice a clean walk → bucket → hash → group implementation under 15 minutes including manual fixture creation.
+
+Drill the streaming-hash variant: open both files, read in 1 MB chunks, abort the comparison as soon as a chunk hash differs.
+
+Be able to whiteboard the distributed answer with size-bucket sharding and a final merge step.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

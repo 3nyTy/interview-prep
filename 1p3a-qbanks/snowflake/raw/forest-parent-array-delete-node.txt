@@ -1,0 +1,120 @@
+===H1===
+Forest Parent Array Delete Node
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/forest-parent-array-delete-node
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Forest Parent Array Delete Node
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+·
+60 min
+Members
+Forest Parent Array Delete Node
+
+Given a forest encoded as an array where `parent[i]` stores node `i`'s parent index and each root has `parent[i] == i`, delete a specified node and return a new parent-index array that still satisfies the same representation constraints. The post confirms valid input and no null / None entries; the child-promotion rule should be clarified before coding.
+
+SWE
+tree
+array
+hashmap
+medium
+Frequency
+Single report
+Last asked
+2026-06-24
+Stage
+phone-screen
+Requirements
+Input is an array representation of a forest. For every node index i, parent[i] stores the index of its parent.
+A root node stores itself as parent: parent[i] == i.
+Input is always valid and contains no NULL / None.
+Delete one specified node and return the resulting parent array.
+The output array must still use valid indices under the same rules after the deleted node is removed and remaining nodes are reindexed.
+Clarify before coding how children of the deleted node should be repaired. A common convention is to promote direct children of the deleted node into roots, then shift all parent indices greater than the deleted index down by one.
+Notes
+The core difficulty is not tree traversal; it is maintaining parent-index validity after the array shrinks.
+Build an old-index -> new-index map for every node except the deleted node. Then rewrite each remaining node's parent through that map.
+If a remaining node's old parent is the deleted node, apply the agreed repair policy. Under root-promotion semantics, its new parent becomes its own new index.
+Edge cases: deleting a root, deleting a leaf, single-node forest, multiple roots, and deleting a node whose parent index is greater than the deleted index.
+Preparation
+Implement the old-to-new index remapping approach and test it on a forest with multiple roots.
+Walk through deletion of a root with two children and verify all shifted parent indices by hand.
+Prepare one sentence to clarify child repair semantics before writing code.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Preparation
+Related discussions · 1
+🔑Snowflake Backend Engineer 面经
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Throne Inheritance
+Single report
+tree
+hashmap
+medium
++1
+Copy List with Random Pointer
+Single report
+hashmap
+medium
+linked-list
+Boundary of Binary Tree
+Single report
+tree
+medium
+dfs
++1
+Top-K Search Terms (Per-User Deduped)
+Single report
+hashmap
+medium
+set
++2
+Longest Univalue Path
+Single report
+tree
+medium
+dfs
++1
+Code editor

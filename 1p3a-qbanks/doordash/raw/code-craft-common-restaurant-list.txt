@@ -1,0 +1,48 @@
+===H1===
+Code Craft: Common Restaurant Pickup Order (LCS Variant)
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/code-craft-common-restaurant-list
+===BODY===
+DoorDash
+Coding·60 minMembers
+Code Craft: Common Restaurant Pickup Order (LCS Variant)
+Two drivers each have an ordered list of restaurants to pick up from; one car, can only pick up at restaurants both lists contain, must preserve each list's order. Return the longest common pickup list. Equivalent to the classic Longest Common Subsequence reconstruction.
+SWE
+dp
+string
+medium
+Frequency
+Single report
+Last asked
+2025-12-11
+Stage
+phone-screen
+Requirements
+
+Input: two lists a, b of restaurant names (each ordered).
+
+Output: the longest subsequence common to both, preserving relative order in each list (i.e. the LCS, reconstructed as a string list rather than its length).
+
+Once you pass a restaurant in either list, you cannot return — the order is strict.
+
+Notes
+
+Standard LCS DP: dp[i][j] = length of LCS of a[:i] and b[:j]. Recurrence: dp[i][j] = dp[i-1][j-1] + 1 if a[i-1] == b[j-1] else max(dp[i-1][j], dp[i][j-1]). O(n × m) time and space.
+
+Reconstruction: walk backward from dp[n][m] to reconstruct the actual subsequence (not just the length).
+
+Space optimization: rolling rows reduces space to O(min(n, m)), but you lose easy reconstruction; mention as follow-up rather than implementing first.
+
+Watch the interviewer's clarification: "common restaurants" could mean longest common substring (contiguous) — confirm subsequence semantics from the example.
+
+Preparation
+
+Drill LC 1143 (Longest Common Subsequence) plus the reconstruction extension until automatic.
+
+Write both the DP table and the backtrace in under 25 minutes; this is the gate for finishing the production-style follow-up on time.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

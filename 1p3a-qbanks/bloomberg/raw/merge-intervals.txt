@@ -1,0 +1,45 @@
+===H1===
+Merge Intervals (LC 56)
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/merge-intervals
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Merge Intervals (LC 56)
+Given a collection of intervals, merge every overlapping group and return non-overlapping intervals covering the same ranges. This appeared in a 60-minute phone screen with an explicit dry-run requirement.
+SWE
+interval
+sorting
+array
+medium
+Frequency
+Single report
+Last asked
+2026-08-07
+Stage
+phone-screen
+Requirements
+
+Given an array of intervals where each interval is represented as [start, end], merge all overlapping intervals and return the resulting non-overlapping intervals. The returned intervals must cover exactly the same ranges as the input.
+
+The interview format requires a complete dry run after implementation.
+
+Notes
+
+Sort intervals by start, then sweep once: extend the current interval when the next start is at most the current end; otherwise emit the current interval and begin a new one. Sorting dominates at O(n log n) time; the sweep is O(n), with output aside from the sorting strategy.
+
+In the canonical closed-interval form, touching endpoints overlap. Confirm this boundary rule before coding if the interviewer presents a modified variant.
+
+Keep the dry run concrete: show how the current merged interval changes as each remaining interval is processed.
+
+Preparation
+
+Implement the standard version from a blank editor, including empty and single-interval cases.
+
+Practice narrating a full dry run and state the time and space complexity before the interviewer asks.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

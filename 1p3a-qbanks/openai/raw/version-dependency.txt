@@ -1,0 +1,153 @@
+===H1===
+Version Dependency
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/version-dependency
+===BODY===
+OpenAI
+Coding·75 minMembers
+Version Dependency
+Given packages with version dependencies ('package A v1 requires B >= 2.0'), implement parsing, queries, and likely a SAT-like resolver. 4 sub-parts; very large code volume.
+SWE
+RE
+algorithm
+graph
+dependency-resolution
+medium
+Frequency
+Medium
+Last asked
+2026-05-08
+Stage
+phone-screen
+Requirements
+
+Full rules not leaked; the consensus across candidates is 'huge amount of code — keep typing — never optimize'.
+
+'Version dependency' is the second sub-question, alongside 'Transformer bug hunt' and 'numpy puzzle'.
+
+One candidate describes Part 4 as 'three binary classifiers, write each one separately'.
+
+Alternate canonical variant — earliest supported version via API probe
+
+A separate rotation drops the dependency-graph framing entirely and turns the round into a binary-search-over-versions problem: find the earliest version in a list at which a feature first works, probing a slow isSupported API as few times as possible. It unfolds in escalating parts.
+
+def parse_version(version: str) -> tuple[int, int, int]:
+    # "103.003.02" → (103, 3, 2); split on "." and int() each part.
+    # int() drops leading zeros, so "003" parses to 3 — never string-compare.
+    # The input list is sorted lexicographically, NOT numerically — always
+    # parse before comparing; "1.10.0" > "1.9.0" numerically but < "1.9.0"
+    # lexicographically.
+    parts = version.split('.')
+    return tuple(int(part) for part in parts)
+
+def isSupported(version: str) -> bool: ...
+    # Provided by the harness. Slow / rate-limited — minimize calls.
+
+def find_earliest_supported_version(versions: list[str]) -> str | None: ...
+    # Part 1 (monotone): support is False…then True and stays True. Sort by
+    # parse_version, linear scan, return the first True or None if nothing
+    # supports the feature. Format is {major}.{minor}.{patch}.
+
+    # Part 2 (regressions): support may go True → False → True. Guarantee: if
+    # any version supports it, some later version also supports it. Still return
+    # the ABSOLUTE earliest True version — you cannot early-exit on the first
+    # True; track a running minimum across ALL True results:
+    #   earliest, earliest_tuple = None, None
+    #   for v in sorted(versions, key=parse_version):
+    #       if isSupported(v):
+    #           t = parse_version(v)
+    #           if earliest is None or t < earliest_tuple:
+    #               earliest, earliest_tuple = v, t
+    #   return earliest
+
+    # Part 3 (rate-limited): exploit "monotone within groups" — if some patch in
+    # major.minor X.Y is True, some later patch is also True; if some minor in
+    # major X is True, some later minor is also True. Hierarchical binary search
+    # over (major → minor → patch) gets to O(log M + log Mi + log P) API calls
+    # instead of O(N). Probe the *latest* version in each group to represent
+    # that group; binary-search to the first True group, then recurse one level
+    # down. Cache every probe so you never re-call isSupported on the same string.
+
+The Part-3 bisection rides on a single "first True" helper, reused at every level (major groups → minor groups → patch list). Its only subtlety is the termination rule — after a True hit, keep searching left for an even-earlier True rather than returning:
+
+def binary_search_first_supported(items: list, is_supported_func) -> any:
+    # Returns the item value at the first index where is_supported_func(idx)
+    # is True, or None. Continues LEFT after a hit — does not return on the
+    # first True.
+    if not items:
+        return None
+    left, right, result = 0, len(items) - 1, None
+    while left <= right:
+        mid = (left + right) // 2
+        if is_supported_func(mid):
+            result = items[mid]
+            right = mid - 1   # an earlier True may still exist
+        else:
+            left = mid + 1
+    return result
+
+Overall cost: O(log M + log Mi + log P) API calls (vs O(N) probing every version), O(N log N) to sort the list up front, O(N) space for the grouped buckets.
+
+Examples
+
+A monotone Part-1 list — ["1.0.1", "1.0.2", "1.1.0", "2.0.0", "2.0.1"] with only "1.1.0" onward supported — returns "1.1.0" (note "1.1.0" sorts after "1.0.2" only once parsed: (1,1,0) > (1,0,2)).
+
+A Part-2 regression list — ["1.0.0", "1.0.1", "1.0.2", "1.0.3"] where 1.0.1 → True, 1.0.2 → False, 1.0.3 → True — returns "1.0.1", the absolute earliest, despite the later break.
+
+A Part-3 walkthrough over three majors finds the feature first appears at major 2, then minor 1, then patch 0 → "2.1.0", costing ~5 probes where a flat scan of 12 versions would cost 12.
+
+Notes
+
+Even 75 min is tight; the consensus on the call is that optimization is unnecessary.
+
+Hard to prep just from compiled prompts — pair with an LLM-generated harness.
+
+The dependency-graph half is the canonical topological-sort skeleton: build an adjacency list pkg@version -> required peers, Kahn's algorithm with an indegree counter emits a legal install order in O(V + E); a cycle (returned-order length < V) is the conflict signal. Layered on top is version constraint propagation — when A requires B >= 2.0 and another node requires B < 1.5, the constraint set on B becomes empty and you backtrack. A small DPLL/DFS resolver over the version-candidate set is sufficient for the prompt; SAT-grade machinery is overkill.
+
+Common mistakes candidates report
+
+Lexicographic vs numeric order: treating "1.10.0" as less than "1.9.0" because "10" < "9" string-wise. Always sort by parse_version key, never by raw string.
+
+Leading-zero parsing: "103.003.02" must read as (103, 3, 2) — feed each part through int(), never compare the zero-padded strings.
+
+Binary search termination: when searching for the first True, you must continue left after finding a match — do not return immediately on the first True hit.
+
+Wrong group representative: the representative version for a major/minor group must be the latest patch in that group (not the first). Probing an earlier patch may return False even if a later patch in the same group is True.
+
+Missing Part 2 tracker: in the regression case, a simple return on first True is wrong — accumulate all True versions and return the minimum-parsed one.
+
+Suggested follow-ups
+
+Caching: memoize every isSupported call by version string to avoid redundant probes across the hierarchical search levels.
+
+Parallel probing: if the API supports concurrent requests, fan out the group-representative probes in parallel to reduce wall-clock time.
+
+Non-standard version formats: how would the solution change if versions include pre-release suffixes like "v2.1-beta" or build metadata?
+
+Error handling: what if isSupported times out or returns an error? Retry with backoff, or propagate as None?
+
+Return all working versions: if the task is extended to return every supported version rather than just the earliest, the hierarchical binary search no longer applies — revert to a full linear scan.
+
+Suggested follow-up drills
+
+A quick analyze_pattern print loop — dump each sorted version against its isSupported result before coding — is the fastest way to confirm whether you are in the monotone (Part 1) or regression (Part 2) regime; interviewers reward checking the data instead of assuming "False then True."
+
+Clarify before optimizing: ask whether support can break within a minor group and whether a break is permanent — the Part-3 group-monotonicity assumption (some later patch/minor returns to True) is what licenses bisecting on the group's latest member.
+
+Preparation
+
+Semver parsing, topological sort (Kahn's BFS with indegree counter), constraint propagation
+
+A simple SAT-style resolver (DFS + backtracking) is enough — keep the candidate-version sets explicit and prune as constraints are added
+
+Drill the canonical "find any valid install order; detect cycle if no full order exists" skeleton until it's muscle memory, then layer the version-constraint propagation on top
+
+For the rate-limited binary-search variant, drill hierarchical bisection: bisect majors first (probe the latest patch of each major), then minors inside the chosen major, then patches; cache every probe so you never re-call isSupported on the same string
+
+Memorize the "first True" bisection invariant — record the hit, then move the right bound left — and the Part-2 running-minimum loop; both are the spots candidates most often get subtly wrong
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

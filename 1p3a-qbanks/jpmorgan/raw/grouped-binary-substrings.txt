@@ -1,0 +1,55 @@
+===H1===
+Grouped Binary Substrings
+===URL===
+https://www.1point3acres.com/interview/problems/company/jpmorgan/grouped-binary-substrings
+===BODY===
+JPMorgan Chase
+Coding·60 minMembers
+Grouped Binary Substrings
+Count substrings of a binary string where the number of `0`s equals the number of `1`s and all `0`s and all `1`s appear in two contiguous groups, such as `000111`, `111000`, `01`, or `10`.
+SWE
+RS
+binary-string
+string
+string-processing
+oa
+easy
+Frequency
+Low
+Last asked
+2026-03-14
+Stage
+oa
+Requirements
+
+Input: a string containing only 0 and 1.
+
+Count substrings satisfying both conditions:
+
+equal number of 0s and 1s
+
+all identical characters are grouped into two contiguous runs
+
+Valid examples of shape: 000111, 111000, 01, 10.
+
+Return the count.
+
+Notes
+
+This is the same algorithmic family as LC 696 when the OA phrases it with grouped binary substrings.
+
+Compress the string into run lengths. For each adjacent pair of runs, add min(prev_run_len, cur_run_len).
+
+Do not enumerate substrings. The linear run-length solution is shorter and avoids timeouts.
+
+Preparation
+
+Implement the run-length scan in one pass while tracking prev and cur run lengths.
+
+Test alternating input (010101), one long block followed by a short block, and all-identical input.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

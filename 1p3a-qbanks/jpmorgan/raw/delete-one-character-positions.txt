@@ -1,0 +1,52 @@
+===H1===
+Delete-One-Character Positions
+===URL===
+https://www.1point3acres.com/interview/problems/company/jpmorgan/delete-one-character-positions
+===BODY===
+JPMorgan Chase
+Coding·60 minMembers
+Delete-One-Character Positions
+Given strings `s1` and `s2`, where `s2` can be obtained by deleting one character from `s1`, return all deletion positions that make the transformation valid.
+SWE
+string
+two-pointer
+string-processing
+oa
+easy
+Frequency
+Single report
+Last asked
+2025-07-29
+Stage
+oa · tech-screen
+Requirements
+
+Input: two strings s1 and s2.
+
+s2 is obtainable from s1 by deleting one character.
+
+Return every index in s1 whose deletion produces s2.
+
+If repeated characters make multiple deletions equivalent, include all valid positions.
+
+Notes
+
+First verify len(s1) == len(s2) + 1 unless the prompt guarantees it.
+
+A simple O(n²) check deletes each index and compares strings; acceptable only for small constraints.
+
+The O(n) approach finds the first mismatch, then expands across the run of identical characters in s1 that could all be deleted to produce the same s2.
+
+Duplicate-character runs are the main trap: s1 = "aaab", s2 = "aab" should return multiple positions, not just the first mismatch.
+
+Preparation
+
+Implement the brute-force version as a correctness oracle, then the O(n) run-expansion version.
+
+Test leading deletion, trailing deletion, middle deletion, and a repeated-character block with several valid answers.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

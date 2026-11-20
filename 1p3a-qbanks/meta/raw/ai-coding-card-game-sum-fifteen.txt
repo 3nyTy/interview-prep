@@ -1,0 +1,73 @@
+===H1===
+AI Coding — Card Game (Three Cards Summing to 15)
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/ai-coding-card-game-sum-fifteen
+===BODY===
+Meta
+Coding·60 minMembers
+AI Coding — Card Game (Three Cards Summing to 15)
+Card game with 36 cards (4 suits × values 1-9). Starting table has 16 random cards; each round pick 3 cards summing to 15 for 15 points, then refill until no more pairs are possible. Perfect score is 12 pairs × 15 = 180. Four progressive sub-tasks: debug a draw method → naive scorer → simulate to measure quality → optimize with DP.
+SWE
+MLE
+ai-coding
+3sum
+backtracking
+simulation
+medium
+Frequency
+Medium
+Last asked
+2026-06-03
+Stage
+onsite-coding
+Requirements
+
+Game mechanics (confirmed across multiple reports):
+
+Deck: 36 cards, 4 suits × values 1-9.
+
+Initial table: 16 cards randomly dealt.
+
+Round: pick any 3 distinct cards summing to 15 (e.g. three different 5s, or 9 + 3 + 2). Score 15 points per pair.
+
+After each round, refill the table until the deck is exhausted or no triple-sum-15 remains.
+
+Perfect game = 12 pairs cleared = 180 points.
+
+Sub-tasks:
+
+Q1 — Debug the draw-cards method. Unit test fails because the drawn triple isn't guaranteed to come from the cards currently on the table; the fix is often in the main flow (an if/else gate), not the unit test itself. Read the codebase carefully — interviewer hints at the failing assertion line but the bug is elsewhere.
+
+Q2 — Naive scoring strategy. Per round, draw any three cards summing to 15 (3Sum-style two-pointer or hash-set complement). Optimize per-round, not whole-game.
+
+Q3 — Measure strategy quality. Run a simulation harness over many shuffled games (commonly 100) and report perfect-game rate. Reported baseline: naive strategy ≈ 20-40% perfect games. AI typically scaffolds the simulator; you may need to tweak.
+
+Q4 — Optimize. Backtrack over all draw orderings or DP on remaining-cards state; keep the best whole-game score. Reported result after optimization: 60-90% perfect games. Interviewers may ask whether a strategy can guarantee 100% — the answer is no (counterexample: a starting table of only 4×9, 4×8, 4×7, 4×6 has no sum-15 triple).
+
+Examples
+
+One candidate reported: naive 3Sum greedy → 20/100 perfect games; DP-based optimization → 60/100. Another reports 40% → 90% with backtracking.
+
+Notes
+
+Confirmed as one of the four core AI-Coding prompts. The Q3 simulation step is the differentiator from Maze / Max-Unique — be ready to argue why simulation is a valid quality measure.
+
+One candidate's interviewer ate most of the time on Q1. Pace target: ~10 min Q1, ~10 min Q2, ~15 min Q3, ~20 min Q4.
+
+Be ready for the "is there a perfect strategy?" closing question — argue from a degenerate starting table.
+
+Preparation
+
+Practice the 3Sum LeetCode 15 / 3Sum Closest pattern until two-pointer ↔ hash-set switch is automatic.
+
+Drill backtracking over draw orderings for the Q4 optimization — define state (remaining cards), transition (pick one triple), base case (no valid triple).
+
+Pre-write a simulate-and-score harness in your head so Q3 is a 5-minute exercise: shuffle deck → loop rounds → count perfect games.
+
+Pre-script the "no guaranteed perfect strategy" closing argument.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

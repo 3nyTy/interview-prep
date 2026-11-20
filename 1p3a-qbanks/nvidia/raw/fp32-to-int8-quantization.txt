@@ -1,0 +1,82 @@
+===H1===
+FP32 Tensor to Int8 Quantization
+===URL===
+https://www.1point3acres.com/interview/problems/company/nvidia/fp32-to-int8-quantization
+===BODY===
+NVIDIA
+Coding·60 minFree preview
+FP32 Tensor to Int8 Quantization
+Given an FP32 tensor and a floating-point scale, convert the tensor to INT8. Follow-ups add asymmetric quantization with zero point and ask how scale / zero point should change when the input distribution is not symmetric.
+SWE
+MLE
+Perf Eng
+numpy
+inference
+numerical-stability
+medium
+Frequency
+Single report
+Last asked
+2026-02-12
+Stage
+phone-screen
+Requirements
+
+Implement a function that takes:
+
+def quantize_fp32_to_int8(x: np.ndarray, scale: float) -> np.ndarray:
+    ...
+
+Base behavior:
+
+x is an FP32 tensor of any shape.
+
+Divide every value by scale.
+
+Round or cast into signed int8 range.
+
+Return an int8 tensor with the same shape.
+
+Follow-ups:
+
+Add a zero_point parameter for asymmetric quantization.
+
+Explain when symmetric quantization is insufficient.
+
+Derive how scale and zero_point are used together.
+
+Discuss clipping / saturation when values exceed [-128, 127].
+
+Explain what happens to error when the input distribution is skewed or has outliers.
+
+Notes
+
+A standard asymmetric mapping is:
+
+q = clamp(round(x / scale) + zero_point, qmin, qmax)
+x_hat = scale * (q - zero_point)
+
+For signed INT8, qmin = -128 and qmax = 127; for unsigned INT8, qmin = 0 and qmax = 255. If the interviewer does not specify rounding, say what you choose. A practical implementation should use np.rint, clip before casting, and avoid silent wraparound.
+
+Key discussion points:
+
+Symmetric quantization assumes zero maps cleanly to zero and works best when the distribution is roughly centered.
+
+Asymmetric quantization handles non-zero-centered ranges by shifting the integer code space with zero_point.
+
+Outliers enlarge the dynamic range and waste most buckets on rare values; per-channel scale, clipping, or calibration can reduce error.
+
+INT8 conversion is simple coding, but the signal is whether you understand numerical range, saturation, and inference trade-offs.
+
+Preparation
+
+Implement the base function in NumPy, then add zero_point, clipping, and dequantization.
+
+Walk through a tiny example by hand: x=[-1.0, 0.0, 1.0], scale=0.1.
+
+Be ready to explain per-tensor vs per-channel scale and why activations are often harder to quantize than static weights.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

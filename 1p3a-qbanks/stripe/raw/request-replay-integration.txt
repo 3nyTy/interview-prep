@@ -1,0 +1,49 @@
+===H1===
+Request Replay Integration
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/request-replay-integration
+===BODY===
+Stripe
+Coding·60 minMembers
+Request Replay Integration
+Integration round. A sequence of API requests where later requests depend on ids returned by earlier ones. Identify the failing requests, extract dynamic ids from the first response, and propagate them through subsequent URLs and bodies.
+SWE
+api-integration
+http
+string
+medium
+Frequency
+Low
+Last asked
+2026-02-15
+Stage
+onsite-coding
+Requirements
+
+Five API requests are given as fixtures; the first two return 200 OK, the next three fail with status errors.
+
+Part 1: Determine why requests 3-5 fail (hardcoded id from a previous static value).
+
+Part 2: Extract the runtime id from the first response body and substitute it into the later requests.
+
+Part 3: The id must be propagated into both the URL path and the request body of subsequent calls; write the substitution logic so later requests succeed.
+
+Notes
+
+Multiple reports describe this as a "file open + json read" warm-up; do not over-engineer.
+
+Test as you go — interviewers reportedly value seeing tests added during the round.
+
+Preparation
+
+Pre-write helpers for: read a JSON file, parse a response body into a dict, mutate a URL path, mutate a JSON body in-place.
+
+Practice chaining dependent HTTP calls against any sandbox API.
+
+Build a tiny replay harness locally: given a list of (method, url, body), send them in order and log each status code.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

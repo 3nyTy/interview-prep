@@ -1,0 +1,38 @@
+===H1===
+Time Based Key-Value Store (LeetCode 981)
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/time-based-key-value-store
+===BODY===
+ByteDance / TikTok
+CodingMembers
+Time Based Key-Value Store (LeetCode 981)
+Implement time-indexed key-value storage.
+hashmap
+data-structure
+Frequency
+Single report
+Last asked
+—
+Stage
+—
+Requirements
+
+Implement time-indexed key-value storage.
+
+Notes
+
+Twenty-five-minute second-round coding segment involving time-indexed storage after thirty-five minutes of technical questions.
+
+For canonical practice, set(key, value, timestamp) writes at strictly increasing times. get(key, timestamp) returns the latest value no later than the query, or an empty string when absent. Append timestamp/value pairs per key and binary-search the first time greater than the query; its predecessor is the answer. Writes are amortized O(1), queries O(log(m + 1)) for m versions of that key, with O(N) total storage. Out-of-order writes require a different insertion strategy.
+
+Preparation
+
+Implement append and predecessor lookup in 20 minutes.
+
+In 10 minutes, test absent keys and times before, on, between, and after writes.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

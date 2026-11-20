@@ -1,0 +1,68 @@
+===H1===
+Lexicographically Minimal BoxIds via +1/9 Op
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/lex-min-box-ids-plus-one-mod-nine
+===BODY===
+Amazon
+Coding·40 minMembers
+Lexicographically Minimal BoxIds via +1/9 Op
+Given a digit string `boxIds`, repeatedly remove a digit and re-insert `min(digit + 1, 9)` anywhere in the string. Return the lex-minimal achievable string.
+SWE
+string
+greedy
+simulation
+hard
+Frequency
+Single report
+Last asked
+2026-03-22
+Stage
+oa
+Requirements
+
+Operation: pick any index i, remove boxIds[i], insert min(boxIds[i] + 1, 9) at any position.
+
+Apply zero or more times.
+
+Return the lexicographically smallest resulting string of the same length.
+
+Constraints: 1 <= |boxIds| <= 2 * 10^5, digits 0-9 only, leading zeros allowed.
+
+Examples
+
+boxIds = "26547"
+# delete 5, insert 6 -> "26647" (insert at position 4 -> "26647")
+# delete 6 (the original 6), insert 7 at position 4 -> "24677"
+output = "24677"
+
+Notes
+
+Each digit d < 9 can be "transformed" into d + 1 at the cost of moving it; digit 9 is fixed in value but can still be relocated.
+
+Greedy intuition: scan left-to-right and bubble small digits forward. Because of the increment cost, sometimes it's better to keep a 4 where it is than to promote a 5 past it; analyze the trade-off carefully.
+
+This is a non-trivial OA problem; the AI assistant in Part 2 of the same OA is the more time-consuming half, so budget tightly on Part 1.
+
+Restate the operation precisely before coding: each move is (delete at i) + (insert min(d+1, 9) anywhere). Length stays constant; digit 9 is a fixed point under the increment.
+
+Useful invariant: after any sequence of moves, the multiset of digits is determined by how many times each original digit was "promoted" (0→1→2→...→9). You are choosing both a promotion-count vector and a final permutation.
+
+Edge inputs to dry-run by hand: all 9s (no useful moves), strictly decreasing ("98765"), and repeated low digits ("00000") — these expose whether your greedy actually buys anything.
+
+Preparation
+
+Re-derive the greedy on paper for short inputs ("26547", "333", "909").
+
+Practice the simulation in code for small inputs, then characterize when the greedy is optimal.
+
+Discuss the algorithm before coding — the interviewer/grader cares whether you can articulate the invariant, not just produce output.
+
+Before writing code, enumerate the search space for "26547" exhaustively up to 3 moves and verify the greedy matches the brute-force optimum.
+
+Articulate the invariant aloud during the screen — graders reward candidates who name the trade-off ("promoting costs a move but unlocks a smaller digit at this position") even if the final greedy is not fully proven.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,363 @@
+===H1===
+Anagrammed indexOf
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/anagrammed-indexof
+===BODY===
+Databricks
+CodingMembers
+Anagrammed indexOf
+Find the first index in a string where a substring that is an anagram (any permutation) of a query string occurs. Follow-ups probe character counting for UTF-8 / Unicode inputs, edge-case tests, and invalid-input or error-return behavior.
+SWE
+string
+sliding-window
+hashmap
+medium
+Frequency
+Low
+Last asked
+2026-08-19
+Stage
+phone-screen · onsite-coding
+Problem Statement
+
+Your task is to write a function that finds the first time an anagram of a specific pattern appears inside a larger string.
+
+Function Signature:
+
+def anagram_index(lookup_string: str, query: str) -> int
+
+Parameters:
+
+lookup_string: The main text to search through.
+
+query: The pattern we want to match.
+
+Returns:
+
+The starting index (position) of the first matching substring.
+
+-1 if no match is found.
+
+Definition: Two strings are anagrams if they use the exact same letters in the same amounts, but the order does not matter. For example, "cat" and "act" are anagrams.
+
+Sample Cases
+
+Case 1: Standard match
+
+anagram_index('databricks', 'tad')  # Returns: 0
+anagram_index('databricks', 'atd')  # Returns: 0
+anagram_index('databricks', 'dat')  # Returns: 0
+
+Why? The text starts with "dat". This uses one 'd', one 'a', and one 't'. This matches all the query examples.
+
+Case 2: Match found later
+
+anagram_index('databricks', 'ribkc')  # Returns: 4
+
+Why? The substring "brick" (indices 4-8) is an anagram of "ribkc".
+
+Case 3: Very short query
+
+anagram_index('databricks', 'sk')  # Returns: 8
+
+Why? The substring "ks" at the end matches "sk".
+
+Case 4: No match possible
+
+anagram_index('databricks', 'abc')  # Returns: -1
+
+Why? The letters 'a', 'b', and 'c' do not appear together anywhere in the text.
+
+Case 5: Query is too long
+
+anagram_index('data', 'databricks')  # Returns: -1
+
+Why? The query is longer than the text, so it cannot fit inside.
+
+Case 6: Empty strings
+
+anagram_index('databricks', '')  # Returns: 0 (Empty matches start)
+anagram_index('', 'query')       # Returns: -1 (Cannot find text in empty string)
+anagram_index('', '')            # Returns: 0
+
+Solution 1: Dictionary Sliding Window
+
+The Strategy
+
+The best way to solve this is using a sliding window combined with a frequency map (like a Dictionary or HashMap):
+
+Check basics: If strings are empty or sizes are wrong, handle them immediately.
+
+Count the query: Create a map counting the characters in the query.
+
+Count the first window: Create a map for the first chunk of the lookup_string.
+
+Slide:
+
+Compare the two maps. If they match, we found it!
+
+If not, move the window one step right.
+
+Remove the letter leaving the window and add the new letter entering it.
+
+Finish: If we reach the end with no match, return -1.
+
+Code Implementation
+
+def anagram_index(lookup_string: str, query: str) -> int:
+    # Check if query is empty
+    if len(query) == 0:
+        return 0
+
+    # Check if query is too long
+    if len(query) > len(lookup_string):
+        return -1
+
+    # Count characters in query
+    query_freq = {}
+    for char in query:
+        query_freq[char] = query_freq.get(char, 0) + 1
+
+    # Count characters in the first window of text
+    window_freq = {}
+    for i in range(len(query)):
+        char = lookup_string[i]
+        window_freq[char] = window_freq.get(char, 0) + 1
+
+    # Check if the start is a match
+    if window_freq == query_freq:
+        return 0
+
+    # Slide the window across the rest of the string
+    for i in range(len(query), len(lookup_string)):
+        # Add new character (right side)
+        new_char = lookup_string[i]
+        window_freq[new_char] = window_freq.get(new_char, 0) + 1
+
+        # Remove old character (left side)
+        old_char = lookup_string[i - len(query)]
+        window_freq[old_char] -= 1
+        if window_freq[old_char] == 0:
+            del window_freq[old_char]
+
+        # Check if the current window matches
+        if window_freq == query_freq:
+            return i - len(query) + 1
+
+    return -1
+
+Performance Analysis
+
+Time Complexity: O(n + m)
+
+We look at each character in the query and the text essentially once.
+
+Comparing the maps takes constant time (O(1)) because the alphabet size (like 26 letters) is fixed.
+
+Space Complexity: O(1)
+
+The maps store counts for a fixed number of unique characters (e.g., 26 for English letters), so memory usage does not grow with input size.
+
+Solution 2: Using Python Counters
+
+We can write cleaner code using Python's Counter tool. It works the same way but handles the counting logic for us.
+
+def anagram_index(lookup_string: str, query: str) -> int:
+    if len(query) == 0:
+        return 0
+
+    if len(query) > len(lookup_string):
+        return -1
+
+    from collections import Counter
+
+    query_freq = Counter(query)
+    window_freq = Counter(lookup_string[:len(query)])
+
+    # Helper to count matches (optional logic for clarity)
+    def count_matches(freq1, freq2):
+        matches = 0
+        for char in freq1:
+            if freq1[char] == freq2.get(char, 0):
+                matches += 1
+        return matches
+
+    required_matches = len(query_freq)
+
+    if window_freq == query_freq:
+        return 0
+
+    for i in range(len(query), len(lookup_string)):
+        # Slide window
+        new_char = lookup_string[i]
+        old_char = lookup_string[i - len(query)]
+
+        window_freq[new_char] += 1
+        window_freq[old_char] -= 1
+
+        if window_freq[old_char] == 0:
+            del window_freq[old_char]
+
+        # Check match
+        if window_freq == query_freq:
+            return i - len(query) + 1
+
+    return -1
+
+Solution 3: Array Method (For Fixed Alphabet)
+
+If we know the input only contains lowercase English letters (a-z), we can use a list of size 26 instead of a Dictionary. This is often slightly faster because accessing a list index is very efficient.
+
+def anagram_index(lookup_string: str, query: str) -> int:
+    if len(query) == 0:
+        return 0
+
+    if len(query) > len(lookup_string):
+        return -1
+
+    # Use a fixed-size list for counts (a-z)
+    query_freq = [0] * 26
+    window_freq = [0] * 26
+
+    # Count query characters
+    for char in query:
+        query_freq[ord(char) - ord('a')] += 1
+
+    # Count first window characters
+    for i in range(len(query)):
+        window_freq[ord(lookup_string[i]) - ord('a')] += 1
+
+    # Check first window
+    if query_freq == window_freq:
+        return 0
+
+    # Slide window
+    for i in range(len(query), len(lookup_string)):
+        # Add new character
+        window_freq[ord(lookup_string[i]) - ord('a')] += 1
+        # Remove old character
+        window_freq[ord(lookup_string[i - len(query)]) - ord('a')] -= 1
+
+        # Compare lists
+        if query_freq == window_freq:
+            return i - len(query) + 1
+
+    return -1
+
+Important Edge Cases
+
+When testing your code, make sure to check these scenarios:
+
+Empty query: Return 0.
+
+Empty text: Return -1 (unless query is also empty).
+
+Both empty: Return 0.
+
+Query longer than text: Return -1.
+
+No match exists: Return -1.
+
+Single letter inputs: Should work normally.
+
+Total match: If the whole text is an anagram of the query, return 0.
+
+Multiple matches: Return the index of the first one only.
+
+Code Verification
+
+Run these tests to confirm the solution works:
+
+def test_anagram_index():
+    # Basic tests
+    assert anagram_index('databricks', 'tad') == 0
+    assert anagram_index('databricks', 'atd') == 0
+    assert anagram_index('databricks', 'dat') == 0
+
+    # Anagram found later
+    assert anagram_index('databricks', 'ribkc') == 4
+    assert anagram_index('databricks', 'sk') == 8
+
+    # No match
+    assert anagram_index('databricks', 'abc') == -1
+    assert anagram_index('databricks', 'xyz') == -1
+
+    # Query longer than string
+    assert anagram_index('data', 'databricks') == -1
+
+    # Empty strings
+    assert anagram_index('databricks', '') == 0
+    assert anagram_index('', 'query') == -1
+    assert anagram_index('', '') == 0
+
+    # Single character
+    assert anagram_index('a', 'a') == 0
+    assert anagram_index('a', 'b') == -1
+    assert anagram_index('abc', 'c') == 2
+
+    # Entire string is anagram
+    assert anagram_index('abc', 'bca') == 0
+    assert anagram_index('abc', 'cab') == 0
+
+    # Repeated characters
+    assert anagram_index('aabbcc', 'abc') == 0
+    assert anagram_index('aabbcc', 'bca') == 0
+    assert anagram_index('aaabbbccc', 'abc') == 0
+
+    # Multiple possible matches (return first)
+    assert anagram_index('abcabc', 'abc') == 0
+    assert anagram_index('xyzabc', 'bca') == 3
+
+    print("All tests passed!")
+
+test_anagram_index()
+
+Bonus Questions
+
+These are harder variations of the problem that interviewers might ask if you solve the main problem quickly.
+
+Bonus 1: Find All Indices
+
+Goal: Return a list of every index where a match occurs, not just the first one.
+
+def find_all_anagram_indices(lookup_string: str, query: str) -> list[int]:
+    # Use the same sliding window, but append matches to a list
+    pass
+
+Bonus 2: Case-Insensitive
+
+Goal: Treat 'A' and 'a' as the same letter.
+Hint: Convert both strings to lowercase using .lower() before you start counting.
+
+Bonus 3: Ignore Symbols
+
+Goal: Only match letters, ignoring spaces and punctuation.
+Example: "data bricks!" should contain a match for "tad".
+
+Bonus 4: Multiple Queries
+
+Goal: You are given one text and a list of many different queries. Find the first match for each query efficiently.
+
+Bonus 5: Longest Anagram
+
+Goal: Find the longest section of the text that can be formed using letters from a specific query string.
+
+Practice Problems
+
+Here are similar problems on LeetCode to help you practice:
+
+LeetCode 438: Find All Anagrams in a String (Similar to Bonus 1)
+
+LeetCode 567: Permutation in String (True/False check)
+
+LeetCode 76: Minimum Window Substring (A harder sliding window problem)
+
+LeetCode 242: Valid Anagram (Simple check)
+
+LeetCode 49: Group Anagrams (Sorting/Hashing strings)
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

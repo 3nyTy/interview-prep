@@ -1,0 +1,54 @@
+===H1===
+System Design — Online Auction / eBay
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/system-design-online-auction
+===BODY===
+Meta
+System Design·45 minMembers
+System Design — Online Auction / eBay
+Auction with concurrent bidding, real-time price updates, and close-out semantics. Pub/sub + SSE-pushed bid notifications and queue-partitioning by auction-id are the canonical answer.
+SWE
+Infra Eng
+pubsub
+sse
+concurrency
+medium
+Frequency
+Medium
+Last asked
+2026-05-08
+Stage
+onsite-system-design
+Requirements
+
+Functional: list item, bid, get real-time price updates, end auction, declare winner.
+
+Decisions:
+
+Bid ingestion: pub/sub partitioned by auction_id so all bids for an auction are ordered.
+
+Real-time updates: SSE (one-way push) preferred over WebSocket for unidirectional bid stream; argue trade-off.
+
+Close-out: scheduled job at end time; final-bid race-condition handling.
+
+Anti-snipe extension: end-time auto-extension when a bid lands within last N seconds.
+
+Notes
+
+Celebrity / hot-item asymmetry pushes interviewers toward pessimistic locking for the celebrity's bid path. An optimistic-locking pitch is a likely challenge prompt: justify it with contention math and expect a follow-up asking for the fallback when retries explode.
+
+Reported success criteria: name pub/sub + SSE + partition-by-auction-id explicitly. Interviewer accepts as soon as those three appear.
+
+QPS estimation is asked but doesn't need to be exact — anchor on auctions × peak_bidders × bids/sec.
+
+Preparation
+
+Have a 3-sentence SSE-vs-WebSocket-vs-long-poll comparison ready.
+
+Sketch the partition + ordering invariant on a whiteboard until automatic.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

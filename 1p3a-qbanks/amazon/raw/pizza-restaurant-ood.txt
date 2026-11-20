@@ -1,0 +1,74 @@
+===H1===
+Pizza / Restaurant System (OOD)
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/pizza-restaurant-ood
+===BODY===
+Amazon
+System Design·50 minMembers
+Pizza / Restaurant System (OOD)
+Design a pizza ordering and fulfillment system end-to-end — menu, order placement, kitchen workflow, delivery handoff — paired with LP questions on a deadline-driven project.
+SWE
+oop-design
+system-design
+medium
+Frequency
+Medium
+Last asked
+2026-08-28
+Stage
+onsite-coding · onsite-system-design
+Requirements
+
+Customer flow: browse menu, customize pizza (toppings, size), place order, pay, track status.
+
+Kitchen flow: assign orders to stations, advance through states (queued → prep → bake → ready), notify delivery.
+
+Delivery flow: dispatch driver, track location, mark delivered.
+
+Discuss the state machine that ties customer status to kitchen + delivery state.
+
+Examples
+
+Order carries a list of Pizza value objects, each with size + topping set.
+
+KitchenStation is the throughput bottleneck; model it as a worker pool with a queue.
+
+Notes
+
+Round is 50% OOD + 50% LP — pace accordingly.
+
+The state-machine question is the easiest place to add depth: enumerate transitions and the events that trigger them.
+
+Be ready to extend with multi-store and geo-routing — a natural follow-up that turns the OOD into a small system-design.
+
+The Builder pattern for Pizza (size, crust, sauce, toppings) is the cleanest answer to the customization ask and is something interviewers explicitly fish for. Decorator on Pizza for per-topping pricing is the next layer.
+
+The Order state machine is where round depth lives: Placed -> Confirmed -> Prepping -> Baking -> Ready -> OutForDelivery -> Delivered, with Cancelled reachable only from the first three. Enumerate the events that trigger each transition (payment captured, kitchen ack, oven timer expiry, driver scan) — vague transitions read as junior.
+
+KitchenStation is the throughput bottleneck and the natural place to introduce a worker-pool / bounded queue. Multi-store extension turns this into a small system-design problem: a dispatcher routes orders to the nearest store with capacity, which means each store advertises a real-time freeCapacity signal.
+
+Pricing should live in a PricingStrategy not on Pizza itself, so promo codes / dynamic pricing / loyalty discounts plug in without touching the menu domain.
+
+Watch for the trap of modeling Topping as a string — it precludes per-topping inventory, allergen flags, and price overrides. Make it a first-class entity.
+
+Preparation
+
+Practice the canonical Pizza / Restaurant OOD prompt (menu, customizable item, order, kitchen workflow, delivery) end-to-end and draw the state diagram from memory.
+
+Pre-build the class skeleton (Customer, Order, MenuItem, KitchenStation, DeliveryDriver) so you can drop it in fast.
+
+Practice the LP story about a tight-deadline project — interviewers explicitly want both halves of this round to land.
+
+The prompt is still active in 2026 onsite loops; expect it to appear as LP + Pizza, so plan to reserve time for behavioral follow-up instead of spending the whole slot on classes.
+
+Layered drill: (1) whiteboard the customer-facing classes (Customer, Order, MenuItem, Pizza with Builder) in 5 minutes; (2) add the kitchen pipeline (KitchenStation, OrderQueue, state machine) in another 5; (3) layer in delivery (Driver, Dispatcher); (4) extend to multi-store and explain the routing decision.
+
+Pre-rehearse the state-machine enumeration as a memorized list — interviewers want to hear all the transitions and the triggering events without you reading them off a diagram.
+
+Prep the half-LP story explicitly. The 50/50 split means a strong OOD with a weak LP gets a lean no hire; pick a Customer-Obsession or Deliver-Results story that maps to a real cross-team delivery deadline.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

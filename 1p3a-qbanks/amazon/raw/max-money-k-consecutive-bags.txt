@@ -1,0 +1,65 @@
+===H1===
+Max Money from K Consecutive Bags
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/max-money-k-consecutive-bags
+===BODY===
+Amazon
+Coding·40 minMembers
+Max Money from K Consecutive Bags
+OA algorithm problem: bags are laid on a line by range segments, each segment filling its positions with a fixed amount. Take any window of k consecutive positions and maximize the total money.
+SWE
+MLE
+sliding-window
+prefix-sum
+array
+medium
+Frequency
+Medium
+Last asked
+2026-09-02
+Stage
+oa
+Requirements
+
+k: number of consecutive bag positions you take.
+
+segment[n][3]: each [start, end, money] means every position in [start, end] (end inclusive) holds money. Positions not covered by any segment hold 0.
+
+Lay the bags out on a number line, take any window of k consecutive positions, and return the maximum total money.
+
+In the calculateMaximumConsecutiveSum(k, segment) OA contract, segments never overlap and the result is returned modulo 10^9 + 7.
+
+Limits for this contract: 1 ≤ n ≤ 2 × 10^5, 1 ≤ k ≤ 10^9, 1 ≤ start ≤ end ≤ 10^9, and 1 ≤ money ≤ 10^6.
+
+Examples
+
+k = 5, segments = [[1,4,2], [6,6,5], [7,7,7], [9,10,1]]
+Positions: 1->2, 2->2, 3->2, 4->2, 5->0, 6->5, 7->7, 8->0, 9->1, 10->1
+Best window = positions 3..7 -> 2 + 2 + 0 + 5 + 7 = 16
+Answer: 16
+
+Notes
+
+Materializing the full position array and running a fixed-size sliding-window sum is the straightforward solution when coordinates are small.
+
+If start / end can be large (a sparse line), do not expand the array — compress coordinates or sweep segment boundaries and slide the k-width window across event points so a large end does not blow up memory.
+
+Clarify whether segments can overlap and, if so, whether overlapping money stacks; the worked example has no overlap.
+
+The explicit calculateMaximumConsecutiveSum contract settles overlap handling: its input segments are guaranteed disjoint. The earlier overlap-clarification advice only applies when the interviewer leaves that guarantee unspecified.
+
+For the disjoint-segment contract, compare exact 64-bit window sums and apply the modulus only to the final maximum; modular reduction does not preserve ordering. A window total is at most k*10^6 ≤ 10^15.
+
+Sort segments and build prefix totals of (end-start+1)*money. Evaluate windows starting at a segment start or ending at a segment end: between such boundary alignments the sum changes monotonically or stays flat. Use binary searches plus partial endpoint segments to obtain each sum in O(log n), giving O(n log n) time and O(n) space without expanding coordinates.
+
+Preparation
+
+Drill fixed-window maximum-sum until automatic.
+
+Practice the coordinate-compression variant where positions are sparse.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

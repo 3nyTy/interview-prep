@@ -1,0 +1,84 @@
+===H1===
+System Design — Video Upload + Search with LLM
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/system-design-video-upload-search
+===BODY===
+Oracle
+System Design·30 minMembers
+System Design — Video Upload + Search with LLM
+Design a video-upload + search system with an LLM / embeddings layer for semantic retrieval. The interviewer compressed the design into 30 minutes and drilled hard on video upload internals (chunking, presigned URLs, encoding) when the candidate steered toward the search side. OCI phone-screen.
+SWE
+Infra Eng
+MLE
+system-design
+storage
+ingestion
+retrieval
+rag
+mlsd
+medium
+Frequency
+Single report
+Last asked
+2026-02-13
+Stage
+phone-screen
+Requirements
+
+User uploads videos.
+
+After upload, the video is transcribed (video → text), embedded (text → vector), and indexed.
+
+User can search videos by natural-language query — query is embedded, nearest-neighbour search over the video embeddings returns ranked results.
+
+Round-time constraint: only 30 minutes for the SD portion of the phone screen.
+
+Notes
+
+Upload path (the interviewer drilled hardest here)
+
+Chunked upload with resumable semantics. Client splits the video into 5-20 MB chunks; each chunk is uploaded independently and ACKed.
+
+Pre-signed URLs: client requests a pre-signed PUT URL from the backend per chunk; uploads directly to object storage (S3 / OCI Object Storage). Backend never proxies bytes.
+
+Encoding pipeline: after upload completes, kick off a transcoding job (e.g. multiple bitrates / formats via FFmpeg). Storage layer holds the original + the derived encodings.
+
+Metadata storage: separate from the binary — relational DB or document store with (video_id, owner, status, upload_timestamp, encoding_profile, ...). Status transitions: uploading → encoding → ready → embedded.
+
+Async processing: upload completion enqueues a job onto a queue (SQS / Kafka). Workers consume the queue for transcoding and then for embedding.
+
+Search path
+
+Video → text: speech-to-text on the audio track plus optionally OCR of frame text. Output: a transcript document.
+
+Text → embedding: chunk the transcript by time window (e.g. 30-second segments); embed each chunk into a vector. Store (video_id, segment_id, t_start, t_end, embedding) in a vector store.
+
+Query: embed the user's query, run ANN search (HNSW / FAISS / a managed vector DB), top-K segments. Rank by similarity; deduplicate to one row per video; surface the best segment as the result.
+
+Hybrid retrieval: combine vector similarity with keyword (BM25) for better precision; common production pattern.
+
+Common deep dives
+
+Cost / latency of embedding 1M videos vs incremental indexing on upload.
+
+Re-embedding when the model is upgraded (versioned embeddings + dual-read).
+
+Index sharding when the corpus grows beyond a single ANN node's memory.
+
+Privacy: per-user video isolation in the search index.
+
+Preparation
+
+The video-upload chunked + pre-signed-URL pattern is the part most candidates underprepare. Drill it cold: client chunks → pre-signed PUT → ACK → manifest commit → encoding job.
+
+Have the search-side architecture ready as a separate 5-minute pitch (embed query → ANN → rerank → return).
+
+Know the trade-offs: transcribe before or after encoding (after — encoding is faster from canonical form); single embedding per video vs per-segment (per-segment is better for navigation).
+
+Read one public write-up on YouTube / TikTok upload pipelines and one on RAG-style video search to close the cross-domain gap.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

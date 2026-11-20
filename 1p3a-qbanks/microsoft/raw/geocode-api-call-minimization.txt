@@ -1,0 +1,51 @@
+===H1===
+Validate Lat/Long With Minimum Expensive API Calls
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/geocode-api-call-minimization
+===BODY===
+Microsoft
+Coding·45 minMembers
+Validate Lat/Long With Minimum Expensive API Calls
+Process a multi-million-row CSV of store locations; for each row, verify that the stored (lat, long) matches the geocoded version of its address. The geocoding API is expensive — minimize the number of calls.
+SWE
+algorithm-design
+hashmap
+dedup
+medium
+Frequency
+Single report
+Last asked
+2025-11-21
+Stage
+onsite-coding
+Requirements
+
+Each row of a large CSV has name, address, city, state, zip, lat, long. An external geocode(address, city, state, zip) -> (lat, long) API exists but is monetarily expensive (think paid per call). Validate that the stored (lat, long) matches what geocode() would return — and minimize total API calls across the file.
+
+Notes
+
+The key insight is that many rows share an underlying location at different granularities:
+
+Exact address dedup: two rows with identical (address, city, state, zip) can share one call. Hash the tuple, cache the geocode result.
+
+Bulk geocode: most paid geocoding APIs accept batched requests (50-1000 addresses per call). Bundle unique addresses into batches.
+
+Sanity gate before calling: cross-check the stored (lat, long) against the address's zip-code centroid (or a coarse city-level bounding box loaded once). If the stored coordinate is wildly outside the zip's bounding box, mark the row as invalid without calling the expensive API.
+
+Putting it together: a single pass over the file produces (a) the set of unique addresses needing geocoding, after the zip-bounding-box gate filters out anything already provably wrong, then (b) batched calls against that deduplicated set, then (c) a join back against the original file.
+
+The interviewer is more interested in this layered argument than in the code itself. The implementation reduces to: a dict[tuple, result] cache, a batch buffer that flushes at size N, and the bounding-box pre-filter.
+
+Preparation
+
+Pre-rehearse the layered argument: cache → batch → coarse-filter → expensive call. Interviewers want this articulated up front.
+
+Have a coarse-filter to suggest: a small static dataset of zip-code centroids and rough radii is easy to find online and small enough to load in memory.
+
+Practice asking the cost-modeling clarifier: "how much does each call cost; what is the file size; what is the latency tolerance" — the right algorithm depends on the answer.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

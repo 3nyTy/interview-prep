@@ -1,0 +1,66 @@
+===H1===
+RAG / Search ML Design (oral)
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/rag-search-ml-design
+===BODY===
+OpenAI
+System Design·60 minMembers
+RAG / Search ML Design (oral)
+An oral 'ML Design' round; interviewer often specializes in search and drills deep — embedding training (contrastive learning), retrieval flow, hybrid retrieval, ranking.
+RE
+MLE
+ml-knowledge
+retrieval
+Frequency
+Low
+Last asked
+2026-03-22
+Stage
+onsite-system-design
+Examples
+
+How is the text embedding model trained: contrastive learning
+
+What loss?
+
+Positive / negative sample selection? How many?
+
+Retrieval flow / hybrid retrieval / ranking
+
+No deep prior RAG experience required — a focused brush-up on contrastive training and retrieval pipelines is enough.
+
+Notes
+
+Canonical InfoNCE formulation
+
+For an anchor embedding q and a positive k⁺ paired with N in-batch negatives {k⁻_1, …, k⁻_N}:
+
+L_InfoNCE = − log [ exp(sim(q, k⁺) / τ)  /  Σ_j exp(sim(q, k_j) / τ) ]
+
+where sim(·,·) is typically cosine similarity on L2-normalized embeddings and τ is a learned or fixed temperature (common values 0.05–0.1). The denominator sums over the positive plus all negatives in the batch. Two facts the interviewer drills:
+
+In-batch negatives are essentially free: with batch size B, each example sees B − 1 negatives without extra forward passes. This is why larger batch sizes empirically improve contrastive quality.
+
+Hard-negative mining boosts performance when the in-batch distribution is too easy: mine top-k lexically/semantically similar non-paired sentences and inject them into the loss alongside the in-batch ones.
+
+Positive-pair construction (canonical recipes)
+
+Self-supervised (unlabeled corpora): pass the same sentence through the encoder twice with different dropout masks; the two outputs form a positive pair. Negatives are all other sentences in the batch.
+
+Supervised (NLI-style labels): treat entailment pairs as positives, contradiction pairs as hard negatives, neutral as in-batch.
+
+The temperature τ is one of the touchiest hyperparameters: too low and the loss saturates on easy negatives; too high and the model can't separate near-duplicates.
+
+Preparation
+
+Read SimCSE / DPR / ColBERT training details
+
+Prepare: in-batch negatives, hard negative mining, loss (InfoNCE / triplet)
+
+Be able to write the InfoNCE formula on a whiteboard and walk through which term changes when you (a) double the batch size or (b) add mined hard negatives
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

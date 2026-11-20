@@ -1,0 +1,50 @@
+===H1===
+AI Coding — Friend Recommendation
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/ai-coding-friend-recommendation
+===BODY===
+Meta
+Coding·60 minMembers
+AI Coding — Friend Recommendation
+Starter codebase exposes a `User` class with `friends` and `valid_recommend` helpers. Three sub-tasks build from logic-bug fix to AI-assisted random recommender to mutual-friends Top-K ranking.
+SWE
+MLE
+ai-coding
+graph
+oop-design
+medium
+Frequency
+Medium
+Last asked
+2026-08-13
+Stage
+onsite-coding
+Requirements
+
+Q1 — Logic-bug fix in valid_recommend. Typical bug: the function does not exclude the user themselves and/or existing friends from candidates.
+
+Q2 — Implement random_recommend. Pick a random non-friend user. Prompt the AI with the class signature so the output matches the existing interface.
+
+Q3 — Top-K mutual-friends recommendation. Score each candidate by |friends(u) ∩ friends(candidate)|; return the top K. Walk the interviewer through time complexity and discuss how the metric would change for second-degree connections.
+
+Evaluation follow-up. Explain how to verify that the recommender works: build a held-out dataset and measure precision and recall.
+
+Notes
+
+The starter User model and valid_recommend helper are pre-written — read them carefully before prompting the AI, otherwise it will fabricate a parallel API.
+
+The Q3 metric is the discussion point: be ready to argue mutual_friends vs jaccard_similarity vs graph_embedding_lookup, with rough complexity.
+
+Preparation
+
+Drill the LeetCode 1311 (Get Watched Videos by Your Friends) and 547 (Friend Circles) patterns to internalize friend-graph traversal.
+
+Rehearse a 3-sentence trade-off pitch for mutual-friend vs Jaccard vs embedding-based recommendation.
+
+Prep a clean prompt: "Given the User class with self.friends: set[User], implement random_recommend(user, k) that returns k random non-friend users; do not include the user themselves."
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

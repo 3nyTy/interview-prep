@@ -1,0 +1,65 @@
+===H1===
+Build Binary Tree from Edges / S-Expression
+===URL===
+https://www.1point3acres.com/interview/problems/company/optiver/binary-tree-from-edges
+===BODY===
+Optiver
+Coding·120 minMembers
+Build Binary Tree from Edges / S-Expression
+An OA coding problem (experienced-SWE rotation): given parent-child pairs as raw strings, validate the input against a priority-ordered list of error types and, if valid, output the tree's S-expression. The input validation is deliberately fiddly.
+SWE
+tree
+parsing
+simulation
+oa
+medium
+Frequency
+Medium
+Last asked
+2026-07-16
+Stage
+oa · take-home
+Requirements
+
+Input is a set of (parent, child) pairs (parent first in each pair), supplied as arbitrary strings that must be parsed and validated.
+
+If the input is malformed or doesn't describe a valid binary tree, output the highest-priority error among:
+
+E1: Invalid Input String
+
+E2: Duplicate Pair
+
+E3: A parent has more than 2 children
+
+E4: Multiple Roots
+
+E5: Cycle in the Tree
+
+If there is no error, output the S-expression of the tree:
+S(node) = "(" + node.val + S(node.first_child) + S(node.second_child) + ")", e.g. (A(B(C))(D)).
+
+Examples
+
+Input pairs (A,B) (B,C) (A,D) → (A(B(C))(D)).
+
+Input A,B A,C C,D D,B → contains a cycle / multiple-root style violation (report the highest-priority error).
+
+Notes
+
+Input is "any string", so the E1 validation (well-formed pairs, allowed characters) is the laborious part — handle it before building the tree.
+
+Children ordering for the S-expression follows the order pairs are given / sorted as the prompt specifies; confirm whether output uses first-seen or sorted child order.
+
+In the experienced-SWE OA this is the second problem, paired with a "days between two dates" warm-up; tests are sparse with many hidden cases, so validate aggressively. The OA window is generous (up to 72 hours) but submitting too slowly has correlated with rejection.
+
+Preparation
+
+Write the parser/validator first with explicit checks per error type, ordered by priority, then the tree build + recursive S-expression.
+
+Stress-test malformed inputs (bad tokens, duplicate pairs, 3-child parents, two roots, cycles) since hidden tests target exactly these.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

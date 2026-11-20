@@ -1,0 +1,635 @@
+===H1===
+Task Management System OA
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/task-management-oa
+===BODY===
+Coinbase
+Coding·70 minMembers
+Task Management System OA
+Newer 4-level rotation: priority-based task CRUD, then filtered listing, then per-user assignment with quotas and TTL, then time-aware completion with explicit handling of expired tasks. Same shape as the banking / DB rotations but built around priority queues and TTL bookkeeping.
+SWE
+hashmap
+heap
+object-design
+ttl
+codesignal
+oa
+medium
+Frequency
+Single report
+Last asked
+2026-02-03
+Stage
+oa
+Task Management System
+
+System Overview
+
+You need to build a task management system. You will start with a simple version and add more features in four steps.
+
+Each task has three parts:
+
+task_id (string): A unique ID.
+
+name (string): The description of the task.
+
+priority (integer): A number indicating importance (higher number = higher priority).
+
+Level 1: Basic Features
+
+Requirements
+
+Create a class called TaskManager. It needs to handle three basic actions:
+
+Create: Add a new task. If the ID already exists, do not add it.
+
+Get: Find a task by its ID and return its details.
+
+Update: Change the name and priority of an existing task.
+
+class TaskManager:
+    def __init__(self):
+        """Setup the system."""
+        pass
+
+    def create_task(self, task_id: str, name: str, priority: int) -> bool:
+        """
+        Add a new task.
+        Returns True if successful, False if ID exists.
+        """
+        pass
+
+    def get_task(self, task_id: str) -> str:
+        """
+        Find a task by ID.
+        Returns "task_id: name (priority P)" or empty string if missing.
+        """
+        pass
+
+    def update_task(self, task_id: str, name: str, priority: int) -> bool:
+        """
+        Update a task's details.
+        Returns True if successful, False if task is missing.
+        """
+        pass
+
+Example
+
+tm = TaskManager()
+
+tm.create_task("t1", "Design API", 3)        # True
+tm.create_task("t2", "Write Tests", 5)       # True
+tm.create_task("t1", "Duplicate", 1)         # False (ID t1 exists)
+
+tm.get_task("t1")                            # "t1: Design API (priority 3)"
+tm.get_task("t3")                            # "" (Does not exist)
+
+tm.update_task("t1", "Design REST API", 4)   # True
+tm.get_task("t1")                            # "t1: Design REST API (priority 4)"
+tm.update_task("t3", "Nothing", 1)           # False
+
+Solution for Level 1
+
+We use a HashMap (Dictionary in Python) to store tasks. This allows us to find, add, or update tasks in O(1) time.
+
+class TaskManager:
+    def __init__(self):
+        self.tasks = {}  # Map task_id to details
+
+    def create_task(self, task_id: str, name: str, priority: int) -> bool:
+        if task_id in self.tasks:
+            return False
+        self.tasks[task_id] = {"name": name, "priority": priority}
+        return True
+
+    def get_task(self, task_id: str) -> str:
+        if task_id not in self.tasks:
+            return ""
+        task = self.tasks[task_id]
+        return f"{task_id}: {task['name']} (priority {task['priority']})"
+
+    def update_task(self, task_id: str, name: str, priority: int) -> bool:
+        if task_id not in self.tasks:
+            return False
+        self.tasks[task_id] = {"name": name, "priority": priority}
+        return True
+
+Complexity:
+
+MethodTimeSpace
+create_taskO(1)O(1)
+get_taskO(1)O(1)
+update_taskO(1)O(1)
+
+Level 2: Searching and Sorting
+
+Requirements
+
+Add a feature to list the most important tasks.
+
+Sort: Return tasks with the highest priority first.
+
+Filter (Optional): If a search word is provided, only return tasks with that word in their name.
+
+Limit: Return only the top N results.
+
+If two tasks have the same priority, sort them alphabetically by their ID.
+
+def list_tasks(self, n: int, substr: str = "") -> list:
+    """
+    Get the top N tasks by priority.
+    Filter by 'substr' if provided.
+    """
+    pass
+
+Example
+
+tm = TaskManager()
+
+tm.create_task("t1", "Design API", 3)
+tm.create_task("t2", "Write Tests", 5)
+tm.create_task("t3", "Review API docs", 5)
+tm.create_task("t4", "Deploy service", 1)
+
+tm.list_tasks(3)
+# [
+#   "t2: Write Tests (priority 5)",
+#   "t3: Review API docs (priority 5)",
+#   "t1: Design API (priority 3)"
+# ]
+# t2 and t3 are tied (priority 5), so t2 comes first (alphabetical ID).
+
+tm.list_tasks(2, "API")
+# [
+#   "t3: Review API docs (priority 5)",
+#   "t1: Design API (priority 3)"
+# ]
+# Only tasks with "API" in the name.
+
+Solution for Level 2
+
+We iterate through all tasks to find the ones that match the search word. Then, we sort them. Because we must sort the results, the time complexity is O(T log T).
+
+class TaskManager:
+    def __init__(self):
+        self.tasks = {}  # task_id -> {"name": str, "priority": int}
+
+    def create_task(self, task_id: str, name: str, priority: int) -> bool:
+        if task_id in self.tasks:
+            return False
+        self.tasks[task_id] = {"name": name, "priority": priority}
+        return True
+
+    def get_task(self, task_id: str) -> str:
+        if task_id not in self.tasks:
+            return ""
+        task = self.tasks[task_id]
+        return f"{task_id}: {task['name']} (priority {task['priority']})"
+
+    def update_task(self, task_id: str, name: str, priority: int) -> bool:
+        if task_id not in self.tasks:
+            return False
+        self.tasks[task_id] = {"name": name, "priority": priority}
+        return True
+
+    def list_tasks(self, n: int, substr: str = "") -> list:
+        # 1. Find matches
+        matching = []
+        for task_id, task in self.tasks.items():
+            if substr == "" or substr in task["name"]:
+                matching.append((task_id, task))
+
+        # 2. Sort by priority (desc), then task_id (asc)
+        matching.sort(key=lambda x: (-x[1]["priority"], x[0]))
+
+        # 3. Format output
+        return [
+            f"{task_id}: {task['name']} (priority {task['priority']})"
+            for task_id, task in matching[:n]
+        ]
+
+Complexity:
+
+MethodTimeSpace
+list_tasksO(T log T)O(T)
+
+T = Total number of tasks.
+
+Level 3: Users and Assignments
+
+Requirements
+
+Now, we add Users.
+
+Quota: Each user has a limit on how many tasks they can have at once.
+
+TTL (Time-To-Live): When a user gets a task, it is assigned for a specific time. After that time, the assignment expires.
+
+You need to implement:
+
+Add User: Create a user with a specific quota.
+
+Assign Task: Give a task to a user with a TTL.
+
+Fails if the user is full (quota reached).
+
+Fails if the user already has this task active.
+
+Note: "Active" means the assignment time has not expired yet.
+
+List User Tasks: Show all valid (non-expired) tasks for a user, sorted by priority.
+
+def add_user(self, user_id: str, quota: int) -> bool:
+    """Add a user with a max task limit."""
+    pass
+
+def assign_task(self, timestamp: int, user_id: str, task_id: str, ttl: int) -> bool:
+    """
+    Assign a task. It expires at timestamp + ttl.
+    Checks quota and duplicates.
+    """
+    pass
+
+def list_user_tasks(self, timestamp: int, user_id: str) -> list:
+    """List active assignments for a user."""
+    pass
+
+Example
+
+tm = TaskManager()
+tm.create_task("t1", "Design API", 3)
+tm.create_task("t2", "Write Tests", 5)
+tm.create_task("t3", "Code Review", 2)
+
+tm.add_user("alice", 2)                       # Quota is 2
+
+tm.assign_task(1, "alice", "t1", 10)          # True (Expires at 11)
+tm.assign_task(2, "alice", "t2", 20)          # True (Expires at 22)
+tm.assign_task(3, "alice", "t3", 15)          # False (Quota full)
+
+# Alice waits until time 11. t1 expires.
+tm.list_user_tasks(11, "alice")
+# ["t2: Write Tests (priority 5)"]
+# t1 is gone because 11 >= 11 (expiry time).
+
+# Now quota is free
+tm.assign_task(12, "alice", "t3", 10)         # True
+
+Solution for Level 3
+
+We store assignments in a dictionary where the key is user_id. The value is a list of assignment records.
+We use lazy expiration: we don't delete old records immediately. Instead, whenever we check a user's tasks, we ignore the ones where expiry_time <= current_time.
+
+class TaskManager:
+    def __init__(self):
+        self.tasks = {}       # task_id -> details
+        self.users = {}       # user_id -> quota
+        self.assignments = {} # user_id -> list of (task_id, start, expiry)
+
+    def create_task(self, task_id: str, name: str, priority: int) -> bool:
+        if task_id in self.tasks:
+            return False
+        self.tasks[task_id] = {"name": name, "priority": priority}
+        return True
+
+    def get_task(self, task_id: str) -> str:
+        if task_id not in self.tasks:
+            return ""
+        task = self.tasks[task_id]
+        return f"{task_id}: {task['name']} (priority {task['priority']})"
+
+    def update_task(self, task_id: str, name: str, priority: int) -> bool:
+        if task_id not in self.tasks:
+            return False
+        self.tasks[task_id] = {"name": name, "priority": priority}
+        return True
+
+    def list_tasks(self, n: int, substr: str = "") -> list:
+        matching = []
+        for task_id, task in self.tasks.items():
+            if substr == "" or substr in task["name"]:
+                matching.append((task_id, task))
+        matching.sort(key=lambda x: (-x[1]["priority"], x[0]))
+        return [
+            f"{task_id}: {task['name']} (priority {task['priority']})"
+            for task_id, task in matching[:n]
+        ]
+
+    def _get_active_assignments(self, user_id: str, timestamp: int) -> list:
+        """Helper to get only valid, non-expired tasks."""
+        if user_id not in self.assignments:
+            return []
+        return [
+            a for a in self.assignments[user_id]
+            if a[2] > timestamp  # expiry_time > current time
+        ]
+
+    def add_user(self, user_id: str, quota: int) -> bool:
+        if user_id in self.users:
+            return False
+        self.users[user_id] = {"quota": quota}
+        self.assignments[user_id] = []
+        return True
+
+    def assign_task(self, timestamp: int, user_id: str, task_id: str, ttl: int) -> bool:
+        if user_id not in self.users or task_id not in self.tasks:
+            return False
+
+        active = self._get_active_assignments(user_id, timestamp)
+
+        # 1. Check if user already has this task active
+        for a in active:
+            if a[0] == task_id:
+                return False
+
+        # 2. Check quota
+        if len(active) >= self.users[user_id]["quota"]:
+            return False
+
+        # 3. Add assignment
+        expiry_time = timestamp + ttl
+        self.assignments[user_id].append((task_id, timestamp, expiry_time))
+        return True
+
+    def list_user_tasks(self, timestamp: int, user_id: str) -> list:
+        if user_id not in self.users:
+            return []
+
+        active = self._get_active_assignments(user_id, timestamp)
+
+        # Get unique task IDs
+        seen = set()
+        unique_tasks = []
+        for task_id, start_time, expiry_time in active:
+            if task_id not in seen and task_id in self.tasks:
+                seen.add(task_id)
+                unique_tasks.append(task_id)
+
+        # Sort and Format
+        unique_tasks.sort(key=lambda tid: (-self.tasks[tid]["priority"], tid))
+
+        return [
+            f"{tid}: {self.tasks[tid]['name']} (priority {self.tasks[tid]['priority']})"
+            for tid in unique_tasks
+        ]
+
+Complexity:
+
+MethodTimeSpace
+assign_taskO(A)O(1)
+list_user_tasksO(A log A)O(A)
+
+A = Number of assignments for that user.
+
+Level 4: Completing Tasks
+
+Requirements
+
+Add the ability to Complete a task.
+
+Complete Task: A user can mark an assigned task as done.
+
+This frees up their quota immediately.
+
+You cannot complete a task that has already expired.
+
+List Expired Tasks: Show tasks that passed their TTL without being completed.
+
+Status Logic:
+
+Active: Not expired AND not completed.
+
+Completed: User finished it.
+
+Expired: Time ran out and user did NOT finish it.
+
+def complete_task(self, timestamp: int, user_id: str, task_id: str) -> bool:
+    """Mark an active assignment as completed."""
+    pass
+
+def list_expired_tasks(self, timestamp: int, user_id: str) -> list:
+    """List assignments that expired without completion."""
+    pass
+
+Example
+
+tm.assign_task(1, "alice", "t1", 10)  # Expires at 11
+tm.assign_task(2, "alice", "t2", 20)  # Expires at 22
+
+# Alice finishes t2
+tm.complete_task(5, "alice", "t2")    # True
+
+# t1 expires at 11
+tm.list_expired_tasks(12, "alice")
+# ["t1: Design API (priority 3)"]
+# t2 is NOT in this list because it was completed safely.
+
+Solution for Level 4
+
+We need to track more data for each assignment. Instead of a simple tuple, we store a dictionary (or object) containing:
+
+task_id
+
+start_time
+
+expiry_time
+
+completed (Boolean flag)
+
+When listing tasks, we carefully check the completed flag and the timestamp to decide if a task is active, completed, or expired.
+
+class TaskManager:
+    def __init__(self):
+        self.tasks = {}
+        self.users = {}
+        self.assignments = {} # user_id -> [assignment_dict]
+
+    def create_task(self, task_id: str, name: str, priority: int) -> bool:
+        if task_id in self.tasks:
+            return False
+        self.tasks[task_id] = {"name": name, "priority": priority}
+        return True
+
+    def get_task(self, task_id: str) -> str:
+        if task_id not in self.tasks:
+            return ""
+        task = self.tasks[task_id]
+        return f"{task_id}: {task['name']} (priority {task['priority']})"
+
+    def update_task(self, task_id: str, name: str, priority: int) -> bool:
+        if task_id not in self.tasks:
+            return False
+        self.tasks[task_id] = {"name": name, "priority": priority}
+        return True
+
+    def list_tasks(self, n: int, substr: str = "") -> list:
+        matching = []
+        for task_id, task in self.tasks.items():
+            if substr == "" or substr in task["name"]:
+                matching.append((task_id, task))
+        matching.sort(key=lambda x: (-x[1]["priority"], x[0]))
+        return [
+            f"{task_id}: {task['name']} (priority {task['priority']})"
+            for task_id, task in matching[:n]
+        ]
+
+    # --- Helpers ---
+    def _is_active(self, assignment: dict, timestamp: int) -> bool:
+        # Active if NOT completed AND time has NOT run out
+        return (not assignment["completed"] and assignment["expiry_time"] > timestamp)
+
+    def _is_expired(self, assignment: dict, timestamp: int) -> bool:
+        # Expired if NOT completed AND time HAS run out
+        return (not assignment["completed"] and assignment["expiry_time"] <= timestamp)
+
+    # --- Core Logic ---
+    def add_user(self, user_id: str, quota: int) -> bool:
+        if user_id in self.users:
+            return False
+        self.users[user_id] = {"quota": quota}
+        self.assignments[user_id] = []
+        return True
+
+    def assign_task(self, timestamp: int, user_id: str, task_id: str, ttl: int) -> bool:
+        if user_id not in self.users or task_id not in self.tasks:
+            return False
+
+        assignments = self.assignments[user_id]
+        active_count = 0
+
+        # Check quota and duplicates
+        for a in assignments:
+            if self._is_active(a, timestamp):
+                if a["task_id"] == task_id:
+                    return False  # Already active
+                active_count += 1
+
+        if active_count >= self.users[user_id]["quota"]:
+            return False
+
+        # Create new assignment record
+        self.assignments[user_id].append({
+            "task_id": task_id,
+            "start_time": timestamp,
+            "expiry_time": timestamp + ttl,
+            "completed": False,
+        })
+        return True
+
+    def list_user_tasks(self, timestamp: int, user_id: str) -> list:
+        if user_id not in self.users:
+            return []
+
+        # Find unique active tasks
+        seen = set()
+        active_task_ids = []
+        for a in self.assignments[user_id]:
+            if self._is_active(a, timestamp) and a["task_id"] not in seen:
+                if a["task_id"] in self.tasks:
+                    seen.add(a["task_id"])
+                    active_task_ids.append(a["task_id"])
+
+        active_task_ids.sort(key=lambda tid: (-self.tasks[tid]["priority"], tid))
+        return [
+            f"{tid}: {self.tasks[tid]['name']} (priority {self.tasks[tid]['priority']})"
+            for tid in active_task_ids
+        ]
+
+    def complete_task(self, timestamp: int, user_id: str, task_id: str) -> bool:
+        if user_id not in self.users or task_id not in self.tasks:
+            return False
+
+        # Find the active assignment that started earliest
+        best_assignment = None
+        for a in self.assignments[user_id]:
+            if a["task_id"] == task_id and self._is_active(a, timestamp):
+                if best_assignment is None or a["start_time"] < best_assignment["start_time"]:
+                    best_assignment = a
+
+        if best_assignment is None:
+            return False
+
+        best_assignment["completed"] = True
+        return True
+
+    def list_expired_tasks(self, timestamp: int, user_id: str) -> list:
+        if user_id not in self.users:
+            return []
+
+        # Find unique expired tasks
+        seen = set()
+        expired_task_ids = []
+        for a in self.assignments[user_id]:
+            if self._is_expired(a, timestamp) and a["task_id"] not in seen:
+                if a["task_id"] in self.tasks:
+                    seen.add(a["task_id"])
+                    expired_task_ids.append(a["task_id"])
+
+        expired_task_ids.sort(key=lambda tid: (-self.tasks[tid]["priority"], tid))
+        return [
+            f"{tid}: {self.tasks[tid]['name']} (priority {self.tasks[tid]['priority']})"
+            for tid in expired_task_ids
+        ]
+
+Complexity:
+
+MethodTimeSpace
+complete_taskO(A)O(1)
+list_expired_tasksO(A log A)O(A)
+
+Interview Discussion Points
+
+Sorting vs. Priority Queue (Heap):
+
+Using a Heap helps find the "Top K" items quickly. However, because we also have to search for a substring in the name, we usually have to look at every task anyway. Sorting the filtered list is simpler and fast enough for this problem.
+
+How to handle Expiration (TTL):
+
+Lazy (Used here): We store everything. We calculate if something is expired only when the user asks for the list. This is fast to write but uses more memory over time.
+
+Eager: We could use a background process or a Heap to delete expired items immediately. This saves memory but is harder to code.
+
+Concurrency (Multi-threading):
+
+If two people try to assign tasks to the same user at the exact same time, they might both pass the "quota check" before either task is saved. This would exceed the quota. In a real system, we would need "locks" to prevent this.
+
+Data Growth:
+
+The assignments list grows forever. In a real app, we would move old, expired data to a separate archive database so the main list stays small and fast.
+
+Big O Complexity
+
+MethodTimeSpace
+create_taskO(1)O(1)
+get_taskO(1)O(1)
+update_taskO(1)O(1)
+list_tasksO(T log T)O(T)
+add_userO(1)O(1)
+assign_taskO(A)O(1)
+list_user_tasksO(A log A)O(A)
+complete_taskO(A)O(1)
+list_expired_tasksO(A log A)O(A)
+
+T = Total number of tasks.
+
+A = Number of assignments for a specific user.
+
+Candidate-Report Notes
+
+Per-user heaps keyed on (ttlAt, startTime) make the Level-4 "earliest start time" tiebreak free. Maintain a parallel Set of completed assignment ids to lazily skip stale heap entries.
+
+The Level-3 quota check counts active assignments only, not historical ones. Decrement on completion and on expiry.
+
+Hidden tests at Level 4 are sparse and miss several corner cases (e.g. assigning the same taskId twice to the same user, completing exactly at ttlAt). Add your own.
+
+Preparation
+
+Build a single mental template covering the three TTL-flavored rotations on this list (banking-system scheduled payments, in-memory DB TTL, task management). The substructure is the same: heap-of-events + cancelled-set + per-entity counter.
+
+Pre-write a Level-1 priority-keyed map so you can drop it in without typos under time pressure.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

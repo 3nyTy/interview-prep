@@ -1,0 +1,73 @@
+===H1===
+First-Login Only-Once User Tracker (O(1) Worst-Case)
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/first-unique-login-tracker
+===BODY===
+Oracle
+Coding·45 minMembers
+First-Login Only-Once User Tracker (O(1) Worst-Case)
+Design a structure that records user logins and, on demand, returns the earliest-logged-in user whose login count is exactly one. Both operations must be O(1) worst-case. Asked as the coding portion of a difficult OCI phone screen where the interviewer iteratively rewrote the prompt.
+SWE
+Infra Eng
+linked-list
+hashmap
+design
+data-structure
+medium
+Frequency
+Single report
+Last asked
+2025-12-01
+Stage
+phone-screen
+Requirements
+
+Two operations:
+
+record(userId) — log that userId just logged in.
+
+firstUnique() — return the user ID of the earliest-logged-in user whose total login count across the lifetime of the tracker is exactly one. If no such user exists, return null / sentinel.
+
+Workload assumption: relatively few logins, far more firstUnique queries.
+
+Both operations must be O(1) worst-case (not amortised).
+
+Notes
+
+The canonical structure pairs:
+
+A HashMap<userId, Node> for direct lookup.
+
+A doubly-linked list whose nodes hold userId, threaded in login order.
+
+A HashSet<userId> (or a count field per node) marking users that have logged in more than once.
+
+record(userId):
+
+If userId is unknown → append a new node to the list tail; map points to it.
+
+If userId is in the map and not yet marked duplicate → remove its node from the list, mark it duplicate. (Removal is O(1) because the map gives us the node.)
+
+If already marked duplicate → no-op.
+
+firstUnique() returns the user ID at the head of the linked list, or null if empty.
+
+All operations are O(1) worst-case.
+
+The round's interviewer initially asked for a simpler version ("any unique user") and the candidate proposed two sets. The interviewer then iteratively tightened the requirement — "earliest unique" and "O(1) worst-case" — at which point the doubly-linked-list-plus-map structure becomes necessary. Recognising the LRU-cache shape early is the speedup.
+
+The reporting candidate flagged communication / clarification as the failure mode, not the algorithm: writing three different implementations as the prompt drifted. Lock the requirement with a concrete example before coding.
+
+Preparation
+
+Implement LeetCode 146 ("LRU Cache") cold — same data-structure pattern (map + doubly-linked list).
+
+Drill this prompt directly: list operations needed, sketch the structure on the whiteboard, then code.
+
+Practise writing down the operation set as the very first step (record(userId), firstUnique()), confirming the interviewer agrees, and then explicitly stating the complexity target before writing any code.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

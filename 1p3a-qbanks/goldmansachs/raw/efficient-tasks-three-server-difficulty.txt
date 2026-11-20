@@ -1,0 +1,55 @@
+===H1===
+Efficient Tasks / Three-Server Difficulty Split
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/efficient-tasks-three-server-difficulty
+===BODY===
+Goldman Sachs
+Coding·120 minMembers
+Efficient Tasks / Three-Server Difficulty Split
+Partition task difficulties across three servers, then each server chooses one task to minimize `|d1-d2| + |d2-d3|`; maximize that minimized value over all valid partitions. Multiple 2026 OA candidates describe this as the harder coding problem.
+SWE
+RS
+array
+greedy
+math
+medium
+Frequency
+Low
+Last asked
+2025-11-25
+Stage
+oa
+Requirements
+
+Input: integer array difficulty, where difficulty[i] is the difficulty of one software module.
+
+Partition all modules across exactly three servers. Every module must be assigned once, and each server must receive at least one module.
+
+For a fixed partition, one module is selected from each server to compute |d1 - d2| + |d2 - d3|. The selected modules are chosen to minimize this expression.
+
+Return the maximum possible value of that minimized expression across all valid partitions.
+
+Examples
+
+difficulty = [5, 1, 2, 5, 3, 5]
+return 6
+
+Notes
+
+A quant-track version describes the same core formula as selecting three numbers from an array; the Engineering OA version frames it as deployment across three servers.
+
+Clarify whether duplicate difficulty values are distinct modules. The deployment wording implies they are distinct items even if values match.
+
+The high-level invariant is to make the closest possible triple across the three groups as far apart as possible; sorting the difficulties is the natural first step.
+
+Preparation
+
+Work several sorted-array examples by hand before coding; the objective is maximin, so intuitive greedy splits can fail silently.
+
+State the brute-force partition search first, then explain the sorted / boundary-based optimization you choose.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

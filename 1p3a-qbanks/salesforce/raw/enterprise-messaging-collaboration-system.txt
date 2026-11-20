@@ -1,0 +1,73 @@
+===H1===
+Design an Enterprise Messaging / Collaboration System
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/enterprise-messaging-collaboration-system
+===BODY===
+Salesforce
+System DesignMembers
+Design an Enterprise Messaging / Collaboration System
+Design an enterprise messaging product with direct messages, group channels, durable history, read receipts, search, presence, offline delivery, and strict cross-organization isolation. The round focuses on tenant-aware storage and search, deterministic per-conversation ordering, compact read watermarks, and server-enforced permissions.
+SWE
+messaging
+chat
+access-control
+schema-design
+search
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-system-design
+Requirements
+
+Clarify the number of organizations, users per organization, direct-message and group-channel support, persistence, read receipts, history search, and required presence accuracy.
+
+Data belonging to different organizations must be completely isolated.
+
+Deliver messages to connected recipients in real time, persist them for history, and route offline recipients through push notification.
+
+Assign a deterministic order within each conversation without relying on client clocks.
+
+Support read state without producing one write per reader per message; channels may contain hundreds of members.
+
+Search historical messages while enforcing both tenant boundaries and the requesting user's conversation membership.
+
+Support public, private, and invite-only channels plus administrator roles; authorization must be enforced on the server.
+
+Notes
+
+Core architecture and data model
+
+Clients hold persistent connections to a gateway. The messaging service writes each message to storage and delivers it to online recipients; offline users receive a push notification.
+
+Use conversation, message, and membership records. Partition messages by conversation ID and order them by a server-issued, monotonically increasing identifier so history retrieval is a range scan.
+
+Tenant isolation
+
+Compare a dedicated database per tenant, a shared database with separate schemas, and shared tables carrying a tenant key. The isolation-cost trade-off can support a hybrid model in which large customers receive dedicated deployments while smaller customers share infrastructure.
+
+Shared-table safety cannot depend on every engineer remembering a filter. Inject the tenant condition in the data-access layer and expose no bypass path to application code.
+
+Ordering, receipts, search, and permissions
+
+Let the server assign the conversation sequence number. Clients may render optimistically and reconcile after acknowledgment.
+
+Store one monotonic read watermark per user per conversation instead of one receipt row per user per message. Advance it with max(current, acknowledged_sequence) and batch or coalesce acknowledgments over a short interval. The watermark reduces stored receipt state from O(users * messages) to O(users) per conversation; coalescing is what also prevents one database write for every message each user reads.
+
+Build an inverted index for history search, but partition or filter it by tenant and authorized conversations.
+
+Check channel visibility and administrative privileges on the server rather than relying on hidden client controls.
+
+Preparation
+
+Rehearse a five-minute requirements pass that explicitly covers tenant count, users per tenant, channel size, persistence, ordering, receipts, search, presence, and permission levels.
+
+Draw the message write path and the minimum schema, then quantify how read watermarks reduce writes in a channel with hundreds of members.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

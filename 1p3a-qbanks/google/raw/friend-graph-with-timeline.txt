@@ -1,0 +1,78 @@
+===H1===
+Friend Graph with Timeline (Friend / Unfriend Events)
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/friend-graph-with-timeline
+===BODY===
+Google
+Coding·45 minMembers
+Friend Graph with Timeline (Friend / Unfriend Events)
+Onsite coding question family: given a chronologically ordered log of friend / unfriend events on N people, answer connectivity questions over time. Base case is union-find for friend-only events; the follow-up adds deletions, pushing toward segment tree or fully dynamic connectivity.
+SWE
+graph
+union-find
+hard
+Frequency
+Medium
+Last asked
+2026-08-12
+Stage
+onsite-coding · phone-screen
+Requirements
+
+Base problem
+
+Input: list of N people and a chronological log; each log entry is (timestamp, person_a, person_b, action) where action ∈ {friend}.
+
+Return: the earliest timestamp at which all N people are in one connected component (everyone becomes a transitive friend).
+
+Solve with union-find: process events in order, union the pair, stop when there is exactly one component.
+
+Follow-up 1 (segment tree)
+
+Same log, but you must answer for multiple query timestamps: "are X and Y friends at time t?".
+
+Offline approach: build a segment tree over edges (each edge alive during an interval) and process queries by tree-walk + rollback union-find.
+
+Follow-up 2 (fully dynamic connectivity)
+
+Events can also be unfriend. Same global-connectivity / pairwise-connectivity queries.
+
+This is genuinely hard (link-cut tree / Holm-Lichtenberg). In practice candidates write a brute-force rebuild on each query + state where the optimal algorithm sits.
+
+Variant: "build a graph + BFS" is accepted by some interviewers if you explicitly call out the trade-off.
+
+Follow-up 3 (maximum friendship hops)
+
+After building the friendship graph, return the largest hop count needed to reach a friend. The prompt leaves the exact scope open: clarify the source person, whether the metric is a single-source eccentricity or a graph-wide diameter, and which timeline snapshot to use before coding.
+
+The expected working direction is a BFS over the materialized graph once the scope is fixed.
+
+Examples
+
+Base: N=3, events [(1,A,B,friend), (5,B,C,friend)] → answer 5.
+
+Follow-up 1: after the above events, query (0, A, C) → false, (5, A, C) → true.
+
+Notes
+
+The base problem looks innocent; the follow-up about unfriending is the actual signal. In practice, interviewers accept "rebuild graph from scratch per query + BFS" as a working answer if you also articulate why the optimal algorithm is fully dynamic connectivity.
+
+The same family shows up as "friends form a chain over time" or "chess pieces R / L that can move plus walls" — the connectivity backbone is identical.
+
+The follow-up the interviewer is fishing for is consistently a segment tree built over the event timeline; have the offline algorithm ready.
+
+Two algorithmic families converge here: (1) offline — sort all events by time, run union-find, snapshot connectivity at each query T; (2) online with unfriend support — vanilla union-find doesn't handle deletion, so either rebuild per query, use link-cut trees, or apply offline reverse-time processing (treat unfriends as adds in reverse). Clarify with the interviewer which they want.
+
+Preparation
+
+Have weighted/path-compressed union-find ready and warm.
+
+Practice the offline trick: segment tree over time intervals containing each edge, DFS the tree applying / rolling back unions.
+
+Memorize the punchline for fully-dynamic: "online deletion breaks union-find; offline is OK; for online you need Holm–Lichtenberg or link-cut tree (O(polylog n))."
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

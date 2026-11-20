@@ -1,0 +1,71 @@
+===H1===
+Distributed Rate Limiter with Lua Details
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/distributed-rate-limiter-with-lua
+===BODY===
+Apple
+System Design·45 minMembers
+Distributed Rate Limiter with Lua Details
+Storage infra onsite system design asking for a distributed rate limiter, with interviewer emphasis on implementation detail such as Redis Lua scripting.
+SWE
+Infra Eng
+rate-limiting
+redis
+distributed-systems
+scaling
+medium
+Frequency
+Low
+Last asked
+2026-08-05
+Stage
+phone-screen · onsite-system-design
+Requirements
+
+Design a distributed rate limiter.
+
+Functional requirements:
+
+Limit requests by user, IP, API key, or service identity.
+
+Support configurable limits per endpoint or tier.
+
+Reject or throttle requests consistently across multiple application servers.
+
+Return a clear allow / deny decision with enough metadata for callers.
+
+Scale / constraints:
+
+The limiter must work across a fleet, not just inside one process.
+
+The design should keep request-path latency low.
+
+Design decisions:
+
+Token bucket vs fixed window vs sliding window.
+
+In-process limiter, sidecar, gateway, or dedicated service.
+
+Redis shared state, sharding, hot keys, availability, and atomic updates.
+
+Fail-open vs fail-closed during limiter outage.
+
+Notes
+
+The implementation detail that matters is atomicity. If Redis is the shared state, the counter update and allow/deny decision should happen in one atomic operation; a Lua script is a common answer because it reads state, mutates state, and sets expiry together.
+
+For senior candidates, be ready to discuss configuration rollout, multi-region consistency, hot-key mitigation, observability, and how much precision the product actually needs.
+
+Preparation
+
+Practice a token-bucket Lua-style flow: refill tokens, cap at capacity, consume one token, set TTL, return allow/deny.
+
+Compare fixed window, sliding-window log, sliding-window counter, and token bucket in under two minutes.
+
+Prepare a failure-mode table: Redis unavailable, clock skew, hot user key, config rollback, and partial regional outage.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

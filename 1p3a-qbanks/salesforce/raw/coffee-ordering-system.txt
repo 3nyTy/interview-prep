@@ -1,0 +1,93 @@
+===H1===
+Coffee Ordering System Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/coffee-ordering-system
+===BODY===
+Salesforce
+System Design·45 minFree preview
+Coffee Ordering System Design
+Salesforce's signature backend SD prompt: design an online coffee ordering / management service end-to-end. Interviewers compress the design into 30 minutes and then drill on SQL queries and edge cases ("customers who never ordered", "top spender last month"), so a clean ER model and explicit notification flow are weighted more than novel architecture.
+SWE
+system-design
+coffee-ordering
+schema-design
+sql
+notification
+scaling
+medium
+Frequency
+Medium
+Last asked
+2026-02-09
+Stage
+phone-screen · onsite-system-design
+Requirements
+
+Customer-facing flow: browse stores / menus, place an order, pay, track status, get notified on ready / pickup.
+
+Store-side flow: receive order, update status (queued → preparing → ready → picked up), broadcast status changes.
+
+Multi-store / multi-region support (Salesforce stores in many cities, not a single shop).
+
+Catalog: items, modifiers (size, milk, syrup), per-store availability, per-store pricing.
+
+Reporting / analytics endpoints — interviewers consistently ask for SQL during the round (see Notes).
+
+Common follow-ups:
+
+Coordinate notification between the customer app and the store POS when an order is ready.
+
+Scale the order-placement path under burst load (morning commute spike).
+
+Handle store-side cancellation / refund.
+
+Authentication and rate-limiting of the order API.
+
+Notes
+
+Most interviewers spend ~30 of the 45 minutes on design and ~15 on SQL. Two SQL prompts recur:
+
+Find the user who spent the most last month.
+
+Find users who have never placed an order.
+The second one is the trap — interviewers want the explicit LEFT JOIN ... WHERE order.id IS NULL (or NOT EXISTS) form, not a count-based filter. Practice writing both.
+
+The data model is the load-bearing artefact. A workable schema:
+
+users(id, email, ...)
+
+stores(id, name, region, ...)
+
+items(id, store_id, name, base_price, ...)
+
+modifiers(id, item_id, name, price_delta)
+
+orders(id, user_id, store_id, status, total, created_at)
+
+order_items(id, order_id, item_id, qty, applied_modifiers_json)
+
+payments(id, order_id, amount, status, gateway_ref)
+
+Notification design is a common follow-up. The cleanest answer is a state-change event published to a queue, with two consumers: a push-notification service for the customer and a WebSocket / long-poll channel to the store POS. Avoid having the store POS poll the order table.
+
+Scaling: orders are write-heavy and read-light per-user. Partition orders by user_id (read locality) or by store_id (store dashboard locality) depending on which side is the hotter consumer. Hot-store handling (one flagship store at peak) needs a per-store queue + back-pressure on order placement, not raw DB scaling.
+
+Idempotency: order-create should accept a client-generated idempotency key — duplicate POSTs from a flaky mobile network must not produce duplicate orders.
+
+Interviewers vary widely in what they care about. One round may push hard on SQL; another may ignore SQL and drill on notification fan-out and scaling. Have both branches ready.
+
+Preparation
+
+Whiteboard the schema in under 5 minutes. Then practise the two SQL queries (top spender last month; users who never ordered) until they feel automatic — anti-join (LEFT JOIN ... IS NULL or NOT EXISTS) is the answer for the second.
+
+Draw the customer ↔ backend ↔ store-POS notification flow as a sequence diagram so it lands clean under time pressure.
+
+Prepare a short answer for: idempotency on order create, partitioning trade-off (by user vs by store), and one concrete back-pressure mechanism for a flagship-store spike.
+
+Rehearse the 30-minute compressed format: 5 min clarify → 5 min data model → 10 min API + flow → 5 min scaling → 5 min one deep dive (notification or SQL).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

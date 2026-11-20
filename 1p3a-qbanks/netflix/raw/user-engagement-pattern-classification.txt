@@ -1,0 +1,146 @@
+===H1===
+User Engagement Pattern Classification
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/user-engagement-pattern-classification
+===BODY===
+User Engagement Pattern Classification
+
+<https://www.1point3acres.com/interview/problems/company/netflix/user-engagement-pattern-classification>
+
+Netflix
+Coding
+
+60 min
+Members
+User Engagement Pattern Classification
+
+Classify each viewing session as Abandoned / Sampled / Completed by watched percentage, find each user's most-common pattern, and return a count of users per dominant pattern.
+
+SWE
+DS
+hashmap
+array
+string-processing
+medium
+Frequency
+Single report
+Last asked
+2026-01-02
+Stage
+phone-screen  onsite-coding
+User Engagement Analysis
+
+You need to analyze how users interact with video content. We categorize a user's activity based on the percentage of the video they watched:
+
+"Abandoned": The user watched less than 25% of the content.
+"Sampled": The user watched between 25% and 75% (inclusive).
+"Completed": The user watched more than 75% of the content.
+Data Format
+
+You have a list of viewing sessions. Each session contains these details:
+
+account_id: The user's ID.
+title_id: The content ID.
+title_runtime_secs: The total length of the video in seconds.
+watched_secs: How many seconds the user actually watched.
+day_nbr: The day the viewing happened (ignore this for this problem).
+The Goal
+
+Write a function that does the following:
+
+Classify Sessions: Label every session as "Abandoned", "Sampled", or "Completed".
+Find User Habits: For each user, identify their most common engagement pattern.
+Note: If there is a tie (two patterns appear the same amount of times), you can pick any of the tied patterns.
+Count Totals: Return a dictionary/object showing the count of users for each dominant pattern.
+Example Walkthrough
+
+Input:
+
+viewing_data = [ 
+  {"account_id": "U1", "title_id": "T1", "title_runtime_secs": 3600, "watched_secs": 3500, "day_nbr": 1}, 
+  {"account_id": "U1", "title_id": "T2", "title_runtime_secs": 5400, "watched_secs": 5000, "day_nbr": 3}, 
+  {"account_id": "U2", "title_id": "T1", "title_runtime_secs": 3600, "watched_secs": 800, "day_nbr": 5}, 
+  {"account_id": "U2", "title_id": "T2", "title_runtime_secs": 2700, "watched_secs": 500, "day_nbr": 9}, 
+  {"account_id": "U3", "title_id": "T1", "title_runtime_secs": 3600, "watched_secs": 1800, "day_nbr": 2} 
+]
+
+Output:
+
+{"Completed": 1, "Abandoned": 1, "Sampled": 1}
+
+Explanation:
+
+User U1:
+
+Watched 97% (3500/3600) -> Completed
+Watched 93% (5000/5400) -> Completed
+Main Pattern: Completed
+
+User U2:
+
+Watched 22% (800/3600) -> Abandoned
+Watched 19% (500/2700) -> Abandoned
+Main Pattern: Abandoned
+
+User U3:
+
+Watched 50% (1800/3600) -> Sampled
+Main Pattern: Sampled
+
+Result: 1 user is "Completed", 1 is "Abandoned", and 1 is "Sampled".
+
+Input Constraints
+1 <= viewing_data.length <= 10^5
+1 <= title_runtime_secs <= 10^6
+0 <= watched_secs <= title_runtime_secs
+account_id and title_id are always non-empty strings.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+User Engagement Analysis
+Data Format
+The Goal
+Example Walkthrough
+Input Constraints
+Related discussions  0
+Related questions
+
+Other Netflix questions sharing tags with this one
+
+Number Pairs That Match Target
+Single report
+hashmap
+array
+medium
++1
+JSON Path Query / Inverted Index
+Low
+hashmap
+string-processing
+medium
++4
+Count Disjoint String Pairs
+Low
+hashmap
+medium
+bitmask
++1
+Homepage Viewport / Shelf Dedupe
+Medium
+array
+medium
+dedup
++4
+Merge Intervals
+Single report
+array
+medium
+interval
++1
+Code editor
+
+---

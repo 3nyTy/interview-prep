@@ -1,0 +1,65 @@
+===H1===
+Flood Fill
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/flood-fill
+===BODY===
+Apple
+CodingMembers
+Flood Fill
+You are given an m x n integer grid image where image[r][c] is the pixel color at that position, and three integers sr, sc, and color.
+SWE
+easy
+grid
+dfs
+bfs
+Frequency
+Single report
+Last asked
+2026-04-20
+Stage
+phone-screen
+You are given an m x n integer grid image where image[r][c] is the pixel color at that position, and three integers sr, sc, and color. Starting from pixel (sr, sc), replace the color of all pixels connected 4-directionally (up, down, left, right) that share the original color with color.
+
+Return the modified image.
+
+Examples
+
+Example 1:
+
+Input: image = [[1,1,1],[1,1,0],[1,0,1]], sr = 1, sc = 1, color = 2
+
+Output: [[2,2,2],[2,2,0],[2,0,1]]
+
+Explanation:
+
+All pixels connected to (1,1) that were originally color 1 are recolored to 2.
+
+Example 2:
+
+Input: image = [[0,0,0],[0,0,0]], sr = 0, sc = 0, color = 0
+
+Output: [[0,0,0],[0,0,0]]
+
+Explanation:
+
+The starting pixel already has the target color, so the image is returned unchanged.
+
+Constraints
+
+m == image.length
+
+n == image[i].length
+
+1 <= m, n <= 50
+
+0 <= image[i][j], color < 2^16
+
+0 <= sr < m
+
+0 <= sc < n
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

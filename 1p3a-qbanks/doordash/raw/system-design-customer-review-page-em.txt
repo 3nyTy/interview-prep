@@ -1,0 +1,71 @@
+===H1===
+System Design: Customer Review Page (EM)
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/system-design-customer-review-page-em
+===BODY===
+DoorDash
+System Design·60 minMembers
+System Design: Customer Review Page (EM)
+EM-track SD prompt. Design a customer-facing review page for DoorDash with text + rating + multimedia, search, and (newer dimension) AI-based summarization of reviews. Less infra-deep than the SDE SD round; more focus on product trade-offs and team-level decisions.
+EM
+search
+ranking
+llm
+caching
+product-design
+medium
+Frequency
+Single report
+Last asked
+2026-04-02
+Stage
+phone-screen · onsite-system-design
+Requirements
+
+Display reviews for a restaurant / item with rating distribution and multimedia attachments.
+
+Searchable / filterable (date, rating, with-photo, helpful, language).
+
+Optional AI-summary section that distills the review corpus into a 2–3 sentence highlights + lowlights summary, refreshed on a cadence.
+
+Pagination / infinite scroll on the review list.
+
+Notes
+
+This is an EM round, so the interviewer grades how you scope the problem and which sub-systems you delegate to your team rather than full infra depth.
+
+Display side. Read-heavy; cache the rendered review page in a CDN layer with cache-key including the most-recent review timestamp; invalidate on new review / edit.
+
+Search. Elasticsearch / OpenSearch index over reviews; per-restaurant index slice; updated by an indexer consuming the review_created / review_edited Kafka topic.
+
+AI summary. Offline batch job runs over the recent review window per restaurant; output stored in a review_summaries(restaurant_id, summary, model_version, generated_at) table; refreshed every N days or N new reviews. Surface the model-version + freshness timestamp in the UI for trust.
+
+Cost trade-off. Per-restaurant summarization at LLM rates is non-trivial — batch by tier (top X restaurants daily, mid-tier weekly, long-tail on-demand). EM interviewer specifically looks for this kind of cost-conscious framing.
+
+Quality safeguards. Human review of generated summaries for top restaurants; per-summary thumbs-up / thumbs-down feedback to fine-tune over time.
+
+Privacy. Summaries must not quote individual reviewers verbatim if they reveal PII; per-review opt-out for inclusion in summarization.
+
+Common follow-up themes
+
+How do you size the team to ship this? (Frontend, backend, search, ML-platform, ops — name 3–5 roles and split.)
+
+What's the rollout plan? (Internal dogfood → 1% production → tiered rollout by restaurant tier; per-tier metric gates.)
+
+How do you measure success? (Engagement on review page, conversion lift from summary, complaint rate, summary thumbs-up rate.)
+
+What does on-call look like? (Per-component owners, escalation flow, summary-generation failure handling.)
+
+Preparation
+
+Practice opening this prompt with 2–3 clarification questions (which surfaces, monolingual-or-multilingual, AI-summary scope) — EM rounds grade scoping discipline.
+
+Have a 2-minute story on team-level execution: who builds what, what dependencies, what the 90-day plan looks like.
+
+Brush up on cost-aware LLM batching since the AI-summary dimension is the newer / differentiating part of this prompt.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

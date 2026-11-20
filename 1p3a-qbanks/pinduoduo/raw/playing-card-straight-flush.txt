@@ -1,0 +1,48 @@
+===H1===
+Playing Cards: Straight Flush / Missing Card
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinduoduo/playing-card-straight-flush
+===BODY===
+Temu / Pinduoduo
+Coding·60 minFree preview
+Playing Cards: Straight Flush / Missing Card
+A recurring Temu coding round built around a poker-hand theme: given a list of cards, detect or complete a straight flush. A common variant asks you to find the missing card needed to complete a hand, where 0 can stand in for either an Ace or a 1.
+SWE
+array
+sorting
+simulation
+medium
+Frequency
+Low
+Last asked
+2026-03-27
+Stage
+onsite-coding
+Requirements
+
+Given a list of characters / values representing playing cards, reason over their ranks (and suits where relevant).
+
+Two variants recur:
+
+Straight flush detection: determine whether (or which) cards form a straight flush — five consecutive ranks in the same suit.
+
+Missing-card completion: given a near-complete hand, find the missing card that completes a straight. Wildcard rule: a 0 may represent either an Ace or a 1, so both ends of the run must be considered.
+
+In at least one round the interviewer supplied the algorithm up front and asked only for a clean implementation.
+
+Notes
+
+The wildcard ambiguity (0 = Ace or 1) is the main correctness trap — clarify how Aces wrap before coding.
+
+These rounds run roughly 10-20 minutes after a long project deep dive, so a clean, bug-free pass matters more than heavy optimization.
+
+Preparation
+
+Drill run / sequence detection over sorted rank arrays, grouping by suit with a hashmap.
+
+Write a helper that enumerates both Ace-high and Ace-low (or 0 = Ace / 1) interpretations and re-checks the straight.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

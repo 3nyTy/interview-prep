@@ -1,0 +1,75 @@
+===H1===
+Recursive Schema Validation
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/schema-validation-recursive
+===BODY===
+Amazon
+Coding·60 minMembers
+Recursive Schema Validation
+Given a JSON-like data structure and a schema definition, verify that the data conforms (types, required fields, nested shapes). An FAR onsite coding round emphasizing OOP design and edge-case coverage.
+RE
+MLE
+recursion
+oop-design
+data-structure
+hard
+Frequency
+Single report
+Last asked
+2026-03-21
+Stage
+onsite-coding
+Requirements
+
+Inputs: arbitrary nested data (dict | list | primitive) and a schema describing expected types, required keys, and nested structures.
+
+Return whether the data validates; on failure, optionally return the failing path.
+
+Support common schema constructs: primitive types, lists with item schema, dicts with required/optional keys, nullable fields.
+
+Examples
+
+schema = {
+  "type": "object",
+  "properties": {
+    "name": {"type": "string"},
+    "tags": {"type": "array", "items": {"type": "string"}}
+  },
+  "required": ["name"]
+}
+data = {"name": "foo", "tags": ["a", "b"]}
+validate(data, schema) -> True
+
+Notes
+
+Use dataclasses or a small class hierarchy to model Schema variants (ObjectSchema, ListSchema, PrimitiveSchema) and dispatch validation via methods. The original interview was a Principal SDE round — clean class structure was scored explicitly.
+
+Candidates routinely run out of time covering all edge cases; budget heavily on additionalProperties, missing required keys, type coercion (int vs float), and nullability.
+
+Reference standard: JSON Schema draft-07 semantics are the implicit target. You don't need full coverage — pick a representative subset and document it.
+
+Useful class skeleton: a Schema ABC with validate(data, path) -> list[Error] and three subclasses — ObjectSchema(properties, required, additional_properties), ArraySchema(items, min_items, max_items), PrimitiveSchema(type, nullable). Each subclass owns its own edge cases; the dispatcher just routes by type field.
+
+Error reporting: return a list of (json_pointer, message) tuples and let the caller decide between "first error" or "all errors". Resist booleanizing — graders penalize loss of failure context.
+
+Coverage menu to declare upfront: required keys, additionalProperties, type checks (including int vs float), nullability, array items, nested objects. State which you will implement and which you will stub; explicit scoping signals seniority.
+
+Preparation
+
+Implement a mini JSON Schema validator on your own machine ahead of the loop — even 100 lines is enough to internalize the recursion shape.
+
+Build a 5-edge-case checklist (missing required, extra unknown, wrong type, null in non-nullable, mixed list items).
+
+Practice splitting design time vs coding time — Amazon Staff-level rounds penalize a sloppy class hierarchy even when the logic is correct.
+
+Write a 100-line subset validator (object + array + primitive + required + nullable) at home, then exercise it against three hand-crafted invalid payloads. The recursion shape sticks after one full implementation.
+
+Practice walking through the design on paper before coding — the Principal SDE round scores class-hierarchy decisions and naming as much as it scores running code.
+
+Pre-think the follow-up "how do you support $ref?" — answer: a SchemaRegistry keyed on $id, resolved lazily inside ObjectSchema.validate to support cycles.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,62 @@
+===H1===
+Waymo Passenger Pickup Scheduler (OO Design)
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/passenger-pickup-scheduler-oo-design
+===BODY===
+Waymo
+Coding·45 minMembers
+Waymo Passenger Pickup Scheduler (OO Design)
+Phone screen for a senior SWE: design and implement an OO scheduler that simulates a Waymo car picking up passengers in input order, returning the total elapsed time. Follow-ups extend the model with time-skipping and trip cancellation.
+SWE
+oop-design
+object-design
+simulation
+scheduling
+medium
+Frequency
+Single report
+Last asked
+2026-01-29
+Stage
+phone-screen
+Requirements
+
+Implement an OO scheduler that accepts a stream of pickup requests in arrival order.
+
+The car services requests strictly in the order they were submitted (no re-ordering).
+
+Return the total elapsed time once all requests are served, given each request's pickup and drop-off coordinates plus travel-time function.
+
+Follow-ups:
+
+Add skip_to(timestamp) — fast-forward the simulation clock to a future timestamp, completing any in-progress trip up to that point.
+
+Add cancel(request_id) — remove a request that has not yet started service.
+
+Notes
+
+Sketch the class boundary up front: Scheduler (clock, queue, current trip), Request (id, pickup, drop-off, state), Car (position, travel_time(from, to)). Driving the class diagram before writing code is a meaningful signal in this round.
+
+Use a doubly-linked structure or an ordered map keyed by request id for the request queue — the cancel follow-up requires O(log N) lookup and preservation of arrival order.
+
+Keep the clock as a separate field so skip_to is a single mutation rather than a global recompute. Active-trip handling: complete the trip up to min(travel_remaining, skip_amount) and recompute the residual.
+
+State machine per Request: pending → picking_up → in_transit → completed | cancelled. Cancellation is only legal in pending.
+
+Mention concurrency only if the interviewer asks — the round is graded on the single-threaded simulation first.
+
+Common bug: confusing 'pickup time' and 'arrival time' — distinguish t_request_submitted, t_pickup_begin, t_pickup_done, t_dropoff.
+
+Preparation
+
+Pre-write a class skeleton (Scheduler, Request, Car) with empty methods and a small enum State you can reproduce in under 10 minutes.
+
+Drill on stating the trade-offs aloud (queue vs sorted map, push-based vs poll-based clock) before implementing — interviewers in OO scheduler rounds reliably credit the design discussion.
+
+Write a 10-line test driver: submit three requests, advance time, cancel one, verify elapsed time. Most reported failures trace to the lack of a tight test loop, not the algorithm.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,56 @@
+===H1===
+Currency Arbitrage Detection
+===URL===
+https://www.1point3acres.com/interview/problems/company/optiver/currency-arbitrage-detection
+===BODY===
+Optiver
+Coding·90 minMembers
+Currency Arbitrage Detection
+A HackerRank graph problem: given an n×n matrix of currency exchange rates, decide whether an arbitrage cycle exists after accounting for a small per-cycle transaction fee. The classic reduction is negative-cycle detection via Bellman-Ford on log-transformed rates.
+RS
+SWE
+DS
+graph
+bellman-ford
+trading
+oa
+medium
+Frequency
+Low
+Last asked
+2025-08-26
+Stage
+oa
+Requirements
+
+Input: an n × n matrix where rates[i][j] is how many units of currency j you get for 1 unit of currency i. Diagonal entries are 1.
+
+A closed cycle of exchanges incurs a transaction fee of 0.01% of the starting amount.
+
+Determine whether an arbitrage opportunity exists: a sequence of exchanges starting and ending at the same currency that yields strictly more than the original amount after the fee.
+
+Return True if arbitrage exists, else False.
+
+Examples
+
+n = 2, rates [[1, 0.5], [2.0, 1]] → False.
+
+Notes
+
+Standard reduction: take -log(rates[i][j]) as edge weights; an arbitrage cycle is a negative-weight cycle, detectable with Bellman-Ford (run the relaxation, then check for a further relaxation on an extra pass).
+
+Fold the 0.01% fee into the threshold — the product of rates around the cycle must exceed 1 / (1 - fee) (equivalently, shift the negative-cycle test by the log of the fee factor).
+
+Watch floating-point tolerance near the no-arbitrage boundary.
+
+Preparation
+
+Implement Bellman-Ford negative-cycle detection on the log-transformed graph and verify it flags a hand-built arbitrage triangle.
+
+Work the fee math explicitly so the "strictly more after fee" boundary is correct.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

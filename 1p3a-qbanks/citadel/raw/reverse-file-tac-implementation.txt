@@ -1,0 +1,64 @@
+===H1===
+Implement `tac` — Reverse-Order File Reader
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/reverse-file-tac-implementation
+===BODY===
+Citadel / Citadel Securities
+Coding·60 minMembers
+Implement `tac` — Reverse-Order File Reader
+Citsec C++ phone-screen prompt: implement the `tac` command (cat with line order reversed), then ladder up through `O(1)` space optimizations and large-file scaling. A separate Citsec HFT onsite round in Singapore asked the analogous `tail -n` over a very large file.
+SWE
+io
+string-processing
+operating-systems
+complexity-analysis
+medium
+Frequency
+Low
+Last asked
+2026-05-07
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Implement a function that, given a text file path, prints its lines starting from the last line and ending at the first.
+
+Ladder of follow-ups:
+
+Simplest correct implementation.
+
+Reduce auxiliary space to O(1) (no buffering the full file or full line set in memory).
+
+Beyond the space budget, optimize for either time or I/O cost on very large files.
+
+The HFT-onsite variant generalizes to tail: print the last n lines of a potentially huge file with discussion of which optimizations apply.
+
+Notes
+
+Baseline: read all lines into a std::vector<std::string>, print in reverse. O(file_size) memory.
+
+O(1) extra-memory implementation: seek to end of file, then walk backwards a chunk at a time using std::ifstream::seekg with std::ios::end anchor and std::ifstream::tellg to track position. Within each chunk, locate newline boundaries and emit lines in reverse order. Spillover bytes (a partial line at the chunk boundary) prepend to the next chunk read. The classic gotcha is forgetting to flush the final partial line.
+
+The Citsec interviewer in the SDE Intern phone screen reportedly coached the candidate live through the seekg / tellg API because the candidate had never used it. Even partial familiarity with backward file navigation in C++ is a strong differentiator.
+
+For the tail -n variant on huge files, the same backwards-seek pattern works: count newlines while walking backward; stop once you have n + 1 newlines (the +1 accounts for the partial line at the start of the relevant region). Final emit reads forward from that anchor.
+
+Memory-mapped (mmap) variant: map the file, scan from end - 1 backward looking for '\n', emit lines on the fly. Avoids explicit seek arithmetic at the cost of a virtual-memory region the size of the file.
+
+Interviewer signals on this problem: deep probing of standard-library familiarity (which ifstream calls? what does seekg(0, std::ios::end) mean? how do you read the current position?). Brush up before the screen.
+
+Preparation
+
+Write the O(1)-memory tac in C++ from scratch using ifstream::seekg and a fixed-size chunk buffer. Reps matter — under interview time pressure the seekg arithmetic is the slowest step.
+
+Memorize the C++ file-pointer primitives: seekg(offset, std::ios::beg | cur | end), tellg(), gcount(), read(buf, n). Confidence with these surfaces in many Citsec rounds.
+
+Practice the tail -n generalization out loud: same backward walk, terminate after counting n newlines, emit forward from the stopping point.
+
+Have a 30-second mmap pitch ready as an alternative when the interviewer asks "any other approach?". Cite the trade-off: simpler code, larger virtual-memory footprint, no syscall overhead per chunk.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

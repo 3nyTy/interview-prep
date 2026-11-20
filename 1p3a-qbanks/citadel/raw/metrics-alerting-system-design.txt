@@ -1,0 +1,56 @@
+===H1===
+Metrics Collection & Alerting System
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/metrics-alerting-system-design
+===BODY===
+Citadel / Citadel Securities
+System DesignMembers
+Metrics Collection & Alerting System
+Citsec C++ SWE onsite design round: build an end-to-end metrics and alerting pipeline — instrumentation on a machine fleet, collection, time-series storage, a serving/query layer, threshold alerting, and per-worker failure detection. Storage-engine choice (time-series / SSTable vs. relational) and the failure-detection mechanism are the probed decision points; a ~2-second query-latency requirement surfaces mid-round.
+SWE
+metrics
+distributed-systems
+hard
+Frequency
+Single report
+Last asked
+2026-07-08
+Stage
+onsite-system-design
+Requirements
+
+Design a metrics + alerting system for a fleet of machines: instrumentation / emission on each host, a collection path, storage, and a serving layer for queries and dashboards.
+
+Layer alerting on top of the stored metrics.
+
+Detect failure of individual worker machines.
+
+Query latency under ~2 seconds — a constraint that may be introduced only after the design is underway, not during initial requirement gathering.
+
+Notes
+
+The prompt maps closely onto the canonical production observability stack (instrumentation → collection → storage → serving, with an alerting / SLO layer on top); candidates with production observability experience can lean directly on that architecture.
+
+Storage: a time-series-oriented layout (e.g. sorted-string-table storage) is a defensible primary choice, but be prepared to explicitly compare it against relational and general non-relational options — the comparison may be asked for even after a storage choice has already been stated.
+
+Per-worker failure detection: heartbeat-based detection is the expected answer. State it crisply and be ready to restate and expand it — missed-heartbeat thresholds, false-positive handling — if the interviewer circles back to the same question.
+
+Requirement management is part of the test: gather requirements up front, then re-confirm periodically, since new constraints (like the latency target) can surface mid-round. Candidates report heavy interviewer interruption in this round — keep each trade-off statement short and self-contained so it lands between interruptions.
+
+Asked inside a five-round Citsec onsite. Under Citsec's single-fail dynamics, a miss here can turn the remaining rounds into a formality.
+
+Preparation
+
+Rehearse sketching the four-layer pipeline (instrumentation → collection → time-series storage → serving / dashboards, with alerting on top) on a whiteboard in under 10 minutes, naming the data that crosses each boundary.
+
+Prepare a 60-second storage comparison — time-series / sorted-string-table layout vs. relational vs. general key-value — covering write path, compaction, and range-scan behavior, and be ready to deliver it even after you have already committed to one choice.
+
+Write out the heartbeat failure-detection spec once end-to-end: heartbeat interval, missed-beat threshold, false-positive handling (network partition vs. dead host), and what the alerting layer emits on detection.
+
+Drill requirement re-confirmation as an explicit habit: restate the constraint list after each major design block so late-arriving constraints (like a query-latency target) get incorporated instead of missed.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

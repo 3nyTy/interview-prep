@@ -1,0 +1,60 @@
+===H1===
+Matrix Border Sort & Clockwise Fill
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/matrix-border-sort-clockwise-fill
+===BODY===
+Capital One
+Coding·70 minMembers
+Matrix Border Sort & Clockwise Fill
+Given an integer matrix, process every border layer independently: read its cells clockwise from the layer's top-left corner, sort those values in ascending order, and write them back along the same clockwise coordinate sequence. Handle inner layers that collapse to one row, one column, or one cell without duplicating coordinates.
+DS
+MLE
+grid
+array
+simulation
+medium
+oa
+codesignal
+Frequency
+Low
+Last asked
+2026-07-19
+Stage
+oa
+Requirements
+
+Input: an n x m integer matrix.
+
+Treat the matrix as concentric border layers. Layer 0 is the outer border, layer 1 is the next border after removing layer 0, and so on.
+
+For each layer, enumerate its coordinates clockwise starting at that layer's top-left cell.
+
+Extract the layer's values, sort them in ascending order, and write the sorted values back along the same clockwise coordinate sequence.
+
+Return the matrix after every layer has been processed.
+
+Constraints: 1 <= n, m <= 200 and -10^9 <= matrix[i][j] <= 10^9.
+
+An innermost layer may be a single row, a single column, or one cell; visit every cell exactly once in each case.
+
+Notes
+
+Build one coordinate list per layer and reuse it for both extraction and writeback. This keeps the clockwise order identical in both phases.
+
+For an ordinary rectangular layer, enumerate the top edge left-to-right, the right edge top-to-bottom without repeating the top-right corner, the bottom edge right-to-left without repeating the bottom-right corner, and the left edge bottom-to-top without repeating either left corner.
+
+Handle a one-row or one-column layer before the ordinary four-edge traversal so corner cells are not duplicated.
+
+Preparation
+
+Write a helper border_coords(top, left, bottom, right) and test it on 1xN, Nx1, 2x2, and 3x4 layers.
+
+Trace extraction, ascending sort, and writeback separately on paper before combining them.
+
+Verify that the number of generated coordinates equals the number of cells on every processed layer.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

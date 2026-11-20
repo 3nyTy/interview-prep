@@ -1,0 +1,408 @@
+===H1===
+Document Store with Predicate Query
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/doc-predicate-store
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Document Store with Predicate Query
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+·
+55 min
+Members
+Document Store with Predicate Query
+
+Build a web-server-style document store with `InsertDoc(filename)` and `CheckContains(filename, predicate)`. Predicates are boolean expressions over terms (`a && b || c`). Follow-ups extend to `GetAllFiles(predicate)` and a distributed-systems design discussion on sharding and replication.
+
+SWE
+data-structure
+parsing
+search
+hashmap
+sharding
+distributed-systems
+hard
+Frequency
+Single report
+Last asked
+2026-04-20
+Stage
+onsite-coding
+Problem Overview
+
+You are building a small web server that stores documents and answers boolean queries against their contents. Commands arrive on standard input and the server emits exactly one line of output per command.
+
+The problem is split into three progressive parts:
+
+Part 1, Insert and OR-only check: implement INSERT_DOC and a restricted CHECK_CONTAINS that only accepts OR-chains like a || b || c. Establishes the Server class, the in-memory document store, and the input dispatcher.
+Part 2, Full boolean predicates: extend CHECK_CONTAINS to handle mixed && and || predicates such as a && b || c. Introduces a pure evaluate_predicate helper.
+Part 3, GetAllFiles with inverted index: implement GET_ALL_FILES, which returns every filename whose contents match the predicate. Reuses evaluate_predicate for a naive scan and then upgrades to an inverted index built during INSERT_DOC.
+
+A short distributed-system discussion at the end covers sharding and replication.
+
+Command Summary
+Command	Arguments	Output on success
+INSERT_DOC	<filename> <word1> <word2> ...	OK
+CHECK_CONTAINS	<filename> <predicate>	true or false
+GET_ALL_FILES	<predicate>	<file1,file2,...> or None
+Predicate Grammar
+A term is a bare word made up of letters, digits, and underscores (no quotes).
+The boolean operators are && (AND) and || (OR), each surrounded by whitespace.
+&& binds tighter than ||, matching the precedence used in Python, Java, and C.
+A predicate is therefore a sum of products: a && b || c && d means (a && b) || (c && d).
+There are no parentheses or NOT operator in the base problem.
+Part 1: INSERT_DOC and OR-only CHECK_CONTAINS
+Problem Statement
+
+Maintain an in-memory map from filename to the set of words it contains.
+
+INSERT_DOC <filename> <word1> <word2> ...
+
+Store the given words under filename. Return ERROR if a document with the same name already exists or if no words were given. Otherwise return OK.
+
+CHECK_CONTAINS <filename> <predicate>
+
+In Part 1 the predicate is an OR-chain of terms, e.g. a, a || b, or a || b || c. Print true if at least one term appears in the file's word set, false otherwise. Print ERROR if the filename is unknown.
+
+Example
+INSERT_DOC notes.txt apple banana cherry
+INSERT_DOC notes.txt fig
+INSERT_DOC empty.txt
+CHECK_CONTAINS notes.txt apple
+CHECK_CONTAINS notes.txt grape
+CHECK_CONTAINS notes.txt grape || cherry
+CHECK_CONTAINS missing.txt apple
+
+
+Expected output:
+
+OK
+ERROR
+ERROR
+true
+false
+true
+ERROR
+
+Solution
+
+The Server class owns a single documents dict keyed by filename. The dispatcher reads a line, dispatches by command name, and prints exactly one line per command.
+
+import sys
+
+class Server:
+    def __init__(self) -> None:
+        self.documents: dict[str, set[str]] = {}
+
+    def insert_doc(self, filename: str, words: list[str]) -> str:
+        if not words:
+            return "ERROR"
+        if filename in self.documents:
+            return "ERROR"
+        self.documents[filename] = set(words)
+        return "OK"
+
+    def check_contains(self, filename: str, predicate: str) -> str:
+        if filename not in self.documents:
+            return "ERROR"
+        words = self.documents[filename]
+        terms = [t.strip() for t in predicate.split("||")]
+        return "true" if any(t in words for t in terms) else "false"
+
+def main() -> None:
+    server = Server()
+    for line in sys.stdin:
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            if line.startswith("INSERT_DOC "):
+                parts = line.split()
+                filename, words = parts[1], parts[2:]
+                print(server.insert_doc(filename, words))
+            elif line.startswith("CHECK_CONTAINS "):
+                _, filename, predicate = line.split(maxsplit=2)
+                print(server.check_contains(filename, predicate))
+            else:
+                print("ERROR")
+        except (ValueError, IndexError):
+            print("ERROR")
+
+
+Key design choices that carry into later parts:
+
+Documents are stored as set[str], so term lookups are O(1) and duplicate input words are deduped automatically. Word frequency is not needed for boolean queries.
+CHECK_CONTAINS parses the line with split(maxsplit=2), so the predicate keeps its internal whitespace intact. Part 2 reuses this exact dispatch.
+Predicate parsing is isolated inside check_contains. In Part 2 we lift it into a free function so the naive Part 3 implementation can call it on every document during GET_ALL_FILES.
+
+Complexity: INSERT_DOC is O(W) for W words. CHECK_CONTAINS is O(T) for T terms in the predicate.
+
+Part 2: Full Boolean Predicates
+Problem Statement
+
+Extend CHECK_CONTAINS so the predicate may mix && and ||, with && binding tighter than ||. Examples:
+
+a && b is true iff both a and b are present.
+a && b || c is true iff (a && b) is true or c is true.
+a && b || c && d is true iff either (a && b) or (c && d) is satisfied.
+
+Validation rules from Part 1 still apply.
+
+Example
+INSERT_DOC f1 apple banana cherry
+CHECK_CONTAINS f1 apple && banana
+CHECK_CONTAINS f1 apple && grape
+CHECK_CONTAINS f1 apple && grape || cherry
+CHECK_CONTAINS f1 grape && pear || apple && date
+
+
+Expected output:
+
+OK
+true
+false
+true
+false
+
+
+In the third query, the AND clause apple && grape fails but the OR clause cherry succeeds, so the result is true. In the fourth query, neither AND clause is fully satisfied (pear and date are missing), so the result is false.
+
+Solution
+
+Pull the predicate evaluator out of the class. The trick is to recognize that a && b || c && d is already in disjunctive normal form: split on || to get the OR clauses, split each clause on && to get the AND terms, and the predicate is true iff any clause has all its terms in the document.
+
+def evaluate_predicate(words: set[str], predicate: str) -> bool:
+    for clause in predicate.split("||"):
+        terms = [t.strip() for t in clause.split("&&")]
+        if not all(terms):
+            continue
+        if all(t in words for t in terms):
+            return True
+    return False
+
+
+The check_contains method becomes a one-liner:
+
+def check_contains(self, filename: str, predicate: str) -> str:
+    if filename not in self.documents:
+        return "ERROR"
+    return "true" if evaluate_predicate(self.documents[filename], predicate) else "false"
+
+
+The dispatcher from Part 1 is unchanged, since CHECK_CONTAINS already passed the full predicate string through to the method.
+
+Why DNF parsing works here: because && has higher precedence than || and there are no parentheses, every predicate is structurally (term && term && ...) || (term && term && ...) || .... Splitting on the lower-precedence operator first, then on the higher-precedence operator, recovers exactly that structure with no recursion needed.
+
+Stretch extension: if the interviewer adds parentheses or a ! operator, the linear-split approach breaks down. The standard fix is a recursive descent parser with three levels (or_expr -> and_expr ('||' and_expr)*, and_expr -> unary ('&&' unary)*, unary -> '!'? term | '(' or_expr ')'). Most interviewers stop before that point.
+
+Complexity: O(T) where T is the total number of terms in the predicate.
+
+Part 3: GET_ALL_FILES with an Inverted Index
+Problem Statement
+
+GET_ALL_FILES <predicate>
+
+Return the names of every stored document whose contents satisfy the predicate. The predicate uses the same grammar as Part 2.
+
+Print the matching filenames in lexicographic order, joined with commas and no spaces. Print None if no document matches.
+
+Example
+INSERT_DOC f1 apple banana
+INSERT_DOC f2 banana cherry
+INSERT_DOC f3 cherry date
+GET_ALL_FILES apple
+GET_ALL_FILES banana
+GET_ALL_FILES apple || cherry
+GET_ALL_FILES banana && cherry
+GET_ALL_FILES grape
+
+
+Expected output:
+
+OK
+OK
+OK
+f1
+f1,f2
+f1,f2,f3
+f2
+None
+
+Naive Solution
+
+Reuse evaluate_predicate from Part 2 and run it against every document.
+
+def get_all_files(self, predicate: str) -> str:
+    matches = sorted(
+        name for name, words in self.documents.items()
+        if evaluate_predicate(words, predicate)
+    )
+    return ",".join(matches) if matches else "None"
+
+
+This is correct but scans every document on every query: O(F * T) per call, where F is the number of files and T is the predicate size.
+
+Optimized Solution: Inverted Index
+
+Maintain a second map index: dict[str, set[str]] from word to the set of filenames containing that word. The cost is shifted from query time to insert time. For each AND clause, intersect the relevant posting lists; union the per-clause results to handle the OR.
+
+class Server:
+    def __init__(self) -> None:
+        self.documents: dict[str, set[str]] = {}
+        self.index: dict[str, set[str]] = {}
+
+    def insert_doc(self, filename: str, words: list[str]) -> str:
+        if not words or filename in self.documents:
+            return "ERROR"
+        unique = set(words)
+        self.documents[filename] = unique
+        for w in unique:
+            self.index.setdefault(w, set()).add(filename)
+        return "OK"
+
+    def get_all_files(self, predicate: str) -> str:
+        matches: set[str] = set()
+        for clause in predicate.split("||"):
+            terms = [t.strip() for t in clause.split("&&")]
+            if not all(terms):
+                continue
+            postings = [self.index.get(t, set()) for t in terms]
+            clause_match = set.intersection(*postings) if postings else set()
+            matches |= clause_match
+        if not matches:
+            return "None"
+        return ",".join(sorted(matches))
+
+
+The check_contains method from Part 2 is unchanged: it still reads from self.documents and uses evaluate_predicate. Only insert_doc and the new get_all_files touch the inverted index.
+
+Why this is faster: instead of touching every document, the query only touches the posting lists of the words that appear in the predicate. For an AND clause with terms t1, t2, ..., tk, intersecting in increasing posting-list size order keeps the running intersection small. Sorting the postings by len() before the set.intersection call is the standard production tweak; we omit it here for clarity.
+
+Dispatcher update for both CHECK_CONTAINS and GET_ALL_FILES:
+
+elif line.startswith("CHECK_CONTAINS "):
+    _, filename, predicate = line.split(maxsplit=2)
+    print(server.check_contains(filename, predicate))
+elif line.startswith("GET_ALL_FILES "):
+    _, predicate = line.split(maxsplit=1)
+    print(server.get_all_files(predicate))
+
+
+Complexity:
+
+INSERT_DOC is O(W) per call (constant work per word).
+GET_ALL_FILES is O(sum of posting-list sizes for the predicate's terms), typically much smaller than F.
+Followup: Distributed System Design
+Sharding
+
+Two natural sharding strategies, with opposite trade-offs:
+
+Shard by document ID (filename). Hash the filename and route INSERT_DOC and per-file CHECK_CONTAINS to a single shard. Writes and per-file lookups are cheap. The cost lands on GET_ALL_FILES, which has to fan out to every shard, run the local query, and merge filenames at the coordinator.
+
+Shard by term (inverted-index partitioning). Hash each word in the index and store its posting list on one shard. GET_ALL_FILES for a small predicate touches only a handful of shards. The cost lands on INSERT_DOC: a document with W words triggers W cross-shard writes.
+
+Most production search systems use document sharding because writes are far more frequent than GET_ALL_FILES calls, and total system throughput scales linearly with the number of shards. Use consistent hashing on the filename so adding or removing shards only re-routes a small slice of the keyspace.
+
+Replication
+
+Inside each shard, run a leader and two followers (replication factor 3). Writes go to the leader and replicate synchronously or asynchronously to followers depending on the durability requirement. Reads for CHECK_CONTAINS and GET_ALL_FILES can hit any follower, which gives extra read throughput at the cost of read-your-writes lag on async replicas.
+
+Consistency
+
+If a client must see its own writes, route subsequent reads to the leader, or attach a write-version token that followers compare against before serving. For most search workloads, eventual consistency is acceptable: a document that lands a few seconds late in GET_ALL_FILES is rarely a correctness problem.
+
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Problem Overview
+Command Summary
+Predicate Grammar
+Part 1: and OR-only
+Problem Statement
+Example
+Solution
+Part 2: Full Boolean Predicates
+Problem Statement
+Example
+Solution
+Part 3: with an Inverted Index
+Problem Statement
+Example
+Naive Solution
+Optimized Solution: Inverted Index
+Followup: Distributed System Design
+Sharding
+Replication
+Consistency
+Related discussions · 1
+🔑雪花 梯批诶斯 2轮背靠背
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Transactional KV Store
+Low
+data-structure
+hashmap
+hard
++3
+Serialize and Deserialize Dictionary Trie
+Single report
+parsing
+data-structure
+trie
++2
+Filter System with Dynamic Blacklist
+Single report
+hashmap
+data-structure
+oop-design
++3
+Find Median from Data Stream
+Single report
+data-structure
+hard
+heap
++1
+Distributed Tree Node Count
+Single report
+distributed-systems
+hard
+tree
++2
+Code editor

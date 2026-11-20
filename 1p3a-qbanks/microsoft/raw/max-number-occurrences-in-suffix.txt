@@ -1,0 +1,48 @@
+===H1===
+Maximum-Value Frequency in Array Suffixes
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/max-number-occurrences-in-suffix
+===BODY===
+Microsoft
+CodingMembers
+Maximum-Value Frequency in Array Suffixes
+Given `nums` and query indices, return for each index how many times the maximum value of that suffix appears. Two independent MAI interviews used the same example and contract.
+MLE
+SWE
+array
+easy
+Frequency
+Low
+Last asked
+2026-08-26
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Given an integer array nums and an array of query indices query, produce one answer per query. For each query[i] = idx, consider the suffix nums[idx:], find its maximum value, and return the number of times that maximum occurs in the suffix.
+
+Examples
+
+nums  = [7, 5, 7, 2, 7]
+query = [0, 1, 2, 3, 4]
+output = [3, 2, 2, 1, 1]
+
+Notes
+
+The prompt has appeared in both MAI phone-screen and onsite coding rounds. State the preprocessing and per-query complexity explicitly; recomputing the maximum and its frequency independently for every suffix leaves avoidable repeated work.
+
+Scan nums from right to left while maintaining the maximum value seen and its count. At index i, replace the maximum and reset the count to one when nums[i] is larger, increment the count when it is equal, and otherwise leave both unchanged; store the current count as the answer for suffix i. Each query then becomes one array lookup. Preprocessing takes O(n) time and O(n) space, all queries take O(q) time, and the empty-input or out-of-range-index behavior should be clarified before implementation.
+
+Preparation
+
+Implement the right-to-left preprocessing in one pass and trace strictly increasing, strictly decreasing, all-equal, negative-only, and duplicate-maximum arrays.
+
+Compare the O(n + q) solution with an O(nq) per-query scan and state exactly what the suffix table stores.
+
+Add tests for repeated query indices and clarify whether invalid indices are rejected, ignored, or assigned a sentinel result.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

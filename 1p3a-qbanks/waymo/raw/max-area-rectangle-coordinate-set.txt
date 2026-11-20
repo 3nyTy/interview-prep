@@ -1,0 +1,53 @@
+===H1===
+Maximum-Area Axis-Aligned Rectangle from a Coordinate Set
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/max-area-rectangle-coordinate-set
+===BODY===
+Waymo
+Coding·45 minMembers
+Maximum-Area Axis-Aligned Rectangle from a Coordinate Set
+Onsite coding: given a set of `(x, y)` integer points, find the maximum-area axis-aligned rectangle whose four corners are all in the set. Variant of LeetCode 939 (Minimum Area Rectangle) with the objective flipped from min to max.
+SWE
+array
+hashmap
+set
+hard
+Frequency
+Single report
+Last asked
+2026-04-24
+Stage
+onsite-coding
+Requirements
+
+Input: a list of (x, y) integer coordinate pairs.
+
+Find the axis-aligned rectangle of maximum area whose four corners are all present in the input set.
+
+Return 0 if no rectangle exists.
+
+Notes
+
+Reduce to LC 939's structure: group points by x to get a Map<x, Set<y>>. For each pair of distinct x columns (x1, x2), intersect their y-sets — every common y pair (y1, y2) defines a rectangle of area |x2 - x1| · |y2 - y1|.
+
+For a pair of columns, the maximum (y2 - y1) over common y-values is max(common) - min(common) — compute it once per column pair instead of enumerating all y pairs.
+
+Complexity: with C distinct x columns and average column height H, the naive enumeration is O(C² · H). Pre-sort each y-set; intersect via a two-pointer walk in O(H) per pair.
+
+Heuristic prune: sort x-columns by descending (y_max - y_min); bail early when no further pair can exceed the current best area.
+
+Edge case: degenerate rectangles (zero width or height) are rejected by the LC 939 family — confirm with the interviewer whether degenerate cases count before coding.
+
+Preparation
+
+Drill LC 939 (Minimum Area Rectangle) so the Map<x, Set<y>> reduction is automatic; the max variant flips a min to a max and adds the per-pair extremum trick.
+
+Practice the two-pointer set intersection on sorted lists.
+
+Prepare to argue complexity carefully — interviewers in this round paused to verify the candidate could explain why O(C² · H) is acceptable on practical inputs.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

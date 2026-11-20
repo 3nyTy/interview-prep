@@ -1,0 +1,70 @@
+===H1===
+System Design: Simulation Log Collection and Result Aggregation
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/sd-simulation-log-aggregation
+===BODY===
+Waymo
+System Design·60 minMembers
+System Design: Simulation Log Collection and Result Aggregation
+Onsite system design: build a system that collects logs from large-scale autonomous-driving simulations and aggregates them into evaluation metrics. Cross-cutting follow-up: how do you reconcile the abundance of simulation data against the relative scarcity of real-world fleet data?
+MLE
+SWE
+Infra Eng
+data-engineering
+etl
+evaluation
+storage
+scaling
+calibration
+hard
+Frequency
+Single report
+Last asked
+2026-04-23
+Stage
+onsite-system-design
+Requirements
+
+Inputs: per-simulation-run log streams from a fleet of simulation workers (vehicle state, perception outputs, planner decisions, collision flags).
+
+Outputs: aggregated metrics per (scenario cluster, model version), with the ability to drill down to individual runs.
+
+Scale: thousands to millions of simulation runs per day, each emitting MB to GB of structured data.
+
+Cross-cutting: a fact-of-life that simulation produces orders of magnitude more data than the real fleet — design the metric pipeline so on-road data isn't drowned out.
+
+Notes
+
+Ingestion. Workers write per-run logs to object storage (one folder per run, partitioned by date + scenario cluster). Emit a lightweight summary record per run (metric snapshot, scenario id, model version, success flag) to a streaming bus (Kafka / PubSub). The full logs stay cold; summaries drive the live dashboards.
+
+Schema. Use a versioned schema (Protobuf / Avro) for both raw logs and summary records. Encode the model version, simulator version, and scenario library version as first-class fields so every record is self-describing.
+
+Aggregation. Batch ETL job (Spark / Beam) consumes summary records, aggregates by (scenario cluster, model version), materializes into a metric warehouse. Compute confidence intervals using bootstrap over runs within a cluster, weighted by the cluster's importance prior.
+
+Storage tiering. Hot tier (last 14 days, full logs accessible) backed by SSD-backed object storage. Cold tier (90+ days) compressed and archived; rehydration is on-demand for incident investigation.
+
+Sim-vs-real reconciliation. Maintain two metric pipelines: one for simulation, one for on-road fleet data. Treat simulation metrics as a strong prior, on-road metrics as the truth signal. The composite gate for model promotion requires (a) simulation metrics within bounds across a broad scenario library, and (b) on-road metrics within tolerance on a smaller, real-world test corpus.
+
+Calibration. Track per-scenario sim-to-real gap as a first-class metric: for each scenario class, compare simulator outputs against the closest matching real-world drives. Alarm when the gap widens.
+
+Querying. Notebook-driven analysis on the metric warehouse (Trino / BigQuery). Pre-compute the top 20 most-watched dashboards as materialized views to avoid ad-hoc full-table scans.
+
+Replay-after-fix. When a simulator bug is identified, mark affected runs as poisoned; re-run only the affected scenario classes against the patched simulator; merge the patched results back into the metric warehouse.
+
+Operational hooks. Per-run cost telemetry, per-scenario throughput, queue depth. Alarm on stalled workers and on metric-pipeline lag.
+
+Preparation
+
+Sketch the worker → object storage → streaming bus → ETL → metric warehouse pipeline before the round.
+
+Pre-stage answers for the sim-vs-real reconciliation question — the deep-dive consistently lands here.
+
+Memorize the schema versioning argument: version model, simulator, scenario library independently; treat each version as a first-class dimension in the aggregate.
+
+Read one applied ML-evaluation pipeline writeup (offline → A/B → guardrail metrics) to borrow the staged-promotion structure.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

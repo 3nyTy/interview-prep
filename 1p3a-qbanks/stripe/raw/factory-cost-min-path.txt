@@ -1,0 +1,102 @@
+===H1===
+Factory Cost — Min-Cost Path Across Layers
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/factory-cost-min-path
+===BODY===
+Stripe
+Coding·45 minMembers
+Factory Cost — Min-Cost Path Across Layers
+Phone-screen DP/graph problem. Each row of a 2D grid represents a factory type; each element is a single factory with `(distance_from_origin, build_cost)`. Pick one factory per type to minimize total cost, eventually including inter-factory transit distance with arbitrary layer count.
+SWE
+dp
+graph
+medium
+Frequency
+Single report
+Last asked
+2026-04-15
+Stage
+phone-screen
+Requirements
+
+Input: a list of production stages; each stage is a list of factory choices, and each choice is [build_cost, position] where position is a location on a 1D railway line.
+
+Goal: choose exactly one factory per stage to minimize the total cost. Total cost = sum of chosen build_cost + sum of transit costs between consecutive chosen factories.
+
+Transit cost between two consecutive stages is the absolute distance of their positions: |position_current - position_next|. The first stage incurs no inbound transit.
+
+Part 1: minimize the sum of build_cost only (positions are irrelevant / transit is free). Greedy — take the cheapest factory in each stage.
+
+Part 2: add inter-factory transit cost. The grid has exactly 3 layers in this part — the prompt explicitly limits depth so candidates don't over-engineer.
+
+Part 3: same as Part 2 but the number of layers is unbounded. Standard DP across layers (no fixed per-stage loops).
+
+Part 4: you must skip exactly one stage. When a stage is skipped, the transit cost is measured across the gap — between the stage before the gap and the stage after it. Try skipping every stage and take the minimum.
+
+def find_minimum_cost(stages: list[list[list[int]]]) -> int: ...
+    # stages[i] is a list of [build_cost, position] choices for stage i.
+    # Returns the lowest achievable total = sum(build_cost) + sum(|pos_i - pos_{i+1}|).
+    # Part 1: positions ignored. Empty stages -> 0.
+
+def find_minimum_cost_skip_one(stages: list[list[list[int]]]) -> int: ...
+    # Same total-cost rule but exactly one stage must be removed before selecting.
+    # Transit is measured across the gap (before-stage -> after-stage).
+    # n <= 1 -> 0 (nothing left to connect, so transit is 0).
+
+Examples
+
+Part 1: stages = [[[10,0],[20,0],[35,0]], [[35,0],[50,0],[25,0]], [[30,0],[5,0],[40,0]]] → 40 (pick 10 + 25 + 5).
+
+Part 2: stages = [[[100,2],[50,0],[30,1]], [[100,1],[20,2],[10,5]], [[10,1],[12,1],[5,3]]] → 51 (build 30+10+5=45, transit |1-5|+|5-3|=6).
+
+Part 4: stages = [[[10,0],[20,2]], [[100,5]], [[15,1],[25,3]], [[5,2],[15,0]]] → 32 (skip the expensive stage 1: pick [10,0]→[15,1]→[5,2], build 30, transit |0-1|+|1-2|=2).
+
+Notes
+
+The interviewer's hint per the source: do not assume Part 3 in Part 2 — pick the obvious O(n*m^2) DP only when layers go unbounded.
+
+One report finished Part 1 and Part 2, ran out of time on Part 3, and was rejected with feedback that emphasized code readability over optimality.
+
+For Part 3, the canonical DP is dp[i][j] = build_cost[i][j] + min_{k≠j}(dp[i-1][k] + transit(i-1,k → i,j)). If transit is independent of column choice it collapses to min(dp[i-1]) and you can keep only the two smallest values of the previous row, giving O(n·m) time and O(1) extra space — a useful optimization to mention even if you implement the straightforward O(n·m²) version under time pressure.
+
+Branch-and-bound pruning for the brute-force / backtracking path
+
+Backtracking is an acceptable Part 3 first cut before reaching for DP: pick a factory, recurse into the next stage carrying the running cost and previous position. It is O(m^n) worst case but trivially correct, so it doubles as an oracle for testing the DP.
+
+Prune aggressively: pass the best total found so far and return early whenever the partial current_cost already meets or exceeds it (if current_cost >= best: return). The same prune applies to the Part 2 nested-loop brute force — if the accumulated build cost alone already beats the running best, abandon that combination. This keeps the exponential search tractable on the small grids the early parts use and is a clean point to articulate before switching to DP.
+
+Corner cases to confirm
+
+Empty stages list → 0. A stage with a single factory is forced. All factories equal cost is fine.
+
+Part 4 with only 2 stages: skipping one leaves a single stage, so transit is 0. Confirm whether the first or last stage may be skipped (usually yes).
+
+Clarify before coding: are positions always non-negative? May two factories share a position? Is there a cap on factories per stage?
+
+Part 4 optimization — prefix/suffix
+
+Naively re-running the Part-3 DP for each of the n skip choices is O(n) DP passes. Instead precompute a forward (prefix) DP and a backward (suffix) DP over the stages, then for each skipped stage s combine the best cost reaching s-1 with the best cost from s+1, paying the single across-gap transit between the chosen factories — turning the repeated recomputation into a constant-work combine per skip.
+
+Part 1 lower bound
+
+Part 1's O(n·m) scan is optimal: you must inspect every factory to know the per-stage minimum, and sorting (O(m log m)) is strictly worse. A clean talking point if asked whether Part 1 can be sped up.
+
+Preparation
+
+Drill min-cost-path DPs where the cost has both a per-node and a per-transition component.
+
+Practice writing both BFS-with-state and DP-across-rows for layered graphs.
+
+Be explicit when you switch from greedy/brute-force to DP — interviewers want to see the trade-off articulated.
+
+Drill the "min falling path with the no-same-column constraint" pattern: track (smallest_value, smallest_idx, second_smallest_value) of the previous row, so each new row's update is O(m) instead of O(m²). That trick is the difference between a clean Part 3 and one that times out on tight grids.
+
+Write a 6-line O(n·m²) brute DP first and run it on a tiny grid to confirm correctness, then layer the two-smallest optimization on top. Practising the staged refactor is the actual interview skill here.
+
+For Part 4, practise the prefix+suffix "remove one element and stitch the gap" pattern so you can answer the skip variant without an O(n)-pass rerun.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

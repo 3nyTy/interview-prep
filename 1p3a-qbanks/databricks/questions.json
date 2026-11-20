@@ -1,0 +1,1215 @@
+{
+  "company": "databricks",
+  "display_name": "Databricks",
+  "qbank_count": 35,
+  "questions_scraped": 35,
+  "site_total_count": 159,
+  "oj_count": 88,
+  "external_count": 36,
+  "description": "Databricks interviews are unusually bank-driven: candidates who know the recurring prompt families often recognize the round within the first few minutes. The loop mixes algorithmic coding with low-level systems and product-grounded design, then puts real weight on behavioral, hiring-committee, and reference signals after the technical rounds.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/databricks",
+  "scraped_at": "2026-09-20",
+  "source": "1point3acres qbank (logged-in session)",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "optimal-commute-grid",
+      "title": "Optimal Commute Grid",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "High",
+      "last_asked": "2026-08-31",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "grid",
+        "bfs",
+        "dijkstra",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "grid",
+        "bfs",
+        "dijkstra",
+        "medium"
+      ],
+      "overview": "Find the fastest transportation mode from `S` to `D` in a grid where each cell is a mode, `X` is blocked, and each mode has per-block time and cost. Tie-break on total cost; follow-ups allow turns or mode switching with penalties.",
+      "source_count": 13,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/optimal-commute-grid"
+    },
+    {
+      "n": 2,
+      "slug": "multi-threaded-log-writer",
+      "title": "Multi-Threaded Log Writer",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-08-13",
+      "stage": "onsite-coding · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "io",
+        "concurrency",
+        "threading",
+        "persistence",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "io",
+        "concurrency",
+        "threading",
+        "persistence",
+        "hard"
+      ],
+      "overview": "Design and partially implement a durable event writer shared by thousands of application threads on one server. Each opaque payload is at most 1 KB; follow-ups center on batching, `fsync`, group commit, ordering, and crash recovery.",
+      "source_count": 13,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/multi-threaded-log-writer"
+    },
+    {
+      "n": 3,
+      "slug": "ip-cidr-firewall",
+      "title": "IP / CIDR Firewall",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "High",
+      "last_asked": "2026-08-11",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Free preview",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "bit-manipulation",
+        "interval",
+        "parsing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "bit-manipulation",
+        "interval",
+        "parsing",
+        "medium"
+      ],
+      "overview": "Given an ordered list of IP or CIDR allow / deny rules, return the first matching rule for an input IP. Follow-ups switch the input from a single IP to a CIDR block and ask whether the entire range is allowed after applying ordered rules.",
+      "source_count": 10,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/ip-cidr-firewall"
+    },
+    {
+      "n": 4,
+      "slug": "kv-store-rolling-qps",
+      "title": "KV Store With Rolling QPS",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "High",
+      "last_asked": "2026-08-07",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "in-memory-database",
+        "sliding-window",
+        "rate-limiting",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "in-memory-database",
+        "sliding-window",
+        "rate-limiting",
+        "medium"
+      ],
+      "overview": "Implement an in-memory key-value store with `put` / `get` / sometimes `delete`, plus APIs that return average put/get load or QPS over a rolling time window such as the last five minutes.",
+      "source_count": 14,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/kv-store-rolling-qps"
+    },
+    {
+      "n": 5,
+      "slug": "rle-bit-packing-encoder-decoder",
+      "title": "RLE + Bit-Packing Encoder / Decoder",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-08-13",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "compression",
+        "iterator",
+        "streaming",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "compression",
+        "iterator",
+        "streaming",
+        "medium"
+      ],
+      "overview": "Implement a streaming integer encoder that chooses between run-length encoding and bit-packing, then optionally implement an iterator-style decoder. Edge cases include negative values and integer limits.",
+      "source_count": 7,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/rle-bit-packing-encoder-decoder"
+    },
+    {
+      "n": 6,
+      "slug": "file-encryption-tree-optimization",
+      "title": "File Encryption Tree Optimization",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Medium",
+      "last_asked": "2026-08-11",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "tree",
+        "dp",
+        "filesystem",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "tree",
+        "dp",
+        "filesystem",
+        "medium"
+      ],
+      "overview": "Traverse a file-system tree to count encrypted vs unencrypted files, then choose the minimum-cost set of file-level or directory-level encryption calls.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/file-encryption-tree-optimization"
+    },
+    {
+      "n": 7,
+      "slug": "tic-tac-toe-generalized",
+      "title": "Generalized Tic-Tac-Toe",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-08-07",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "simulation",
+        "grid",
+        "object-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "simulation",
+        "grid",
+        "object-design",
+        "medium"
+      ],
+      "overview": "Implement tic-tac-toe with custom board dimensions and a custom win length. One intern variant adds a simple AI move by calling a random API.",
+      "source_count": 7,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/tic-tac-toe-generalized"
+    },
+    {
+      "n": 8,
+      "slug": "snapshot-set-iterator",
+      "title": "Snapshot Set / MVCC Iterator",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-26",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "snapshot",
+        "mvcc",
+        "iterator",
+        "data-structure",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "snapshot",
+        "mvcc",
+        "iterator",
+        "data-structure",
+        "medium"
+      ],
+      "overview": "Implement a set or key-value structure with snapshot reads. Values retain version history by snapshot id, and an iterator returns a consistent snapshot view.",
+      "source_count": 6,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/snapshot-set-iterator"
+    },
+    {
+      "n": 9,
+      "slug": "fibonacci-tree-path",
+      "title": "Fibonacci Tree Path",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-07",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "recursion",
+        "math",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "recursion",
+        "math",
+        "medium"
+      ],
+      "overview": "Given a Fibonacci tree order `k` and two preorder node labels `a` and `b`, return the path between those nodes without constructing the exponentially large tree.",
+      "source_count": 7,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/fibonacci-tree-path"
+    },
+    {
+      "n": 10,
+      "slug": "lazy-array",
+      "title": "Lazy Array",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-04-13",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "iterator",
+        "object-design",
+        "testing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "iterator",
+        "object-design",
+        "testing",
+        "medium"
+      ],
+      "overview": "Implement a lazy array abstraction where transformations are recorded and only evaluated when values are read or iterated. Interviewers often focus on how to test laziness, not just functional output.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/lazy-array"
+    },
+    {
+      "n": 11,
+      "slug": "circuit-breaker-pattern",
+      "title": "Implement Circuit Breaker Pattern",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-28",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "circuit-breaker",
+        "state-machine",
+        "concurrency",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "circuit-breaker",
+        "state-machine",
+        "concurrency",
+        "medium"
+      ],
+      "overview": "Design and implement circuit breakers for a database topology with one primary and two secondary replicas. Each server has its own breaker; two consecutive failures move it from CLOSED to OPEN, and requests must fall back to a replica when the primary is unavailable. The operation result is supplied through a lambda-style callback.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/circuit-breaker-pattern"
+    },
+    {
+      "n": 12,
+      "slug": "string-pattern-partition",
+      "title": "String Pattern Partition",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-05-22",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "dp",
+        "parsing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "dp",
+        "parsing",
+        "medium"
+      ],
+      "overview": "Given two strings, represent the target string as a minimum sequence of substrings indexed from the source string. A follow-up deletes one character and asks for the new minimum partition.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/string-pattern-partition"
+    },
+    {
+      "n": 13,
+      "slug": "sql-query-plan-optimizer",
+      "title": "SQL Query Plan Optimizer",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-10",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "sql",
+        "query-optimization",
+        "tree",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "sql",
+        "query-optimization",
+        "tree",
+        "hard"
+      ],
+      "overview": "Given a node-based representation of a SQL query plan, implement optimizer rewrites such as predicate pushdown and make the transformed plan runnable.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/sql-query-plan-optimizer"
+    },
+    {
+      "n": 14,
+      "slug": "maximal-square-and-rectangle",
+      "title": "Maximal Square and Rectangle in Binary Matrix",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2025-11-26",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "dp",
+        "grid",
+        "monotonic-stack",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "dp",
+        "grid",
+        "monotonic-stack",
+        "medium"
+      ],
+      "overview": "Given a binary matrix of 0s and 1s, find the largest all-1s square and return its area, then extend to the largest all-1s rectangle.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/maximal-square-and-rectangle"
+    },
+    {
+      "n": 15,
+      "slug": "house-robber-series",
+      "title": "House Robber Series",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2025-11-18",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "dp",
+        "array",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "dp",
+        "array",
+        "medium"
+      ],
+      "overview": "The House Robber DP family: maximize the sum of values from non-adjacent houses, with follow-ups such as a circular street and a binary-tree variant.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/house-robber-series"
+    },
+    {
+      "n": 16,
+      "slug": "multi-threaded-chat-system",
+      "title": "Multi-Threaded Chat System",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2025-10-24",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "concurrency",
+        "threading",
+        "chat",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "concurrency",
+        "threading",
+        "chat",
+        "medium"
+      ],
+      "overview": "Design and implement a thread-safe, single-machine chat system where multiple clients communicate through channels.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/multi-threaded-chat-system"
+    },
+    {
+      "n": 17,
+      "slug": "revenue-tracking-with-referrals",
+      "title": "Revenue Tracking System with Referrals",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-08-24",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "object-design",
+        "design-implementation",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "object-design",
+        "design-implementation",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Design and implement an in-memory revenue-tracking system that records transactions and supports customer referrals, attributing referred revenue.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/revenue-tracking-with-referrals"
+    },
+    {
+      "n": 18,
+      "slug": "anagrammed-indexof",
+      "title": "Anagrammed indexOf",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-08-19",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "sliding-window",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "sliding-window",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Find the first index in a string where a substring that is an anagram (any permutation) of a query string occurs. Follow-ups probe character counting for UTF-8 / Unicode inputs, edge-case tests, and invalid-input or error-return behavior.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/anagrammed-indexof"
+    },
+    {
+      "n": 19,
+      "slug": "cipher-cover-interval-editing",
+      "title": "Cipher Cover Interval Editing",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-08-13",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "interval",
+        "interval-aggregation",
+        "binary-search",
+        "string",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "interval",
+        "interval-aggregation",
+        "binary-search",
+        "string",
+        "medium"
+      ],
+      "overview": "Given covers — a list of (start, end) intervals into a source string (the 'cipher book') — delete the element at a given flattened index across the covered text. The deletion can split an interval; a follow-up asks to return the simplified cover with all mergeable intervals merged.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/cipher-cover-interval-editing"
+    },
+    {
+      "n": 20,
+      "slug": "randomly-connect-node-groups",
+      "title": "Uniformly Connect Node Groups",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Low",
+      "last_asked": "2026-05-05",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "graph",
+        "sampling",
+        "math",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "graph",
+        "sampling",
+        "math",
+        "hard"
+      ],
+      "overview": "Given several connected components, return a random minimum-size edge set that connects all groups into one connected graph, with the edge set sampled uniformly from all valid solutions.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/randomly-connect-node-groups"
+    },
+    {
+      "n": 21,
+      "slug": "linear-regression-gradient-descent",
+      "title": "Linear Regression Gradient Descent",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-04-17",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "linear-regression",
+        "gradient-descent",
+        "numpy",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "linear-regression",
+        "gradient-descent",
+        "numpy",
+        "medium"
+      ],
+      "overview": "Hand-code gradient descent for simple linear regression using MSE loss, then discuss learning rate, early stopping, convergence bugs, and project / ML-design follow-ups.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/linear-regression-gradient-descent"
+    },
+    {
+      "n": 22,
+      "slug": "book-seller-external-fanout",
+      "title": "Book Seller External Fan-Out",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-08-13",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "api-integration",
+        "fan-out",
+        "caching",
+        "idempotency",
+        "circuit-breaker",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "api-integration",
+        "fan-out",
+        "caching",
+        "idempotency",
+        "circuit-breaker",
+        "medium"
+      ],
+      "overview": "Design a broker that fans out an ISBN, bid price, and payment method to partner bookstores, selects the lowest available price, and orders or returns the best quote. An alternate storefront form covers browse/search, inventory, checkout, payment, and order management within the marketplace itself.",
+      "source_count": 9,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/book-seller-external-fanout"
+    },
+    {
+      "n": 23,
+      "slug": "slack-chat-system",
+      "title": "Chat system similar to Slack",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Medium",
+      "last_asked": "2026-07-30",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "chat",
+        "messaging",
+        "system-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "chat",
+        "messaging",
+        "system-design",
+        "medium"
+      ],
+      "overview": "Design a Slack-like chat system from APIs through storage. Deep dives include message and conversation deletion for online and offline users, cache placement and partitioning, cache-miss behavior, and application-memory versus shared-cache trade-offs.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/slack-chat-system"
+    },
+    {
+      "n": 24,
+      "slug": "in-memory-kv-cache-with-wal",
+      "title": "In-Memory KV Cache With WAL",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-28",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "in-memory-database",
+        "persistence",
+        "concurrency",
+        "caching",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "in-memory-database",
+        "persistence",
+        "concurrency",
+        "caching",
+        "medium"
+      ],
+      "overview": "Design a single-machine in-memory cache for a web service, then add persistence with a write-ahead log and discuss scaling via sharding and lock-contention reduction.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/in-memory-kv-cache-with-wal"
+    },
+    {
+      "n": 25,
+      "slug": "distributed-file-system",
+      "title": "Distributed File System",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-05-15",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "distributed-systems",
+        "filesystem",
+        "storage",
+        "data-modeling",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "distributed-systems",
+        "filesystem",
+        "storage",
+        "data-modeling",
+        "medium"
+      ],
+      "overview": "Design the metadata layer of a distributed file system supporting create-directory, list, put / get file, delete, and a recursive hierarchy. The defining requirement is strong consistency: a list must immediately reflect prior puts (unlike eventually-consistent S3). Blob storage is assumed to exist.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/distributed-file-system"
+    },
+    {
+      "n": 26,
+      "slug": "stock-trading-agent",
+      "title": "Stock Trading Agent Service",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-04-06",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "trading",
+        "api-integration",
+        "idempotency",
+        "queueing",
+        "circuit-breaker",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "trading",
+        "api-integration",
+        "idempotency",
+        "queueing",
+        "circuit-breaker",
+        "medium"
+      ],
+      "overview": "Design an intermediary service between clients and a third-party broker API. Clients submit buy/sell orders with a deadline; the service forwards them, polls status until filled, and auto-cancels unfilled orders at the deadline. The crux is tracking thousands of deadlines and absorbing spikes when many orders expire at once.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/stock-trading-agent"
+    },
+    {
+      "n": 27,
+      "slug": "job-scheduler-with-dependencies",
+      "title": "Job Scheduler With Dependencies",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-04-02",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "scheduling",
+        "topological-sort",
+        "queueing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "scheduling",
+        "topological-sort",
+        "queueing",
+        "medium"
+      ],
+      "overview": "Design a low-level scheduler where each job contains tasks with dependencies. The interviewer expects task-state modeling, dependency execution order, retries, and worker scheduling.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/job-scheduler-with-dependencies"
+    },
+    {
+      "n": 28,
+      "slug": "network-throttling-system",
+      "title": "Design a Network Throttling System",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2025-11-20",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "rate-limiting",
+        "throttling",
+        "scaling",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "rate-limiting",
+        "throttling",
+        "scaling",
+        "medium"
+      ],
+      "overview": "Design a throttling system for serving infrastructure handling both internal and external users, covering per-user and global rate limits, fairness, and overload protection.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/network-throttling-system"
+    },
+    {
+      "n": 29,
+      "slug": "ad-marketplace-system",
+      "title": "Design an Ad Marketplace System",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2025-11-05",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "ads",
+        "scaling",
+        "system-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "ads",
+        "scaling",
+        "system-design",
+        "medium"
+      ],
+      "overview": "Design a scalable ad marketplace connecting publisher websites with ad providers, covering bidding, matching, serving, and budget accounting.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/ad-marketplace-system"
+    },
+    {
+      "n": 30,
+      "slug": "payment-gateway-system",
+      "title": "Payment Gateway System",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2025-10-30",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "payment",
+        "idempotency",
+        "transactions",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "payment",
+        "idempotency",
+        "transactions",
+        "medium"
+      ],
+      "overview": "Design a payment gateway supporting multiple credit and bank card types, covering authorization, capture, retries, idempotency, and failure handling.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/payment-gateway-system"
+    },
+    {
+      "n": 31,
+      "slug": "waymo-ride-hailing-app",
+      "title": "Design an Autonomous Vehicle Ride-Hailing App (Waymo-like)",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2025-10-09",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "product-design",
+        "location",
+        "system-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "product-design",
+        "location",
+        "system-design",
+        "medium"
+      ],
+      "overview": "Design a user-facing autonomous-vehicle ride-hailing app (Waymo-like): request a ride, match a vehicle, track the trip, and handle lifecycle and edge cases.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/waymo-ride-hailing-app"
+    },
+    {
+      "n": 32,
+      "slug": "harmful-content-detection-ml-design",
+      "title": "Harmful Content Detection ML Design",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-08-11",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "mlsd",
+        "moderation",
+        "ai-safety",
+        "evaluation",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "mlsd",
+        "moderation",
+        "ai-safety",
+        "evaluation",
+        "medium"
+      ],
+      "overview": "Design an ML system to detect harmful LLM content. The LLM-focused form is broader than social-media moderation and expects both classical integrity considerations and LLM-specific concerns across data, evaluation, deployment, and policy trade-offs.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/harmful-content-detection-ml-design"
+    },
+    {
+      "n": 33,
+      "slug": "collaborative-playlist-design",
+      "title": "Collaborative Playlist Design",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Low · New",
+      "last_asked": "2026-07-30",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "frontend",
+        "data-modeling",
+        "api-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "frontend",
+        "data-modeling",
+        "api-design",
+        "medium"
+      ],
+      "overview": "Design a shared playlist app — add, remove, and reorder songs — that multiple users edit collaboratively. Distributed scale is explicitly out of scope: the round is scored on data modeling for the ordered song list and on API / event design for propagating one user's edits to the others. The same prompt covers both the frontend screen and the onsite frontend system-design round.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/collaborative-playlist-design"
+    },
+    {
+      "n": 34,
+      "slug": "swe-behavioral-round",
+      "title": "SWE / MLE Behavioral Round",
+      "category": "behavioral",
+      "duration": null,
+      "frequency": "Medium · New",
+      "last_asked": "2026-08-13",
+      "stage": "onsite-bq",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "why-company",
+        "deep-dive",
+        "conflict",
+        "culture-fit"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "why-company",
+        "deep-dive",
+        "conflict",
+        "culture-fit"
+      ],
+      "overview": "Prepare for motivation, proud-project impact, project delays, difficult team pain points, feedback or technical disagreements, and cross-functional collaboration. Answers should make individual ownership, judgment, and measurable outcomes explicit.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/swe-behavioral-round"
+    },
+    {
+      "n": 35,
+      "slug": "senior-fde-recruiter-screen",
+      "title": "Senior FDE Recruiter Screen",
+      "category": "behavioral",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-07-21",
+      "stage": "recruiter-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "why-company",
+        "fit",
+        "culture-fit",
+        "verbal"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "why-company",
+        "fit",
+        "culture-fit",
+        "verbal"
+      ],
+      "overview": "The recruiter asks for the candidate's exact city, why they applied to the FDE role, why their background fits it, and how well they understand Databricks before opening the call for candidate questions.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/databricks/senior-fde-recruiter-screen"
+    }
+  ]
+}

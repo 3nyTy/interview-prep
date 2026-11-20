@@ -1,0 +1,131 @@
+===H1===
+K Shuttle Pickup Locations
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/k-shuttle-pickup-locations
+===BODY===
+Uber
+CodingMembers
+K Shuttle Pickup Locations
+Given the coordinates of N people, choose K shuttle pickup locations so the total L1 distance from each person to their nearest pickup location is minimized. This is the k-median objective under Manhattan distance, where the best center of a fixed cluster is the coordinate-wise median.
+SWE
+MLE
+clustering
+k-median
+greedy
+math
+optimization
+medium
+Frequency
+Single report
+Last asked
+2026-01-24
+Stage
+onsite-coding
+K Shuttle Pickup Locations
+
+Problem Overview
+
+You are given the coordinates of N people and asked to choose K shuttle pickup locations so that the total distance from each person to their nearest pickup location is minimized. The distance metric is L1 distance:
+
+dist((x1, y1), (x2, y2)) = |x1 - x2| + |y1 - y2|
+
+This is the k-median objective under Manhattan distance. A candidate is expected to recognize two key facts:
+
+each rider should be assigned to the nearest pickup location
+
+for a fixed cluster of riders, the best L1 center is given by the coordinate-wise median
+
+The interviewer is usually testing whether you can identify the right optimization formulation and propose a practical algorithm, not whether you can brute-force all partitions.
+
+Two useful clarifications:
+
+if K = 1, the exact optimal pickup point is simply the coordinate-wise median of all riders
+
+if K > 1, the full 2D problem is much harder, so a practical iterative algorithm is the realistic interview answer unless the interviewer adds more structure
+
+Recommended Solution
+
+The interview-safe recommendation is an iterative k-medians algorithm:
+
+Initialize K pickup locations.
+
+Assign each rider to the nearest pickup location using L1 distance.
+
+Recompute each pickup location as the median x and median y of the riders assigned to it.
+
+Repeat until the assignments stop changing or the objective no longer improves.
+
+This should be described honestly as a local-search method:
+
+it is the L1 analogue of k-means
+
+it can converge to a local optimum
+
+initialization matters, so multiple restarts are often helpful in practice
+
+Why this works:
+
+under L1 distance, the median minimizes the sum of absolute deviations in one dimension
+
+in 2D, the objective separates into x and y, so the best center for a fixed cluster is (median_x, median_y)
+
+Reference implementation:
+
+from typing import List, Tuple
+
+Point = Tuple[int, int]
+
+def l1(a: Point, b: Point) -> int:
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+def median_value(values: List[int]) -> int:
+    values = sorted(values)
+    return values[len(values) // 2]
+
+def cluster_median(points: List[Point]) -> Point:
+    xs = [x for x, _ in points]
+    ys = [y for _, y in points]
+    return median_value(xs), median_value(ys)
+
+def k_shuttle_pickups(points: List[Point], k: int, max_iters: int = 50) -> List[Point]:
+    if k <= 0 or k > len(points):
+        raise ValueError("k must be between 1 and len(points)")
+
+    centers = points[:k]
+
+    for _ in range(max_iters):
+        clusters = [[] for _ in range(k)]
+
+        for point in points:
+            best_idx = min(range(k), key=lambda i: l1(point, centers[i]))
+            clusters[best_idx].append(point)
+
+        new_centers = []
+        for i in range(k):
+            if clusters[i]:
+                new_centers.append(cluster_median(clusters[i]))
+            else:
+                new_centers.append(centers[i])
+
+        if new_centers == centers:
+            break
+        centers = new_centers
+
+    return centers
+
+The per-iteration cost is O(NK) for assignment plus the cost of recomputing medians, which is typically O(N log N) total if you sort cluster coordinates directly. In practice, that is usually good enough for an interview discussion.
+
+The most important caveat is optimality: the full 2D k-median problem is not something you should pretend to solve exactly with a tiny amount of code. A strong answer says this clearly:
+
+if the interviewer wants a scalable practical solution, use iterative k-medians
+
+if they simplify the problem to 1D, then an exact dynamic programming solution becomes much more plausible
+
+if pickup locations must be snapped to existing rider locations or intersections, replace medians with the allowed representative point that gives the best cluster cost
+
+That combination of correct formulation, correct update rule, and honest discussion of trade-offs is usually what the interviewer is looking for.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

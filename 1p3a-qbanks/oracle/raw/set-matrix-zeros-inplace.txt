@@ -1,0 +1,81 @@
+===H1===
+Set Matrix Zeros (in-place)
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/set-matrix-zeros-inplace
+===BODY===
+Oracle
+Coding·30 minFree preview
+Set Matrix Zeros (in-place)
+Given a 2D integer matrix, set every cell sharing a row or column with a zero to zero, in place. Asked as the coding portion of an OCI IC4 phone screen with two follow-ups: handle ragged (non-rectangular) input, and generalise to char[][] with an arbitrary marker value.
+SWE
+Infra Eng
+array
+grid
+hashmap
+medium
+Frequency
+Single report
+Last asked
+2025-09-11
+Stage
+phone-screen
+Requirements
+
+Input: a 2-D integer matrix that may contain multiple zeros.
+
+Output: the same matrix mutated in place so that, for every original zero at (i, j), every cell in row i and every cell in column j is set to zero.
+
+The mutation must happen on the input array; allocating a parallel output matrix is not accepted.
+
+Multiple zeros must be handled correctly (cells already marked zero from one source row must not propagate further to a different row's column scan — the original zero positions are the only sources).
+
+Follow-ups:
+
+Input is a ragged (jagged) 2-D structure where rows have different lengths. Generalise the algorithm so it does not depend on a fixed n from arr[0].length.
+
+Generalise the matrix element type to char[][] (or T[][] via generics) and the marker to a parameter — e.g. set every cell sharing a row/column with 'z' to 'z'.
+
+Examples
+
+Input:
+  [[5, 6, 8],
+   [2, 9, 1],
+   [3, 0, 7]]
+
+Output:
+  [[5, 0, 8],
+   [2, 0, 1],
+   [0, 0, 0]]
+
+Ragged follow-up:
+
+Input:
+  [[5, 6],
+   [2, 9, 1],
+   [3, 0, 7]]
+
+Notes
+
+The straightforward two-pass solution uses two sets (zeroRows, zeroCols) populated in a first traversal; a second traversal sets arr[i][j] = 0 whenever i in zeroRows || j in zeroCols. O(m + n) extra space.
+
+An O(1)-extra-space variant uses the first row and first column of the matrix as the marker arrays, with two boolean flags for whether the first row / column themselves originally contained a zero. This is the canonical LeetCode 73 solution and is usually accepted when proposed as the "can we do better than O(m+n) space" follow-up.
+
+For the ragged follow-up, do not cache n = arr[0].length outside the inner loop. Recompute arr[i].length in the column loop for that specific row. The row-set approach extends without further changes; the in-place first-row/column trick requires more care because there is no longer a uniformly long first row.
+
+For the generic-type follow-up, parameterise the cell type with T (Java generics) or accept Comparable element types and the marker as a method parameter; the algorithm is unchanged. Interviewers tend to want explicit generic syntax (<T>) rather than ad-hoc overload variants.
+
+Preparation
+
+Drill the two-set solution from scratch in under 10 minutes; then drill the O(1)-extra-space variant separately.
+
+Practise restating the prompt by writing an explicit input/output example before coding — this is the typical mid-round check Oracle interviewers run.
+
+Be ready to discuss the generic-type follow-up clearly: "the algorithm doesn't care about the cell type, only equality with the marker — I'll lift int and 0 into a type parameter T and a constructor argument marker."
+
+Equivalent to LeetCode 73 ("Set Matrix Zeroes"). Solve LC 73 once, then practise the ragged-input variant by hand.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

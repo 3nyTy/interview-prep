@@ -1,0 +1,89 @@
+===H1===
+Phone Screen: First Customer Who Visited Only Once
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/phone-screen-first-unique-visitor
+===BODY===
+Uber
+Coding·60 minMembers
+Phone Screen: First Customer Who Visited Only Once
+Recurring phone-screen OOD prompt. A website receives a stream of `visit(customer_id)` events. Support two operations: `visit(id)` (record a visit) and `firstUniqueVisitor()` (return the earliest customer who has visited exactly once so far). Both should be efficient.
+SWE
+data-structure
+hashmap
+oop-design
+medium
+Frequency
+Medium
+Last asked
+2026-07-01
+Stage
+phone-screen
+Requirements
+
+visit(customer_id) — record that the given customer visited the website. Multiple visits by the same customer are possible.
+
+firstUniqueVisitor() — return the earliest visited customer who has visited exactly once so far. If none, return null / sentinel.
+
+Both operations should run in O(1) amortized; firstUniqueVisitor() must be constant time, not a scan.
+
+Notes
+
+Use a doubly-linked list holding customer IDs in arrival order, plus a hashmap id → node and a hashmap id → visitCount.
+
+On first visit: append a new node, store the pointer in the map, count = 1.
+
+On subsequent visit: remove the node from the linked list (using the stored pointer) if it was still there; increment count.
+
+firstUniqueVisitor() returns the head of the linked list (or null).
+
+This achieves true O(1) for both operations; a TreeMap-based approach is O(log n) and is acceptable but inferior.
+
+Common interviewer follow-ups:
+
+"What if we have 10M visits per second?" → talk about lock-free maps, sharding by customer_id % k, async write-behind.
+
+"How would you persist this?" → discuss write-ahead log + periodic snapshots.
+
+"What about deleting a customer?" → easy with the linked-list + map pattern.
+
+This is morally LC 387 (First Unique Character) lifted to a streaming/OOD setting; cite the equivalence if the interviewer asks.
+
+Alternate canonical variant — FirstUnique(int[]) queue API
+
+Same underlying data structure (insertion-ordered linked list + count map), exposed as a class over a queue of integers instead of visit/firstUniqueVisitor. A number is unique if it appears exactly once among all numbers currently in the queue; showFirstUnique returns a -1 sentinel (not null) when no unique value exists.
+
+class FirstUnique:
+    def __init__(self, nums: list[int]) -> None: ...
+        # Initialize the queue with nums (in order); seed the linked list + count map.
+    def showFirstUnique(self) -> int: ...
+        # Return the first integer with count == 1 in arrival order, or -1 if none.
+    def add(self, value: int) -> None: ...
+        # Append value; if its count reaches 2, it stops being unique and leaves the unique list.
+
+Constraints worth confirming: 1 <= nums.length <= 10^5, 1 <= nums[i], value <= 10^8, and at most 5 * 10^4 calls across showFirstUnique + add.
+
+Worked sequence: start [2, 3, 5] → showFirstUnique() returns 2; add(5) → queue [2,3,5,5], still 2; add(2) → [2,3,5,5,2], now 3; add(3) → [2,3,5,5,2,3], now -1 (no unique remains).
+
+The only behavioral differences from the main variant are the API surface and the -1 sentinel in place of null; the head-of-list / count-map mechanics are identical.
+
+Examples
+
+visit(7), visit(3), visit(7) → firstUniqueVisitor() returns 3 (7 is now a repeat; 3 is the earliest single-visit customer).
+
+After visit(3) again → both customers have visited twice, so firstUniqueVisitor() returns null / sentinel.
+
+Preparation
+
+Write the doubly-linked-list + hashmap pattern from memory; it is the same backbone as LC 146 (LRU Cache).
+
+Practice removing a known node from a doubly-linked list in O(1) by manipulating prev/next pointers directly; this is the bug-magnet step.
+
+Pre-script the answer to the "how do you scale this?" follow-up — the interviewer expects a 2–3 minute sketch covering sharding, idempotency, and persistence.
+
+A newer phone-screen variant explicitly asks for a doubly linked list optimization: keep one list of currently unique first-time users, remove an id when its second visit arrives, and return the head for firstUniqueVisitor().
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

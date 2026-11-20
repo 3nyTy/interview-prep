@@ -1,0 +1,52 @@
+===H1===
+Implement Python's itertools.tee
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/python-tee-independent-iterators
+===BODY===
+Google
+CodingMembers
+Implement Python's itertools.tee
+Implement the behavior of Python's `tee`: accept one iterator and an integer `n`, then return `n` independent iterators over the same source sequence. Define the required function and classes yourself and improve a naive design toward an efficient shared-state implementation.
+SWE
+iterator
+queue
+data-structure
+object-design
+medium
+Frequency
+Single report
+Last asked
+2026-08-20
+Stage
+onsite-coding
+Requirements
+
+Input: one Python iterator and an integer n.
+
+Return n independent iterators over the source sequence.
+
+Each returned iterator must be able to advance independently while preserving source order.
+
+Define the function and class interface yourself.
+
+Start with a correct naive design, then improve it toward the optimal shared-state design.
+
+Notes
+
+The round depends on Python iterator-protocol fluency as much as general data-structure reasoning. Clarify laziness, source exhaustion, invalid n, and whether concurrent consumption is in scope before implementing.
+
+A correct baseline consumes the source lazily once and gives each returned iterator its own queue: when one queue is empty, pull one source value, append it to every queue, then return it from the requesting queue. If n iterators trail across a gap of g values, however, those queues can retain O(n·g) buffered copies. For the optimal shared-state design, keep one linked buffer (or indexed deque) of source values plus one cursor per iterator, and discard a buffered value only after every cursor has passed it. That preserves independent consumption with O(g+n) auxiliary state, where g is the distance between the fastest and slowest consumers.
+
+Preparation
+
+Implement a custom Python iterator class from memory, including __iter__ and __next__.
+
+Trace two and three consumers advancing at different speeds and identify what state must remain available.
+
+Compare a fully materialized baseline with a lazy shared-state design and explain the memory behavior.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

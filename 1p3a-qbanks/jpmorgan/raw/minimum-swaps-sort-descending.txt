@@ -1,0 +1,48 @@
+===H1===
+Minimum Swaps to Sort Descending
+===URL===
+https://www.1point3acres.com/interview/problems/company/jpmorgan/minimum-swaps-sort-descending
+===BODY===
+JPMorgan Chase
+Coding·60 minMembers
+Minimum Swaps to Sort Descending
+Given an array, compute the minimum number of swaps needed to sort it in decreasing order.
+RS
+array
+sorting
+cycle-detection
+oa
+medium
+Frequency
+Single report
+Last asked
+2025-10-29
+Stage
+oa
+Requirements
+
+Input: an array of integers.
+
+Return the minimum number of swaps required to reorder it into descending order.
+
+Clarify duplicate handling. If duplicates exist, stable target positions or value-index pairs are needed to avoid ambiguous swaps.
+
+Notes
+
+Sort value-index pairs by value descending to compute each element's target position, then count cycles in the permutation.
+
+Each cycle of length k contributes k - 1 swaps.
+
+If all values are distinct, the implementation is straightforward. If duplicates are allowed, pair each value with its original index to make target positions deterministic.
+
+Preparation
+
+Implement cycle counting from a target-position permutation.
+
+Test already-sorted descending input, ascending input, duplicates, and a single long cycle.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

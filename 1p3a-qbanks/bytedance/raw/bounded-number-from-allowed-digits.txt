@@ -1,0 +1,60 @@
+===H1===
+Bounded Number Construction from Allowed Digits
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/bounded-number-from-allowed-digits
+===BODY===
+ByteDance / TikTok
+Coding·60 minMembers
+Bounded Number Construction from Allowed Digits
+Given an integer N and a set A of decimal digits reusable without limit, construct the largest number strictly smaller than N using only digits from A. One interview example uses N = 23415 and A = {2, 4, 9}, producing 22999.
+SWE
+array
+greedy
+backtracking
+hard
+Frequency
+Single report
+Last asked
+2026-07-29
+Stage
+phone-screen
+Requirements
+
+Input an integer N and an array A whose elements are decimal digits from 0 through 9.
+
+Digits in A may be reused any number of times.
+
+Construct the largest number strictly smaller than N using only digits from A.
+
+Examples
+
+Input: N = 23415, A = {2, 4, 9}
+Output: 22999
+
+Notes
+
+The one-hour screen spent about 40 minutes probing resume projects and technical details, leaving less than 20 minutes for this problem.
+
+No exact LeetCode match was identified; treat this as a bespoke digit-construction task.
+
+Leading-zero semantics and the required return value when no valid number exists were not specified. Clarify both before coding.
+
+Sort and deduplicate the allowed digits, then reconstruct the answer left to right. At each position, try eligible digits in descending order while tracking whether the prefix is still equal to N or is already smaller; accept a completed candidate only after it has become strictly smaller.
+
+If an equal-prefix branch cannot finish, backtrack to the nearest position that can take the next smaller allowed digit, then fill the remaining suffix with the largest allowed digit. If no same-length candidate exists, try the largest valid shorter length after applying the agreed leading-zero policy.
+
+A memoized digit-DP reconstruction has O(L * |A|) time and O(L) state for L digits; the greedy-with-backtracking implementation follows the same state transitions.
+
+Preparation
+
+Implement the left-to-right greedy construction and its backtracking step from a blank editor.
+
+Practice explaining when a prefix remains equal to the bound and when it must step down to an allowed digit.
+
+Write down the missing-contract questions before coding: leading zeros, zero as an answer, and no-solution behavior.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

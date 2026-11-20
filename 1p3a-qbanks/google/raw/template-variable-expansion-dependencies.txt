@@ -1,0 +1,56 @@
+===H1===
+Template Variable Expansion with Follow-Ups
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/template-variable-expansion-dependencies
+===BODY===
+Google
+CodingMembers
+Template Variable Expansion with Follow-Ups
+Replace `%KEY%` placeholders using a key-value map whose values may contain other placeholders. Clarify malformed delimiters and literal-percent escaping, flatten nested values, and detect cyclic dependencies before expansion.
+SWE
+string
+parsing
+graph
+topological-sort
+medium
+Frequency
+Single report
+Last asked
+2026-08-14
+Stage
+onsite-coding
+Requirements
+
+Input: a key-value map and a string containing placeholders delimited by %, such as %USER%. Replace every placeholder with the corresponding value.
+
+Map values can themselves contain placeholders, so resolve or flatten dependencies before expanding the final string.
+
+Define behavior for malformed delimiters such as unmatched percent signs, for a literal % in output, and for nested-looking forms before coding; the prompt intentionally leaves these contracts open.
+
+Follow-up: detect cyclic dependencies among map values. Model keys as a dependency graph and use indegrees plus a queue to determine whether a complete topological resolution is possible.
+
+Examples
+
+Given {USER: "admin", HOME: "/%USER%/home"}:
+
+Input: I am %USER% My home is %HOME%
+
+Output: I am admin My home is /admin/home
+
+Notes
+
+The interviewer spent most of the round probing the delimiter and escaping contract before allowing implementation. State a compact grammar and get explicit agreement; otherwise a nominally easy parser can lose the coding budget to unresolved edge cases.
+
+Preparation
+
+Implement one-pass placeholder scanning under a written delimiter/escape contract.
+
+Resolve a dependency chain in the map before processing the template, then add cycle detection.
+
+Prepare three malformed-input cases and explain whether each is rejected, preserved literally, or interpreted as an escape.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,73 @@
+===H1===
+2-D Matrix Range Sum with Updates (OA SumTable)
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-prefix-sum-2d-matrix-oa
+===BODY===
+LinkedIn
+Coding·90 minMembers
+2-D Matrix Range Sum with Updates (OA SumTable)
+HackerRank OA for the SWE AI Trainer (LLM rater) role. Five TypeScript multiple-choice questions on code-quality judgement plus one Python implementation: process a stream of `get`/`set` queries against a 2-D matrix returning the rectangle sum for `get` and applying point updates for `set`.
+SWE
+prefix-sum
+data-structure
+io
+parsing
+medium
+Frequency
+Single report
+Last asked
+2026-04-08
+Stage
+oa
+Requirements
+
+Reported OA format (HackerRank, camera-on, ~90 minutes):
+
+5 multiple-choice TypeScript questions — pick the better-written of two snippets each. The implicit role context is LLM training / data annotation.
+
+1 Python implementation — the SumTable problem below.
+
+SumTable: read stdin shaped like
+
+2
+3
+1 2 3
+4 5 6
+5
+get 0 2 1 3
+set 0 1 10
+get 0 2 1 3
+set 0 0 -3
+get 0 1 0 2
+
+The first three lines specify a 2 × 3 matrix [[1, 2, 3], [4, 5, 6]]. The fifth line is the number of subsequent queries. Each query is either:
+
+set r c v — matrix[r][c] = v.
+
+get r1 c1 r2 c2 — print the sum of matrix[r1..r2][c1..c2] inclusive on the lower bound, exclusive on the upper? Verify boundary inclusivity from the examples — given get 0 2 1 3 on the starting matrix returns 1 + 2 + 5 + 6 = 14, the indices map to rows [0, 2) and columns [1, 3).
+
+Expected output for the input above: 14, 24, 7.
+
+Given the mixed update/query workload, the textbook answer is a 2-D Binary Indexed Tree (Fenwick) with O(log² N) per operation. A naive prefix-sum recompute on every set is O(R × C) per update and likely TLEs on large inputs.
+
+Notes
+
+This OA is associated with a part-time AI trainer role — the work is rating LLM-generated code, not building product. The TypeScript multiple-choice section reflects that.
+
+Camera-on monitoring is enforced; no external assistance is allowed.
+
+Parsing is part of the grade — the comma-vs-space-separated rows in the prompt are a deliberate trap; the actual stdin uses spaces.
+
+Preparation
+
+Implement 2-D Fenwick tree from scratch; expect to need update(r, c, delta) and query(r1, c1, r2, c2) with inclusion-exclusion.
+
+Drill clean stdin parsing in Python (sys.stdin.read().split()) — the OA's I/O harness is unforgiving on stray newlines.
+
+For the TypeScript multiple-choice portion, brush up on idiomatic vs anti-pattern code (mutation-in-map, missing await, untyped any, missing error handling).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

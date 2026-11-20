@@ -1,0 +1,67 @@
+===H1===
+OA: Permutation Prefix Balanced (1..k Subarray Check)
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/oa-permutation-prefix-balanced
+===BODY===
+Uber
+Coding·90 minMembers
+OA: Permutation Prefix Balanced (1..k Subarray Check)
+Hack2Hire OA problem. Given a permutation `p` of `1..n` and each `k` in `1..n`, decide whether `1..k` appears as a contiguous subarray somewhere in `p`. Return a binary string of length `n` (1 = balanced, 0 = not).
+SWE
+array
+hashmap
+medium
+Frequency
+Low
+Last asked
+2026-02-02
+Stage
+oa
+Requirements
+
+Input: array p that is a permutation of 1..n, with 1 <= n <= 2 * 10^5.
+
+For each k from 1 to n: check whether there exists l, r with r − l + 1 == k such that {p[l..r]} == {1..k} (as sets) — i.e. the values 1..k occupy a contiguous block.
+
+Output: a binary string of length n where the i-th character (1-indexed) is 1 if k = i is balanced, else 0.
+
+Examples
+
+p = [5, 3, 1, 2, 4]
+For k = 1: position of 1 is index 2; subarray [1] = {1} ✓
+For k = 2: positions of 1, 2 are {2, 3}; max−min+1 = 2 == k ✓
+For k = 3: positions of 1, 2, 3 are {1, 2, 3}; max−min+1 = 3 == k ✓
+For k = 4: positions of 1..4 are {1, 2, 3, 4}; max−min+1 = 4 == k ✓
+For k = 5: positions of 1..5 are {0..4}; max−min+1 = 5 == k ✓
+Output: "11111"
+
+p = [2, 4, 1, 3]
+For k = 1: position of 1 is index 2; spread = 1 == k ✓ → '1'
+For k = 2: positions of 1, 2 are {2, 0}; spread = 3 ≠ 2 → '0'
+For k = 3: positions of 1, 2, 3 are {2, 0, 3}; spread = 4 ≠ 3 → '0'
+For k = 4: positions of 1..4 are {0..3}; spread = 4 == k ✓ → '1'
+Output: "1001"
+
+Notes
+
+Key invariant: a permutation of 1..k occupies exactly k distinct positions, so it forms a contiguous subarray iff max(positions of 1..k) − min(positions of 1..k) + 1 == k.
+
+Build a position lookup pos[v] = index of v in p. Sweep k = 1..n, maintain a running maxPos, minPos, and append '1' whenever maxPos − minPos + 1 == k.
+
+k = 1 and k = n are always balanced ({1} is trivially contiguous; 1..n is the whole array); the interesting cases are the interior k that yield '0'.
+
+O(n) time, O(n) extra space.
+
+Off-by-one: when storing positions, decide and stick with either 0-indexed or 1-indexed end-to-end; mixing produces a binary string off by one.
+
+Preparation
+
+Internalise the trick: "for a permutation of 1..k embedded in the array, the position spread of those k values is exactly k." Once seen, the implementation is trivial.
+
+Drill LC 1375 (Bulb Switcher III) which uses the same prefix-max-equals-prefix-length insight on a different surface.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

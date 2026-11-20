@@ -1,0 +1,62 @@
+===H1===
+Squirrel Nut Storage Tracker
+===URL===
+https://www.1point3acres.com/interview/problems/company/optiver/squirrel-nut-storage
+===BODY===
+Optiver
+Coding·75 minMembers
+Squirrel Nut Storage Tracker
+An OOP simulation OA: model cone-shaped hiding locations whose level capacities grow Fibonacci-style, then support hiding nuts (deepest-level-first, with expiry) and retrieving them under a layered weight/percentage rule with a fall-down refill mechanic. Heavy on careful rule implementation.
+SWE
+oop-design
+simulation
+data-structure
+oa
+hard
+Frequency
+Medium
+Last asked
+2026-08-17
+Stage
+oa
+Requirements
+
+Implement the SquirrelResearch class. Operations carry globally-ever-increasing timestamps (seconds since epoch, float). Weights are floats in grams.
+
+init(locations: dict[str, int]) — locations maps a location id to its number of levels. Levels are cone-shaped and grow per the Fibonacci sequence; e.g. a 3-level location holds 6 nuts: 1 at the deepest level, 2 in the middle, 3 at the top.
+
+HideNut(timestamp, location_id, nut_id, nut_weight, time_to_expire) -> bool — hide a nut. Fill from the deepest level upward; only move to the next level once the current one is full. nut_id must be globally unique among hidden nuts. Fail if the location is full/invalid. The nut expires immediately after timestamp + time_to_expire.
+
+RetrieveNuts(timestamp, location_id, max_squirrel_capacity_in_nuts) -> list[str] — retrieve up to a capacity of nuts, returning their ids in retrieval order.
+
+Retrieval rules:
+
+Retrieve by level starting from the topmost level that has nuts; within a level, heavier nuts first, ties broken by smallest id alphabetically.
+
+If the topmost occupied level is under 50% of its capacity, the next level down also becomes reachable, and the squirrel prefers heavier nuts from there.
+
+Whenever a nut is taken from a level that isn't the topmost occupied level, the lightest nut from the level above falls down into the freed slot.
+
+Expired nuts that get retrieved are immediately discarded (not returned). Retrieved/discarded nuts are removed; a nut_id may be reused afterward.
+
+Fail (empty list) if the location is empty/invalid.
+
+Notes
+
+The Fibonacci level sizing starts "from the 3rd digit" — confirm the per-level capacities (1, 2, 3, 5, …) against the worked example (3 levels → 1+2+3 = 6).
+
+The 50%-reachability rule plus the fall-down refill is where most candidates lose correctness; model each level as an ordered structure keyed by (weight, id) and re-evaluate reachability after each removal.
+
+Expiry is checked at retrieval time against the retrieval timestamp.
+
+Preparation
+
+Implement per-level ordered containers (by weight, then id) and the deepest-first fill; then layer in the 50% reachability and the fall-down refill.
+
+Test expiry-on-retrieve, the under-50% cross-level pull, and tie-breaking by id as separate cases.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,58 @@
+===H1===
+Drone Delivery on a Hub Ring — Minimum Travel
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/drone-hub-ring-min-travel
+===BODY===
+Amazon
+Coding·40 minMembers
+Drone Delivery on a Hub Ring — Minimum Travel
+OA problem. `m` hubs sit on a ring (1-indexed); a drone starts at Hub 1 and must visit `requestedHubs` in order, each leg taking the shorter of the clockwise / counter-clockwise path measured by per-edge transition times. Return the minimum total delivery time. The classic traps are the tail-to-head wrap-around and the `m == 2` ring edge case.
+SWE
+array
+prefix-sum
+simulation
+greedy
+medium
+Frequency
+Medium
+Last asked
+2026-09-09
+Stage
+oa
+Requirements
+
+m hubs are arranged on a ring, 1-indexed; the ring closes (the last hub connects back to the first).
+
+Input: the ordered list of requestedHubs to visit, and a list of transition times for the edges between adjacent hubs (the cost of leaving each hub for its neighbor).
+
+The drone starts at Hub 1 and visits the requested hubs in the given order. For each leg it may travel clockwise or counter-clockwise and pays the cheaper of the two directional path costs.
+
+Minority variant: An SDE II OA describes clockwise-only travel between destinations, rather than choosing the cheaper direction. Clarify before coding whether counter-clockwise travel is permitted.
+
+Return the minimum total travel time to complete every requested visit.
+
+Notes
+
+For the clockwise-only variant, use the clockwise prefix-sum arc directly; do not minimize against its complement. A repeated destination costs zero.
+
+Precompute prefix sums of the edge transition times around the ring so any clockwise arc cost is O(1); the counter-clockwise cost for the same pair is total_ring_cost - clockwise_cost. The per-leg answer is the min of the two.
+
+The tail-to-head step is the most-reported bug: moving from the last hub back toward Hub 1 must use the same wrap-around prefix-sum arithmetic, not a special case. Several candidates lose points exactly here.
+
+The m == 2 ring is a degenerate case (two parallel edges between the same pair); confirm how its two directions are defined before coding.
+
+Mind whether edge costs are uniform or per-edge — when transition times differ per edge, you cannot shortcut with hop-count distance; you must compare the two summed arc costs.
+
+Recent HackerRank OA wording is long and domain-heavy; budget time to strip it down to ring + requested destinations + adjacent-edge distances before coding the prefix-sum helper.
+
+Preparation
+
+Build the prefix-sum-on-a-ring helper and write arc(a, b) returning min(clockwise, total - clockwise); test it on a hand-drawn 4-hub ring.
+
+Add explicit unit tests for the wrap-around leg (last requested hub back through Hub 1) and the m == 2 ring before trusting the solution.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

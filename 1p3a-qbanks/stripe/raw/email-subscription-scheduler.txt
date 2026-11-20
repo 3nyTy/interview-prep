@@ -1,0 +1,130 @@
+===H1===
+Email Subscription Scheduler
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/email-subscription-scheduler
+===BODY===
+Stripe
+Coding·60 minMembers
+Email Subscription Scheduler
+Onsite coding round. Given a list of users with subscription plans and a schedule of relative offsets for different email types, print the full timeline of emails. Later parts add mid-stream plan changes and plan extensions.
+SWE
+simulation
+scheduling
+string
+medium
+Frequency
+Medium
+Last asked
+2026-05-22
+Stage
+onsite-coding
+Requirements
+
+Inputs
+
+user_accounts: list of users; each has name, plan, account_date, duration. A user's end date is account_date + duration.
+
+send_schedule: dict mapping a key to an email title. Keys are one of:
+
+"start" → fire on account_date.
+
+"end" → fire on end_date.
+
+a (negative) integer offset → fire on end_date + offset (e.g. -15 means 15 days before the end date).
+
+Values are email titles such as Welcome, Upcoming expiration, Expired, Changed, Renewed. The schedule must be treated as data — detect the key type ("start" / "end" / number) and do the arithmetic; never hardcode a specific offset like -15.
+
+changes: list of mid-stream events with name + change_date, carrying either new_plan (a plan change) or extension (a renewal). A user can have several.
+
+Output format
+
+Each line: <day>: [<EmailTitle>] Subscription for <Name> (<Plan>). Group by day low→high; one line per email; skip days with no emails. Emails carry the user's current plan at the moment they fire.
+
+Tasks
+
+Task 1: Using only user_accounts + send_schedule, print every email each user should receive in time order.
+
+Task 2: With plan changes (new_plan), print one additional Changed email at change_date and update that user's plan name for all subsequent emails. The end date is unaffected. Other users are unaffected. Plan changes are assumed to occur while the subscription is still active.
+
+Task 3: With renewals (extension), print a Renewed email at change_date, add extension to the current end date, then recompute that user's future emails. Extension lands after the original expiry, not on the click day — so a user can receive Upcoming expiration twice (once for the old end date, once for the new one).
+
+Signature
+
+def send_emails(
+    user_accounts: list[dict],
+    send_schedule: dict,          # keys: "start" | "end" | int offset; values: email title
+    changes: list[dict] = [],     # each: {"name", "change_date"} + ("new_plan" | "extension")
+) -> None: ...
+    # end_date = account_date + duration
+    # number key -> notification fires on end_date + offset
+    # plan change ("new_plan"): emit "Changed" at change_date; relabel that user's later emails; end_date unchanged
+    # renewal ("extension"):    emit "Renewed" at change_date; end_date += extension; recompute future emails
+    # same-day ordering: process changes/renewals BEFORE notifications
+
+Follow-ups
+
+How would you test it? (Be ready to enumerate edge cases: multiple changes on the same day, plan change after expiry, extension that pushes expiry beyond another event.)
+
+Clarifying questions worth raising up front: will schedule keys always be "start" / "end" / a negative number; what happens when a computed date falls before the user joined; does same-day email order matter.
+
+Examples
+
+# Task 3 — John changes Silver→Gold on day 5; Alice renews +15 on day 3
+0:  [Welcome] Subscription for John (Silver)
+1:  [Welcome] Subscription for Alice (Gold)
+1:  [Upcoming expiration] Subscription for Alice (Gold)
+3:  [Renewed] Subscription for Alice (Gold)
+5:  [Changed] Subscription for John (Gold)
+15: [Upcoming expiration] Subscription for John (Gold)
+16: [Upcoming expiration] Subscription for Alice (Gold)   # old end 16 already passed expiry into a 2nd notice
+30: [Expired] Subscription for John (Gold)
+31: [Expired] Subscription for Alice (Gold)               # new end 16 + 15
+
+Notes
+
+Multiple reports finish 2 of 3 parts in 60 min; reaching part 3 is considered strong signal.
+
+Watch for off-by-one on the negative-offset schedule entries.
+
+Reading the long prompt eats heavily into coding time — candidates report not finishing because parsing the spec took too long.
+
+Interviewers ask drill-down questions on data-structure choices (e.g. defaultdict vs sorted list, how you keep emails stable-sorted when same timestamp).
+
+Same-day ordering & stable sort
+
+When several events share a day, process state-mutating events first so emails reflect the post-mutation plan/end-date: priority plan_change → renewal → notification. Sort key (date, priority).
+
+Renewal recompute mechanics (Task 3)
+
+A renewal changes future email dates, so you cannot freeze the whole timeline up front. On a renewal:
+
+end_date += extension (added to the current end date, not change_date).
+
+Delete that user's still-pending future notifications (they used the old end date).
+
+Regenerate that user's notifications from the new end_date, keep only those strictly after change_date, merge back and re-sort.
+
+Short-subscription corner case
+
+A negative offset can compute a date before the user joined (e.g. 10-day plan with a -15 rule → day -5). Clarify with the interviewer; the usual choices are: skip the email, clamp it to the start date, or only emit when notification_date >= account_date.
+
+if notification_date >= account_date:
+    emit(notification_date, ...)
+
+Complexity
+
+Task 1: event generation is O(U × S) (U = users, S = schedule entries), plus O(D log D) to sort the days carrying emails (D = distinct email days); space O(D × E) for the per-day email buckets (E = emails per day). The Task 2/3 single-event-list variant is O(N log N) on total event count N; each renewal does a filter + regenerate + re-sort, so a chain of R renewals is O(R × N log N) under the naive re-sort approach.
+
+Preparation
+
+Write a clean priority-queue or sorted-list-based event scheduler from scratch in your chosen language.
+
+Practice parsing relative-offset rules and applying them to a user record.
+
+Pre-write a tiny harness that diffs your output against an expected string list; the round provides no test runner.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

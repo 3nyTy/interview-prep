@@ -1,0 +1,73 @@
+===H1===
+Distributed Task Scheduler
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/distributed-task-scheduler
+===BODY===
+Apple
+System Design·45 minMembers
+Distributed Task Scheduler
+Storage infra onsite design for a distributed task scheduler, with follow-ups on queue structure, task representation, and scaling.
+SWE
+Infra Eng
+scheduling
+queueing
+distributed-systems
+dependency-resolution
+medium
+Frequency
+Single report
+Last asked
+2025-11-21
+Stage
+onsite-system-design
+Requirements
+
+Design a distributed task scheduler.
+
+Functional requirements:
+
+Submit tasks with metadata, priority, dependency, and execution constraints.
+
+Store runnable and pending tasks durably.
+
+Assign work to workers while avoiding duplicate execution.
+
+Retry failed tasks with backoff and expose status.
+
+Scale the task queue and workers independently.
+
+Scale / constraints:
+
+The system must handle many tasks and workers without one queue becoming a bottleneck.
+
+A task may fail, time out, or be picked by a worker that dies.
+
+Design decisions:
+
+Central queue vs sharded queues.
+
+Lease / heartbeat semantics for in-progress tasks.
+
+Priority and fairness.
+
+Dependency resolution and idempotent retries.
+
+Notes
+
+The interview focus is implementation detail. Define the task record explicitly: id, state, payload pointer, priority, scheduled time, dependency ids, lease owner, lease expiry, retry count, and created / updated timestamps.
+
+Scaling usually starts with partitioning by queue or task type, then adding a scheduler that promotes eligible tasks and workers that pull with leases. Avoid claiming exactly-once execution; design for at-least-once plus idempotent task handlers.
+
+Preparation
+
+Practice drawing a lease-based worker queue with pending, leased, succeeded, and failed states.
+
+Prepare follow-ups for delayed tasks, dependencies, worker crashes, and poison-pill tasks.
+
+Be ready to discuss metrics: queue depth, task age, retry rate, lease timeout rate, and worker utilization.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

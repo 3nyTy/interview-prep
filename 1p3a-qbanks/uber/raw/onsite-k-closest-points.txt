@@ -1,0 +1,59 @@
+===H1===
+Onsite Coding: K Closest Points
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/onsite-k-closest-points
+===BODY===
+Uber
+Coding·45 minMembers
+Onsite Coding: K Closest Points
+The base prompt is LC 973: return the K points closest to the origin, with K much smaller than N. The round asks for both a bounded max-heap solution and a written quickselect partition, then extends the problem to an arbitrary rider location, tens of millions of moving points, and road-network distance.
+SWE
+array
+heap
+quickselect
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-coding
+Requirements
+
+Given a collection of 2D points and an integer K, return the K points closest to the origin.
+
+Assume K is much smaller than the total number of points.
+
+After the first implementation, write the partition step for an average-linear-time selection variant.
+
+Follow-up: replace the origin with an arbitrary rider position.
+
+Follow-up: support tens of millions of points whose positions change continuously.
+
+Follow-up: rank by road-network distance rather than straight-line distance.
+
+Notes
+
+The public base problem is LC 973. Compare squared Euclidean distances so ranking does not require square roots.
+
+The first accepted approach keeps a size-K max-heap, for O(N log K) time and O(K) auxiliary space.
+
+The alternate implementation uses quickselect and requires writing the partition logic, not merely naming the technique; its expected time is O(N), with a quadratic worst case for consistently poor pivots.
+
+For moving points, grid partitioning or a quadtree provides a coarse candidate set before exact distance evaluation. Grid-cell size trades candidate volume against the number of neighboring cells that must be searched.
+
+A fixed top-M straight-line prefilter is only approximate for road-network ranking: barriers can make a geometrically nearer point much farther by road. For an exact result, use straight-line distance as a lower bound, evaluate route distances in increasing lower-bound order, keep the best K exact distances, and stop only when the next lower bound cannot beat the current Kth result.
+
+Preparation
+
+Implement both the bounded-heap and quickselect versions from a blank editor, including the partition function and duplicate-distance cases.
+
+Rehearse the three production follow-ups: arbitrary query origin, moving spatial data, and a two-stage straight-line / road-distance ranking path.
+
+Construct a barrier or river case where Euclidean order differs from road-distance order, then trace the lower-bound stopping rule to show why a fixed-size prefilter is unsafe.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

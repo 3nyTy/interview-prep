@@ -1,0 +1,62 @@
+===H1===
+DS Business Analyst Case (P&L Decomposition)
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/ds-business-analyst-case-study
+===BODY===
+Capital One
+Other·60 minMembers
+DS Business Analyst Case (P&L Decomposition)
+DS Power Day round 1. Given a credit / lending business scenario — typical: a credit line increase strategy, or a new product entering the market — frame the analysis, decompose the P&L, and propose levers. Mental math is part of the round.
+DS
+critical-thinking
+verbal
+open-ended
+math-reasoning
+medium
+Frequency
+Single report
+Last asked
+2026-02-27
+Stage
+final-round
+Requirements
+
+The interviewer presents a concrete business scenario in a credit / lending context. Examples reported:
+
+Should we offer line-of-credit increases to a specific customer segment? Forecast revenue and default impact.
+
+A new credit product is launching in a new geo — analyse expected profitability.
+
+A risk-model change has been proposed — what's the P&L sensitivity?
+
+Phase 1: clarify the goal — revenue uplift? default-rate reduction? combined profit?
+
+Phase 2: decompose into a P&L equation: Profit = Revenue - Loss - Operational Cost. For credit products, the revenue line includes interest income, interchange, and fees; the loss line includes charge-offs and provisions.
+
+Phase 3: identify levers — interest rate, credit limit, risk-model cutoff, segment definition.
+
+Phase 4: mental-math sensitivity check on the dominant lever.
+
+Notes
+
+Do not jump to modelling. The single most common failure mode in this round is the candidate who hears "DS interview" and pitches an XGBoost approach in the first two minutes. The graded signal is business decomposition first; modelling comes much later, if at all.
+
+The P&L decomposition for credit lending has a specific structure worth memorising: Profit = (APR × Balance × Approval Rate − Charge-off Rate × Balance × Approval Rate − Operating Cost per Account) × Population. Knowing this template lets the candidate decompose any new scenario into the four levers cleanly.
+
+Mental math: the round expects approximate-but-correct answers. A 5% charge-off rate on $1B in balances is $50M in loss; if the recruitment of a new segment adds $100M in balance at 8% charge-off, the marginal loss is $8M. Practise these one-step calculations.
+
+The role-play and BQ rounds later in the loop test the same business framing applied to talking to a PM — the case round and the role-play round are scored as a pair.
+
+Preparation
+
+Memorise the credit-product P&L template above. Drill it on three scenarios (line increase, new geo, risk model change) until the decomposition is automatic.
+
+Practise mental math with credit-product anchors: $1B balance × 18% APR = $180M revenue; 5% charge-off rate × $1B = $50M loss. Get to the answer in under 30 seconds.
+
+Practise the not modelling discipline. When the interviewer mentions data, name the dependent variable explicitly ("the model would predict default probability per account") before discussing features or algorithms — this signals you understand the modelling step exists but isn't the round's focus.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

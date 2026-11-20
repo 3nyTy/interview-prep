@@ -1,0 +1,49 @@
+===H1===
+Randomized Container
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/randomized-container
+===BODY===
+Meta
+CodingMembers
+Randomized Container
+Implement a generic container with `insert(T element)` and `popRandom()`, where `popRandom` removes and returns one stored element with equal probability. The expected implementation keeps insertion and random removal at O(1).
+SWE
+array
+hashmap
+sampling
+medium
+Frequency
+Single report
+Last asked
+2026-07-19
+Stage
+onsite-coding
+Requirements
+
+Implement a generic mutable container with two methods:
+
+insert(T element): add the element to the container.
+
+popRandom(): remove and return one currently stored element, giving every stored element an equal chance of selection.
+
+Keep both insertion and random removal at O(1).
+
+Notes
+
+Duplicate-value semantics and behavior on an empty container are not specified. Clarify both before coding.
+
+Uniform selection applies to the container's current state, so every removal must leave the indexing structure consistent for the next call.
+
+Preparation
+
+Implement the O(1) design with an indexed sequence plus value-to-position bookkeeping; rehearse updating the moved element's index when the selected slot is filled from the end.
+
+State the representation invariant before coding and prove that the random choice remains uniform after any sequence of inserts and removals.
+
+Test one element, repeated operations, removal until empty, and any agreed duplicate-value behavior.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

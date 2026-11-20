@@ -1,0 +1,148 @@
+===H1===
+Rate Limiter — Return Dropped Times
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/rate-limiter-dropped-requests
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Rate Limiter — Return Dropped Times
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+·
+50 min
+Members
+Rate Limiter — Return Dropped Times
+
+Given request arrival times, enforce rate-limit rules and identify rejected requests. An online variant expands the task to multiple simultaneous rules, thread safety, handler failures, and deferred processing of throttled work.
+
+SWE
+sliding-window
+queue
+simulation
+rate-limiting
+medium
+Frequency
+Low
+Last asked
+2026-08-10
+Stage
+phone-screen · onsite-coding
+Requirements
+Input: array where arr[i] is the arrival time (seconds, real-valued or integer ticks) of request i. Requests arrive in non-decreasing time order.
+Rules (applied jointly):
+At most 3 requests per any 1-second window.
+At most 20 requests per any 10-second window.
+A request that violates either rule when it would otherwise be accepted is dropped; output is the list of dropped request times in the order they would have arrived.
+Both rules apply to the count of accepted requests, not the total of accepted + dropped.
+Examples
+requests = [0.1, 0.2, 0.3, 0.4, 5.0]
+# t=0.4 is the 4th request in [0.0, 1.0) → dropped
+output   = [0.4]
+
+Notes
+The clean implementation uses two sliding-window deques over accepted timestamps: one for the 1-second window, one for the 10-second window.
+For each incoming request, pop expired timestamps from the front of both deques, then check both window sizes (< 3 and < 20). If both pass, append to both deques; otherwise add to the dropped list.
+Hidden trap: the second rule (20 per 10 sec) implicitly relaxes the first rule for sustained traffic. A naive implementation that checks only the 1-second rule passes the obvious tests but fails the edge case where bursts within the 10-second window cap kick in.
+Both windows operate on accepted timestamps only — pushing a dropped request into the deque corrupts subsequent decisions. This is the most commonly reported failure mode.
+Real-valued timestamps require strict-less-than comparison on the window boundary (t - 1.0 vs t - 1); integer ticks make this less error-prone.
+Edge cases: empty input, all requests at the same timestamp (only first 3 accepted under rule 1), requests spaced exactly at 1.0-second boundaries.
+Alternate canonical variant — online concurrent limiter
+Design an online rate limiter, first for one rule and then for multiple simultaneous rules.
+Make the decision path thread-safe; the quota check and the state update must behave as one critical operation.
+If the request handler throws an exception, that request must not consume quota.
+Do not discard throttled requests. Retain them and process them when capacity becomes available.
+Discuss additional hazards, including requests observed out of arrival order.
+Treat rule evaluation and quota reservation as one atomic state transition. If handler execution occurs outside the critical section, keep the reservation provisional and refund it on failure; retained throttled work must be rechecked after refunds.
+Store throttled work in a delayed queue keyed by its next eligible time, and re-run every active rule when it wakes because elapsed time or refunds may have changed capacity.
+Define an event-time policy—monotonic arrival order, bounded reordering, or explicit rejection of late data—rather than feeding out-of-order timestamps directly into FIFO sliding-window deques.
+Preparation
+Implement the two-deque sliding-window version; verify on a hand-crafted test where both rules independently trigger drops.
+Add an explicit unit test for the case where the 10-second rule is the binding constraint and the 1-second rule would have passed.
+Be ready to extend to a token-bucket / leaky-bucket variant if the interviewer reframes the rule as smoothed throughput.
+Build the online variant with a lock-protected check/reserve path, inject a handler failure, and assert that quota is refunded; then use a fake clock to verify that deferred work is rechecked rather than discarded.
+Alternate canonical variant — integer request times
+Another common version receives sorted integer requestTimes and drops a request if it would create either more than 3 requests in the same second or more than 20 requests in any rolling 10-second window.
+The output is the timestamps of dropped requests, in arrival order, with a request listed once even if it violates both rules.
+Clarify whether the rolling-window counts are based on all arrivals or accepted arrivals; the deque solution above assumes accepted arrivals, while some platform-style versions count raw positions in the sorted input.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Examples
+Notes
+Alternate canonical variant — online concurrent limiter
+Preparation
+Alternate canonical variant — integer request times
+Related discussions · 3
+🔑雪花片店面挂经
+🔑❄️雪花电面挂经
+雪花全套
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Frontend Grid: Robot Eats Candies
+Single report
+simulation
+medium
+frontend
++2
+Recipe as Contiguous Ingredient Subsequence
+Single report
+sliding-window
+medium
+string
++4
+Document Target Coverage and Minimum Window
+Single report
+sliding-window
+medium
+hashmap
++1
+Filter System with Dynamic Blacklist
+Single report
+simulation
+medium
+oop-design
++3
+Connect Four - Can Play Win
+Single report
+simulation
+medium
+game-engine
++1
+Code editor

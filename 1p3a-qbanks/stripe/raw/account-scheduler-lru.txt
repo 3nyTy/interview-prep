@@ -1,0 +1,71 @@
+===H1===
+Account Scheduler with LRU
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/account-scheduler-lru
+===BODY===
+Stripe
+Coding·45 minMembers
+Account Scheduler with LRU
+Onsite coding. Implement an `AccountScheduler` that tracks which accounts are locked until what time. Follow-ups add `acquire` and an LRU-based auto-pick.
+SWE
+data-structure
+hashmap
+scheduling
+medium
+Frequency
+Low
+Last asked
+2026-03-27
+Stage
+onsite-coding
+Requirements
+
+Constructor takes a list of account_ids and a locked_until dict mapping each account_id to the timestamp it is locked until.
+
+is_available(account_id, t): return whether the account is unlocked at time t. Queries are sequential, no concurrency.
+
+Follow-up 1: acquire(account_id, duration)
+
+Locks the given account for duration time units starting at the current query time t: locked_until[account_id] = t + duration.
+
+Follow-up 2: LRU auto-acquire
+
+If acquire is called without an account_id, pick the available account that has been least recently used.
+
+After acquiring, update both locked_until and the LRU ordering.
+
+Examples
+
+accounts      = [1, 2, 3, 4]
+locked_until  = {1: 10, 2: 5, 3: 0, 4: 20}
+
+is_available(1, 8)   -> False
+is_available(2, 8)   -> True
+is_available(3, 1)   -> True
+is_available(4, 21)  -> True
+
+Notes
+
+One thread links a sibling "AccountBalance" problem that uses similar inputs but asks about transferring balances and rejecting illegal transfers; treat them as the same family of state-tracking-over-time questions.
+
+Be explicit about your LRU invariant before coding; interviewers care that you can defend the data structure choice.
+
+The canonical LRU contract is O(1) average-case for both get(key) -> value | -1 and put(key, value) with eviction of the least-recently-used entry on overflow. The standard implementation is a hash map keyed to nodes of a doubly-linked list; OrderedDict in Python wraps the same data structure. Mention this contract up front — the follow-up here is essentially LRU with a time-of-acquisition twist.
+
+The standard implementation pattern is sentinel left / right dummy nodes with a hashmap from key to node; get removes-then-reinserts at the right (most-recently-used end), put evicts the node immediately after left on overflow. The two common pitfalls are (a) forgetting that get itself counts as a use and must reposition the node, and (b) storing the value but not the key inside each node — without the key on the node you cannot delete the hashmap entry during eviction.
+
+Preparation
+
+Pre-write a small OrderedDict-based LRU and a heap-based variant; know when each wins.
+
+Drill problems where queries arrive with a t parameter and state depends on the query order.
+
+Practice explaining the LRU follow-up's edge cases (all accounts available, all accounts locked, multiple accounts available with equal recency).
+
+Hand-write the doubly-linked-list-plus-hashmap LRU once from scratch (not via OrderedDict) so you can defend the pointer updates under follow-up questions about thread-safety and eviction order.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

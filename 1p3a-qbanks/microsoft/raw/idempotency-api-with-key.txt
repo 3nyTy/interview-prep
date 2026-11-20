@@ -1,0 +1,63 @@
+===H1===
+Idempotency API with Idempotency-Key Header
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/idempotency-api-with-key
+===BODY===
+Microsoft
+Coding·45 minMembers
+Idempotency API with Idempotency-Key Header
+HE round opener: design and implement an API endpoint that deduplicates retries via an `Idempotency-Key` header. The interviewer hands you a spec sheet and watches whether you cover replay semantics, concurrent in-flight retries, and TTL eviction.
+SWE
+idempotency
+concurrency
+hashmap
+medium
+Frequency
+Single report
+Last asked
+2026-01-26
+Stage
+onsite-coding
+Requirements
+
+Implement a handler signature roughly:
+
+def post(request, idempotency_key, body) -> response
+
+Spec the interviewer enumerates:
+
+First call with key K processes normally and returns response R; the (K → R) mapping is stored.
+
+Replay with the same K and the same body returns the previously stored R without re-executing.
+
+Replay with the same K but a different body returns 409 Conflict (or equivalent) — the key is being reused for a different request.
+
+Two concurrent in-flight requests with the same K: the second should wait for the first to complete and observe its response, not double-execute.
+
+Storage policy: keys have a TTL (e.g. 24h). Garbage-collect expired keys.
+
+Hidden tests in the interviewer's harness check 1-4 directly. Point 5 is asked verbally and a sketch is sufficient.
+
+Notes
+
+Storage shape: a map key → IdempotencyRecord(body_hash, status, response, expires_at). The status field is IN_FLIGHT | DONE; concurrent retries block on IN_FLIGHT and resume when it transitions to DONE.
+
+Concurrency control is the part candidates miss. Use a per-key Condition variable (same pattern as the Gen/Score task scheduler problem in this bank): on lookup, if IN_FLIGHT, wait() on its condition; on completion, notify_all(). A naive if key in store: return store[key] race-condition lets two requests both miss the cache and both execute.
+
+Body-hash comparison guards against key reuse: hash the canonical body (sorted keys for JSON, normalized whitespace) and compare. Different hash + same key → 409.
+
+TTL eviction is either lazy (check expires_at on lookup; treat expired as not-present) or background (periodic sweep). Lazy is simpler and usually expected.
+
+Preparation
+
+Pre-write the per-key Condition pattern from the Gen/Score scheduler — it reappears here verbatim.
+
+Drill the four spec points (first call, replay-same-body, replay-different-body, concurrent retry) as four test cases on paper.
+
+Pre-rehearse the TTL discussion: lazy vs background sweep, when each makes sense.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

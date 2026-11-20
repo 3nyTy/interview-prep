@@ -1,0 +1,81 @@
+===H1===
+MLE CodeSignal OA (MCQ + NN + Classical-ML Coding)
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/mle-codesignal-oa
+===BODY===
+Coinbase
+Coding·70 minMembers
+MLE CodeSignal OA (MCQ + NN + Classical-ML Coding)
+MLE candidates get a 70-minute CodeSignal bundle: 6 multi-select ML conceptual questions, 1 numerical fill-in (forward-pass through a small NN), and 3 coding problems mixing one warm-up algorithm with two from-scratch classical-ML implementations (bagging, k-means, decision tree). Webcam on; screen-share recorded; the AI assistant is not the explicit collaborator here.
+MLE
+ml-knowledge
+numpy
+classification
+scikit-learn
+linear-algebra
+codesignal
+oa
+medium
+Frequency
+Medium
+Last asked
+2026-02-08
+Stage
+oa
+Requirements
+
+Format (70 minutes total, ~10 items):
+
+Multi-select ML concepts (6 questions)
+
+Calibration / Precision / Recall / FPR trade-offs (e.g. "which thresholds satisfy recall ≥ X and FPR ≤ Y").
+
+Choosing the loss for a logistic regression model.
+
+How to simultaneously increase bias and reduce variance.
+
+Correct considerations when picking ensemble learning.
+
+PCA vs LDA — when to use which.
+
+One additional rotating item.
+
+Multi-select means all correct answers must be selected; partial-credit is not awarded.
+
+Numerical fill-in (1 question, 4-decimal answer)
+
+Compute the output of a small 2-layer neural network given weights, biases, and an input. Activations are typically ReLU and Sigmoid; do the arithmetic by hand or with a scratch calculator.
+
+Coding (3 problems)
+
+Warm-up: array / string algorithm (e.g. longest consecutive run of identical characters returning the rightmost when tied; find local maxima).
+
+From-scratch bagging classifier: given a base classifier interface, implement bootstrap resampling, fit, and predict.
+
+From-scratch k-means: distance function is provided; implement assignment + centroid update + convergence loop. Decision-tree variant: implement a purity function (formula provided), information gain, and predict.
+
+Each problem allows multiple submissions; the harness shows how many of its (~200) hidden tests pass.
+
+Notes
+
+MCQ items are unforgiving because they are multi-select. Read every option; eliminate-then-confirm. The PCA-vs-LDA item in particular has historically tripped people who only remember the headline trade-off.
+
+NN fill-in: lay out the matmul on scratch paper, mind the activation order. Off-by-one on ReLU vs Sigmoid placement is the most common cause of a wrong 4-decimal answer.
+
+Bagging / k-means / decision tree are mechanically simple but interface-fiddly. Pre-write a template for each in your interview language so the round becomes a copy-tweak exercise. CodeSignal's Classification Algorithms and Metrics course includes a Decision Tree implementation walkthrough that matches the test interface closely.
+
+The 70-minute budget is workable if (and only if) you do not spend more than 25–30 minutes on the MCQ + NN block. Move on from any MCQ you are uncertain on after 90 seconds.
+
+Preparation
+
+Drill the canonical from-scratch implementations: bagging (bootstrap → fit base → majority-vote predict), k-means (init → assign → update → repeat-until-stable), decision-tree (best-split by information gain → recurse → predict by path).
+
+Refresh PCA vs LDA, ensemble-bias-variance, and calibration in a 20-minute review block before the round.
+
+Pre-build a 10-line scratchpad function that does dense matmul + activation in your language so the NN fill-in is mechanical.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

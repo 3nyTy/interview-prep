@@ -1,0 +1,72 @@
+===H1===
+System Design: Evaluate a Self-Driving Model End-to-End
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/sd-evaluate-self-driving-model
+===BODY===
+Waymo
+System Design·60 minMembers
+System Design: Evaluate a Self-Driving Model End-to-End
+Open-ended onsite design: how would you evaluate a self-driving model? Reported as deliberately unstructured — interviewer asked about simulating emergent road conditions, detecting sim-to-real gap, accelerating simulations under compute budget, and handling buggy simulator artifacts. No whiteboard, no notes — verbal only.
+MLE
+SWE
+mlsd
+evaluation
+simulation
+ml-knowledge
+open-ended
+hard
+Frequency
+Single report
+Last asked
+2026-01-23
+Stage
+onsite-system-design
+Requirements
+
+Open-ended question: design the full evaluation harness for a self-driving model.
+
+Sub-questions that surfaced in the round:
+
+How do you simulate emergent / rare road events?
+
+How do you detect that the simulator's renderings don't match the real world?
+
+With limited compute, how do you scale to thousands of simulation runs?
+
+How do you accelerate simulation throughput?
+
+How do you handle a simulator bug that corrupts a swath of evaluation runs?
+
+Notes
+
+Two-layer evaluation taxonomy. (1) Open-loop replay: feed sensor logs back through the new model, compare predicted actions to logged human actions. Cheap, fast, no compounding error, but misses long-horizon failures. (2) Closed-loop simulation: roll out the model in a simulated world; the model's actions change subsequent observations. Catches compounding error and emergent behavior. Use both.
+
+Scenario library. Maintain a structured library of test scenarios with tags (intersection, merging, weather, agent density). Mix logged-replay scenarios with parametric procedurally-generated ones so emergent edge cases are sampled even when no logged precedent exists.
+
+Long-tail generation. Use adversarial agents driven by RL to surface failure scenarios; mine simulation runs for high-disagreement frames; replay clusters of similar real-world incidents with parametric perturbations (lighting, weather, agent intent).
+
+Sim-to-real detection. Track distribution shift on perception inputs (lighting histograms, object size distributions, point-cloud densities). Run the same scenario in sim and on a real test track; treat divergence in downstream planner decisions as a sim-to-real gap signal.
+
+Compute scaling. Distribute simulation across a fleet of worker nodes with a scenario queue; deduplicate scenarios with content-addressed hashing so identical configurations aren't re-run; check-point intermediate state so worker preemption doesn't waste work.
+
+Acceleration techniques. Reduce simulation fidelity for early-stage filters (kinematic-only models, no sensor rendering) and reserve full-fidelity for promising scenarios. Run the perception model in batched mode across many scenarios sharing the same world state.
+
+Simulator-bug handling. Treat the simulator like any production service: version it, sign every run with the simulator commit hash, gate model promotion on evaluation under the current simulator version, and add canary scenarios whose expected output is hand-verified. When a bug is detected, replay all flagged runs after the fix and bisect the regression range.
+
+Reporting. Aggregate at the scenario-cluster level, not per-scenario. Report intervention rate, collision rate, jerk distribution, mission completion. Compare against the previous champion model with a statistical-significance test that accounts for the scenario library's stratification.
+
+Verbalize the structure before drilling into any sub-question — the reported failure mode is reaching for a sub-answer (e.g. 'use RL for adversarial scenarios') before establishing the framework.
+
+Preparation
+
+Rehearse a 90-second framework opener: 'There are two evaluation regimes (replay vs sim), three failure modes to catch (perception, planning, emergent behavior), and three operational concerns (throughput, sim-to-real, harness reliability).'
+
+Practice talking through the system without a whiteboard. The round reportedly disallows drawing, which throws candidates who rely on diagrams.
+
+Prepare 2–3 'what would you do if the simulator was wrong' stories from your own work; this question reliably surfaces.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

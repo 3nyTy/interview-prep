@@ -1,0 +1,154 @@
+===H1===
+Transaction Fee Calculator
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/transaction-fee-calculator
+===BODY===
+Stripe
+Coding·45 minMembers
+Transaction Fee Calculator
+Phone-screen-style string-processing round. Given a CSV of transactions and a fee-rule table, compute the fee per row based on payment provider, payment type, and status.
+SWE
+string
+payment
+easy
+Frequency
+Medium
+Last asked
+2026-08-24
+Stage
+phone-screen · tech-screen
+Requirements
+
+Input: a single CSV string. The first row is the header; remaining rows are transaction records. Canonical columns: id, reference, amount, currency, date, merchant_id, buyer_country, transaction_type, payment_provider, status.
+
+amount is in cents (e.g. 1000 = $10.00). status values include payment_completed, payment_failed, payment_pending. payment_provider ∈ {card, klarna, bank_transfer}.
+
+Output: a CSV string with header id,transaction_type,payment_provider,fee, one line per input transaction.
+
+The fee per row comes from a rules table keyed by (buyer_country, payment_provider, status); each entry is a percentage rate plus a fixed cent fee. Always floor the final fee to an integer (use int() truncation).
+
+The problem is delivered in three escalating parts:
+
+Part 1 — basic per-provider fee
+
+Each provider charges amount × rate + fixed, floored:
+
+providerratefixed
+card2.9%30
+klarna3.5%50
+bank_transfer0.8%0 (flat)
+
+def calculate_fees(csv_data: str) -> str: ...
+    # Parse header → {col_name: index}; skip header row when iterating.
+    # fee = int(amount * rate + fixed)  # floor via int()
+    # Emit "id,transaction_type,payment_provider,fee" per row.
+
+Part 2 — status gate + regional rates
+
+Only charge a fee when status == "payment_completed"; for failed/pending the fee is 0.
+
+Ireland (buyer_country == "ie") uses cheaper rates; all other countries fall back to the Part-1 standard rates.
+
+ie providerratefixed
+card1.9%20
+klarna2.5%40
+
+def get_fee_config(country: str, provider: str) -> tuple[float, int]: ...
+    # Return regional override if (country, provider) present, else the default rate.
+    # Caller: if status != "payment_completed": fee = 0
+
+Part 3 — per-merchant volume discount
+
+Count successful (payment_completed) transactions per merchant_id. Look up the discount using the merchant's count before the current transaction (i.e. on the (count+1)-th completed tx), then increment the count only for completed transactions.
+
+Process rows in input order — ordering is significant.
+
+Fees are now sourced from a passed-in country_fees dict (fall back to the "default" key when a country is absent; within a country fall back to default for a missing provider):
+
+country_fees = {
+    "ie":      {"card": (0.019, 20), "klarna": (0.025, 40), "bank_transfer": (0.006, 0)},
+    "de":      {"card": (0.025, 25), "klarna": (0.030, 45), "bank_transfer": (0.007, 0)},
+    "fr":      {"card": (0.027, 28), "klarna": (0.032, 48), "bank_transfer": (0.008, 0)},
+    "default": {"card": (0.029, 30), "klarna": (0.035, 50), "bank_transfer": (0.008, 0)},
+}
+
+Discount tiers (by cumulative completed-transaction count):
+
+count so fardiscount
+1–100%
+11–5010%
+51–10015%
+101+20%
+
+def calculate_fees(csv_data: str, country_fees: dict) -> str: ...
+    # base = amount * rate + fixed
+    # fee  = int(base * (1 - discount))   # discount applied, then floored
+
+Example output (Part-1 rates, floor each fee):
+
+id,transaction_type,payment_provider,fee
+py_1,payment,card,59
+py_2,payment,card,102
+py_3,payment,klarna,169
+py_4,payment,bank_transfer,40
+
+py_1: 1000 × 0.029 + 30 = 59. py_2: 2500 × 0.029 + 30 = 102.5 → 102. py_3: 3400 × 0.035 + 50 = 169. py_4: 5000 × 0.008 = 40.
+
+Minority variant: some candidates report a rules table also keyed on status (different rate per status) and smaller fee figures (e.g. card → 51, klarna → 101) — confirm the exact rate table and rounding direction with the interviewer before coding.
+
+Examples
+
+Part 2 — same four rows plus a pending py_5 (ie, card, 2000):
+
+id,transaction_type,payment_provider,fee
+py_1,payment,card,39
+py_2,payment,card,0
+py_3,payment,klarna,125
+py_4,payment,bank_transfer,40
+py_5,payment,card,0
+
+py_1: Ireland rate → 1000 × 0.019 + 20 = 39. py_2: failed → 0. py_3: Ireland klarna → 3400 × 0.025 + 40 = 125. py_4: France falls back to standard bank_transfer → 40. py_5: pending → 0.
+
+Part 3 — discount applied, then floored. For a completed ie/card tx of 1500 that is a merchant's 11th completed tx (10% tier):
+
+base = 1500 × 0.019 + 20 = 48.5; discounted = 48.5 × 0.9 = 43.65; floored → 43.
+
+Notes
+
+One report (Java) was told the interviewer explicitly evaluates Java candidates more leniently on time.
+
+The core skill is fast string handling — read CSV by hand, split, look up in a dict, emit lines.
+
+Multiple reports note clean output formatting matters more than algorithmic optimization.
+
+Both Part 1 and Part 3 run in O(n) (single pass); Part 3 also keeps O(m) merchant counters.
+
+Questions to clarify with the interviewer (Part 3)
+
+Is the discount applied before or after rounding?
+
+If a merchant sells across multiple countries, do all sales count toward one shared volume total?
+
+Does the volume count ever reset (e.g. monthly)?
+
+Edge cases to guard
+
+Empty input string.
+
+A payment_provider not present in the fee table.
+
+Malformed / short CSV rows.
+
+Preparation
+
+Drill clean CSV parsing without pandas (Stripe rounds typically want stdlib).
+
+Pre-write a rule-table evaluator: (provider, type, status) → rate.
+
+Practice writing the expected output to stdout exactly, including trailing-newline handling.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

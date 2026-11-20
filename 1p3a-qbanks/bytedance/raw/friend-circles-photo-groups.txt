@@ -1,0 +1,61 @@
+===H1===
+Photo Groups via Transitive Similarity
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/friend-circles-photo-groups
+===BODY===
+ByteDance / TikTok
+Coding·60 minMembers
+Photo Groups via Transitive Similarity
+Given a symmetric similarity matrix where `isSimilar[i][j] == 1` means photos i and j are directly similar, count the number of photo groups under transitive closure.
+SWE
+graph
+union-find
+dfs
+medium
+Frequency
+Single report
+Last asked
+2026-03-05
+Stage
+phone-screen
+Requirements
+
+You are given a square n x n matrix isSimilar where:
+
+isSimilar[i][j] == 1 means photos i and j are directly similar
+
+isSimilar[i][j] == 0 means they are not directly similar
+
+The relation is symmetric
+
+Similarity is transitive: if A ~ B and B ~ C, then A ~ C. Return the number of similarity groups.
+
+def findGroups(isSimilar: List[List[int]]) -> int: ...
+
+Notes
+
+This is the canonical "number of connected components in an undirected graph" formulation, equivalent to friend-circles / province-counting problems.
+
+Two standard approaches: union-find (Kruskal-style) or DFS / BFS over the implicit adjacency. Union-find is typically the cleaner answer in interviews and extends best to streaming variants.
+
+Union-find with path compression and union by rank gives near O(n²α(n)) time on the full matrix, which is dominated by the O(n²) matrix scan.
+
+Common bug: iterating over both (i, j) and (j, i) — only the upper triangle needs union calls, but it does not change correctness, only timing.
+
+If the matrix is sparse, switch to an adjacency-list representation; the algorithmic skeleton is identical.
+
+Preparation
+
+Write a textbook union-find with find (path compression) and union (union by rank) — be able to produce it in 5 minutes.
+
+Drill the DFS connected-components alternative as a backup; some interviewers ask for both.
+
+Practice on a 4×4 toy example with 2 groups (e.g. {0,1} and {2,3}) to make sure the count is right.
+
+Be ready to discuss the asymptotic difference between the matrix-input and edge-list-input versions.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

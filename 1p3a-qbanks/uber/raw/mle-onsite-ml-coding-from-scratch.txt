@@ -1,0 +1,148 @@
+===H1===
+MLE Onsite: ML Coding from Scratch (Regression / Markov / Facility)
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/mle-onsite-ml-coding-from-scratch
+===BODY===
+Uber
+Coding·60 minMembers
+MLE Onsite: ML Coding from Scratch (Regression / Markov / Facility)
+MLE-specific onsite coding round. Implement a small ML primitive from scratch in Python / NumPy without using framework helpers. Recurring prompts: linear & logistic regression, a markov-chain text generator, and k-medoids facility-location for shuttle pickup with L1 distance.
+MLE
+RS
+pytorch
+numpy
+ml-knowledge
+linear-algebra
+medium
+Frequency
+Medium
+Last asked
+2026-04-15
+Stage
+onsite-coding · phone-screen
+Requirements
+
+The interviewer picks one of the following families:
+
+Linear / logistic regression — implement closed-form linear regression with normal equations, then logistic regression with mini-batch gradient descent. Expect to derive the gradient on the whiteboard before coding. (Precise specs in ### Linear and logistic regression from scratch.)
+
+Markov-chain text generator — two functions:
+
+build_frequency_map(corpus: str) → Dict[str, Dict[str, int]]. Tokenise the corpus (treat each word as a token; sanitise punctuation). For each word, count the words that immediately follow.
+
+generate_text(transition_map, start_word: str, steps: int) → str. From start_word, at each step pick the most frequent next-word (ties broken deterministically), continue for steps steps.
+
+Facility location / shuttle pickup — input: N rider coordinates and target count K. Find K pickup locations on the same grid that minimise the sum of L1 distances from each rider to its nearest pickup. The interviewer accepts a greedy / 1-D-decomposition approximation if you note the trade-off.
+
+Multi-head self-attention (PyTorch) — implement scaled dot-product multi-head self-attention as an nn.Module from scratch. A distinct task, usually a phone-screen variant. (Precise specs in ### Multi-head self-attention from scratch (PyTorch).)
+
+Notes
+
+The interviewer explicitly forbids sklearn, torch.nn (for the regression/Markov families), or any framework helper that would short-circuit the math. NumPy is allowed. The attention task is the exception — there you build on top of torch / nn.Module but must implement the attention math by hand rather than calling nn.MultiheadAttention.
+
+For regression, the derivation is graded as heavily as the code — interviewers have failed candidates who wrote correct code but couldn't justify the gradient.
+
+For the markov generator, sanitisation is the bug-magnet: "It's" vs "its", trailing punctuation, casing. State your normalisation policy in the first minute.
+
+For facility location, the L1 axis-decomposition trick (median minimises L1 in 1D) is the canonical optimal for K = 1 and the canonical heuristic for K > 1. State this trick explicitly even if you fall back to a heuristic.
+
+The round is 60 min including 10 min of resume-walk and ML-knowledge questions; coding time is closer to 40 min. Don't aim for an optimal solution if a clean approximate one is faster.
+
+For the facility-location / shuttle variant, the textbook framing is k-medoids with PAM under L1 distance: BUILD picks k initial medoids greedily, SWAP iterates each (medoid, non-medoid) pair and keeps the swap with the largest cost reduction. NP-hard, so state up front that you are giving a local-optimum heuristic, not the exact answer. Naive PAM is O(k(n − k)²) per iteration.
+
+Linear and logistic regression from scratch
+
+Implement both models with the same five-step structure — init w, b; predict; compute loss; derive gradient; update by gradient descent. The grader wants to see you know the objective, the gradient, and the update rule without a library.
+
+Linear regression
+
+prediction: y_hat = Xw + b
+
+loss (MSE): MSE = (1/n) · Σ_i (y_hat_i − y_i)²
+
+gradient term: error = y_hat − y; grad_w = (2/n) · Xᵀ·error, grad_b = (2/n) · Σ error
+
+Logistic regression
+
+logit: z = Xw + b; probability: p = sigmoid(z)
+
+loss (BCE): BCE = −(1/n) · Σ_i [ y_i·log(p_i) + (1 − y_i)·log(1 − p_i) ]
+
+gradient term: error = p − y; grad_w = (1/n) · Xᵀ·error, grad_b = (1/n) · Σ error
+
+Canonical signatures (X: np.ndarray (n, d), y: np.ndarray (n,)):
+
+class LinearRegressionGD:
+    def __init__(self, lr: float = 0.01, epochs: int = 1000): ...
+    def fit(self, X, y) -> None: ...        # w = zeros(d); loop epochs: y_hat = X @ w + b; error = y_hat - y
+                                            # grad_w = (2/n) * X.T @ error; grad_b = (2/n) * error.sum()
+    def predict(self, X) -> np.ndarray: ...  # X @ w + b
+    def loss(self, X, y) -> float: ...       # mean((predict(X) - y) ** 2)
+
+class LogisticRegressionGD:
+    @staticmethod
+    def sigmoid(z): ...                      # z = np.clip(z, -500, 500); 1 / (1 + exp(-z))  — guards overflow
+    def fit(self, X, y) -> None: ...         # error = sigmoid(X @ w + b) - y; grad_w = (1/n) * X.T @ error
+    def predict_proba(self, X) -> np.ndarray: ...
+    def loss(self, X, y) -> float: ...       # clip p to [1e-12, 1 - 1e-12] before log; -mean(y*log(p)+(1-y)*log(1-p))
+    def predict(self, X, threshold: float = 0.5) -> np.ndarray: ...  # (proba >= threshold).astype(int)
+
+Numerical-stability details the grader listens for: clip the sigmoid argument to [-500, 500] to avoid exp overflow, and clip p to [1e-12, 1 − 1e-12] before log to avoid log(0). Standardising features speeds convergence. Linear regression also admits the closed-form normal equation, but presenting both models under one gradient-descent story reads cleaner.
+
+Follow-ups to be ready for: add L2 regularisation to both; explain why logistic regression is linear on the log-odds scale; replace the fixed epoch count with a convergence criterion (loss-delta threshold).
+
+Multi-head self-attention from scratch (PyTorch)
+
+Implement multi-head self-attention as an nn.Module. Self-attention means Q, K, V all derive from the same input x.
+
+Dimensions and invariants:
+
+input x: (batch_size, seq_len, d_model)
+
+d_model must be divisible by num_heads; head_dim = d_model // num_heads
+
+optional attention mask must be broadcastable to the score tensor (B, H, T, T)
+
+Six-step pattern: (1) linear-project x to Q, K, V; (2) reshape (B, T, D) → (B, H, T, D_head) via view + transpose(1, 2); (3) scores = Q @ Kᵀ / sqrt(head_dim); (4) softmax over the last dim; (5) context = attn @ V; (6) concat heads back to (B, T, D) and apply the output projection.
+
+class MultiHeadSelfAttention(nn.Module):
+    def __init__(self, d_model: int, num_heads: int):
+        # assert d_model % num_heads == 0; head_dim = d_model // num_heads
+        # q_proj, k_proj, v_proj, out_proj = nn.Linear(d_model, d_model) x4
+        ...
+    def forward(self, x: torch.Tensor, mask: torch.Tensor | None = None) -> torch.Tensor: ...
+        # q,k,v = *_proj(x); each .view(B, T, H, head_dim).transpose(1, 2) -> (B, H, T, head_dim)
+        # scores = (q @ k.transpose(-2, -1)) / math.sqrt(head_dim)       -> (B, H, T, T)
+        # mask: (B,T) -> [:, None, None, :]; (B,T,T) -> [:, None, :, :]; scores.masked_fill(~mask, -inf)
+        # attn = softmax(scores, dim=-1); context = attn @ v             -> (B, H, T, head_dim)
+        # context.transpose(1, 2).contiguous().view(B, T, d_model); return out_proj(context)
+
+Shape trace (the point of the exercise): (B,T,D) → split heads (B,H,T,D_head) → scores (B,H,T,T) → weighted values (B,H,T,D_head) → concat (B,T,D). The .contiguous() before the final view is required because transpose leaves a non-contiguous tensor.
+
+Mask handling: a padding mask (B, T) expands to (B, 1, 1, T); a full mask (B, T, T) expands to (B, 1, T, T); both then broadcast against (B, H, T, T). Apply with masked_fill(~mask, float("-inf")) before softmax.
+
+For an interview this is just the attention module — no residual, layer-norm, or feed-forward unless asked for the full Transformer block. Follow-ups: add a causal mask for autoregressive decoding; explain why scaling by sqrt(head_dim) matters (keeps softmax out of saturation); compare three separate projections vs one fused qkv projection; discuss the O(T²) time and memory cost.
+
+Examples
+
+A regression sanity check: fit LinearRegressionGD on X = [[1.0], [2.0], [3.0]], y = [2.0, 4.0, 6.0] and after enough epochs w ≈ 2.0, b ≈ 0.0. For attention, a forward pass on x of shape (2, 5, 16) with num_heads = 4 returns a tensor of shape (2, 5, 16) and per-row attention weights summing to 1.
+
+Preparation
+
+Drill NumPy vectorisation and einsum until you can write logistic regression without looking up array shapes.
+
+Derive the L2 loss → Wx + b reduction once by hand; you should be able to reproduce the gradient on a whiteboard in 3 minutes.
+
+Implement the markov-chain generator end-to-end in 20 minutes as a practice run; the sanitisation step is the time sink.
+
+Read the K-medoids and PAM algorithms; be ready to discuss why this is NP-hard for general K and what a city-block decomposition buys you.
+
+For the regression variant, derive the gradient of ½‖Xw − y‖² to Xᵀ(Xw − y) on paper twice before the round; interviewers will ask you to whiteboard it before letting you code.
+
+For the attention variant, write the (B,T,D) → (B,H,T,D_head) reshape and the scaled-dot-product math from memory; rehearse the shape trace out loud and remember the .contiguous() before the final view.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

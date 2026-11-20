@@ -1,0 +1,49 @@
+===H1===
+Tree Node Relationship — Sibling / Cousin / Other
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/tree-node-relationship-sibling-cousin
+===BODY===
+Amazon
+Coding·60 minMembers
+Tree Node Relationship — Sibling / Cousin / Other
+Given an arbitrary tree and two of its nodes, classify their relationship as `sibling`, `cousin`, or `other`.
+SWE
+tree
+bfs
+tree-traversal
+easy
+Frequency
+Single report
+Last asked
+2026-05-13
+Stage
+onsite-coding
+Requirements
+
+Input: the tree root plus two node references (or values) a and b.
+
+Output one of sibling (same parent), cousin (same depth, different parent), or other (everything else — ancestor / descendant / different depths).
+
+The interview prompt left tree arity (binary vs n-ary) open; clarify before coding.
+
+Notes
+
+The canonical solve is a single BFS / DFS that records (parent, depth) for both targets, then compares: same parent → sibling; same depth + different parent → cousin; otherwise other.
+
+Bail out as soon as both targets are seen so large trees stay O(n) worst-case with early termination.
+
+Edge cases worth raising up front: a == b (same node), one node missing from the tree, root involved (root has no parent, so it can never be a sibling or cousin).
+
+Preparation
+
+Drill LC 993 "Cousins in Binary Tree" first, then extend the same scan to also report the sibling vs other branches.
+
+Write both BFS and recursive-DFS variants — the interviewer in this loop pushed for the iterative version after the recursion was working.
+
+Pre-define an Info(parent, depth, found) carrier so the classification step reads as a clean three-way if instead of nested boolean logic.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

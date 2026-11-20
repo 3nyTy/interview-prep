@@ -1,0 +1,66 @@
+===H1===
+Content Moderation System Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/content-moderation-system-design
+===BODY===
+ByteDance / TikTok
+System Design·60 minMembers
+Content Moderation System Design
+End-to-end design of a content-moderation pipeline for short-video / e-commerce content. Variants include ML inference layer, feature pipeline, job scheduler follow-up, and review-queue prioritization.
+SWE
+MLE
+moderation
+ml-infra
+messaging
+scaling
+evaluation
+hard
+Frequency
+Medium
+Last asked
+2026-08-12
+Stage
+onsite-system-design
+Requirements
+
+Design a content-moderation system for a high-volume short-video / live / e-commerce platform. The interviewer will probe at least three of:
+
+Functional: ingest user-generated content (video, image, text); run pre-publish moderation; flag violations into a human review queue; expose moderation outcome back to the publishing service.
+
+ML infrastructure: model serving (per-modality models — vision, ASR transcript, OCR, text classifier); feature pipeline (embeddings, sampled frames); offline retraining loop.
+
+Scale: 100M+ uploads / day; sub-second decision SLA for short videos; full-video re-scan within minutes.
+
+Reliability: at-least-once delivery between stages; replay-ability of past content if rules change; audit log of every decision.
+
+Follow-up: how would you build a job scheduler sitting on top of this pipeline to handle high-frequency re-moderation tasks (e.g., re-scoring trending content)? Discuss priority queue + worker pool + at-least-once delivery semantics.
+
+Notes
+
+The canonical architecture has three planes: ingestion / decision / review. Ingestion writes raw content + metadata to durable storage and emits a Kafka event. A decision worker pool fans out per-modality model calls (or one multimodal model), aggregates scores, applies rule logic, writes the verdict. Verdicts above auto-action thresholds enforce; ambiguous ones enqueue for human review.
+
+Model serving deserves its own slot: ensemble of cheap rule filters → vision / ASR / OCR pipelines → expensive multimodal LLM only for ambiguous cases. The cost shape is hourglass: cheap up front, expensive in the middle, cheap again after a confident verdict.
+
+Replay-ability matters: rules change. Architect so the system can re-process past content by replaying events through the decision plane against new rules without disturbing the live path.
+
+The job-scheduler follow-up wants three components: a priority queue (heap or Kafka with partitioned priority), a worker pool that pulls and processes, and at-least-once delivery with idempotent task processing (deduplicated by content_id + rule_version).
+
+For e-commerce variants, the interviewer often asks about graph features (buyer-seller-item heterogeneous graph) for fraud — GNN candidate generation followed by XGBoost re-rank is the conventional answer.
+
+Common pitfall: candidates start with the model layer and forget the queue / storage / replay plane. Lead with the data flow, then layer ML.
+
+Preparation
+
+Draft a 3-plane architecture (ingest / decide / review) you can sketch in 5 minutes; annotate Kafka topics, storage buckets, model service endpoints.
+
+Be ready to walk through the per-modality model stack and explain why a cheap filter precedes the expensive multimodal model.
+
+Drill the job-scheduler follow-up separately — priority queue + worker pool + at-least-once delivery + idempotency key.
+
+Have an opinion on synchronous vs. asynchronous decision paths: short-video uploads can tolerate ~1s end-to-end; live streams cannot, so you need a fast asynchronous path with rollback if a downstream verdict reverses.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

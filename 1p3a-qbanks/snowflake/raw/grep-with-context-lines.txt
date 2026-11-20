@@ -1,0 +1,409 @@
+===H1===
+Grep With Context Lines
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/grep-with-context-lines
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Grep With Context Lines
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+Members
+Grep With Context Lines
+
+You are given a scanned document represented as an array of strings, where each string is one line.
+
+SWE
+string-processing
+parsing
+io
+medium
+Frequency
+Single report
+Last asked
+2026-02-19
+Stage
+phone-screen · onsite-coding
+Grep With Context Lines
+Problem Requirements
+
+You are given a document. It is stored as a list of strings, where each string is one line of text.
+
+You need to write a function that acts like a simple grep tool:
+
+Search for lines that contain a specific target string.
+If line i has the target, print that line. Also print linesAround number of lines before and after it.
+Important: Do not print the same line twice.
+Keep the lines in the same order as the original document.
+
+The interview usually follows these steps:
+
+Solve for a standard list input.
+Solve for streaming input (lines come in one by one).
+Optimize the speed.
+Design a solution using multithreading.
+Example
+lines = [
+    "good morning",
+    "hello there",
+    "my name is Alex",
+    "my friend is albert",
+    "it is nice to meet you Alex",
+]
+
+search_target = "Alex"
+lines_around = 1
+
+
+Expected Output:
+
+[
+    "hello there",
+    "my name is Alex",
+    "my friend is albert",
+    "it is nice to meet you Alex",
+]
+
+
+Note: The line "my friend is albert" is near both matches, but it is included in the result only once.
+
+Part 1: Solution for Static Input
+Problem Approach
+
+We need to implement this function:
+
+def grep_with_context(
+    lines: list[str],
+    search_target: str,
+    lines_around: int,
+) -> list[str]:
+    pass
+
+
+The easiest way to solve this is to use a list of booleans (True/False) to mark lines we want to keep.
+
+Create a marked list full of False. It should be the same length as the input.
+Loop through every line.
+If a line contains the search_target, set marked to True for that line and its neighbors (based on lines_around).
+Finally, loop through the original lines and return only the ones marked True.
+Code Implementation
+def grep_with_context(
+    lines: list[str],
+    search_target: str,
+    lines_around: int,
+) -> list[str]:
+    if lines_around < 0:
+        raise ValueError("lines_around must be >= 0")
+
+    n = len(lines)
+    marked = [False] * n
+    k = lines_around
+
+    # Scan the lines
+    for i, line in enumerate(lines):
+        if search_target in line:
+            # Determine the start and end of the window
+            left = max(0, i - k)
+            right = min(n - 1, i + k)
+            # Mark all lines in this window
+            for j in range(left, right + 1):
+                marked[j] = True
+
+    # Collect marked lines
+    return [line for i, line in enumerate(lines) if marked[i]]
+
+Complexity Analysis
+Step	Time	Space
+Scan + marking	O(n * k) worst-case	O(n)
+Build output	O(n)	O(1) extra
+
+n is the number of lines. k is lines_around.
+
+Part 2: Follow-up (Streaming Input)
+Problem Adjustments
+
+Now, the lines come in one at a time. You cannot see the whole list at the start. You must process each line as it arrives.
+
+Solution Design
+
+We need to remember recent lines to handle the "context before" a match. We also need to know when to print lines for the "context after" a match.
+
+Buffer: Use a deque to store the last k lines. This handles the "before" context.
+Track Printing: Use a variable emit_until. This tells us the furthest index into the future we need to print.
+Avoid Duplicates: Check a flag on each buffered line to ensure we don't print it twice.
+
+This method uses O(k) memory.
+
+Code Implementation
+from collections import deque
+
+class StreamingGrep:
+    def __init__(self, search_target: str, lines_around: int):
+        if lines_around < 0:
+            raise ValueError("lines_around must be >= 0")
+        self.search_target = search_target
+        self.k = lines_around
+        self.idx = -1
+        self.emit_until = -1
+        # Each entry stores: [index, line, is_printed]
+        self.buffer = deque()
+
+    def process_line(self, line: str) -> list[str]:
+        self.idx += 1
+        out: list[str] = []
+        # Add new line to buffer
+        self.buffer.append([self.idx, line, False])
+
+        # Remove lines that are too old to be "before context"
+        min_keep_idx = self.idx - self.k
+        while self.buffer and self.buffer[0][0] < min_keep_idx:
+            self.buffer.popleft()
+
+        is_match = self.search_target in line
+        if is_match:
+            # Update how far into the future we need to print
+            self.emit_until = max(self.emit_until, self.idx + self.k)
+            
+            # Print everything currently in the buffer
+            for entry in self.buffer:
+                if not entry[2]: # If not printed yet
+                    out.append(entry[1])
+                    entry[2] = True
+
+        # Print the current line (or buffered lines) if they are within the "after context" range
+        for entry in self.buffer:
+            if entry[0] <= self.emit_until and not entry[2]:
+                out.append(entry[1])
+                entry[2] = True
+
+        return out
+
+Complexity Analysis
+Operation	Time	Space
+Per line	O(k) worst-case	O(k)
+Part 3: Follow-up (Optimization)
+Problem Adjustments
+
+If k (lines around) is very large, the Part 1 solution is slow. It writes to the boolean array too many times. We need a faster way.
+
+Solution Approach
+
+Instead of marking every single line individually, we can use Intervals.
+
+When we find a match, calculate the range [start, end].
+If this range overlaps with the previous range, merge them into one big range.
+If it doesn't overlap, save the previous range and start a new one.
+After checking all lines, simply loop through the merged intervals to print the lines.
+Code Implementation
+def grep_with_context_optimized(
+    lines: list[str],
+    search_target: str,
+    lines_around: int,
+) -> list[str]:
+    if lines_around < 0:
+        raise ValueError("lines_around must be >= 0")
+
+    n = len(lines)
+    k = lines_around
+    intervals: list[list[int]] = []
+
+    for i, line in enumerate(lines):
+        if search_target in line:
+            left = max(0, i - k)
+            right = min(n - 1, i + k)
+            
+            # If list is empty or new range does not overlap, add it
+            if not intervals or left > intervals[-1][1] + 1:
+                intervals.append([left, right])
+            else:
+                # Merge with the previous interval
+                intervals[-1][1] = max(intervals[-1][1], right)
+
+    result: list[str] = []
+    # Collect lines based on merged intervals
+    for left, right in intervals:
+        for i in range(left, right + 1):
+            result.append(lines[i])
+    return result
+
+Complexity Analysis
+Step	Time	Space
+Scan + interval merge	O(n)	O(t)
+Build output	O(r)	O(1) extra
+
+t is the number of merged intervals. r is the number of lines returned.
+
+Part 4: Follow-up (Multithreading)
+Problem Adjustments
+
+How would you solve this for a massive file using multiple CPU threads?
+
+System Design
+
+We can use a map-reduce style approach:
+
+Split: Divide the list of lines into chunks. Assign each chunk to a worker.
+Workers (Map): Each worker scans its chunk. Instead of printing lines, it returns a list of intervals (start and end indices) where matches were found.
+Coordinator (Reduce):
+Collects all intervals from all workers.
+Merges overlapping intervals (just like in Part 3).
+Prints the lines corresponding to the final merged intervals.
+
+This ensures the output remains in the correct order and contains no duplicates.
+
+Complexity
+Worker: Scans O(n / p) lines, where p is the number of workers.
+Coordinator: Merges intervals in O(m log m), where m is the number of matches found.
+Pseudocode
+# Worker function for a chunk of lines [start, end]
+def worker(lines, search_target, k, start, end):
+    local_intervals = []
+    for i in range(start, end + 1):
+        if search_target in lines[i]:
+            # Store the range using global indices
+            local_intervals.append([max(0, i - k), min(len(lines) - 1, i + k)])
+    return local_intervals
+
+# Coordinator logic:
+# 1) Collect interval lists from all workers
+# 2) Sort and merge these intervals
+# 3) Print lines based on the final merged ranges
+
+Edge Cases To Test
+
+Make sure your code handles these situations:
+
+The input list is empty (lines = []).
+The target string is not found anywhere.
+Every single line matches the target.
+lines_around is 0.
+lines_around is bigger than the entire document.
+Matches are close together (overlapping windows).
+A match is on the very first or very last line.
+Additional Tests
+def _run_tests():
+    lines = ["a", "b Alex", "c", "Alex d", "e"]
+    # Normal case with overlap handling
+    assert grep_with_context(lines, "Alex", 1) == ["a", "b Alex", "c", "Alex d", "e"]
+    # Zero lines around
+    assert grep_with_context(lines, "Alex", 0) == ["b Alex", "Alex d"]
+    # No match found
+    assert grep_with_context(lines, "zzz", 3) == []
+    # Empty input
+    assert grep_with_context([], "Alex", 2) == []
+
+    # Test Optimized Solution
+    assert grep_with_context_optimized(lines, "Alex", 1) == [
+        "a", "b Alex", "c", "Alex d", "e"
+    ]
+
+    # Test Streaming Solution
+    sg = StreamingGrep("Alex", 1)
+    out = []
+    for line in lines:
+        out.extend(sg.process_line(line))
+    assert out == ["a", "b Alex", "c", "Alex d", "e"]
+
+    # Test Streaming with 0 lines around
+    sg0 = StreamingGrep("Alex", 0)
+    out0 = []
+    for line in lines:
+        out0.extend(sg0.process_line(line))
+    assert out0 == ["b Alex", "Alex d"]
+
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Grep With Context Lines
+Problem Requirements
+Example
+Part 1: Solution for Static Input
+Problem Approach
+Code Implementation
+Complexity Analysis
+Part 2: Follow-up (Streaming Input)
+Problem Adjustments
+Solution Design
+Code Implementation
+Complexity Analysis
+Part 3: Follow-up (Optimization)
+Problem Adjustments
+Solution Approach
+Code Implementation
+Complexity Analysis
+Part 4: Follow-up (Multithreading)
+Problem Adjustments
+System Design
+Complexity
+Pseudocode
+Edge Cases To Test
+Additional Tests
+Related discussions · 0
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Serialize and Deserialize Dictionary Trie
+Single report
+parsing
+medium
+trie
++2
+Frontend Grid: Robot Eats Candies
+Single report
+medium
+frontend
+bfs
++2
+Throne Inheritance
+Single report
+medium
+tree
+hashmap
++1
+Copy List with Random Pointer
+Single report
+medium
+linked-list
+hashmap
+Boundary of Binary Tree
+Single report
+medium
+tree
+dfs
++1
+Code editor

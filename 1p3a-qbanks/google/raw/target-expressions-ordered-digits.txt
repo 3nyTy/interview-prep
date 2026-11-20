@@ -1,0 +1,58 @@
+===H1===
+Target Expressions from Ordered Digits
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/target-expressions-ordered-digits
+===BODY===
+Google
+CodingMembers
+Target Expressions from Ordered Digits
+Given digits in fixed order and a target, enumerate every expression using `+`, `*`, and parentheses that evaluates to the target under standard precedence. The follow-up generalizes from three digits to N; the available solution signal is memoization plus dynamic programming, without a fully specified state contract.
+SWE
+array
+backtracking
+dp
+math
+medium
+Frequency
+Single report
+Last asked
+2026-08-13
+Stage
+onsite-coding
+Requirements
+
+Input: an ordered list of digits and a target value. Preserve digit order and use only addition, multiplication, and parentheses.
+
+Output every valid expression that evaluates to the target under standard arithmetic precedence.
+
+The initial version uses three digits and can be enumerated directly.
+
+Follow-up: support N digits. Memoization plus dynamic programming is the available implementation direction, but the exact state representation is not fixed; clarify whether every digit must be used and which parenthesizations are valid.
+
+Examples
+
+For digits [2, 3, 4] and target 14, valid outputs include:
+
+2 * (3 + 4)
+
+2 + 3 * 4
+
+Notes
+
+The base case is small enough for direct enumeration, but a complicated ad hoc implementation becomes difficult to extend. Keep expression construction separate from numeric evaluation while negotiating the N-digit contract.
+
+If the agreed contract uses every digit exactly once in order, memoize each interval [l, r) as a map from attainable numeric values to the expression strings producing them. For every split point, combine left and right entries with + and *, wrapping composite children as needed; the full-interval target bucket is the answer. Because every distinct expression must be retained, both time and storage are output-sensitive and can grow exponentially even though interval states are memoized.
+
+Preparation
+
+Enumerate operator placements and valid parenthesizations for three or four ordered digits.
+
+Explore memoized dynamic-programming state definitions for the N-digit follow-up and be ready to justify one before coding.
+
+Explain how duplicate expressions or duplicate values would be handled without discarding distinct valid output forms.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,72 @@
+===H1===
+DE / AE Screen: SQL + Python (Sliding Window + Joins)
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/de-ae-sql-python-screen
+===BODY===
+DoorDash
+Coding·60 minMembers
+DE / AE Screen: SQL + Python (Sliding Window + Joins)
+Data Engineer / Analytics Engineer screen. One Python coding (sliding-window max-sum returning the 1-based start day) + four SQL queries against a merchant / menu / order / dasher ER diagram (bucket assignment, top-5 selection, vegetarian-merchant percentage). Candidate chooses Python-first or SQL-first ordering.
+DS
+sql
+python
+sliding-window
+query-optimization
+medium
+Frequency
+Low
+Last asked
+2026-03-20
+Stage
+phone-screen
+Requirements
+
+Python (1 question)
+
+Max sum sliding window over a list of integers; return the start day (1-indexed) of the window as a list (or as a single integer if window length is fixed). Clarify whether multiple optimal windows should all be returned.
+
+SQL (4 questions, target 3 to pass)
+
+Schema: tables for merchant, menu, order, dasher and possibly customer. ER diagram given; no sample rows.
+
+Q1: Assign each merchant (or order) to a bucket based on some threshold — typical bucket-via-CASE / NTILE pattern.
+
+Q2: Top 5 selection (top 5 merchants by orders, top 5 dashers by completion rate, etc.) — RANK() / ROW_NUMBER() + LIMIT.
+
+Q3: Vegetarian-merchant percentage over all active merchants — ratio with CASE WHEN ... THEN 1 END aggregation, filtered by active=true.
+
+Q4: Open-ended fourth — many candidates only get to attempt this one.
+
+Notes
+
+Order matters: pick whichever you're faster at (SQL-first if you trust the syntax; Python-first if the window math is easy for you).
+
+The Python question reportedly returns the start day as a 1-based index, not 0-based. Off-by-one on this is the most common bug.
+
+SQL gotchas:
+
+Bucket assignment is often via CASE WHEN ... THEN 'a' WHEN ... THEN 'b' ELSE 'c' END; mention NTILE if asked about uniform-size buckets.
+
+Top-5 with ties: clarify whether you want exactly 5 rows (LIMIT 5), or all rows tied for rank ≤ 5 (DENSE_RANK() ≤ 5).
+
+Vegetarian-percentage needs 1.0 * SUM(CASE WHEN vegetarian THEN 1 ELSE 0 END) / COUNT(*); integer division is the most common bug.
+
+A bug in any single SQL question burns enough time that the candidate cannot reach Q4.
+
+Window-function basics (ROW_NUMBER, RANK, DENSE_RANK, LAG, LEAD, NTILE, SUM() OVER (PARTITION BY ...)) cover ~80% of recent SQL prompts.
+
+Preparation
+
+Drill SQL window functions on StrataScratch / DataLemur until you can write each pattern in under 5 minutes cold.
+
+Pre-write the max-sum sliding-window template returning the 1-based start index.
+
+Practice with a small ER diagram exercise: given 5 tables, write 4 SQL queries against them in 30 minutes.
+
+Brush up on CASE / NULLIF / COALESCE — these come up across the bucket and ratio questions.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

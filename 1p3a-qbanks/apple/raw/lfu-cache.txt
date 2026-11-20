@@ -1,0 +1,71 @@
+===H1===
+LFU Cache
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/lfu-cache
+===BODY===
+Apple
+CodingMembers
+LFU Cache
+Design and implement a data structure for a Least Frequently Used (LFU) cache.
+SWE
+hard
+data-structure
+hashmap
+linked-list
+Frequency
+Single report
+Last asked
+2026-03-17
+Stage
+phone-screen
+Design and implement a data structure for a Least Frequently Used (LFU) cache.
+
+Implement the LFUCache class:
+
+LFUCache(int capacity) Initializes the cache with the given positive capacity.
+
+int get(int key) Returns the value of the key if present in the cache, otherwise returns -1.
+
+void put(int key, int value) Updates the value of the key if it exists, or inserts the key-value pair. When the cache is at capacity, invalidate and remove the least frequently used key before inserting. If multiple keys share the lowest frequency, evict the least recently used among them.
+
+To determine frequency: the use count of a key is the number of get and put calls made to it since insertion. The use count is reset to 0 when the key is removed from the cache. Inserting a key via put counts as its first use (frequency 1).
+
+The functions get and put must each run in O(1) average time complexity.
+
+Note. With capacity = 0, the cache stores nothing; every get returns -1 and every put is a no-op.
+
+Examples
+
+Example 1:
+
+Input: ["LFUCache","put","put","get","put","get","get","put","get","get","get"] [[2],[1,1],[2,2],[1],[3,3],[2],[3],[4,4],[1],[3],[4]]
+
+Output: [null,null,null,1,null,-1,3,null,-1,3,4]
+
+Explanation:
+
+Example 2:
+
+Input: ["LFUCache","put","get"] [[0],[1,1],[1]]
+
+Output: [null,null,-1]
+
+Explanation:
+
+Capacity 0 means nothing is ever stored.
+
+Constraints
+
+0 <= capacity <= 10^4
+
+0 <= key <= 10^5
+
+0 <= value <= 10^9
+
+At most 2 * 10^5 calls to get and put
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,51 @@
+===H1===
+Optimal Execution with a Broker Backstop
+===URL===
+https://www.1point3acres.com/interview/problems/company/optiver/optimal-execution-broker
+===BODY===
+Optiver
+Coding·90 minMembers
+Optimal Execution with a Broker Backstop
+A HackerRank optimal-stopping / DP problem: buy n units one at a time, each at an i.i.d. price uniform on [a,b]; at each step you may accept the observed price or fall back to a broker's fixed price p, usable at most k times. Return the minimum expected total execution price under the optimal policy.
+RS
+DS
+dp
+expected-value
+trading
+oa
+hard
+Frequency
+Medium
+Last asked
+2025-10-24
+Stage
+oa
+Requirements
+
+You must buy n units of an asset, one at a time at n distinct times.
+
+At each step you observe a market price drawn i.i.d. Uniform(a, b). You then either buy at that price, or call a broker who sells at a fixed price p — but the broker can be used at most k times.
+
+Given integers n, k, interval bounds a, b, and broker price p, return the expected price (per the optimal policy) at which you execute the order.
+
+# Complete 'OptimalExecutionCost(n, a, b, k, p)' -> DOUBLE
+
+Notes
+
+This is backward-induction DP on state (units remaining, broker calls remaining): the value function gives a threshold below which you accept the market price and above which you either use a broker call or take the expected continuation.
+
+The continuation value involves the expected value of min(observed, threshold) over the uniform distribution — set up the integral / closed form for the uniform expectation carefully.
+
+Candidates consistently rate this the hardest of the three coding problems and frequently run out of time; getting the recurrence and the uniform-expectation term right is the crux.
+
+Preparation
+
+Derive the optimal-stopping recurrence on paper for small n, k first, then generalize; confirm the accept/continue threshold structure.
+
+Implement the uniform-expectation term (expected cost given a threshold) and unit-test the k = 0 (no broker) and p very-high / very-low corner cases.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,57 @@
+===H1===
+W-D-L Outcome Reordering
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/wdl-cyclic-reordering
+===BODY===
+Capital One
+Coding·70 minMembers
+W-D-L Outcome Reordering
+Given a string containing only `W`, `D`, and `L`, reorder its characters by repeatedly emitting available symbols in `W`, `D`, `L` order while preserving the original count of each symbol.
+MLE
+string
+simulation
+easy
+Frequency
+Single report
+Last asked
+2026-07-19
+Stage
+oa
+Requirements
+
+Input: a string containing only W, D, and L.
+
+Reorder the characters into repeated passes through W, then D, then L.
+
+During each pass, emit one copy of each symbol that remains; skip a symbol once all of its copies have been used.
+
+Preserve the input count of every symbol.
+
+Examples
+
+input:  WWWLLDDLD
+output: WDLWDLWDL
+
+input:  WLDDL
+output: WDLDL
+
+input:  WWWWLDDL
+output: WDLWDLWW
+
+Notes
+
+Count the three symbols once, then emit passes: while any count is positive, append one W, then one D, then one L, skipping any symbol whose remaining count is zero and decrementing as you emit. O(n) total.
+
+No sorting or index juggling is needed — the output is fully determined by the three counts, which also makes hand-verifying the unequal-count examples fast.
+
+Preparation
+
+Hand-trace all three examples by tracking the remaining count of W, D, and L after each pass.
+
+Use the unequal-count examples to verify that exhausted symbols are skipped without changing the W, D, L priority.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

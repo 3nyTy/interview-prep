@@ -1,0 +1,72 @@
+===H1===
+Frontend System Design — Crypto Trading UI Architecture
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/fe-sd-trading-ui
+===BODY===
+Coinbase
+System Design·60 minMembers
+Frontend System Design — Crypto Trading UI Architecture
+Frontend System Design round: design the architecture of a crypto trading UI given a prototype screenshot — framework choice, UI library, state management, error handling, loading patterns, performance, security, A/B testing. A staff-level signaling round; "not comprehensive enough" is the most common rejection feedback.
+SWE
+frontend
+react
+design
+ux
+ab-testing
+performance-modeling
+medium
+Frequency
+Low
+Last asked
+2026-05-08
+Stage
+onsite-system-design
+Requirements
+
+Cover the frontend architecture for a non-trivial trading product:
+
+Framework choice (React / Next.js / Remix etc.) and rendering strategy (SSR / SSG / CSR mix).
+
+UI library / design-system approach (Radix + Tailwind, MUI, custom).
+
+State management — what lives in component state vs URL state vs server state (React Query / SWR) vs a global store (Redux / Zustand / Jotai).
+
+Real-time data delivery (WebSocket subscription model, message routing to components, reconnect / replay handling).
+
+Error handling — error boundaries, retry strategies, user-facing error UI.
+
+Loading patterns — skeletons, suspense, optimistic updates.
+
+Performance — bundle splitting, code-splitting per route, image / font optimization, list virtualization.
+
+Security — XSS / CSRF posture, CSP, secrets handling, third-party script isolation.
+
+A/B testing — how flag evaluation reaches the client without hurting performance; how exposure logging hooks into analytics.
+
+A reported sub-variant: build the reusable component library for the trading product — what components do you extract, where do their boundaries sit, how do you version and ship the library.
+
+Notes
+
+Breadth over depth. Staff-level grading rewards covering all nine axes shallowly more than going deep on two. Watch the clock and force yourself to move on after 5 minutes per axis.
+
+State-management section is the most common failure point. Have a strong default opinion ("server state with React Query, component state with useState, derived state with useMemo, global state only when truly cross-cutting — auth, theme, feature flags") and defend it.
+
+A/B testing answers should hit: client-side flag SDK (evaluation is local once config is loaded), exposure events fired to analytics, server-side rendering needs the flag at request time so use a synchronous cookie-cache.
+
+Real-time data ties into the backend Coinbase Explore architecture — be ready to draw the same WebSocket → relay → browser shape and explain how the React tree subscribes (a custom hook backed by a singleton client, distributing updates via a context selector or zustand store).
+
+Performance number budget: aim for LCP < 2.5s, TBT < 200ms, JS bundle < 200KB per route. Cite these as anchors.
+
+Preparation
+
+Build a checklist of the 9 axes above and rehearse 5-minute walkthroughs of each on a whiteboard. The single most useful thing you can do for this round.
+
+Read one canonical reference design doc (Stripe Dashboard architecture, Linear's frontend stack postmortems) for vocabulary on production-grade frontend choices.
+
+Have an opinionated take on Redux-vs-React-Query that you can defend in 60 seconds — many interviewers seem to want the candidate to commit rather than hedge.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

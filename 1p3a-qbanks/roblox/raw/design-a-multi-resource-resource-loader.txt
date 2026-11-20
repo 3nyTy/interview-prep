@@ -1,0 +1,500 @@
+===H1===
+Design a Multi-Resource Resource Loader
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/design-a-multi-resource-resource-loader
+===BODY===
+Roblox
+System DesignMembers
+Design a Multi-Resource Resource Loader
+Design a loader that schedules work across multiple constrained resources while respecting dependencies, fairness, and failure handling.
+SWE
+Infra Eng
+scheduling
+concurrency
+backend
+scaling
+Frequency
+Single report
+Last asked
+2025-12-23
+Stage
+onsite-system-design
+Problem Statement
+
+Design a multi-resource resource loader for a game engine or client runtime. The loader should support multiple resource types such as textures, meshes, audio clips, scripts, animation data, and configuration files. Callers should be able to request resources by ID or path, avoid duplicate loads, handle dependencies, and release memory when resources are no longer needed.
+
+This prompt is often more local-memory and engine-system focused than a traditional distributed-system interview. You are designing an in-process subsystem with concurrency, caching, scheduling, and lifecycle management.
+
+Common variants of this prompt include:
+
+Design a resource loader that supports multiple resource types
+
+Design an asset loader for a game client
+
+Design a local memory resource manager
+
+Design an async loader with dependencies and cache eviction
+
+Do not start with load balancers, databases, and Kafka. For this prompt, the interesting architecture is inside one client or engine process: APIs, in-memory state, worker queues, dependency resolution, cache policy, and prompt safety.
+
+Phase 1: Requirements (~5 minutes)
+
+Functional Requirements
+
+Callers should be able to load resources by typed identifier, such as texture, mesh, audio, or script.
+
+The loader should deduplicate concurrent requests for the same resource.
+
+The loader should resolve dependencies before a resource becomes ready.
+
+Callers should receive async completion, failure, or cancellation results.
+
+The loader should cache loaded resources and evict unused resources under memory pressure.
+
+Optional follow-ups:
+
+Streaming large resources in chunks.
+
+Hot reload in development.
+
+Priority loading based on camera distance or gameplay need.
+
+Platform-specific resource variants.
+
+Reference counting versus garbage-collected handles.
+
+Non-Functional Requirements
+
+RequirementTargetWhy it matters
+Low latency for cache hitsMicroseconds to a few millisecondsGameplay code may request common assets frequently
+Non-blocking loadsMain prompt should not block on disk/network/decodeAvoid frame hitches
+Memory budgetConfigurable per resource class and global cacheClients have limited memory
+CorrectnessNo duplicate decode, no use-after-free, no partially ready resources exposedEngine stability
+ExtensibilityNew resource types should plug in without rewriting core loaderEngines evolve
+prompt safetySafe calls from main prompt and worker threadsLoading is concurrent
+ObservabilityTrace slow loads, cache hit rate, memory usage, failuresDebugging asset problems is hard
+
+Clarifying Questions
+
+Where do resources come from?
+Assume local package files and optional remote content. The design abstracts source behind ResourceProvider.
+
+What resource types are required?
+Assume textures, meshes, audio, scripts/config, and composed prefabs that depend on other resources.
+
+Do callers need sync loading?
+Cache hits can be synchronous, but misses should return a future/promise/handle.
+
+How are resources released?
+Assume callers hold reference-counted handles. When references drop, resources become evictable.
+
+Can resources depend on each other?
+Yes. A character prefab may depend on mesh, materials, textures, animations, and scripts.
+
+Capacity Estimation
+
+Example client assumptions:
+- 20K resources in the local manifest
+- 2K resources loaded during a large play session
+- 1-2 GB memory budget for loaded resources depending on device
+- 100-500 load requests during scene transition bursts
+
+Resource examples:
+- Texture: 0.5-32 MB after decode/GPU upload
+- Mesh: 100 KB-10 MB
+- Audio: 100 KB-20 MB compressed, more if decoded
+- Config/script: small but latency-sensitive
+
+Conclusion:
+- Metadata fits comfortably in memory.
+- Resource payloads do not; use lazy loading, reference tracking, priorities, and eviction.
+
+The useful capacity conclusion is that the manifest can be indexed in memory, but decoded resources need budget-aware caching. This drives the architecture more than raw request QPS.
+
+Phase 2: Data Model (~5 minutes)
+
+Core Entities
+
+ResourceId
+- type: texture | mesh | material | audio | animation | script | prefab | config
+- key: path, asset id, or content hash
+- variant: platform, quality level, locale
+
+ResourceManifestEntry
+- resource_id
+- source_uri
+- content_hash
+- compressed_size
+- estimated_loaded_size
+- dependencies: ResourceId[]
+- loader_type
+- priority_hint
+
+ResourceRecord
+- resource_id
+- state: missing | loading | loaded | failed | canceled | evicting
+- loaded_object
+- error
+- ref_count
+- last_accessed_at
+- loaded_size_bytes
+- generation
+- waiters
+
+LoadRequest
+- request_id
+- resource_id
+- priority
+- cancellation_token
+- deadline
+- requester_tag
+
+ResourceHandle
+- resource_id
+- generation
+- value
+- pointer/reference to loaded object
+- release()
+
+LoaderPlugin
+- resource_type
+- parse_metadata()
+- load()
+- unload()
+
+State Machine
+
+In-Memory Indexes
+
+manifest_by_id:
+- ResourceId -> ResourceManifestEntry
+
+records:
+- ResourceId -> ResourceRecord
+
+inflight_loads:
+- ResourceId -> Promise/Future shared by all waiters
+
+dependency_graph:
+- ResourceId -> dependencies
+- ResourceId -> reverse dependencies
+
+eviction_queue:
+- loaded resources with ref_count = 0 ordered by policy
+
+Modeling Decisions
+
+Resource identity includes type and variant so texture:tree@mobile and texture:tree@desktop are different loaded objects.
+
+One ResourceRecord owns state for each resource, preventing duplicate loads.
+
+Waiters attach to inflight loads rather than starting independent disk reads and decodes.
+
+Handles carry a generation so stale handles can be detected if a resource is evicted and reloaded.
+
+Loader plugins own type-specific decode and unload logic while the core owns scheduling and lifecycle.
+
+Phase 3: API Design (~5 minutes)
+
+API Shape
+
+This is an in-process API, not an HTTP API. Use futures/promises or callbacks for async completion.
+
+type ResourceType =
+  | "texture"
+  | "mesh"
+  | "material"
+  | "audio"
+  | "animation"
+  | "script"
+  | "prefab"
+  | "config";
+
+interface ResourceId {
+  type: ResourceType;
+  key: string;
+  variant?: string;
+}
+
+interface LoadOptions {
+  priority?: number;
+  deadlineMs?: number;
+  cancellationToken?: CancellationToken;
+  requesterTag?: string;
+}
+
+interface ResourceLoader {
+  load<T>(id: ResourceId, options?: LoadOptions): Promise<ResourceHandle<T>>;
+  tryGet<T>(id: ResourceId): ResourceHandle<T> | null;
+  prefetch(ids: ResourceId[], options?: LoadOptions): void;
+  release(handle: ResourceHandle<unknown>): void;
+  registerPlugin(plugin: LoaderPlugin): void;
+  setMemoryBudget(bytes: number): void;
+}
+
+Example Usage
+
+const texture = await resourceLoader.load<Texture>({
+  type: "texture",
+  key: "characters/noob/body",
+  variant: "mobile"
+}, {
+  priority: 100,
+  cancellationToken: sceneLoadToken
+});
+
+renderer.bindTexture(texture.value);
+texture.release();
+
+Loader Plugin Interface
+
+interface LoaderPlugin<T = unknown> {
+  type: ResourceType;
+  load(input: {
+    id: ResourceId;
+    bytes: ArrayBuffer;
+    dependencies: Map<string, ResourceHandle<unknown>>;
+  }): Promise<T>;
+  unload(resource: T): void;
+}
+
+Error Semantics
+
+load(id)
+- returns existing loaded handle if present
+- `tryGet` also returns a retained handle; callers must release it
+- attaches to existing inflight promise if loading
+- starts new load if missing or retryable failed
+- rejects with ResourceNotFound, DecodeError, DependencyError, or Canceled
+
+Being explicit that this is an in-process API helps avoid a distributed-system answer. The "API design" phase is still valuable; it defines the subsystem contract.
+
+Phase 4: High-Level Design (~15-25 minutes)
+
+Load Flow
+
+Caller requests load(resource_id, options).
+
+Loader normalizes the ID and checks records.
+
+If state is loaded, increment ref_count, return a handle.
+
+If state is loading, attach the caller as a waiter to the existing promise.
+
+If state is missing or retryable failed, create a LoadRequest and enqueue it.
+
+Scheduler chooses requests by priority, deadline, and dependency readiness.
+
+Worker resolves manifest entry and dependency IDs.
+
+Worker loads dependencies first, with cycle detection.
+
+Worker reads bytes from ResourceProvider.
+
+Worker calls the type-specific plugin to decode and prepare the resource.
+
+Worker publishes state loaded, completes all waiters, and updates cache memory usage.
+
+Dependency Resolution
+
+Dependencies form a directed graph.
+
+Prefab PlayerAvatar
+  -> Mesh player_body
+  -> Material player_material
+       -> Texture body_diffuse
+       -> Texture body_normal
+  -> Animation idle
+
+Rules:
+
+Detect cycles before loading or during DFS.
+
+Load shared dependencies once and share handles.
+
+If a dependency fails, mark the parent as failed with DependencyError.
+
+If a parent is canceled but dependencies are still needed by other waiters, keep them running.
+
+Deduplication
+
+The central invariant:
+
+At most one active load job exists per ResourceId.
+
+Use a lock or single-threaded loader coordinator around records transitions:
+
+missing -> loading
+loading -> loaded
+loading -> failed
+loaded -> evicting -> missing
+
+Concurrent callers see the same loading record and attach as waiters.
+
+Threading Model
+
+promptWork
+Main promptAPI calls, cache hits, lightweight handle operations, final GPU handoff if required
+IO workersRead files or remote bytes
+Decode workersCPU-heavy parsing/decompression
+Render promptGPU upload or renderer-owned resource creation
+Loader coordinatorOwns state transitions and waiter completion
+
+Some resources cannot be fully created on a background prompt, especially GPU objects. Separate byte read/decode from main-prompt or render-prompt finalization.
+
+Eviction Flow
+
+Loader tracks total loaded bytes and per-type budgets.
+
+When memory exceeds budget, evictor selects resources with ref_count = 0.
+
+Eviction policy considers last access time, load cost, priority, and resource type.
+
+Evictor transitions loaded -> evicting.
+
+Type-specific plugin unloads resource memory or GPU handles.
+
+Record returns to missing while manifest metadata remains.
+
+Component Responsibilities
+
+ComponentResponsibility
+ResourceLoader APIPublic contract, dedupe, handle creation
+Manifest IndexResource metadata, size estimates, dependencies
+Resource RecordsPer-resource lifecycle state
+Priority SchedulerOrders load work and handles deadlines
+Worker PoolPerforms IO and CPU decode
+Resource ProviderReads bytes from package, disk, cache, or remote source
+Loader PluginsType-specific decode and unload
+EvictorEnforces memory budget
+
+Phase 5: Scaling & Trade-offs (~15-20 minutes)
+
+Reference Counting Versus LRU
+
+Use both:
+
+Reference counting prevents eviction while a caller actively uses a resource.
+
+LRU or cost-aware eviction chooses which unused resources to remove.
+
+Trade-off:
+
+StrategyProsCons
+Ref counting onlyPrevents use-after-freeDoes not choose good cache victims
+LRU onlySimple cache policyCan evict in-use resources unless handles are tracked
+Ref count + LRUPractical and safeMore bookkeeping
+
+Priority and Cancellation
+
+Priorities prevent background prefetch from blocking gameplay-critical loads.
+
+Priority examples:
+- 1000: needed for current frame or blocking scene transition
+- 500: near camera / soon visible
+- 100: prefetch likely future assets
+- 10: background warmup
+
+Cancellation rules:
+
+Canceling one waiter does not cancel the load if other waiters remain.
+
+If all waiters cancel and the resource is not a dependency of another load, cancel the job if possible.
+
+IO and decode work should periodically check cancellation tokens.
+
+Memory Pressure
+
+When memory is tight:
+
+Stop low-priority prefetch.
+
+Evict unused resources by policy.
+
+Downgrade variants if supported, such as lower-resolution textures.
+
+Fail optional loads gracefully.
+
+Emit diagnostics for resources pinned too long.
+
+Large Resources and Streaming
+
+For large textures, terrain, worlds, or audio:
+
+Load metadata first.
+
+Stream chunks by priority.
+
+Expose partial readiness states, such as metadata_ready, low_res_ready, full_ready.
+
+Keep chunk cache separate from whole-resource cache.
+
+Failure Handling
+
+FailureHandling
+Missing manifest entryReturn ResourceNotFound immediately
+IO read failureRetry if source is remote; fail fast for missing local package
+Decode failureMark failed with diagnostic details
+Dependency failureFail parent with dependency chain
+Memory budget exceededEvict unused, then reject optional loads if still over budget
+Loader plugin crash/errorIsolate error to resource and mark failed
+
+Observability
+
+Track:
+
+Cache hit rate by resource type.
+
+Load latency by phase: queue, IO, decode, upload.
+
+Number of inflight loads and waiters.
+
+Memory by resource type and owner tag.
+
+Evictions and reloads.
+
+Dependency failure chains.
+
+Main-prompt finalization time.
+
+For engine prompts, observability is part of the design. A loader that works but cannot explain frame hitches, memory spikes, or missing assets is not production-ready.
+
+Common Pitfalls
+
+Treating every request as independent - Without inflight dedupe, scene transitions can load and decode the same asset many times.
+
+Ignoring dependency cycles - A prefab or material graph can accidentally create cycles. Detect them and fail with useful diagnostics.
+
+Evicting resources while callers still hold them - Use handles and reference tracking to avoid use-after-free bugs.
+
+Interview Checklist
+
+Clarify that this is an in-process local memory design.
+
+Define resource identity with type, key, and variant.
+
+Define ResourceManifestEntry, ResourceRecord, LoadRequest, ResourceHandle, and LoaderPlugin.
+
+Explain cache hit, inflight dedupe, dependency loading, decode, and completion.
+
+Draw API, manifest, records, scheduler, workers, provider, plugins, cache, and evictor.
+
+Discuss priority, cancellation, memory budget, prompt safety, and GPU finalization.
+
+Mention observability for load latency and memory pressure.
+
+Summary
+
+AreaRecommended Answer
+ScopeIn-process engine/client subsystem
+APIAsync load, sync tryGet, prefetch, release
+DeduplicationOne ResourceRecord and one inflight job per resource ID
+ExtensibilityType-specific loader plugins
+DependenciesDirected graph with cycle detection
+MemoryRef-counted handles plus cost-aware eviction
+Key trade-offFast cache hits and safe lifecycle versus loader complexity
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

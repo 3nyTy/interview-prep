@@ -1,0 +1,331 @@
+===H1===
+Uniformly Connect Node Groups
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/randomly-connect-node-groups
+===BODY===
+Databricks
+Coding·55 minMembers
+Uniformly Connect Node Groups
+Given several connected components, return a random minimum-size edge set that connects all groups into one connected graph, with the edge set sampled uniformly from all valid solutions.
+SWE
+graph
+sampling
+math
+hard
+Frequency
+Low
+Last asked
+2026-05-05
+Stage
+phone-screen
+Problem Overview
+
+You are given n connected components ("groups") of nodes. For example:
+
+groups = [[1], [2, 3], [4, 5, 6]]
+
+Each group is already internally connected. Your job is to write a function that returns a set of new edges such that, after these edges are added, the union of all groups becomes one single connected graph.
+
+Two requirements:
+
+Use the minimum number of edges. Connecting k groups into one component requires exactly k - 1 new edges.
+
+The returned edge set must be uniformly sampled from the set of all valid edge sets that satisfy requirement 1.
+
+Each new edge connects one node from one group to one node from a different group.
+
+Example
+
+Input:  groups = [[1], [2, 3], [4, 5, 6]]
+Output: [(1, 3), (2, 5)]   # one possible result
+        [(1, 6), (3, 4)]   # another possible result
+
+Both outputs are valid because they connect all three groups using exactly two edges.
+
+Constraints
+
+2 <= n <= 50 (number of groups)
+
+Group sizes can vary; total nodes up to a few thousand
+
+Node values across groups are distinct
+
+Output must be uniform over all valid edge sets, not just "some random valid edge set"
+
+What Makes This Tricky
+
+The hard part is the word uniform. Many natural-looking sampling strategies produce some valid result, but not with the right distribution. Below we walk through the strategies in the order they typically come up in the interview.
+
+Approach 1: Brute Force Enumeration
+
+Idea
+
+Enumerate every valid edge set, then pick one uniformly at random.
+
+A valid edge set is built by:
+
+Choosing a spanning tree T of the complete graph on n group-supernodes (there are n^(n-2) of these by Cayley's formula).
+
+For each tree edge (A, B) in T, choosing one node from group A and one node from group B.
+
+So the total number of valid edge sets is:
+
+N = sum over spanning trees T of K_n of
+        product over edges (A, B) in T of |A| * |B|
+
+Algorithm
+
+import itertools
+import random
+
+def enumerate_all_edge_sets(groups):
+    n = len(groups)
+    indices = list(range(n))
+
+    # Generate every spanning tree of K_n via Prufer sequences (length n - 2).
+    all_edge_sets = []
+    for prufer in itertools.product(indices, repeat=max(0, n - 2)):
+        tree_edges = prufer_to_tree(list(prufer), n)
+
+        # For every tree edge, pick any (u, v) with u in group A, v in group B.
+        choices = [
+            [(u, v) for u in groups[a] for v in groups[b]]
+            for (a, b) in tree_edges
+        ]
+        for combo in itertools.product(*choices):
+            all_edge_sets.append(list(combo))
+
+    return all_edge_sets
+
+def sample_uniform_brute(groups):
+    all_sets = enumerate_all_edge_sets(groups)
+    return random.choice(all_sets)
+
+prufer_to_tree is the standard conversion from a Prufer sequence of length n - 2 to a labeled tree on n nodes; any reference implementation works.
+
+Complexity
+
+n^(n-2) spanning trees by Cayley's formula, each multiplied by the product of group-size pairs.
+
+For n = 10: about 10^8 = 100 million trees, plus the fanout multiplier per tree.
+
+For n = 50: astronomical.
+
+Correct distribution by construction, but only practical for n <= 6 or 7.
+
+This is the answer that tells the interviewer you understand the problem. Then they push you for something faster.
+
+Approach 2: Why Kruskal-Style Random Edge Picking Is Not Uniform
+
+The Tempting Wrong Answer
+
+def kruskal_like_wrong(groups):
+    n = len(groups)
+    parent = list(range(n))
+
+    def find(x):
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    edges = []
+    while len(edges) < n - 1:
+        a, b = random.sample(range(n), 2)
+        if find(a) != find(b):
+            u = random.choice(groups[a])
+            v = random.choice(groups[b])
+            edges.append((u, v))
+            parent[find(a)] = find(b)
+    return edges
+
+It produces a valid (n - 1)-edge connector. It is not uniform.
+
+Why It Fails: Worked Bias Example
+
+Use the same example as the problem statement: groups A = {1}, B = {2, 3}, C = {4, 5, 6} with sizes 1, 2, 3.
+
+There are 3 spanning trees of the supernode graph K_3. For each one, count how many concrete edge sets it expands to (its "fanout" = product of |A| * |B| over its tree edges):
+
+Supernode treeFanout
+edges {A-B, B-C}1*2 * 2*3 = 12
+edges {A-C, B-C}1*3 * 2*3 = 18
+edges {A-B, A-C}1*2 * 1*3 = 6
+
+So there are 12 + 18 + 6 = 36 valid edge sets total. Under a truly uniform distribution, each edge set should occur with probability 1/36.
+
+Now look at what kruskal_like_wrong actually produces. By symmetry over K_3, it picks each supernode tree with probability 1/3 (you can verify this directly from the rejection logic on n = 3). Conditional on a tree, it then picks endpoints uniformly within each super-edge, so each concrete edge set under that tree is 1 / fanout. Multiplying:
+
+Supernode treeP(tree)P(specific edge set) under samplerWhat uniform would give
+{A-B, B-C}1/31/3 * 1/12 = 1/361/36
+{A-C, B-C}1/31/3 * 1/18 = 1/541/36
+{A-B, A-C}1/31/3 * 1/6 = 1/181/36
+
+Edge sets that go through the small-fanout tree {A-B, A-C} are sampled at double the uniform rate, while the large-fanout tree {A-C, B-C} is undersampled.
+
+The general rule: choosing the supernode tree uniformly is wrong. The supernode tree must be sampled with probability proportional to its fanout |A| * |B| product, not uniformly. That cancels the per-edge-set 1 / fanout and leaves a flat distribution. We will use this in Approach 3.
+
+What About Plain MST on Random Weights?
+
+Assigning each candidate edge a uniform random weight and running Kruskal gives the minimum spanning tree under those weights. The induced distribution over spanning trees is not uniform either, except on highly symmetric graphs. The bias depends on the graph and is generally hard to characterize, which is why this trick does not work as a uniform sampler.
+
+The takeaway: greedy or weight-based tricks pick a spanning tree, but the induced distribution is determined by the graph's structure, and we need something distribution-correct.
+
+Approach 3: Decompose, Then Sample a Weighted Spanning Tree
+
+Key Insight
+
+Every valid edge set corresponds to:
+
+A spanning tree T of the supernode graph K_n (groups are supernodes).
+
+For each tree edge (A, B), an unordered pair (u in A, v in B).
+
+If we sample T so that
+
+P(T) is proportional to  product over edges (A, B) in T of |A| * |B|
+
+then independently pick u uniform from A and v uniform from B for each tree edge, the joint distribution over full edge sets is uniform.
+
+Proof sketch. Each valid edge set S collapses to a unique underlying supernode tree T(S) (just contract each group). Let fanout(T) = product over edges (A, B) in T of (|A| * |B|). Then:
+
+P(T(S) = T) is proportional to fanout(T) by construction.
+
+P(S | T(S) = T) = 1 / fanout(T) because we pick endpoints uniformly within each super-edge, and there are exactly fanout(T) ways to do that.
+
+Multiplying: P(S) is proportional to fanout(T(S)) * (1 / fanout(T(S))) = 1.
+
+So every valid edge set has equal probability. Note that the total number of valid edge sets is exactly sum over T of fanout(T), which is the normalizing constant from Approach 1.
+
+This reduces the problem to: sample a spanning tree of K_n with edge weights w(A, B) = |A| * |B|, where P(T) is proportional to the product of its edge weights.
+
+Sampling a Weighted Uniform Spanning Tree: Wilson's Algorithm
+
+Wilson's algorithm samples a spanning tree of an arbitrary weighted graph with the correct weighted-uniform distribution using loop-erased random walks.
+
+Algorithm
+
+1. Pick any starting supernode r. Mark it as "in tree".
+2. While some supernode is not yet in the tree:
+   a. Pick any not-yet-in-tree supernode v.
+   b. Do a random walk from v, where at each step the next neighbor is chosen
+      with probability proportional to the edge weight.
+   c. Continue until the walk first hits a node that is already in the tree.
+   d. Erase loops from the walk so it becomes a simple path.
+   e. Add every edge of that simple path to the tree, and mark every node on
+      the path as in tree.
+3. The resulting tree T is sampled with P(T) proportional to product of its edge weights.
+
+The loop-erasure step is what makes the distribution come out right. It is a classical and somewhat surprising result.
+
+Implementation
+
+import random
+
+def sample_weighted_spanning_tree(n, weight):
+    """
+    n: number of supernodes
+    weight(a, b): weight of edge between supernodes a and b
+    Returns list of (a, b) edges forming a spanning tree of K_n,
+    sampled with P(T) proportional to product of edge weights.
+    """
+    in_tree = [False] * n
+    next_node = [None] * n  # next_node[v] = the neighbor v points to in the tree
+
+    root = 0
+    in_tree[root] = True
+
+    for start in range(n):
+        if in_tree[start]:
+            continue
+
+        # Random walk with loop erasure (Wilson's trick: store only "next" pointer).
+        u = start
+        while not in_tree[u]:
+            neighbors = [v for v in range(n) if v != u]
+            weights = [weight(u, v) for v in neighbors]
+            total = sum(weights)
+            r = random.random() * total
+            acc = 0
+            for v, w in zip(neighbors, weights):
+                acc += w
+                if r <= acc:
+                    next_node[u] = v
+                    break
+            u = next_node[u]
+
+        # Walk back from start, marking nodes in tree.
+        u = start
+        while not in_tree[u]:
+            in_tree[u] = True
+            u = next_node[u]
+
+    edges = []
+    for v in range(n):
+        if next_node[v] is not None:
+            edges.append((v, next_node[v]))
+    return edges
+
+The "next pointer" trick is the standard cute Wilson's implementation: instead of tracking the explicit walk path and erasing loops afterward, you overwrite next_node[u] each time you visit u, which automatically performs the loop erasure.
+
+Putting It Together
+
+import random
+
+def random_connecting_edges(groups):
+    n = len(groups)
+    if n <= 1:
+        return []
+
+    sizes = [len(g) for g in groups]
+
+    def weight(a, b):
+        return sizes[a] * sizes[b]
+
+    super_edges = sample_weighted_spanning_tree(n, weight)
+
+    result = []
+    for a, b in super_edges:
+        u = random.choice(groups[a])
+        v = random.choice(groups[b])
+        result.append((u, v))
+    return result
+
+Complexity
+
+Wilson's algorithm on K_n: expected runtime O(n^2) per walk in the worst case, total expected O(n^2) to O(n^3) depending on weights, dominated by the loop-erased walks.
+
+Final node-pair selection: O(n).
+
+Memory: O(n).
+
+For n = 50 this runs in microseconds.
+
+Why This Is the Expected Answer
+
+Uniform spanning tree sampling is a known textbook problem with two standard answers: Wilson's algorithm (loop-erased random walk) and Aldous-Broder (random walk until all nodes visited). Wilson's is usually faster on dense graphs like K_n. Either is acceptable.
+
+What the interviewer is checking:
+
+That you recognized the brute-force enumeration up front.
+
+That you understood why naive greedy or Kruskal-on-random-weights is biased.
+
+That you decomposed the problem into "sample a weighted spanning tree, then pick endpoints uniformly inside each chosen super-edge."
+
+That you produced a real algorithm (Wilson's or equivalent) rather than handwaving "do something with random walks."
+
+Summary
+
+ApproachTimeUniform?Practical?
+Brute force enumerate all edge setsexponential in nyesonly tiny n
+Kruskal-style random pair pickO(n alpha(n))nowrong
+MST on uniform random weightsO(n^2 log n)nowrong
+Weighted spanning tree via Wilson + uniform endpoint pickO(n^2) to O(n^3) expectedyesyes
+
+The headline lesson: when an interviewer says "uniform," do not pattern-match to MST or to "iterate randomly until done." Decompose the sample space, then reach for Wilson's loop-erased random walk to sample spanning trees with the correct distribution.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

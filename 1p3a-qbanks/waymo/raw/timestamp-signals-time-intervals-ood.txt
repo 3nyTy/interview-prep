@@ -1,0 +1,44 @@
+===H1===
+OO Design: Continuous Time Intervals from Two Timestamp Signal Streams
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/timestamp-signals-time-intervals-ood
+===BODY===
+Waymo
+Coding·45 minMembers
+OO Design: Continuous Time Intervals from Two Timestamp Signal Streams
+Phone screen with a real Waymo business framing: given two kinds of timestamp-based signals, design a class that returns the continuous time intervals during which a condition holds. The interviewer cares about how you analyze the problem and pin down details, and explicitly wants you to ask about anything ambiguous before coding.
+SWE
+oop-design
+object-design
+interval
+ambiguous-spec
+medium
+Frequency
+Single report
+Last asked
+2026-06-13
+Stage
+phone-screen
+Requirements
+
+Two distinct streams of timestamp-based signals are provided.
+
+Design a class / API that ingests both streams and returns the continuous time intervals over which a stated condition is satisfied.
+
+The exact condition is deliberately under-specified — clarifying it (and the edge semantics) with the interviewer is part of the round.
+
+Notes
+
+Clarify first. The interviewer values problem analysis and locking down details: are the two signal types combined with AND / OR? Are timestamps discrete events or interval boundaries? Are intervals half-open [start, end)? Do back-to-back qualifying intervals merge? Settle these before writing code — candidates are told explicitly to ask whenever something is unclear.
+
+Modeling. Treat each signal as a sequence of (timestamp, state-change) events, merge the two streams into one time-ordered event timeline, and sweep a running condition state across it, emitting an interval each time the combined condition flips from false→true→false. This is a sweep over event boundaries rather than a scan of fixed buckets.
+
+Class boundary. Separate the ingestion / storage of each signal stream from the interval-evaluation logic so the condition can be changed without rewriting the merge. State the class responsibilities up front — the design discussion is graded.
+
+Edge cases to raise. Overlapping or coincident timestamps from the two streams, a condition true at the very start or still true at the end of the observed window, and zero-length intervals.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,500 @@
+===H1===
+Optimal Commute Grid
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/optimal-commute-grid
+===BODY===
+Databricks
+Coding·55 minMembers
+Optimal Commute Grid
+Find the fastest transportation mode from `S` to `D` in a grid where each cell is a mode, `X` is blocked, and each mode has per-block time and cost. Tie-break on total cost; follow-ups allow turns or mode switching with penalties.
+SWE
+grid
+bfs
+dijkstra
+medium
+Frequency
+High
+Last asked
+2026-08-31
+Stage
+phone-screen · onsite-coding
+Problem Statement
+
+You have a simplified map of San Francisco. It is a 2D grid. Each square on the grid is one of these:
+
+'S': Your Home (Start).
+
+'D': Your Office (Destination).
+
+A digit '1' to 'k': A street that only allows one specific type of travel (like a bike lane or bus route).
+
+'X': A roadblock. You cannot go here.
+
+You also get three lists (arrays) of length k:
+
+modes: The names of the travel types (e.g., ["bike", "bus"]).
+
+times: How many minutes it takes to move one block for each mode.
+
+costs: How many dollars it costs to move one block for each mode.
+
+Rules for Moving
+
+You can move up, down, left, or right. You cannot move diagonally.
+
+You must stay on the same travel mode (the same digit) for the whole trip.
+
+You cannot switch modes in the middle of the trip.
+
+You cannot step on a different number or an 'X'.
+
+For each mode i, the time and cost to move one block are found in times[i] and costs[i].
+
+To find the total time and total cost, you add up the time and cost for every numbered block you step on. The start ('S') and end ('D') blocks are free. They do not add to the time or cost.
+
+Goal
+
+Find the name of the travel mode that gets you from 'S' to 'D' in the least amount of time.
+
+If two modes have the exact same time, pick the one that costs less money.
+
+If there is no way to reach the office, return an empty string "".
+
+Example Case
+
+Input:
+
+grid = [
+    ['S', '1', '1', '1', 'D'],
+    ['2', '2', '2', '2', 'X']
+]
+
+modes = ["bike", "bus"]
+times = [5, 3]
+costs = [2, 1]
+
+Explanation:
+
+The map looks like this:
+
+Row 0: S   1   1   1   D
+Row 1: 2   2   2   2   X
+
+Mode 1 (bike): You can go from S to D.
+
+Path: S → 1 → 1 → 1 → D
+
+Distance: You stepped on 3 "bike" blocks.
+
+Time: 3 blocks × 5 minutes = 15 minutes.
+
+Cost: 3 blocks × 2 dollars = 6 dollars.
+
+Mode 2 (bus): You cannot reach D.
+
+Path: S → 2 → 2 → 2 → 2... but then you hit 'X'.
+
+The bus path is blocked.
+
+Output:
+
+"bike"  # This is the only way to get there
+
+Input Limits
+
+The grid size is between 1x1 and 100x100.
+
+There are between 1 and 4 travel modes (k).
+
+Time and cost values are between 1 and 100.
+
+There is exactly one 'S' and one 'D'.
+
+Solution 1: Basic BFS (Slower)
+
+How it Works
+
+We treat each travel mode as a separate problem.
+
+Pick the first mode.
+
+Run a BFS starting from 'S'.
+
+Only move onto cells that match this mode's number.
+
+Calculate the time and cost if you reach 'D'.
+
+Repeat this for every mode.
+
+Compare the results to find the best one.
+
+Time Complexity
+
+O(k × r × c)
+
+k is the number of modes.
+
+r and c are the grid rows and columns.
+
+We run BFS k times. Each BFS looks at the whole grid.
+
+Space Complexity
+
+O(r × c) to store the visited cells and the queue.
+
+Code:
+
+from collections import deque
+from typing import List
+
+def findOptimalCommute(grid: List[List[str]], modes: List[str],
+                       times: List[int], costs: List[int]) -> str:
+    rows, cols = len(grid), len(grid[0])
+
+    # Find start and destination
+    start, dest = None, None
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] == 'S':
+                start = (r, c)
+            elif grid[r][c] == 'D':
+                dest = (r, c)
+
+    if not start or not dest:
+        return ""
+
+    best_time = float('inf')
+    best_cost = float('inf')
+    best_mode = ""
+
+    # Try each transportation mode one by one
+    for mode_idx in range(len(modes)):
+        mode_digit = str(mode_idx + 1)
+
+        # BFS for this specific mode
+        queue = deque([(start[0], start[1], 0)])  # (row, col, distance)
+        visited = {start}
+        found = False
+
+        while queue and not found:
+            r, c, dist = queue.popleft()
+
+            # Check if we reached destination
+            if (r, c) == dest:
+                # Calculate time and cost
+                total_time = dist * times[mode_idx]
+                total_cost = dist * costs[mode_idx]
+
+                # Update best mode if this is faster or cheaper
+                if (total_time < best_time or
+                    (total_time == best_time and total_cost < best_cost)):
+                    best_time = total_time
+                    best_cost = total_cost
+                    best_mode = modes[mode_idx]
+                found = True
+                break
+
+            # Check neighbors
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                nr, nc = r + dr, c + dc
+
+                if (0 <= nr < rows and 0 <= nc < cols and
+                    (nr, nc) not in visited):
+                    cell = grid[nr][nc]
+
+                    # Move if cell matches our mode or is destination
+                    if cell == mode_digit or cell == 'D':
+                        visited.add((nr, nc))
+                        # Don't add distance for D (it's free)
+                        new_dist = dist if cell == 'D' else dist + 1
+                        queue.append((nr, nc, new_dist))
+
+    return best_mode
+
+Solution 2: Optimized BFS (Faster)
+
+The first solution repeats work. We can improve it by running just one BFS. We check all modes at the same time.
+
+How it Works
+
+Start BFS from 'S'.
+
+Look at all neighbors. If a neighbor is a number (like '1'), we start a path for mode 1. If it's '2', we start a path for mode 2.
+
+We track (row, col, mode_used) in our visited set.
+
+If we are on a path using mode '1', we only move to other '1' cells or 'D'.
+
+Since every cell on the grid has a fixed number, we only ever visit a cell once. A cell marked '1' is never visited by the '2' path.
+
+This makes the solution much faster.
+
+Time Complexity
+
+O(r × c)
+
+We visit each cell exactly once because each cell belongs to only one mode.
+
+Space Complexity
+
+O(r × c) for the visited set and queue.
+
+Code:
+
+from collections import deque
+from typing import List
+
+def findOptimalCommuteOptimized(grid: List[List[str]], modes: List[str],
+                                times: List[int], costs: List[int]) -> str:
+    rows, cols = len(grid), len(grid[0])
+
+    # Find start and destination
+    start, dest = None, None
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] == 'S':
+                start = (r, c)
+            elif grid[r][c] == 'D':
+                dest = (r, c)
+
+    if not start or not dest:
+        return ""
+
+    best_time = float('inf')
+    best_cost = float('inf')
+    best_mode = ""
+
+    # Single BFS: (row, col, mode_used, distance)
+    # mode_used is the number string of the mode
+    queue = deque()
+    visited = set()
+
+    # Initialize: check all neighbors of start
+    for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+        nr, nc = start[0] + dr, start[1] + dc
+
+        if 0 <= nr < rows and 0 <= nc < cols:
+            cell = grid[nr][nc]
+
+            if cell.isdigit():
+                mode_digit = cell
+                visited.add((nr, nc, mode_digit))
+                queue.append((nr, nc, mode_digit, 1))
+
+    # Run BFS
+    while queue:
+        r, c, mode_digit, dist = queue.popleft()
+
+        # Check if we reached destination
+        if grid[r][c] == 'D':
+            mode_idx = int(mode_digit) - 1
+            total_time = dist * times[mode_idx]
+            total_cost = dist * costs[mode_idx]
+
+            # Update best mode
+            if (total_time < best_time or
+                (total_time == best_time and total_cost < best_cost)):
+                best_time = total_time
+                best_cost = total_cost
+                best_mode = modes[mode_idx]
+            continue
+
+        # Look at neighbors using the SAME mode
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nr, nc = r + dr, c + dc
+
+            if (0 <= nr < rows and 0 <= nc < cols and
+                (nr, nc, mode_digit) not in visited):
+                cell = grid[nr][nc]
+
+                # Move if same mode or destination
+                if cell == mode_digit or cell == 'D':
+                    visited.add((nr, nc, mode_digit))
+                    # Don't add distance for D
+                    new_dist = dist if cell == 'D' else dist + 1
+                    queue.append((nr, nc, mode_digit, new_dist))
+
+    return best_mode
+
+Follow-Up 1: Switching Modes Allowed
+
+Question: What if you can switch travel modes during the trip? Each switch costs extra money and takes extra time.
+
+How to Solve
+
+Now that costs can vary (switching is expensive, moving is cheap), standard BFS is not enough. We must use Dijkstra's algorithm.
+
+Use a Priority Queue. It keeps the path with the lowest time/cost at the top.
+
+State: (total_time, total_cost, row, col, current_mode).
+
+When moving to a neighbor:
+
+If the neighbor is the same mode, add normal time/cost.
+
+If the neighbor is a different mode, add travel time/cost PLUS the switch penalty.
+
+Time Complexity
+
+O((r × c × k) log(r × c × k))
+
+We use a priority queue, which adds the log factor.
+
+Each cell might be visited k times (once for each arriving mode).
+
+Code:
+
+import heapq
+from typing import List
+
+def findOptimalCommuteWithSwitching(grid: List[List[str]], modes: List[str],
+                                    times: List[int], costs: List[int],
+                                    switch_time: int, switch_cost: int) -> str:
+    rows, cols = len(grid), len(grid[0])
+
+    # Find start and destination
+    start, dest = None, None
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] == 'S':
+                start = (r, c)
+            elif grid[r][c] == 'D':
+                dest = (r, c)
+
+    if not start or not dest:
+        return ""
+
+    # Priority queue: (total_time, total_cost, row, col, mode_idx)
+    pq = []
+
+    # Initialize with all modes from start
+    for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+        nr, nc = start[0] + dr, start[1] + dc
+        if 0 <= nr < rows and 0 <= nc < cols:
+            cell = grid[nr][nc]
+            if cell.isdigit():
+                mode_idx = int(cell) - 1
+                heapq.heappush(pq, (times[mode_idx], costs[mode_idx], nr, nc, mode_idx))
+
+    # Track best (time, cost) for each (row, col, mode)
+    best = {}
+
+    while pq:
+        curr_time, curr_cost, r, c, mode_idx = heapq.heappop(pq)
+
+        # Check if we've seen this state with better time/cost
+        state = (r, c, mode_idx)
+        if state in best:
+            best_time, best_cost = best[state]
+            if (curr_time > best_time or
+                (curr_time == best_time and curr_cost >= best_cost)):
+                continue
+
+        best[state] = (curr_time, curr_cost)
+
+        # Check if reached destination
+        if grid[r][c] == 'D':
+            return modes[mode_idx]
+
+        # Explore neighbors
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nr, nc = r + dr, c + dc
+
+            if 0 <= nr < rows and 0 <= nc < cols:
+                cell = grid[nr][nc]
+
+                if cell == 'X':
+                    continue
+
+                # Special case: destination
+                if cell == 'D':
+                    # Move to destination with current mode (no extra cost)
+                    next_state = (nr, nc, mode_idx)
+                    if next_state in best:
+                        best_time, best_cost = best[next_state]
+                        if (curr_time > best_time or
+                            (curr_time == best_time and curr_cost >= best_cost)):
+                            continue
+                    heapq.heappush(pq, (curr_time, curr_cost, nr, nc, mode_idx))
+                    continue
+
+                # Try all possible modes for next cell
+                for next_mode_idx in range(len(modes)):
+                    next_mode_digit = str(next_mode_idx + 1)
+
+                    # Check if this mode is valid for the cell
+                    if cell != next_mode_digit:
+                        continue
+
+                    # Calculate new time and cost
+                    new_time = curr_time + times[next_mode_idx]
+                    new_cost = curr_cost + costs[next_mode_idx]
+
+                    # Add switch penalty if changing modes
+                    if next_mode_idx != mode_idx:
+                        new_time += switch_time
+                        new_cost += switch_cost
+
+                    # Check if this is better than previous visit
+                    next_state = (nr, nc, next_mode_idx)
+                    if next_state in best:
+                        best_time, best_cost = best[next_state]
+                        if (new_time > best_time or
+                            (new_time == best_time and new_cost >= best_cost)):
+                            continue
+
+                    heapq.heappush(pq, (new_time, new_cost, nr, nc, next_mode_idx))
+
+    return ""  # No path found
+
+Follow-Up 2: Limit on Mode Switches
+
+Question: What if you can only switch modes a limited number of times (e.g., max 2 switches)?
+
+How to Solve
+
+We still use Dijkstra's algorithm, but we need to track how many switches we have used.
+
+Update State: (total_time, total_cost, row, col, current_mode, switches_used).
+
+Update Storage: best[row][col][mode][switches_used].
+
+Logic: Only allow a mode switch if switches_used is less than the limit.
+
+Time Complexity
+
+O((r × c × k × max_switches) log(...))
+
+Special Cases
+
+Impossible Path: If 'D' is surrounded by 'X' or the wrong numbers, return "".
+
+S and D are neighbors: If there is no numbered cell between them, the path is invalid (length 0). Return "".
+
+Ties: If two paths take the same time, make sure your code picks the cheaper one.
+
+No Mode Cells: If the grid only has 'S', 'D', and 'X', return "".
+
+Important Takeaways
+
+Identify the Graph: Recognize that the grid is a graph. Moving between cells is traversing edges.
+
+BFS vs Dijkstra:
+
+Use BFS when the cost to move is uniform (the base problem).
+
+Use Dijkstra when costs change (switching modes costs extra).
+
+Optimization: You don't always need to run the algorithm multiple times. Sometimes a single pass can solve everything if you track the state correctly.
+
+Notes
+
+Be ready to explain Java collection operations when the interviewer is more familiar with Python.
+
+Debugging can consume the time reserved for follow-ups. One candidate spent about ten minutes debugging, finished the implementation with ten minutes remaining, and only discussed test cases before the round ended.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

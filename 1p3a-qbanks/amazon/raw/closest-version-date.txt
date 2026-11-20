@@ -1,0 +1,53 @@
+===H1===
+Closest Version Date
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/closest-version-date
+===BODY===
+Amazon
+Coding·45 minMembers
+Closest Version Date
+Given a target version date and a list of released version dates, return the version whose date is closest to the target. The example target `2026-04-01` with versions `2023-04-01`, `2025-04-01`, and `2026-05-03` returns `2026-05-03`.
+SWE
+array
+binary-search
+sorting
+medium
+Frequency
+Single report
+Last asked
+2026-07-02
+Stage
+onsite-coding
+Requirements
+
+Input: a target version date and a list of available version dates.
+
+Return the version date closest to the target date by calendar distance.
+
+Clarify tie-breaking before coding: earlier version, later version, or either acceptable.
+
+If the list is already sorted, use binary search around the insertion point; otherwise sort first or build the ordered index.
+
+Examples
+
+target = 2026-04-01
+versions = [2023-04-01, 2025-04-01, 2026-05-03]
+answer = 2026-05-03
+
+Notes
+
+The prompt was explicitly described as not being a direct LeetCode problem. Treat it like a production version-selection helper rather than a memorized LC template.
+
+Convert dates to comparable numeric values before taking differences; string comparison only works if the format is canonical ISO yyyy-mm-dd.
+
+Preparation
+
+Implement lower_bound on a sorted list and compare the predecessor / successor around the insertion index.
+
+Drill edge cases: target before all versions, after all versions, exact match, duplicate dates, and equidistant neighbors.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

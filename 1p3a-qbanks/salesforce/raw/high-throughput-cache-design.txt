@@ -1,0 +1,85 @@
+===H1===
+Design a High-Throughput Distributed Cache
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/high-throughput-cache-design
+===BODY===
+Salesforce
+System Design·60 minMembers
+Design a High-Throughput Distributed Cache
+Second system-design round in the Salesforce LMTS onsite — distinct from the service-design round earlier in the loop. Design an in-memory caching layer (Redis-class) that fronts a primary database, with explicit attention to eviction, consistency, hot keys, and sharding under high concurrent load.
+SWE
+system-design
+caching
+sharding
+distributed-systems
+concurrency
+scaling
+hard
+Frequency
+Single report
+Last asked
+2026-01-09
+Stage
+onsite-system-design
+Requirements
+
+Workload: read-heavy, very-high-throughput cache layer fronting an RDBMS / NoSQL store. Tens to hundreds of K ops/sec.
+
+Operations: get(key), set(key, value, ttl?), delete(key), optional mget / mset for batching.
+
+Eviction: bounded memory per node; admin chooses policy.
+
+Consistency: cache must not return arbitrarily stale data on writes to the primary store.
+
+Multi-node: scale horizontally; tolerate a node loss without losing the whole cache.
+
+Concurrent reads and writes from many clients; no read-modify-write should corrupt counters.
+
+Notes
+
+Eviction policies: LRU (default), LFU (when access frequency is heavily skewed), TTL-only (when keys have natural expiry). Discuss trade-off briefly — pure LRU thrashes under scan-heavy workloads; W-TinyLFU (LFU with admission window) is the modern compromise; TTL+LRU is the production default in most cache layers.
+
+Cache consistency with primary DB (the most-asked deep-dive). Five canonical patterns:
+
+Cache-aside / lazy load — app reads cache, falls back to DB on miss, writes both on update. Stale risk on the write path if the cache write fails after the DB write. Simplest, most common.
+
+Write-through — app writes cache, cache writes DB synchronously. Always consistent on success, slower writes.
+
+Write-back / write-behind — app writes cache, cache flushes to DB async. Lowest write latency, durability risk on node loss.
+
+Read-through with TTL — wrap reads in cache layer; TTL bounds staleness.
+
+Invalidate-on-write — explicit DELETE to cache on every DB write; next read re-populates. Easy to reason about; consistent with one tricky race (reader B reads an old DB snapshot → writer A commits the new value and invalidates the cache → reader B writes its old snapshot into the now-empty cache, leaving a stale value). Mitigations: double-delete with delay, or version-stamp the value.
+State the race explicitly when discussing invalidate-on-write.
+
+Hot key problem: one extremely popular key overloads its shard. Mitigations:
+
+Replication / read replicas at the cache layer for that key.
+
+Client-side local cache (process-local micro-cache with short TTL) absorbs the bulk of reads.
+
+Key splitting (key#shard_n) with the writer fanning out and readers picking a random shard — works only for read-mostly counters.
+
+Sharding: consistent hashing across nodes so adding/removing a node moves only a fraction of keys. Discuss virtual nodes (V-nodes) to even out load.
+
+Concurrency on set / counter increments: use atomic ops in the cache (INCR, CAS) — never read, mutate, write from the app.
+
+High availability: replicate each shard (primary + 1-2 followers); promote a follower on failure. Reads can go to followers for higher throughput (with monotonic-read trade-off).
+
+Persistence (clarify the requirement): pure cache loses data on restart and that's acceptable; mixed cache+durable store needs append-only log or snapshotting (Redis RDB / AOF model).
+
+Preparation
+
+Be able to enumerate the five consistency patterns and pick one with a justification in under 90 seconds.
+
+Drill the invalidate-on-write race scenario on a whiteboard until you can describe it without notes.
+
+Prepare the consistent-hashing sketch (ring, virtual nodes, key→node lookup).
+
+Have a concrete hot-key mitigation for the deep dive: "replicate the hot key to 4 shards by appending a random suffix on read, write to all 4 on update".
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,69 @@
+===H1===
+Count Subarrays Where First = Last = Max
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-subarray-first-last-equal-max
+===BODY===
+LinkedIn
+Coding·55 minMembers
+Count Subarrays Where First = Last = Max
+Count subarrays where the first element equals the last element equals the maximum value in the subarray. Not a canonical LC problem; the optimal `O(N)` solution uses a monotonic-decreasing stack to find, for each index, the next strictly greater element on the right and group equal-value runs accordingly.
+SWE
+array
+stack
+hashmap
+monotonic-stack
+medium
+Frequency
+Single report
+Last asked
+2025-11-13
+Stage
+onsite-coding
+Requirements
+
+def count_first_last_max_subarrays(arr: list[int]) -> int:
+    # subarray arr[i..j] qualifies if arr[i] == arr[j] == max(arr[i..j])
+
+Insight: a qualifying subarray has its left and right endpoints sharing the same value v, and no element strictly greater than v between them. For each value v, the qualifying pairs (i, j) are exactly the unordered pairs of indices within a maximal run between two strictly-greater "walls". With a monotonic decreasing stack, walk the array once and for each index i:
+
+Pop while stack.top.value < arr[i] (those values can no longer be a "max-bounded" endpoint).
+
+If stack.top.value == arr[i], the new index extends a qualifying group — count C(k+1, 2) - C(k, 2) = k additional pairs where k is the current group size, then increment the group counter on top.
+
+Otherwise push a new (value, count = 1) entry.
+
+Total pairs sum across all groups give the answer. Plus N single-element subarrays (each element trivially satisfies the predicate with i == j).
+
+Examples
+
+arr = [3, 1, 1, 3]
+qualifying subarrays:
+  [3]                  i=0,j=0
+  [1]                  i=1,j=1
+  [1]                  i=2,j=2
+  [3]                  i=3,j=3
+  [1, 1]               i=1,j=2  (max=1)
+  [3, 1, 1, 3]         i=0,j=3  (max=3)
+answer = 6
+
+Notes
+
+This is not a published LC problem; candidates who attempt brute-force O(N²) with running max often pass small inputs but fail when the interviewer changes the bound to N = 1e5.
+
+The monotonic-stack-of-(value, count) pattern is reused in the canonical "sum of subarray minimums" and "largest rectangle in histogram" families; recognizing the family is what unlocks the linear solution.
+
+Reported as graded harshly — the candidate had to defend correctness aloud while the interviewer disputed the algorithm without proof. Articulating the invariant proactively is worth practice.
+
+Preparation
+
+Drill the canonical "sum of subarray minimums" solution; the bookkeeping is structurally identical.
+
+Practice stating the invariant ("after processing index i, the stack stores maximal runs of values that are still candidate maxima for some subarray starting at or before i") aloud before coding.
+
+Pre-test the boundary cases: all-equal array, strictly increasing, strictly decreasing.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

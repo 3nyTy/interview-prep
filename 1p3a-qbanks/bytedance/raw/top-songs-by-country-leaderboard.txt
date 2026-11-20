@@ -1,0 +1,81 @@
+===H1===
+Top Songs by Country Leaderboard
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/top-songs-by-country-leaderboard
+===BODY===
+ByteDance / TikTok
+System DesignMembers
+Top Songs by Country Leaderboard
+Design a near-real-time service that ingests song listen/click events and serves each country's top ten songs, refreshing about every ten minutes. The stated scale is roughly 500 million users and about 50K read QPS plus 50K event writes per second, with availability favored over strong consistency.
+SWE
+leaderboard
+streaming
+top-k
+caching
+scaling
+hard
+Frequency
+Single report
+Last asked
+2026-08-30
+Stage
+onsite-system-design
+Requirements
+
+Serve the top ten songs for any country or region.
+
+Accept a listen/click event whenever a user plays a song; determine region from trusted profile, IP, or device context rather than blindly trusting the client.
+
+Maintain an independent ranking per country and refresh it approximately every ten minutes.
+
+Keep leaderboard query latency below one second; a few minutes of staleness is acceptable.
+
+Design for roughly 500 million users, each reading the leaderboard about ten times and listening to about ten songs per day: approximately 50K read QPS and 50K write events per second.
+
+Favor availability and eventual consistency over per-play strong consistency.
+
+Separate high-volume event ingestion, incremental ranking computation, durable aggregates, and low-latency serving.
+
+Address hot songs / hot counters and explain the sharding or aggregation strategy.
+
+Examples
+
+GET /songs/top?region=US
+
+{
+  "region": "US",
+  "songs": [
+    { "songId": "123", "rank": 1 }
+  ]
+}
+
+POST /songs/{songId}/listen
+
+{
+  "region": "US",
+  "timestamp": "..."
+}
+
+Notes
+
+A synchronous database counter update on every listen creates a severe hot-key path for suddenly popular songs.
+
+The expected decomposition is an asynchronous event path, streaming aggregation by region and song, a materialized top-K result, and a small cached read object per region.
+
+A ten-minute cache lifetime aligns naturally with the ranking-refresh cadence, but failure and late-event behavior still need explicit treatment.
+
+Capacity estimation, consistency choice, hot-key handling, and the stream-processing boundary carry more weight than drawing service boxes.
+
+Preparation
+
+Derive the read and event QPS from the stated user behavior without a calculator, then identify the first hot partitions.
+
+Draw separate write and read paths and narrate delivery, late-event, replay, and cache-refresh behavior.
+
+Compare periodic batch recomputation with incremental streaming aggregation and state when each becomes preferable.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

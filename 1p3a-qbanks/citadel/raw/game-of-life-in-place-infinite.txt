@@ -1,0 +1,61 @@
+===H1===
+Game of Life — In-Place and Infinite Board
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/game-of-life-in-place-infinite
+===BODY===
+Citadel / Citadel Securities
+Coding·60 minMembers
+Game of Life — In-Place and Infinite Board
+Citsec phone screen 2 of 2: implement Conway's Game of Life on a 2D board, then escalate to in-place updates, sparse-board optimization, and finally the infinite-board case.
+SWE
+All
+grid
+simulation
+bit-manipulation
+hashmap
+medium
+Frequency
+Single report
+Last asked
+2026-03-21
+Stage
+phone-screen
+Requirements
+
+Standard Game of Life on an m x n board. Each cell is alive (1) or dead (0). All cells update simultaneously based on the standard Conway rules.
+
+Ladder of follow-ups:
+
+Update the board in place — no auxiliary O(mn) matrix.
+
+The board is large (e.g. 1000 x 1000). Time stays O(mn); what can you do about space?
+
+Most cells are dead. Optimize for sparse boards.
+
+The board is infinite (no fixed size). What changes?
+
+Notes
+
+In-place trick: encode the next state in unused bits of the current state. For an integer board, use bit 1 (>> 1) to store the new value while bit 0 keeps the old value during the same sweep. After the sweep, right-shift every cell. For a {0, 1} board, encode (new << 1) | old and decode at the end.
+
+Sparse / large-board optimization: store only the set of currently-alive coordinates. Build a counter of neighbor visits by iterating each live cell and incrementing its 8 neighbors. Cells with exactly 3 neighbor hits become alive; live cells with 2 or 3 hits survive. Time is O(L) for L live cells, independent of board size.
+
+Infinite board: same sparse representation works directly — coordinates live in a hashmap of (x, y) instead of a fixed array. Bounding box of live cells grows monotonically until a stable / periodic configuration is reached.
+
+Interviewer behavior: this Citsec interviewer pushed for the infinite-board generalization beyond what most other companies ask, then drilled the candidate's mental model when the explanation didn't land. State the sparse representation early — it answers stages 2-4 simultaneously.
+
+Preparation
+
+Implement the in-place bit-encoding version of LC 289 from scratch; the trick stops being scary after two reps.
+
+Internalize the sparse set-of-live-cells representation as the single answer to "what if the board is huge / sparse / infinite" — it covers all three follow-ups.
+
+Practice articulating why the sparse approach is correct: every cell that could change state in the next step is either alive now or adjacent to a live cell. No cell more than one step away from the live set matters.
+
+Plan a 60-second "infinite board" pitch: hashmap of live coordinates, neighbor-count map, one pass to compute next-step liveness, one pass to swap the live set.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

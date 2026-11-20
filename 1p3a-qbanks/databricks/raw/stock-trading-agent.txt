@@ -1,0 +1,471 @@
+===H1===
+Stock Trading Agent Service
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/stock-trading-agent
+===BODY===
+Databricks
+System DesignMembers
+Stock Trading Agent Service
+Design an intermediary service between clients and a third-party broker API. Clients submit buy/sell orders with a deadline; the service forwards them, polls status until filled, and auto-cancels unfilled orders at the deadline. The crux is tracking thousands of deadlines and absorbing spikes when many orders expire at once.
+SWE
+trading
+api-integration
+idempotency
+queueing
+circuit-breaker
+medium
+Frequency
+Single report
+Last asked
+2026-04-06
+Stage
+phone-screen · onsite-system-design
+System Requirements
+
+You need to build a "Stock Trading Agent." This system sits in the middle between clients (users) and a stock broker's API. The system must do the following:
+
+Take requests from users to buy or sell stocks. Each request has a specific deadline (time limit).
+
+Send these requests to an outside Broker Service.
+
+Check the status of the orders until the time runs out.
+
+If an order is not finished by the deadline, automatically cancel it.
+
+Handle situations where thousands of orders expire at the exact same time.
+
+Example Client Requests
+
+BUY BABA 30 "2023-11-01 15:00:00"
+SELL AMZN 10 "2023-11-01 12:00:00"
+
+Broker Service Details
+
+The broker gives us three ways (APIs) to interact with them:
+
+GET /orders/{orderId} - Check if an order is pending, filled, or cancelled.
+
+POST /orders - Send a new order to the broker.
+
+DELETE /orders/{orderId} - Tell the broker to cancel an order.
+
+Harder Interview Questions
+
+Be ready to answer these "What if?" questions:
+
+System Crashes: If your server stops working while handling orders, how do you make sure no money or orders are lost?
+
+Broker Issues: What if the broker's API is down or very slow?
+
+Managing Deadlines: How do you track thousands of different deadlines efficiently?
+
+Sudden Spikes: If 10,000 orders all expire at the exact same second, how does the system handle the workload?
+
+Data Accuracy: How do you make sure your database matches the broker's database?
+
+Idempotency: How do you retry a failed request without accidentally buying the same stock twice?
+
+Health Checks: How do you know if the system is working correctly?
+
+Partial Fills: What if you wanted to buy 100 shares, but only got 50 by the deadline?
+
+Connection Loss: What happens if the internet cuts out between you and the broker?
+
+Important Note
+
+This is just one sample solution. To do well in your interview:
+
+Try to solve the problem yourself first.
+
+Think of different ways to build this and what problems they might have.
+
+Practice speaking out loud while you design.
+
+Be ready to change your plan if the interviewer asks for something else.
+
+Do not memorize this. Use it to learn.
+
+Sample Solution
+
+Step 1: Understanding the Rules
+
+Before we design, we need to ask questions to understand the limits.
+
+Basic Features:
+
+Do we support just "Market" orders (buy now) or "Limit" orders (buy at specific price)?
+
+Can users change an order after sending it?
+
+Can users cancel an order manually before the deadline?
+
+Do users need to see updates instantly?
+
+Speed & Volume:
+
+How many orders per second do we need to handle?
+
+How long are the deadlines usually? (Minutes? Days?)
+
+How fast must the system respond?
+
+Reliability:
+
+How reliable must the system be? (e.g., 99.99% uptime?)
+
+Is it okay to lose data? (Usually, the answer is "No").
+
+What happens if the broker goes offline?
+
+Broker Constraints:
+
+Does the broker limit how many requests we can send per second (Rate Limiting)?
+
+Does the broker tell us when an order is done (Webhooks), or do we have to keep asking (Polling)?
+
+Assumptions for this design:
+
+We are only building the backend (server side).
+
+Peak traffic is 10,000 orders per second.
+
+We must never lose an order.
+
+Deadlines are between 1 minute and 24 hours.
+
+The broker does not send updates; we must poll (ask repeatedly).
+
+We need 99.99% reliability.
+
+Step 2: Doing the Math
+
+Let's calculate the size and speed requirements.
+
+Traffic:
+
+Peak: 10,000 orders/second.
+
+Average: 2,000 orders/second.
+
+Total per day: About 173 million orders.
+
+Storage:
+
+One order is about 500 bytes.
+
+Daily storage: 173 million * 500 bytes = ~86.5 GB per day.
+
+One year of data: ~31.6 TB.
+
+Deadlines:
+
+If 20% of orders expire, that is ~400 expirations per second on average.
+
+Spike risk: If many people pick the same deadline, we might need to cancel 100,000+ orders in one second.
+
+Bandwidth (Network Speed):
+
+Incoming data: ~10 MB/s.
+
+Broker communication: ~36 MB/s.
+
+Step 3: API Design
+
+Client APIs (How users talk to us):
+
+# User sends a new order
+POST /api/v1/orders
+Request:
+{
+  "userId": "string",
+  "action": "BUY" | "SELL",
+  "symbol": "string",
+  "quantity": number,
+  "deadline": "ISO8601 timestamp",
+  "orderType": "MARKET" | "LIMIT",  # Optional
+  "limitPrice": number  # Needed if using LIMIT
+}
+Response:
+{
+  "orderId": "string",
+  "status": "SUBMITTED",
+  "submittedAt": "timestamp"
+}
+
+# User checks order status
+GET /api/v1/orders/{orderId}
+Response:
+{
+  "orderId": "string",
+  "status": "PENDING" | "FILLED" | "CANCELLED" | "EXPIRED",
+  "filledQuantity": number,
+  "updatedAt": "timestamp"
+  # ... other fields
+}
+
+# User cancels manually
+DELETE /api/v1/orders/{orderId}
+
+# User sees list of their orders
+GET /api/v1/orders?userId={userId}
+
+Internal Broker Calls (How we talk to the broker):
+
+# We call these functions inside our server
+
+# Send order to broker
+brokerClient.createOrder(symbol, action, quantity, orderType, limitPrice)
+# Returns: { brokerOrderId, status }
+
+# Check status with broker
+brokerClient.getOrderStatus(brokerOrderId)
+# Returns: { status, filledQuantity }
+
+# Cancel order at broker
+brokerClient.cancelOrder(brokerOrderId)
+
+Step 4: Database Design
+
+We need to store data carefully.
+
+Key Data Structures:
+
+Order Table: Stores the main details (ID, User, Stock Symbol, Status, Deadline).
+
+OrderEvent Table: A history log. Every time an order changes, we save a record here. This helps with debugging.
+
+ScheduledCancellation: A list of orders sorted by when they expire.
+
+Technology Choices:
+
+Main Database (PostgreSQL):
+
+We use this because it is ACID compliant (safe and accurate).
+
+It is good for keeping order data consistent.
+
+Cancellation Scheduler (Redis Sorted Sets):
+
+Redis is very fast memory storage.
+
+"Sorted Sets" are perfect for sorting items by time. We can easily ask, "Give me all orders expiring in the next 1 second."
+
+Cache (Redis):
+
+Stores active orders so we don't have to hit the main database every time a user checks status.
+
+Step 5: Basic Architecture
+
+Here is how the pieces fit together:
+
+┌─────────────┐
+│   Clients   │
+└──────┬──────┘
+       │
+       ▼
+┌─────────────────┐
+│ Load Balancer   │ (Distributes traffic)
+└──────┬──────────┘
+       │
+       ▼
+┌──────────────────────────────────┐
+│   API Server                     │
+│   (Receives requests, validates) │
+└─────┬────────────────────────┬───┘
+      │                        │
+      ▼                        ▼
+┌─────────────┐         ┌──────────────┐
+│   Redis     │         │  PostgreSQL  │
+│   (Cache)   │         │  (Main DB)   │
+└─────────────┘         └──────────────┘
+      │                        │
+      ▼                        ▼
+┌──────────────────────────────────────┐
+│   Message Queue (Kafka)              │
+│   (Queues tasks so nothing is lost)  │
+└─────┬─────────────┬──────────────┬───┘
+      │             │              │
+      ▼             ▼              ▼
+┌─────────────┐ ┌──────────────┐ ┌─────────────────┐
+│   Broker    │ │   Status     │ │  Cancellation   │
+│   Service   │ │   Poller     │ │   Scheduler     │
+│             │ │              │ │                 │
+│ - Sends to  │ │ - Checks     │ │ - Watches     │
+│   broker    │ │   status     │ │   deadlines     │
+│ - Retries   │ │ - Updates DB │ │ - Cancels       │
+│   failures  │ │              │ │   expired       │
+└─────┬───────┘ └──────────────┘ └─────────────────┘
+      │
+      ▼
+┌──────────────────┐
+│   Broker APIs    │
+└──────────────────┘
+
+Who does what?
+
+API Server: The "front door." Checks if the request is valid.
+
+Message Queue: A holding area. Ensures that even if a service crashes, the order message waits here safely.
+
+Broker Service: Takes messages from the queue and sends them to the real broker.
+
+Status Poller: Repeatedly asks the broker, "Is this order done yet?"
+
+Cancellation Scheduler: Watches the clock. If time runs out, it triggers a cancellation.
+
+Step 6: How It Works in Detail
+
+6.1 Submitting an Order
+
+# This runs when a user clicks "Buy"
+async def submit_order(request):
+    # 1. Check if the request is valid
+    validate_order_request(request)
+
+    # 2. Save to database immediately (Status: SUBMITTED)
+    order = await db.create_order(..., status="SUBMITTED")
+
+    # 3. Send to Message Queue so the background worker handles it
+    await messageQueue.publish(topic="order.created", message=order)
+
+    # 4. Add to Redis so we remember to check its deadline later
+    await redis.zadd(
+        key="scheduled_cancellations",
+        score=order.deadline.timestamp(), # Score is the time
+        member=order.orderId
+    )
+
+    # 5. Tell the user "We received it"
+    return { "orderId": order.orderId, "status": "SUBMITTED" }
+
+6.2 Sending to Broker (Broker Service)
+
+# Background worker processing the queue
+async def process_new_order(message):
+    orderId = message["orderId"]
+
+    try:
+        # 1. Check if we already sent this (Idempotency)
+        order = await db.get_order(orderId)
+        if order.brokerOrderId:
+            return  # Already done, skip.
+
+        # 2. Send to broker with retry logic
+        # If it fails, wait 1s, then 2s, then 4s (Backoff)
+        brokerResponse = await retry_with_backoff(
+            lambda: brokerClient.createOrder(...)
+        )
+
+        # 3. Update database with the Broker's ID
+        await db.update_order(
+            orderId=orderId,
+            brokerOrderId=brokerResponse.brokerOrderId,
+            status="PENDING"
+        )
+
+    except BrokerAPIError:
+        # Log the error and try again later
+        await handle_broker_error(orderId)
+
+6.3 Checking Status (Status Poller)
+
+Problem: We can't ask the broker about every order every second. They will block us.
+Solution: Check urgent orders more often.
+
+Fast Priority: Deadline is less than 1 minute away? Check every 10 seconds.
+
+Slow Priority: Deadline is far away? Check every 60 seconds.
+
+while True:
+    # Get all active orders
+    active_orders = db.get_active_orders()
+
+    for order in active_orders:
+        # Decide how often to check based on deadline
+        if time_to_check(order):
+            # Ask broker
+            status = brokerClient.getOrderStatus(order.brokerOrderId)
+
+            # If status changed, update DB
+            if status != order.status:
+                db.update_order(order.orderId, status)
+
+                # If finished, remove from deadline checker
+                if status == "FILLED":
+                    redis.zrem("scheduled_cancellations", order.orderId)
+
+6.4 Handling Deadlines (Cancellation Scheduler)
+
+Problem: What if 100,000 orders expire at 4:00 PM exactly?
+Solution: Use Redis to find them quickly and multiple workers to process them.
+
+while True:
+    # 1. Ask Redis: "Who expires in the next 60 seconds?"
+    expiring_orders = redis.get_orders_expiring_soon()
+
+    for order in expiring_orders:
+        if order.deadline <= now and order.status == "PENDING":
+            # 2. Lock the order so no one else touches it
+            if db.lock_order(order.orderId):
+
+                # 3. Tell broker to cancel
+                brokerClient.cancelOrder(order.brokerOrderId)
+
+                # 4. Mark as EXPIRED in our DB
+                db.update_order(order.orderId, status="EXPIRED")
+
+    # 5. Clean up Redis
+    redis.remove_processed_orders(expiring_orders)
+
+6.5 Fault Tolerance (Handling Crashes)
+
+Database Failure: We use a primary database and read replicas. If the main one fails, a replica takes over.
+
+Circuit Breaker: If the broker API starts failing (returning errors), we stop sending requests for a minute to let it recover. This prevents our system from freezing up.
+
+Retry Logic: If a request fails, we save it to a "Dead Letter Queue" to try again later manually or automatically.
+
+Step 7: Fixing Slow Points (Bottlenecks)
+
+Database Slowdown:
+
+Problem: Too many updates happening at once.
+
+Fix: Group updates together (Batching). Instead of writing to the DB 100 times, write 1 time with 100 updates.
+
+Broker Limits:
+
+Problem: The broker only allows 5,000 requests per second.
+
+Fix: Use a "Rate Limiter." If we go too fast, we pause our requests slightly.
+
+Deadline Spikes:
+
+Problem: Huge spike of cancellations at one specific time.
+
+Fix: Start checking orders 30-60 seconds before they expire. Spread the work out slightly so it doesn't all happen in one millisecond.
+
+Cache Issues:
+
+Problem: "Cache Stampede." When a popular order's cache expires, 1,000 users hit the database at once.
+
+Fix: Use a lock. Only allow one request to fetch from the DB and refill the cache; everyone else waits for that one result.
+
+Final Thoughts
+
+This system design teaches you how to handle:
+
+Reliability: Keeping data safe even when things crash.
+
+Time Management: Using Redis to track deadlines efficiently.
+
+Scalability: Handling massive spikes in traffic without breaking.
+
+Consistency: Keeping your local data in sync with the external broker.
+
+The most important part is not just placing the order, but ensuring the system is robust enough to fix itself when errors happen.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

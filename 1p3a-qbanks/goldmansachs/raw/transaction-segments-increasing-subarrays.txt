@@ -1,0 +1,48 @@
+===H1===
+Transaction Segments / Increasing Subarrays of Length K
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/transaction-segments-increasing-subarrays
+===BODY===
+Goldman Sachs
+Coding·120 minMembers
+Transaction Segments / Increasing Subarrays of Length K
+Given transaction values over time, count contiguous segments of exactly length k whose values are strictly increasing from left to right. The prompt is a clean one-pass window / run-length counting problem from the 2026 Engineering OA.
+SWE
+array
+sliding-window
+easy
+Frequency
+Single report
+Last asked
+2025-11-25
+Stage
+oa
+Requirements
+
+Input: an integer array transactionValues of length n and an integer k.
+
+transactionValues[i] is the transaction amount at time i.
+
+Count contiguous subarrays of exactly length k such that every adjacent pair is strictly increasing: transactionValues[i] < transactionValues[i+1] < ... < transactionValues[i+k-1].
+
+Return the number of such segments.
+
+Notes
+
+Track the current length of the strictly-increasing run ending at each index. Every index with runLength >= k contributes one valid segment ending there.
+
+O(n) time, O(1) space.
+
+Edge cases: k = 1 makes every element a valid segment; duplicate adjacent values break the run because the condition is strict.
+
+Preparation
+
+Implement the run-length version and walk through why it counts exactly one length-k segment per valid ending index.
+
+Compare against the brute-force window check for small arrays to catch off-by-one errors.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

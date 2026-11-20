@@ -1,0 +1,71 @@
+===H1===
+Phone Screen: Tennis Rounds — Print Round Winners
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/phone-screen-tennis-rounds
+===BODY===
+Uber
+Coding·60 minMembers
+Phone Screen: Tennis Rounds — Print Round Winners
+Phone-screen prompt. Given a list of player rankings, simulate a single-elimination tournament. In each round, adjacent pairs play and the higher-ranked one wins. Print the surviving list after every round.
+SWE
+simulation
+array
+easy
+Frequency
+Low
+Last asked
+2026-05-23
+Stage
+phone-screen
+Requirements
+
+Input: an integer array ranks of player ranks, with length a power of 2 (1, 2, 4, 8, …).
+
+In each round, pair up adjacent players (ranks[0], ranks[1]), (ranks[2], ranks[3]), …. The higher rank wins each match.
+
+After each round, print the surviving ranks (in their new positions) on one line.
+
+Continue until one survivor remains.
+
+Examples
+
+Input:  [1, 2, 3, 4, 5, 6, 7, 8]   (assume higher number = higher rank)
+Round 1: 2 vs 1, 4 vs 3, 6 vs 5, 8 vs 7  → [2, 4, 6, 8]
+Round 2: 4 vs 2, 8 vs 6                  → [4, 8]
+Round 3: 8 vs 4                          → [8]
+
+Print order:
+1, 2, 3, 4, 5, 6, 7, 8
+2, 4, 6, 8
+4, 8
+8
+
+Notes
+
+Trivial simulation: at each round, walk the list two at a time and emit the larger.
+
+Time O(n), with log(n) rounds; total O(n log n) for printing but only O(n) total comparison work because the list halves each round.
+
+The tie-breaking rule is ambiguous across rounds. Confirm with the interviewer whether the convention is "higher number wins" or "lower rank number wins" (rank #1 = best).
+
+Closed-form for total matches is n − 1 (every team but the champion gets eliminated once). The Uber prompt forces explicit per-round simulation because the output is the survivor list at every level, not just the match count.
+
+Follow-up: generate the seeding (reverse problem)
+
+A harder second part, asked in the same round, reverses the simulation: given n, generate an input permutation of ranks 1..n so that the single-elimination bracket eliminates higher rank numbers (weaker players) earlier — i.e. the strongest seeds survive longest. This is the generalization of "Output Contest Matches" (LC 544) without the n = 2^k restriction, so odd sizes must be handled.
+
+Build it recursively: solve for the bracket of ceil(n/2) survivors, place them at even indices, then fill the odd indices with the just-eliminated ranks from largest to smallest.
+
+Do not let the interviewer talk you into ignoring odd n — even if the top level is even, n/2 at a deeper level can become odd, so the odd case must be handled inside the recursion. Iterating bottom-up only writes cleanly for n = 2^k; recursion is much simpler for the general case.
+
+Preparation
+
+One of the easier Uber phone-screen prompts. Treat it as a warm-up; the interviewer will usually add a follow-up like "now group of 4 with top-2 advancing" once you finish, which uses a small heap per group.
+
+Pre-bake the heap-per-bucket variant for the common follow-up where each round groups players in fours and the top two advance — same shape with a 4-way nlargest(2) per group.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

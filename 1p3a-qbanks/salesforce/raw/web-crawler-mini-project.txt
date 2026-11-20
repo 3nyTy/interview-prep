@@ -1,0 +1,64 @@
+===H1===
+Onsite Mini Project — Concurrent Web Crawler
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/web-crawler-mini-project
+===BODY===
+Salesforce
+Coding·60 minMembers
+Onsite Mini Project — Concurrent Web Crawler
+Salesforce AI Engineer onsite "Hands-on Mini Project" round: implement a small end-to-end project on the spot. A representative instance is a concurrent web crawler that scrapes a specified site, orders the results per a given rule, and exports to CSV. Code-while-narrating is part of the signal.
+MLE
+SWE
+python
+concurrency
+web-crawler
+mini-project
+async
+medium
+Frequency
+Single report
+Last asked
+2026-03-10
+Stage
+onsite-coding
+Requirements
+
+Implement a working program live in the interview (Python is the popular choice — the saved-time from minimal boilerplate matters).
+
+Representative instance: "a high-concurrency web crawler that scrapes a given site, sorts the contents per a stated rule, and exports the result as CSV".
+
+Plan for ~10 minutes of implementation, ~10-15 minutes of narrating optimisation paths and edge cases, and a closing chat on production hardening.
+
+Best-practices coding standards (typed signatures, small functions, clear naming) carry signal. Narrate the design as you write.
+
+Stretch credit: discuss how a production version would differ — retry logic, robots.txt, polite delay, rate limit, deduplication of URLs, persistent visit log, graceful shutdown.
+
+Notes
+
+Concurrency choice in Python: asyncio + aiohttp is the cleanest and fastest if the candidate is fluent. concurrent.futures.ThreadPoolExecutor over requests.get is acceptable and easier to write under pressure. Avoid multiprocessing — overkill for I/O-bound work.
+
+Core pipeline: seed-URL queue → fetch worker pool → parse (extract content + new URLs) → enqueue unseen URLs → emit row to CSV writer. Bound depth or page count explicitly.
+
+Threading hygiene to mention out loud: visited set guarded by a lock (or use a thread-safe queue), CSV writer guarded by a lock (single writer thread is cleaner), bounded queue to back-pressure the fetchers.
+
+Edge cases interviewers probe: large pages (stream rather than .text the whole body), redirects, 4xx/5xx handling with bounded retry, non-HTML responses, infinite loops via query-string variants (canonicalise URLs).
+
+Sorting: clarify whether the sort happens after the full crawl (easy — collect then sorted(results, key=...)) or streamed as a top-K (heap of size K with custom comparator). For the base version, use a post-crawl sort unless the interviewer requests streaming top-K output.
+
+For the production-grade discussion, name-drop polite-crawl primitives (robots.txt parsing via urllib.robotparser, per-host token bucket, jittered backoff) — interviewers explicitly value seeing the candidate think beyond the toy version.
+
+Preparation
+
+Write a 50-line concurrent crawler in Python from scratch, twice — once with asyncio / aiohttp, once with ThreadPoolExecutor. Time yourself; aim for <15 minutes for either version.
+
+Build the CSV-writer guard cleanly: single dedicated writer thread reading from a queue.Queue beats locking around csv.writer from N workers.
+
+Practise narrating as you code — pick one design decision per minute and say it out loud ("using a set with a lock here so we don't double-fetch").
+
+Pre-prepare a 3-bullet production-hardening pitch (robots.txt, bounded retry with jittered backoff, dedup with canonical URL form).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

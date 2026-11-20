@@ -1,0 +1,64 @@
+===H1===
+Count Perfect Wake Numbers up to N
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/perfect-wake-number-count
+===BODY===
+Google
+Coding·45 minMembers
+Count Perfect Wake Numbers up to N
+Fresh coding round 1: define a Perfect Wake Number as a positive integer with all distinct digits, no `0`, and no digit adjacent to two strictly-larger digits. Given `n`, count how many Perfect Wake Numbers lie in `[1, n]`. The base check is easy; the count follow-up is the actual signal.
+SWE
+dp
+bit-manipulation
+hard
+Frequency
+Single report
+Last asked
+2026-05-07
+Stage
+phone-screen · onsite-coding
+Requirements
+
+A positive integer is a Perfect Wake Number iff all of the following hold:
+
+No two digits in its decimal representation are equal.
+
+No digit is 0.
+
+No interior digit is strictly less than both of its left and right neighbors. (Equivalently, no digit is adjacent to two strictly larger digits — so the digit sequence has no "strict valley".)
+
+Part 1 (warm-up): implement isPerfect(x).
+Part 2 (the actual question): given n, return how many integers in [1, n] are Perfect Wake Numbers.
+
+Examples
+
+196   → perfect (digits 1,9,6 all distinct, no 0, 9 is not a valley)
+23    → perfect
+12463 → perfect (1<2, 2<4, 4>6? No, 4<6, 6>3 — 6 is not a valley because its right neighbor 3 is smaller)
+1546  → not perfect (4 is adjacent to 5 and 6, both strictly larger)
+320   → not perfect (contains 0)
+34321 → not perfect (digit 3 repeats)
+
+Notes
+
+Part 1 is a linear scan; Part 2 is digit DP with state (position, mask of used digits, last digit, is_tight against n). Track whether the previous step went up or down to detect a future valley.
+
+Multiple candidates report not finishing Part 2 in the 45-minute window. The interviewer is generally patient and dispenses hints ("think DP" / "think digit DP") when you stall.
+
+Watch out: the "no valley" rule is about interior digits, so the first and last digit are never themselves the valley; they can still create one for their neighbor.
+
+The full prompt is short and recent — expect the follow-up to vary (e.g. count exactly-K-digit Perfect Wake Numbers).
+
+Preparation
+
+Drill digit DP templates: classic digit-DP problems — "count digit one", "non-negative integers without consecutive ones", "numbers at most N given digit set", "numbers with repeated digits" — cover "count integers ≤ n satisfying digit predicate."
+
+Practice bitmask-over-digits + tight-flag state machines.
+
+Memorize the standard skeleton: recurse over positions, accept any digit ≤ n's digit when tight, else any digit 1..9.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

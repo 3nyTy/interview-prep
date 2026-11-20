@@ -1,0 +1,262 @@
+===H1===
+Rotate Image
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/rotate-image
+===BODY===
+Apple
+CodingMembers
+Rotate Image
+You are given an n x n 2D matrix representing an image. Rotate the image by 90 degrees clockwise, in place.
+SWE
+medium
+grid
+array
+Frequency
+Single report
+Last asked
+2026-05-22
+Stage
+phone-screen
+Basic Problem: Rotate 90° Clockwise
+
+You are given an n x n 2D matrix representing an image. Rotate the image by 90 degrees clockwise, in place.
+
+You have to modify the input 2D matrix directly. Do not allocate another 2D matrix and do the rotation.
+
+Example
+
+Input:
+1 2 3
+4 5 6
+7 8 9
+
+Output:
+7 4 1
+8 5 2
+9 6 3
+
+Constraints
+
+n == matrix.length == matrix[i].length
+
+1 <= n <= 20
+
+-1000 <= matrix[i][j] <= 1000
+
+Approach: Transpose + Reverse Rows
+
+Two-pass in-place rotation without extra space:
+
+Transpose the matrix across the main diagonal — swap matrix[i][j] with matrix[j][i].
+
+Reverse each row — for each row, reverse its elements.
+
+Why It Works
+
+A 90° clockwise rotation is the composition of two reflections:
+
+Transposing reflects across the main diagonal: element at (i, j) moves to (j, i).
+
+Reversing each row reflects across the vertical centerline: element at (j, i) moves to (j, n-1-i).
+
+After both steps, the element originally at (i, j) lands at (j, n-1-i) — exactly where a 90° clockwise rotation sends it.
+
+Complexity
+
+Time: O(n^2) — every cell is touched a constant number of times.
+
+Space: O(1) — in place.
+
+Reference Implementation (Python)
+
+class Solution:
+    def rotate(self, matrix: List[List[int]]) -> None:
+        n = len(matrix)
+        # Transpose
+        for i in range(n):
+            for j in range(i + 1, n):
+                matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
+        # Reverse each row
+        for row in matrix:
+            row.reverse()
+
+Reference Implementation (Java)
+
+class Solution {
+    public void rotate(int[][] matrix) {
+        int n = matrix.length;
+        // Transpose
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+                int tmp = matrix[i][j];
+                matrix[i][j] = matrix[j][i];
+                matrix[j][i] = tmp;
+            }
+        }
+        // Reverse each row
+        for (int i = 0; i < n; i++) {
+            int left = 0, right = n - 1;
+            while (left < right) {
+                int tmp = matrix[i][left];
+                matrix[i][left] = matrix[i][right];
+                matrix[i][right] = tmp;
+                left++;
+                right--;
+            }
+        }
+    }
+}
+
+Follow-up 1: Rotate 90° Counter-clockwise
+
+Rotate the same matrix by 90 degrees counter-clockwise, in place.
+
+Input:
+1 2 3
+4 5 6
+7 8 9
+
+Output:
+3 6 9
+2 5 8
+1 4 7
+
+Approach
+
+Same idea, with the order flipped:
+
+Transpose the matrix.
+
+Reverse each column (equivalently, reverse the row order of the whole matrix).
+
+Or: Reverse each row first, then transpose. Both produce the counter-clockwise rotation.
+
+Reference Implementation (Python)
+
+class Solution:
+    def rotateCounterClockwise(self, matrix: List[List[int]]) -> None:
+        n = len(matrix)
+        # Transpose
+        for i in range(n):
+            for j in range(i + 1, n):
+                matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
+        # Reverse row order
+        matrix.reverse()
+
+Follow-up 2: Rotate by an Arbitrary Angle
+
+Discussion question — interviewer may push on this open-endedly. Focus on clarifying the problem before coding.
+
+Clarifying Questions to Ask
+
+Arbitrary angles introduce two fundamental issues the interviewer wants you to surface:
+
+Output coordinates are non-integer. A pixel at (i, j) rotated by θ lands at a non-grid point. How should the output be represented?
+
+A new matrix of the same size with pixels resampled onto the integer grid?
+
+A larger bounding-box matrix containing the full rotated image?
+
+A continuous function f(x, y) returning interpolated color?
+
+Pixel resampling policy. When the rotated source pixel doesn't align with a destination grid cell, how do we fill the destination?
+
+Nearest-neighbor (pick the closest source pixel)
+
+Bilinear / bicubic interpolation (weighted average of nearby source pixels)
+
+Leave holes / fill with a background color for cells outside the rotated image
+
+Rotation center and output bounds.
+
+Rotate about the center of the matrix, or a corner?
+
+Crop to the original n x n bounds (some pixels are lost), or expand to fit the entire rotated image (bounding box grows to ~n * (|cos θ| + |sin θ|))?
+
+Recommended Approach: Inverse Mapping + Bilinear Interpolation
+
+For each cell (r, c) in the destination matrix, compute which source point it came from and sample the source — this avoids holes.
+
+Let the center be (cx, cy) = ((n-1)/2, (n-1)/2).
+
+For each destination cell (r, c), compute the inverse-rotated source point:
+
+dx = c - cx
+dy = r - cy
+sx =  cos(θ) * dx + sin(θ) * dy + cx
+sy = -sin(θ) * dx + cos(θ) * dy + cy
+
+If (sx, sy) is outside [0, n-1] x [0, n-1], fill with a background color.
+
+Otherwise, bilinearly interpolate from the four nearest source pixels.
+
+Reference Implementation (Python)
+
+import math
+from typing import List
+
+def rotate_arbitrary(matrix: List[List[float]], theta_rad: float,
+                     background: float = 0.0) -> List[List[float]]:
+    n = len(matrix)
+    cx = cy = (n - 1) / 2
+    cos_t, sin_t = math.cos(theta_rad), math.sin(theta_rad)
+    out = [[background] * n for _ in range(n)]
+
+    for r in range(n):
+        for c in range(n):
+            dx, dy = c - cx, r - cy
+            sx =  cos_t * dx + sin_t * dy + cx
+            sy = -sin_t * dx + cos_t * dy + cy
+            if sx < 0 or sx > n - 1 or sy < 0 or sy > n - 1:
+                continue
+
+            x0, y0 = int(math.floor(sx)), int(math.floor(sy))
+            x1, y1 = min(x0 + 1, n - 1), min(y0 + 1, n - 1)
+            tx, ty = sx - x0, sy - y0
+
+            top    = matrix[y0][x0] * (1 - tx) + matrix[y0][x1] * tx
+            bottom = matrix[y1][x0] * (1 - tx) + matrix[y1][x1] * tx
+            out[r][c] = top * (1 - ty) + bottom * ty
+
+    return out
+
+Complexity
+
+Time: O(n^2) — one sample per destination cell.
+
+Space: O(n^2) for the output matrix. In-place rotation for arbitrary angles is not generally possible because destination pixels depend on multiple source pixels.
+
+Additional Discussion Topics
+
+1. Rotation as Matrix Multiplication
+
+Any 2D rotation can be expressed as multiplication by the rotation matrix:
+
+[ cos θ   -sin θ ]
+[ sin θ    cos θ ]
+
+90° clockwise (θ = -π/2) gives [[0, 1], [-1, 0]], which matches the transpose-and-reverse trick. Framing the problem this way makes the arbitrary-angle follow-up a natural generalization rather than a new problem.
+
+2. Why Not Forward-Map Pixels?
+
+A naive implementation iterates source pixels, computes their rotated destination, and writes there. This creates holes — some destination cells never get written because no source pixel rotates exactly there. Inverse mapping (iterate destinations, sample sources) avoids holes entirely and is the standard approach in image processing libraries.
+
+3. Rectangular (Non-Square) Matrices
+
+The in-place 90° trick relies on n x n symmetry. For an m x n matrix, the output dimensions are n x m, so in-place is not possible without allocating new memory. Confirm with the interviewer whether the matrix is guaranteed square.
+
+4. Large Images and Memory
+
+For very large images (e.g., 100,000 x 100,000), the O(n^2) output matrix may not fit in memory. Possible mitigations:
+
+Tile-based rotation: rotate blocks at a time, streaming to disk.
+
+Cache-aware traversal: tune the iteration order to minimize cache misses (row-major destination + column-major source access pattern can thrash the cache).
+
+SIMD / GPU: for real image-processing workloads, delegate to vectorized primitives.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

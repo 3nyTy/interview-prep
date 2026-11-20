@@ -1,0 +1,65 @@
+===H1===
+Code Craft: Basic Calculator (No Parentheses)
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/code-craft-basic-calculator-no-parens
+===BODY===
+DoorDash
+Coding·60 minMembers
+Code Craft: Basic Calculator (No Parentheses)
+Phone-screen coding round. Implement a basic calculator that handles `+`, `−`, `×`, `÷` over integer operands. No parentheses. Standard operator-precedence evaluation.
+SWE
+stack
+string
+parsing
+medium
+Frequency
+Single report
+Last asked
+2026-04-06
+Stage
+phone-screen
+Requirements
+
+Input: a string expression containing non-negative integers, the four operators + − × ÷, and possibly whitespace. No parentheses.
+
+Output: the evaluated integer (truncate toward zero for division per LC convention; clarify rounding rule with interviewer).
+
+Operator precedence: × ÷ before + −. Left-to-right associativity within a precedence class.
+
+Notes
+
+Standard approach: single-pass tokenize + stack.
+
+Walk characters, build the current number.
+
+On hitting an operator (or end of string), apply the previous operator to the current number based on whether it was +, −, ×, or ÷:
+
++: push num onto the stack.
+
+−: push −num.
+
+×: pop top, push top × num.
+
+÷: pop top, push top ÷ num (with the agreed rounding).
+
+At the end, sum the stack.
+
+Equivalent to LC 227 "Basic Calculator II" — drill that until automatic.
+
+Edge cases: leading whitespace, multi-digit numbers, division by zero (clarify expected behavior), negative results, very large numbers (use 64-bit if the interviewer pushes scale).
+
+Follow-up sometimes asked: extend to support parentheses (LC 224 "Basic Calculator"), or add unary minus.
+
+Preparation
+
+Drill LC 227 and LC 224 back-to-back; the stack pattern is the same skeleton with one extra recursive case for (.
+
+Pre-write the tokenizer + stack template in under 10 minutes.
+
+Have the Python integer-division convention story ready (// rounds toward negative infinity; LC expects truncation toward zero — use int(a / b) instead).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

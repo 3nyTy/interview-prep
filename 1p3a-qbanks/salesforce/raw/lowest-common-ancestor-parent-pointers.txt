@@ -1,0 +1,56 @@
+===H1===
+Lowest Common Ancestor with Parent Pointers (LeetCode 1650)
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/lowest-common-ancestor-parent-pointers
+===BODY===
+Salesforce
+CodingMembers
+Lowest Common Ancestor with Parent Pointers (LeetCode 1650)
+Given two nodes in a binary tree where each node has a parent pointer and the root is unavailable, return their lowest common ancestor; the interview expects the constant-space pointer-switching solution and an explanation of the disconnected-tree case. A follow-up replaces the tree with a multi-parent DAG, where common ancestry can be non-unique.
+SWE
+tree
+two-pointer
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-coding
+Requirements
+
+Each binary-tree node carries a pointer to its parent; the root node is not provided.
+
+Given nodes p and q, return their lowest common ancestor.
+
+Return null when the nodes belong to different trees.
+
+Discuss three solution families and implement the constant-space pointer-switching version.
+
+Follow-up: replace the tree with a directed acyclic graph in which a node can have multiple parents. Explain how the definition, return shape, and search must change when several nearest common ancestors can exist.
+
+Notes
+
+Ancestor set: walk from p to null and store every ancestor, then walk from q until the first stored node. This takes O(h_p + h_q) time and O(h_p) extra space.
+
+Depth alignment: find each node's depth and root, return null if the roots differ, advance the deeper pointer, then move both upward in lockstep. This takes O(h_p + h_q) time and O(1) extra space.
+
+Pointer switching: advance a toward its root and restart it at q after null; do the symmetric operation for b and p. Both pointers traverse the same combined distance, so they meet at the LCA or at null after O(h_p + h_q) steps with O(1) extra space.
+
+The interviewer asks for multiple approaches before selecting the constant-space version for implementation. Be ready to compare their time and space costs clearly.
+
+The disconnected-tree case is the key termination trap: the implementation must allow both pointers to reach null and return it rather than restarting indefinitely.
+
+In the DAG follow-up, the nearest common ancestor may not be unique. Clarify whether the output should contain every nearest answer and how ties are defined before proposing an algorithm.
+
+Preparation
+
+Implement the set, depth-alignment, and pointer-switching versions from a blank editor, then state the time and space cost of each without notes.
+
+Trace the constant-space version on a shared-root case and a disconnected-tree case, and explain exactly why neither trace can loop forever.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

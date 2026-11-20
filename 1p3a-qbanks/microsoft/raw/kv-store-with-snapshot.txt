@@ -1,0 +1,61 @@
+===H1===
+KV Store with Snapshot Versions
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/kv-store-with-snapshot
+===BODY===
+Microsoft
+Coding·60 minMembers
+KV Store with Snapshot Versions
+Build an in-memory KV store that supports point-in-time snapshots, reads scoped to a snapshot id, and writes that branch from a snapshot without polluting earlier snapshots.
+MLE
+SWE
+data-structure
+snapshot
+mvcc
+versioning
+hard
+Frequency
+Single report
+Last asked
+2026-03-23
+Stage
+onsite-coding
+Requirements
+
+Implement a class with the following API (names paraphrased; signatures align across candidates):
+
+kv.put(key, value)                       # writes to current snapshot
+kv.get(key) -> value | None              # reads current snapshot
+snap_id = kv.snapshot()                  # take an immutable snapshot of current state
+kv.get(key, snap_id) -> value | None     # read at snapshot snap_id
+kv.put(key, value, snap_id)              # branch-write: create a new mutable head off snap_id
+
+Snapshots must be O(1) (or amortized cheap) — you cannot deep-copy the whole map on every snapshot. Reads at older snapshots must observe the state as it was at that point in time, ignoring later writes.
+
+Standard follow-up: support deletion (kv.delete(key)) without breaking older snapshot reads. Reads of a deleted key in a newer snapshot return None; reads in older snapshots return the historical value.
+
+Notes
+
+The canonical structure is MVCC-style versioned values: each key maps to a sorted list of (snapshot_id, value) entries appended on every write. Reads at snap_id binary-search the list for the largest entry ≤ snap_id. snapshot() is a counter bump — no copying.
+
+Branch-writes complicate the linear version chain into a tree — represent snapshots as a tree where each node points to its parent. A read at snap_id walks up the snapshot tree finding the most recent (snapshot_id, value) reachable from snap_id. This is O(depth) per read; flatten with path compression if the tree gets deep.
+
+Deletion is just a tombstone value at the new snapshot id; treat it as any other write.
+
+Memory grows monotonically — interviewers may ask about garbage collection for unreachable snapshots (snapshots with no live references and no descendants). Mark-and-sweep over the snapshot tree is acceptable.
+
+Preparation
+
+Write the linear-snapshot version first (just a counter and a sorted list of versioned writes); confirm reads work.
+
+Layer the branching variant on top by replacing the global counter with a snapshot-tree node ref.
+
+Pre-rehearse the explanation "this is MVCC" — interviewers recognize it and accept it immediately.
+
+Pair with the in-memory SQL problem in the same loop; they often appear together for MAI Copilot.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

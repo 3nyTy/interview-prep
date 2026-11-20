@@ -1,0 +1,129 @@
+===H1===
+Cross-Platform Logging Library
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/logging-library-design
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Cross-Platform Logging Library
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+System Design
+·
+60 min
+Members
+Cross-Platform Logging Library
+
+Design a logging library that runs in both web and mobile clients and ships logs to a backend without degrading client-side performance. The round drives hard on the backpressure / batching trade-off when call volume grows.
+
+SWE
+distributed-systems
+ingestion
+queueing
+frontend
+backend
+batching
+medium
+Frequency
+Single report
+Last asked
+2026-03-23
+Stage
+onsite-system-design
+Requirements
+Library runs on both web (browser SPA) and mobile (iOS / Android) clients.
+Logs are emitted by application code and must reach a backend collector.
+Hard constraint: emitting a log must not block the calling thread or noticeably degrade UX.
+Backend has a single ingest API; throughput from any one client is variable and can spike.
+The interviewer pushes hard on what happens when batching makes the in-flight batch too large to send without back-pressuring the caller.
+Notes
+Two-layer design:
+In-process ring buffer: log calls write into a fixed-size in-memory buffer at O(1). Drops oldest (or oldest of a chosen severity level) when full. This guarantees the calling thread is never blocked.
+Background flusher: a separate thread / event-loop task drains the buffer in batches and POSTs to the backend. Batch size and flush interval are tunable (min(batch_size, flush_interval) is the canonical heuristic).
+Backpressure handling when the backend is slow or down:
+Cap the in-flight HTTP requests so the flusher itself doesn't pile up.
+When the buffer fills, drop log entries with the lowest severity first; record a single "dropped N entries" summary log so the loss is observable.
+Optional disk spill on mobile (small bounded file) so logs survive process restarts; web uses IndexedDB for the same purpose.
+Persistence semantics worth surfacing: at-most-once (drop on failure), at-least-once (retry until success or buffer full), best-effort with drop summaries (the typical answer for client telemetry). At-least-once requires a deduplication strategy on the server.
+Compression: gzip batches before send; reduces both bandwidth and battery cost on mobile.
+The "call volume too large" trap is solved by tightening the in-process drop policy, not by making the flusher faster — the latter only moves the bottleneck downstream.
+Preparation
+Sketch the ring-buffer + background-flusher architecture in under 3 minutes; be ready to walk through what each component owns.
+Drill the drop-policy decision: severity-aware drop with a single summary entry is the answer Snowflake interviewers tend to accept.
+Prepare specific mobile-vs-web differences: disk spill via IndexedDB on web, sqlite / bounded log file on mobile, background-flusher lifecycle differences when the app is backgrounded on mobile.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Preparation
+Related discussions · 1
+🔑雪花点面挂筋
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Frontend Grid: Robot Eats Candies
+Single report
+frontend
+medium
+bfs
++2
+Service Failure Forensics
+Single report
+distributed-systems
+medium
+graph
++2
+Grep With Context Lines
+Single report
+medium
+string-processing
+parsing
++1
+Top-K Search Terms (Per-User Deduped)
+Single report
+medium
+hashmap
+set
++2
+Recipe as Contiguous Ingredient Subsequence
+Single report
+medium
+string
+hashing
++4
+Code editor

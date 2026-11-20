@@ -1,0 +1,51 @@
+===H1===
+Spiral Matrix (LC 54) + Follow-Ups
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/spiral-matrix-traversal
+===BODY===
+Microsoft
+CodingMembers
+Spiral Matrix (LC 54) + Follow-Ups
+Traverse a 2-D matrix in clockwise spiral order and return the values as a one-dimensional sequence. Follow-ups switch to counterclockwise traversal and to filling an n × n matrix in spiral order.
+SWE
+array
+grid
+simulation
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-coding
+Requirements
+
+Given a rectangular 2-D matrix, return all values as a one-dimensional sequence in clockwise spiral order.
+
+Handle matrices that collapse to a single row or a single column without emitting values twice.
+
+Follow-up 1: produce the traversal in counterclockwise order.
+
+Follow-up 2: given n, fill an n × n matrix in spiral order rather than reading an existing matrix.
+
+Examples
+
+The interviewer ran three shape-focused cases: a 1 × 5 single row, a 5 × 1 single column, and a 3 × 3 matrix.
+
+Notes
+
+A four-boundary implementation tracks top, bottom, left, and right, shrinking the matching boundary after each edge. Guard the bottom and left sweeps after earlier contractions; otherwise single-row and single-column inputs duplicate values. The loop remains active while both boundary pairs are valid.
+
+The counterclockwise and fill variants reuse the same boundary skeleton; only the edge order or read-versus-write operation changes.
+
+Preparation
+
+Implement clockwise and counterclockwise traversal back-to-back, then test both on one-row, one-column, odd-square, and rectangular inputs.
+
+Write the spiral-fill variant using the same boundary helpers and explain where duplicate writes can occur.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

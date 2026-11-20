@@ -1,0 +1,48 @@
+===H1===
+Playlist / Guide Voting System (OOD)
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/playlist-guide-voting-ood
+===BODY===
+Amazon
+System DesignMembers
+Playlist / Guide Voting System (OOD)
+Object-oriented design for a system of playlists holding guides, with add, upvote/downvote, and a getPlaylist that returns guides sorted by vote then timestamp. Extensibility follow-up points at the Strategy pattern.
+SWE
+oop-design
+sorting
+medium
+Frequency
+Single report
+Last asked
+2026-05-31
+Stage
+onsite-coding
+Requirements
+
+Model many playlists, each holding many guides. You choose all data structures and class boundaries.
+
+addGuide(guideId, userId, playlistId) — add a guide to a playlist (no return value).
+
+vote(guideId, userId, playlistId, vote) — register an upvote or downvote on a guide (no return value).
+
+getPlaylist(playlistId) — return all guides in a playlist sorted by vote count descending, ties broken by timestamp.
+
+Notes
+
+Standard shape: a Playlist owns Map<guideId, Guide>; each Guide tracks id, creator userId, creation timestamp, and a vote tally.
+
+Pin down vote semantics with the interviewer: can a user vote more than once, can they flip an upvote to a downvote? A per-guide Map<userId, voteValue> keeps voting idempotent.
+
+getPlaylist sorts on (votes desc, timestamp). When asked to support other orderings, pull the comparator out — the expected answer is the Strategy pattern (inject a sort strategy) rather than branching inside getPlaylist.
+
+Preparation
+
+Pre-write the class skeleton (Playlist, Guide, per-guide vote map) so interview time goes to the sort / extensibility discussion.
+
+Rehearse the Strategy extension aloud: a SortStrategy interface with byVotesThenTime, byRecency, etc., injected into getPlaylist.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

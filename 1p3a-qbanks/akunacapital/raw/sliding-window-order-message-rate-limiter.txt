@@ -1,0 +1,70 @@
+===H1===
+Sliding-Window Order Message Rate Limiter
+===URL===
+https://www.1point3acres.com/interview/problems/company/akunacapital/sliding-window-order-message-rate-limiter
+===BODY===
+Akuna Capital
+CodingFree preview
+Sliding-Window Order Message Rate Limiter
+Design and implement a reusable class that decides how many order messages can be sent without breaching a moving-window rate limit such as 50 messages per 1000 ms.
+SWE
+Infra Eng
+rate-limiting
+sliding-window
+queue
+trading
+testing
+medium
+Frequency
+Single report
+Last asked
+2026-01-23
+Stage
+onsite-coding
+Requirements
+
+Implement a class for trading-engine clients that enforces order-message rate limits over a continuous moving time window.
+
+The class must support:
+
+Configurable limits, such as 100 order messages per 1 second or 500 order messages per 1 minute.
+
+A true moving window measured against the past timeLimitWindow, not a coarse fixed bucket.
+
+Batch sends: the caller may ask to send more than one message at a timestamp.
+
+A method shaped like RateLimit(maxMsgCount, timeLimitWindow) and checkRateLimit(int suggestOrders, time_unit_t insert_ts).
+
+Unit tests covering normal acceptance, partial acceptance, expiry of old events, and requests larger than remaining capacity.
+
+Examples
+
+For RateLimit(50, 1000ms):
+
+t = 0,    suggest 20  -> allow 20
+t = 50,   suggest 30  -> allow 30
+t = 300,  suggest 10  -> allow 0
+t = 1000, suggest 30  -> allow 20
+t = 1050, suggest 7   -> allow 7
+
+Notes
+
+The direct implementation is a deque of (timestamp, accepted_count) events. Before each request, evict entries with timestamp <= now - window. Sum the remaining accepted counts, compute remaining = max(0, limit - used), allow min(suggestOrders, remaining), and append the accepted amount if it is positive.
+
+If timestamps are nondecreasing, eviction is O(1) amortized and each request is O(1) amortized plus the cost of maintaining the running sum. If timestamps can arrive out of order, switch to an ordered map or reject nonmonotonic input explicitly.
+
+Production extensions usually probe atomicity. In a multithreaded caller, the prune-count-add sequence must be protected by a lock or executed atomically inside the backing store; otherwise two callers can both observe remaining capacity and exceed the limit.
+
+Preparation
+
+Implement the deque + running-sum version in C++ and Python, then write tests for the exact sample above.
+
+Practice explaining why a fixed-window counter is wrong at boundaries and why a sliding-window log is exact but memory grows with accepted events.
+
+Add one concurrency answer: a single mutex for in-process correctness, or an atomic server-side script if the state lives in Redis.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

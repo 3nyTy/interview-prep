@@ -1,0 +1,69 @@
+===H1===
+Holiday Service Latency Optimization
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/holiday-service-latency-optimization
+===BODY===
+Bloomberg
+System Design·60 minMembers
+Holiday Service Latency Optimization
+Team-loop system-design round: a thin Holiday Service sits between a C++ client library and a lower-level data service owned by another team, exposing `getData(countryCode, year)` and reformatting dates. The round pivots on one follow-up — end-to-end requests take ~150 ms and clients want materially less — pushing the discussion into multi-tier caching, prefetch/sync, and what the client SDK can absorb.
+SWE
+caching
+service-design
+distributed-systems
+medium
+Frequency
+Single report
+Last asked
+2026-07-07
+Stage
+onsite-system-design
+Requirements
+
+Design a Holiday Service that exposes one API to client applications:
+
+getData(countryCode, year)
+
+For example, getData("US", 2026) returns all holidays for that country and year:
+
+New Year (2026/01/01)
+Christmas (2026/12/25)
+...
+
+Current architecture:
+
+Client applications never call the service directly — they go through a C++ adapter/library linked into each application.
+
+Many client applications across many machines share the one Holiday Service.
+
+The Holiday Service stores no holiday data itself; it calls a lower-level holiday service owned by another team.
+
+The Holiday Service transforms the downstream payload before returning it — e.g. the lower-level service returns MM/DD, the Holiday Service returns YYYY/MM/DD.
+
+Many Client Applications
+        │
+        ▼
+   Holiday Service
+        │
+        ▼
+Lower-level Holiday Service (owned by another team)
+
+Follow-up — the round's real question: end-to-end requests currently take ~150 ms, and some clients need materially lower latency. How do you restructure the system to deliver it?
+
+Notes
+
+The API and transformation layer are warm-up; the grading happens on the latency follow-up. The discussion is a caching + data-synchronization + client-SDK design at heart — expect to spend most of the hour on how to cut the 150 ms path across the three tiers (in-process client library, service, downstream dependency) rather than on holiday-domain modeling.
+
+The prompt deliberately notes that the lower-level service is owned by another team; keep that ownership boundary in view when proposing where cached or synchronized data should live.
+
+Preparation
+
+Drill the multi-tier read-path playbook: in-process cache inside the client library, service-tier cache, and prefetch/refresh from the downstream service, with TTL-versus-push-invalidation trade-offs for slowly changing reference data.
+
+Practice opening latency follow-ups with a budget breakdown — which hops and transformations account for the 150 ms — before proposing components; it turns a vague "make it faster" into a structured answer.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

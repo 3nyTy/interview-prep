@@ -1,0 +1,59 @@
+===H1===
+Trie-Based Autocomplete
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/trie-autocomplete
+===BODY===
+Oracle
+Coding·45 minMembers
+Trie-Based Autocomplete
+Build an autocomplete service: given a prefix and a dictionary, return all strings that match the prefix. The interviewer pushes hard on maintainability — Trie and Solution classes must be separated, and the dictionary must initialise once in the constructor. Follow-up: rank results by past-query frequency.
+SWE
+trie
+dfs
+string
+data-structure
+design
+medium
+Frequency
+Single report
+Last asked
+2025-09-15
+Stage
+onsite-coding
+Requirements
+
+Input: a dictionary of words (provided once at construction) and a sequence of prefix queries at runtime.
+
+For each prefix query, return all dictionary words that start with the given prefix.
+
+Maintainability constraint: separate the Trie data structure from the Autocomplete / Solution orchestration class. The dictionary is initialised once in the constructor and is not rebuilt per query.
+
+Follow-up: rank returned results so that more-frequently-queried words appear first.
+
+Notes
+
+The standard implementation: build a Trie at construction time (O(total characters in dictionary)); per query, walk the Trie to the prefix's terminal node (O(|prefix|)), then DFS the subtree collecting all complete words (O(matches × average word length)).
+
+For the frequency follow-up, store a per-node counter that increments every time the autocomplete service is called with a prefix that ultimately selects a word containing this node — or, more simply, store the per-word query count in the leaf node. At query time, collect matches, then sort by counter descending. If the dictionary is large, swap the final sort for a partial top-K via a small max-heap.
+
+API design that interviewers reward: Trie exposes insert(word) and findPrefix(prefix) → Optional<Node>; the orchestrator owns recordQuery(word) and suggest(prefix) → List<String>. The interviewer in this round explicitly checked whether the candidate handled "do I re-initialise the dictionary every call?" — the correct answer is constructor-time once.
+
+Time pressure: the round had 30 minutes for coding and 15 for follow-ups. Get the base implementation done in under 20 minutes so the frequency ranking and complexity discussion fit.
+
+For a very large dictionary, mention compressed Tries (radix tree / Patricia trie) and DAWG (directed acyclic word graph) as space optimisations — interviewers sometimes probe whether the candidate is aware of these.
+
+Preparation
+
+Implement the Trie class from scratch: TrieNode { Map<Character, TrieNode> children; boolean isEnd; }, plus insert and findPrefix.
+
+Layer the autocomplete suggest method on top with a DFS that yields all complete words under a given node.
+
+Drill the frequency-ranking follow-up: practise the partial top-K version (max-heap of size K) rather than the full sort, since the round explicitly asked about ranking.
+
+Articulate the maintainability split (Trie vs orchestrator) before writing code — the interviewer's questions came back to it twice.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

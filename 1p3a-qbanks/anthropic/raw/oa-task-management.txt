@@ -1,0 +1,123 @@
+===H1===
+OA — Task Manager (TTL + Snapshot)
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/oa-task-management
+===BODY===
+Anthropic
+Coding·90 minMembers
+OA — Task Manager (TTL + Snapshot)
+CodeSignal four-level task manager. Levels 1–2 are CRUD on a per-user task list; Level 3 adds TTL-based auto-deletion; Level 4 requires a time-travel snapshot — `get_task_list(user, at_timestamp)` must return that user's tasks as of any past moment.
+SWE
+MLE
+codesignal
+data-structure
+snapshot
+ttl
+medium
+Frequency
+Low
+Last asked
+2026-08-21
+Stage
+oa
+Requirements
+
+Levels 1–2 — Basic task manager
+
+Per-user CRUD on tasks: add_task(user, task_id, ...), update_task, complete_task, get_task_list(user). Standard ledger-style semantics; nothing tricky.
+
+Level 3 — TTL auto-expiry
+
+Each task may carry an optional ttl. At any timestamp beyond created_at + ttl, the task must behave as if deleted (no longer surfaces in get_task_list, cannot be updated). Most candidates extend the level-1 store with a deletion_at field and filter at read-time rather than running an active reaper.
+
+Level 4 — Time-travel snapshot
+
+get_task_list(user, at_timestamp) returns the user's task list as it was at any past moment. All earlier operations are already timestamped; the API must reconstruct historical state on demand without storing one snapshot per call.
+
+Notes
+
+Same flavor as the in-memory-database OA's level-3 (TTL) + level-4 (look-back) combination, just dressed as a task domain. If you have already drilled the in-memory-DB variant, the data structures transfer almost verbatim — a per-key list of (timestamp, op, payload) events folded at query time handles both TTL and look-back uniformly.
+
+Hidden tests favor the happy path; subtle bugs may slip through but a wrong data-structure choice forces a level-3/4 rewrite under time pressure. Pick the event-log representation up front.
+
+90-minute hard cap with progressive level unlock — earlier levels must pass before the next opens.
+
+A reported priority/quota run pairs Level 1 CRUD, Level 2 sort by priority then creation order, Level 3 per-user quota + task assignment, and a Level 4 history look-back (rather than the overdue-reporting close) — confirming the two families' levels can mix. Read the harness before committing.
+
+Both 4-level shapes (TTL/look-back vs. priority/quota) rotate under the same OA name — confirm by reading the harness signatures the first 60 seconds before committing to either implementation path.
+
+Alternate canonical variant in rotation — priority / quota
+
+Cross-reports indicate the harness exposes these exact signatures:
+
+# Level 1 — task CRUD with autoincrement ids
+def add_task(self, timestamp: int, name: str, priority: int) -> str: ...
+    # Returns "task_id_1", "task_id_2", … in creation order.
+    # Multiple tasks may share the same name; ids are unique.
+
+def update_task(self, timestamp: int, task_id: str, name: str, priority: int) -> bool: ...
+    # True on success; False if task_id is unknown.
+
+def get_task(self, timestamp: int, task_id: str) -> str | None: ...
+    # Returns a JSON string with NO spaces between keys/values: '{"name":"...","priority":N}'.
+    # Field order is fixed: name first, priority second.
+    # None if the task does not exist.
+
+# Level 2 — search and ranked listing
+def search_tasks(self, timestamp: int, name_filter: str, max_results: int) -> list[str]: ...
+    # Substring match on name. Sort: priority desc, then creation order asc.
+    # Returns [] when max_results <= 0.
+
+def list_tasks_sorted(self, timestamp: int, limit: int) -> list[str]: ...
+    # Same sort key as search_tasks. Returns [] when limit <= 0.
+
+# Level 3 — users, quotas, timed assignments
+def add_user(self, timestamp: int, user_id: str, quota: int) -> bool: ...
+    # False if user_id already exists.
+
+def assign_task(self, timestamp: int, task_id: str, user_id: str, finish_time: int) -> bool: ...
+    # Assignment is active over [timestamp, finish_time); auto-expires at finish_time.
+    # False if task or user is missing, or if the user's active-assignment count
+    # is already at quota. The same task can be assigned to the same user multiple
+    # times — each assignment occupies one quota slot independently.
+
+def get_user_tasks(self, timestamp: int, user_id: str) -> list[str]: ...
+    # Task ids currently active for the user (start <= timestamp < finish).
+    # Sort: finish_time asc, then start_time asc.
+
+# Level 4 — completion and overdue reporting
+def complete_task(self, timestamp: int, task_id: str, user_id: str) -> bool: ...
+    # Marks an active assignment done and frees the quota slot immediately.
+    # If the user has the same task assigned multiple times concurrently,
+    # complete the one with the EARLIEST start_time. False if no active match.
+
+def get_overdue_assignments(self, timestamp: int, user_id: str) -> list[str]: ...
+    # Assignments whose finish_time <= timestamp AND were never completed.
+    # Sort: finish_time asc, then start_time asc. The same task may appear
+    # multiple times if it expired multiple times.
+
+Implementation notes for this variant:
+
+Task ids are issued by an internal counter; the format "task_id_{n}" is part of the contract — hidden tests compare the literal string.
+
+get_task's JSON return is a string, not a dict: f'{{"name":"{name}","priority":{priority}}}'. No spaces inside the braces.
+
+Quota is enforced on the count of currently active assignments at the requested timestamp; expired-but-not-completed assignments do NOT count against quota (they free their slot at finish_time even if complete_task was never called) but DO surface in get_overdue_assignments.
+
+A per-user list of Assignment(task_id, start, finish, completed) records, scanned linearly at query time, passes the hidden cases inside the 90-minute window without any indexing beyond the dict-of-list.
+
+A score of 750/1000 advanced to the recruiter stage even though the fourth part passed only a few edge-case tests. Treat this as evidence that partial completion can advance, not as a guaranteed cutoff.
+
+Preparation
+
+Drill the canonical event-sourced store: a dict[user] -> list[(t, kind, payload)]. Implement at(user, t) by folding events with t' <= t and skipping ones whose (t' + ttl) <= t.
+
+Practice writing level 1 in ≤15 minutes with clean enough abstractions that levels 3 and 4 do not force a refactor.
+
+Pre-write a small replay(events, until_t) helper on paper; this collapses level-4 to a one-liner over the level-3 store.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

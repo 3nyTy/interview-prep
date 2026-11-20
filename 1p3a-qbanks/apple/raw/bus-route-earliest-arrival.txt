@@ -1,0 +1,58 @@
+===H1===
+Bus Route Earliest Arrival
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/bus-route-earliest-arrival
+===BODY===
+Apple
+Coding·45 minMembers
+Bus Route Earliest Arrival
+Given bus routes / schedules, travel times between stops, waiting times, origin, destination, and departure time, compute the earliest arrival time.
+SWE
+graph
+dijkstra
+heap
+binary-search
+hard
+Frequency
+Single report
+Last asked
+2026-04-18
+Stage
+phone-screen
+Requirements
+
+Given several bus route timetables, compute the earliest arrival time.
+
+Input concept:
+
+Routes with ordered stops.
+
+Travel time between adjacent stops.
+
+Waiting / departure times.
+
+Query: (start_location, end_location, departure_time).
+
+Output: earliest arrival time.
+
+You should discuss test cases and time complexity.
+
+Notes
+
+Model this as a time-dependent graph. A state is (stop, current_time). From a stop, eligible outgoing edges are bus departures at or after current_time; edge cost is waiting time plus travel time. If all edge costs are non-negative, Dijkstra-style traversal works.
+
+For simple inputs, a route scan may be enough. For repeated queries, pre-index departures by stop and use binary search to find the next eligible bus.
+
+Preparation
+
+Practice turning transit schedules into graph edges with departure and arrival times.
+
+Implement a single-query version using a priority queue.
+
+Prepare follow-ups for transfer limits, overnight schedules, repeated queries, and real-time delays.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,431 @@
+{
+  "company": "lyft",
+  "display_name": "Lyft",
+  "qbank_count": 13,
+  "questions_scraped": 13,
+  "site_total_count": 37,
+  "oj_count": 24,
+  "external_count": 0,
+  "description": "Lyft's engineering loop is hands-on and execution-heavy: candidates repeatedly see practical API-wrapper, in-memory data-store, scheduling, and product-system prompts rather than abstract puzzle rounds. Senior loops add system design around payments, donation flows, web crawling, or marketplace-adjacent products, while frontend and intern tracks lean toward small project-style implementation.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/lyft",
+  "scraped_at": "2026-09-20",
+  "source": "1point3acres qbank (logged-in session)",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "transactional-in-memory-kv-store",
+      "title": "Transactional In-Memory Key-Value Store",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "High",
+      "last_asked": "2026-09-01",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "in-memory-database",
+        "transactions",
+        "data-structure",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "in-memory-database",
+        "transactions",
+        "data-structure",
+        "hard"
+      ],
+      "overview": "Implement an in-memory key-value database with transaction support. The core APIs include normal get/set-style operations plus `begin`, `rollback`, and `commit`, with careful edge-case handling under ...",
+      "source_count": 8,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/lyft/transactional-in-memory-kv-store"
+    },
+    {
+      "n": 2,
+      "slug": "rotten-oranges-grid-bfs",
+      "title": "Rotten Oranges / Grid Infection BFS",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-09-01",
+      "stage": "oa · phone-screen · onsite-coding",
+      "access": "Free preview",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "bfs",
+        "grid",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "bfs",
+        "grid",
+        "medium"
+      ],
+      "overview": "A recurring phone-screen and OA-style coding prompt equivalent to the rotten-oranges family: run a BFS infection process on a grid and compute whether all reachable fresh cells can be converted.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/lyft/rotten-oranges-grid-bfs"
+    },
+    {
+      "n": 3,
+      "slug": "pagination-api-wrapper",
+      "title": "Pagination API Wrapper",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-29",
+      "stage": "phone-screen · tech-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "api-integration",
+        "iterator",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "api-integration",
+        "iterator",
+        "medium"
+      ],
+      "overview": "Design a wrapper over an immutable paginated client. The underlying client can only fetch complete pages, while the new API must return the next requested number of records across repeated calls.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/lyft/pagination-api-wrapper"
+    },
+    {
+      "n": 4,
+      "slug": "one-hot-encoder-and-ml-error-diagnosis",
+      "title": "One-Hot Encoder + ML Error Diagnosis",
+      "category": "coding",
+      "duration": "75 min",
+      "frequency": "Single report",
+      "last_asked": "2026-03-21",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "mle"
+      ],
+      "tags": [
+        "ml-knowledge",
+        "feature-engineering",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "ml-knowledge",
+        "feature-engineering",
+        "medium"
+      ],
+      "overview": "MLE phone screen split into a 30-minute ML-concepts section and a 45-minute handwritten one-hot encoder implementation. The concepts section used five train/test error scenarios and asked for diagnosi...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/lyft/one-hot-encoder-and-ml-error-diagnosis"
+    },
+    {
+      "n": 5,
+      "slug": "frontend-incremental-clicker-table",
+      "title": "Frontend Incremental Clicker with Configurable Buttons",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-11-17",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "frontend",
+        "state-machine",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "frontend",
+        "state-machine",
+        "medium"
+      ],
+      "overview": "Build a small clicker-style UI in stages: a button increases score, reaching five points unlocks another button that spends points and adds score over time, then a table lets users configure more such...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/lyft/frontend-incremental-clicker-table"
+    },
+    {
+      "n": 6,
+      "slug": "minesweeper-game-logic",
+      "title": "Minesweeper Game Logic",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-10-16",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "grid",
+        "bfs",
+        "simulation",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "grid",
+        "bfs",
+        "simulation",
+        "medium"
+      ],
+      "overview": "Frontend loop coding round implemented in Python: build the algorithmic core of Minesweeper without display concerns, including map expansion and win/loss detection.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/lyft/minesweeper-game-logic"
+    },
+    {
+      "n": 7,
+      "slug": "job-scheduler-minimum-workers",
+      "title": "Job Scheduler: Minimum Workers with Assignment History",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Low",
+      "last_asked": "2026-07-29",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "heap",
+        "scheduling",
+        "parsing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "heap",
+        "scheduling",
+        "parsing",
+        "medium"
+      ],
+      "overview": "Given jobs with start time and duration, assign them to the minimum number of workers so no worker runs overlapping jobs. Unlike plain Meeting Rooms II, the output must include each job's worker assig...",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/lyft/job-scheduler-minimum-workers"
+    },
+    {
+      "n": 8,
+      "slug": "minimum-window-substring",
+      "title": "Minimum Window Substring",
+      "category": "coding",
+      "duration": "50 min",
+      "frequency": "Low",
+      "last_asked": "2026-06-29",
+      "stage": "phone-screen · tech-screen",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "string",
+        "sliding-window",
+        "hashmap",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "sliding-window",
+        "hashmap",
+        "hard"
+      ],
+      "overview": "Asked as the LC 76 Minimum Window Substring prompt in Lyft technical screens. Given two strings, return the shortest contiguous substring of the first that covers every character of the second, includ...",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/lyft/minimum-window-substring"
+    },
+    {
+      "n": 9,
+      "slug": "frontend-autocomplete-component",
+      "title": "Frontend Autocomplete Component",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2025-11-17",
+      "stage": "onsite-coding · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "frontend",
+        "react",
+        "design-implementation",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "frontend",
+        "react",
+        "design-implementation",
+        "medium"
+      ],
+      "overview": "Frontend onsite round that begins as component/system design and then expects implementation of the autocomplete component. The interviewer may explicitly require the design to be implementable immedi...",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/lyft/frontend-autocomplete-component"
+    },
+    {
+      "n": 10,
+      "slug": "wikipedia-internet-archive-crawler",
+      "title": "Wikipedia Internet Archive / Web Crawler",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-08-19",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "web-crawler",
+        "dedup",
+        "scaling",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "web-crawler",
+        "dedup",
+        "scaling",
+        "medium"
+      ],
+      "overview": "Design a crawler/archive system that coordinates one reliable primary machine and about 1,000 unreliable, untrusted bots on different IPs to discover and download all Wikipedia pages, store them durab...",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/lyft/wikipedia-internet-archive-crawler"
+    },
+    {
+      "n": 11,
+      "slug": "charity-donation-system",
+      "title": "Charity Donation System",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-05-12",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "payment",
+        "idempotency",
+        "transactions",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "payment",
+        "idempotency",
+        "transactions",
+        "medium"
+      ],
+      "overview": "Design a charity donation website where payment execution is abstracted behind an SDK, but the system still has to handle correctness, failure recovery, duplicate prevention, and traffic spikes.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/lyft/charity-donation-system"
+    },
+    {
+      "n": 12,
+      "slug": "behavioral-project-conflict-and-dei",
+      "title": "Behavioral: Project, Conflict, Failure, and DEI",
+      "category": "behavioral",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-04-10",
+      "stage": "onsite-bq",
+      "access": "Members",
+      "roles": [
+        "all-roles"
+      ],
+      "tags": [
+        "behavioral",
+        "medium"
+      ],
+      "roles_slug": [
+        "all-roles"
+      ],
+      "tags_slug": [
+        "behavioral",
+        "medium"
+      ],
+      "overview": "Lyft behavioral rounds are standard but broad. Candidates are asked for many short examples across conflict, communication, feedback, failure, decisions, project challenges, and sometimes diversity su...",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/lyft/behavioral-project-conflict-and-dei"
+    },
+    {
+      "n": 13,
+      "slug": "ds-commuter-coupon-probability",
+      "title": "Commuter Coupon Conditional Probability",
+      "category": "other",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-05-30",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "ds"
+      ],
+      "tags": [
+        "probability",
+        "math-reasoning",
+        "medium"
+      ],
+      "roles_slug": [
+        "ds"
+      ],
+      "tags_slug": [
+        "probability",
+        "math-reasoning",
+        "medium"
+      ],
+      "overview": "Data science statistics screen probability problem framed around Lyft commute couponing: given conditional ride probabilities for the to-work and return-home trips, compute the marginal probability of...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/lyft/ds-commuter-coupon-probability"
+    }
+  ]
+}

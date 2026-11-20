@@ -1,0 +1,270 @@
+===H1===
+Apple News Search (No ML)
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/apple-news-search-no-ml
+===BODY===
+Apple
+System DesignMembers
+Apple News Search (No ML)
+Design the first version of search for Apple News. A user types a free-form query (e.g. "tesla earnings", "wildfires california") and expects back a ranked list of news articles drawn from tens of thousands of publishers.
+MLE
+search
+ranking
+retrieval
+Frequency
+Single report
+Last asked
+2025-12-18
+Stage
+phone-screen · onsite-system-design
+Problem Statement
+
+Design the first version of search for Apple News. A user types a free-form query (e.g. "tesla earnings", "wildfires california") and expects back a ranked list of news articles drawn from tens of thousands of publishers.
+
+The twist: assume you have no trained ML model available. No learned-to-rank, no embeddings, no query understanding model. You need to get a useful baseline into production using classical information retrieval and hand-crafted signals, and leave room to swap in ML later.
+
+This is the kind of question Apple asks ML engineers to check whether you can ship a reasonable system when modeling is off the table, and whether you understand the IR primitives that every downstream ranker eventually sits on top of.
+
+Phase 1: Requirements
+
+Functional Requirements
+
+Ingest articles from publisher feeds and internally curated sources, with title, body, publisher, timestamp, topic/category tags.
+
+Accept a text query and return a ranked list of articles relevant to it.
+
+Paginate results (top 10 per page, up to ~1000 results).
+
+Reflect fresh articles quickly so breaking news is findable within minutes of publication.
+
+Filter by obvious facets: time window (past 24h / week), category, language, region.
+
+Explicitly deferred for a v1: personalization, query suggestions, spelling correction, semantic search, clickthrough feedback loops. Call these out as places future ML lands.
+
+Non-Functional Requirements
+
+RequirementTargetRationale
+Query latencyp95 under 200ms end-to-endUsers expect search to feel instant
+Index freshnessNew article searchable within 1 to 5 minutesNews has a short half-life
+Availability99.9%Search is a core tab in Apple News
+Scale10M+ articles in the active corpus, 1–5k QPS at peakMatches a large news app
+Result qualityReasonable top-10 with no MLClassical IR signals must carry the system
+
+Capacity Estimation
+
+Rough numbers to anchor the design:
+
+Corpus size: keep the last 2 years of articles hot. Say 5M articles/year across all publishers Apple News tracks. That gives ~10M active documents.
+
+Document size: title ~100 bytes, body ~5 KB, metadata ~1 KB. Call it 6 KB per doc. 10M × 6 KB = 60 GB of raw article text.
+
+Inverted index: with Lucene-style compression and positions, budget roughly 40–80% of raw text size. Call it 30–50 GB of index, comfortably fitting across a handful of shards.
+
+Ingest rate: 5M articles/year works out to ~0.2 articles/second steady. Breaking-news bursts can push this to ~50/second for short windows, so size the indexing pipeline for that.
+
+Query rate: 50M DAU, each issuing ~2 searches/day = 100M queries/day = ~1.2k QPS average, plan for ~5k QPS peak.
+
+Phase 2: Data Model
+
+Article Document
+
+Article
+├── article_id: UUID (PK)
+├── publisher_id: VARCHAR
+├── title: TEXT
+├── body: TEXT
+├── summary: TEXT              // 1–2 sentence lead, often from the feed
+├── url: VARCHAR
+├── language: VARCHAR(8)
+├── region: VARCHAR(8)
+├── categories: VARCHAR[]      // e.g. ["politics", "tech"]
+├── entities: VARCHAR[]        // extracted via simple NER or feed tags
+├── published_at: TIMESTAMP
+├── ingested_at: TIMESTAMP
+└── publisher_score: FLOAT     // static source-authority signal
+
+Inverted Index Entry (per shard)
+
+term → postings list
+term (e.g. "tesla")
+├── doc_freq: INT
+└── postings: [
+    { article_id, term_freq, positions: [int], fields: bitmask(title|body|tags) },
+    ...
+  ]
+
+Storing field membership (title vs. body vs. tags) on each posting lets the ranker apply a title-match boost without a separate index.
+
+Phase 3: API Design
+
+Public Search API
+
+GET /v1/search?q=tesla+earnings&limit=10&cursor=<opaque>&time=past_week&category=business
+
+Response:
+{
+  "results": [
+    {
+      "article_id": "...",
+      "title": "...",
+      "summary": "...",
+      "publisher": "Bloomberg",
+      "published_at": "2026-03-15T14:22:00Z",
+      "url": "..."
+    },
+    ...
+  ],
+  "next_cursor": "...",
+  "took_ms": 83
+}
+
+Indexer Callback (internal)
+
+POST /internal/index
+Body: { article_id, operation: "upsert" | "delete" }
+
+Triggered by the ingestion pipeline when a new article is finalized or an existing one is updated/retracted.
+
+Phase 4: High-Level Design
+
+Ingestion Path
+
+Fetch articles from publisher RSS/Atom feeds and partner APIs on a polling cadence (per-publisher, adaptive).
+
+Normalize: strip HTML, extract title/body/summary, detect language, normalize timestamps, join with publisher metadata (authority score, category hints).
+
+Dedup: articles often syndicate across publishers. SimHash or MinHash over the body gives a near-dup signal; keep the highest-authority copy as canonical, link the rest.
+
+Persist the raw article to Postgres (metadata) + blob storage (body), then emit an event on Kafka.
+
+Indexer workers consume the event, tokenize the text, and update the inverted index shards.
+
+Tokenization and Analysis
+
+Keep it simple and deterministic for v1:
+
+Lowercase, Unicode-normalize (NFKC).
+
+Split on whitespace and punctuation.
+
+Apply a stoplist for very common terms ("the", "a", "of").
+
+Porter stemmer or lightweight lemmatizer for English; per-language analyzers for other languages.
+
+Preserve field information (title/body/tags) on each posting so ranking can reward title matches.
+
+No learned tokenizer, no embedding. Consistency between index-time and query-time analyzers is the rule that matters most.
+
+Index Layout
+
+Shard the inverted index by document (hash of article_id). Each shard is a self-contained mini-index. Every query fans out to all shards, each returns its top-K, the broker merges.
+
+Doc-partitioned is simpler than term-partitioned: no hot shards for common terms, each shard holds a roughly equal share of documents, and adding capacity is just adding replicas or splitting a shard.
+
+Tradeoff: every query fans out to every shard, so coordination overhead (scatter-gather, tail latency from the slowest shard) grows with shard count. Acceptable at our scale, and easier to reason about than term-partitioning.
+
+Keep shards small enough that top-K retrieval stays in-memory-ish. 10–20 shards for 10M docs is a reasonable starting point.
+
+Use Elasticsearch/OpenSearch as the index engine unless there's a strong reason to hand-roll. The interview answer is "I'd evaluate ES/Solr first; a custom index only if they don't meet latency or control requirements."
+
+Query Path
+
+Parse the query: same analyzer as the indexer. Detect operators (quoted phrases, AND/OR if supported).
+
+Retrieve candidates: scatter the tokenized query to every index shard. Each shard returns the top few hundred BM25-scored candidates.
+
+Merge the shard results at the broker.
+
+Re-rank the merged candidates using the scoring function below.
+
+Hydrate the top K with full metadata from the article store.
+
+Apply filters (time window, category) either as pre-filter on the shards (if cheap) or post-filter at the ranker.
+
+Paginate with a cursor that encodes the last seen score + article_id for stability.
+
+Ranking Without ML
+
+The whole question hinges on this section. With no model, the ranking is a hand-weighted linear combination of transparent signals:
+
+score(article, query) =
+    w1 * BM25(query, article.title)
+  + w2 * BM25(query, article.body)
+  + w3 * recency(article.published_at)
+  + w4 * publisher_score(article)
+  + w5 * category_match(article, query)
+  - penalty(duplicate, clickbait_heuristic)
+
+Signal choices:
+
+BM25 on title and body separately, with a higher weight on title. Title matches are strong intent signals in news.
+
+Recency decay: news relevance drops fast. A simple exponential decay, e.g. exp(-age_hours / half_life) with half-life around 24–48 hours. Tunable by category (breaking news decays faster than evergreen).
+
+Publisher authority score: a static per-publisher prior, hand-scored or derived from editorial lists. Prevents low-trust sources from dominating.
+
+Category/topic match: if the query maps to a category (via a dictionary of category keywords), boost articles in that category.
+
+Penalties: down-rank known near-duplicates and articles with clickbait patterns (all-caps title, excessive punctuation).
+
+Weights (w1…w5) are hand-tuned on a small curated eval set of queries with human-labeled relevance. This is where the "no ML" constraint bites, and where you should acknowledge to the interviewer that these weights are the first thing ML will replace.
+
+Why not just BM25? Pure BM25 ignores that news users almost always want recent articles. A 5-year-old article can BM25-match better than today's breaking story. Recency and source authority are what make a news ranker feel useful.
+
+Freshness Pipeline
+
+New articles must become searchable within a few minutes. Two mechanisms in tandem:
+
+Near-real-time indexing: indexer workers consume Kafka events and write to the shard's in-memory segment. Searches read from both the committed on-disk index and the in-memory segment.
+
+Periodic merge: background compaction merges in-memory segments into the on-disk index every few minutes. Standard Lucene-style design, and what ES gives you out of the box.
+
+Phase 5: Scaling and Trade-offs
+
+Handling Peak QPS
+
+Replicate each shard (e.g. 3x) behind a load balancer. Reads scale horizontally with replicas.
+
+Front the search API with a cache keyed on normalized (query, filters, page) tuples. Short TTL (30–60s) because news is time-sensitive. Hot queries like "breaking news" benefit most.
+
+Index Size Growth
+
+Roll old articles (say older than 2 years) into a cold tier with a smaller, cheaper cluster. Most queries only hit the hot tier.
+
+Alternatively, soft-delete stale articles from the inverted index but keep them retrievable by direct ID for permalinks.
+
+Freshness vs. Cost
+
+Every additional index refresh per minute costs CPU. Trade off by category: breaking-news categories (top stories, politics) get 1-minute refresh, evergreen (hobbies, weekend reads) gets 10-minute refresh.
+
+What ML Replaces Later
+
+Worth naming explicitly in the interview, because it shows you understand the upgrade path:
+
+Learned-to-rank replaces the hand-tuned linear combination. Features are the same signals plus query/doc interactions; the model is a gradient-boosted tree or small MLP trained on clickthrough logs.
+
+Query understanding: intent classification, entity linking, spelling correction. All wrap the query parser and rewrite the query.
+
+Semantic retrieval: dense embeddings for articles and queries, served via an ANN index (HNSW/IVF). Runs in parallel with BM25 and fuses candidates before ranking.
+
+Personalization: user embedding joined at rank time. Requires a feedback log the v1 system should already be collecting.
+
+The key design property that makes all of this possible: the v1 system logs every query, every result shown, and every click. Without that, there's no training data when you're ready for ML.
+
+Key Points to Emphasize
+
+Classical IR still gets you 80% of the way. BM25 + recency + source authority + title boost produces a real, shippable news search.
+
+Log everything from day one. The no-ML v1 is also the data-generator for the ML v2.
+
+Pick boring infrastructure. Elasticsearch/OpenSearch is the right default; don't hand-roll an index in an interview unless asked.
+
+Freshness is a first-class requirement in news. Design the pipeline around minutes-to-index, not hours.
+
+Name the ML upgrade path. Interviewers asking "no ML" want to see you can both ship now and plan the handoff cleanly.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

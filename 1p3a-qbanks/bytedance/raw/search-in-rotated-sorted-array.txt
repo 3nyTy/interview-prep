@@ -1,0 +1,58 @@
+===H1===
+Search in Rotated Sorted Array
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/search-in-rotated-sorted-array
+===BODY===
+ByteDance / TikTok
+Coding·45 minMembers
+Search in Rotated Sorted Array
+LeetCode 33: search for a target in an ascending array rotated at an unknown pivot and return its index or `-1`. A current intern-screen follow-up removes the distinct-values guarantee, requiring explicit handling of duplicate boundary values.
+SWE
+array
+binary-search
+medium
+Frequency
+Low · New
+Last asked
+2026-08-21
+Stage
+phone-screen · final-round
+Requirements
+
+The input array was originally sorted in ascending order and then rotated at an unknown pivot.
+
+Given a target value, return its index if present; otherwise return -1.
+
+The base version contains distinct integers and expects O(log n) running time.
+
+Minority variant: values are not guaranteed to be distinct; clarify the degraded worst-case behavior before coding.
+
+Examples
+
+Input: nums = [4,5,6,7,0,1,2], target = 0
+Output: 4
+
+Input: nums = [4,5,6,7,0,1,2], target = 3
+Output: -1
+
+Notes
+
+The distinct-values version appeared late in a multi-round SDE loop after a broad technical oral drill.
+
+The duplicate-values follow-up appeared in a 2027 summer-intern screen after cache and database fundamentals.
+
+Boundary decisions must be dry-run aloud; unexplained branch conditions and silent off-by-one fixes weaken otherwise correct code.
+
+Preparation
+
+Write the modified binary search from memory and state which half is sorted before deciding where the target can lie.
+
+Extend the implementation for duplicate boundary values and explain why shrinking equal endpoints can be necessary.
+
+Drill the one-element array, no-rotation case, pivot at either boundary, absent targets, and repeated values.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

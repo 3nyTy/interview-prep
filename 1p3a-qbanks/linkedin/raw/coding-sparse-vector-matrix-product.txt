@@ -1,0 +1,77 @@
+===H1===
+Sparse Vector / Matrix Product
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-sparse-vector-matrix-product
+===BODY===
+LinkedIn
+Coding·60 minMembers
+Sparse Vector / Matrix Product
+Design `SparseVector` and `SparseMatrix` classes from scratch, then implement vector-vector and matrix-matrix products without materializing the dense form. The bar is *both* sub-`O(M × N)` time and minimal memory — a list-of-coordinates representation is the expected baseline; CSR/CSC if pushed.
+MLE
+RS
+data-structure
+object-design
+math
+linear-algebra
+memory-bounded
+hard
+Frequency
+Single report
+Last asked
+2025-11-16
+Stage
+onsite-coding
+Requirements
+
+class SparseVector:
+    def __init__(self, length: int): ...
+    def set(self, idx: int, val: float) -> None: ...
+    def get(self, idx: int) -> float: ...
+    def dot(self, other: "SparseVector") -> float: ...
+
+class SparseMatrix:
+    def __init__(self, rows: int, cols: int): ...
+    def set(self, r: int, c: int, val: float) -> None: ...
+    def matmul(self, other: "SparseMatrix") -> "SparseMatrix": ...
+
+Acceptance criteria:
+
+Storage is sub-linear in the dense form — O(nnz) not O(R × C).
+
+dot is O(nnz1 + nnz2) (or O(min(nnz1, nnz2)) with the smaller side as the iterator if the larger uses a hashmap).
+
+matmul is O(nnzA × avg_nnz_per_col_B) — not O(R × K × C).
+
+Reasonable internal representations:
+
+List of (index, value) pairs, sorted by index. Cheap iteration; O(log nnz) random access via binary search.
+
+Hashmap index -> value. Cheap random access; iteration is unordered.
+
+CSR / CSC for matrices (rows-indexed pointer array + column-index array + value array). Standard scientific-computing representation.
+
+For matmul, iterate non-zeros of A and for each non-zero A[r][k], walk the non-zeros of row k of B (CSR-style) and accumulate into the output. Skip both inner products and output cells entirely when sparsity allows.
+
+Notes
+
+"Cannot be O(M × N)" is the explicit constraint; submitting a dense matrix product fails the round even if it returns the right answer.
+
+Memory minimality is the more aggressive constraint; CSR is the expected end-state if the interviewer keeps pushing.
+
+Be prepared to discuss when sparse-times-sparse becomes denser than its inputs (e.g. random sparsity converges quickly toward dense after a few multiplications).
+
+Preparation
+
+Implement SparseVector.dot with the two-pointer merge on index-sorted arrays; this is the cleanest version under time pressure.
+
+Sketch CSR on paper — data, indices, indptr — so the matrix follow-up doesn't catch you cold.
+
+Brush up on scipy.sparse semantics (csr_matrix, coo_matrix, the conversion costs) for the comparative discussion.
+
+For the MLE oriented variant, be ready to connect this to embedding-table lookups and gradient sparsity in recommender training.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

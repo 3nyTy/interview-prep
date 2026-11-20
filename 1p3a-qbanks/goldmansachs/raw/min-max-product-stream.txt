@@ -1,0 +1,49 @@
+===H1===
+Min × Max Product After Push / Pop
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/min-max-product-stream
+===BODY===
+Goldman Sachs
+Coding·60 minMembers
+Min × Max Product After Push / Pop
+Maintain a multiset under a stream of push / pop operations and, after each operation, output the product of the current minimum and maximum elements. Tests whether the candidate reaches for a balanced BST / `TreeMap` rather than re-scanning.
+SWE
+data-structure
+bst
+streaming
+medium
+Frequency
+Single report
+Last asked
+2024-10-26
+Stage
+oa
+Requirements
+
+You receive two parallel arrays of length n: operations (each "push" or "pop") and arr (the value associated with each operation). After each operation, compute the product of the current minimum and current maximum elements in the multiset and append it to the result.
+
+public static List<Long> minMaxArray(String[] operations, int[] arr)
+
+Notes
+
+The container must support: insert a value, remove one occurrence of a value, query min, query max. A TreeMap<Integer, Integer> (value → count) is the natural Java implementation; in Python a SortedList or two heaps with lazy deletion works.
+
+Each operation is O(log n) with a balanced BST; total O(n log n).
+
+Use long for the product — two int values multiplied together easily overflow.
+
+pop of a value that is not currently in the multiset is undefined by the problem statement; the behavior is left loose, so clarify with the interviewer (treat as no-op vs throw) before coding.
+
+After the multiset is emptied, the min × max query is undefined — handle by emitting 0 or null per the interviewer's choice.
+
+Preparation
+
+Implement once with TreeMap; then rewrite using two heaps with lazy-deletion (a PriorityQueue plus a removed-counter map) — the second form is a common follow-up.
+
+Practice the canonical "running median" two-heap pattern (LC 295) for related streaming-stat muscle memory.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

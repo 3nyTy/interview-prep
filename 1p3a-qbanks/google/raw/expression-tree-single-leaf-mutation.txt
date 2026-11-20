@@ -1,0 +1,58 @@
+===H1===
+Expression Tree Single-Leaf Mutation
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/expression-tree-single-leaf-mutation
+===BODY===
+Google
+Coding·45 minMembers
+Expression Tree Single-Leaf Mutation
+Evaluate a boolean expression tree, then answer the root value after each single-leaf flip. Current variants include XOR/OR/AND/NOT operators, no parent pointer on the node interface, and an expectation that the candidate cache parent links or paths during the initial traversal.
+SWE
+tree
+dfs
+simulation
+medium
+state-machine
+Frequency
+Low
+Last asked
+2026-06-23
+Stage
+onsite-coding
+Requirements
+
+Input: a binary expression tree. Internal nodes are logical operators: AND, OR, XOR, or unary NOT. Leaves are boolean values.
+
+Evaluate the tree bottom-up to get the root result.
+
+Traverse leaves from left to right. For each leaf, temporarily flip its boolean value, compute the root result, then restore the leaf before moving to the next leaf.
+
+Return the sequence of root results after each single-leaf flip.
+
+A harder onsite variant gives only an expression-shaped tree such as XOR(OR(False, True), AND(True, NOT(True))); parsing may be out of scope, but the candidate still needs to define a reasonable TreeNode interface.
+
+Do not rely on a parent pointer being present. Build a parent map or root-to-leaf path cache during the initial evaluation pass.
+
+Notes
+
+Brute force is: collect leaves by inorder traversal, flip each leaf, and re-evaluate the whole tree.
+
+The natural optimization is to cache subtree values and only recompute the path from the flipped leaf to the root.
+
+Clarify whether XOR is binary-only and whether the tree is guaranteed valid.
+
+Early-stop optimization is expected: after a leaf flip, recompute upward only until a parent value stays unchanged, then reuse the previous root value.
+
+Preparation
+
+Practice tree evaluation for boolean expression trees.
+
+Add parent pointers or store root paths during leaf collection to support path-only recomputation.
+
+Drill AND / OR / XOR truth tables so updates are mechanical.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

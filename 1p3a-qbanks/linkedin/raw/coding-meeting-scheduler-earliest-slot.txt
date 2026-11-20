@@ -1,0 +1,75 @@
+===H1===
+Meeting Scheduler — Earliest Available Slot
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-meeting-scheduler-earliest-slot
+===BODY===
+LinkedIn
+Coding·60 minMembers
+Meeting Scheduler — Earliest Available Slot
+Given a list of existing meetings and a new meeting's required start-time-no-earlier-than and duration, return the earliest start that fits. Delivered as the AI-coding round in recent loops — the interviewer watches whether the candidate uses the assistant for boilerplate while keeping the data-structure decision (sorted-by-start with binary search vs segment tree) under their own control.
+SWE
+interval
+binary-search
+data-structure
+concurrency
+ai-tools
+medium
+Frequency
+Low
+Last asked
+2026-02-12
+Stage
+onsite-coding
+Requirements
+
+class Scheduler:
+    def add_booking(self, start: int, end: int) -> None: ...
+    def find_earliest_slot(self, after: int, duration: int) -> int: ...
+
+The simple version maintains a list of (start, end) intervals sorted by start. find_earliest_slot(after, duration):
+
+Binary search for the first interval whose start >= after.
+
+Walk forward, checking the gap between each consecutive interval pair. Return the first gap that fits.
+
+If no internal gap, return max(after, last_end).
+
+Follow-ups consistently asked:
+
+O(N) find / O(log N) add. The default ordering keeps add cheap, find linear. Push for O(log N) find by maintaining a sorted gap structure or a segment tree of busy intervals.
+
+Thread-safe variant. Reads dominate or writes dominate? Treating the scheduler as write-heavy is the safer default — a single Lock or a ReentrantReadWriteLock is sufficient. Discuss readers-writers fairness if pushed.
+
+O(log N) add and find. Segment tree on the time axis or interval tree; trade-off discussion against the simpler structure.
+
+AI-coding variant. Read the problem carefully — it is long and the assistant frequently misreads the inclusive/exclusive boundary on intervals. The expected workflow: think through the data structure first, then prompt the assistant for the implementation with explicit boundary semantics, then drive the dry-run yourself.
+
+Examples
+
+bookings: [(10, 20), (30, 40)]
+
+find_earliest_slot(after=5, duration=5)   -> 5      # fits before [10, 20]
+find_earliest_slot(after=5, duration=15)  -> 40     # neither gap fits; place after last
+find_earliest_slot(after=15, duration=5)  -> 20     # right after the first booking
+
+Notes
+
+The trap is the "after" semantics — does after mean >= or >? Confirm with the interviewer; the assistant defaults differ between languages.
+
+For the thread-safety follow-up, pessimistic locking is acceptable; lock-free skip-list approaches over-engineer the round.
+
+The segment-tree follow-up rarely needs full code; sketching the structure with a recurrence is sufficient.
+
+Preparation
+
+Implement the sorted-list + linear scan version cleanly with bisect (Python) or Collections.binarySearch (Java).
+
+Sketch the segment-tree-of-busy-intervals on paper so the follow-up rolls off; you do not need to code it to credit.
+
+Rehearse the AI-coding flow: state design verbally, write the function signature, prompt for the body, drive tests manually. The recurring grading axis is who is in charge of the design — the candidate, not the assistant.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

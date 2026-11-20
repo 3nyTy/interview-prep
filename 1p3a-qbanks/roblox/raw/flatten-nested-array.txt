@@ -1,0 +1,73 @@
+===H1===
+Flatten Nested Array
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/flatten-nested-array
+===BODY===
+Roblox
+CodingMembers
+Flatten Nested Array
+Flatten a nested array structure into a single list while preserving left-to-right order.
+SWE
+array
+recursion
+iterator
+medium
+Frequency
+Single report
+Last asked
+2026-03-15
+Stage
+phone-screen
+Given a nested array of integers, return a single array containing every integer in left-to-right order.
+
+A nested array is an array whose elements are either an integer or another nested array. The nesting can be of arbitrary depth.
+
+The interviewer expects two solutions: one written recursively, and one written iteratively (no recursion). The reference solution shows both.
+
+flatten([1, [2, [3, 4], 5], 6]) -> [1, 2, 3, 4, 5, 6]
+flatten([[1, 2, 3], [4, 5], [6]])  -> [1, 2, 3, 4, 5, 6]
+flatten([])                        -> []
+
+This question was observed from a Roblox Frontend Engineer phone screen (June 2025). The candidate had to write both a recursive and a non-recursive (stack-based) version on the same call.
+
+Examples
+
+Example 1:
+
+Input: nested = [[1, 2, 3], [4, 5], [6]]
+
+Output: [1, 2, 3, 4, 5, 6]
+
+Explanation:
+
+Each sub-array is concatenated in order.
+
+Example 2:
+
+Input: nested = [[1], [], [2, 3]]
+
+Output: [1, 2, 3]
+
+Explanation:
+
+Empty sub-arrays contribute nothing.
+
+Example 3:
+
+Input: nested = []
+
+Output: []
+
+Constraints
+
+0 <= nested.length <= 10^4
+
+Leaves are 32-bit signed integers.
+
+The grader uses depth-2 inputs (number[][]); your recursive solution should still generalize to arbitrary depth — that is what the interviewer evaluates.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

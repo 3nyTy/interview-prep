@@ -1,0 +1,81 @@
+===H1===
+Progressive Array Partitioning
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/array-partition-unique-frequencies-straights
+===BODY===
+Google
+Coding·45 minMembers
+Progressive Array Partitioning
+Given an integer multiset, first decide whether grouping equal values produces pairwise-distinct group sizes; then solve a follow-up in which every partition must form a consecutive run. The second variant's exact run-length rule is underspecified, so clarify it against the supplied examples before coding.
+SWE
+array
+hashmap
+sorting
+medium
+Frequency
+Single report
+Last asked
+2026-08-11
+Stage
+phone-screen
+Requirements
+
+The 45-minute coding round progresses through two partition tests over an integer array.
+
+Stage 1 — distinct group sizes
+
+Put every occurrence of the same integer into the same partition.
+
+The partition is valid only when no two value-groups contain the same number of elements.
+
+Return whether the full input satisfies that rule.
+
+Stage 2 — consecutive groups
+
+Change the condition so every partition must form a straight: its values are consecutive integers.
+
+Use every input occurrence exactly once across the partitions.
+
+Clarify whether all straights must have a fixed or equal length; the available negative example implies an additional length constraint that is not stated explicitly.
+
+Examples
+
+Stage 1
+
+[1, 2, 3, 4, 2, 3, 3, 4, 4, 4] → true because the four value-groups have different sizes.
+
+[1, 2, 3] → false because every value-group has size one.
+
+Stage 2
+
+[1, 2, 2, 3, 3, 4, 4, 5, 5, 6] → true.
+
+[4, 5, 6, 7, 7, 8, 9] → false.
+
+Notes
+
+The interviewer presents Stage 2 only after the first implementation, so keep the initial data model easy to adapt.
+
+Before coding the straight variant, reconcile the length rule with both examples; otherwise a superficially valid decomposition can contradict the expected result.
+
+Evaluation emphasized the efficiency of the chosen data structures, not only whether the sample cases passed.
+
+Solution skeleton
+
+Stage 1: count each distinct value, then verify that the frequency values are themselves unique. A hash map plus a set gives O(n) time and O(u) space for u distinct values.
+
+Stage 2: first pin down a group size k. For the fixed-size interpretation, reject when n % k != 0, process keys in ascending order, and whenever the smallest remaining key x has multiplicity c, remove c copies from every key in [x, x + k). Any missing count makes the partition impossible. Sorting the u keys gives O(n + u log u) time and O(u) space.
+
+Do not let length-one groups make every input trivially valid unless the interviewer explicitly allows them; the negative example requires a stronger group-size contract.
+
+Preparation
+
+Implement both stages against repeated values, singletons, empty input, and inputs with many duplicate counts.
+
+Practice stating the partition invariant and asking about run length, duplicate consumption, and whether every element must be used exactly once before writing code.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

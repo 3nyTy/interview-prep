@@ -1,0 +1,65 @@
+===H1===
+Out-of-Order Package Receiver
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/out-of-order-package-receiver
+===BODY===
+Amazon
+CodingMembers
+Out-of-Order Package Receiver
+Design a receiver for package IDs that arrive out of order. One API records an ID; a query returns the endpoint of the contiguous prefix beginning at 0 plus all missing IDs before the largest observed package.
+SWE
+streaming
+data-structure
+state-machine
+medium
+Frequency
+Low · New
+Last asked
+2026-08-14
+Stage
+phone-screen
+Requirements
+
+Package IDs start at 0, but packages may be received in any order.
+
+Design receivePackage(id) to record one incoming package ID.
+
+Design a second API that returns:
+
+the last ID in the contiguous received prefix that begins at 0; and
+
+every missing ID after that prefix and before the largest observed ID.
+
+For received IDs {0, 1, 2, 3, 100}, the query returns prefix endpoint 3 and missing IDs [4, 5, ..., 99].
+
+Examples
+
+receivePackage(0)
+receivePackage(1)
+receivePackage(2)
+receivePackage(3)
+receivePackage(100)
+
+query() -> (3, [4, 5, ..., 99])
+
+Notes
+
+One version calls the first return value the "largest package ID," while the concrete example makes it the end of the contiguous prefix from 0. Clarify that semantic before coding.
+
+A baseline keeps a received-ID set, largest_observed, and prefix_end initialized to -1. On receipt, insert the ID and update the maximum; while prefix_end + 1 is present, advance the prefix. Query by enumerating absent IDs from prefix_end + 1 through largest_observed - 1. Receipts are O(1) average amortized, and a query costs O(largest_observed - prefix_end) including the output scan.
+
+Treat duplicate receipts as idempotent unless the interviewer specifies otherwise.
+
+Clarify the empty state, whether the missing list is sorted, and whether IDs above the first gap but below the observed maximum must be returned.
+
+Preparation
+
+Implement the received-set baseline and test the empty state, a first receipt above 0, duplicate receipts, and filling the first gap.
+
+Dry-run the exact {0, 1, 2, 3, 100} case, then explain how an interval-based representation changes update and query costs for a sparse ID range.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

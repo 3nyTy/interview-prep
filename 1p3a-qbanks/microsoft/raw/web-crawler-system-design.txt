@@ -1,0 +1,101 @@
+===H1===
+Distributed Web Crawler System Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/web-crawler-system-design
+===BODY===
+Microsoft
+System Design·45 minMembers
+Distributed Web Crawler System Design
+MAI phone-screen SD slot. 30-minute compressed treatment — get the pipeline shape, politeness, and dedup right before time runs out.
+SWE
+MLE
+distributed-systems
+messaging
+storage
+scaling
+medium
+Frequency
+Single report
+Last asked
+2026-05-13
+Stage
+phone-screen · onsite-system-design
+Requirements
+
+Functional
+
+Seed the crawler with a starter URL set.
+
+Fetch each URL, persist HTML, extract embedded links, enqueue new URLs.
+
+Honor robots.txt per-domain and respect crawl-delay directives.
+
+Deduplicate at URL level and (optional) content level.
+
+Non-functional
+
+Crawl ~10 B pages over ~5 days (rough scale).
+
+Per-domain politeness ≈ 1 req/sec.
+
+Survive worker / DNS failures without restarting from scratch.
+
+Notes
+
+Pipeline stages.
+
+URL frontier: queue (SQS / Kafka) of pending URLs. Visibility-timeout + DLQ handles transient fetch failures with exponential backoff.
+
+Fetcher workers: pull from frontier, resolve DNS (cached), perform HEAD to filter oversized files, GET HTML, persist raw HTML to blob storage (S3).
+
+Parser workers: pull persisted HTML, extract text + outbound links, run content-dedup, enqueue novel URLs back to the frontier.
+
+Metadata DB: url → (last_fetched_at, content_hash, status). Drives URL-level dedup before enqueuing.
+
+Splitting fetch / parse into separate worker pools lets each scale independently (fetch is network-bound; parse is CPU-bound) and means a parser crash does not lose fetched HTML.
+
+Dedup.
+
+URL-level: hash and look up the metadata DB before enqueue. Cheap.
+
+Content-level: SHA-256 the canonicalized HTML body; Bloom filter (Redis-backed) on the hash. Tolerates the ~1% false-positive rate because the cost is missing a duplicate, not over-counting.
+
+Politeness.
+
+Cache robots.txt per domain; honor Crawl-delay and Disallow.
+
+Per-domain Redis lock with TTL ≈ 1 second to enforce request spacing across fetcher nodes.
+
+Domain-sharded URL frontier so a single hot domain does not starve others.
+
+Scaling.
+
+Fetcher throughput ≈ network bandwidth × utilization; one mid-size node fetches a few thousand pages/sec at ~30% bandwidth headroom.
+
+~10 B pages in 5 days needs ~3000 sustained pages/sec — single-digit fetcher nodes suffice; many more parser nodes (typically Lambda / Fargate auto-scaled on queue depth).
+
+DNS resolution is the silent bottleneck: cache aggressively, run multiple resolvers, fail over.
+
+Failure handling.
+
+Crawler traps (infinite calendar / pagination links): max depth + URL pattern blacklist.
+
+Robots.txt cache invalidation on a 24h timer.
+
+Persistent fetch failures (5xx, timeout) move to DLQ after N retries; an investigator queue lets a human triage.
+
+Preparation
+
+Pre-write the four-stage pipeline diagram (frontier → fetcher → blob store → parser).
+
+Know the dedup story: URL-level via metadata DB, content-level via Bloom filter.
+
+Drill the politeness story: cached robots.txt, per-domain Redis lock with TTL.
+
+Pre-rehearse the failure modes: DNS bottleneck, crawler traps, fetcher / parser splitting.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,63 @@
+===H1===
+Jupyter / WebSocket Load Balancer (OA)
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/jupyter-load-balancer-oa
+===BODY===
+Stripe
+Coding·60 minMembers
+Jupyter / WebSocket Load Balancer (OA)
+HackerRank OA. Simulate a load balancer that routes long-lived websocket connections across servers. Five progressive parts: round-robin → duplicate-aware → disconnects → capacity limits → SHUTDOWN with eviction and re-route.
+SWE
+simulation
+scheduling
+data-structure
+medium
+Frequency
+Low
+Last asked
+2026-02-02
+Stage
+oa
+Requirements
+
+Part 1 — Basic load balancing
+
+Handle only CONNECT. Route to the server with the fewest active connections; ties broken by smaller index. Log each successful connect.
+
+Part 2 — Disconnection
+
+Add DISCONNECT. Decrement the load of the server the connection was using. Only CONNECT produces log entries.
+
+Part 3 — Object stickiness
+
+Each connection has an objectId. If another active connection already uses the same objectId, the new connection must go to the same server — even if it is not the least loaded. Otherwise use normal load balancing.
+
+Part 4 — Capacity limits
+
+Each server has a max active connection count. A full server cannot accept new connections. If no eligible server is available the connection is rejected (no log entry, no state change). Stickiness that targets a full server is also rejected.
+
+Part 5 — Server shutdown
+
+Add SHUTDOWN. Evict every active connection on the target; re-route each evicted connection in order using the same routing rules. Successful re-routes are logged. The shut-down server becomes available again immediately after eviction.
+
+Notes
+
+60-minute time budget. Multiple reports finish all 5 parts.
+
+The variant reported for the 26 NG OA uses round-robin instead of fewest-loaded in Part 1; double-check which rule your prompt specifies.
+
+The trickiest part is Part 5's re-route — the order of eviction matters for the log.
+
+Preparation
+
+Drill stateful command-dispatch problems (CONNECT, DISCONNECT, SHUTDOWN etc.) where each command mutates internal state and emits log lines.
+
+Pre-write helpers for: "pick server" with both stickiness and load-balance modes; "evict server" that walks active connections in a stable order.
+
+Build a small replay harness that lets you swap routing policy without rewriting the state machine.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

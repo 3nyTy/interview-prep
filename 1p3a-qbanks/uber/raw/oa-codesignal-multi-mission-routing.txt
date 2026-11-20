@@ -1,0 +1,53 @@
+===H1===
+OA: Round-Trip Mission Schedule
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/oa-codesignal-multi-mission-routing
+===BODY===
+Uber
+Coding·70 minMembers
+OA: Round-Trip Mission Schedule
+Legacy CodeSignal SDE2 OA problem. Two locations A and B have fixed departure timetables. Each mission is a round trip A→B→A, departing only at the next available departure on each side; each leg takes 100 time units. Given a mission count, return the earliest completion time.
+SWE
+two-pointer
+simulation
+easy
+Frequency
+Single report
+Last asked
+2025-07-10
+Stage
+oa
+Requirements
+
+Input: sorted integer arrays A[] and B[] (departure times from A and B respectively), integer m (mission count).
+
+Each mission consists of: wait at A until the next departure ≥ current_time, travel for 100 units to B, wait at B until the next departure ≥ arrival_time, travel 100 units back to A.
+
+Output: the earliest arrival time back at A after the last mission completes.
+
+Examples
+
+A = [0, 99, 300, 500],  B = [101, 220, 440, 900],  m = 2
+Mission 1: depart A at 0 → arrive B at 100 → next B departure ≥ 100 is 101 → arrive A at 201
+Mission 2: next A departure ≥ 201 is 300 → arrive B at 400 → next B departure ≥ 400 is 440 → arrive A at 540
+Output: 540
+
+Notes
+
+Two pointers on A and B: advance each pointer to the first departure ≥ current_time. If no departure is available, the mission cannot complete.
+
+For each mission, do two pointer advances (one on each list); total time O(m + |A| + |B|).
+
+Binary search on each list also works (bisect_left(A, current_time)); slightly less efficient but easier to debug.
+
+This is a CodeSignal-era problem; newer Hack2Hire OAs use the prompts above instead. Mostly retained for reference if your loop still uses CodeSignal.
+
+Preparation
+
+Practice the two-pointer pattern over sorted timetables — a similar shape recurs in Uber Eats batching / fleet scheduling problems.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

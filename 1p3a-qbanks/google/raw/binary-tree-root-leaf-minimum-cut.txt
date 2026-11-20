@@ -1,0 +1,66 @@
+===H1===
+Minimum-Cost Tree Disconnection
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/binary-tree-root-leaf-minimum-cut
+===BODY===
+Google
+CodingMembers
+Minimum-Cost Tree Disconnection
+Cut weighted edges in a binary tree to disconnect the root from every original leaf at minimum total cost. Begin with nonnegative weights, then analyze what changes when negative weights are allowed.
+SWE
+tree
+dp
+Frequency
+Single report
+Last asked
+2026-09-09
+Stage
+phone-screen
+Requirements
+
+Input is a binary tree whose edges have nonnegative weights. Remove edges so the root cannot reach any leaf from the original tree, minimizing the sum of removed edge weights.
+
+Leaves remain defined by the original tree; cutting an edge does not redefine the target leaves.
+
+Both the node count and sum of weights are bounded by Integer.MAX_VALUE.
+
+Follow-up: allow negative edge weights. Determine whether the original algorithm still works and provide a counterexample if it does not.
+
+Explain time and space complexity and discuss test cases.
+
+Examples
+
+Negative-weight follow-up:
+
+A --(-1)--> B --(-1)--> C
+Minimum total cut cost: -2
+
+Cutting both edges costs -2, even though cutting just the first edge already separates the root from the original leaf.
+
+Notes
+
+Clarify the required result for an empty tree and a single-node tree. No final return convention is specified for these cases.
+
+Include recursion-stack memory in space analysis. The tree can degenerate into a chain; balanced-tree depth is not a worst-case bound.
+
+Coding took place directly in Google Docs with no supplied framework; the candidate also had to define the tree node structure.
+
+The interviewer asked the candidate to think aloud while developing the approach.
+
+For nonnegative weights, use postorder DP. Let F(v) be the minimum cost to disconnect node v from every original leaf below it. An original leaf has F(v) = infinity; an internal node has F(v) = sum(min(weight(v,c), F(c))) over its children. Each branch must be blocked independently. Use a safe infinity representation rather than adding to a fixed-width maximum integer.
+
+For negative weights, cutting an ancestor edge does not remove the opportunity to cut negative edges below it. Track A(v), the minimum optional cut cost when the subtree is already disconnected: A(v) = sum(min(0, weight(v,c)) + A(c)), with A(leaf) = 0. Then use F(v) = sum(min(weight(v,c) + A(c), F(c))), retaining F(leaf) = infinity. This includes beneficial redundant negative cuts without double counting edges.
+
+Both recurrences process each edge once: O(n) time and O(h) recursive auxiliary space, where h can equal n. A single original root-leaf cannot be disconnected from itself by cutting edges; agree on its result convention before coding.
+
+Preparation
+
+Implement the nonnegative postorder recurrence, then trace a chain and a branching tree while accounting for recursion depth.
+
+Implement the two-state negative-weight version and compare it with exhaustive edge-subset enumeration on small trees, including the given negative chain.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,58 @@
+===H1===
+Minimum Redistribution Cost on a Ring
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/min-redistribution-cost-ring
+===BODY===
+Amazon
+CodingMembers
+Minimum Redistribution Cost on a Ring
+OA algorithm problem: warehouses on a circle hold differing product counts. Moving a product across one edge costs 1, and all moves must go in a single fixed direction. Equalize every position at minimum cost.
+SWE
+MLE
+prefix-sum
+greedy
+array
+math
+medium
+Frequency
+Low
+Last asked
+2026-06-09
+Stage
+oa
+Requirements
+
+n warehouses arranged in a circle; products[i] is the count at position i.
+
+One move shifts a single product across one edge to an adjacent position and costs 1.
+
+All moves must go in a single fixed direction — either all clockwise or all anti-clockwise (you pick the cheaper one, but cannot mix).
+
+The total is divisible by n. Equalize every position to the average and return the minimum cost.
+
+Examples
+
+n = 5, products = [1, 11, 1, 1, 1], average = 3
+Position 2 has 8 surplus; clockwise it feeds 2 units to each of the next four positions:
+  2*1 + 2*2 + 2*3 + 2*4 = 20
+Answer: 20
+
+Notes
+
+diff[i] = products[i] - avg. Walk the ring accumulating a running carry across each edge; the cost an edge contributes is the absolute number of products still crossing it.
+
+Because all flow goes one direction around the ring, shift the prefix sums by their minimum (prefix - min_prefix) so every carry is non-negative, then sum. Compute this for clockwise and anti-clockwise and take the minimum.
+
+The single-direction constraint is the whole trick — the naive "each product takes its own shortest path around the circle" answer is wrong. A second OA in the same window confirmed this as the exact first problem.
+
+Preparation
+
+Derive the line (non-circular) version first: minimum moves to equalize a line is sum(|prefix_sum_of_diffs|).
+
+Extend to the ring with the prefix - min_prefix shift, and confirm both directions agree on the worked example.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

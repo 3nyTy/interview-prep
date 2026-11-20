@@ -1,0 +1,65 @@
+===H1===
+Singly Linked List — Remove Duplicate Values
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/linked-list-remove-duplicates
+===BODY===
+Salesforce
+Coding·30 minMembers
+Singly Linked List — Remove Duplicate Values
+Online assessment classic asked in Salesforce's HackerRank OA, both SMTS and MTS levels. Given a singly linked list, keep only the first occurrence of each value and remove every later node with a value seen earlier. Return the head of the modified list.
+SWE
+linked-list
+hashmap
+deduplication
+easy
+Frequency
+Low
+Last asked
+2026-01-30
+Stage
+oa
+Requirements
+
+Input: head of a singly linked list of integers.
+
+Operate on the list (in-place pointer rewiring is fine; allocating a new list also accepted unless the prompt forbids it).
+
+Keep only the first occurrence of each value; remove every subsequent duplicate.
+
+Return the head of the modified list.
+
+Node definition: LinkedListNode { int data; LinkedListNode next; }.
+
+Examples
+
+Input:  3 -> 4 -> 3 -> 6
+Output: 3 -> 4 -> 6
+
+Input:  3 -> 4 -> 3 -> 2 -> 6 -> 1 -> 2 -> 6
+Output: 3 -> 4 -> 2 -> 6 -> 1
+
+Notes
+
+O(n) hash-set walk is the expected solution: iterate with a (prev, curr) pointer pair, keep a seen set, and when curr.data ∈ seen, splice out curr by setting prev.next = curr.next; otherwise advance prev = curr.
+
+O(n²) two-pointer scan (no extra memory) is acceptable if the interviewer constrains memory — for each retained node, walk forward and skip any later node matching its value. Mention the trade-off explicitly.
+
+Edge cases: empty list (head == null), single node, all-distinct list (output identical), all-duplicate list (output is one node), duplicates clustered at the head.
+
+Take care to not dereference curr.next after splicing — advance via the stored next pointer, not prev.next.
+
+Do not use the adjacent-duplicate shortcut for a sorted list: this input is unsorted, so the implementation needs a global seen set or a full suffix scan.
+
+Preparation
+
+Implement both the O(n)/O(n) hash-set version and the O(n²)/O(1) two-pointer version.
+
+Practise the splice logic by hand on a 4-node list where the duplicate sits at the tail.
+
+Be ready for the in-OA follow-up: "remove all occurrences of a duplicated value". The structure changes — you need a two-pass count pre-pass or a recursion that returns whether the current value is duplicated.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

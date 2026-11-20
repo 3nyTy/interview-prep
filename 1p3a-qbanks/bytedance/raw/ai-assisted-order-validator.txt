@@ -1,0 +1,61 @@
+===H1===
+AI-Assisted Order Validator
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/ai-assisted-order-validator
+===BODY===
+ByteDance / TikTok
+CodingMembers
+AI-Assisted Order Validator
+Build an `OrderValidator` that rejects prohibited items and out-of-range prices, supports adding and removing validation rules, and respects dependencies between rules. The follow-up changes the dependency graph when a rule is removed: its prerequisites become prerequisites of its downstream rules.
+SWE
+ai-coding
+ai-allowed
+graph
+oop-design
+testing
+medium
+Frequency
+Single report
+Last asked
+2026-08-06
+Stage
+phone-screen
+Requirements
+
+Build an OrderValidator for orders and a mutable collection of validation rules.
+
+Reject orders containing prohibited items or prices outside an allowed range.
+
+Support adding and removing rules.
+
+Model rule prerequisites as a directed acyclic graph and respect those dependencies during validation.
+
+Follow-up: when a rule is removed, connect each of its prerequisites to each downstream rule that previously depended on it.
+
+Notes
+
+This is an AI-assisted first round: use your own AI tool and share the screen while working.
+
+Test coverage is part of the delivery bar; budget time to add and run representative cases after implementing the rule operations.
+
+Method signatures, order schema, error behavior, and graph-update edge cases are deliberately thin. Clarify them before coding.
+
+Store each rule once and maintain both outgoing dependency edges and reverse incoming edges as sets. The two views make topological validation and local deletion rewiring explicit while preventing duplicate edges.
+
+Respect prerequisites with a topological traversal that executes a rule only after all active predecessors. Any proposed dependency that creates a cycle violates the DAG contract and must not enter the graph.
+
+To remove a rule, snapshot its predecessors and successors, delete its incident edges, add every predecessor-to-successor edge, then remove the node. This contracts the node: it preserves paths that previously passed through the removed rule and cannot create a cycle when the original graph was acyclic.
+
+With hash-set adjacency, a full topological validation is O(V + E); removing one rule costs O(in_degree + out_degree + in_degree * out_degree) for cleanup and the cross-product rewiring.
+
+Preparation
+
+Implement a small validator with pluggable rules, dependency-aware add/remove operations, and focused unit tests from a blank repository.
+
+Rehearse using an AI assistant while narrating the data model, reviewing generated code, and maintaining a visible test checklist.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

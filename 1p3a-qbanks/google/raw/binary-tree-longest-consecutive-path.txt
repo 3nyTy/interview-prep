@@ -1,0 +1,51 @@
+===H1===
+Longest Consecutive Path in Binary Tree
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/binary-tree-longest-consecutive-path
+===BODY===
+Google
+Coding·45 minMembers
+Longest Consecutive Path in Binary Tree
+Given a binary tree, return the length of the longest parent-to-child path whose values increase consecutively by 1. Follow-up: allow the path to extend in any direction through the tree, not only from parent to child.
+SWE
+tree
+dfs
+recursion
+medium
+Frequency
+Single report
+Last asked
+2026-07-02
+Stage
+phone-screen
+Requirements
+
+Input: the root of a binary tree.
+
+Base task: return the length of the longest path where each next node is a child of the previous node and child.val = parent.val + 1.
+
+The path direction is strictly parent → child in the base version.
+
+Follow-up: allow the path to extend in any direction through the tree, so a valid consecutive chain may pass through a node and continue into another branch.
+
+Notes
+
+In the base version, carry the current consecutive length while traversing downward and reset to 1 whenever the child is not exactly parent + 1.
+
+For the any-direction follow-up, track increasing and decreasing chain lengths at each node, then combine through the node when the left/right child values support a consecutive bridge.
+
+Clarify whether the answer is measured in nodes or edges before coding; Google candidates usually state node count.
+
+Preparation
+
+Write the parent-to-child traversal in under 10 minutes with a global best.
+
+Practice the bidirectional tree follow-up where each node returns two lengths upward.
+
+Dry-run single-node, duplicate-value, and split-branch cases before discussing complexity.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

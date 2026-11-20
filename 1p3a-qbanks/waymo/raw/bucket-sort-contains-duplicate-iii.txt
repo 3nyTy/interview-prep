@@ -1,0 +1,63 @@
+===H1===
+Contains Duplicate III (Bucket Sort)
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/bucket-sort-contains-duplicate-iii
+===BODY===
+Waymo
+Coding·45 minMembers
+Contains Duplicate III (Bucket Sort)
+Phone screen: LeetCode 220 (Contains Duplicate III). Given an integer array, indexDiff `k`, and valueDiff `t`, decide whether there exists a pair `(i, j)` with `i ≠ j`, `|i − j| ≤ k`, `|nums[i] − nums[j]| ≤ t`. Optimal solution is bucket sort over a sliding window.
+SWE
+bucket-sort
+sliding-window
+array
+medium
+Frequency
+Single report
+Last asked
+2026-05-15
+Stage
+phone-screen
+Requirements
+
+Input: integer array nums, integers indexDiff (k) and valueDiff (t), both ≥ 0.
+
+Output: true if there exists i ≠ j such that |i − j| ≤ k and |nums[i] − nums[j]| ≤ t; otherwise false.
+
+Constraints: nums.length up to 10⁵, values in [-10⁹, 10⁹].
+
+Notes
+
+Bucket-sort approach: bucket width t + 1. For each new value v, compute bucket_id = v / (t + 1) (integer division that rounds toward -∞ for negatives). Then:
+
+If the current bucket already holds a value, return true (any two values in the same bucket are within t).
+
+If the left-neighbor bucket holds a value within t, return true.
+
+If the right-neighbor bucket holds a value within t, return true.
+
+Otherwise insert into the current bucket.
+
+Slide the window by removing nums[i - k - 1]'s bucket once i > k.
+
+Complexity O(n) time, O(min(n, k)) space.
+
+Watch the negative-value bucket math: (-1) / 3 in C++ rounds toward zero (gives 0) but in Python rounds toward -∞ (gives -1). Use floor division explicitly so the bucket id is monotonic on the integer line.
+
+Edge case t = 0 works under the same algorithm — the bucket width is 1 so any duplicate values within the window land in the same bucket.
+
+Alternative: ordered set (TreeSet) sliding window with floor / ceiling queries. O(n log k) time, easier to reason about but slower in practice.
+
+Preparation
+
+Drill LC 220 with bucket sort; rehearse the floor-division trick for negative values.
+
+Have the TreeSet fallback ready in case the interviewer disallows assumptions about value range.
+
+Be able to argue why bucket sort doesn't apply to a more general |nums[i] − nums[j]| ≤ t without the window constraint — the windowing is what bounds memory.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,82 @@
+===H1===
+Rate Limiter for Expensive API with User-Configurable Monthly Quota
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/rate-limiter-user-configurable-quota
+===BODY===
+Salesforce
+System Design·45 minMembers
+Rate Limiter for Expensive API with User-Configurable Monthly Quota
+Tech-screen system-design round in the Salesforce MTS/SMTS loop. The product has one expensive API; each customer can set their own monthly call limit via dashboard. Design the rate-limiting layer that enforces those quotas, accepts updates to them, and explains overage behaviour.
+SWE
+system-design
+rate-limiting
+throttling
+caching
+redis
+quotas
+medium
+Frequency
+Single report
+Last asked
+2026-01-30
+Stage
+onsite-system-design · tech-screen
+Requirements
+
+Single expensive API endpoint (think LLM inference, third-party data pull, etc.).
+
+Each customer configures their own monthly quota (e.g. "500 calls / month") via a self-serve dashboard. Quota changes take effect immediately.
+
+Enforce the quota on every API call:
+
+Reject calls beyond the quota with a clear 429 / quota-exceeded error.
+
+Optionally allow soft-cap warnings ("80% used this month").
+
+Quota window: calendar month (resets at the start of each month in the customer's billing tz) or rolling 30-day — clarify with interviewer.
+
+Multi-region / multi-instance enforcement: a customer's quota is global, not per-instance.
+
+Reporting: customer can view their current usage; admin can audit historical usage.
+
+Notes
+
+The canonical design is a counter per (customer, period) in a fast central store:
+
+Redis with a key like quota:{customer_id}:{YYYY-MM} and a TTL at the end of the period. A single Lua script reads the current limit and usage, rejects when usage is already at the limit, otherwise increments usage and initializes the TTL atomically.
+
+Do not split the decision across INCR / check / compensating DECR commands; concurrent requests and client failure between commands can leave misleading usage. Keep the admission decision in the Lua script.
+
+Quota updates: configuration lives in the primary DB; pushed into the limiter via cache invalidation or pub-sub on change. Avoid querying the primary DB on every API call.
+
+Multi-region: either (a) a globally consistent Redis cluster (latency cost), or (b) per-region soft quotas summing to the global quota with periodic reconciliation (eventual consistency cost — customer may briefly burst over). State the trade-off explicitly.
+
+Period boundary: handle the month-rollover atomically. The Redis key naturally rolls over because the period suffix changes; just be careful about timezones (store the customer's IANA timezone and compute the next calendar-month boundary as a UTC instant; a fixed offset is insufficient across daylight-saving changes).
+
+Soft cap / warning: maintain a separate threshold; if usage crosses 80% and the customer hasn't been warned this period, enqueue a notification (idempotent — store a flag per customer/period).
+
+Burst smoothing: a pure monthly counter doesn't prevent the customer from spending the whole quota in one second. If the prompt asks about that, layer a per-second token bucket under the monthly counter for short-window smoothing.
+
+Reporting: copy aggregates to a longer-term store (warehouse) nightly. Live dashboard reads Redis; historical reads the warehouse.
+
+Failure modes:
+
+Redis outage → fail-open (allow but log) vs fail-closed (reject); typically fail-open for revenue, fail-closed for cost-protected APIs. State your choice.
+
+Counter drift → reconcile against the request log periodically.
+
+Preparation
+
+Whiteboard the Redis key scheme + atomic check-and-increment in <5 minutes (Lua script is the cleanest answer).
+
+Be able to compare the three classic rate-limit algorithms (fixed window, sliding window log, token bucket) and pick the right one — Salesforce's monthly quota is fixed-window; smoothing is token-bucket.
+
+Prepare the multi-region answer with explicit assumptions: compare the added latency of a globally consistent counter with the bounded overshoot of per-region allocations and reconciliation.
+
+Have a notification design ready for the soft-cap follow-up — idempotent per period, async via the existing event bus.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

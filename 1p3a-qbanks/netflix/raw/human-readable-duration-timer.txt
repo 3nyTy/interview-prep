@@ -1,0 +1,125 @@
+===H1===
+Human Readable Duration Timer
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/human-readable-duration-timer
+===BODY===
+Human Readable Duration Timer
+
+<https://www.1point3acres.com/interview/problems/company/netflix/human-readable-duration-timer>
+
+Netflix
+Coding
+
+60 min
+Members
+Human-Readable Duration Timer
+
+Recursively format a non-negative seconds count into months/weeks/days/hours/minutes/seconds (30-day months), hiding zero units but always showing seconds  no date/time libraries allowed.
+
+SWE
+recursion
+math
+string-processing
+easy
+Frequency
+Single report
+Last asked
+2026-01-25
+Stage
+phone-screen  onsite-coding
+Problem Statement
+
+You need to write a function called timer. This function takes one input called seconds (a non-negative integer).
+
+The goal is to return a string that shows the time in a format humans can easily read. The function should break the total seconds down into months, weeks, days, hours, minutes, and seconds. For this problem, assume every month has exactly 30 days.
+
+Rules to Follow
+Hide Zero Values: Do not show any unit if its value is 0. However, you must always show the "seconds" part at the end.
+Correct: "5 minutes, 0 seconds"
+Correct: "2 days, 3 minutes, 10 seconds"
+Incorrect: "2 days, 0 hours, 3 minutes, 10 seconds" (Notice the 0 hours should be hidden).
+No Built-in Tools: You are not allowed to use standard date or time libraries included in the language.
+Use Recursion: The solution must be implemented recursively.
+Conversion Values
+
+Use these exact numbers for your math:
+
+1 minute = 60 seconds
+1 hour = 60 minutes
+1 day = 24 hours
+1 week = 7 days
+1 month = 30 days
+Sample Inputs and Outputs
+
+Test Case 1:
+
+Input: seconds = 55
+
+Output: "55 seconds"
+
+Test Case 2:
+
+Input: seconds = 65
+
+Output: "1 minutes, 5 seconds"
+
+Test Case 3:
+
+Input: seconds = 3805000
+
+Output: "1 months, 2 weeks, 56 minutes, 40 seconds"
+
+Explanation for Test Case 3:
+
+The total seconds (3805000) breaks down into: 1 month, 2 weeks, 0 days, 0 hours, 56 minutes, and 40 seconds. Since "days" and "hours" are zero, we remove them from the final string.
+
+Input Limits
+0 <= seconds <= 10^9
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Problem Statement
+Rules to Follow
+Conversion Values
+Sample Inputs and Outputs
+Input Limits
+Related discussions  0
+Related questions
+
+Other Netflix questions sharing tags with this one
+
+JSON Path Query / Inverted Index
+Low
+recursion
+string-processing
+json
++4
+Basic Calculator
+Single report
+string-processing
+stack
+parsing
++1
+Error Rate Window Monitor
+Single report
+easy
+array
+sliding-window
+Meeting Rooms (Conflict Check)
+Single report
+easy
+interval
+sorting
+User Engagement Pattern Classification
+Single report
+string-processing
+hashmap
+array
++1
+Code editor
+
+---

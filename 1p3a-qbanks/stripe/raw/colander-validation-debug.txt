@@ -1,0 +1,51 @@
+===H1===
+Colander Validation Debug (BugSquash)
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/colander-validation-debug
+===BODY===
+Stripe
+CodingMembers
+Colander Validation Debug (BugSquash)
+Python BugSquash round on a Colander-style validation library. Multiple validators aggregate their errors into a structured dict via `asdict()`; the planted bugs live in error aggregation, nested validation, and default handling during serialization.
+SWE
+debugging
+code-reading
+python
+hard
+Frequency
+Single report
+Last asked
+2026-05-12
+Stage
+onsite-coding
+Requirements
+
+Python debug round on a checkout of the Colander validation library. The prompt names the exact failing tests and the command to reproduce them.
+
+Multiple validators run together and aggregate their errors into a structured dictionary via asdict(). Three reported bugs:
+
+Error aggregation crash on null/empty messages — some validators produce empty or None messages and the aggregation logic crashes combining them. Fix: filter out None before combining.
+
+Nested validation handling — with layered validators, errors from inner validations are not combined consistently (e.g. nested None inside a list). Fix: apply the same message filtering/aggregation recursively across nested structures.
+
+Inconsistent default handling in sequences — during serialization, empty inputs and null-like values are treated differently, so defaults apply inconsistently. Fix: treat an empty list the same as a list of null values so defaults apply uniformly.
+
+Notes
+
+Same BugSquash format as Mako; the interviewer guides when you get stuck. One candidate fixed only the first bug in time.
+
+Start from the named failing test, trace the execution path, and handle the edge cases correctly rather than rushing to fix all three.
+
+Preparation
+
+Step through Colander's asdict() / error-aggregation path with a debugger before the round.
+
+Practice recursive error-collection over nested validators and reason about None vs empty-list handling.
+
+Rehearse the failing-test-first workflow with an IDE debugger on an unfamiliar Python library.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

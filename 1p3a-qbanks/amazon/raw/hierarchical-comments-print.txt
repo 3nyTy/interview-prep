@@ -1,0 +1,47 @@
+===H1===
+Print Hierarchical Comments
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/hierarchical-comments-print
+===BODY===
+Amazon
+Coding·30 minMembers
+Print Hierarchical Comments
+Given a flat array of comment maps containing comment ID, parent-comment ID, and text, print every comment in hierarchical order. Nesting may be arbitrarily deep.
+SWE
+tree
+hashmap
+dfs
+medium
+Frequency
+Single report
+Last asked
+2026-08-22
+Stage
+onsite-coding
+Requirements
+
+Input: an array of maps; each map contains a comment id, its parentCommentId, and comment text.
+
+Comments support multiple nesting levels.
+
+Print all comments in hierarchical parent/child order.
+
+Clarify the root marker, sibling order, indentation format, and behavior for a missing parent.
+
+Notes
+
+A direct N-ary-tree construction is accepted; a hashmap-based index can avoid repeated scans when linking children to parents.
+
+Budget time for clarification and explanation: the implementation itself may be short, but the interviewer can probe the representation throughout coding.
+
+Preparation
+
+Implement both an explicit tree build and an adjacency-map traversal, preserving input order among siblings.
+
+Test multiple roots, a deep chain, an orphaned comment, duplicate IDs, and an empty input.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,68 @@
+===H1===
+Code Reading — CLI Tool Feature Audit
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/code-reading-cli-tool-refactor
+===BODY===
+Oracle
+Coding·45 minMembers
+Code Reading — CLI Tool Feature Audit
+Read an existing CLI-tool codebase against a written requirements list; identify missing features and propose optimisations. Asked as the first technical round in an Oracle Health AI IC4 onsite — not a traditional LeetCode round.
+SWE
+MLE
+code-reading
+refactoring
+design-review
+medium
+Frequency
+Single report
+Last asked
+2026-02-03
+Stage
+onsite-coding
+Requirements
+
+The interviewer provides:
+
+A short written requirements document describing what a CLI tool is supposed to do.
+
+An existing implementation of that CLI tool.
+
+Task:
+
+Read the implementation against the requirements.
+
+Identify any features that are missing or incorrectly implemented.
+
+Propose specific optimisations (algorithmic, structural, or for maintainability).
+
+No green / red test signal — the interviewer is judging reasoning, code-reading speed, and how the candidate organises findings.
+
+Notes
+
+This is a code-reading / refactor round, not LeetCode. Pace yourself: 5-10 minutes reading the requirements, 10-15 minutes scanning the code in full before drilling into any one section.
+
+Take structured notes as you read: missing_features, bugs_present, optimisations, style_issues. Volunteer these in priority order at the end.
+
+Read the test surface first if tests are provided — they often reveal the interviewer's actual definition of "correct behaviour".
+
+When proposing optimisations, attach a concrete "before / after" sketch — "this nested loop is O(n²); a hashmap lookup makes it O(n)" is more persuasive than "this is slow."
+
+Be ready for the round to extend into a live coding follow-up: "now fix the most important issue you found." Pick one with the highest impact-to-effort ratio rather than the most interesting one.
+
+This round in OHAI is paired with a second round on applying a list of operations to an initial state (see apply-operations-command-pattern) — both deviate from traditional LeetCode.
+
+Preparation
+
+Practise code-reading on an unfamiliar small project (~500 lines) under a 20-minute timer; produce a structured findings list.
+
+Drill the "identify missing features against a written spec" workflow: read spec, read code, diff in your head.
+
+Brush up on common Java / Python performance gotchas (nested loops, boxed integers in tight loops, string concatenation in a loop) since proposed optimisations land best when phrased in language-idiomatic terms.
+
+Practise the "prioritise findings by impact" pitch — interviewers in this round score how you sequence your output, not just whether you spot everything.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

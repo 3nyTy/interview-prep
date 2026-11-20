@@ -1,0 +1,710 @@
+===H1===
+Cipher Cover Interval Editing
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/cipher-cover-interval-editing
+===BODY===
+Databricks
+CodingMembers
+Cipher Cover Interval Editing
+Given covers — a list of (start, end) intervals into a source string (the 'cipher book') — delete the element at a given flattened index across the covered text. The deletion can split an interval; a follow-up asks to return the simplified cover with all mergeable intervals merged.
+SWE
+interval
+interval-aggregation
+binary-search
+string
+medium
+Frequency
+Low
+Last asked
+2026-08-13
+Stage
+onsite-coding
+Problem Summary
+
+You have a list of intervals. These intervals are sorted and do not overlap. Imagine you write down every number included in these intervals in a single long list. This is the "flattened" list.
+
+You are given an index. Your job is to remove the number at that index from the flattened list. Then, return the new list of intervals.
+
+Key Points:
+
+Intervals are sorted and do not touch each other.
+
+The index points to a specific number in the full sequence of numbers.
+
+When you remove a number, an interval might split into two smaller intervals.
+
+Requirements
+
+Given:
+
+intervals: A list of tuples [(start, end), ...]. Both the start and end numbers are included.
+
+index: An integer (starting at 0) that points to a position in the full sequence of numbers.
+
+Return:
+
+A new list of intervals after the number at index is removed.
+
+Examples to Understand
+
+Example 1: Delete from Middle
+
+intervals = [(4, 7), (10, 11), (13, 15)]
+index = 2
+
+# Flattened list: [4, 5, 6, 7, 10, 11, 13, 14, 15]
+# Index 2 points to the value 6.
+# After removing 6: [4, 5, 7, 10, 11, 13, 14, 15]
+# Result: [(4, 5), (7, 7), (10, 11), (13, 15)]
+
+Explanation:
+
+The intervals cover 9 total numbers: 4, 5, 6, 7, 10, 11, 13, 14, 15.
+
+The 3rd number (index 2) is 6.
+
+Removing 6 breaks the interval (4, 7) into two parts: (4, 5) and (7, 7).
+
+Example 2: Delete from Start
+
+intervals = [(4, 7), (10, 11), (13, 15)]
+index = 0
+
+# Flattened list: [4, 5, 6, 7, 10, 11, 13, 14, 15]
+# Index 0 points to value 4.
+# After removing 4: [5, 6, 7, 10, 11, 13, 14, 15]
+# Result: [(5, 7), (10, 11), (13, 15)]
+
+Example 3: Delete from End
+
+intervals = [(4, 7), (10, 11), (13, 15)]
+index = 3
+
+# Flattened list: [4, 5, 6, 7, 10, 11, 13, 14, 15]
+# Index 3 points to value 7.
+# After removing 7: [4, 5, 6, 10, 11, 13, 14, 15]
+# Result: [(4, 6), (10, 11), (13, 15)]
+
+Example 4: Delete Single Value Interval
+
+intervals = [(4, 7), (10, 10), (13, 15)]
+index = 4
+
+# Flattened list: [4, 5, 6, 7, 10, 13, 14, 15]
+# Index 4 points to value 10.
+# After removing 10: [4, 5, 6, 7, 13, 14, 15]
+# Result: [(4, 7), (13, 15)]
+
+Input Limits
+
+1 <= len(intervals) <= 10^4
+
+Interval values can be very large (up to 10^9).
+
+Intervals are always sorted and non-overlapping.
+
+The index is always valid.
+
+Approach 1: Math Calculation (Best Solution)
+
+How it Works
+
+You do not need to create the full list of numbers. Creating the list is too slow and uses too much memory. Instead, you can calculate where the target number is.
+
+Find the interval:
+
+Loop through the intervals.
+
+Calculate how many numbers are in each interval (end - start + 1).
+
+Keep a running total count.
+
+Stop when the total count is greater than the index. This means the target number is in the current interval.
+
+Calculate the value:
+
+Find the exact position of the number inside that interval.
+
+Update the interval:
+
+Start: If it's the first number, increase the start value by 1.
+
+End: If it's the last number, decrease the end value by 1.
+
+Middle: If it's in the middle, split the interval into two.
+
+Single Element: If the interval only has one number, remove the interval completely.
+
+Time Complexity
+
+O(n) where n is the number of intervals.
+
+We loop through the intervals once.
+
+Space Complexity
+
+O(n) to create the new result list.
+
+O(1) extra space for calculations.
+
+Code Implementation
+
+def delete_from_intervals(intervals, index):
+    """
+    Delete element at given index from flattened interval array.
+
+    Args:
+        intervals: List of (start, end) tuples (inclusive)
+        index: Position in flattened covered list
+
+    Returns:
+        List of intervals after deletion
+    """
+    if not intervals:
+        return []
+
+    result = []
+    cumulative_count = 0
+
+    for i, (start, end) in enumerate(intervals):
+        interval_size = end - start + 1
+
+        # Check if target index falls in this interval
+        if cumulative_count + interval_size > index:
+            # Calculate which element within this interval to delete
+            offset = index - cumulative_count
+            target_value = start + offset
+
+            # Handle deletion based on position
+            if target_value == start and target_value == end:
+                # Single-element interval, delete entire interval
+                pass  # Don't add to result
+            elif target_value == start:
+                # Delete from start, shift start forward
+                result.append((start + 1, end))
+            elif target_value == end:
+                # Delete from end, shift end backward
+                result.append((start, end - 1))
+            else:
+                # Delete from middle, split into two intervals
+                result.append((start, target_value - 1))
+                result.append((target_value + 1, end))
+
+            # Add all remaining intervals unchanged
+            result.extend(intervals[i + 1:])
+            break
+        else:
+            # This interval comes before the target
+            result.append((start, end))
+            cumulative_count += interval_size
+
+    return result
+
+# Test cases
+def test_delete_from_intervals():
+    # Example 1: Delete from middle
+    intervals = [(4, 7), (10, 11), (13, 15)]
+    result = delete_from_intervals(intervals, 2)
+    assert result == [(4, 5), (7, 7), (10, 11), (13, 15)]
+
+    # Example 2: Delete from start
+    intervals = [(4, 7), (10, 11), (13, 15)]
+    result = delete_from_intervals(intervals, 0)
+    assert result == [(5, 7), (10, 11), (13, 15)]
+
+    # Example 3: Delete from end
+    intervals = [(4, 7), (10, 11), (13, 15)]
+    result = delete_from_intervals(intervals, 3)
+    assert result == [(4, 6), (10, 11), (13, 15)]
+
+    # Example 4: Delete single-element interval
+    intervals = [(4, 7), (10, 10), (13, 15)]
+    result = delete_from_intervals(intervals, 4)
+    assert result == [(4, 7), (13, 15)]
+
+    print("All tests passed!")
+
+test_delete_from_intervals()
+
+Comparison: Why Not Prefix Sum?
+
+The interviewer might ask about using a Prefix Sum. This is why the direct math approach is better:
+
+Prefix Sum Approach:
+
+Needs an extra array: O(n) space.
+
+Needs to pre-calculate values: O(n) time.
+
+Uses Binary Search: O(log n) time.
+
+Direct Math Approach:
+
+No preparation needed.
+
+No extra arrays.
+
+Just one loop: O(n) time.
+
+The direct calculation is simpler and uses less memory.
+
+Approach 2: Building the List (Slow)
+
+This is a naive (basic) solution. Do not use this in an interview, but it helps to understand the logic.
+
+def delete_from_intervals_naive(intervals, index):
+    """Naive approach: build entire flattened list."""
+    # Build covered list
+    covered = []
+    for start, end in intervals:
+        covered.extend(range(start, end + 1))
+
+    # Remove element at index
+    if 0 <= index < len(covered):
+        del covered[index]
+
+    # Rebuild intervals
+    if not covered:
+        return []
+
+    result = []
+    start = covered[0]
+    end = covered[0]
+
+    for i in range(1, len(covered)):
+        if covered[i] == end + 1:
+            # Consecutive, extend interval
+            end = covered[i]
+        else:
+            # Gap found, save current interval
+            result.append((start, end))
+            start = covered[i]
+            end = covered[i]
+
+    # Don't forget last interval
+    result.append((start, end))
+
+    return result
+
+Why this is bad:
+
+If an interval is (1, 1000000000), the loop runs 1 billion times.
+
+Your program will run out of memory and crash.
+
+Follow-Up 1: Fast Deletions with Many Updates
+
+Question: If the list of intervals is huge and you need to delete numbers frequently, how can you make it faster?
+
+Solution: Segment Tree
+
+A standard list takes O(n) to delete because you have to rebuild the list. A Segment Tree allows you to delete in O(log n).
+
+You build a tree where each node stores:
+
+The start and end of the interval.
+
+The covered_count (how many total numbers are in this subtree).
+
+To find the index, you look at the covered_count of the left child.
+
+If the index is smaller than the left child's count, go left.
+
+If the index is larger, subtract the left count and go right.
+
+class IntervalNode:
+    def __init__(self, start, end, covered_count):
+        self.start = start
+        self.end = end
+        self.covered_count = covered_count  # Total elements in subtree
+        self.left = None
+        self.right = None
+
+class IntervalTree:
+    def __init__(self, intervals):
+        """Build balanced tree from intervals."""
+        self.root = self._build(intervals, 0, len(intervals) - 1)
+
+    def _build(self, intervals, left, right):
+        """Recursively build tree."""
+        if left > right:
+            return None
+
+        mid = (left + right) // 2
+        start, end = intervals[mid]
+        count = end - start + 1
+
+        node = IntervalNode(start, end, count)
+        node.left = self._build(intervals, left, mid - 1)
+        node.right = self._build(intervals, mid + 1, right)
+
+        # Update covered_count to include children
+        if node.left:
+            node.covered_count += node.left.covered_count
+        if node.right:
+            node.covered_count += node.right.covered_count
+
+        return node
+
+    def delete_at_index(self, index):
+        """Delete element at given index."""
+        self._delete_helper(self.root, index)
+
+    def _delete_helper(self, node, index):
+        """Recursively find and delete element."""
+        if not node:
+            return None
+
+        left_count = node.left.covered_count if node.left else 0
+        current_interval_size = node.end - node.start + 1
+
+        if index < left_count:
+            # Target is in left subtree
+            node.left = self._delete_helper(node.left, index)
+            node.covered_count -= 1
+        elif index < left_count + current_interval_size:
+            # Target is in current node's interval
+            offset = index - left_count
+            target_value = node.start + offset
+
+            # Modify current interval
+            if target_value == node.start and target_value == node.end:
+                # Delete entire node
+                return self._merge_children(node.left, node.right)
+            elif target_value == node.start:
+                node.start += 1
+                node.covered_count -= 1
+            elif target_value == node.end:
+                node.end -= 1
+                node.covered_count -= 1
+            else:
+                # Split into two nodes
+                # This requires restructuring the tree
+                # (Implementation omitted for brevity)
+                pass
+        else:
+            # Target is in right subtree
+            right_index = index - left_count - current_interval_size
+            node.right = self._delete_helper(node.right, right_index)
+            node.covered_count -= 1
+
+        return node
+
+    def to_intervals(self):
+        """Convert tree back to interval list."""
+        result = []
+        self._inorder(self.root, result)
+        return result
+
+    def _inorder(self, node, result):
+        if not node:
+            return
+        self._inorder(node.left, result)
+        if node.start <= node.end:  # Valid interval
+            result.append((node.start, node.end))
+        self._inorder(node.right, result)
+
+Complexity Analysis:
+
+Time: O(log n) per deletion.
+
+Space: O(n) to store the tree.
+
+Alternative: Skip List
+
+You can also use a Skip List. This is often easier to code than a balanced tree and provides similar speed (O(log n) on average).
+
+import random
+
+class IntervalSkipNode:
+    def __init__(self, start, end, level):
+        self.start = start
+        self.end = end
+        self.covered_count = end - start + 1
+        self.forward = [None] * (level + 1)
+        self.span = [0] * (level + 1)  # Distance to next node
+
+class IntervalSkipList:
+    def __init__(self, max_level=16):
+        self.max_level = max_level
+        self.header = IntervalSkipNode(-1, -1, max_level)
+        self.level = 0
+
+    def find_at_index(self, index):
+        """Find interval containing element at index."""
+        current = self.header
+        cumulative = 0
+
+        for i in range(self.level, -1, -1):
+            while current.forward[i] and cumulative + current.span[i] <= index:
+                cumulative += current.span[i]
+                current = current.forward[i]
+
+        return current, cumulative
+
+    # Delete, insert, and other operations omitted
+
+Follow-Up 2: Adding and Removing Numbers
+
+Question: How do you handle both deleting numbers and adding new numbers?
+
+When you add a number, you must check if it connects two existing intervals. If interval A ends at 4 and interval B starts at 6, inserting 5 will merge them into one long interval (4-6).
+
+class DynamicIntervalSet:
+    def __init__(self, intervals=None):
+        """Initialize with optional list of intervals."""
+        self.intervals = sorted(intervals) if intervals else []
+
+    def delete_at_index(self, index):
+        """Delete element at given index from flattened list."""
+        if not self.intervals:
+            return
+
+        result = []
+        cumulative_count = 0
+
+        for i, (start, end) in enumerate(self.intervals):
+            interval_size = end - start + 1
+
+            if cumulative_count + interval_size > index:
+                offset = index - cumulative_count
+                target_value = start + offset
+
+                if target_value == start and target_value == end:
+                    pass  # Remove entire interval
+                elif target_value == start:
+                    result.append((start + 1, end))
+                elif target_value == end:
+                    result.append((start, end - 1))
+                else:
+                    result.append((start, target_value - 1))
+                    result.append((target_value + 1, end))
+
+                result.extend(self.intervals[i + 1:])
+                break
+            else:
+                result.append((start, end))
+                cumulative_count += interval_size
+
+        self.intervals = result
+
+    def insert_value(self, value):
+        """
+        Insert a single value and merge with adjacent intervals.
+
+        Time Complexity: O(n) to find position + O(n) to rebuild
+        """
+        if not self.intervals:
+            self.intervals = [(value, value)]
+            return
+
+        # Binary search to find insertion point
+        insert_pos = self._find_insert_position(value)
+
+        # Check if value already covered
+        if insert_pos > 0:
+            prev_start, prev_end = self.intervals[insert_pos - 1]
+            if prev_start <= value <= prev_end:
+                return  # Already covered
+
+        # Check if we can merge with previous interval
+        merge_prev = False
+        if insert_pos > 0:
+            prev_start, prev_end = self.intervals[insert_pos - 1]
+            if prev_end + 1 == value:
+                merge_prev = True
+
+        # Check if we can merge with next interval
+        merge_next = False
+        if insert_pos < len(self.intervals):
+            next_start, next_end = self.intervals[insert_pos]
+            if next_start - 1 == value:
+                merge_next = True
+
+        # Perform merge
+        if merge_prev and merge_next:
+            # Merge with both neighbors
+            prev_start, prev_end = self.intervals[insert_pos - 1]
+            next_start, next_end = self.intervals[insert_pos]
+            new_interval = (prev_start, next_end)
+            self.intervals = (
+                self.intervals[:insert_pos - 1] +
+                [new_interval] +
+                self.intervals[insert_pos + 1:]
+            )
+        elif merge_prev:
+            # Extend previous interval
+            prev_start, prev_end = self.intervals[insert_pos - 1]
+            self.intervals[insert_pos - 1] = (prev_start, value)
+        elif merge_next:
+            # Extend next interval
+            next_start, next_end = self.intervals[insert_pos]
+            self.intervals[insert_pos] = (value, next_end)
+        else:
+            # Insert new interval
+            self.intervals.insert(insert_pos, (value, value))
+
+    def _find_insert_position(self, value):
+        """Binary search to find where to insert value."""
+        left, right = 0, len(self.intervals)
+        while left < right:
+            mid = (left + right) // 2
+            if self.intervals[mid][0] < value:
+                left = mid + 1
+            else:
+                right = mid
+        return left
+
+    def get_intervals(self):
+        """Return current intervals."""
+        return self.intervals.copy()
+
+# Usage Example
+dynamic_set = DynamicIntervalSet([(4, 7), (10, 11), (13, 15)])
+
+# Delete element at index 2 (removes 6)
+dynamic_set.delete_at_index(2)
+print(dynamic_set.get_intervals())  # [(4, 5), (7, 7), (10, 11), (13, 15)]
+
+# Insert 6 (merges intervals)
+dynamic_set.insert_value(6)
+print(dynamic_set.get_intervals())  # [(4, 7), (10, 11), (13, 15)]
+
+# Insert 9 (merges with adjacent interval)
+dynamic_set.insert_value(9)
+print(dynamic_set.get_intervals())  # [(4, 7), (9, 11), (13, 15)]
+
+# Insert 8 (merges three intervals)
+dynamic_set.insert_value(8)
+print(dynamic_set.get_intervals())  # [(4, 11), (13, 15)]
+
+Complexity
+
+Delete: O(n)
+
+Insert: O(n) (because Python lists take O(n) to shift elements)
+
+Optimization: Use a SortedList or Balanced BST to make insertion O(log n).
+
+Follow-Up 3: Minimizing Intervals
+
+Question: You delete a number, creating a gap. You are allowed to add back up to K numbers. Which numbers should you add to make the total number of intervals as small as possible?
+
+Strategy:
+
+Look at the "gaps" (empty spaces) between intervals.
+
+Calculate the size of each gap.
+
+Sort the gaps from smallest to largest.
+
+Fill the smallest gaps first using your K numbers. This merges intervals together.
+
+def minimize_intervals_with_k_additions(intervals, k):
+    """
+    Add up to K elements to minimize number of intervals.
+
+    Returns:
+        - Minimum number of intervals achievable
+        - List of values to add
+    """
+    if len(intervals) <= 1:
+        return len(intervals), []
+
+    # Calculate gaps between consecutive intervals
+    gaps = []
+    for i in range(len(intervals) - 1):
+        end_current = intervals[i][1]
+        start_next = intervals[i + 1][0]
+        gap_size = start_next - end_current - 1
+
+        if gap_size > 0:
+            gaps.append({
+                'size': gap_size,
+                'start': end_current + 1,
+                'end': start_next - 1,
+                'index': i
+            })
+
+    # Sort by gap size (prioritize small gaps)
+    gaps.sort(key=lambda g: g['size'])
+
+    # Greedily fill gaps
+    elements_to_add = []
+    merged_count = 0
+
+    for gap in gaps:
+        if k >= gap['size']:
+            # Fill entire gap
+            elements_to_add.extend(range(gap['start'], gap['end'] + 1))
+            k -= gap['size']
+            merged_count += 1
+        else:
+            # Partial fill (may not merge intervals)
+            break
+
+    min_intervals = len(intervals) - merged_count
+    return min_intervals, elements_to_add
+
+# Example
+intervals = [(1, 3), (5, 7), (9, 11), (15, 20)]
+min_count, to_add = minimize_intervals_with_k_additions(intervals, 2)
+print(f"Minimum intervals: {min_count}")  # 2
+print(f"Add elements: {to_add}")  # [4, 8]
+
+Tricky Scenarios (Edge Cases)
+
+Make sure your code handles these:
+
+Empty List: The input is empty [].
+
+Single Element Deletion: The interval is (5, 5) and you delete 5. The result should be [].
+
+Very Large Numbers: Intervals like (1, 1000000000) should not slow down the code.
+
+Consecutive Singles: A list like [(1,1), (2,2), (3,3)] is valid.
+
+Test Cases
+
+def test_edge_cases():
+    # Empty intervals
+    assert delete_from_intervals([], 0) == []
+
+    # Single element interval
+    assert delete_from_intervals([(5, 5)], 0) == []
+
+    # Delete first element of first interval
+    assert delete_from_intervals([(1, 5), (10, 12)], 0) == [(2, 5), (10, 12)]
+
+    # Delete last element of last interval
+    assert delete_from_intervals([(1, 5), (10, 12)], 7) == [(1, 5), (10, 11)]
+
+    # Large interval
+    assert delete_from_intervals([(1, 1000000000)], 500000001) == [
+        (1, 500000001), (500000003, 1000000000)
+    ]
+
+    # Consecutive single-element intervals
+    assert delete_from_intervals([(1, 1), (2, 2), (3, 3)], 1) == [(1, 1), (3, 3)]
+
+    print("All edge case tests passed!")
+
+test_edge_cases()
+
+Similar Practice Problems
+
+LeetCode 56: Merge Intervals
+
+LeetCode 57: Insert Interval
+
+LeetCode 228: Summary Ranges
+
+LeetCode 352: Data Stream as Disjoint Intervals
+
+LeetCode 715: Range Module
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

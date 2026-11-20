@@ -1,0 +1,44 @@
+===H1===
+Largest Number (LC 179)
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-largest-number
+===BODY===
+LinkedIn
+CodingMembers
+Largest Number (LC 179)
+Arrange non-negative integers to form the largest concatenated number. The standard formulation returns a string; any interview-specific modifications remain unspecified.
+sorting
+string
+Frequency
+Single report
+Last asked
+—
+Stage
+phone-screen
+Requirements
+
+For the standard formulation, accept a nonempty list of non-negative integers and return the largest number obtainable by arranging and concatenating all of them.
+
+Return a string so that the result need not fit in a machine integer. Interview-specific changes to this contract remain unspecified.
+
+Notes
+
+Convert each number to a decimal string. For two strings a and b, order a first when a + b is lexicographically larger than b + a; equal concatenations may appear in either order. Join the sorted strings.
+
+Numeric descending order or ordinary lexicographic sorting of individual strings is insufficient. Comparing both concatenations captures which local ordering yields the larger result; swapping an inverted adjacent pair cannot improve the final sorted result.
+
+If the first sorted string is 0, every value is zero; return a single 0 rather than repeated zeros.
+
+With n values and maximum decimal length k, comparison sorting takes O(n log n * k) time. Storing the strings, joined output, and sorting buffers requires O(n * k) space.
+
+Preparation
+
+In 15 minutes, implement the concatenation comparator, sorting, and all-zero normalization without converting the final result to an integer.
+
+In 15 minutes, compare the result with exhaustive permutation search on short lists, including repeated values, shared prefixes, one element, and all zeros.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

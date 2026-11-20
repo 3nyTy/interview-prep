@@ -1,0 +1,50 @@
+===H1===
+Count Same-Color Squares in Matrix
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/count-same-color-squares
+===BODY===
+Google
+Coding·40 minMembers
+Count Same-Color Squares in Matrix
+LeetCode 221 variant — count maximal same-color square sub-grids. DP on each cell as the bottom-right corner.
+SWE
+grid
+dp
+medium
+Frequency
+Low
+Last asked
+—
+Stage
+onsite-coding
+Requirements
+
+Input: m × n grid of colored cells.
+
+Output: count of square sub-grids whose cells are all the same color (or maximum side length, depending on prompt).
+
+DP: dp[i][j] = 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]) if grid[i][j] == grid[i-1][j] == grid[i][j-1] == grid[i-1][j-1] else 1.
+
+Sum dp[i][j] across the grid for the count variant; max for the side variant.
+
+Examples
+
+The plain "count all-1 squares" DP generalizes to same-color directly.
+
+Notes
+
+Variant reported in both intern VO and an additional NG round.
+
+Common bug: assuming all four corners equal is sufficient — need all three neighbors (top, left, top-left) to match the current cell.
+
+Preparation
+
+Write the all-1-squares DP from memory in under 8 min.
+
+Generalize to multi-color in <2 min — only the equality check changes.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

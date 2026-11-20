@@ -1,0 +1,63 @@
+===H1===
+Battery Usage with Recharge Cycle
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/battery-recharge-cycle
+===BODY===
+Capital One
+Coding·70 minMembers
+Battery Usage with Recharge Cycle
+A phone needs to run for `t` more minutes. Given a pool of spare batteries with per-battery capacity and recharge times, swap batteries when one drains; the swapped battery starts recharging immediately. Return the number of *full-charge cycles* consumed, or `-1` if the runtime cannot be reached.
+MLE
+heap
+simulation
+scheduling
+medium
+oa
+codesignal
+Frequency
+Single report
+Last asked
+2026-02-18
+Stage
+oa
+Requirements
+
+Input: integer t (required runtime in minutes), capacity[i] (minutes a fully charged battery i provides), and recharge[i] (minutes battery i takes to recharge from empty).
+
+The phone uses one battery at a time. When the active battery is empty, swap to the next available battery (one that finished recharging by now); the swapped-out battery enters its recharge cycle starting at the swap moment.
+
+Initially all batteries are fully charged.
+
+Return the number of full-charge cycles consumed if total runtime ≥ t is achievable, otherwise -1.
+
+Examples
+
+t        = 100
+capacity = [2, 3, 4, 5]
+recharge = [12, 8, 9, 10]
+
+At t=0: use battery 0 (cap 2). Drained at t=2, starts recharging, ready at t=14.
+At t=2: use battery 1 (cap 3). Drained at t=5, ready at t=13.
+...continue until cumulative runtime reaches 100 or no battery is ready.
+
+Notes
+
+Event-driven simulation with a min-heap keyed by "time at which this battery is next available". Pop the battery with the earliest readiness ≤ current clock; if the earliest readiness is strictly greater than the current clock, the phone has died — return -1.
+
+Track per-battery cycle counters separately if the prompt asks for them, otherwise a single global counter is sufficient.
+
+Edge case: a battery whose capacity exceeds the remaining runtime contributes a fractional cycle. The prompt asks for fully consumed cycles, so do not count a partial drain at the end.
+
+If multiple batteries are available at the same moment, the prompt does not specify a tiebreak. Picking the largest capacity tends to extend total runtime; the order does not change feasibility, only the cycle count.
+
+Preparation
+
+Implement the min-heap simulation; verify on the worked example (the exact cycle count depends on the heap tiebreaker, so calculate by hand first).
+
+Practise the failure-return path. The bug here is usually that the candidate forgets to advance the clock to the next-available-readiness time when no battery is currently free, mis-detecting a recoverable gap as a permanent failure.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

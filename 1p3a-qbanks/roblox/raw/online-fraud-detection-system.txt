@@ -1,0 +1,77 @@
+===H1===
+Online Fraud Detection System
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/online-fraud-detection-system
+===BODY===
+Roblox
+System DesignMembers
+Online Fraud Detection System
+Design an online fraud detection pipeline that scores user actions in near real time and escalates suspicious activity.
+SWE
+Infra Eng
+integrity
+streaming
+ranking
+scaling
+Frequency
+Single report
+Last asked
+2026-03-24
+Stage
+onsite-system-design
+Problem Statement
+
+Design a machine learning system to support online fraud detection for a large-scale consumer platform. The system should make low-latency fraud decisions, support offline analytics, serve models in production, and collect the right metrics for model quality and system health.
+
+ML System Design
+
+Data Processing: How would you collect, clean, and preprocess transaction, account, device, session, and behavior data?
+
+Feature Engineering: Which real-time and offline features would you use? How would you avoid training-serving skew?
+
+Model Design: Which models are suitable for online fraud detection? How do you handle class imbalance and delayed fraud labels?
+
+Evaluation Metrics: What offline and online metrics would you use to evaluate model performance and business impact?
+
+Deployment: How would you serve the model in production with low latency and safe rollback?
+
+Post-Deployment: How would you monitor drift, adversarial behavior, false positives, and model degradation?
+
+System Architecture
+
+Beyond the ML components, expect questions on traditional system design:
+
+Online Decisioning: How would the request path fetch features, score the model, and return an allow, block, challenge, or review decision?
+
+Offline Analytics: How would you store events and labels for investigation, reporting, feature generation, and retraining?
+
+Model Serving: How would you version models, roll out canaries, and keep latency within the product's budget?
+
+Metrics Collection: What model, data, product, and infrastructure metrics would you collect?
+
+Scalability and Reliability: How would you handle high event volume, downstream failures, and backpressure?
+
+System Diagram: Be prepared to draw the full architecture, including event ingestion, streaming features, online feature store, model service, decision service, data lake, training pipeline, and monitoring.
+
+Solution Resources
+
+These resources provide comprehensive coverage of online fraud detection ML systems:
+
+Real-Time Fraud Detection ML System Design - Detailed architecture covering streaming pipelines, feature stores, model selection, and deployment patterns
+
+Fraud Detection - ML System Design (Video)
+
+Fraud Detection - ML/AI System Design
+
+Detect Fraud & Scam Content
+
+Disclaimer: These resources provide sample architectural approaches. During your interview, you should develop your own solution based on your understanding of the requirements and trade-offs.
+
+Interview Context
+
+This Roblox ML system design question was observed for a Software Engineer onsite process in July 2025. The observed prompt asked candidates to design a system for online fraud detection, including offline analytics, model serving, and metric collection.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,44 @@
+===H1===
+Lowest Common Ancestor (LC 235) with a Follow-Up Variant
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/lowest-common-ancestor-bst-binary-tree
+===BODY===
+Microsoft
+CodingMembers
+Lowest Common Ancestor (LC 235) with a Follow-Up Variant
+Start with LC 235 and find the lowest common ancestor of two nodes in a binary search tree. The follow-up removes the BST ordering guarantee and becomes the general binary-tree problem in LC 236.
+MLE
+tree
+bst
+dfs
+recursion
+medium
+Frequency
+Single report
+Last asked
+2026-08-15
+Stage
+onsite-coding
+Requirements
+
+Given the root of a binary search tree and two nodes p and q, return their lowest common ancestor.
+
+Use the BST ordering property to locate the split point where the two target values no longer lie on the same side.
+
+Follow-up: solve the same lowest-common-ancestor query for an ordinary binary tree with no ordering guarantee.
+
+Notes
+
+The follow-up tests whether you can switch from ordered navigation to a general post-order tree traversal. For the ordinary binary tree, return immediately when the current node is null or matches p or q; recurse into both subtrees; if both return a match, the current node is the LCA; otherwise propagate the non-null result. The match base case is essential because one target may be an ancestor of the other.
+
+Preparation
+
+Implement the iterative and recursive BST forms and explain why the split point is the answer.
+
+Implement the ordinary binary-tree form immediately afterward, then trace cases where one target is an ancestor of the other.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

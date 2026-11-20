@@ -1,0 +1,69 @@
+===H1===
+Transformer Bug Hunt
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/transformer-bug-hunt
+===BODY===
+OpenAI
+Coding·60 minMembers
+Transformer Bug Hunt
+A working-ish Transformer + train script + tests is provided with ~4 bugs planted. Find them so loss converges and outputs are correct. The appetizer of any ML coding round — almost guaranteed.
+MLE
+RS
+RE
+ml-knowledge
+transformer
+debugging
+medium
+Frequency
+High
+Last asked
+2026-08-13
+Stage
+tech-screen · onsite-coding
+Requirements
+
+The 4 bugs (consistent across reports):
+
+Positional embedding initialization is wrong (most commonly named)
+
+Attention mask isn't set to -inf (0 or some other value used)
+
+Missing loss.backward() (forward runs but params never update)
+
+nn.Linear dim is wrong (projection mis-shaped / mis-positioned)
+
+The bugs cluster by component: two sit in the self-attention logic, one in the positional-embedding setup, and one in the loss function — useful for triaging which section to read first.
+
+Follow-up (one of):
+
+Classifier conversion: replace the final head with a classification head, modify pred + loss; some interviewers prefer mean-pooling before the final logits. A common concrete ask is a binary classifier deciding whether a number is odd or even.
+
+KV cache: skeleton class is provided; plug in cache during attention, modify positional embedding handling, pass-through params — straightforward if you've done it before
+
+Notes
+
+Almost guaranteed in every ML coding round.
+
+Don't just memorize the 4 bugs; explain why each is a bug and what the fix means physically.
+
+Recent versions (post 2026-04) 'even mark which sections have bugs' — generously scoped; comments in the file point at exactly the lines to fix.
+
+Bug types candidates report
+
+Bugs range from algorithmic (wrong axis on a reduction, missing scale factor) down to single-character typos — one candidate burned the rest of the round hunting a bug that turned out to be a stray variable name (v where the code meant y). Read variable names literally, not by what you assume they should be.
+
+Preparation
+
+Must-watch resource: a from-scratch GPT walkthrough that builds self-attention, masking, positional embedding, FFN, and the training loop in one sitting — drill until you can reproduce each component blind
+
+Hand-write a Transformer once (self-attention, masking, positional embedding, FFN, residual + LayerNorm)
+
+Have an LLM plant bugs in your implementation; drill catching all of them in 30 minutes
+
+Learn the KV-cache plug-in pattern: practice on a minimal GPT implementation (a few hundred lines, single-file) until you can slot caching into attention, adjust positional-embedding indexing, and pipe pass-through params in under 20 minutes
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

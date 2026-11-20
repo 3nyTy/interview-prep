@@ -1,0 +1,82 @@
+===H1===
+Text Highlighting / Citation Tagging
+===URL===
+https://www.1point3acres.com/interview/problems/company/harvey/text-highlighting-citation
+===BODY===
+Harvey
+Coding·60 minFree preview
+Text Highlighting / Citation Tagging
+Given an LLM-generated sentence and a list of source phrases, wrap every word-level matched region in <yellow></yellow> tags, merging overlapping matches into a single block. The follow-up appends every contributing source index after each block, ordered by global source frequency descending and then source index ascending.
+SWE
+MLE
+string
+interval
+interval-aggregation
+parsing
+hashmap
+string-processing
+medium
+Frequency
+Very high
+Last asked
+2026-08-09
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input: a sentence (string) and a list of matches / source phrases (list of strings), each of which may appear in the sentence.
+
+Output: the sentence with every matched region wrapped in <yellow> … </yellow> tags.
+
+Matching is word-level, not substring. A phrase matches only on whole-word boundaries — "row" against "quick brown fox jumps" returns 0 matches, and "blue" must not match inside "blueprint".
+
+Merge only overlapping matches into one tag block. Two matched regions collapse into a single <yellow>…</yellow> span only when they overlap (share at least one word), and the span must extend to cover the longest reachable overlap. Phrases can overlap by more than one word, and a phrase is not limited to two words.
+
+Matches that do not overlap stay as separate tag blocks — this includes both matches separated by a gap (a non-matched word between them) and matches that are merely adjacent (touching but sharing no word). Only a shared word triggers a merge.
+
+Follow-up — citation indices: after tagging, append the source index/indices that produced each highlighted block, e.g. …</yellow>[1][3]. Include every source contributing to a merged highlight.
+
+Count how many times each source phrase appears across the complete text. Sort a block's citation indices by this global count descending; break ties by source index ascending.
+
+Examples
+
+sentence = "The quick brown fox jumps over the lazy dog."
+matches  = ["quick brown", "brown fox jumps"]
+output   = "The <yellow>quick brown fox jumps</yellow> over the lazy dog."
+
+sentence = "foo bar abc xyz abc xyz foo bar"
+matches  = ["abc xyz abc", "xyz"]
+output   = "foo bar <yellow>abc xyz abc</yellow> <yellow>xyz</yellow> foo bar"
+
+Here the second xyz sits immediately after the abc xyz abc block but shares no word with it, so it stays a separate tag block rather than merging.
+
+text    = "the quick brown fox"
+sources = ["the quick", "quick brown"]
+output  = "<yellow>the quick brown</yellow> fox"
+
+For the citation follow-up, a source appearing more often across the full text is listed first after an overlapping block. When counts tie, the lower source index comes first.
+
+A phrase can also extend across an overlap that is longer than one word: with "who lets the dog" and "the dog out", the text "who lets the dog out" matches as a single block.
+
+Notes
+
+Two solution shapes recur: (a) a single left-to-right scan recording each match's start/end word indices, then merge only the intervals that overlap (share a word) and tag by interval start/end; or (b) pre-extend the phrases first (greedily lengthen each to its maximal overlap) so the sentence can be tagged by direct lookup.
+
+The parts candidates most often miss are the overlap-merge logic and the word-boundary rule — interviewers run their own hidden test cases, and the edge cases (overlap longer than one word, adjacent-but-separate blocks, substring-vs-word) are where bugs surface.
+
+For the citation follow-up, a hashmap from phrase → global count gives frequency; each interval also records which source indices contributed so the citations can be emitted in the required order.
+
+Recent loops are strict about bug-free code — clearing the interviewer's test cases on the first solid attempt matters.
+
+Preparation
+
+Implement the interval-merge version end to end: tokenize into words, find every (start, end) word-span for each phrase, merge only overlapping spans (adjacent-but-non-overlapping stays separate), then re-emit the sentence with tags.
+
+Hand-test these cases: an overlap spanning more than one word, two matches separated by a gap (separate blocks), two matches that are adjacent but share no word (still separate blocks — this is the boundary bug), a phrase that is a substring of a longer word (no match), and a phrase that appears multiple times.
+
+Drill the citation follow-up: maintain a phrase → global-count map, retain every contributing source index per merged block, and sort by count descending with index ascending as the tie-breaker.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

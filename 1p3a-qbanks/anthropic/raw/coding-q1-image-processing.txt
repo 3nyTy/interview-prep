@@ -1,0 +1,110 @@
+===H1===
+Coding Q1 — Image Processing Pipeline
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/coding-q1-image-processing
+===BODY===
+Anthropic
+Coding·55 minMembers
+Coding Q1 — Image Processing Pipeline
+The other Q1 prompt: apply a sequence of image transformations (grayscale, flip, scale, blur, rotate) to a directory of images using a Python imaging library, then optimize with multiprocessing/multithreading for a target wall-clock budget.
+SWE
+MLE
+Infra Eng
+concurrency
+multiprocessing
+pillow
+python
+medium
+Frequency
+Very high
+Last asked
+2026-08-30
+Stage
+phone-screen · onsite-coding
+Requirements
+
+You are given four folders and their absolute paths up front:
+
+small_images/ — used for the correctness pass.
+
+big_images/ — used for the performance pass.
+
+transformations/ — JSON files describing transformation sequences.
+
+out/ — write outputs here.
+
+The canonical function signature is:
+
+def process_images(
+    image_dir: str,
+    transformation_dir: str,
+    output_dir: str,
+    get_output_path: Callable[[str, str], str],  # (image_name, json_name) -> abs path
+) -> None: ...
+    # For each (image, transformations.json) pair: load image, apply the
+    # listed transformations in order, write to get_output_path(...).
+    # No return value — outputs are observed by the grader on disk.
+
+Each transformations JSON has the shape {"transformations": [{"type": ..., <param>: ...}, …]}. Six transformation types:
+
+No-parameter: grayscale, flip_horizontally (a.k.a. flip_horizontal), flip_vertically (a.k.a. flip_vertical).
+
+Parameterised: scale (factor: float), blur (radius: int), rotate (angle: float, degrees).
+
+For every (image, transformation_json) pair, apply the listed transformations sequentially and write the result. The supplied get_output_path (sometimes named util.get_output_path) supplies output paths so candidates do not have to do their own os.path work.
+
+Phases
+
+Correctness pass: apply transformations on small_images/. Match against expected outputs.
+
+Performance pass: apply the same pipeline to big_images/ under a wall-clock target. Naive sequential implementations always miss the target; candidates are expected to introduce ProcessPoolExecutor (preferred — image transforms are CPU-bound) or ThreadPoolExecutor (acceptable; some interviewers explicitly want to see threads).
+
+Follow-ups: thread vs. process tradeoffs, sharing pre-decoded images across workers, distributing across multiple machines, dealing with images that don't fit in memory.
+
+After completing the multiprocessing version, a further optimization follow-up asks you to reuse intermediate image results across pipelines with identical leading transformation steps. Implement the shared-prefix reuse rather than stopping at a verbal proposal.
+
+Notes
+
+Image-library transformations return new image objects rather than mutating in place; reassign every result. Cast computed resize dimensions to integers before calling the library API.
+
+The speedup discussion explicitly contrasts multiprocessing with multithreading. Explain why CPU-bound transformations usually favor processes and when native imaging code that releases the GIL can make threads competitive.
+
+pillow (PIL) is the most common choice; scikit-image works too. Familiarity with at least one is required — interviewers will not coach API details.
+
+A common rewrite during the round: stop re-reading the same source image inside each worker. Split the pipeline so the decode happens once and only the transform list runs per (image, json) pair in parallel.
+
+One sibling variant adds TPS / throughput estimation as a follow-up — quantify FPS achieved, identify the bottleneck (CPU, memory bandwidth, disk IO).
+
+For the multi-process path, beware of pickling cost: passing decoded PIL images across process boundaries can dominate wall-clock unless you pass paths and decode inside the worker.
+
+The interviewer states up front that searching online is allowed and expected — this round tests how you read a new imaging-library API in real time. AI assistants are forbidden. Some rotations name the folders large_images/ and output/ (instead of big_images/ and out/); the helper util exposes both the listing and the output-path builder.
+
+A recent full-stack rotation exposed three datasets in sequence: small files for correctness, large files for performance, and a final dirty set whose special cases were not disclosed. The starter code handled path plumbing and ordinary JSON parsing, so the evaluation concentrated on composing transforms and improving throughput rather than defensive input validation.
+
+Search is allowed, but AI-generated search summaries must not be used; move past them immediately and rely on conventional documentation/results.
+
+One sequential implementation took roughly 90 seconds; an asyncio.to_thread rewrite reached about 70 seconds but still left substantial optimization headroom. Be ready to implement and justify a worker/queue or process-pool design, not merely name multiprocessing.
+
+The shared-prefix optimization can arrive after the multiprocessing implementation is complete. One candidate finished writing it but ran out of time to execute it; reserve time to validate the follow-up.
+
+For shared-prefix reuse, group deterministic pipelines by their full ordered prefix of transformation names and parameters, separately for each source image. Decode once per image within a worker, compute each distinct prefix once, and branch from that intermediate result. Treat cached images as immutable; copy before an in-place operation so one branch cannot corrupt another. Do not merge different parameters or different input images. Keep reuse local to a worker where practical, bound retained intermediate memory, and measure whether recomputation is cheaper than copying results between processes.
+
+Preparation
+
+Write a sequential transform pipeline against pillow from scratch in under 10 minutes (open, apply, save).
+
+Build a ProcessPoolExecutor wrapper that maps (image_path, transformation_json) pairs to workers and returns when all complete.
+
+Internalize the thread-vs-process answer: image transforms release the GIL inside PIL's C code in some cases, so threads can help; but most candidates have better luck arguing for processes due to predictable CPU parallelism.
+
+Cross-train the web-crawler sibling prompt in parallel — same recruiter blurb, different problem.
+
+In 20 minutes, implement prefix reuse for one image with branching transformation sequences, then compare every output against independently executed pipelines; include different parameters and a repeated sequence.
+
+In 10 minutes, benchmark separate-pipeline execution against per-image grouped execution, recording elapsed time and peak memory; check that intermediates are released when no remaining branch needs them.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

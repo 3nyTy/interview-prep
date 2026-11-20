@@ -1,0 +1,47 @@
+===H1===
+Anagram Queries on Word List
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/anagram-queries
+===BODY===
+Goldman Sachs
+Coding·60 minMembers
+Anagram Queries on Word List
+For each query string, return every word from a given word list that is an anagram of the query, sorted lexicographically.
+SWE
+string
+hashmap
+sorting
+easy
+Frequency
+Single report
+Last asked
+2024-10-26
+Stage
+oa
+Requirements
+
+Given a list of words and a list of queries, for each query return all words in words that are anagrams of the query, sorted lexicographically.
+
+public static String[][] getSearchResults(String[] words, String[] queries)
+
+Notes
+
+The canonical fast solution pre-computes a fingerprint per word (sorted characters, or a 26-element count array packed to a string) and stores fingerprint → List<originalWord>. Each query is then an O(L log L) sort + a hashmap lookup.
+
+The reference snippet sorts characters for every comparison, giving O(Q × W × L log L) — fine for small inputs but the interview follow-up is usually "how would you handle 10^6 queries?" Answer with the pre-computed fingerprint approach.
+
+Sort each result list before returning (the problem requires lexicographic order, which the naïve scan doesn't guarantee).
+
+Edge cases: queries with no matches return an empty array (not null); duplicate words in words are preserved per the reference behavior.
+
+Preparation
+
+Implement once with sorted-string fingerprint; then rewrite using a 26-int count array → string fingerprint to remove the per-word sort.
+
+LC 49 "Group Anagrams" is the canonical equivalent for the fingerprint pattern.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

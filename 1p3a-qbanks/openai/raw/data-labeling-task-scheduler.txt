@@ -1,0 +1,118 @@
+===H1===
+Data Labeling Task Scheduler
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/data-labeling-task-scheduler
+===BODY===
+OpenAI
+Coding·60 minMembers
+Data Labeling Task Scheduler
+Build a scheduler for a data labeling platform: t tasks, m models, h human labelers. Emit a schedule (list of (task, model, human) tuples) under fairness + uniqueness constraints. Tied with infection-spread as the hottest 'new question'.
+SWE
+RE
+MLE
+algorithm
+simulation
+scheduling
+medium
+Frequency
+High
+Last asked
+2026-07-10
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Each human labeler must participate in ≥ k tasks total
+
+For any prefix of the output schedule, each (task, model) pair has max - min ≤ 1 occurrences
+
+For any prefix, each (task, human) pair similarly satisfies max - min ≤ 1
+
+Each human labels each task at most once
+
+Part-2 follow-up: (model, human) also evenly distributed (all pairwise combos balanced — significantly harder than Part 1)
+
+Part-3 / streaming variant: new tasks arrive each day; incrementally update without restarting; each human handles at most one task per day
+
+Canonical signatures (Part 1 ignores the prefix-balance clause; Part 2 enforces it at every prefix):
+
+from typing import List, Optional, Tuple
+Assignment = Tuple[int, int, int]  # (task, model, human)
+
+def build_basic_schedule(t: int, m: int, h: int, k: int) -> Optional[List[Assignment]]: ...
+    # Returns None when k > t, or any of t/m/h <= 0; returns [] when k == 0.
+    # Part 1: each human appears >= k times; each (task, human) at most once.
+    # No prefix-balance required; simplest construction assigns model = 0 throughout.
+
+def build_balanced_schedule(t: int, m: int, h: int, k: int) -> Optional[List[Assignment]]: ...
+    # Part 2: same constraints, plus for every task x both
+    #   max_i count_prefix(x, model=i) - min_i count_prefix(x, model=i) <= 1
+    #   max_j count_prefix(x, human=j) - min_j count_prefix(x, human=j) <= 1
+    # hold at every prefix. (task, human) balance is automatic from "at most once".
+    # Returns None when k > t, or any of t/m/h <= 0; returns [] when k == 0.
+    # Produces a minimal-length schedule of exactly h * k assignments.
+
+Feasibility bound
+
+Because each human can touch a given task at most once, a human can perform at most t assignments total. Since every human must reach k, the only feasibility condition is k <= t — i.e. k > t is impossible (return None). With k <= t and m >= 1 a valid schedule always exists.
+
+Examples
+
+For t = 3, m = 2, h = 4, k = 2, one valid schedule (4 humans × 2 rounds = 8 assignments):
+
+[
+    (0, 0, 0), (1, 0, 1), (2, 0, 2), (0, 1, 3),   # round 0
+    (1, 1, 0), (2, 1, 1), (0, 0, 2), (1, 0, 3),   # round 1
+]
+
+Properties to check on the call:
+
+every human appears exactly 2 times; no human repeats a task
+
+for task 0 the per-model counts evolve (1,0) → (1,1) → (2,1), so the model max - min never exceeds 1 at any prefix; tasks 1 and 2 behave identically.
+
+Notes
+
+No complexity requirement, so brute force is encouraged: maintain 2-3 Counters and greedily pick the combo where both counters are lowest (validated).
+
+Constraints vary slightly between loops (does Part 1 require task-human balance? Is balance enforced per-prefix or per-day?). Clarify Part 2 carefully on the call before committing.
+
+Suggested core construction (Part 2)
+
+Schedule in exactly k rounds of h assignments each (h * k total). In round r for human u pick task = (u + r) mod t so each human sees k distinct tasks (requires k <= t). Keep a task_seen[task] counter and assign model = task_seen[task] mod m, then increment; this cycles models 0, 1, ..., m-1, 0, ... per task so the prefix difference across models is always 0 or 1.
+
+Why task-human balance is automatic
+
+The (task, human) prefix-balance condition holds trivially: since each (task, human) pair appears at most once, every per-task human count is either 0 or 1, so max - min ≤ 1 at every prefix without any extra bookkeeping. The only nontrivial constraint to engineer is the per-task model balance.
+
+Model balance correctness (floor/ceil bound)
+
+Fix any task x. Each time x is scheduled, the next model is assigned in round-robin order 0, 1, ..., m-1, 0, 1, .... After c total appearances of task x, each model has been used either floor(c / m) or ceil(c / m) times, so the difference between the maximum and minimum model count is always at most 1 — at every intermediate prefix, not just at the end.
+
+Why the schedule is minimal in length
+
+Every tuple raises exactly one human's total assignment count by 1. Since each of the h humans must reach at least k, any valid schedule needs at least h * k tuples. The round-based construction emits exactly h * k, so it is optimal in length — worth stating explicitly if the interviewer asks whether the output can be shorter.
+
+Complexity
+
+Time: O(h · k) to build the schedule.
+
+Space: O(t) auxiliary (the task_seen counter array), plus the output list of length h · k.
+
+Annotators / Models / Questions framing
+
+One recurring wording gives three sets — Annotators (A), Models (M) (candidate models to evaluate), Questions (Q) — and asks for a list of (a, m, q) assignments such that: (1) each (m, q) pair appears as evenly as possible; (2) additionally, for each annotator a the counts across different models are as even as possible. A greedy pick (lowest-count combo at each step) solves it, but interviewers may push past a quick greedy answer — be ready to argue why the balance invariant holds, not just that it usually does.
+
+Preparation
+
+Invariant: 'balanced at any prefix' — at each step greedily pick the (task, model, human) tuple where all relevant counters are minimum
+
+Streaming version: priority queue keyed by current count
+
+After implementing, hand-verify 5-10 small cases to confirm balance really holds
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

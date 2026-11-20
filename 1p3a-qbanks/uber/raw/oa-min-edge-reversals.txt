@@ -1,0 +1,81 @@
+===H1===
+OA: Minimum Edge Reversals from Every Root
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/oa-min-edge-reversals
+===BODY===
+Uber
+Coding·90 minMembers
+OA: Minimum Edge Reversals from Every Root
+Hack2Hire OA problem, equivalent to LeetCode 2858 / 1466 variant. Given an acyclic directed graph with `n` nodes and `n − 1` edges, for each node `r` compute the minimum number of edge reversals so that every node has a directed path to `r`.
+SWE
+graph
+dfs
+tree
+hard
+Frequency
+Low
+Last asked
+2026-05-31
+Stage
+oa
+Requirements
+
+Input: a directed graph with gNodes nodes numbered 1..gNodes and gNodes − 1 directed edges, where the i-th edge goes from gFrom[i] to gTo[i]. The underlying undirected graph is guaranteed to be a tree.
+
+You may reverse any directed edges. For a chosen root r, the cost is the number of reversals needed so that every edge points away from r (every other node is reachable from r along directed edges).
+
+Output: a single integer — the minimum reversal count over all possible root choices (min over r in 1..gNodes).
+
+Minority variant: some versions instead ask for an array ans of length n where ans[r] is the per-root reversal count (LC 2858 framing, often 0-indexed), rather than the single minimum — clarify the exact return shape before coding.
+
+def min_reversals(g_nodes: int, g_from: list[int], g_to: list[int]) -> int: ...
+    # Nodes are 1-indexed (1..g_nodes); len(g_from) == len(g_to) == g_nodes - 1.
+    # Returns the minimum number of edge reversals over all root choices so that
+    # every edge points away from the root. Underlying undirected graph is a tree.
+
+Notes
+
+Two-pass DFS (re-rooting DP):
+
+Treat the graph as undirected, encode each edge with weight 0 (original direction) and weight 1 (reversed direction).
+
+DFS from node 0 to compute ans[0] = sum of weights on the tree rooted at 0.
+
+Second DFS to re-root: moving the root from u to a neighbor v along edge (u, v) flips that edge's weight, so ans[v] = ans[u] ± 1 depending on the original orientation. The answer is min(ans[r]) over all r.
+
+O(n) time, O(n) space.
+
+A naive O(n²) (re-DFS from every root) passes the visible tests but times out on the hidden tests (gNodes up to 10^5).
+
+Watch the indexing: this canonical shape numbers nodes 1..gNodes, so offset by 1 if your adjacency list is 0-based. gFrom[i] != gTo[i] (no self-loops).
+
+Alternate canonical variant — Reorder Routes to Make All Paths Lead to the City Zero (LC 1466)
+
+A closely related prompt fixes the root instead of minimizing over all roots: n cities 0..n−1 and n − 1 directed roads forming a tree; return the minimum number of edges to reverse so every city can reach city 0 (paths lead toward 0, the opposite orientation convention from the main variant).
+
+def min_reorder(n: int, connections: list[list[int]]) -> int: ...
+    # connections[i] == [from, to], 0-indexed cities; len == n - 1; underlying graph is a tree.
+    # Single DFS/BFS from city 0 over the undirected tree: count each edge traversed
+    # in its original (forward, away-from-0) direction as needing one reversal.
+
+Single traversal from 0 suffices here (root is fixed), so no re-rooting DP is needed — a forward edge encountered while walking away from 0 costs one reversal, a backward edge costs zero. n up to 5 * 10^4.
+
+Examples
+
+gNodes = 4, gFrom = [1, 2, 3], gTo = [4, 4, 4] → 2. Rooting at 2 (or 1/3) needs reversing 1 → 4 and 3 → 4 so all edges point away from the root.
+
+gNodes = 4, gFrom = [1, 1, 3], gTo = [2, 3, 4] → 0. Rooting at 1, every edge already points away from it.
+
+gNodes = 4, gFrom = [2, 2, 4], gTo = [1, 3, 3] → 1. Rooting at 2 only requires reversing 4 → 3.
+
+Preparation
+
+Drill LC 2858 (Minimum Edge Reversals So Every Node Is Reachable) and LC 1466 (Reorder Routes) — exact pattern.
+
+Internalise the re-rooting DP template; it shows up across multiple Uber OA prompts and onsite graph follow-ups.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

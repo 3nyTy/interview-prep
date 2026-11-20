@@ -1,0 +1,61 @@
+===H1===
+N-ary Tree Sum + Leaf `next` Pointer
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/tree-sum-leaf-next-pointer
+===BODY===
+Citadel / Citadel Securities
+Coding·60 minMembers
+N-ary Tree Sum + Leaf `next` Pointer
+Citadel Data Storage / Infra technical phone screen: define a tree-node structure, compute the sum of all node values, then connect all leaf nodes in DFS order using a `next` pointer. The final follow-up asks for `O(1)` extra space by reusing the node's own pointer fields instead of a helper array or traversal stack.
+SWE
+Infra Eng
+tree
+dfs
+tree-traversal
+recursion
+linked-list
+complexity-analysis
+medium
+Frequency
+Single report
+Last asked
+2026-06-13
+Stage
+phone-screen
+Requirements
+
+One-hour live coding round, tree / data-structure focused. The problem is delivered as a three-part ladder:
+
+Define the node and sum the tree. Design a tree-node data structure. The prompt does not restrict the tree to binary, so an N-ary structure with children is acceptable. Return the sum of all node values in the tree.
+
+Connect leaves in DFS order. Add a next pointer to the node. After traversal, every leaf node should point to the next leaf in DFS order.
+
+Optimize extra space. Complete the leaf-connection step with O(1) extra space. The interviewer hints that a traditional recursive DFS or explicit stack makes the bound hard, and that the existing next pointer can be reused as temporary traversal structure.
+
+Notes
+
+For part 1, a plain DFS is expected. Time O(n) for n nodes; recursion stack is O(h) and can be O(n) in a degenerate tree.
+
+For part 2, the straightforward implementation collects leaves into an array during DFS, then links adjacent entries. Time O(n), extra space O(L + h) where L is number of leaves.
+
+The O(1) follow-up is the real discriminator. The interviewer is probing whether you can separate output pointers from traversal bookkeeping and exploit the mutable next field without allocating a leaf array. Clarify whether temporary mutation of next on internal nodes is allowed and whether the final state must preserve only leaf-to-leaf links.
+
+Complexity narration matters. The round grades clear data-structure definition, traversal order, and space accounting more than the first two implementations.
+
+The interviewer is interactive and gives hints; use them to restate invariants before coding the follow-up.
+
+Preparation
+
+Implement N-ary tree DFS recursively and iteratively, including value aggregation and leaf detection.
+
+Practice linking leaves in preorder / DFS order with both an auxiliary array and a rolling prev_leaf pointer.
+
+Drill tree traversals under explicit space constraints: Morris-style traversal for binary trees, pointer-threading ideas, and when temporary pointer mutation is acceptable.
+
+Rehearse complexity accounting for recursion stack vs heap-allocated helper structures; Citadel interviewers probe that distinction directly.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

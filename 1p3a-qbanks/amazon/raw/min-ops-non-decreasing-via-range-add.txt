@@ -1,0 +1,62 @@
+===H1===
+Minimum Range-Add Ops to Non-Decreasing Array
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/min-ops-non-decreasing-via-range-add
+===BODY===
+Amazon
+Coding·40 minMembers
+Minimum Range-Add Ops to Non-Decreasing Array
+Given an integer array, pick any closed interval and add a positive integer x to every element. Minimize total x summed across operations so the final array is non-decreasing.
+SWE
+array
+greedy
+medium
+Frequency
+Single report
+Last asked
+2026-03-23
+Stage
+oa
+Requirements
+
+Choose any [i, j] and any positive x, then add x to every a[k] for i <= k <= j.
+
+Repeat as many times as needed. Final array must satisfy a[i] <= a[i+1] for all i.
+
+Minimize the total sum of all x values used.
+
+Examples
+
+a = [3, 1, 2, 1]
+# scan left-to-right: when a[i] < a[i-1], pay (a[i-1] - a[i])
+# bumps: (3->1) pay 2; later (2->1) pay 1; total = 3
+
+Notes
+
+The answer is simply the sum of max(0, a[i-1] - a[i]) over all i >= 1. Reason: every "dip" must be patched, and any range-add that lifts the dip cleanly is optimal because it never overpays.
+
+Don't overthink the range structure — the intervals are constructive, not part of the answer.
+
+The interviewer may follow up with "what if x must be a fixed constant?" — then it becomes a ceiling-division aggregation.
+
+Canonical one-liner: ans = a[0] + sum(max(0, a[i] - a[i-1]) for i in range(1, n)) when the target starts from zero; for the non-decreasing variant here, drop the leading a[0] term and only pay on dips (max(0, a[i-1] - a[i])).
+
+The constructive proof has two halves: every dip contributes at least its drop (lower bound), and a single range-add per dip — extending from that index to the end — saturates the bound (upper bound). Mention both halves in the verbal proof.
+
+Preparation
+
+Drill greedy proofs for monotone-array problems (LC 665 Non-decreasing Array, LC 1827 Min Ops to Make Array Increasing).
+
+Practice writing the proof in two sentences: every dip contributes at least the difference, and a single range-add per dip achieves exactly that.
+
+Be ready for the dual problem: minimize x over range-subtract to make the array non-increasing — symmetric reasoning.
+
+After whiteboarding the proof, code it twice: once with the leading-element term (target-shaped, LC 1526 style), once dip-only (this variant). Confirm both pass on [1,2,3,2,1] and [5,4,3,2,1].
+
+Time-box the proof discussion to 3 minutes — the implementation itself is 5 lines and graders reward fast cleanup so the follow-up (constant-x ceiling variant) gets airtime.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

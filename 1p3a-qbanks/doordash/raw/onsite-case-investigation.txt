@@ -1,0 +1,80 @@
+===H1===
+Onsite: On-Call Case Investigation
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/onsite-case-investigation
+===BODY===
+DoorDash
+Other·60 minMembers
+Onsite: On-Call Case Investigation
+Verbal-only onsite round that simulates discovering a live production incident. The candidate is given a scenario (alert fired, dashboard anomaly, customer complaint), and must verbally walk through investigation, mitigation, and recovery. Tests real on-call experience.
+SWE
+EM
+sre
+troubleshooting
+verbal
+open-ended
+operating-systems
+medium
+Frequency
+Medium
+Last asked
+2026-07-17
+Stage
+onsite-coding · onsite-deep-dive
+Requirements
+
+Input: a scenario described by the interviewer (e.g. "orders are completing but customers report missing items", "latency on the payment service has doubled", "a percentage of dasher payouts are stuck in PENDING").
+
+Output: verbal walkthrough of investigation steps, hypothesis tree, mitigation actions, recovery, and post-mortem.
+
+No coding. The interviewer adjusts the scenario based on the candidate's responses.
+
+Notes
+
+The most reported variant centers on a payment / dasher / order subsystem incident; specific scenarios change per candidate.
+
+Standard framework to demonstrate:
+
+Acknowledge & assess — page on call? confirm scope (% affected, regions, services). Decide severity.
+
+Communicate — open incident channel, status page, ping XFN owners.
+
+Investigate — recent deploys, related alerts, dashboards (latency, error rate, queue depth), correlated metrics.
+
+Hypothesize — narrow to 2–3 likely root causes; rank by ease of verification.
+
+Mitigate — rollback / feature flag / circuit breaker / capacity bump. Stop the bleeding before finding root cause.
+
+Verify mitigation — watch the relevant metric for X minutes.
+
+Root cause — confirm with logs, traces, or reproduction.
+
+Recover — undo any temporary workarounds; restore normal state.
+
+Post-mortem — timeline, contributing factors, action items, owners.
+
+The interviewer grades on real-world reasoning, not buzzword recall. Specific recent experience ("we hit this last quarter when our DB connection pool exhausted") earns the strongest signal.
+
+Common pitfall: jumping to root cause before mitigating. Stop-the-bleeding first; root-cause later.
+
+For DoorDash-specific scenarios, useful domain knowledge: payment idempotency, dasher allocation, restaurant POS integration failures, Kafka consumer lag.
+
+One reported variant is deliberately constrained: when the candidate proposes infrastructure mitigations (rollback, circuit breaker, capacity bump), the interviewer replies that the system supports none of them. The round is really probing operational incident handling — how you triage, communicate, coordinate responders, and apply manual mitigations — not architecture. If technical fixes keep getting rejected, pivot to the operational playbook.
+
+A marketplace-ops scenario also rotates in: a merchant's listed prices are wrong, shopping dashers' company payment cards get declined at checkout for insufficient limit, and support call volume spikes. Same playbook as the constrained variant — scope the impact, unblock the affected dashers, and manage the support surge before root-causing the pricing data.
+
+Preparation
+
+Pre-write 3 personal on-call stories: a database / cache incident, a payment / third-party API incident, a deploy-related incident. Each with timeline + mitigation + post-mortem.
+
+Drill the SRE incident-response framework above until it's automatic.
+
+For DoorDash-specific prep: read about marketplace incident patterns (dasher under-supply, surge pricing failures, payment retries).
+
+Have 2–3 follow-up questions ready for the interviewer ("what monitoring would help next time?") to demonstrate ownership thinking.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

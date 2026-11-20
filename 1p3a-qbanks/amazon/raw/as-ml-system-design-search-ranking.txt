@@ -1,0 +1,86 @@
+===H1===
+ML System Design — Search / Ranking / Experimentation
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/as-ml-system-design-search-ranking
+===BODY===
+Amazon
+System Design·60 minMembers
+ML System Design — Search / Ranking / Experimentation
+Applied Scientist L5 full-loop ML-system-design round on search / ranking / experimentation. The case study often goes beyond a single model into evaluation and live A/B design.
+RS
+MLE
+system-design
+ml-knowledge
+retrieval
+hard
+Frequency
+Single report
+Last asked
+2026-04-29
+Stage
+onsite-system-design
+Requirements
+
+Pick a domain (the interviewer often gives 'search ranking' or 'image generation for brand ads').
+
+Walk through the ML stack: retrieval, candidate generation, ranking, re-ranking, business-rule overlays, online evaluation.
+
+Discuss evaluation metrics (offline: NDCG, MRR; online: CTR, conversion, brand-safety pass rate) and how to design an A/B test that's not contaminated by network effects.
+
+For generative variants, cover prompt-driven quality scoring and brand-name fidelity checks.
+
+Examples
+
+Recent prompts:
+
+"How would you evaluate generation quality for image or text?"
+
+"If the image is for brand ads, how do you make sure the brand name is right in the image?"
+
+Notes
+
+The round is open-ended; the interviewer wants depth, not coverage. Pick one axis (offline evaluation, online experimentation, or model-quality estimation) and dive 5 levels deep.
+
+Brand-fidelity question is a back-door way to test grounded-generation knowledge: mention OCR-on-output verification, retrieval-augmented generation with a brand corpus, and reinforcement signals from human raters.
+
+Online experimentation: bring up variance reduction (CUPED), holdout populations, and ramp strategy.
+
+The canonical decomposition is a three-tier funnel: candidate retrieval (millions -> ~thousands, latency-optimized via two-tower embeddings + ANN), lightweight ranker (thousands -> ~hundreds, GBDT on cheap features), heavy ranker (hundreds -> top-k, deep model on the full feature set). Re-ranking and business-rule overlays sit on top of the heavy ranker. Open with this funnel before any model choice.
+
+Two-tower retrieval (separate query/user encoder and item encoder sharing an embedding space) is the default; train with in-batch negatives + a sampled softmax or triplet loss, serve via Faiss / ScaNN ANN. Be ready to explain why a single-tower model can't be used for retrieval (you'd need to score every item at request time).
+
+Feature parity between training and serving is the single most common production failure. The mitigation pattern is one feature store called from both the offline trainer and the online ranker; if you propose computing features ad hoc in the serving path, expect a deep-dive on train-serve skew.
+
+Position bias in implicit-feedback training data is mandatory to mention. Standard fixes: inverse-propensity weighting, treating position as a feature that is set to a constant at serving time, or randomization holdouts.
+
+For online evaluation, lead with the metric hierarchy: north star (revenue / session length) > proxy metrics (CTR, conversion) > guardrails (latency, brand-safety pass rate). Then layer variance reduction (CUPED), holdout populations, and ramp strategy.
+
+The brand-fidelity / generative variant is a grounding question. The textbook answer chains: retrieval-augmented generation against a vetted brand corpus, OCR or vision-model verification on the rendered output, and a human-rater reward signal for the residual cases that automated checks can't catch.
+
+Multi-task heads (predict click, dwell time, share, complete in parallel) act as regularizers and give the re-ranker richer signal than a single CTR head. This is a cheap depth signal to drop in.
+
+Preparation
+
+Pre-build a 5-minute pitch on a ranking system you've shipped (or studied) covering retrieval, features, model, training data, and evaluation in that fixed order.
+
+Memorize one offline metric formula (NDCG@k) and one online variance-reduction technique (CUPED) — interviewers reach for these by name.
+
+Drill A/B test pitfalls: SUTVA violations, novelty effect, primacy effect, segment heterogeneity.
+
+For brand-fidelity / generative variants, prep a 90-second answer that covers OCR-on-output verification, retrieval-grounded generation, and human-rater reward signals.
+
+Pre-build a 5-minute pitch on a ranking system you've shipped (or studied) in this fixed order: problem framing -> data and labels -> candidate retrieval -> features -> model -> training pipeline -> offline eval -> online eval -> serving. Practice it on a whiteboard until the order is muscle memory.
+
+Memorize one offline metric definition (NDCG@k with the discount 1/log2(i+1)) and one online variance-reduction technique (CUPED uses pre-experiment covariates to remove explainable variance). Interviewers reach for these by name.
+
+Drill the A/B test pitfall list out loud: SUTVA violations (network effects on social graphs), novelty effect, primacy effect, segment heterogeneity, sample-ratio mismatch. Have a one-sentence mitigation for each.
+
+For the brand-fidelity / generative follow-up, prep a 90-second answer that walks RAG -> OCR/vision verification on output -> human-rater reward signal, and pre-rehearse two failure modes (brand-name homoglyph in the rendered image, retrieval miss on a long-tail brand).
+
+Layered drill on the funnel itself: (1) whiteboard the three-tier diagram from memory; (2) zoom into retrieval and derive the two-tower training loss; (3) zoom into the heavy ranker and justify multi-task heads; (4) zoom into the serving path and budget the 250 ms latency across the three stages.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

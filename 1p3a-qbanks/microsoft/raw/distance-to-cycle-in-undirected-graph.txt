@@ -1,0 +1,55 @@
+===H1===
+Distance from Each Node to the Cycle in an Undirected Graph
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/distance-to-cycle-in-undirected-graph
+===BODY===
+Microsoft
+Coding·45 minMembers
+Distance from Each Node to the Cycle in an Undirected Graph
+Given an undirected graph that contains exactly one cycle, return for every node its shortest distance to any node on the cycle. Cycle nodes return 0.
+SWE
+graph
+bfs
+topological-sort
+hard
+Frequency
+Single report
+Last asked
+2026-01-16
+Stage
+onsite-coding
+Requirements
+
+Input is an undirected connected graph as (n, edges). The graph contains exactly one simple cycle plus trees hanging off cycle nodes. Return a length-n array dist where dist[v] is the shortest path from v to the nearest cycle node.
+
+Reported in the HE coding round as a single 45-minute prompt. The interviewer pushed for an iterative DFS implementation after the first pass.
+
+Notes
+
+The clean approach is leaf pruning (topological-sort style on an undirected graph):
+
+Compute degree of every node. The non-cycle "tree" tails are exactly the nodes whose degree drops to 1 after repeated peeling.
+
+Repeatedly pop degree-1 nodes off a queue, recording the round in which each pops (this is its dist). Cycle nodes never drop to degree 1 and end up with dist = 0.
+
+Equivalent: run multi-source BFS from the cycle inwards, but identifying the cycle first is the harder step — leaf pruning fuses both.
+
+This runs in O(V + E) and is the same shape as the canonical "minimum-height-trees" / "find centroid of tree" algorithm.
+
+To identify the cycle explicitly (some interviewers ask), DFS the graph tracking parent; the back-edge that closes the cycle gives you two nodes whose paths up to the LCA form the cycle. Or just keep peeling leaves until everything left is the cycle (degree ≥ 2 for every survivor).
+
+Common bug: storing distance only on cycle nodes initially and pushing distances outward — works but is two passes; the leaf-peel does it in one.
+
+Preparation
+
+Drill the degree-peeling pattern on a small example (cycle of 4 + two pendant chains of length 2 each); confirm the rounds at which nodes pop match the expected distances.
+
+Practice the iterative-DFS cycle-detection alternative for when the interviewer pushes the recursion-to-iteration conversion.
+
+Pair-prep with topological sort: the implementation pattern (queue + degree-decrement) is identical.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

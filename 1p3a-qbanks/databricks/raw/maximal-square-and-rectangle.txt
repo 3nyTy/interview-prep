@@ -1,0 +1,569 @@
+===H1===
+Maximal Square and Rectangle in Binary Matrix
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/maximal-square-and-rectangle
+===BODY===
+Databricks
+CodingMembers
+Maximal Square and Rectangle in Binary Matrix
+Given a binary matrix of 0s and 1s, find the largest all-1s square and return its area, then extend to the largest all-1s rectangle.
+SWE
+dp
+grid
+monotonic-stack
+medium
+Frequency
+Single report
+Last asked
+2025-11-26
+Stage
+phone-screen · onsite-coding
+Problem Requirements
+
+You are given a grid (matrix) filled with 0s and 1s. Your task is to find the largest square made entirely of 1s and return its area.
+
+After you solve this, the interviewer might ask a follow-up: Find the largest rectangle instead.
+
+Rules:
+
+Square: The shape must have equal sides (e.g., 2×2, 3×3).
+
+Valid: 1×1 squares count.
+
+Content: The shape must contain only 1s (no 0s allowed inside).
+
+Result: Return the area (side × side), not just the side length.
+
+Input Limits
+
+matrix: A 2D array of characters '0' and '1'.
+
+Rows (m): 1 to 300
+
+Columns (n): 1 to 300
+
+Visual Examples
+
+Example 1: Basic Square
+
+Input:
+matrix = [
+  ["1","0","1","0","0"],
+  ["1","0","1","1","1"],
+  ["1","1","1","1","1"],
+  ["1","0","0","1","0"]
+]
+
+Output: 4
+
+Why?
+We found a 2×2 square of 1s.
+Area = 2 × 2 = 4.
+
+Visualization:
+
+1  0  1  0  0
+1  0 [1][1] 1
+1  1 [1][1] 1
+1  0  0  1  0
+
+Example 2: No Ones
+
+Input: matrix = [["0"]]
+Output: 0
+
+There are no 1s, so the area is 0.
+
+Example 3: 3×3 Square
+
+Input:
+matrix = [
+  ["1","1","1","1"],
+  ["1","1","1","1"],
+  ["1","1","1","0"],
+  ["1","1","1","0"]
+]
+
+Output: 9
+
+The largest square is 3×3. Area = 9.
+
+Approach 1: Brute Force
+
+The Logic
+
+This is the simplest way to solve it, but it is slow.
+
+Visit every cell in the grid.
+
+If the cell is a '1', treat it as the top-left corner of a square.
+
+Try to expand the square (size 1, size 2, size 3...) as much as possible.
+
+Keep track of the largest size found.
+
+def maximalSquare_bruteforce(matrix):
+    if not matrix or not matrix[0]:
+        return 0
+
+    rows, cols = len(matrix), len(matrix[0])
+    max_side = 0
+
+    def is_square_valid(r, c, size):
+        """Check if square of given size starting at (r,c) contains all 1s."""
+        if r + size > rows or c + size > cols:
+            return False
+
+        for i in range(r, r + size):
+            for j in range(c, c + size):
+                if matrix[i][j] == '0':
+                    return False
+        return True
+
+    # Try each cell as top-left corner
+    for r in range(rows):
+        for c in range(cols):
+            if matrix[r][c] == '1':
+                # Try expanding square sizes
+                size = 1
+                while is_square_valid(r, c, size):
+                    max_side = max(max_side, size)
+                    size += 1
+
+    return max_side * max_side
+
+Time Complexity
+
+O(m × n × min(m,n)²)
+
+This is very slow. We visit every cell, and for every cell, we check many possible squares repeatedly.
+
+Space Complexity
+
+O(1)
+
+We don't use any extra memory structures.
+
+Approach 2: Dynamic Programming (Best Solution)
+
+Key Insight
+
+We can solve this efficiently using Dynamic Programming (DP). Instead of treating a cell as the top-left corner, let's treat it as the bottom-right corner.
+
+For a cell at (i, j) to be the bottom-right corner of a square of size k, its neighbors must also be part of squares. Specifically, we look at:
+
+Top neighbor
+
+Left neighbor
+
+Top-Left (diagonal) neighbor
+
+The Rule:
+If the current cell is '1', the size of the square ending here is 1 + minimum(top, left, diagonal).
+
+Visual Example
+
+Imagine we are filling a dp table.
+
+Matrix:          DP table (side lengths):
+1 0 1 0 0        1 0 1 0 0
+1 0 1 1 1        1 0 1 1 1
+1 1 1 1 1        1 1 1 2 2
+1 0 0 1 0        1 0 0 1 0
+
+Look at the cell (2, 3) (row 2, col 3). It has a '1'.
+
+Top neighbor has value 1.
+
+Left neighbor has value 1.
+
+Diagonal neighbor has value 1.
+
+New Value = min(1, 1, 1) + 1 = 2.
+This means a 2×2 square ends at this spot.
+
+Solution Code
+
+def maximalSquare(matrix):
+    """
+    Find the area of the largest square containing only 1s.
+
+    Time: O(m × n)
+    Space: O(m × n) - can be optimized to O(n)
+    """
+    if not matrix or not matrix[0]:
+        return 0
+
+    rows, cols = len(matrix), len(matrix[0])
+    dp = [[0] * cols for _ in range(rows)]
+    max_side = 0
+
+    for i in range(rows):
+        for j in range(cols):
+            if matrix[i][j] == '1':
+                if i == 0 or j == 0:
+                    # First row or column - can only form 1×1 squares
+                    dp[i][j] = 1
+                else:
+                    # Take minimum of three neighbors and add 1
+                    dp[i][j] = min(
+                        dp[i-1][j],      # above
+                        dp[i][j-1],      # left
+                        dp[i-1][j-1]     # diagonal
+                    ) + 1
+
+                max_side = max(max_side, dp[i][j])
+
+    return max_side * max_side
+
+# Test cases
+def test_maximal_square():
+    # Example 1
+    matrix1 = [
+        ["1","0","1","0","0"],
+        ["1","0","1","1","1"],
+        ["1","1","1","1","1"],
+        ["1","0","0","1","0"]
+    ]
+    assert maximalSquare(matrix1) == 4
+
+    # Example 2
+    matrix2 = [["0"]]
+    assert maximalSquare(matrix2) == 0
+
+    # Example 3
+    matrix3 = [["1"]]
+    assert maximalSquare(matrix3) == 1
+
+    # Example 4: All ones
+    matrix4 = [
+        ["1","1"],
+        ["1","1"]
+    ]
+    assert maximalSquare(matrix4) == 4
+
+    # Example 5: Larger square
+    matrix5 = [
+        ["1","1","1","1"],
+        ["1","1","1","1"],
+        ["1","1","1","0"]
+    ]
+    assert maximalSquare(matrix5) == 9  # 3×3 square
+
+    print("All tests passed!")
+
+test_maximal_square()
+
+Time Complexity
+
+O(m × n): We look at every cell exactly once.
+
+Space Complexity
+
+O(m × n): We build a table of the same size as the matrix.
+
+We can improve this to O(n) because we only need the previous row to calculate the current row.
+
+Space-Optimized Code
+
+def maximalSquare_optimized(matrix):
+    """
+    Space-optimized version using O(n) space.
+    """
+    if not matrix or not matrix[0]:
+        return 0
+
+    rows, cols = len(matrix), len(matrix[0])
+    dp = [0] * cols
+    max_side = 0
+    prev = 0  # Stores dp[i-1][j-1]
+
+    for i in range(rows):
+        for j in range(cols):
+            temp = dp[j]  # Save current value before overwriting
+
+            if matrix[i][j] == '1':
+                if j == 0:
+                    dp[j] = 1
+                else:
+                    # dp[j] currently holds dp[i-1][j] (above)
+                    # dp[j-1] holds dp[i][j-1] (left)
+                    # prev holds dp[i-1][j-1] (diagonal)
+                    dp[j] = min(dp[j], dp[j-1], prev) + 1
+
+                max_side = max(max_side, dp[j])
+            else:
+                dp[j] = 0
+
+            prev = temp  # Update prev for next iteration
+
+    return max_side * max_side
+
+Follow-Up Question: Maximal Rectangle
+
+After you solve the square problem, the interviewer might ask:
+
+"What if we want to find the largest rectangle? The width and height don't have to be equal."
+
+This is LeetCode 85: Maximal Rectangle.
+
+How to Solve
+
+We can't use the exact same DP logic as the square problem. Instead, we treat each row as the base of a Histogram.
+
+Steps:
+
+Go through the matrix row by row.
+
+Update a "heights" array. If a cell is '1', increase the height. If it is '0', reset the height to 0.
+
+For each row, calculate the "Largest Rectangle in Histogram" using that heights array.
+
+The answer is the maximum area found across all rows.
+
+Histogram Concept
+
+Matrix:
+1 0 1 0 0
+1 0 1 1 1  <-- View this row
+
+For the second row, the consecutive 1s going upwards (heights) are: [2, 0, 2, 1, 1].
+We then find the largest rectangle that fits inside these bars.
+
+Solution Code (Rectangle)
+
+def maximalRectangle(matrix):
+    """
+    Find the area of the largest rectangle containing only 1s.
+
+    Time: O(m × n)
+    Space: O(n)
+    """
+    if not matrix or not matrix[0]:
+        return 0
+
+    rows, cols = len(matrix), len(matrix[0])
+    heights = [0] * cols
+    max_area = 0
+
+    for i in range(rows):
+        # Update histogram heights for current row
+        for j in range(cols):
+            if matrix[i][j] == '1':
+                heights[j] += 1
+            else:
+                heights[j] = 0
+
+        # Find max rectangle in current histogram
+        max_area = max(max_area, largestRectangleInHistogram(heights))
+
+    return max_area
+
+def largestRectangleInHistogram(heights):
+    """Helper function to find max rectangle in histogram."""
+    stack = []
+    max_area = 0
+    heights = heights + [0]  # Sentinel value
+
+    for i, h in enumerate(heights):
+        while stack and heights[stack[-1]] > h:
+            height_index = stack.pop()
+            height = heights[height_index]
+            width = i if not stack else i - stack[-1] - 1
+            max_area = max(max_area, height * width)
+        stack.append(i)
+
+    return max_area
+
+# Test cases
+def test_maximal_rectangle():
+    # Example 1
+    matrix1 = [
+        ["1","0","1","0","0"],
+        ["1","0","1","1","1"],
+        ["1","1","1","1","1"],
+        ["1","0","0","1","0"]
+    ]
+    result = maximalRectangle(matrix1)
+    assert result == 6  # Rectangle at rows 1-2, cols 2-4
+
+    # Example 2: All zeros
+    matrix2 = [["0"]]
+    assert maximalRectangle(matrix2) == 0
+
+    # Example 3: Single one
+    matrix3 = [["1"]]
+    assert maximalRectangle(matrix3) == 1
+
+    # Example 4: Full rectangle
+    matrix4 = [
+        ["1","1","1"],
+        ["1","1","1"]
+    ]
+    assert maximalRectangle(matrix4) == 6  # 2×3 rectangle
+
+    print("All rectangle tests passed!")
+
+test_maximal_rectangle()
+
+Time Complexity
+
+O(m × n): We process each cell to build the histogram, and the histogram calculation is linear O(n) per row.
+
+Space Complexity
+
+O(n): We need an array to store the heights and a stack for the histogram calculation.
+
+Alternative Solution: DP with Boundaries
+
+There is another way to solve the rectangle problem using three DP arrays:
+
+left[j]: The leftmost boundary of the current strip of 1s.
+
+right[j]: The rightmost boundary.
+
+height[j]: The height of the strip.
+
+This approach is efficient but harder to implement during an interview.
+
+def maximalRectangle_dp(matrix):
+    """
+    DP approach tracking left, right, and height boundaries.
+
+    Time: O(m × n)
+    Space: O(n)
+    """
+    if not matrix or not matrix[0]:
+        return 0
+
+    rows, cols = len(matrix), len(matrix[0])
+    left = [0] * cols       # Left boundary (inclusive)
+    right = [cols] * cols   # Right boundary (exclusive)
+    height = [0] * cols     # Height of consecutive 1s
+    max_area = 0
+
+    for i in range(rows):
+        # Update height
+        for j in range(cols):
+            if matrix[i][j] == '1':
+                height[j] += 1
+            else:
+                height[j] = 0
+
+        # Update left boundary
+        cur_left = 0
+        for j in range(cols):
+            if matrix[i][j] == '1':
+                left[j] = max(left[j], cur_left)
+            else:
+                left[j] = 0
+                cur_left = j + 1
+
+        # Update right boundary
+        cur_right = cols
+        for j in range(cols - 1, -1, -1):
+            if matrix[i][j] == '1':
+                right[j] = min(right[j], cur_right)
+            else:
+                right[j] = cols
+                cur_right = j
+
+        # Calculate area
+        for j in range(cols):
+            max_area = max(max_area, (right[j] - left[j]) * height[j])
+
+    return max_area
+
+Summary: Square vs. Rectangle
+
+FeatureMaximal SquareMaximal Rectangle
+ShapeSides must be equalWidth and height can differ
+LogicSimple DP (look at 3 neighbors)Complex (Histogram + Stack)
+Formulamin(top, left, diag) + 1(right - left) * height
+ComplexityTime: O(m×n), Space: O(n)Time: O(m×n), Space: O(n)
+DifficultyMediumHard
+
+Common Edge Cases
+
+For Maximal Square:
+
+Empty matrix: Return 0.
+
+No 1s: Return 0.
+
+Single '1': Return 1.
+
+All 1s: The answer is min(rows, cols)².
+
+For Maximal Rectangle:
+
+Empty matrix: Return 0.
+
+No 1s: Return 0.
+
+Single '1': Return 1.
+
+Single row/column of 1s: Return the length of that row/column.
+
+All 1s: Return rows × cols.
+
+Code for Testing
+
+def test_edge_cases():
+    # Empty matrix
+    assert maximalSquare([]) == 0
+    assert maximalRectangle([]) == 0
+
+    # All zeros
+    matrix_zeros = [["0","0"],["0","0"]]
+    assert maximalSquare(matrix_zeros) == 0
+    assert maximalRectangle(matrix_zeros) == 0
+
+    # Single row
+    single_row = [["1","1","1","1"]]
+    assert maximalSquare(single_row) == 1  # Only 1×1 possible
+    assert maximalRectangle(single_row) == 4  # 1×4 rectangle
+
+    # Single column
+    single_col = [["1"],["1"],["1"]]
+    assert maximalSquare(single_col) == 1  # Only 1×1 possible
+    assert maximalRectangle(single_col) == 3  # 3×1 rectangle
+
+    # All ones - square matrix
+    all_ones = [
+        ["1","1","1"],
+        ["1","1","1"],
+        ["1","1","1"]
+    ]
+    assert maximalSquare(all_ones) == 9  # 3×3 square
+    assert maximalRectangle(all_ones) == 9  # 3×3 rectangle
+
+    # All ones - rectangular matrix
+    rect_ones = [
+        ["1","1","1","1"],
+        ["1","1","1","1"]
+    ]
+    assert maximalSquare(rect_ones) == 4  # 2×2 square
+    assert maximalRectangle(rect_ones) == 8  # 2×4 rectangle
+
+    print("All edge case tests passed!")
+
+test_edge_cases()
+
+Similar Practice Problems
+
+LeetCode 221: Maximal Square
+
+LeetCode 85: Maximal Rectangle
+
+LeetCode 84: Largest Rectangle in Histogram (Essential for solving the rectangle version)
+
+LeetCode 1277: Count Square Submatrices with All Ones
+
+LeetCode 1727: Largest Submatrix With Rearrangements
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

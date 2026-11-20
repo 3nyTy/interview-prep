@@ -1,0 +1,2436 @@
+{
+  "company": "bytedance",
+  "display_name": "ByteDance / TikTok",
+  "qbank_count": 70,
+  "questions_scraped": 70,
+  "site_total_count": 431,
+  "oj_count": 361,
+  "external_count": 0,
+  "description": "ByteDance / TikTok runs a strict one-round-at-a-time funnel with sharp org-by-org variance in bar, language, and round mix. Coding rounds skew toward classic LeetCode-medium with one self-built test case; MLE and SRE loops front-load 30+ minutes of oral 八股 before any code is written. Interviewer professionalism varies — strong candidates drive the round structurally rather than waiting to be assessed.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/bytedance",
+  "scraped_at": "2026-09-20",
+  "source": "1point3acres qbank (logged-in session)",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "number-of-islands-family",
+      "title": "Number of Islands and Grid BFS Variants",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-08-08",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "grid",
+        "bfs",
+        "dfs",
+        "union-find",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "grid",
+        "bfs",
+        "dfs",
+        "union-find",
+        "medium"
+      ],
+      "overview": "Grid traversal in the 'number of islands' family — count connected components, then a follow-up that adds a constraint such as no-modify-in-place, equal-shape detection, water-flow direction, or 2D scaling.",
+      "source_count": 10,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/number-of-islands-family"
+    },
+    {
+      "n": 2,
+      "slug": "lru-cache-with-ttl",
+      "title": "LRU Cache (with TTL and LFU Follow-ups)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-09-06",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-structure",
+        "hashmap",
+        "linked-list",
+        "ttl",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "hashmap",
+        "linked-list",
+        "ttl",
+        "medium"
+      ],
+      "overview": "Design and implement an LRU cache in O(1) per op. Follow-ups extend it with TTL expiry, LFU eviction, or fixed-time get/put semantics under contention.",
+      "source_count": 7,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/lru-cache-with-ttl"
+    },
+    {
+      "n": 3,
+      "slug": "basic-calculator",
+      "title": "Basic Calculator (with and without parentheses)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-08-26",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Free preview",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "stack",
+        "parsing",
+        "string-processing",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "stack",
+        "parsing",
+        "string-processing",
+        "hard"
+      ],
+      "overview": "Implement a string calculator supporting +, -, *, / on integers. Variants range from no-parentheses (operator precedence only) to full infix with parentheses and unary minus.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/basic-calculator"
+    },
+    {
+      "n": 4,
+      "slug": "merge-intervals",
+      "title": "Merge Intervals",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Medium · New",
+      "last_asked": "2026-08-25",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "interval",
+        "sorting",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "interval",
+        "sorting",
+        "medium"
+      ],
+      "overview": "The canonical LeetCode 56 prompt: merge every overlapping interval and return the non-overlapping intervals that cover the same ranges.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/merge-intervals"
+    },
+    {
+      "n": 5,
+      "slug": "course-schedule-topo-sort",
+      "title": "Course Schedule and Topological Sort on a Directed Graph",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-08-17",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "graph",
+        "bfs",
+        "dfs",
+        "topological-sort",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "graph",
+        "bfs",
+        "dfs",
+        "topological-sort",
+        "medium"
+      ],
+      "overview": "Detect whether a directed-graph schedule is satisfiable (cycle detection on a DAG), then extend to producing a valid order — used both as a SWE coding question and as the warmup before a word-ladder shortest-path follow-up.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/course-schedule-topo-sort"
+    },
+    {
+      "n": 6,
+      "slug": "reverse-nodes-in-k-group",
+      "title": "Reverse Nodes in K-Group (incomplete tail variant)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-08-06",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "linked-list",
+        "two-pointer",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "linked-list",
+        "two-pointer",
+        "hard"
+      ],
+      "overview": "Reverse a linked list in groups of K. Variants flip the convention for the final partial group, split into a two-step problem (single-list reverse warmup first, then grouped reverse), or invert the task entirely — reverse the order of the K-groups while keeping each group's internal order intact.",
+      "source_count": 7,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/reverse-nodes-in-k-group"
+    },
+    {
+      "n": 7,
+      "slug": "binary-tree-max-path-sum",
+      "title": "Binary Tree Maximum Path Sum (with path reconstruction)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-17",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "dfs",
+        "recursion",
+        "dp",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "dfs",
+        "recursion",
+        "dp",
+        "hard"
+      ],
+      "overview": "Classic 'max path sum that may bend at any node' on a binary tree, plus the harder follow-up of reconstructing the actual node sequence — not just the score.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/binary-tree-max-path-sum"
+    },
+    {
+      "n": 8,
+      "slug": "seller-task-scheduler",
+      "title": "Seller Task Scheduler",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-09-02",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "scheduling",
+        "heap",
+        "queue"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "scheduling",
+        "heap",
+        "queue"
+      ],
+      "overview": "Implement task intake and next-task selection with per-seller priority ordering and tier-weighted turns across sellers.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/seller-task-scheduler"
+    },
+    {
+      "n": 9,
+      "slug": "timestamped-task-scheduler",
+      "title": "Timestamped Task Scheduler",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-08-20",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "heap",
+        "scheduling",
+        "data-structure",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "heap",
+        "scheduling",
+        "data-structure",
+        "medium"
+      ],
+      "overview": "Implement a task scheduler supporting `addTask(taskID, timestamp)`, `removeTask(taskID)`, and `popTask(num)`, where `popTask` removes and returns the first `num` tasks ordered by start timestamp.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/timestamped-task-scheduler"
+    },
+    {
+      "n": 10,
+      "slug": "pythagorean-triple-integer-array",
+      "title": "Pythagorean Triple in an Integer Array",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-17",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "math",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "math",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Given an integer array, decide whether three available elements can be chosen as a, b, and c such that a² + b² = c². Negative values, zero, and duplicate counts all matter; the expected general bound discussed in the round was quadratic time.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/pythagorean-triple-integer-array"
+    },
+    {
+      "n": 11,
+      "slug": "stickers-to-spell-word",
+      "title": "Stickers to Spell Word (LeetCode 691)",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-08-17",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "state-compression-dp",
+        "bitmask",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "state-compression-dp",
+        "bitmask",
+        "hard"
+      ],
+      "overview": "Given reusable letter stickers and a target string, return the minimum number of stickers needed to assemble the target. The prompt was identified as LeetCode 691, with the target length limited to roughly the low teens.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/stickers-to-spell-word"
+    },
+    {
+      "n": 12,
+      "slug": "minimum-window-substring",
+      "title": "Minimum Window Substring (LeetCode 76)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-17",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "sliding-window",
+        "hashmap",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "sliding-window",
+        "hashmap",
+        "hard"
+      ],
+      "overview": "Find the shortest substring of S containing every character of T with multiplicity, then handle variants requiring a threshold count and returning all equally short answers. The prompt was identified as LeetCode 76.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/minimum-window-substring"
+    },
+    {
+      "n": 13,
+      "slug": "build-nested-comment-tree",
+      "title": "Build a Nested Comment Tree from Flat Records",
+      "category": "coding",
+      "duration": "30 min",
+      "frequency": "Single report",
+      "last_asked": "2026-08-13",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "hashmap",
+        "data-modeling",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "hashmap",
+        "data-modeling",
+        "medium"
+      ],
+      "overview": "Transform a flat list of comment objects with id, parent_id, and text into a nested root array by attaching children recursively. The supplied example contains two roots and a grandchild, plus a parent_id typo in the displayed expected payload that should be clarified.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/build-nested-comment-tree"
+    },
+    {
+      "n": 14,
+      "slug": "ai-assisted-order-validator",
+      "title": "AI-Assisted Order Validator",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-06",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "ai-coding",
+        "ai-allowed",
+        "graph",
+        "oop-design",
+        "testing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "ai-coding",
+        "ai-allowed",
+        "graph",
+        "oop-design",
+        "testing",
+        "medium"
+      ],
+      "overview": "Build an `OrderValidator` that rejects prohibited items and out-of-range prices, supports adding and removing validation rules, and respects dependencies between rules. The follow-up changes the dependency graph when a rule is removed: its prerequisites become prerequisites of its downstream rules.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/ai-assisted-order-validator"
+    },
+    {
+      "n": 15,
+      "slug": "bounded-number-from-allowed-digits",
+      "title": "Bounded Number Construction from Allowed Digits",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-07-29",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "greedy",
+        "backtracking",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "greedy",
+        "backtracking",
+        "hard"
+      ],
+      "overview": "Given an integer N and a set A of decimal digits reusable without limit, construct the largest number strictly smaller than N using only digits from A. One interview example uses N = 23415 and A = {2, 4, 9}, producing 22999.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/bounded-number-from-allowed-digits"
+    },
+    {
+      "n": 16,
+      "slug": "longest-repeating-character-replacement",
+      "title": "Longest Repeating Character Replacement",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-07-23",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "sliding-window",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "sliding-window",
+        "medium"
+      ],
+      "overview": "The unmodified LeetCode 424 prompt: replace at most `k` characters in an uppercase string and return the longest substring that can be made entirely one repeated character.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/longest-repeating-character-replacement"
+    },
+    {
+      "n": 17,
+      "slug": "sliding-window-maximum",
+      "title": "Sliding Window Maximum",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Single report",
+      "last_asked": "2026-07-23",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "sliding-window",
+        "queue",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "sliding-window",
+        "queue",
+        "hard"
+      ],
+      "overview": "The unmodified LeetCode 239 prompt: given an integer array and a fixed window size, return the maximum value in every window as it advances one position at a time.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/sliding-window-maximum"
+    },
+    {
+      "n": 18,
+      "slug": "flatten-multilevel-list-skip-empty-nodes",
+      "title": "Flatten a Multilevel Doubly Linked List (Skip Empty Nodes)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-07-17",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "linked-list",
+        "dfs",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "linked-list",
+        "dfs",
+        "medium"
+      ],
+      "overview": "LC 430 (Flatten a Multilevel Doubly Linked List) with one delta: nested nodes carry empty values and must be excluded from the flattened output. Asked alongside a binary-tree max-path-sum question in the same IC round.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/flatten-multilevel-list-skip-empty-nodes"
+    },
+    {
+      "n": 19,
+      "slug": "equalize-root-to-leaf-path-sums",
+      "title": "Equalize Root-to-Leaf Path Sums in an N-ary Tree",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-07-14",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "dfs",
+        "greedy",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "dfs",
+        "greedy",
+        "medium"
+      ],
+      "overview": "After a warm-up (most frequent array element, ties broken toward the smaller number), the main problem gives an n-ary tree of integers where each operation increments one node's value by 1; return the minimum operations to make all root-to-leaf path sums equal. Both problems require self-written, executed test cases.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/equalize-root-to-leaf-path-sums"
+    },
+    {
+      "n": 20,
+      "slug": "grid-shortest-path-with-obstacle-elimination",
+      "title": "Grid Shortest Path with K Obstacle Eliminations",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-29",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "grid",
+        "bfs",
+        "shortest-path",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "grid",
+        "bfs",
+        "shortest-path",
+        "medium"
+      ],
+      "overview": "First-round Growth coding prompt: find the shortest path in a grid, then handle the follow-up where up to `k` obstacles can be eliminated. Full I/O was thin, but the required state is `(row, col, remaining_eliminations)` for the follow-up.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/grid-shortest-path-with-obstacle-elimination"
+    },
+    {
+      "n": 21,
+      "slug": "sorted-array-elements-more-than-one-third",
+      "title": "Elements Appearing More Than n/3 in a Sorted Array",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-26",
+      "stage": "tech-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "binary-search",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "binary-search",
+        "medium"
+      ],
+      "overview": "Given a sorted array of length at least 3, return every value whose frequency is greater than `n / 3`. Examples include `[1,1,2,4,4] -> [1,4]`; follow-up requires time complexity below `O(n)` by exploiting sorted order.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/sorted-array-elements-more-than-one-third"
+    },
+    {
+      "n": 22,
+      "slug": "longest-zigzag-path-grid",
+      "title": "Longest Zigzag Path in a Grid",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-17",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "grid",
+        "dfs",
+        "backtracking",
+        "dp",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "grid",
+        "dfs",
+        "backtracking",
+        "dp",
+        "medium"
+      ],
+      "overview": "TT Ads phone screen. Given an integer grid, return the length of the longest path (4-directional moves) whose consecutive value comparisons strictly alternate — grid[a] < grid[b] > grid[c] < ... or the inverse. DFS over a (cell, last-direction) state, best memoized like a longest-increasing-path-in-matrix DP; solved with DFS + backtracking.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/longest-zigzag-path-grid"
+    },
+    {
+      "n": 23,
+      "slug": "n-ary-tree-path-sum-count",
+      "title": "N-ary Tree Path Sum Count",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-05-29",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "dfs",
+        "prefix-sum",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "dfs",
+        "prefix-sum",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Count target-sum paths in a tree, with the binary-tree version generalized to an N-ary tree. The expected optimal solution uses DFS plus a prefix-sum counter rather than checking every ancestor path.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/n-ary-tree-path-sum-count"
+    },
+    {
+      "n": 24,
+      "slug": "word-search-ii-trie",
+      "title": "Word Search II with Trie",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-05-20",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "trie",
+        "grid",
+        "dfs",
+        "backtracking",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "trie",
+        "grid",
+        "dfs",
+        "backtracking",
+        "hard"
+      ],
+      "overview": "Find words from a dictionary inside a 2D character board. The expected solution builds a trie over the word list, then runs backtracking DFS from each board cell with in-place visited marking.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/word-search-ii-trie"
+    },
+    {
+      "n": 25,
+      "slug": "shortest-path-grid-with-fuel",
+      "title": "Minimum-Cost Path on a Grid with Fuel and Recharge Cells",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-04-05",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "grid",
+        "dijkstra",
+        "bfs",
+        "dp",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "grid",
+        "dijkstra",
+        "bfs",
+        "dp",
+        "hard"
+      ],
+      "overview": "Weighted-cost grid traversal from top-left to bottom-right with a fuel budget that depletes per step, can be refilled at marked cells, and is bounded by some cells being fully blocked.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/shortest-path-grid-with-fuel"
+    },
+    {
+      "n": 26,
+      "slug": "reverse-words-in-place",
+      "title": "Reverse Words in a String (Preserve Spaces, In-Place)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-03-10",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "two-pointer",
+        "in-memory-database",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "two-pointer",
+        "in-memory-database",
+        "medium"
+      ],
+      "overview": "Reverse the word order in a string. Follow-ups: rewrite to preserve the original number of spaces between every position, and reduce extra space below `O(n)`.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/reverse-words-in-place"
+    },
+    {
+      "n": 27,
+      "slug": "friend-circles-photo-groups",
+      "title": "Photo Groups via Transitive Similarity",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-03-05",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "graph",
+        "union-find",
+        "dfs",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "graph",
+        "union-find",
+        "dfs",
+        "medium"
+      ],
+      "overview": "Given a symmetric similarity matrix where `isSimilar[i][j] == 1` means photos i and j are directly similar, count the number of photo groups under transitive closure.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/friend-circles-photo-groups"
+    },
+    {
+      "n": 28,
+      "slug": "binary-tree-right-side-view",
+      "title": "Binary Tree Right Side View",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-02-01",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "bfs",
+        "dfs",
+        "tree-traversal",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "bfs",
+        "dfs",
+        "tree-traversal",
+        "medium"
+      ],
+      "overview": "Standard tree-from-the-right view problem, but reported with the extra constraint of building the input tree yourself and writing all test scaffolding inside the round.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/binary-tree-right-side-view"
+    },
+    {
+      "n": 29,
+      "slug": "valid-parentheses-with-wildcard",
+      "title": "Valid Parentheses with Wildcard '*' and DFS All Strings",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-30",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "stack",
+        "dfs",
+        "backtracking",
+        "testing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "stack",
+        "dfs",
+        "backtracking",
+        "testing",
+        "medium"
+      ],
+      "overview": "Validate a parenthesis string where `*` can act as `(`, `)`, or empty. Follow-up: enumerate every valid concrete string the input can produce.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/valid-parentheses-with-wildcard"
+    },
+    {
+      "n": 30,
+      "slug": "largest-rectangle-histogram",
+      "title": "Largest Rectangle in Histogram",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-29",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "stack",
+        "array",
+        "complexity-analysis",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "stack",
+        "array",
+        "complexity-analysis",
+        "hard"
+      ],
+      "overview": "Given a histogram represented by an array of bar heights, compute the largest rectangular area contained inside it. Reported as the second problem in an NG SWE phone screen after a sliding-window warmup.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/largest-rectangle-histogram"
+    },
+    {
+      "n": 31,
+      "slug": "codesignal-ml-rs-oa",
+      "title": "CodeSignal ML / Research Scientist OA (10-Problem Battery)",
+      "category": "coding",
+      "duration": "70 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-04",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RS"
+      ],
+      "tags": [
+        "ml-knowledge",
+        "classification",
+        "linear-algebra",
+        "codesignal",
+        "oa",
+        "scikit-learn",
+        "hard"
+      ],
+      "roles_slug": [
+        "mle",
+        "rs"
+      ],
+      "tags_slug": [
+        "ml-knowledge",
+        "classification",
+        "linear-algebra",
+        "codesignal",
+        "oa",
+        "scikit-learn",
+        "hard"
+      ],
+      "overview": "10-question, 70-minute CodeSignal battery for ByteDance Research Scientist intern: a mix of ML multiple-choice on classical model trade-offs, a hand-computed forward pass, a local-maximum array algorithm, and from-scratch implementations of Bagging and k-Means.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/codesignal-ml-rs-oa"
+    },
+    {
+      "n": 32,
+      "slug": "largest-min-max-subarray",
+      "title": "Contiguous Subarray with Largest Min + Max",
+      "category": "coding",
+      "duration": "30 min",
+      "frequency": "Single report",
+      "last_asked": "2025-11-26",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "two-pointer",
+        "math",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "two-pointer",
+        "math",
+        "medium"
+      ],
+      "overview": "A custom 30-minute coding question: given a positive integer array, find a contiguous subarray (length ≥ 2) maximizing `min + max`, return the sum.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/largest-min-max-subarray"
+    },
+    {
+      "n": 33,
+      "slug": "subarray-sum-equals-k",
+      "title": "Subarray Sum Equals K (Count)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "—",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "prefix-sum",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "prefix-sum",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Given an integer array and a target `k`, return the number of contiguous subarrays whose sum equals `k`. The exact interview signature, constraints, and examples remain unspecified.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/subarray-sum-equals-k"
+    },
+    {
+      "n": 34,
+      "slug": "create-binary-tree-from-descriptions",
+      "title": "Create Binary Tree from Descriptions (LeetCode 2196)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "—",
+      "stage": "—",
+      "access": "Members",
+      "roles": [],
+      "tags": [
+        "tree",
+        "hashmap"
+      ],
+      "roles_slug": [],
+      "tags_slug": [
+        "tree",
+        "hashmap"
+      ],
+      "overview": "Construct a binary tree from descriptions.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/create-binary-tree-from-descriptions"
+    },
+    {
+      "n": 35,
+      "slug": "longest-substring-without-repeating-characters",
+      "title": "Longest Substring Without Repeating Characters",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "—",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "sliding-window",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "sliding-window",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Given a string, return the length of its longest substring containing no repeated characters. The exact interview signature, character set, constraints, and examples remain unspecified.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/longest-substring-without-repeating-characters"
+    },
+    {
+      "n": 36,
+      "slug": "intersection-of-two-interval-lists",
+      "title": "Intersection of Two Interval Lists",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "—",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "interval",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "interval",
+        "medium"
+      ],
+      "overview": "Given two interval lists, return their intersections. The prompt aligns with LC 986, while the interview report leaves sorting guarantees, endpoint semantics, and the exact output contract unspecified.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/intersection-of-two-interval-lists"
+    },
+    {
+      "n": 37,
+      "slug": "reconstruct-binary-tree-from-preorder-and-postorder",
+      "title": "Reconstruct Binary Tree from Preorder and Postorder",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "—",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "dfs",
+        "divide-and-conquer",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "dfs",
+        "divide-and-conquer",
+        "medium"
+      ],
+      "overview": "Reconstruct a binary tree from its preorder and postorder traversals. The prompt aligns with LC 889, but the interview report does not specify uniqueness assumptions or the exact return contract.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/reconstruct-binary-tree-from-preorder-and-postorder"
+    },
+    {
+      "n": 38,
+      "slug": "reverse-linked-list-in-place",
+      "title": "Reverse a Linked List In Place",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "—",
+      "stage": "—",
+      "access": "Members",
+      "roles": [],
+      "tags": [
+        "linked-list"
+      ],
+      "roles_slug": [],
+      "tags_slug": [
+        "linked-list"
+      ],
+      "overview": "Reverse a linked list in place.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/reverse-linked-list-in-place"
+    },
+    {
+      "n": 39,
+      "slug": "non-overlapping-intervals",
+      "title": "Non-Overlapping Intervals (LeetCode 435)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "—",
+      "stage": "—",
+      "access": "Members",
+      "roles": [],
+      "tags": [
+        "interval",
+        "array"
+      ],
+      "roles_slug": [],
+      "tags_slug": [
+        "interval",
+        "array"
+      ],
+      "overview": "Find the minimum removals needed to eliminate overlapping intervals.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/non-overlapping-intervals"
+    },
+    {
+      "n": 40,
+      "slug": "time-based-key-value-store",
+      "title": "Time Based Key-Value Store (LeetCode 981)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "—",
+      "stage": "—",
+      "access": "Members",
+      "roles": [],
+      "tags": [
+        "hashmap",
+        "data-structure"
+      ],
+      "roles_slug": [],
+      "tags_slug": [
+        "hashmap",
+        "data-structure"
+      ],
+      "overview": "Implement time-indexed key-value storage.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/time-based-key-value-store"
+    },
+    {
+      "n": 41,
+      "slug": "longest-substring-k-distinct",
+      "title": "Longest Substring with At Most K Distinct Characters",
+      "category": "coding",
+      "duration": "30 min",
+      "frequency": "Low",
+      "last_asked": "2026-09-04",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "sliding-window",
+        "hashmap",
+        "string",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "sliding-window",
+        "hashmap",
+        "string",
+        "easy"
+      ],
+      "overview": "Sliding-window warmup in a TT SDE phone screen, paired with a much harder grid-with-fuel BFS problem.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/longest-substring-k-distinct"
+    },
+    {
+      "n": 42,
+      "slug": "restore-ip-addresses",
+      "title": "Restore IP Addresses",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low · New",
+      "last_asked": "2026-09-04",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "dfs",
+        "backtracking",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "dfs",
+        "backtracking",
+        "medium"
+      ],
+      "overview": "Partition a digit string into every valid IPv4 address: exactly four numeric segments, each valid and with no leading zero unless the segment itself is zero. The follow-up generalizes the partition to an arbitrary `k` supplied as another argument.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/restore-ip-addresses"
+    },
+    {
+      "n": 43,
+      "slug": "alien-dictionary",
+      "title": "Alien Dictionary",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low · New",
+      "last_asked": "2026-09-02",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "graph",
+        "topological-sort",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "graph",
+        "topological-sort",
+        "hard"
+      ],
+      "overview": "The standard Alien Dictionary problem: infer a valid character order from words already sorted under an unknown alphabet. The implementation must include every character, avoid duplicate indegree increments, detect impossible ordering constraints, and explain each graph update.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/alien-dictionary"
+    },
+    {
+      "n": 44,
+      "slug": "search-in-rotated-sorted-array",
+      "title": "Search in Rotated Sorted Array",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Low · New",
+      "last_asked": "2026-08-21",
+      "stage": "phone-screen · final-round",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "binary-search",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "binary-search",
+        "medium"
+      ],
+      "overview": "LeetCode 33: search for a target in an ascending array rotated at an unknown pivot and return its index or `-1`. A current intern-screen follow-up removes the distinct-values guarantee, requiring explicit handling of duplicate boundary values.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/search-in-rotated-sorted-array"
+    },
+    {
+      "n": 45,
+      "slug": "streaming-median-min-max-stack",
+      "title": "MinStack, MaxStack and Streaming Median",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-08-17",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "SWE"
+      ],
+      "tags": [
+        "stack",
+        "heap",
+        "data-structure",
+        "streaming",
+        "hard"
+      ],
+      "roles_slug": [
+        "mle",
+        "swe"
+      ],
+      "tags_slug": [
+        "stack",
+        "heap",
+        "data-structure",
+        "streaming",
+        "hard"
+      ],
+      "overview": "Three linked structures in a single MLE round: `MinStack` with O(1) min, `MaxStack`, and a streaming-median follow-up that pushes you to two heaps — then asks how to retrofit `MaxStack` to maintain the running median.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/streaming-median-min-max-stack"
+    },
+    {
+      "n": 46,
+      "slug": "remove-duplicate-letters-lexicographically-smallest",
+      "title": "Remove Duplicate Letters for Lexicographically Smallest Result",
+      "category": "coding",
+      "duration": "30 min",
+      "frequency": "Low",
+      "last_asked": "2026-07-13",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "stack",
+        "monotonic-stack",
+        "greedy",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "stack",
+        "monotonic-stack",
+        "greedy",
+        "medium"
+      ],
+      "overview": "Given a string, remove duplicate letters so each character appears exactly once and the final string is lexicographically smallest among all valid results. The round explicitly included the two standard examples `bcabc -> abc` and `cbacdcbc -> acdb`, with a monotonic-stack solution expected.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/remove-duplicate-letters-lexicographically-smallest"
+    },
+    {
+      "n": 47,
+      "slug": "self-attention-cross-entropy-pseudocode",
+      "title": "Hand-Code Self-Attention and Cross-Entropy",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-05-01",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RS"
+      ],
+      "tags": [
+        "transformer",
+        "attention",
+        "numpy",
+        "pytorch",
+        "ml-knowledge",
+        "hard"
+      ],
+      "roles_slug": [
+        "mle",
+        "rs"
+      ],
+      "tags_slug": [
+        "transformer",
+        "attention",
+        "numpy",
+        "pytorch",
+        "ml-knowledge",
+        "hard"
+      ],
+      "overview": "Write self-attention pseudocode and the cross-entropy loss derivation on the spot, interleaved with attention-mechanism oral questions (FFN role, attention scaling).",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/self-attention-cross-entropy-pseudocode"
+    },
+    {
+      "n": 48,
+      "slug": "codesignal-swe-oa-spring-2026",
+      "title": "CodeSignal SWE OA (Spring 2026 Bank)",
+      "category": "coding",
+      "duration": "70 min",
+      "frequency": "Low",
+      "last_asked": "2026-03-17",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "simulation",
+        "sliding-window",
+        "greedy",
+        "string-processing",
+        "codesignal",
+        "oa",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "simulation",
+        "sliding-window",
+        "greedy",
+        "string-processing",
+        "codesignal",
+        "oa",
+        "hard"
+      ],
+      "overview": "TikTok's Spring 2026 SWE intern OA on CodeSignal: 4 problems covering memory allocator simulation, alternating-parity zigzag counting, charging-station relay, and constrained text justification.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/codesignal-swe-oa-spring-2026"
+    },
+    {
+      "n": 49,
+      "slug": "longest-palindromic-substring",
+      "title": "Longest Palindromic Substring (LeetCode 5)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "—",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "palindromes",
+        "dp",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "palindromes",
+        "dp",
+        "medium"
+      ],
+      "overview": "Return the longest contiguous palindromic substring. A follow-up requires Manacher's algorithm rather than the classic expand-around-center baseline.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/longest-palindromic-substring"
+    },
+    {
+      "n": 50,
+      "slug": "valid-parentheses",
+      "title": "LeetCode 20 Valid Parentheses in SRE Loop",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "—",
+      "stage": "—",
+      "access": "Members",
+      "roles": [],
+      "tags": [
+        "stack",
+        "string"
+      ],
+      "roles_slug": [],
+      "tags_slug": [
+        "stack",
+        "string"
+      ],
+      "overview": "Validate parentheses in a short SRE coding exercise and run the test cases.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/valid-parentheses"
+    },
+    {
+      "n": 51,
+      "slug": "content-moderation-system-design",
+      "title": "Content Moderation System Design",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-08-12",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "moderation",
+        "ml-infra",
+        "messaging",
+        "scaling",
+        "evaluation",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "moderation",
+        "ml-infra",
+        "messaging",
+        "scaling",
+        "evaluation",
+        "hard"
+      ],
+      "overview": "End-to-end design of a content-moderation pipeline for short-video / e-commerce content. Variants include ML inference layer, feature pipeline, job scheduler follow-up, and review-queue prioritization.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/content-moderation-system-design"
+    },
+    {
+      "n": 52,
+      "slug": "top-songs-by-country-leaderboard",
+      "title": "Top Songs by Country Leaderboard",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-30",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "leaderboard",
+        "streaming",
+        "top-k",
+        "caching",
+        "scaling",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "leaderboard",
+        "streaming",
+        "top-k",
+        "caching",
+        "scaling",
+        "hard"
+      ],
+      "overview": "Design a near-real-time service that ingests song listen/click events and serves each country's top ten songs, refreshing about every ten minutes. The stated scale is roughly 500 million users and about 50K read QPS plus 50K event writes per second, with availability favored over strong consistency.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/top-songs-by-country-leaderboard"
+    },
+    {
+      "n": 53,
+      "slug": "ai-driven-qa-pipeline-workflow",
+      "title": "AI-Driven QA Pipeline Workflow",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-08-25",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "testing",
+        "agentic-workflow",
+        "llm-agent",
+        "ci-cd",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "testing",
+        "agentic-workflow",
+        "llm-agent",
+        "ci-cd",
+        "hard"
+      ],
+      "overview": "Design an AI-oriented QA workflow that turns a PRD into test cases, test data, automation scripts, execution, and a final report. The interviewer expects collaborating role-specific agents rather than merely inserting model calls into conventional CI stages, and asks how the system operates when CI has no GPU capacity.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/ai-driven-qa-pipeline-workflow"
+    },
+    {
+      "n": 54,
+      "slug": "recent-like-count-and-top-posts",
+      "title": "Recent Like Count and Top Posts in a Sliding Window",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-11",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "feed",
+        "ranking",
+        "streaming",
+        "sliding-window",
+        "redis",
+        "kafka",
+        "top-k",
+        "scaling",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "feed",
+        "ranking",
+        "streaming",
+        "sliding-window",
+        "redis",
+        "kafka",
+        "top-k",
+        "scaling",
+        "medium"
+      ],
+      "overview": "Design the last-minute like-count backend for a social platform: exact count for one post, global top posts over the last minute, and region-based top posts over the same window.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/recent-like-count-and-top-posts"
+    },
+    {
+      "n": 55,
+      "slug": "realtime-auction-bidding-system",
+      "title": "Realtime Auction Bidding System",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-05-20",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "messaging",
+        "kafka",
+        "redis",
+        "websocket",
+        "sse",
+        "state-machine",
+        "scaling",
+        "transactions",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "messaging",
+        "kafka",
+        "redis",
+        "websocket",
+        "sse",
+        "state-machine",
+        "scaling",
+        "transactions",
+        "medium"
+      ],
+      "overview": "Design a high-read, high-write auction service with REST bids, ordered bid processing, durable bid history, current-price state, and realtime client updates through SSE or WebSocket.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/realtime-auction-bidding-system"
+    },
+    {
+      "n": 56,
+      "slug": "agent-tool-use-system-design",
+      "title": "Agent Tool-Use System Design (AML Volcano Engine)",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-03-20",
+      "stage": "onsite-system-design · onsite-research",
+      "access": "Members",
+      "roles": [
+        "RS",
+        "MLE"
+      ],
+      "tags": [
+        "mlsd",
+        "agents",
+        "tool-use",
+        "llm-agent",
+        "evaluation",
+        "open-ended",
+        "hard"
+      ],
+      "roles_slug": [
+        "rs",
+        "mle"
+      ],
+      "tags_slug": [
+        "mlsd",
+        "agents",
+        "tool-use",
+        "llm-agent",
+        "evaluation",
+        "open-ended",
+        "hard"
+      ],
+      "overview": "Senior research-scientist intern round at ByteDance AML (Volcano Engine): open-ended design of an agent tool-use system, drilling on state management, evaluation, and failure modes of multi-step tool-invoking agents.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/agent-tool-use-system-design"
+    },
+    {
+      "n": 57,
+      "slug": "dynamic-k-retrieval-ml-system-design",
+      "title": "ML System Design: Dynamic K in Retrieval Stage",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-28",
+      "stage": "onsite-system-design · onsite-research",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RS"
+      ],
+      "tags": [
+        "mlsd",
+        "retrieval",
+        "ranking",
+        "recommendation",
+        "calibration",
+        "open-ended",
+        "hard"
+      ],
+      "roles_slug": [
+        "mle",
+        "rs"
+      ],
+      "tags_slug": [
+        "mlsd",
+        "retrieval",
+        "ranking",
+        "recommendation",
+        "calibration",
+        "open-ended",
+        "hard"
+      ],
+      "overview": "Open-ended ML system design for a senior / staff MLE round: in a recommendation stack, design a model or system to dynamically determine `K` — the number of candidates passed from retrieval to ranking — per request, rather than using a static cap.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/dynamic-k-retrieval-ml-system-design"
+    },
+    {
+      "n": 58,
+      "slug": "payment-platform-design",
+      "title": "Design a Stripe-like Payment Platform",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-12-10",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "Infra Eng",
+        "SWE"
+      ],
+      "tags": [
+        "payment",
+        "idempotency",
+        "transactions",
+        "scaling",
+        "distributed-systems",
+        "hard"
+      ],
+      "roles_slug": [
+        "infra-eng",
+        "swe"
+      ],
+      "tags_slug": [
+        "payment",
+        "idempotency",
+        "transactions",
+        "scaling",
+        "distributed-systems",
+        "hard"
+      ],
+      "overview": "Open-ended payment-platform system design for an SRE candidate: payment intent lifecycle, idempotency, transactional integrity, retry semantics under partial failure.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/payment-platform-design"
+    },
+    {
+      "n": 59,
+      "slug": "short-video-recommendation-system",
+      "title": "Short-Video Recommendation System",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-08-17",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "recommendation",
+        "ranking",
+        "retrieval",
+        "two-tower",
+        "personalization",
+        "streaming",
+        "ab-testing",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "recommendation",
+        "ranking",
+        "retrieval",
+        "two-tower",
+        "personalization",
+        "streaming",
+        "ab-testing",
+        "hard"
+      ],
+      "overview": "Design a multi-stage short-video recommendation stack: parallel retrieval produces hundreds to thousands of candidates per route, coarse ranking reduces the pool, fine ranking optimizes several engagement objectives, and reranking enforces diversity and exploration. Deep dives cover cold start, event-time feature correctness, real-time behavior updates, and online evaluation.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/short-video-recommendation-system"
+    },
+    {
+      "n": 60,
+      "slug": "video-keyword-association-review-system",
+      "title": "Video-Keyword Association Review System",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-07-07",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "schema-design",
+        "versioning",
+        "ingestion",
+        "video-generation",
+        "retrieval",
+        "job-system",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "schema-design",
+        "versioning",
+        "ingestion",
+        "video-generation",
+        "retrieval",
+        "job-system",
+        "medium"
+      ],
+      "overview": "Design a service where users submit batches of 50+ videos and 1000+ keywords, then the system evaluates association between videos and keywords while supporting updates, versioning, and resumable upload.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/video-keyword-association-review-system"
+    },
+    {
+      "n": 61,
+      "slug": "project-deep-dive-round",
+      "title": "Project Deep Dive (Resume Drill)",
+      "category": "behavioral",
+      "duration": "60 min",
+      "frequency": "Very high",
+      "last_asked": "2026-09-06",
+      "stage": "phone-screen · onsite-coding · onsite-deep-dive · final-round",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE",
+        "RS",
+        "Infra Eng"
+      ],
+      "tags": [
+        "deep-dive",
+        "behavioral",
+        "verbal",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "rs",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "deep-dive",
+        "behavioral",
+        "verbal",
+        "medium"
+      ],
+      "overview": "Most rounds open with 15-30 minutes of resume deep-dive before any coding. Interviewers anchor on one project from your resume, drill into the technical decisions, and probe `why this trade-off, not that one`.",
+      "source_count": 47,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/project-deep-dive-round"
+    },
+    {
+      "n": 62,
+      "slug": "hm-behavioral-final-round",
+      "title": "Hiring Manager / Final Behavioral Round",
+      "category": "behavioral",
+      "duration": "45 min",
+      "frequency": "High",
+      "last_asked": "2026-08-17",
+      "stage": "final-round · onsite-bq",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE",
+        "RS",
+        "Infra Eng"
+      ],
+      "tags": [
+        "behavioral",
+        "bq",
+        "star",
+        "deep-dive",
+        "leadership",
+        "fit",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "rs",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "behavioral",
+        "bq",
+        "star",
+        "deep-dive",
+        "leadership",
+        "fit",
+        "medium"
+      ],
+      "overview": "Final HM round, typically 30-45 min, mixing standard STAR-format behavioral questions with one extra project deep-dive — and on the director / M2 variant, motivation and impact rather than implementation details.",
+      "source_count": 9,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/hm-behavioral-final-round"
+    },
+    {
+      "n": 63,
+      "slug": "data-engineering-experience-screen",
+      "title": "Data Engineering Experience Screen",
+      "category": "behavioral",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-31",
+      "stage": "recruiter-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-engineering",
+        "data-modeling",
+        "database"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-engineering",
+        "data-modeling",
+        "database"
+      ],
+      "overview": "A recruiter screen follows a previously completed experience form, covering data modeling, warehouses, and data services.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/data-engineering-experience-screen"
+    },
+    {
+      "n": 64,
+      "slug": "motivation-ambiguity-collaboration-screen",
+      "title": "Motivation, Ambiguity, and Collaboration Screen",
+      "category": "behavioral",
+      "duration": null,
+      "frequency": "Low · New",
+      "last_asked": "2026-08-25",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "bq",
+        "ambiguity",
+        "fit",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "bq",
+        "ambiguity",
+        "fit",
+        "medium"
+      ],
+      "overview": "Prepare concise answers for why you are changing roles, difficult project communication, handling ambiguity, personal weakness, acceptable work pace, and cross-time-zone constraints. These questions appear inside technical phone screens rather than only in the final HM round.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/motivation-ambiguity-collaboration-screen"
+    },
+    {
+      "n": 65,
+      "slug": "sre-linux-networking-troubleshoot",
+      "title": "SRE Linux / Networking Troubleshooting Round",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-09-03",
+      "stage": "phone-screen · onsite-coding · final-round",
+      "access": "Members",
+      "roles": [
+        "Infra Eng",
+        "SWE"
+      ],
+      "tags": [
+        "sre",
+        "networking",
+        "operating-systems",
+        "troubleshooting",
+        "verbal",
+        "medium"
+      ],
+      "roles_slug": [
+        "infra-eng",
+        "swe"
+      ],
+      "tags_slug": [
+        "sre",
+        "networking",
+        "operating-systems",
+        "troubleshooting",
+        "verbal",
+        "medium"
+      ],
+      "overview": "Verbal round for SRE and network-focused SDE candidates drilling Linux internals, networking, and structured production triage. Recurring topics include disk-full RCA, slow-backend triage, browser-to-backend connectivity, HTTP / DNS / TCP fundamentals, and packet sizing.",
+      "source_count": 10,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/sre-linux-networking-troubleshoot"
+    },
+    {
+      "n": 66,
+      "slug": "ml-knowledge-oral-cluster",
+      "title": "MLE Oral 八股: Dropout, Overfitting, Normalization, Loss Functions",
+      "category": "other",
+      "duration": "30 min",
+      "frequency": "High",
+      "last_asked": "2026-08-06",
+      "stage": "phone-screen · onsite-coding · onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RS"
+      ],
+      "tags": [
+        "ml-knowledge",
+        "transformer",
+        "attention",
+        "verbal",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "rs"
+      ],
+      "tags_slug": [
+        "ml-knowledge",
+        "transformer",
+        "attention",
+        "verbal",
+        "medium"
+      ],
+      "overview": "Oral ML-fundamentals quiz that runs at the front of nearly every MLE / Monetization / Commerce phone screen. Topics rotate but the deep-dive targets are stable: dropout mechanics, overfitting mitigation, normalization choices, and standard loss functions.",
+      "source_count": 8,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/ml-knowledge-oral-cluster"
+    },
+    {
+      "n": 67,
+      "slug": "backend-fundamentals-oral-cluster",
+      "title": "CAP / DB Indexing / Concurrency / Logging Oral 八股",
+      "category": "other",
+      "duration": null,
+      "frequency": "Medium",
+      "last_asked": "2026-09-06",
+      "stage": "phone-screen · onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "database",
+        "distributed-systems",
+        "concurrency",
+        "verbal",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "database",
+        "distributed-systems",
+        "concurrency",
+        "verbal",
+        "medium"
+      ],
+      "overview": "Backend oral cluster covering schema and index choices, CAP trade-offs, cache failure modes, messaging, web transport, SQL-versus-document storage, concurrency, and production logging.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/backend-fundamentals-oral-cluster"
+    },
+    {
+      "n": 68,
+      "slug": "llm-safety-project-deep-dive",
+      "title": "LLM Safety Project Deep Dive",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-09-10",
+      "stage": "onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "llm",
+        "ai-safety",
+        "deep-dive",
+        "ownership"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "llm",
+        "ai-safety",
+        "deep-dive",
+        "ownership"
+      ],
+      "overview": "A senior USDS JV MLE technical discussion probes LLM safety post-training ownership, escalation, design choices, and multimodal safety trade-offs.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/llm-safety-project-deep-dive"
+    },
+    {
+      "n": 69,
+      "slug": "ai-agent-intern-oral-fundamentals",
+      "title": "AI Agent Intern Technical Questions",
+      "category": "other",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-09-09",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "agents",
+        "evaluation",
+        "troubleshooting",
+        "operating-systems",
+        "networking"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "agents",
+        "evaluation",
+        "troubleshooting",
+        "operating-systems",
+        "networking"
+      ],
+      "overview": "A Chinese-language AI Agent internship screen combines virtual-memory and TCP questions with agent-quality evaluation and tool-call debugging.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/ai-agent-intern-oral-fundamentals"
+    },
+    {
+      "n": 70,
+      "slug": "rag-agent-kafka-oral-drill",
+      "title": "RAG / Agent / Kafka Oral Drill",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-03",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "rag",
+        "llm-agent",
+        "tool-use",
+        "kafka",
+        "redis",
+        "concurrency",
+        "networking",
+        "verbal",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "rag",
+        "llm-agent",
+        "tool-use",
+        "kafka",
+        "redis",
+        "concurrency",
+        "networking",
+        "verbal",
+        "medium"
+      ],
+      "overview": "A verbal fundamentals screen covering RAG, LangGraph / LangChain agent design, tool use, MCP, Kafka consumer groups, Redis / MySQL persistence, concurrency, and long-context memory handling.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bytedance/rag-agent-kafka-oral-drill"
+    }
+  ]
+}

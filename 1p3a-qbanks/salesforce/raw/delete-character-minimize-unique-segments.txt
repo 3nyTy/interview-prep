@@ -1,0 +1,64 @@
+===H1===
+Delete One Character Type, Minimize Unique-Character Segments
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/delete-character-minimize-unique-segments
+===BODY===
+Salesforce
+Coding·90 minMembers
+Delete One Character Type, Minimize Unique-Character Segments
+Choose one character value, delete every occurrence of it from the input string, then partition the remaining string into the minimum number of contiguous segments such that no segment contains a repeated character. Return the smallest segment count achievable over all deletion choices.
+SWE
+string
+string-processing
+medium
+Frequency
+Single report
+Last asked
+2026-07-25
+Stage
+oa
+Requirements
+
+Input: a string.
+
+Choose one character value and delete every occurrence of that character from the string.
+
+Partition the remaining string into contiguous segments so that every character within each segment is unique.
+
+Return the minimum possible number of segments over all choices of the deleted character.
+
+Examples
+
+Input: avcccde
+
+Delete: c
+
+Remaining string: avde
+
+Output: 1
+
+Notes
+
+This is the first of two tasks in a 90-minute full-stack OA.
+
+AI assistance is explicitly prohibited for this algorithm task.
+
+Confirm whether the deletion must remove all occurrences of the chosen character before coding; the supplied example uses that interpretation.
+
+For a fixed deleted character, scan the remaining characters left to right while tracking the characters in the current segment. When the next character is already present, close the current segment, clear the set, and start the next segment with that character; taking the longest valid prefix minimizes the segment count for that deletion choice.
+
+Try every distinct character as the deletion choice and keep the smallest count. With d distinct characters and input length n, this direct approach takes O(dn) time and O(d) auxiliary space.
+
+Preparation
+
+Implement the fixed-deletion greedy scan first, then wrap it in the loop over distinct deletion choices; dry-run the supplied avcccde case before testing code.
+
+Test a one-character string, an alternating repeated pattern, a string that becomes empty after deletion, and a case with several equally good deletion choices.
+
+Explain why a repeated character forces a boundary in every valid partition and why extending each segment to its longest valid prefix cannot increase the number of segments.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

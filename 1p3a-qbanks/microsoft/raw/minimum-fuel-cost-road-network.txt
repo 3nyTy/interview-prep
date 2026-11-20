@@ -1,0 +1,83 @@
+===H1===
+Minimum Fuel Cost Across a Road Network
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/minimum-fuel-cost-road-network
+===BODY===
+Microsoft
+Coding·90 minMembers
+Minimum Fuel Cost Across a Road Network
+In a 90-minute Microsoft OA, minimize the cost to travel from A to B in an undirected weighted road network where each city sells fuel at a different price and vehicles have unlimited capacity. Return -1 when B is unreachable; the prompt supplies a complete getMinCost contract and a five-city example.
+SWE
+graph
+shortest-path
+hard
+Frequency
+Low · New
+Last asked
+2026-08-11
+Stage
+oa
+Requirements
+
+Hackerland contains g_nodes cities numbered from 1 to g_nodes and g_edges bidirectional roads. Road i connects g_from[i] to g_to[i] and consumes g_weight[i] units of fuel.
+
+Fuel costs arr[i] per unit in city i.
+
+A vehicle has unlimited fuel capacity and may buy any amount of fuel in any city.
+
+Given start city A and destination city B, return the minimum purchase cost required to reach B.
+
+Return -1 when no route exists.
+
+Complete getMinCost with these parameters:
+
+int g_nodes
+
+int[] g_from
+
+int[] g_to
+
+int[] g_weight
+
+int[] arr
+
+int A
+
+int B
+
+The function returns a long.
+
+Examples
+
+g_nodes = 5
+g_from = [4, 5, 5, 1, 3, 4, 4]
+g_to = [1, 3, 4, 5, 1, 2, 3]
+g_weight = [1, 1, 8, 1, 3, 9, 5]
+arr = [9, 11, 3, 2, 10]
+A = 3
+B = 2
+output = 27
+
+One optimal route is 3 -> 5 -> 1 -> 4 -> 2. Buy 3 units at city 3 for 3 * 3 = 9, then buy 9 units at city 4 for 9 * 2 = 18; total cost is 27.
+
+Notes
+
+This was the harder second task in a 90-minute, two-question OA. The candidate suspected a Dijkstra-style search with extra state, but the submitted implementation timed out; the exact optimal state representation has not surfaced.
+
+A canonical solution uses (city, cheapest_price_seen) as the shortest-path state. Start at (A, arr[A]) with cost 0. From (u, p), traversing a road to v that consumes w units adds w * p to the cost and moves to (v, min(p, arr[v])). Unlimited capacity makes this accounting valid: for any chosen route, the vehicle can pre-buy each future unit at the cheapest city visited so far. Run Dijkstra over these non-negative transitions and take the smallest distance among states whose city is B; return -1 if none is reachable.
+
+If P is the number of distinct fuel prices, there are at most V * P states and E * P transitions. The resulting complexity is O(E * P * log(V * P)) time and O(V * P) space, with P <= V.
+
+Preparation
+
+Implement the expanded-state Dijkstra with compressed fuel-price ranks, then verify that the sample returns 27 and reconstructs 3 -> 5 -> 1 -> 4 -> 2.
+
+Add four focused tests: A == B, an unreachable destination, a single-road graph, and a detour to a cheap city that beats the direct route.
+
+Explain in two minutes why plain Dijkstra on cities loses necessary state, then derive the O(E * P * log(V * P)) bound from the expanded graph.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

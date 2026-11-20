@@ -1,0 +1,57 @@
+===H1===
+Stratified Sampling from Class-Bucketed JSON
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-stratified-sample
+===BODY===
+LinkedIn
+Coding·20 minMembers
+Stratified Sampling from Class-Bucketed JSON
+ML-coding sub-round (~20 min slot inside a triple-task phone screen). Input is a JSON object keyed by class label; the values are example arrays. Implement a uniform-over-classes sampler — pick a class uniformly at random first, then sample one example from that class.
+MLE
+sampling
+probability
+hashmap
+data-engineering
+easy
+Frequency
+Single report
+Last asked
+2026-03-18
+Stage
+phone-screen
+Requirements
+
+def stratified_sample(training: dict[str, list]) -> tuple[str, object]:
+    # training = {"cat": [...], "dog": [...], "fox": [...]}
+    # Return (class_label, sampled_example) such that the marginal distribution
+    # over class_label is uniform across keys (regardless of bucket sizes).
+
+The expected implementation:
+
+Sample a class label uniformly from the keys.
+
+Sample an example uniformly from that class's list.
+
+The trap is using random.choice over the flattened training set, which biases toward majority classes — that's random sampling, not stratified. The round tests whether the candidate articulates why uniform-over-classes ≠ uniform-over-examples.
+
+Notes
+
+Stratification semantics differ across teams. Asking "uniform over classes or proportional to class frequency?" is the high-signal opening.
+
+Reported as part of a tightly packed 60-minute phone screen (BQ + ML coding + system design); manage time aggressively and avoid optimizing for sub-millisecond performance.
+
+The MLE / data-engineering follow-up sometimes asks how to do this efficiently when classes live in shards / on disk — reservoir sampling per shard then a final uniform draw across shards.
+
+Preparation
+
+Verbalize the difference between stratified and proportional sampling in < 30 seconds.
+
+Implement both variants — uniform-over-classes and uniform-over-examples — so you can switch if the spec changes mid-round.
+
+Brush up on reservoir sampling for the streaming follow-up.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

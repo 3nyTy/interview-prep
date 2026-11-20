@@ -1,0 +1,51 @@
+===H1===
+Stack Items into the Shortest Column (Min-Heap Load Balancing)
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/shortest-column-stacking-heap
+===BODY===
+Pinterest
+Coding·60 minMembers
+Stack Items into the Shortest Column (Min-Heap Load Balancing)
+A stream of items (pins / ads), each with a height, is appended one by one onto a fixed number of columns. Each item always goes onto the column that is currently shortest; ties break to the leftmost such column. Maintain the running column heights and analyze time / space complexity. The base case uses two columns; the follow-up generalizes to k columns.
+SWE
+MLE
+heap
+greedy
+medium
+Frequency
+Low
+Last asked
+2026-06-16
+Stage
+phone-screen
+Requirements
+
+Items arrive in order, each carrying a positive integer height.
+
+Place each item onto the column whose current total height is smallest. On a tie, choose the leftmost qualifying column.
+
+Base version: two columns. Follow-up: generalize to k columns.
+
+Report the time and space complexity of your approach.
+
+Notes
+
+The intended structure is a min-heap keyed by (current_height, column_index): pop the shortest column, add the item's height, push it back. Putting column_index second in the heap key gives the leftmost-on-tie behavior for free.
+
+For exactly two columns a heap is overkill — a pair of running totals with an explicit "lower, else left" comparison reads cleaner and interviewers accept it — but switching to the heap is the expected move the moment the k-column follow-up lands, so structure the base solution to generalize.
+
+Complexity: O(n log k) time for n items over k columns, O(k) extra space. State this explicitly — the round grades the complexity discussion, not just a working placement loop.
+
+Preparation
+
+Implement the heap version once with (height, index) tuples so the index breaks ties without extra branching.
+
+Write the two-column running-total version too, and be ready to articulate when each is preferable.
+
+Rehearse stating the O(n log k) / O(k) bound out loud.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,74 @@
+===H1===
+Warehouse Round-Robin Allocation with Closures
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/warehouse-round-robin-allocation
+===BODY===
+Capital One
+Coding·70 minMembers
+Warehouse Round-Robin Allocation with Closures
+Simulate a round-robin package router: dispatch incoming packages to the next available warehouse starting from index 0, skip closed or full warehouses, and reset all capacities (keeping closures) when no warehouse can take the next package. Return the index of the warehouse that handled the most packages (largest index on ties).
+SWE
+MLE
+array
+simulation
+scheduling
+medium
+oa
+codesignal
+Frequency
+Low
+Last asked
+2026-04-08
+Stage
+oa
+Requirements
+
+Input: capacity[] (initial integer capacity per warehouse) and dailyLogs[] (ordered log entries).
+
+Log types:
+
+"PACKAGE" — dispatch one package to the next available warehouse, starting the search from index 0.
+
+"CLOSURE idx" — permanently disable warehouse idx; it can never receive packages again.
+
+Allocation rule: scan warehouses from index 0; the package goes to the first warehouse that is not closed and has remaining capacity > 0. If a full pass through all warehouses finds none, reset every non-closed warehouse to its initial capacity and re-attempt the allocation. The package is never dropped.
+
+Track packages handled per warehouse. After processing all logs, return the index of the warehouse with the highest count; on ties, return the largest index.
+
+Examples
+
+capacity   = [2, 1, 3]
+dailyLogs  = ["PACKAGE", "PACKAGE", "PACKAGE", "CLOSURE 0", "PACKAGE", "PACKAGE"]
+
+Step 1: warehouse 0 takes package (remaining 1).
+Step 2: warehouse 0 takes package (remaining 0).
+Step 3: warehouse 1 takes package (remaining 0).
+Step 4: close warehouse 0.
+Step 5: warehouse 2 takes package (remaining 2).
+Step 6: warehouse 2 takes package (remaining 1).
+
+Counts: [2, 1, 2]. Tie between 0 and 2 -> return 2.
+
+Notes
+
+Two state arrays: remaining[i] (current capacity) and closed[i] (boolean). A counter array handled[i] aggregates the answer.
+
+The reset is the bug magnet: the spec resets every non-closed warehouse back to its initial capacity. Resetting closed ones, or skipping the reset for warehouses that still have capacity, both produce subtle mid-run divergence that only shows up on hidden tests.
+
+An inner-loop optimisation (skip to next non-closed warehouse via a precomputed alive list) is not required for the given limits but is the standard follow-up if the interviewer extends the round.
+
+Watch for infinite loops: if every warehouse is closed and a PACKAGE log arrives, the spec is silent; the safe assumption is to ignore the package and continue.
+
+Preparation
+
+Implement and dry-run on a 3-warehouse case with a closure mid-stream, then with all warehouses closed at the end — both branches need explicit handling.
+
+Time-budget: 25 minutes is realistic for this problem; it has the highest code volume of any recurring C1 OA problem. If it appears as Q3 (typical slot), skip it temporarily if you have not started the implementation by minute 30 of the OA — Q4 may be a faster win.
+
+Practise the tie-break case explicitly. return max(indices_with_max_count) is more reliable than tracking max as you go.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

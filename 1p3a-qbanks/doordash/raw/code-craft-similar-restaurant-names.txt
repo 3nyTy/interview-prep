@@ -1,0 +1,52 @@
+===H1===
+Code Craft: Similar Restaurant Names (K-Swap Anagram)
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/code-craft-similar-restaurant-names
+===BODY===
+DoorDash
+Coding·60 minMembers
+Code Craft: Similar Restaurant Names (K-Swap Anagram)
+K-anagram-family Code Craft variant. Determine if two restaurant names are "similar" — equivalent up to at most `k` character swaps. Several recent loops use `k = 2` (one swap of two character positions allowed); some older loops use the general K-anagram form.
+SWE
+string
+hashmap
+easy
+Frequency
+Low
+Last asked
+2026-03-13
+Stage
+phone-screen
+Requirements
+
+Input: two strings s1, s2 and an integer k.
+
+Output: boolean — true if you can transform s1 into s2 by swapping at most k positions in s1 (each swap exchanges any two characters in the string).
+
+Strings have the same length (clarify; if not, return false immediately).
+
+Notes
+
+First check: both strings must be anagrams (same character multiset). If not, return false.
+
+Mismatch counting: walk the strings in parallel, count positions where s1[i] != s2[i]. Each swap can fix at most 2 mismatched positions. So the minimum number of swaps required is ceil(mismatches / 2) when characters can be paired arbitrarily — but only if the mismatches form pairs that resolve in one swap each. For arbitrary letters this is mismatches / 2 since the anagram check guarantees a pairing exists.
+
+Special k=2 case: just check that the strings differ in at most 2 positions and are anagrams. Equivalent to LC 859 "Buddy Strings" when k=1 (one swap).
+
+Common bug: forgetting the anagram check and only counting positional diff; will mark non-anagrams as similar when mismatches ≤ 2k.
+
+The interviewer typically asks for self-authored test cases; cover identical strings, off-by-one mismatch, anagram-but-too-many-swaps.
+
+Preparation
+
+Drill LC 859 (Buddy Strings) for the k=1 case until automatic.
+
+Generalize to arbitrary k by combining the character-multiset check with the mismatches / 2 count.
+
+Write the test harness in under 5 minutes; this round usually has 15–20 minutes of follow-up on edge cases.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

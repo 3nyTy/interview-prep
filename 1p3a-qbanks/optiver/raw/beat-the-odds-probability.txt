@@ -1,0 +1,88 @@
+===H1===
+Beat the Odds — Probability Test
+===URL===
+https://www.1point3acres.com/interview/problems/company/optiver/beat-the-odds-probability
+===BODY===
+Optiver
+Other·45 minFree preview
+Beat the Odds — Probability Test
+The signature Optiver quant assessment: 30 multiple-choice probability questions, ~90 seconds each, no going back. You pick the answer closest to the true value, so speed and estimation matter more than exact computation. Wrong answers are penalized.
+RS
+DS
+probability
+mental-math
+expected-value
+brainteaser
+math-reasoning
+oa
+Frequency
+Very high
+Last asked
+2026-02-16
+Stage
+oa
+Requirements
+
+30 questions (QT/QR rotation; some sittings report 10–20), roughly 90 seconds each. You cannot return to a skipped question, but you may skip.
+
+Each question is multiple choice (usually 5 options) and you select the value closest to the true answer — exact arithmetic is often unnecessary, fast estimation wins.
+
+Wrong answers carry a penalty, so blind guessing is not free.
+
+Topics: dice/coin/card probability, expected value, symmetric random walks on polygons (hitting / return time), gambler's ruin, combinatorics, central-limit-style estimation, and optimal-stopping flavored questions.
+
+The pool is a rotating question bank; identical question types (and sometimes the same question) recur within one sitting and across sittings, so drilling the bank pays off directly. Programming-minded candidates often pre-simulate the recurring families.
+
+Examples
+
+Verbatim questions candidates have reported:
+
+You throw one die twice. What is the probability the 2nd throw has a different face value than the first? (closest to 0.75)
+
+Take a shuffled 52-card deck and throw away the top 10 cards. What is the probability the new top card is red? (0.5)
+
+You throw two dice. Probability they add up to 11 or 12? (~0.1)
+
+Flip a coin 3 times — probability the outcome is the same for all flips? (0.25)
+
+61 coins randomly placed into 15 boxes; you win if any box has more than 4. Probability you win? (1)
+
+A bag has 10 red, 10 yellow, 10 blue balls. Draw until only two colours remain. Expected number of balls remaining?
+
+Roll a die, keeping a running sum, until the sum exceeds 100. Probability the last roll was a 2?
+
+Two particles at opposite vertices of an octagon; each second each flips a coin to move clockwise/anticlockwise one edge. Expected number of coin flips until they meet?
+
+A particle on a vertex of a decagon: each second roll a die — 1/2 move clockwise, 3/4 anticlockwise, 5/6 stay. Expected steps to reach the initially-farthest vertex.
+
+Particle at the centre of a 10×10 grid moving up/right/down/left with probability 1/4 each — expected steps to hit the boundary.
+
+Start with $10, bet $1 per round on a fair (or 60/40) coin, stop at $20 or $0 — probability you reach $20 (gambler's ruin).
+
+Flip 6 coins — probability of at most 3 heads / more heads than tails.
+
+A machine outputs integers uniformly 1–10. You and a friend each take the sum of two draws — probability the sums are equal.
+
+Integer chosen uniformly from 1 to 1,000,000 — probability it contains the digit 7 at least once.
+
+Notes
+
+The recurring structural families are worth memorizing as closed forms: symmetric random walk return time on an n-gon (expected return time = n), polygon hitting times via Markov-chain / first-step analysis, gambler's ruin with biased coins, and "remove matched pairs/sets until one type remains" expectations (symmetry + CLT estimate).
+
+Several candidates note the 2025/26 pool got noticeably harder than earlier years and that there often is not enough time to compute exactly — the closest-answer format is a deliberate test of numerical intuition.
+
+Have a calculator and scratch paper ready; many report typing furiously on a calculator. Some sittings allow pen-and-paper, others are pure on-screen.
+
+Preparation
+
+Drill the standard green-book and tradinginterview.com probability sets until each family is automatic; build a one-page cheat sheet of closed forms (random-walk return/hitting times, gambler's ruin, coupon-collector, linearity-of-expectation tricks).
+
+Write quick simulators for the recurring families (polygon walks, dice running-sum, pair-removal) so you can pre-compute answers and recognize the type in seconds.
+
+Practice estimating to the nearest option under a 90-second clock rather than solving exactly — train the "which bucket" reflex.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

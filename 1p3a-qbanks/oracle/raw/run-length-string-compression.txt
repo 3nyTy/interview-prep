@@ -1,0 +1,57 @@
+===H1===
+Run-Length String Compression
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/run-length-string-compression
+===BODY===
+Oracle
+CodingMembers
+Run-Length String Compression
+Compress contiguous runs in a string from left to right: emit a character alone when its run length is one, otherwise emit the character followed by its count.
+SWE
+string
+compression
+string-processing
+easy
+Frequency
+Single report
+Last asked
+2026-08-10
+Stage
+onsite-coding
+Requirements
+
+Scan the input string from left to right and group contiguous identical characters.
+
+If a character appears once in its run, append only that character.
+
+If a character appears more than once consecutively, append the character followed by the run length.
+
+Return the concatenation of all encoded runs.
+
+Examples
+
+The interview input was aaaaabbbccca; produce its compressed form under the rules above.
+
+Notes
+
+Maintain the start of the current run and advance an end pointer until the character changes. Emit the character and append the run length only when it exceeds one.
+
+Flush the final run after the scan; omitting that flush is the most common boundary bug.
+
+Applying the stated rules to the interview input yields a5b3c3a.
+
+Time complexity is O(n); the result uses O(n) space in the worst case.
+
+Preparation
+
+Implement the two-pointer scan once with an explicit final-run flush and once with a sentinel-style loop.
+
+Trace the interview input by hand and verify the four runs and the result a5b3c3a.
+
+Test an empty string, one character, alternating characters, and a run whose count has multiple digits; clarify the empty-input contract if it is not stated.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

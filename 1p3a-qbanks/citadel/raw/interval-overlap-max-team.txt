@@ -1,0 +1,61 @@
+===H1===
+Largest Team Whose Members Share a Common Office Window
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/interval-overlap-max-team
+===BODY===
+Citadel / Citadel Securities
+Coding·75 minMembers
+Largest Team Whose Members Share a Common Office Window
+Citadel SWE Campus Assessment (HackerRank, 75 minutes total). Given `n` employees with `[startTime[i], endTime[i]]` office windows, return the largest team that contains at least one "core employee" whose window overlaps with every other member's window. Reduces to the maximum number of intervals covering a single point.
+SWE
+oa
+interval-aggregation
+sorting
+greedy
+medium
+Frequency
+Single report
+Last asked
+2025-12-22
+Stage
+oa
+Requirements
+
+Given two integer arrays startTime and endTime of length n representing each employee's office hours [startTime[i], endTime[i]], return the maximum size of a team subject to:
+
+The team contains at least one "core" employee whose office window overlaps with the window of every other team member.
+
+A tight time budget is enforced — O(n^2) brute force times out on the hidden tests.
+
+Examples
+
+Input:  startTime = [2, 5, 6, 8], endTime = [5, 6, 10, 9]
+Output: 3
+
+Notes
+
+Reframing: a core employee whose window overlaps every other team member's window means every team member's window contains at least one common point. Since the intersection of a set of intervals is non-empty if and only if there exists a point inside all of them, the problem reduces to: find the maximum number of input intervals that simultaneously cover some single point.
+
+Sweep-line solution: build an event array of (start, +1) and (end + 1, -1) events (using end + 1 if the windows are closed on the right). Sort events; sweep maintaining a running active count; the maximum is the answer. Time O(n log n).
+
+The candidate point only needs to be tested at the input endpoints — the active-interval count only changes at events.
+
+For inclusive / exclusive endpoint conventions, clarify with the problem statement; if the windows are half-open [start, end), use (start, +1) and (end, -1) directly.
+
+Common slip: counting pairwise overlaps. Pairwise overlap does not imply the existence of a common point — three intervals that pairwise overlap may still have empty mutual intersection (Helly's theorem fails in 1D only if they don't share a point).
+
+Preparation
+
+Drill the sweep-line idiom: convert intervals to signed events, sort, scan. Use it for "max concurrent meetings", "max overlapping intervals", and "min number of conference rooms" — they are the same algorithm.
+
+Practice the reframing argument out loud: "the core employee requirement means all members share at least one point in common." If you cannot state the reduction in one sentence, you will reach for the wrong algorithm.
+
+Be ready to defend the O(n log n) complexity against the n^2 brute force; in this OA the brute force was the trap.
+
+Refresh how to handle inclusive endpoints in sweep line: the canonical fix is using end + 1 as the off event so the active count at end still includes that interval.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

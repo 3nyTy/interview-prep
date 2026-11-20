@@ -1,0 +1,55 @@
+===H1===
+Number of Islands
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/number-of-islands
+===BODY===
+Apple
+CodingMembers
+Number of Islands
+Given a 2D grid grid where '1' represents land and '0' represents water, count and return the number of islands.
+SWE
+medium
+grid
+dfs
+bfs
+Frequency
+Single report
+Last asked
+2026-08-22
+Stage
+phone-screen
+Given a 2D grid grid where '1' represents land and '0' represents water, count and return the number of islands.
+
+An island is formed by connecting adjacent lands horizontally or vertically and is surrounded by water. You may assume water is surrounding the grid (i.e., all the edges are water).
+
+Examples
+
+Example 1:
+
+Input: grid = [ ["0","1","1","1","0"], ["0","1","0","1","0"], ["1","1","0","0","0"], ["0","0","0","0","0"] ]
+
+Output: 1
+
+Example 2:
+
+Input: grid = [ ["1","1","0","0","1"], ["1","1","0","0","1"], ["0","0","1","0","0"], ["0","0","0","1","1"] ]
+
+Output: 3
+
+Constraints
+
+1 <= grid.length, grid[i].length <= 100
+
+grid[i][j] is '0' or '1'.
+
+Notes
+
+Be ready to compare DFS, BFS, and union-find before coding instead of treating them as interchangeable. DFS can exhaust the call stack on large connected regions; BFS makes the traversal frontier explicit; union-find is most relevant when land is added dynamically.
+
+State the expected follow-up and chosen approach before implementation, then manually trace several test cases.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

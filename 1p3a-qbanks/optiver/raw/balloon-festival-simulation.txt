@@ -1,0 +1,64 @@
+===H1===
+Hot Air Balloon Festival Simulation
+===URL===
+https://www.1point3acres.com/interview/problems/company/optiver/balloon-festival-simulation
+===BODY===
+Optiver
+Coding·90 minMembers
+Hot Air Balloon Festival Simulation
+An OOP simulation OA: track balloons ascending/descending, compute additive wind speed at each balloon's altitude via a given formula, manage a stability rule (unstable above 15 m/s, regains stability after 300 s of calm), and report the stable balloons at/above the highest stable altitude. Timestamps are strictly increasing.
+SWE
+oop-design
+simulation
+oa
+medium
+Frequency
+Medium
+Last asked
+2025-09-09
+Stage
+oa
+Requirements
+
+Implement a BalloonFestival class.
+
+init(balloonNames: list[str]) — register your team's balloon names (unique). Actions on unknown names fail.
+
+balloon_ascended(timestamp, name, altitude) -> bool — balloon ascends to an altitude; stable by default, then immediately checked for wind instability. Returns False on invalid (non-increasing) timestamp or unknown balloon.
+
+balloon_descended(timestamp, name) -> bool — balloon descends to the ground; stability resets to default. False if it wasn't flying or timestamp invalid.
+
+set_wind_speed(timestamp, centerAltitude, windSpeed) -> bool — set/overwrite a wind center at an altitude; afterward all balloons are re-evaluated for stability.
+
+inspect_balloons(timestamp) -> list[str] — return the names of all stable balloons at the highest stable altitude (ties allowed), in the order names were given at init. Empty list if none.
+
+Rules:
+
+A balloon becomes unstable when total wind speed at its altitude exceeds 15 m/s.
+
+An unstable balloon regains stability only if it stays at the same altitude with total wind ≤ 15 m/s for 300 continuous seconds.
+
+Wind at altitude h from a center at centerAltitude with speed W_center:
+W(h) = W_center / (1 + ((h − centerAltitude) / 100)^2). Contributions from all active wind centers add.
+
+All operations have strictly increasing timestamps; a non-increasing timestamp returns False (or empty for inspect).
+
+Notes
+
+The 300-second recovery clock must reset whenever wind rises back above 15 m/s or the balloon changes altitude — track the timestamp since which conditions have been continuously safe.
+
+set_wind_speed overwrites the value at that exact center and triggers a full re-evaluation; recompute total wind per balloon from all centers.
+
+Some sittings phrase the output as "stable balloons at or above the highest stable competitor" — same mechanic, with competitor balloons included in the altitude comparison.
+
+Preparation
+
+Implement the additive wind model and the per-balloon stability state machine (stable / unstable + recovery start time) driven by the monotonic timestamps.
+
+Test the recovery-reset paths: wind dipping then re-exceeding 15, and an altitude change mid-recovery.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

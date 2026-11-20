@@ -1,0 +1,63 @@
+===H1===
+Phone Screen: Bus Routes (LC 815)
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/phone-screen-bus-routes
+===BODY===
+Uber
+Coding·60 minMembers
+Phone Screen: Bus Routes (LC 815)
+Onsite coding prompt, verbatim LeetCode 815 (Bus Routes). Given bus routes, find the minimum number of buses to travel between two stops. BFS on a stop-to-routes adjacency.
+SWE
+graph
+bfs
+hashmap
+hard
+Frequency
+Low
+Last asked
+2026-06-08
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input: routes[i] is the list of stops bus i visits, repeating its loop forever (e.g. routes[0] = [1,5,7] means 1 -> 5 -> 7 -> 1 -> 5 -> 7 -> ...); integers source and target stops.
+
+Output: minimum number of buses to take from source to target, or -1 if unreachable.
+
+Corner case: if source == target, return 0 (already at the destination, no bus needed) — check this before building anything.
+
+def numBusesToDestination(routes: list[list[int]], source: int, target: int) -> int: ...
+    # Returns the least number of buses to ride from source to target, or -1 if unreachable.
+    # Returns 0 immediately when source == target.
+
+Scale: up to 500 routes; a single route can list up to 1e5 stops with total stops across all routes also bounded by 1e5; stop ids range 0 <= stop < 10^6. Index stops sparsely (dict/hash), not a 10^6-sized array.
+
+Notes
+
+Build a stop_to_routes index: for each stop, which routes pass through it.
+
+BFS over routes (not stops). Start: routes containing source. Expand: any route that shares a stop with a current route. Visit each route at most once.
+
+Time O(N + S) where N is total stops across all routes, S is total stop-route entries.
+
+Common pitfall: BFS over stops instead of routes, which inflates the search by a factor equal to route length.
+
+Examples
+
+routes = [[1,2,7],[3,6,7]], source = 1, target = 6 -> 2 (ride bus 0 to stop 7, transfer to bus 1 to reach stop 6).
+
+routes = [[7,12],[4,5,15],[6],[15,19],[9,12,13]], source = 15, target = 12 -> -1 (no chain of shared stops connects 15 to 12).
+
+routes = [[1,5,7],[3,5,6],[6,8]], source = 5, target = 5 -> 0 (already at the destination).
+
+Preparation
+
+Drill LC 815 once; the route-as-node trick is the key insight and transfers to similar transit / multi-hop problems.
+
+Have BFS with a visited-set written cleanly; the round usually leaves ~15 minutes for follow-ups so don't burn time on boilerplate.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

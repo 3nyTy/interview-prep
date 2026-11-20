@@ -1,0 +1,57 @@
+===H1===
+QR OA — Linear Interpolator
+===URL===
+https://www.1point3acres.com/interview/problems/company/twosigma/qr-oa-linear-interpolator
+===BODY===
+Two Sigma
+Coding·105 minFree preview
+QR OA — Linear Interpolator
+Implement a piecewise linear interpolator from sorted knot points. The function must support interpolation inside the knot range, extrapolation outside the range, efficient lookup, and duplicate x-coordinate edge cases.
+RS
+DS
+binary-search
+math
+linear-regression
+medium
+Frequency
+High
+Last asked
+2026-09-09
+Stage
+oa
+Requirements
+
+Given n points in a two-dimensional coordinate system, sorted or sortable by x-coordinate, connect adjacent knot points with straight line segments to define a piecewise linear function L(x).
+
+Implement an evaluator for query x-values:
+
+If the query lies between two neighboring knot points, return the linearly interpolated y-value.
+
+If the query lies outside the smallest or largest knot point, extrapolate by extending the nearest segment.
+
+Sort and pack the points as needed before lookup.
+
+Use binary search or an equivalent indexed lookup so repeated queries do not scan all points.
+
+Handle duplicate x-coordinates explicitly; the prompt calls this out as an edge case.
+
+Notes
+
+Multiple candidates describe this as the first QR OA task and as one of the stable rotations.
+
+The usual implementation path is: normalize points, sort by x, resolve or define duplicate-x behavior, find the bracketing pair with binary search, then apply the two-point line formula.
+
+The most common failure mode is spending too long on later regression tasks and leaving edge-case cleanup here incomplete.
+
+Preparation
+
+Write the interpolation / extrapolation helper once using only the two-point slope formula.
+
+Practice duplicate-x handling as a clarifying question: identical x with identical y is harmless; identical x with conflicting y needs a stated policy.
+
+Drill a binary-search bracketing helper that returns the segment index for both in-range and out-of-range queries.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

@@ -1,0 +1,271 @@
+===H1===
+Multi-Tenant CI/CD Workflow System
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/multi-tenant-ci-cd-workflow
+===BODY===
+OpenAI
+System DesignMembers
+Multi-Tenant CI/CD Workflow System
+Design a scalable, fault-tolerant CI/CD system for a multi-tenant environment that schedules and executes user-defined workflows in response to git pushes. The system must run each job exactly once (even across crashes), display real-time status to users, and keep tenants isolated from one another.
+SWE
+Infra Eng
+ci-cd
+distributed-systems
+idempotency
+scheduling
+docker
+websocket
+scaling
+concurrency
+Frequency
+Low
+Last asked
+2026-06-11
+Stage
+phone-screen · onsite-system-design
+The Challenge
+
+Design a CI/CD system that is scalable and can handle crashes. This system serves many different customers (multi-tenant). It must run workflows defined by users whenever they push code to Git.
+
+The system needs to:
+
+Run the workflows.
+
+Schedule jobs.
+
+Show status updates in real-time.
+
+Ensure every job runs exactly once.
+
+Requirements
+
+Functional Requirements (What it does)
+
+Triggering
+
+System gets an API call on a Git push.
+
+API sends Repository ID and Commit Hash.
+
+System reads a YAML file from the repo to know what to do.
+
+Workflow Shape
+
+Workflows are a straight line of jobs (Linear).
+
+Job 2 cannot start until Job 1 finishes.
+
+Jobs run inside Docker containers on Kubernetes.
+
+Running Jobs
+
+Use Docker containers for isolation.
+
+Run many workflows at the same time (parallel).
+
+Save (cache) Docker images so they load faster.
+
+Monitoring
+
+Show logs and status to the user immediately.
+
+Show progress on a UI.
+
+Non-Functional Requirements (How it performs)
+
+Exactly-Once Execution: Critical. Jobs must run once. No more, no less.
+
+Fault Tolerance: If a worker crashes, the system must recover.
+
+Scalability: The system should handle more load by adding more servers (Horizontal Scaling).
+
+Multi-Tenancy: Keep data separate for different customers.
+
+Key Topics to Study
+
+Note: If the interviewer says "keep workflows simple," listen to them. Do not build a complex graph (DAG) if they ask for a line.
+
+1. Exactly-Once Execution
+
+This is the most important topic. Be ready to answer:
+
+How do you stop a job from running twice if a worker crashes?
+
+How do you make sure a job isn't lost if a worker dies?
+
+What if two workers grab the same task from the queue?
+
+Key ideas:
+
+Atomic DB updates: UPDATE jobs SET status='IN_PROGRESS' WHERE status='PENDING'
+
+Idempotency: Making sure repeating an action doesn't change the result.
+
+Queue visibility: Hiding a message while a worker is busy.
+
+2. Starting the Next Job
+
+How do you trigger Job 2 after Job 1?
+
+Option A: Change Data Capture (CDC)
+
+The DB sends a signal when a job status changes.
+
+The scheduler hears this signal and queues the next job.
+
+Tools: PostgreSQL NOTIFY, DynamoDB Streams.
+
+Option B: Polling
+
+The scheduler keeps asking the DB, "Is Job 1 done?"
+
+This is simpler but slower.
+
+Best approach: Create all job rows as PENDING immediately. Only queue the first one. When it finishes, use the step_index to find the next one and queue it. This approach:
+
+Creates a database entry for every step at the start, marking them all 'PENDING'.
+
+Puts only the first step into the worker queue.
+
+Workers run the step and update the database status to 'COMPLETED'.
+
+Uses CDC to notify the scheduler that the database changed.
+
+The scheduler sees the change, finds the next step, and puts it in the queue.
+
+This keeps the scheduler stateless — additional schedulers can be added easily.
+
+3. Stateless Architecture
+
+How do you keep servers "stateless"?
+
+Do not store job info in the server's memory (RAM).
+
+Store everything in the Database.
+
+If a scheduler crashes, a new one can take over immediately because the data is in the DB.
+
+Workers just pull jobs, do the work, update the DB, and leave.
+
+Why? It makes scaling easy. Just add more servers.
+
+4. Handling Failures
+
+What if things break?
+
+Worker crashes: The queue "visibility timeout" expires. The message reappears. Another worker picks it up.
+
+Database down: Wait and try again (Exponential Backoff).
+
+Job takes too long: Set a strict time limit (Timeout).
+
+Docker fails: Check the exit code. Decide if you should retry.
+
+Retries:
+
+Try 3 times.
+
+Wait longer between each try.
+
+If it fails 3 times, move it to a "Dead Letter Queue" for inspection.
+
+5. Multi-Tenancy (Many Users)
+
+How do you keep users separate?
+
+Quotas: Limit how much CPU/RAM one user can use (Kubernetes Namespaces).
+
+Security: Don't let User A access User B's secrets.
+
+Fairness: Don't let one big user hog all the workers.
+
+6. Docker Performance
+
+How do you make Docker start faster?
+
+Caching: Kubernetes nodes keep images they have already downloaded.
+
+Pre-warming: Download common images before you need them.
+
+7. Real-Time UI
+
+How does the user see live logs?
+
+WebSockets: Keeps a connection open to send data back and forth.
+
+Worker logic: Worker writes logs to storage. System pushes these logs to the WebSocket.
+
+Interview Tips
+
+What the Interviewer Wants
+
+Focus on Exactly-Once
+
+They will ask about this a lot.
+
+Explain how you handle crashes without running the job twice.
+
+Know the difference between "at-least-once" and "exactly-once".
+
+Keep it Simple
+
+If they say "linear sequence," do not build a DAG.
+
+Solve the basic problem first.
+
+Be Stateless
+
+State lives in the DB, not in memory.
+
+This is how you scale.
+
+Database Design
+
+Know your tables (Workflows, Jobs).
+
+Know your indexes.
+
+Explain how you lock rows to prevent errors.
+
+Mistakes to Avoid
+
+Using RAM for State: Never say "I'll store the running jobs in a HashMap."
+
+Ignoring Race Conditions: What if two workers try to update the same row? (Use WHERE status='PENDING').
+
+Forgetting Timeouts: If a worker dies silently, the job stays "IN_PROGRESS" forever unless you have a timeout.
+
+Vague Answers: Don't just say "I'll use a transaction." Write the SQL query logic on the board.
+
+Ignoring Multi-Tenancy: Remember you have many customers. You need to isolate them.
+
+Suggested Flow
+
+Start Simple, then Add Detail:
+
+Step 1: Basic flow. Linear jobs. Single user. "Exactly-once" logic.
+
+Step 2: Add Fault Tolerance. What if it crashes? Add retries.
+
+Step 3: Scaling. Multi-tenancy. Docker caching.
+
+Step 4: UI. Live logs via WebSockets.
+
+Notes
+
+"Add build cache / custom image layer" variant
+
+A screening / add-on system-design round starts from an existing naive CI/CD pipeline (workflow definitions in YAML, jobs run in sequence) and asks you to extend it rather than design from scratch:
+
+Add a build cache: candidates report this is deliberately under-specified — the interviewer will not hand you a problem statement, goal, or scale. You are expected to drive: clarify what a build cache is (cache layers / artifacts so unchanged steps are skipped), then reason about where it lives (local-to-node vs a shared remote cache like Redis / object storage) and how cache keys are computed.
+
+Custom image layers: how dependencies differ between jobs (different compilers / dependency sets → different image layers, cached independently and composed).
+
+Artifact passing between jobs: uploading job outputs to object storage (S3-style), handling partial/failed multi-part uploads (resume, lifecycle cleanup of orphaned parts), and how a later job depends on a previous job's artifacts.
+
+This round breaks the standard "requirements → API → data model → failure modes → deep dive" template; the whole exercise is one continuous deep dive. The skill being tested is driving an ambiguous, infra-flavored conversation, not laying out a textbook design.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,89 @@
+===H1===
+Object-Oriented Design Round
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/object-oriented-design-round
+===BODY===
+Microsoft
+Other·45 minMembers
+Object-Oriented Design Round
+Specifically a Microsoft staple. Some Azure loops replace one coding round with an explicit OOD prompt — design class hierarchies, interfaces, and inheritance relationships for a small system in code.
+SWE
+oop-design
+object-design
+ood
+medium
+Frequency
+Medium
+Last asked
+2026-06-30
+Stage
+onsite-coding
+Requirements
+
+Design and (partially) implement the class hierarchy for a small system the interviewer specifies. Prompt families include:
+
+A parking lot system (cars / motorcycles / trucks; spot tiers; pricing).
+
+A library catalog with checkout / hold / overdue behavior.
+
+A vending machine with payment + inventory + state transitions.
+
+An interface for plug-in chess piece behavior (one MAI variant — implement piece movement rules behind a common interface).
+
+The interviewer evaluates:
+
+Class / interface / abstract-class boundaries.
+
+Inheritance vs composition trade-offs.
+
+Solid principles (single responsibility, open-closed, dependency inversion) applied without name-dropping them.
+
+State-machine encoding (where applicable) — explicit state objects vs enum + switch.
+
+How extensible the design is to a follow-up requirement the interviewer drops mid-round.
+
+Code is expected — not just diagrams. Languages with strong interface support (Java, Kotlin, C#, TypeScript) are easier than Python or Go for these rounds. Senior / Principal loops can still include an OOD coding round; do not assume the level removes implementation work.
+
+Notes
+
+A workable framework for any OOD round:
+
+Clarify scope (5 min): what entities exist; what operations are required; what is out of scope.
+
+Identify nouns (5 min): each noun becomes a candidate class. Group related nouns under an abstract type.
+
+Identify verbs (5 min): each verb becomes a method on the candidate class. Verbs that span multiple classes hint at where an interface lives.
+
+Sketch hierarchy (10 min): draw the inheritance + composition diagram. Mark abstract classes vs concrete classes vs interfaces. State which fields are encapsulated.
+
+Implement core flow (15-20 min): code the 1-2 entry-point methods end-to-end. Stub other methods.
+
+Take the extension (5 min): when the interviewer adds a requirement, show how the design absorbs it without rewriting.
+
+Common failure patterns:
+
+Inheritance overuse (deep class trees that mirror reality but obstruct the actual operations).
+
+Mutable shared state without a clear ownership boundary.
+
+Skipping the interface layer entirely and just listing concrete classes.
+
+For the Azure IC4 verbal variant, the interviewer probes CS fundamentals — abstract class vs interface, polymorphism mechanics, memory layout / vtable cost, idempotency guarantees. This is more "OOD orals" than implementation; have crisp two-sentence definitions ready.
+
+At Principal level, interviewer feedback during the round may stay positive even when the implementation has small bugs. Treat the design narration, invariants, and test plan as part of the evaluated artifact rather than waiting for explicit correction.
+
+Preparation
+
+Drill 3-4 canonical OOD problems (parking lot, vending machine, snake game, library) — write the class skeleton in 20 minutes each.
+
+Pre-rehearse the abstract class vs interface distinction in your language of choice.
+
+Practice the 6-step framework above as a verbal ritual.
+
+Have a default state-machine pattern ready (state objects with a transition() method) for any prompt that involves stateful workflow.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

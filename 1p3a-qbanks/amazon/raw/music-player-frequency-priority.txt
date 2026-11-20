@@ -1,0 +1,71 @@
+===H1===
+Music Player with Frequency Priority
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/music-player-frequency-priority
+===BODY===
+Amazon
+Coding·45 minMembers
+Music Player with Frequency Priority
+Design a streaming music player that ingests batches of `{user, songs[]}`, always picks the most-frequent unplayed song next, and resets the played set once every song has been played. A LC 347-flavored variant fused with a play-history dedupe.
+SWE
+hashmap
+heap
+oop-design
+medium
+Frequency
+Single report
+Last asked
+2026-02-22
+Stage
+onsite-coding
+Requirements
+
+Method 1 — ingest(user, songs[]): append a batch of songs (frequencies accumulate across batches).
+
+Method 2 — next(): return the highest-frequency song that has not yet been played in the current cycle.
+
+Once every distinct song has been played, the played set resets and the next call may pick any song again.
+
+Discuss complexity for both methods and any tie-break rule (the interviewer usually defaults to lexicographic / insertion order; confirm).
+
+Examples
+
+ingest("u1", ["a", "b", "a"])
+ingest("u2", ["a", "c"])
+# frequencies: a=3, b=1, c=1
+next()  # "a"
+next()  # "b" (tie a=2 vs b=1 vs c=1, but a is played; pick highest among unplayed)
+next()  # "c"
+# all songs played -> reset; next() returns "a" again
+
+Notes
+
+Two clean structures: a frequency hashmap plus a max-heap keyed by (-freq, song_id), and a played set. On next(), pop until you find an unplayed song; when the played set covers all songs, clear it and rebuild the heap (or keep a secondary heap).
+
+A pure heap can stale — guard with lazy deletion or rebuild after each ingest.
+
+This is the kind of OOD prompt where interviewers cut the description short on purpose; ask about ingest concurrency, mutability of played history, and reset semantics.
+
+Two viable data-structure pairings: (a) frequency hashmap + max-heap keyed by (-freq, song_id) with a played set, lazy-popping stale entries on next(); (b) bucket arrays indexed by frequency (LFU-cache style) with a played flag per song. Option (a) is O(log n) per op and easier to write; option (b) is O(1) per op but the bookkeeping is dense and rarely worth it in 45 minutes.
+
+On ingest, do not re-heapify in place. Push the new (-new_freq, song) entry and rely on lazy deletion when next() pops a stale (-old_freq, song) whose count no longer matches the hashmap.
+
+The reset semantics matter: when played covers every distinct song, clearing the set is O(distinct). If ingest and next() are both hot paths, this amortizes well; if next() is called in a tight loop after many ingests, mention that the reset cost dominates.
+
+Preparation
+
+Solve LC 347 (Top K Frequent Elements) and LC 295 (Find Median from Data Stream) as warmup for hashmap + heap mechanics.
+
+Practice articulating the heap-vs-bucket-sort tradeoff: O(log n) per op vs O(n) per call.
+
+Sketch a class skeleton (ingest, next, internal state) on paper before writing — Amazon scores OOD structure as much as the algorithm.
+
+Layered drill: (1) write the frequency hashmap + lazy max-heap version with explicit played set in 15 minutes; (2) add the reset-and-rebuild path when all songs have been played; (3) discuss the LFU-bucket alternative verbally without coding it.
+
+Sketch the class skeleton on paper first — __init__, ingest, next, internal _freq, _heap, _played. Amazon scores OOD structure as much as algorithmic correctness on this prompt.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

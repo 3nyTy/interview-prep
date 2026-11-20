@@ -1,0 +1,67 @@
+===H1===
+Refactor Obfuscated C++ Code (Hidden Best-Time-To-Buy-Sell)
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/obfuscated-code-refactor
+===BODY===
+Citadel / Citadel Securities
+Coding·60 minMembers
+Refactor Obfuscated C++ Code (Hidden Best-Time-To-Buy-Sell)
+Citadel OA round: a 30+ line C++ function `root_node(std::vector<int> output)` packed with red-herring variables, `std::pow`, `std::distance`, bit-shift tricks, and constexpr noise. The task is to read past the obfuscation, recognize the underlying algorithm (max profit from a buy-low / sell-high pass), and rewrite it cleanly.
+SWE
+oa
+code-reading
+refactoring
+array
+easy
+Frequency
+Single report
+Last asked
+2026-02-06
+Stage
+oa
+Requirements
+
+Given a deliberately confusing implementation of a function with this signature:
+
+int root_node(std::vector<int> output);
+
+the code includes nested loops, std::find_if, std::numeric_limits<int>::digits arithmetic, std::pow calls, and a final for loop looking for ff * ff == leaf. The behavior, once parsed, reduces to: scan the array tracking the running minimum, return the maximum delta of any later element above that minimum.
+
+The expected refactor is essentially:
+
+int root_node(std::vector<int> output) {
+    int best = 0, lo = output.front();
+    for (int x : output) {
+        if (x <= lo) lo = x;
+        else best = std::max(x - lo, best);
+    }
+    return best;
+}
+
+Notes
+
+The function is LC 121 (Best Time to Buy and Sell Stock) wrapped in a deliberately misleading shell — variables named node, edge, leaf, vertex suggest graph processing, but the actual logic is array sweeping.
+
+The Citsec-style misdirection in this OA is a signature pattern: any reference to std::pow, bit-shifts on negative numbers, constexpr constants, or std::numeric_limits<int>::digits should be read as "branchless sign check" or "clamp to non-negative," not as actual numeric computation.
+
+Reported guidance from the original poster: do not jump straight to the one-line refactor. Doing so risks the OA grader flagging it as suspicious / copied. Submit a cleaner intermediate version (rename variables, remove dead branches, then collapse the loops) before reducing to the canonical 6-line form.
+
+The final for (ff * ff == leaf) block in the original is dead code — leaf is set as a max but the loop only returns inside if a perfect-square match happens, which is incidental. Confirm by tracing: if output = [1, 5, 3, 6, 4] the original returns 5, matching the canonical max(profit) answer.
+
+Failure mode: not recognizing the disguise and trying to optimize the existing loop nest in place. The intended path is reverse-engineer the contract, then rewrite from the contract.
+
+Preparation
+
+Cover a half-dozen short, gnarly C++ snippets (10-50 lines) and practice answering "what does this return given input X?" in under 5 minutes. The skill is reading C++ standard-library calls quickly, not deep algorithmics.
+
+Internalize that LC 121 is the most common hidden-target in Citadel-style refactor prompts. Whenever the function takes a vector<int> and returns an int, run a quick mental check on "is this max-profit / max-subarray / max-diff?".
+
+Practice the staged-cleanup approach: pass 1 rename, pass 2 remove dead branches, pass 3 collapse to canonical form. Documenting these stages in comments inside the OA submission deflects "too clean too fast" suspicion.
+
+Refresh std::numeric_limits<int>::digits (the value is 31, used here to right-shift the sign bit of a difference and recover the sign as {0, 1}). The trick ((unsigned)(a - b)) >> 31 returns 1 if a < b, 0 otherwise — a branchless < comparator.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

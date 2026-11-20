@@ -1,0 +1,78 @@
+===H1===
+Log Parser with Multi-Line Follow-up
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/log-parser-multiline
+===BODY===
+Oracle
+Coding·45 minMembers
+Log Parser with Multi-Line Follow-up
+Parse a stream of log lines of the form `<unix_timestamp> <LEVEL> <message>` into a structured format and validate well-formedness. The recurring follow-up extends each log entry to span multiple physical lines until the next timestamp-prefixed line starts a new entry.
+SWE
+Infra Eng
+string
+parsing
+string-processing
+state-machine
+medium
+Frequency
+Low
+Last asked
+2025-08-06
+Stage
+phone-screen
+Requirements
+
+Input: a sequence of lines, each ideally of the form <unix_timestamp> <LEVEL> <message> (example: 1689200791 INFO some log).
+
+Output: structured records — at minimum {timestamp, level, message} per entry.
+
+Validate that each line conforms to the expected format; flag malformed lines.
+
+After the basic implementation, support querying entries within a [from_ts, to_ts] window (reported in the OHAI variant).
+
+Follow-up: log messages may span multiple physical lines. A new entry begins only when the next line starts with a valid <unix_timestamp> token; everything until the next such line is part of the current entry's message body.
+
+Examples
+
+Basic input:
+
+1689200791 INFO some log
+1689200800 INFO another message
+1689200810 ERROR something failed
+
+Multi-line follow-up input:
+
+1689200795 INFO this is a log message
+1689200800 INFO and here is another message
+but this time its on two lines
+1689200805 ERROR or even some are errors
+and sometimes the logs are
+multiple lines
+
+Expected entry boundaries for the follow-up: lines 1, 2-3, 4-6.
+
+Notes
+
+The base parser is a single pass: split each line on the first two whitespace gaps (timestamp, level, message-rest), validate that the timestamp is an integer of plausible length, and that the level is in the known set (INFO, WARN, ERROR, ...).
+
+The multi-line follow-up turns the line-by-line approach into a state machine: hold a "current entry" buffer, and only close it out when the next line's first token parses as a timestamp. The last entry must be flushed at EOF.
+
+A subtle correctness trap: do not assume "a line starting with digits" is a new entry — require the first token to be a valid timestamp (integer of expected magnitude). Otherwise, message bodies that happen to begin with a number are mis-segmented.
+
+For the [from_ts, to_ts] query follow-up, store entries in a list sorted by timestamp (input is typically already sorted) and use binary search for the range bounds.
+
+Discuss memory: if logs are streaming and only the most recent N entries matter, switch to a fixed-size ring buffer; do not load all entries into memory.
+
+Preparation
+
+Implement the base parser in 15 minutes; immediately add the multi-line follow-up on top without rewriting from scratch — the interviewer is watching for whether the original design supports the extension cleanly.
+
+Practise dictating one test example out loud before writing any code; both reports flagged ambiguity on the entry-boundary rule until an example was confirmed.
+
+Prepare to switch between the streaming (one-pass, generator) formulation and the in-memory (sortable, indexable) formulation depending on which follow-up the interviewer pushes on.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,68 @@
+===H1===
+Simplified Grep
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/simplified-grep
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Simplified Grep
+Implement a simplified `grep`: scan a file line by line and emit lines containing a target substring, with extensibility for additional flags (case-insensitive, invert match, line numbers). Graded for clean parsing and extensible code shape, not raw algorithm.
+SWE
+string-processing
+object-design
+io
+ambiguous-spec
+medium
+Frequency
+Single report
+Last asked
+2025-11-22
+Stage
+onsite-coding
+Requirements
+
+Implement a function or small class:
+
+List<String> grep(Iterator<String> lines, String pattern, GrepFlags flags)
+
+that returns the lines containing pattern as a substring. The interviewer cares about:
+
+Clean parsing. Separate the line reader, the matcher, and the formatter.
+
+Flag extensibility. The API must accept a flags object that can later be extended without breaking callers (caseInsensitive, invertMatch, lineNumbers, wholeWord, etc.).
+
+Clarifying questions first. Confirm: case sensitivity default, line-number formatting, what counts as a line boundary, behavior on empty pattern.
+
+Follow-ups:
+
+Add caseInsensitive and invertMatch. Implement and show how the matcher is parameterized.
+
+Add lineNumbers: prefix output with <n>:. Discuss why this is a formatter concern, not a matcher concern.
+
+Switch the matcher to a regex. Now what changes about the API contract?
+
+Notes
+
+The algorithmic core is String.contains (or a regex match) — this round is not about KMP, Aho-Corasick, or any other clever string matcher unless the interviewer steers there.
+
+The grade is on code structure. A passing answer cleanly separates: source (line iterator), matcher (predicate on a line), formatter (line → output string). Each is independently testable.
+
+Don't read the whole file into memory; the iterator pattern makes this explicit.
+
+Common stumble: hard-coding the case-insensitive comparison inside the line loop instead of building it once into the matcher. Refactor before the interviewer points it out.
+
+An optional sub-discussion: how would you parallelize this across multiple files? (Thread per file, output queue ordered by file id; mention but don't implement unless asked.)
+
+Preparation
+
+Sketch a 30-line skeleton that already has the matcher factored as a Predicate<String> and the formatter as a function of (lineNumber, line) -> String. Reuse this shape for any extension the interviewer asks for.
+
+Drill clarifying questions out loud: this round explicitly grades whether the candidate enumerates ambiguities before writing.
+
+Be ready to add a flag in 30 seconds of editing — pattern of if (flags.foo) ... checks inside grep() is the wrong shape; pre-composing the predicate is the right shape.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

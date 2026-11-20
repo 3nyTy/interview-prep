@@ -1,0 +1,73 @@
+===H1===
+System Design: Evaluation System with Human + LLM Evaluators
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/sd-evaluation-system-llm-human
+===BODY===
+Waymo
+System Design·60 minMembers
+System Design: Evaluation System with Human + LLM Evaluators
+Onsite design: build an evaluation platform that grades candidate outputs using both human raters and LLM-as-judge. Cover labor pool routing, score aggregation, calibration of LLM judges against human gold, and the operational hand-off between the two evaluator types.
+SWE
+MLE
+mlsd
+evaluation
+llm
+data-cleaning
+ranking
+calibration
+hard
+Frequency
+Single report
+Last asked
+2026-01-29
+Stage
+onsite-system-design
+Requirements
+
+Inputs: a stream of model outputs to be evaluated against a rubric.
+
+Two evaluator pools:
+
+Human raters (paid annotators with skill tiers, throughput limits, time-zone coverage).
+
+LLM judges (model-graded scoring; cheaper, faster, less reliable).
+
+Outputs: a per-item score (or distribution), confidence, and an audit trail.
+
+Operational requirements: cost cap per evaluation batch, latency target, throughput target, ability to route hard cases to humans and easy cases to LLMs.
+
+Notes
+
+Architecture sketch. Submission service → routing layer (decides human vs LLM vs both) → evaluator pools → score aggregation → quality monitor → result store. Quality monitor periodically samples LLM-scored items, re-routes a fraction to humans for calibration, and surfaces drift.
+
+Routing policy. Easy cases (high LLM-judge confidence, low rubric ambiguity) go LLM-only. Hard cases or low LLM confidence go to humans. Critical cases (high stakes, low traffic) always get a multi-rater human review. Tune the split per-rubric to hit the cost target.
+
+LLM-as-judge. Prompt the judge with the rubric, the item, and the requested output schema (e.g. score 1–5 + reasoning). Run multiple judge calls per item and aggregate via majority vote or median; use self-consistency to extract a confidence proxy. Bias controls: shuffle option order to avoid position bias, anonymize sources so the judge doesn't favor a known model family.
+
+Human pool management. Track per-rater accuracy via inter-rater agreement on gold items; gate higher tiers of work behind agreement thresholds. Spam detection: insert known-answer items at low frequency and flag raters who fail them.
+
+Calibration. Maintain a gold set (~500 items per rubric) that both humans and LLMs evaluate. Re-fit a calibration mapping (Platt scaling / isotonic regression) from raw LLM scores to human-anchored scores every week. Track LLM judge ↔ human agreement as the production metric; alarm when it drops past a threshold.
+
+Aggregation. For items with multiple human ratings, use median or trimmed mean to suppress outliers; for items with both human and LLM scores, weight by historical accuracy of each pool on similar items.
+
+Cost model. Per-item cost ≈ p_human · cost_human + (1 − p_human) · cost_LLM · n_judges. Surface the lever explicitly: routing fraction, number of judge calls per item, escalation rate.
+
+Audit and replay. Store the raw evaluator outputs (LLM completions, individual human scores) alongside the aggregate. When a rubric changes, replay historical items through the new pipeline rather than re-collecting.
+
+The interviewer in this round is from a labeling-platform background; expect the deep-dive to land on the calibration loop and the human-rater quality control story.
+
+Preparation
+
+Memorize the routing-policy framework (easy → LLM, hard → human, critical → multi-human) and the cost-model equation.
+
+Prepare a calibration sketch: gold set, per-rubric Platt mapping, weekly retraining cadence, drift alarms.
+
+Pre-stage one or two real-life rubric examples (text summarization quality, factual correctness) and walk through how the same architecture handles both.
+
+Read one applied LLM-as-judge writeup to anchor the bias controls (option order, anonymization, multi-call aggregation).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,64 @@
+===H1===
+Delivery-Center Grid — Minimum Inconvenience
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/delivery-center-grid-minimum-inconvenience
+===BODY===
+Amazon
+CodingMembers
+Delivery-Center Grid — Minimum Inconvenience
+Given an `n × m` binary grid of delivery centers, minimize the maximum Chebyshev distance from any empty cell to its nearest center after converting at most one `0` to `1`. Constraints are `n, m ≤ 500`.
+SWE
+grid
+bfs
+binary-search
+shortest-path
+hard
+Frequency
+Medium · New
+Last asked
+2026-08-30
+Stage
+oa
+Requirements
+
+Input: an n × m binary grid, where 1 is a delivery center and 0 is an empty location.
+
+Cell distance is Chebyshev distance: max(|r1-r2|, |c1-c2|).
+
+Grid inconvenience is the maximum, over every empty cell, of its distance to the nearest delivery center.
+
+Convert at most one 0 to 1 and return the minimum achievable inconvenience.
+
+Constraints: 1 ≤ n, m ≤ 500; every cell is 0 or 1.
+
+Examples
+
+Input:
+[[0, 0, 0, 1],
+ [0, 0, 0, 1]]
+
+Output: 1
+
+Adding a center at (0, 0) leaves every cell within distance 1 of a center.
+
+Notes
+
+Compute nearest-center Chebyshev distance with multi-source BFS over all eight neighboring directions; a four-neighbor BFS would compute Manhattan distance instead. If there is no initial center, treat every empty cell's current distance as unbounded.
+
+For a candidate limit L, collect empty cells whose current distance exceeds L. A new center (r, c) must lie in every square [ri-L, ri+L] × [ci-L, ci+L]; intersect those row and column intervals with the grid bounds. The limit is feasible exactly when both intersections are nonempty.
+
+Binary-search the smallest feasible limit. The initial BFS is O(nm), each feasibility scan is O(nm), and the full search is O(nm log(max(n, m))).
+
+The 500 × 500 limit makes repeated full searches per candidate placement too slow; the feasibility check must scan the grid compactly.
+
+Preparation
+
+Implement eight-neighbor multi-source grid BFS and verify its Chebyshev-distance matrix on grids with one center, many centers, and no initial center.
+
+Practice binary search on an answer with a separate feasible(limit) predicate, then hand-check the interval intersections at corners and edges.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

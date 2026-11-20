@@ -1,0 +1,66 @@
+===H1===
+Equalize Root-to-Leaf Path Sums in an N-ary Tree
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/equalize-root-to-leaf-path-sums
+===BODY===
+ByteDance / TikTok
+CodingMembers
+Equalize Root-to-Leaf Path Sums in an N-ary Tree
+After a warm-up (most frequent array element, ties broken toward the smaller number), the main problem gives an n-ary tree of integers where each operation increments one node's value by 1; return the minimum operations to make all root-to-leaf path sums equal. Both problems require self-written, executed test cases.
+SWE
+tree
+dfs
+greedy
+medium
+Frequency
+Single report
+Last asked
+2026-07-14
+Stage
+phone-screen
+Requirements
+
+You are given an n-ary (not binary) tree where every node holds an integer value.
+
+One operation increases the value of a single node by 1.
+
+Return the minimum number of operations needed to make every root-to-leaf path sum equal.
+
+You must write your own test cases and run them — the round grades self-verification, not just the algorithm.
+
+Examples
+
+  2
+ 3 4
+
+Answer: 1 — increase the 3 to 4.
+
+      1
+   2     3
+  2 2   3 3
+
+Answer: 4 — increase each of the two leaf 2s to 4 (2 operations per leaf).
+
+Notes
+
+The interviewer accepted a post-order traversal: for each node, compute the maximum path sum among its child subtrees, charge (max - childSum) for each child that falls short, and propagate node.val + max upward.
+
+The second worked example's stated answer (4) matches applying increments only at the leaves, while the post-order greedy lifts the shared increment to the highest ancestor and yields a smaller count — clarify whether internal nodes may be incremented before committing to an approach.
+
+The screen opens with a short warm-up: given an integer array, return the most frequent element, breaking ties toward the smaller number — a single counting pass with a running best.
+
+The round also includes a brief behavioral opener (favorite project and its hardest technical challenge) before any coding.
+
+Preparation
+
+Drill post-order recursions that aggregate a value from children and charge a per-child correction cost, on both binary and n-ary trees.
+
+Practice building an n-ary Node class and a small test harness from a blank file, and run at least one test per problem before declaring done.
+
+Rehearse asking one clarifying question about operation constraints (which nodes may be modified) before writing code.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,57 @@
+===H1===
+Stickers to Spell Word (LeetCode 691)
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/stickers-to-spell-word
+===BODY===
+ByteDance / TikTok
+Coding·45 minMembers
+Stickers to Spell Word (LeetCode 691)
+Given reusable letter stickers and a target string, return the minimum number of stickers needed to assemble the target. The prompt was identified as LeetCode 691, with the target length limited to roughly the low teens.
+SWE
+string
+state-compression-dp
+bitmask
+hard
+Frequency
+Single report
+Last asked
+2026-08-17
+Stage
+onsite-coding
+Requirements
+
+You receive a collection of stickers, each containing a multiset of letters, plus a target string.
+
+Any sticker type may be used an unlimited number of times.
+
+Return the minimum number of stickers needed to assemble every character of the target.
+
+The target length is limited to roughly the low teens, making compact state representation central to the round.
+
+Treat the task as the unchanged LeetCode 691 prompt.
+
+Notes
+
+The interviewer clarified that letters on one sticker may be matched to target positions in any order.
+
+The candidate stated O(2^n * m * n) for n target positions and m sticker types, but only had time to run one small case.
+
+The round rewards an explicit pruning argument; unfiltered branching grows too quickly under the 45-minute limit.
+
+A canonical exact approach memoizes the remaining target-letter counts; an equivalent bitmask DP tracks which target positions are already satisfied. Precompute each sticker's letter counts and branch first on stickers that supply the first unmet character.
+
+For bitmask DP, each of the 2^n states tries m sticker types and scans at most n target positions, matching the stated O(2^n * m * n) bound. Return -1 when the full mask is unreachable.
+
+Preparation
+
+Implement both memoized residual-count search and bitmask DP, then compare the state keys and pruning opportunities.
+
+Test an impossible target, repeated target letters, and stickers that contribute no useful character.
+
+Hand-trace one target with overlapping sticker choices and explain why selecting only a locally best sticker is unsafe.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

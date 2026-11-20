@@ -1,0 +1,497 @@
+===H1===
+IP / CIDR Firewall
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/ip-cidr-firewall
+===BODY===
+Databricks
+Coding·55 minFree preview
+IP / CIDR Firewall
+Given an ordered list of IP or CIDR allow / deny rules, return the first matching rule for an input IP. Follow-ups switch the input from a single IP to a CIDR block and ask whether the entire range is allowed after applying ordered rules.
+SWE
+Infra Eng
+bit-manipulation
+interval
+parsing
+medium
+Frequency
+High
+Last asked
+2026-08-11
+Stage
+phone-screen · onsite-coding
+Problem Statement
+
+Class-based API contract
+
+One prompt form asks for an IpFirewall class with this interface:
+
+IpFirewall(List<List<String>> rules) initializes ordered [action, cidr] rules, where action is ALLOW or DENY and cidr may be a single IP or a network block.
+
+boolean allowAccess(String ip) returns whether the first matching rule allows the IP.
+
+The class-shaped version guarantees that every queried IP matches at least one rule.
+
+Minority variant: other versions require an explicit default-deny result when no rule matches — clarify before coding.
+
+You are given a list of firewall rules. Each rule has two parts:
+
+An Action: either "ALLOW" or "DENY".
+
+A CIDR block: An IP range (like "192.168.1.0/24").
+
+You are also given a specific Target IP. Your job is to check the rules and decide if this IP is allowed or denied.
+
+Rules for Matching
+
+Check the rules from top to bottom.
+
+The first rule that covers the IP address decides the result.
+
+If a rule matches, stop checking. Use that rule's action.
+
+If you go through all rules and none match, the default answer is DENY.
+
+Note: Older rules (higher up in the list) are more important than newer rules.
+
+How CIDR Works
+
+CIDR is a way to write a group of IP addresses. It looks like this: IP_address/Prefix.
+
+Example: 192.168.1.0/24
+
+The /24 tells us the size of the network.
+
+This specific example covers IPs from 192.168.1.0 to 192.168.1.255 (256 addresses).
+
+Common Range Sizes
+
+CIDRDescriptionNumber of IPs
+x.x.x.x/32A single specific IP1
+x.x.x.x/312 IPs2
+x.x.x.x/304 IPs4
+x.x.x.x/298 IPs8
+x.x.x.x/24Class C Network256
+
+Calculating a Range
+
+Let's look at 255.0.0.8/29:
+
+/29 means we have 3 bits left for the host ($32 - 29 = 3$).
+
+$2^3 = 8$, so this block holds 8 addresses.
+
+Starting at 255.0.0.8, the range goes up to 255.0.0.15.
+
+Example 1: Simple Match
+
+Input:
+
+rules = [
+    {"action": "DENY", "cidr": "255.0.0.8/29"},
+    {"action": "ALLOW", "cidr": "117.145.102.64/30"}
+]
+
+ip = "255.0.0.10"
+
+Explanation:
+
+Look at the first rule: "DENY", "255.0.0.8/29".
+
+This covers 255.0.0.8 through 255.0.0.15.
+
+Our IP is 255.0.0.10. It fits in this range.
+
+Match found. Stop and return "DENY".
+
+Output:
+
+"DENY"
+
+Example 2: Multiple Rules
+
+Input:
+
+rules = [
+    {"action": "DENY", "cidr": "255.0.0.8/29"},
+    {"action": "ALLOW", "cidr": "117.145.102.64/30"},
+    {"action": "ALLOW", "cidr": "192.168.0.0/16"}
+]
+
+ip = "192.168.1.100"
+
+Explanation:
+
+Rule 1: Does the IP fit in 255.0.0.8/29? No.
+
+Rule 2: Does the IP fit in 117.145.102.64/30? No.
+
+Rule 3: Does the IP fit in 192.168.0.0/16? Yes.
+
+Match found. Return "ALLOW".
+
+Output:
+
+"ALLOW"
+
+Example 3: No Match (Default)
+
+Input:
+
+rules = [
+    {"action": "ALLOW", "cidr": "10.0.0.0/8"}
+]
+
+ip = "192.168.1.1"
+
+Explanation:
+
+Rule 1: Does the IP fit? No.
+
+No more rules to check.
+
+Default Action: Return "DENY".
+
+Output:
+
+"DENY"
+
+Solution Approach
+
+The Logic
+
+Convert IP to Integer:
+Computers handle numbers better than strings. We will turn the IP address (like 192.168.1.1) into a single 32-bit integer.
+
+Formula: (First Part << 24) + (Second Part << 16) + ...
+
+Convert CIDR to Range:
+For each rule, we figure out the Start IP and End IP based on the CIDR.
+
+We use a Bitmask to find the start.
+
+We flip the mask to find the end.
+
+Check the Rules:
+Loop through the rules one by one. If the Target IP integer is between the Start and End of a rule, return that rule's action immediately. If we finish the loop, return "DENY".
+
+Python Code
+
+from typing import List, Dict
+
+def ip_to_int(ip: str) -> int:
+    """Convert IP address string to 32-bit integer."""
+    octets = list(map(int, ip.split('.')))
+    return (octets[0] << 24) | (octets[1] << 16) | (octets[2] << 8) | octets[3]
+
+def cidr_to_range(cidr: str) -> tuple[int, int]:
+    """Convert a singleton IP or CIDR block to an inclusive integer range."""
+    if '/' not in cidr:
+        ip_value = ip_to_int(cidr)
+        return ip_value, ip_value
+
+    ip, prefix = cidr.split('/')
+    prefix_len = int(prefix)
+
+    base_ip = ip_to_int(ip)
+
+    # Create mask for the network portion
+    # For /24: mask = 11111111.11111111.11111111.00000000
+    mask = (0xFFFFFFFF << (32 - prefix_len)) & 0xFFFFFFFF
+
+    # Network address (start of range)
+    network_addr = base_ip & mask
+
+    # Broadcast address (end of range)
+    # Invert mask to get host bits, OR with network address
+    broadcast_addr = network_addr | (~mask & 0xFFFFFFFF)
+
+    return (network_addr, broadcast_addr)
+
+class IpFirewall:
+    """Class-shaped adapter for ordered [action, CIDR-or-IP] rules."""
+    def __init__(self, rules: List[List[str]]):
+        self.rules = [
+            (action, *cidr_to_range(cidr))
+            for action, cidr in rules
+        ]
+
+    def allowAccess(self, ip: str) -> bool:
+        ip_value = ip_to_int(ip)
+        for action, start, end in self.rules:
+            if start <= ip_value <= end:
+                return action == "ALLOW"
+        return False  # default-deny variant; unreachable when a match is guaranteed
+
+def check_firewall(rules: List[Dict[str, str]], ip: str) -> str:
+    """
+    Check if an IP address is allowed or denied by firewall rules.
+
+    Args:
+        rules: List of firewall rules, each with 'action' and 'cidr'
+        ip: IP address to check
+
+    Returns:
+        "ALLOW" or "DENY"
+    """
+    ip_int = ip_to_int(ip)
+
+    # Check rules in order
+    for rule in rules:
+        start, end = cidr_to_range(rule['cidr'])
+
+        # Check if IP falls within this CIDR range
+        if start <= ip_int <= end:
+            return rule['action']
+
+    # Default: deny if no match
+    return "DENY"
+
+Time Complexity
+
+O(n): n is the number of rules. We might have to check every rule once.
+
+Space Complexity
+
+O(1): We only use a small amount of memory for variables.
+
+Follow-Up: Checking a Range of IPs
+
+New Question: Instead of checking one single IP, you are given a Query CIDR block. You must decide if the entire range is allowed.
+
+Key Rules
+
+Every single IP in the query block must be covered by an "ALLOW" rule.
+
+If any part of the query hits a "DENY" rule, return "DENY".
+
+If any part of the query matches no rule (a gap), return "DENY".
+
+Follow-Up Example 1: Safe Range
+
+Rule: ALLOW 192.168.0.0/16
+
+Query: 192.168.1.0/24
+
+Result: The query is fully inside the allowed rule. Return "ALLOW".
+
+Follow-Up Example 2: Partial Deny
+
+Rules:
+
+DENY 192.168.1.0/25 (First half of the range)
+
+ALLOW 192.168.0.0/16 (Everything else)
+
+Query: 192.168.1.0/24
+
+Result: The first half of our query hits a DENY rule. Even though the second half is allowed, the whole result is "DENY".
+
+Follow-Up Example 3: A Gap
+
+Rules:
+
+ALLOW first part.
+
+ALLOW last part.
+
+(Middle part has no rules).
+
+Result: The middle part falls through to the default DENY. Return "DENY".
+
+Follow-Up Solution Approach
+
+The Algorithm
+
+Checking every IP individually is too slow. Instead, we use a "Sweep Line" approach:
+
+Get Query Range: Convert the query CIDR to start and end.
+
+Find Breakpoints: Look at all the rules. If a rule starts or ends inside our query range, mark that spot.
+
+Make Segments: Sort these points. This chops our large query range into smaller "segments".
+
+Check Segments: For each small segment, check the rules.
+
+Find the first rule that matches the segment.
+
+If the rule is "DENY", or if there is no rule, return "DENY".
+
+If all segments are safe, return "ALLOW".
+
+Python Code for Follow-Up
+
+from typing import List, Dict
+
+def check_firewall_cidr(rules: List[Dict[str, str]], query_cidr: str) -> str:
+    """
+    Check if an entire CIDR block is allowed by firewall rules.
+
+    Args:
+        rules: List of firewall rules with 'action' and 'cidr'
+        query_cidr: Query CIDR block to check
+
+    Returns:
+        "ALLOW" if entire range is allowed, "DENY" otherwise
+    """
+    query_start, query_end = cidr_to_range(query_cidr)
+
+    # Collect all segment boundaries (events)
+    events = set([query_start, query_end + 1])
+
+    # Add boundaries from overlapping rules
+    for rule in rules:
+        rule_start, rule_end = cidr_to_range(rule['cidr'])
+
+        # Check if rule overlaps with query range
+        if rule_start <= query_end and rule_end >= query_start:
+            # Add overlapping boundaries
+            events.add(max(rule_start, query_start))
+            events.add(min(rule_end + 1, query_end + 1))
+
+    # Sort events to process segments in order
+    events = sorted(events)
+
+    # Check each segment
+    for i in range(len(events) - 1):
+        segment_start = events[i]
+        segment_end = events[i + 1] - 1
+
+        # Find first matching rule for this segment
+        matched = False
+        for rule in rules:
+            rule_start, rule_end = cidr_to_range(rule['cidr'])
+
+            # Check if rule covers this segment
+            if rule_start <= segment_start and segment_end <= rule_end:
+                if rule['action'] == "DENY":
+                    return "DENY"
+                matched = True
+                break  # First match wins
+
+        # If no match found, default is DENY
+        if not matched:
+            return "DENY"
+
+    return "ALLOW"
+
+Optimized Code
+
+Here is a slightly cleaner way to implement the segment check.
+
+def check_firewall_cidr_optimized(rules: List[Dict[str, str]], query_cidr: str) -> str:
+    """
+    Optimized version using segment checking.
+    """
+    query_start, query_end = cidr_to_range(query_cidr)
+
+    # We need to verify every position in the range
+    # Collect all rule boundaries that overlap with query
+    boundaries = set([query_start])
+
+    for rule in rules:
+        rule_start, rule_end = cidr_to_range(rule['cidr'])
+        if rule_start <= query_end and rule_end >= query_start:
+            # Add intersection boundaries
+            if rule_start > query_start and rule_start <= query_end:
+                boundaries.add(rule_start)
+            if rule_end >= query_start and rule_end < query_end:
+                boundaries.add(rule_end + 1)
+
+    boundaries.add(query_end + 1)
+    boundaries = sorted(boundaries)
+
+    # Check each continuous segment
+    for i in range(len(boundaries) - 1):
+        seg_start = boundaries[i]
+        seg_end = boundaries[i + 1] - 1
+
+        # Find first matching rule for a sample IP in this segment
+        sample_ip = seg_start
+        action = check_single_ip(rules, sample_ip)
+
+        if action == "DENY":
+            return "DENY"
+
+    return "ALLOW"
+
+def check_single_ip(rules: List[Dict[str, str]], ip_int: int) -> str:
+    """Helper: Check a single IP (as integer) against rules."""
+    for rule in rules:
+        rule_start, rule_end = cidr_to_range(rule['cidr'])
+        if rule_start <= ip_int <= rule_end:
+            return rule['action']
+    return "DENY"  # Default
+
+Complexity Analysis
+
+Time Complexity: O(n²). We collect boundaries (O(n)), sort them (O(n log n)), and then check segments against rules. Since there can be n segments and we check n rules for each, it becomes O(n²).
+
+Space Complexity: O(n) to store the boundary list.
+
+Advanced Approach: Interval Tree
+
+If you have a massive number of rules, the O(n²) approach might be too slow. You can use an Interval Tree.
+
+Build an Interval Tree using all your rules.
+
+Take your query range and split it into minimal segments.
+
+Query the tree for each segment.
+
+This brings the complexity down to O(n log n) to build and O(k log n) to search.
+
+Tricky Cases
+
+Keep these edge cases in mind during an interview:
+
+Exact Match: The query matches an "ALLOW" rule exactly. (Result: ALLOW).
+
+Giant Query: The query is bigger than all your rules. This usually means there are gaps. (Result: DENY).
+
+Empty List: No rules provided. (Result: DENY).
+
+Single IP: A CIDR ending in /32 is just one IP.
+
+Order Matters: If you have an ALLOW rule and a DENY rule covering the same area, the one that appears first in the list wins.
+
+Similar Interview Questions
+
+LeetCode 751: IP to CIDR - Given an IP range, break it down into standard CIDR blocks.
+
+LeetCode 468: Validate IP Address - Check if an input string is a valid IPv4 or IPv6 address.
+
+Key Takeaways
+
+Order is critical: Later rules cannot override earlier rules.
+
+Gaps mean DENY: If checking a range, even a small gap where no rule exists will cause the whole check to fail.
+
+Bitwise Math: You need to be comfortable with bit shifting (<<) and masking (&) to calculate IP ranges efficiently.
+
+Helpful Bitwise Tricks
+
+How to make a mask for the lowest N bits:
+
+# For /29, we have 3 host bits. We need a mask like 000...000111 (which is 7).
+mask = (1 << (32 - prefix_len)) - 1
+
+Watch your Order of Operations:
+
+# BAD: This compares 'mask' to 'network' first!
+if ip & mask == network:
+
+# GOOD: Use parentheses to mask the IP first.
+if (ip & mask) == network:
+
+Calculating IP Integer:
+
+# Method 1: Bit shifting (Standard)
+ip_int = (a << 24) | (b << 16) | (c << 8) | d
+
+# Method 2: Math (Same result)
+ip_int = a * 256**3 + b * 256**2 + c * 256 + d
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

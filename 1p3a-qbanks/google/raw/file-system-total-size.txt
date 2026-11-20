@@ -1,0 +1,69 @@
+===H1===
+Compute File System Total Size
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/file-system-total-size
+===BODY===
+Google
+Coding·45 minMembers
+Compute File System Total Size
+Early Career / onsite coding prompt: traverse a file-system object with `class`, `size`, and `contains` fields and return the total size of all nested files. Follow-ups ask how to make repeated size computation faster.
+SWE
+tree
+dfs
+medium
+Frequency
+Low
+Last asked
+2026-09-02
+Stage
+onsite-coding · phone-screen
+Requirements
+
+Input: root node of a file system. Each node is either a file (with a size) or a directory (with children).
+
+A second variant gives a plain object with class, size, and contains: class=file nodes own size; class=directory nodes own a list of contained objects.
+
+Base case (strict tree): return the sum of sizes via DFS.
+
+The initial variant assumes the file system may contain hard links → cycles; you must detect and skip already-visited nodes.
+
+Follow-up: complexity of the traversal — discuss O(N) for DFS, then how a cache (node → cached total size) helps when the same directory is queried multiple times.
+
+Follow-up: can the cache be made more efficient? Expected discussion: invalidate cached values up the parent chain when a file is added/removed.
+
+Entity-ID query variant
+
+Given an ID identifying either a file or a directory, return that entity's total size; directories contain files and nested directories.
+
+Follow-up: check whether the structure is a valid file system. The precise validity rules are unspecified; clarify them before implementation.
+
+Examples
+
+root = Dir(
+  Dir(File(10), File(20)),
+  File(5),
+  Dir(File(30)),
+)
+Total: 65
+
+Notes
+
+If the interviewer says "strict tree", drop the visited set and stick with plain DFS — extra cycle handling reads as over-engineering.
+
+For the cache follow-up, store the cached total on each directory node; when a file changes, walk parent pointers invalidating along the path.
+
+The interviewer also pushes for an iterative DFS (explicit stack) after the recursive solution lands — have both ready.
+
+Preparation
+
+Drill recursive-and-iterative DFS over directory-style trees.
+
+Have ready: cycle-safe DFS (visited set), memoized DFS (cache on internal nodes), invalidation cascade.
+
+Practice the same problem under the the canonical "longest absolute file path" parsing problem for warm-up.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,50 @@
+===H1===
+Seller Task Scheduler
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/seller-task-scheduler
+===BODY===
+ByteDance / TikTok
+CodingMembers
+Seller Task Scheduler
+Implement task intake and next-task selection with per-seller priority ordering and tier-weighted turns across sellers.
+SWE
+scheduling
+heap
+queue
+Frequency
+Single report
+Last asked
+2026-09-02
+Stage
+phone-screen
+Requirements
+
+Each task contains task_id, seller_id, tier (VIP or STANDARD), and priority (1 is high, 3 is low).
+
+Implement receive_task(task) to accept a task.
+
+Implement process_next_task() to return the next (seller_id, task_id) to process.
+
+Within each seller, smaller priority numbers are processed first; equal priorities preserve arrival order (FIFO).
+
+Rotate across sellers. A VIP seller may process at most two consecutive tasks per turn; a STANDARD seller processes one before the next seller gets a turn.
+
+Notes
+
+Keep one priority heap per seller, ordered by (priority, arrival_sequence) so equal priorities remain FIFO. Keep active sellers in a deque and track the current seller and remaining turn quota across calls. Emit at most two tasks for VIP and one for STANDARD, ending a turn early when its heap empties. Requeue a still-active seller once its turn ends; never duplicate an active seller in the deque.
+
+Under a fixed tier per seller and an agreed activation-order policy, receive and process each cost O(log(m + 1)) for a seller with m queued tasks; deque operations are O(1). Storage is O(T + S) for T queued tasks and S tracked sellers. Assign a monotonic arrival sequence independently of task IDs.
+
+Clarify the empty return contract, seller reactivation order, duplicate task IDs, and tier changes before coding. These policies are unspecified; any choices made during practice are assumptions, not additional interview requirements.
+
+Preparation
+
+In 20 minutes, implement the two methods with persistent turn state and explicitly document your empty-queue and activation-order assumptions.
+
+In 10 minutes, trace two sellers with different tiers, equal-priority arrivals, a seller that drains mid-turn, and a seller that receives work again. Check priority, FIFO, quota, and deque uniqueness after every call.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,74 @@
+===H1===
+Code Craft: Hierarchical Path Key-Value Store
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/code-craft-path-key-value-store
+===BODY===
+DoorDash
+Coding·60 minMembers
+Code Craft: Hierarchical Path Key-Value Store
+OOD Code Craft round. Implement a hierarchical key-value store using directory-like paths (e.g. `/a/b/c`). The store starts with a root path `/` whose value is `"root"`. Operations: `create`, `set`, `get`, `delete` (leaf-only; root cannot be deleted).
+SWE
+data-structure
+tree
+oop-design
+filesystem
+medium
+Frequency
+Single report
+Last asked
+2026-04-11
+Stage
+phone-screen
+Requirements
+
+Initial state: root path / exists with value "root".
+
+create(path, value): create a new path with the given value. Only succeeds if the parent path already exists.
+
+set(path, value): update the value at an existing path.
+
+get(path): return the value stored at the path.
+
+delete(path): delete a path only if it is a leaf node. Root cannot be deleted.
+
+Method signatures (from the prompt):
+
+class PathKeyValueStore:
+    def create(self, path: str, value: str) -> str
+    def set(self, path: str, value: str) -> str
+    def get(self, path: str) -> str
+    def remove(self, path: str) -> str
+
+Return values are left to the candidate to define; "OK" / the affected value / a boolean string are all accepted.
+
+Notes
+
+Two natural representations:
+
+Tree of nodes — each node holds value + children map. Path operations split on / and walk children. delete checks len(children) == 0. Most natural for create parent-exists check.
+
+Flat dict — {path: value} plus parent-existence checks on create. Simpler code but delete needs a children-count helper (any(p.startswith(path + '/') for p in store)).
+
+The tree version is cleaner for the leaf-check on delete; the flat version is faster to type. Either is acceptable.
+
+Edge cases: trailing slash normalization (/a/b vs /a/b/), root special-case in all four operations, empty path string handling, set on a non-existent path (clarify: error vs upsert).
+
+Concurrency follow-up is common: "how would you make this thread-safe?" — per-node RW lock or a single store-level lock; mention copy-on-write for read-heavy workloads.
+
+Persistence follow-up: write-ahead log of mutations; rebuild tree on startup; snapshot periodically.
+
+Preparation
+
+Write the tree-based implementation in under 25 minutes cold.
+
+Memorize the path-splitting boilerplate in your language of choice (path.strip('/').split('/')).
+
+Have a 60-second answer for thread safety and one for persistence.
+
+Pre-write 5 test cases: create with missing parent, set on non-existent, delete of non-leaf, delete of root, get on missing path.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

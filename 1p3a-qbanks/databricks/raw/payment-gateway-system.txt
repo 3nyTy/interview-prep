@@ -1,0 +1,412 @@
+===H1===
+Payment Gateway System
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/payment-gateway-system
+===BODY===
+Databricks
+System DesignMembers
+Payment Gateway System
+Design a payment gateway supporting multiple credit and bank card types, covering authorization, capture, retries, idempotency, and failure handling.
+SWE
+payment
+idempotency
+transactions
+medium
+Frequency
+Single report
+Last asked
+2025-10-30
+Stage
+onsite-system-design
+Problem Requirements
+
+Design a payment gateway system. This system must handle credit cards and bank cards. Your clients are merchants using POS (Point of Sale) machines. These machines scan cards and call your API to ask if the payment is valid.
+
+Key Goal: Focus on card validation. Do not worry about the full money transfer process.
+
+What you need to do:
+
+Support many card types (Visa, Mastercard, American Express, etc.).
+
+Receive validation requests from POS machines.
+
+Send the request to the correct bank based on the card number.
+
+Ensure the system is always online (High Availability) and very fast (Low Latency).
+
+Interview Questions to Expect
+
+You should be ready to answer these questions during the interview:
+
+Routing Logic: How do you know which bank to call just by looking at the card number? Explain the BIN (Bank Identification Number) system.
+
+Failure Handling: What do you do if the bank's API is broken or too slow? How do you use retry logic and Circuit Breakers?
+
+Security: How do you follow PCI-DSS rules? How do you protect data using tokenization and encryption?
+
+Rate Limiting: How do you stop people from spamming the system?
+
+Idempotency: How do you handle accidental double-clicks? What if a card is scanned twice?
+
+Monitoring: How do you track speed, errors, and fraud?
+
+Multi-region: How do you make the system fast for users in different parts of the world?
+
+Validation Rules: What checks do you run locally (like the Luhn algorithm) before calling the bank?
+
+Scalability: How do you handle huge traffic spikes, like on Black Friday?
+
+Bank Integration: How do you connect to hundreds of banks that use different API formats?
+
+Important Note
+
+The solution below is a sample. To prepare well:
+
+Think first: Try to solve it on your own before reading.
+
+Compare: Look at the pros and cons of different ideas.
+
+Practice: Say your reasons out loud.
+
+Adapt: Be ready to change your design if the interviewer asks for changes.
+
+Solution Approach
+
+Step 1: Understanding the Scope
+
+First, let's ask questions to understand exactly what we need to build.
+
+Core Features:
+
+Q: Which cards do we support?
+
+A: Visa, Mastercard, American Express, Discover, and local cards.
+
+Q: What does "validation" mean here?
+
+A: Check the format, find the right bank, ask the bank "is this good?", and tell the POS machine the answer.
+
+Q: Do we store card numbers?
+
+A: No. We tokenize them. We do not store raw numbers (for PCI-DSS safety).
+
+What to Build:
+
+Include: Validation API, bank routing, error handling, keeping the system online.
+
+Exclude: Moving the actual money (settlement), signing up merchants, or complex fraud checks.
+
+Speed and Uptime:
+
+Q: How fast must it be?
+
+A: The P95 latency must be under 200ms.
+
+Q: How reliable must it be?
+
+A: 99.99% uptime (less than 1 hour of downtime per year).
+
+Security:
+
+Q: Do we need PCI-DSS?
+
+A: Yes, security is strict.
+
+Q: What about fraud?
+
+A: Do basic checks (Luhn algorithm, expiry date). Leave the hard checks to the banks.
+
+Step 2: Estimating Scale
+
+Let's do some quick math to see how big the system needs to be.
+
+Traffic:
+
+We have 10,000 merchants.
+
+Total: 10 million transactions per day.
+
+Average speed: ~115 transactions per second (TPS).
+
+Peak speed (holidays): 5x higher = 575 TPS.
+
+Storage:
+
+Logs: We need to save records for audits.
+
+~19GB per day.
+
+~6.8TB per year.
+
+Routing Table: The list of which numbers belong to which bank.
+
+Small size: ~50MB. This fits easily into the computer's memory (RAM).
+
+Database Loads:
+
+Writes: ~115 writes/sec (logging requests).
+
+Reads: Very few. Most data is read from the Cache (Redis).
+
+Step 3: API Design
+
+POS Machine API (Gateway):
+
+This is how the store's machine talks to us.
+
+POST /api/v1/validate
+Request:
+{
+  "merchant_id": "string",
+  "transaction_id": "string",  // Prevents duplicates (Idempotency)
+  "card_number": "string",      // Encrypted
+  "expiry_month": "string",
+  "expiry_year": "string",
+  "cvv": "string",              // Encrypted
+  "amount": "decimal",
+  "currency": "string",
+  "timestamp": "ISO8601"
+}
+
+Response (Success):
+{
+  "status": "approved" | "declined",
+  "transaction_id": "string",
+  "validation_id": "string",
+  "bank_response_code": "string",
+  "timestamp": "ISO8601"
+}
+
+Response (Error):
+{
+  "status": "error",
+  "error_code": "INVALID_CARD" | "BANK_TIMEOUT" | "RATE_LIMIT_EXCEEDED",
+  "message": "string",
+  "timestamp": "ISO8601"
+}
+
+Bank API (Internal):
+
+This is how we talk to the banks.
+
+POST /validate
+Request:
+{
+  "gateway_id": "string",
+  "card_token": "string",       // Safe version of card number
+  "expiry_month": "string",
+  "expiry_year": "string",
+  "cvv_hash": "string",         // Hashed CVV
+  "amount": "decimal",
+  "currency": "string",
+  "merchant_category": "string",
+  "timestamp": "ISO8601"
+}
+
+Response:
+{
+  "status": "approved" | "declined",
+  "response_code": "string",    // Code from the bank
+  "reason": "string",
+  "timestamp": "ISO8601"
+}
+
+Step 4: Database Schema
+
+Here are the main data structures we need.
+
+Tables:
+
+Merchant: Stores merchant details and API keys.
+
+BINRouting: The map that tells us "Card starting with 4111 goes to Chase Bank".
+
+Stored in: Redis (for speed) and PostgreSQL (for backup).
+
+ValidationLog: A record of every attempt. Used for fixing bugs and audits.
+
+Stored in: PostgreSQL.
+
+BankEndpoint: Settings for connecting to banks (URLs, timeouts).
+
+Database Technology:
+
+Redis: Used for the Routing Table and Rate Limiting. It is very fast.
+
+PostgreSQL: Used for Logs and Merchant data. It is reliable and keeps data safe (ACID compliant).
+
+Step 5: System Architecture
+
+┌─────────────┐
+│ POS Machine │
+└──────┬──────┘
+       │
+       │ HTTPS (TLS 1.3)
+       ▼
+┌─────────────────┐
+│ Load Balancer   │ (Distributes traffic)
+│ (Regional)      │
+└────────┬────────┘
+         │
+    ┌────┴────┐
+    ▼         ▼
+┌────────┐ ┌────────┐
+│ API    │ │ API    │  (Servers)
+│ Gateway│ │ Gateway│
+│ Server │ │ Server │
+└───┬────┘ └───┬────┘
+    │          │
+    ├──────────┴─────────────┐
+    │                        │
+    ▼                        ▼
+┌─────────────┐      ┌──────────────┐
+│ Redis Cache │      │ Auth Service │
+│ (Routing &  │      │ (Check API   │
+│ Rate Limit) │      │  Keys)       │
+└─────────────┘      └──────────────┘
+    │
+    ▼
+┌──────────────────┐
+│ Validation       │
+│ Service          │  (Main Logic)
+└────┬─────────────┘
+     │
+     ├────────────┬────────────┐
+     ▼            ▼            ▼
+┌─────────┐  ┌─────────┐  ┌─────────┐
+│ Bank A  │  │ Bank B  │  │ Bank C  │
+│ Adapter │  │ Adapter │  │ Adapter │
+└────┬────┘  └────┬────┘  └────┬────┘
+     │            │            │
+     ▼            ▼            ▼
+┌─────────┐  ┌─────────┐  ┌─────────┐
+│ Bank A  │  │ Bank B  │  │ Bank C  │
+│ API     │  │ API     │  │ API     │
+└─────────┘  └─────────┘  └─────────┘
+
+    ┌─────────────┐
+    │ PostgreSQL  │
+    │ (Validation │
+    │  Logs)      │
+    └─────────────┘
+
+How it works:
+
+Load Balancer: Sends the request to a healthy server.
+
+API Gateway: Checks if the merchant is allowed and if they are sending too many requests (Rate Limiting).
+
+Redis: Quickly looks up which bank to call.
+
+Validation Service: Runs the business rules.
+
+Bank Adapters: Translates our data into the specific format that Bank A, B, or C needs.
+
+Step 6: Deep Dive
+
+6.1 Routing with BIN
+
+The BIN is the first 6-8 numbers on a card. It identifies the bank.
+
+The Process:
+
+Take the first 8 digits.
+
+Check Redis.
+
+If it's not in Redis, check the database.
+
+Get the bank URL.
+
+Optimization:
+Load the whole table into Redis when the system starts. It is only 50MB, so it fits easily.
+
+6.2 Handling Failures
+
+Banks can be slow or offline.
+
+Timeouts: If a bank doesn't answer in 80ms, we stop waiting.
+
+Retries: We try one more time. Total wait time must stay under 200ms.
+
+Circuit Breaker:
+
+If a bank fails 50% of the time, we stop calling it ("Open Circuit").
+
+We return an error immediately to save time.
+
+After 30 seconds, we try one request ("Half-Open"). If it works, we start using the bank again.
+
+6.3 API Style
+
+We use Synchronous REST.
+
+Why? The POS machine is waiting for an answer right now. REST is simple and fast.
+
+6.4 Data Sharding (Splitting Data)
+
+Logs: We split tables by month (e.g., logs_jan, logs_feb).
+
+Redis: We split data based on the card prefix. This spreads the load across multiple Redis servers.
+
+6.5 Security
+
+Encryption: Use TLS 1.3 for sending data. Encrypt saved logs with AES-256.
+
+Tokenization: Swap the real card number for a random "token" as soon as it enters the system. We never save the real number.
+
+CVV: Never save the CVV code. Use it once, then forget it.
+
+Step 7: Fixing Bottlenecks
+
+Here are common problems and how we fix them:
+
+Load Balancer Failure:
+
+Fix: Use two Load Balancers (Active-Active). If one dies, the other takes over.
+
+Redis Failure:
+
+Fix: Use Redis Sentinel. It keeps backup copies of the data.
+
+Slow Bank API:
+
+Fix: Use the Circuit Breaker (explained in 6.2). Also, use separate "lanes" (thread pools) for each bank so one slow bank doesn't stop the whole system.
+
+Database Writing is Slow:
+
+Fix: Don't write directly to the DB. Write to a queue (like Kafka) first. A background worker saves them to the DB later.
+
+Global Slowness:
+
+Fix: Put servers in different regions (US, Europe, Asia). Route the POS machine to the closest server using GeoDNS.
+
+Wrap Up
+
+This design meets all the requirements:
+
+✅ Always On: Uses multiple regions and backups.
+
+✅ Fast: Uses Redis for lookups and sets strict time limits on banks.
+
+✅ Smart Routing: Finds the right bank using the BIN code.
+
+✅ Resilient: Handles broken banks using Circuit Breakers and Retries.
+
+✅ Secure: Follows PCI-DSS rules (Tokenization, Encryption).
+
+Key Takeaways:
+
+Redis is crucial for speed.
+
+Circuit Breakers prevent one bad bank from crashing your system.
+
+Async Logging keeps the main process fast.
+
+Adapters help you talk to many different banks easily.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

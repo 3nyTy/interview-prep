@@ -1,0 +1,58 @@
+===H1===
+Package Dependency Installation & Build Order
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/package-dependency-installation-build-order
+===BODY===
+Amazon
+CodingMembers
+Package Dependency Installation & Build Order
+Given packages and their dependency adjacency map, either install a target only after all dependencies are installed or return the complete build order for that target. Detect cycles with DFS visiting/visited state; the traversal takes O(V + E) time and O(V) auxiliary space, or O(V + E) total space including the input graph.
+SWE
+dependency-resolution
+graph
+topological-sort
+dfs
+cycle-detection
+complexity-analysis
+medium
+Frequency
+Low · New
+Last asked
+2026-08-14
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input: a map / adjacency list describing each software package and its dependencies.
+
+Each package object exposes install(), which installs only that package and does not install dependencies.
+
+Phone-screen variant: implement installWithDependencies(package) so every dependency is installed before the requested package.
+
+Detect cyclic dependencies and stop or raise an error when a cycle is found.
+
+Onsite variant: given the dependency data and a target package name x, return an ordered list containing every required dependency and x itself.
+
+Use DFS and explain the distinction between a visiting set for the active path and a visited set for completed nodes.
+
+State O(V + E) time and O(V) auxiliary space for DFS state and output; count the input adjacency map only when reporting O(V + E) total space.
+
+Notes
+
+Mark a package as visiting before traversing its dependencies, then append or install it only after every dependency completes. Encountering another visiting package proves a cycle; encountering a visited package means shared work can be skipped.
+
+The phone version performs installation; the onsite version returns the order instead. Keep the traversal invariant the same while adapting the output contract.
+
+Cycle handling is part of the prompt, not an optional follow-up. Clarify whether the expected behavior is an exception, an error result, or immediate termination before coding.
+
+Preparation
+
+Implement target-scoped DFS in under 15 minutes, with separate visiting and visited sets and a postorder result; then adapt the same traversal to call install() instead of returning the order.
+
+Dry-run a diamond-shaped dependency graph and a graph with one back edge, explaining exactly when a shared dependency is skipped and when cycle detection fires.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

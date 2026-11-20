@@ -1,0 +1,70 @@
+===H1===
+Google Doc Line Wrap (Word Wrap with Whitespace and Newlines)
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/document-line-wrap
+===BODY===
+Google
+Coding·45 minMembers
+Google Doc Line Wrap (Word Wrap with Whitespace and Newlines)
+Coding round 1 of an SDE NG onsite, framed as "imagine a Google Doc where each page has a limited width": given a text blob and a max line width, return how many lines the page needs while handling newlines and whitespace correctly.
+SWE
+string
+simulation
+medium
+Frequency
+Single report
+Last asked
+2026-02-01
+Stage
+onsite-coding
+Requirements
+
+Input: a string text and an integer width (max characters per line).
+
+Words are separated by whitespace; explicit \n characters force a line break.
+
+Return: the number of lines required to render the text.
+
+Rules to honor:
+
+A word never splits across lines (assume each individual word fits within width).
+
+Words are joined by a single space; trailing whitespace doesn't count toward width.
+
+A literal \n always advances to a new line, even if the current line is empty.
+
+Consecutive whitespace collapses into a single inter-word gap (but newlines still force a break).
+
+Examples
+
+text  = "Hello world\nFoo bar baz qux"
+width = 10
+Line 1: "Hello"             (5 chars; "world" + space would be 11 → break)
+Line 2: "world"
+Line 3: "Foo bar"            (7 chars; "baz" → "Foo bar baz" = 11 → break)
+Line 4: "baz qux"
+Output: 4
+
+Notes
+
+Single-pass tokenizer + accumulator: track curLen; on each token, decide "fits with leading space", "fits without space" (start of line), or "flush and start new line".
+
+Watch out for \n right after another \n (empty line counts), \n at the end of input, leading whitespace, multiple consecutive spaces inside a line.
+
+Don't try to handle font / kerning / hyphenation — the prompt assumes monospace width counted in characters.
+
+Greedy packing is the expected answer (LC 68 style). Mention DP word-wrap (Knuth's algorithm) only if the interviewer pushes on 'minimum raggedness'; greedy is optimal-enough and what graders look for. Watch edge cases: a single word longer than W, an explicit newline forcing a break mid-pack, trailing whitespace handling.
+
+Preparation
+
+Implement a clean tokenizer that treats \n as a special token and yields plain words otherwise.
+
+Test cases: width = 1, text = "a\n\n\nb", text = "   leading", text with words exactly width chars long.
+
+Be ready to extend to "return the rendered lines" (string list), not just the count, as a likely follow-up.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

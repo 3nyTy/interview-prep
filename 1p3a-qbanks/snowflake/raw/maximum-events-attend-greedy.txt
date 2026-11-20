@@ -1,0 +1,201 @@
+===H1===
+Maximum Number of Events That Can Be Attended
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/maximum-events-attend-greedy
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Maximum Number of Events That Can Be Attended
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+Members
+Maximum Number of Events That Can Be Attended
+
+You are given an array of events where events[i] = [startDayi, endDayi].
+
+SWE
+greedy
+heap
+sorting
+medium
+Frequency
+Single report
+Last asked
+2026-01-30
+Stage
+phone-screen · onsite-coding
+Maximum Number of Events That Can Be Attended
+Problem Overview
+
+You are given a list of events. Each event has a start day and an end day, represented as [startDay, endDay].
+
+Here are the rules:
+
+You can choose to attend an event on any day between its start and end dates (inclusive).
+You can only attend one event per day.
+
+Your goal is to find the maximum number of events you can attend.
+
+Sample Cases
+
+Example 1:
+
+Input: events = [[1,2],[2,3],[3,4]]
+Output: 3
+
+Example 2:
+
+Input: events = [[1,2],[2,3],[3,4],[1,2]]
+Output: 4
+Input Limits
+1 <= events.length <= 10^5
+events[i].length == 2
+1 <= startDay_i <= endDay_i <= 10^5
+How to Solve It
+
+To solve this problem efficiently, we need a smart plan. The best approach is to be "greedy." This means making the best possible choice at each specific moment.
+
+The best choice is to always attend the event that ends the soonest.
+
+Why? Because an event that ends soon expires quickly. If we don't attend it now, we might lose the chance forever. Events that end later can wait for future days.
+
+Here is the step-by-step logic:
+
+Sort the Data: First, sort all events based on their startDay. This allows us to process days in order and know exactly which events become available on which day.
+Use a Min-Heap: We need a way to track the endDay of all currently available events. A Min-Heap (or Priority Queue) is perfect for this. It keeps the event with the smallest endDay at the top.
+Check Each Day: Loop through the days starting from day 1.
+Add New Events: If any events start on the current day, add their endDay to the Min-Heap.
+Remove Expired Events: Check the top of the heap. If an event ended before the current day, remove it. We can no longer attend it.
+Attend an Event: If the Min-Heap is not empty, pick the top item (the one ending soonest). This counts as attending one event. Remove it from the heap and move to the next day.
+Code Implementation
+import java.util.Arrays;
+import java.util.PriorityQueue;
+
+class Solution {
+    public int maxEvents(int[][] events) {
+        // Sort events by startDay
+        Arrays.sort(events, (a, b) -> Integer.compare(a[0], b[0]));
+        
+        // Use a Min-Heap to store endDay of available events
+        PriorityQueue<Integer> pq = new PriorityQueue<>();
+        
+        int count = 0;
+        int eventIndex = 0;
+        int n = events.length;
+        
+        // Iterate from day 1 up to the maximum possible day
+        for (int day = 1; day <= 100000; day++) {
+            
+            // Add all events that start on this specific 'day' into the heap
+            while (eventIndex < n && events[eventIndex][0] == day) {
+                pq.offer(events[eventIndex][1]);
+                eventIndex++;
+            }
+            
+            // Remove events from the heap that are already over
+            while (!pq.isEmpty() && pq.peek() < day) {
+                pq.poll();
+            }
+            
+            // If there are available events, attend the one ending soonest
+            if (!pq.isEmpty()) {
+                pq.poll();
+                count++;
+            }
+            
+            // Optimization: If no events are left to process or in the heap, stop
+            if (eventIndex == n && pq.isEmpty()) {
+                break;
+            }
+        }
+        
+        return count;
+    }
+}
+
+Performance Analysis
+Time Complexity: O(N log N)
+Sorting the events takes O(N log N).
+Operations inside the Min-Heap (insert and remove) take O(log N). In the worst case, we process each event once.
+Space Complexity: O(N)
+We use a Min-Heap which might store up to N events at once.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Maximum Number of Events That Can Be Attended
+Problem Overview
+Sample Cases
+Input Limits
+How to Solve It
+Code Implementation
+Performance Analysis
+Related discussions · 0
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Meeting Rooms II
+Single report
+heap
+sorting
+medium
++1
+K Top Selling Books
+Single report
+heap
+sorting
+medium
++2
+Min Coins to Pay with Change Allowed
+Single report
+greedy
+medium
+dp
++1
+Top-K Search Terms (Per-User Deduped)
+Single report
+heap
+medium
+hashmap
++2
+Max Credits with K Classes (Interval-Style)
+Low
+sorting
+medium
+dp
++3
+Code editor

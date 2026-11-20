@@ -1,0 +1,48 @@
+===H1===
+Longest Substring of All Same Letter
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/longest-same-letter-substring
+===BODY===
+Goldman Sachs
+Coding·60 minMembers
+Longest Substring of All Same Letter
+Given a string, return the length of the longest contiguous substring consisting of a single repeated character. A simple linear-scan warm-up in VP-level phone screens.
+SWE
+string
+two-pointer
+easy
+Frequency
+Single report
+Last asked
+2024-11-21
+Stage
+phone-screen
+Requirements
+
+Input: a string.
+
+Return: the length of the longest run of a single repeated character.
+
+The prompt is terse and may carry an implicit follow-up about handling a per-character count map.
+
+Notes
+
+Single linear pass with a runStart / runLength pair, or equivalently with two pointers left / right.
+
+O(n) time, O(1) space.
+
+Likely follow-up: "now find the longest substring with at most K distinct characters" (LC 340) — different algorithm, sliding window with a count map. Be ready for the pivot.
+
+Edge cases: empty string returns 0; single character returns 1.
+
+Preparation
+
+Drill once cleanly with the two-pointer scan.
+
+Read LC 340 "Longest Substring with At Most K Distinct Characters" as the natural follow-up — same prompt structure, fundamentally different solution.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,55 @@
+===H1===
+Minimum Window Substring (LeetCode 76)
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/minimum-window-substring
+===BODY===
+ByteDance / TikTok
+CodingMembers
+Minimum Window Substring (LeetCode 76)
+Find the shortest substring of S containing every character of T with multiplicity, then handle variants requiring a threshold count and returning all equally short answers. The prompt was identified as LeetCode 76.
+SWE
+string
+sliding-window
+hashmap
+hard
+Frequency
+Single report
+Last asked
+2026-08-17
+Stage
+onsite-coding
+Requirements
+
+Given strings S and T, find the shortest substring of S that contains every character required by T, including duplicate counts.
+
+Explain the linear-time complexity in terms of |S| + |T|.
+
+Follow-up: change the requirement so each required character must appear at least k times.
+
+Follow-up: return every substring tied for the minimum valid length, rather than only one answer.
+
+Notes
+
+Increment the validity counter only when a character count first becomes exactly satisfied; extra copies must not increment it again.
+
+During contraction, record the current answer before removing the leftmost character, because the removal can invalidate the window.
+
+The interviewer challenged whether hash-table operations are truly constant time. With a fixed character set, a fixed-size counter array gives a strict constant bound.
+
+Maintain required counts, window counts, and a formed counter for distinct characters whose multiplicity is satisfied. Expand the right edge, then contract while valid and record the answer before decrementing the left edge.
+
+For the k follow-up, first clarify whether k replaces each distinct character's requirement or scales the multiplicities in T. For all minimum windows, clear the result list on a shorter valid window and append index pairs on ties.
+
+Preparation
+
+Code the O(|S| + |T|) window from memory and test duplicate requirements, no valid window, and mixed-case input.
+
+Modify the implementation to return all tied minimum windows without changing the expansion/contraction invariant.
+
+Explain when a fixed-size counter array gives a strict constant-time update bound and when a hash map is required.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

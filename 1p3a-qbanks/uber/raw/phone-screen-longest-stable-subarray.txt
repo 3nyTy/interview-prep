@@ -1,0 +1,70 @@
+===H1===
+Phone Screen: Longest Subarray with Bounded Diff
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/phone-screen-longest-stable-subarray
+===BODY===
+Uber
+Coding·60 minMembers
+Phone Screen: Longest Subarray with Bounded Diff
+Recurring phone-screen / onsite prompt, equivalent to LeetCode 1438 (Longest Continuous Subarray With Absolute Diff ≤ Limit). Two-pointer plus a monotonic deque or a multiset for min / max tracking.
+SWE
+MLE
+two-pointer
+array
+data-structure
+medium
+Frequency
+Medium
+Last asked
+2026-07-17
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input: integer array nums, integer limit.
+
+Output: the length of the longest non-empty contiguous subarray such that the absolute difference between any two elements in it is ≤ limit.
+
+Equivalently, a window is valid when max(window) − min(window) ≤ limit (bounding the two extremes bounds every pair).
+
+Constraints: 1 ≤ nums.length ≤ 10^5, 1 ≤ nums[i] ≤ 10^9, 0 ≤ limit ≤ 10^9. The large value range rules out counting/bucket tricks; an O(n) or O(n log n) window is expected.
+
+Examples
+
+nums = [8, 2, 4, 7], limit = 4
+Longest valid = [2, 4] or [4, 7], each length 2
+Output = 2
+
+nums = [10, 1, 2, 4, 7, 2], limit = 5
+Longest valid = [2, 4, 7, 2] (max−min = 7−2 = 5)
+Output = 4
+
+nums = [4, 2, 2, 2, 4, 4, 2, 2], limit = 0
+All elements in the window must be equal
+Output = 3
+
+Notes
+
+Two-pointer with two monotonic deques: one tracking the running max, one tracking the running min.
+
+For each right, push to both deques (popping smaller / larger respectively to maintain monotonicity). While max_deque.front − min_deque.front > limit, advance left and pop from the deques as needed.
+
+Time O(n), space O(n).
+
+A multiset-based solution is O(n log n) and acceptable but inferior.
+
+Corner case: limit = 0 forces every element in a valid window to be equal — verify the window logic shrinks correctly on any change in value.
+
+Senior follow-up: "Compute this for every right (return an array of running lengths instead of a single max)." Same algorithm, just emit at each right.
+
+Preparation
+
+Drill LC 1438 once; the dual-monotonic-deque trick is reusable in window-min / window-max problems.
+
+Be ready to discuss why a single deque doesn't suffice — the explanation often shows up as a follow-up question.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

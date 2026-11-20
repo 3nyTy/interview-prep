@@ -1,0 +1,50 @@
+===H1===
+Prerequisite Cycle OA
+===URL===
+https://www.1point3acres.com/interview/problems/company/jpmorgan/prerequisite-cycle-oa
+===BODY===
+JPMorgan Chase
+Coding·60 minMembers
+Prerequisite Cycle OA
+The OA used the original LeetCode Course Schedule prompt: given course prerequisites, decide whether all courses can be completed. It appeared in a two-question, medium-difficulty HackerRank assessment.
+SWE
+graph
+topological-sort
+cycle-detection
+oa
+medium
+Frequency
+Single report
+Last asked
+2026-06-23
+Stage
+oa
+Requirements
+
+Given numCourses and prerequisite pairs, decide whether it is possible to finish all courses.
+
+Each prerequisite pair means one course depends on another course being completed first.
+
+Return a boolean answer.
+
+Use standard Course Schedule prerequisite-cycle semantics.
+
+Notes
+
+The main risk is cycle handling in a directed graph. Make the direction of each prerequisite edge explicit before coding.
+
+A clean answer can use either indegree processing or DFS state coloring; explain the invariant rather than only writing code.
+
+This appeared as one of two OA questions in a 60-minute, non-camera HackerRank-style assessment.
+
+Preparation
+
+Implement both an indegree-queue version and a DFS coloring version.
+
+Test no prerequisites, a simple chain, a two-node cycle, a disconnected graph, and duplicate prerequisite pairs.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,63 @@
+===H1===
+AI Coding — Maximum Unique Character Subset
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/ai-coding-max-unique-character-subset
+===BODY===
+Meta
+Coding·60 minMembers
+AI Coding — Maximum Unique Character Subset
+Given a list of words, pick a subset whose combined characters are all unique and cover the maximum number of distinct letters. Progressive sub-tasks push backtracking to bitmask + state-compression DP on word lists in the 10k range.
+SWE
+MLE
+Infra Eng
+RS
+ai-coding
+backtracking
+bitmask
+state-compression-dp
+medium
+Frequency
+High
+Last asked
+2026-08-20
+Stage
+onsite-coding
+Requirements
+
+Q1 — Bug fix. Starter code has an off-by-one or returns wrong count for empty input / duplicate-letter words. Spot and patch before touching algorithm.
+
+Q2 — Small inputs (~12 words). Implement plain backtracking: at each word, choose include / skip; maintain a 26-bit mask of letters used so far; reject any word whose own mask collides. Return the subset (not just its size — printing the subset rules out pure DP).
+
+Q3 — Pruning for 100-200 words. Drop words that themselves contain repeated letters (precompute and filter once); early-exit when mask hits 26; sort by popcount descending for better pruning.
+
+Q4 — Tens of thousands of words. Switch to bitmask DP / meet-in-the-middle. Some interviewers ask for the optimal subset itself; some accept the maximum cardinality only.
+
+Examples
+
+Input ['jan', 'feb', 'mar', 'apr', ...]. Multiple reports describe building one 26-bit mask per word, filtering out words with internal duplicates ('feb' → keep, 'sees' → drop), then DFS / DP over compatible masks.
+
+Notes
+
+Print-the-subset variant cannot use closed-form bitmask DP without backtracking — memory blows up on the 10k case. Two confirmed approaches: (a) DP for size + a parent table for reconstruction; (b) stay with optimized backtracking and rely on pruning. Several candidates report the interviewer accepting partially optimal solutions when Q4 doesn't terminate.
+
+Common AI failure: Opus 4.6 generates a verbose set-based backtracker. You must specify "26-bit integer mask" and "prune words with internal duplicates" up front or it produces slow code.
+
+One candidate reports the interviewer leading them to a specific optimization path and refusing alternatives — be ready to pivot when the AI's first answer doesn't match what the interviewer wants.
+
+The June 2026 virtual onsite wording asks for the maximum subset of words that do not overlap while capturing the most characters; this is the same core prompt as the unique-character subset variant.
+
+Preparation
+
+Write the 26-bit mask backtracking template from scratch twice. Then write the bitmask DP version that tracks (letter_mask) → best_word_subset.
+
+Practice prompting: "Generate a function letter_mask(word: str) -> int returning the 26-bit mask, or -1 if the word has duplicates." Iterate per helper.
+
+Rehearse explaining: why bitmask, why drop self-conflicting words, what the DP transition is, complexity in O(N · 2^26) worst case vs pruned reality.
+
+LeetCode 1239 (Maximum Length of a Concatenated String with Unique Characters) is the closest public analogue — drill it as a warm-up.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

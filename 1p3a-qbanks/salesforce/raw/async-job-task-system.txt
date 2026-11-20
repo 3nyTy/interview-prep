@@ -1,0 +1,87 @@
+===H1===
+Design an Async Job / Task System
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/async-job-task-system
+===BODY===
+Salesforce
+System Design·60 minMembers
+Design an Async Job / Task System
+First system-design round in the Salesforce LMTS onsite. Design a generic async job execution service — API surface, state machine, retry, idempotency, storage choice. Not asking for novel architecture, but for the candidate to explain a complete service cleanly end-to-end.
+SWE
+system-design
+job-system
+scheduling
+queueing
+idempotency
+retry
+storage
+medium
+Frequency
+Single report
+Last asked
+2026-01-09
+Stage
+onsite-system-design
+Requirements
+
+Public API: submit(job_definition) → job_id, status(job_id) → state, cancel(job_id), optionally result(job_id) → output.
+
+Job lifecycle: submitted → queued → running → (succeeded | failed | cancelled). Failed jobs may auto-retry per policy.
+
+Worker pool consumes from the queue; jobs may take seconds to hours.
+
+Retry semantics: exponential backoff with jitter; max attempt cap.
+
+Idempotency: a duplicate submit (same client-side idempotency key) must not create a second job.
+
+Persistence: jobs and their state survive worker / scheduler restarts.
+
+Storage choice (RDBMS vs NoSQL) is an explicit discussion point.
+
+Notes
+
+Architecture sketch:
+
+API service writes a new job row + enqueues a work item.
+
+Queue (Kafka / SQS / RabbitMQ / Redis Streams) holds pending work.
+
+Worker pool consumes, takes a lease on the job row (state → running, with a visibility timeout), executes, writes terminal state, ACKs the queue message.
+
+Scheduler / sweeper detects leases that expired (worker crashed mid-job), resets state to queued, re-enqueues with the attempt counter incremented.
+
+State machine must be persisted with optimistic concurrency (version column) so two workers can't both claim the same job. Use UPDATE ... WHERE state='queued' AND version=?.
+
+Retry policy: store attempt, next_attempt_at, last_error. On failure, compute next_attempt_at = now() + base * 2^attempt + rand(jitter); cap at max_attempts. The scheduler picks up jobs where next_attempt_at <= now().
+
+Idempotency: client supplies an idempotency_key. The API service first attempts INSERT ... ON CONFLICT (idempotency_key) DO NOTHING RETURNING job_id. If the insert returns no row, it explicitly selects job_id by the same unique idempotency key. The insert and fallback read must use a transaction/isolation level that cannot miss the concurrently committed row.
+
+Storage choice rationale:
+
+RDBMS (Postgres) is the conservative default — transactional state transitions, indexed scheduler queries (WHERE state='queued' AND next_attempt_at <= now()), and clean idempotency via unique constraints. Works to ~10K jobs/sec with sharding.
+
+NoSQL (DynamoDB / Cassandra) if write volume is much higher and you can live with eventually-consistent listing. Use composite keys (status partition, sort by scheduled_at) and a per-status table.
+
+Reasonable rule of thumb: start with Postgres; switch to a dedicated job system (Temporal, Airflow, Argo) when you outgrow it. Mention this in the design.
+
+Cancellation: writing state = cancelling is best-effort. The worker checks the row periodically and exits gracefully; if the worker doesn't observe in time, the job completes anyway. Document that semantic.
+
+Result storage: small results inline in the job row; large results (megabytes+) in object storage with a URL in the row.
+
+Observability: per-job state transitions written to a log; metrics on (queue depth, p99 wait, p99 run-time, failure rate by error class).
+
+Preparation
+
+Memorise the API surface and the 6 lifecycle states. Whiteboard them in 60 seconds.
+
+Practise the optimistic-concurrency UPDATE statement — interviewers may ask you to write it.
+
+Prepare a clear comparison: Postgres-backed job queue vs SQS+DDB vs Temporal. Pick a default and defend it.
+
+Have a retry-storm story — what happens if 10,000 jobs fail simultaneously due to a downstream outage? (Answer: per-job backoff still spaces them out; add a circuit-breaker per downstream).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,60 @@
+===H1===
+Robot Vacuum 8-Direction Grid
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/robot-vacuum-grid
+===BODY===
+Pinterest
+Coding·60 minMembers
+Robot Vacuum 8-Direction Grid
+Three-part robot-traversal grid problem: a vacuum starts at a position and can move in 8 directions (orthogonal + diagonal). Return all reachable cells in three settings — open grid, single-obstacle grid, and two cooperating vacuums. A phone-screen form records visited cells, stops at a blocker, and returns the final matrix.
+SWE
+grid
+dfs
+bfs
+simulation
+medium
+Frequency
+Low
+Last asked
+2026-08-18
+Stage
+phone-screen · onsite-coding
+Requirements
+
+A robot vacuum starts in a 2-D grid and can move to any of the eight surrounding cells. Solve three forms in order:
+
+Return all cells reachable in an open grid.
+
+Add a blocked cell and return the reachable set.
+
+Add a second vacuum and define whether the output is the union of independent reachable sets or an optimized coordinated coverage plan.
+
+Notes
+
+Alternate phone-screen variant — final matrix
+
+The robot moves through the 2-D matrix using the same eight-direction rule. Record every visited cell; when the robot encounters a blocker, stop and return the final matrix.
+
+The movement order and blocker semantics are not fully specified. Clarify how the next direction is chosen, whether the blocker cell is marked, and whether stopping applies to the current path or the entire traversal.
+
+Traversal considerations
+
+Use BFS or DFS with an eight-direction neighbor table and a visited set. For the blocked-cell form, exclude obstacles during neighbor generation.
+
+The two-vacuum form is ambiguous by design. Independent traversal has the same reachable union as one traversal in a connected grid; collision avoidance or minimum coverage time creates a joint-state or scheduling problem. Clarify which contract applies.
+
+A single obstacle rarely disconnects an eight-neighbor grid; test narrow boundaries and small grids where the obstacle can actually block movement.
+
+Preparation
+
+Implement the neighbor helper and traversal once, then add obstacle filtering.
+
+Test 1×1, 1×N, corner-start, and blocked-neighbor cases.
+
+State the two-vacuum clarification question and sketch both independent-union and coordinated-state solutions.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

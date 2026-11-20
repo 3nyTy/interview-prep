@@ -1,0 +1,96 @@
+===H1===
+Phone Screen: Nested Add/Sub Expression Evaluator
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/phone-screen-expression-calculator
+===BODY===
+Uber
+Coding·60 minMembers
+Phone Screen: Nested Add/Sub Expression Evaluator
+Recurring senior phone-screen prompt, also seen at the Hack2Hire problem set. Given a string expression using `add(a, b)` and `sub(a, b)` that can be nested arbitrarily, evaluate it. The interviewer states only 2–3 input/output examples; you must clarify the grammar and parser yourself.
+SWE
+string
+recursion
+data-structure
+medium
+Frequency
+Low
+Last asked
+2026-06-08
+Stage
+phone-screen
+Requirements
+
+Input: a single string expression. Operators are add(a, b) and sub(a, b). Arguments may be integers or nested expressions of the same form.
+
+Output: the evaluated integer.
+
+Examples
+
+"add(1, 2)"              → 3
+"sub(3, 1)"              → 2
+"add(1, sub(3, 1))"      → 3
+"add(add(1, 1), 2)"      → 4
+"sub(add(2, 3), sub(4, 1))" → 2
+
+Notes
+
+The interviewer often presents the problem verbally with only 2–3 examples and no formal grammar. Clarify before coding:
+
+Are there spaces inside the parens? (Often yes.)
+
+Negative integers allowed? (Confirm.)
+
+Whitespace at the boundary? (Confirm.)
+
+Recursive descent is the cleanest solution: a parse(start) → (value, end_index) function that reads the 3-character operator, the opening (, parses argument 1, skips the comma, parses argument 2, then skips the closing ).
+
+A stack-based evaluator is also acceptable: push operands, when you hit ) collapse the top frame using the operator stored at the matching (.
+
+Critical bug: when arguments are themselves nested, you cannot split on the first comma — you must track parenthesis depth to find the top-level comma between the two arguments. Multiple candidates have failed by greedy-splitting on the first ,.
+
+Common follow-up after the basic version compiles: add input validation (mismatched parens, unknown operator, non-integer arguments).
+
+Alternate canonical variant — infix Basic Calculator (LC 224 form)
+
+A second canonical shape drops the add(...)/sub(...) functional notation and asks for a standard infix arithmetic evaluator over a string s:
+
+Supported tokens: digits, +, -, (, ), and spaces. No multiplication/division in this base variant.
+
+Return the evaluated integer. eval() (or any built-in string-expression evaluator) is forbidden — you must parse and evaluate manually.
+
+Operator semantics:
+
++ is never unary (so "+1" and "+(2 + 3)" are invalid inputs).
+
+- may be unary (so "-1" and "-(2 + 3)" are valid).
+
+No two consecutive operators appear in the input.
+
+Constraints: 1 <= len(s) <= 3 * 10^5; s is always a valid expression; every number and every running partial result fits in a signed 32-bit integer.
+
+def calculate(s: str) -> int: ...
+    # Evaluate an infix expression with +, -, (, ), and spaces; no eval().
+    # Canonical O(n) single pass: keep a running result, a current sign (+1/-1),
+    # and a stack. On '(' push (result, sign) and reset; on ')' fold the frame
+    # back: result = popped_result + popped_sign * result.
+    # Handle leading/standalone '-' as unary by resetting sign before a number/'('.
+
+Demo: "1 + 1" → 2; " 2-1 + 2 " → 3; "(1+(4+5+2)-3)+(6+8)" → 23.
+
+Same core trap carries over: spaces can appear anywhere, so accumulate multi-digit numbers across whitespace rather than assuming single characters.
+
+Natural follow-ups: extend to * and / (LC 227, precedence) or to a general operator/parenthesis grammar (LC 772) — confirm which the interviewer wants before adding precedence handling.
+
+Preparation
+
+Drill LC 224 / 227 / 772 (Basic Calculator family) — the parser structure is the same.
+
+Practice writing a recursive-descent parser by hand; many candidates default to regex and get stuck on the nested-argument case.
+
+Pre-define an error model (return null / throw on malformed input) so you can pivot to the input-validation follow-up quickly.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

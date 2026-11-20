@@ -1,0 +1,455 @@
+===H1===
+Design a Concurrent Image Upload System
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/design-a-concurrent-image-upload-system
+===BODY===
+Apple
+System DesignMembers
+Design a Concurrent Image Upload System
+Design a system like Craigslist that accepts a list of images and stores them concurrently, updating the user about the status of each upload as soon as possible.
+SWE
+Infra Eng
+concurrency
+storage
+backend
+Frequency
+Single report
+Last asked
+2025-11-30
+Stage
+oa
+Problem Statement
+
+Design a system like Craigslist that accepts a list of images and stores them concurrently, updating the user about the status of each upload as soon as possible.
+
+This was an Apple phone screen for a Software Engineer that turned into a hybrid system design and coding interview. The interviewer focused on the real-time notification mechanism (WebSocket vs. long/short polling), then asked the candidate to implement the upload handler in Java on CoderPad, storing image bytes in memory with manual thread management (ThreadPoolExecutor explicitly disallowed).
+
+Phase 1: Requirements
+
+Functional Requirements
+
+Submit a batch of images for upload in a single request.
+
+Store each image concurrently; uploads should not block one another.
+
+Notify the client in real time as each individual image finishes, rather than waiting for the entire batch.
+
+Report final batch status once all images succeed or fail.
+
+Safely retry failed images without duplicating successful ones.
+
+Clarify early that the requirement is per-image storage completion status, not byte-level HTTP upload progress. The browser's XHR upload.onprogress events already cover the client→server byte stream. The real-time channel we design here covers the server→object-store phase, which happens after the HTTP request body is fully received. Asking this clarifying question signals seniority.
+
+Non-Functional Requirements
+
+Status latency: client should see a status update within ~1 second of each image being durably stored.
+
+Concurrency: N images in a batch must be stored in parallel, not serially.
+
+Availability: 99.9% on the upload path.
+
+Durability: once an image is marked STORED, it must not be lost. Delegate to the object store (S3 et al. advertise 11-nines durability via erasure coding across AZs).
+
+Scale: Craigslist-like workload. Not Twitter-scale, but non-trivial: millions of listings per day, each with several images.
+
+Capacity Estimation
+
+MetricEstimate
+Daily Active Users~5M
+Listings created per day~2M (users post more than once; batch size ~4 images)
+Images per day~8M = ~100 images/sec average
+Peak multiplier~10x = ~1,000 images/sec
+Average image size~500 KB
+Peak ingress bandwidth~500 MB/sec
+
+The scale does not require exotic distributed systems. A handful of upload servers behind a load balancer, each handling concurrent threads per request, is sufficient. Signal that you recognize this to avoid over-engineering.
+
+Phase 2: Data Model
+
+UploadSession
+├── session_id        UUID, PK
+├── user_id
+├── total_images      count
+├── created_at
+
+Image
+├── image_id          UUID, PK
+├── session_id        FK → UploadSession
+├── filename
+├── size_bytes
+├── status            PENDING | STORING | STORED | FAILED
+├── storage_key       path in object store (null until stored)
+├── updated_at
+
+The status field is the key piece of state the notification layer reads and reports to the client.
+
+Phase 3: API Design
+
+Protocol Choice: WebSocket
+
+For per-image status delivered as soon as possible, WebSocket is the right choice:
+
+Server pushes a message the moment each image thread finishes.
+
+No polling round-trips or connection setup overhead per status check.
+
+Long polling works but adds latency (one round-trip per status event) and is heavier on the server under concurrent batches.
+
+Short polling is the simplest to implement but wastes bandwidth on "nothing yet" responses and adds average latency equal to half the poll interval.
+
+For small images on a reliable connection, short polling at 1-second intervals is actually fine in practice. Raise that trade-off explicitly: WebSocket is lowest-latency and most efficient at scale, long polling is a reasonable middle ground, short polling is acceptable when image uploads complete in under a few seconds.
+
+REST: Initiate Upload
+
+POST /api/uploads
+Authorization: Bearer <token>
+Idempotency-Key: <client-generated UUID>
+Content-Type: multipart/form-data
+Body: images[]  (binary, one part per image, with per-part Content-Disposition name)
+
+Response 202 Accepted:
+{
+  "session_id": "sess-abc123",
+  "image_ids": ["img-001", "img-002", "img-003"],
+  "ws_url": "wss://api.example.com/ws/uploads/sess-abc123"
+}
+
+The Idempotency-Key is critical. Image uploads are expensive and naive retries would double-store the batch. Server stores (key → session_id) for a TTL (e.g., 24h); a retried POST with the same key returns the original response rather than creating a new session.
+
+REST: Fetch Current Session State (Catch-Up / Reconnect)
+
+GET /api/uploads/{session_id}
+
+Response:
+{
+  "session_id": "sess-abc123",
+  "images": [
+    { "image_id": "img-001", "status": "STORED", "storage_key": "..." },
+    { "image_id": "img-002", "status": "STORING" },
+    { "image_id": "img-003", "status": "FAILED", "error": "..." }
+  ]
+}
+
+This endpoint lets the client recover from a dropped WebSocket or a client-restart mid-batch. The status field in the DB is the source of truth; WebSocket is a push optimization on top.
+
+WebSocket: Status Stream
+
+Client connects to: wss://api.example.com/ws/uploads/{session_id}
+
+Server pushes per image (as each thread completes):
+{
+  "image_id": "img-001",
+  "status": "STORED",
+  "storage_key": "images/2025/11/img-001.jpg"
+}
+
+Server pushes on error:
+{
+  "image_id": "img-002",
+  "status": "FAILED",
+  "error": "storage_unavailable"
+}
+
+Server pushes on batch completion:
+{
+  "session_id": "sess-abc123",
+  "status": "COMPLETE",
+  "stored": 2,
+  "failed": 1
+}
+
+Phase 4: High-Level Design
+
+Architecture
+
+Upload Flow
+
+Client sends POST /api/uploads with the image batch and an Idempotency-Key.
+
+API handler validates each image (file type by magic bytes, size limit, MIME sniff) before accepting the batch. Rejected parts fail the whole request with 400.
+
+API handler creates an UploadSession and one Image row per file (status=PENDING), then returns 202 with session_id and ws_url.
+
+For each image, the handler spawns a worker to store the bytes. Each worker: a. Marks image status as STORING in the DB. b. Writes image bytes to object storage. c. Marks image status as STORED (or FAILED) in the DB. d. Notifies the local WebSocket handler for this session (in-process call). At scale-out, this step publishes to a pub/sub bus instead (see the next subsection).
+
+Client opens the WebSocket using ws_url. The load balancer routes it to the same server handling the upload (sticky by session_id). On connect, the handler replays current state from the DB so any events that fired before the WS connected are not lost, then streams live updates from the worker threads.
+
+When all workers finish, the handler pushes a final COMPLETE event.
+
+Race between 202 and WebSocket connect. Workers can finish before the client opens the WebSocket, especially for small images stored in memory. A push-only design loses those early completions silently. Two fixes, both of which you should mention:
+
+DB is the source of truth, WS is a push optimization. On WS connect, the handler queries the DB for current session state and sends a SNAPSHOT frame before streaming live events. This also handles mid-batch WebSocket reconnects.
+
+Buffer events per session in Redis for a short TTL (say 60 s) and replay on connect. Simpler if you don't want a DB read on every WS handshake.
+
+Either works. An Apple interviewer will ask "what if the WebSocket isn't open yet?", so lead with the answer.
+
+Default: Sticky Routing. Upgrade Path: Pub/Sub
+
+At Craigslist-scale (~1,000 images/sec peak across a handful of servers), the worker thread storing the image and the WebSocket handler pushing status live in the same process. Route by session_id (consistent hash at the load balancer) and the worker calls session.send() directly. This is the default.
+
+Reach for a pub/sub bus (Redis Pub/Sub, Kafka, NATS) only when one of these is true:
+
+Upload servers and WebSocket gateways need to scale on different curves (e.g., millions of idle WS connections, few active upload workers).
+
+Sessions must survive server restarts transparently.
+
+There's already a company-wide message bus worth reusing.
+
+Lead with sticky routing; treat pub/sub as the scale-out upgrade. Naming Kafka on the whiteboard before you've justified why sticky routing fails is a common over-engineering signal.
+
+Phase 5: Scaling and Trade-offs
+
+Scaling the Upload Service
+
+BottleneckFix
+CPU / thread count per serverBound threads per request (e.g., max 10 per batch); queue overflow. For very large batches, accept images, queue them, and process from a worker pool
+Object storage write throughputObject stores (S3, GCS) scale horizontally; no action needed at Craigslist scale
+Metadata DB writesAt ~1,000 images/sec × ~2 status transitions per image (~2K writes/sec), a single Postgres primary handles this comfortably; shard by user_id later if write rate grows. Do not batch status writes: the DB is the source of truth for SNAPSHOT replay, so a lagging write is a lost event for clients that reconnect during the lag window
+WebSocket connection countEach WS server holds ~50K–100K connections; horizontal scale is straightforward
+Abuse / per-user throughputRate limit uploads per user (e.g., 20 images/minute free tier) at the API gateway; otherwise one user can saturate an upload server
+
+WebSocket vs. Long Polling vs. Short Polling
+
+MechanismLatencyServer loadComplexity
+WebSocketRTT only (typically 20–100 ms)Low (persistent conn, no wasted polls)Higher (connection lifecycle, reconnect logic)
+Long pollingRTT + up to one poll-wait window (hundreds of ms to seconds)Medium (connections held open per poll)Medium
+Short polling~0.5 × interval on averageHigh (many "nothing yet" responses)Low
+
+For images that typically complete in 1–3 seconds, all three mechanisms are defensible. Pick WebSocket for lowest latency and best scalability; call out the others as valid trade-offs when image sizes are small or the client environment makes persistent connections difficult (e.g., HTTP/1.1 only, strict proxies).
+
+Idempotency and Retries
+
+Client-supplied Idempotency-Key on POST /api/uploads. Server stores (key → session_id) with a TTL (e.g., 24 h). A retried POST with the same key returns the original 202 response instead of creating a duplicate session.
+
+Per-image retry on FAILED is a separate endpoint: POST /api/uploads/{session_id}/images/{image_id}/retry. This re-queues just that image; successful images are never re-stored.
+
+WebSocket reconnect is safe. The handler replays current DB state (SNAPSHOT) before subscribing to live events, so no events are lost across a reconnect.
+
+Upload Validation
+
+Before spawning worker threads, the API handler validates each image:
+
+Magic bytes on the first few KB (JPEG: FF D8 FF, PNG: 89 50 4E 47, etc.). MIME type from the client cannot be trusted.
+
+Size limits per image and per batch.
+
+Moderation hook (often async): submit to a safety-classifier pipeline after storage; mark the image as quarantined until cleared.
+
+Direct Upload via Presigned URLs (Alternative)
+
+Instead of routing image bytes through the upload service, the server can:
+
+Issue a presigned S3 URL per image.
+
+Client uploads each image directly to object storage (in parallel from the browser).
+
+Object storage triggers a completion webhook → server updates status → WebSocket push.
+
+This removes the upload service from the data plane entirely, reducing server bandwidth cost and eliminating the thread-per-image concern. Raise this as the preferred architecture at higher scale.
+
+The Apple interview specifically tested manual thread management in Java, so expect the on-site or phone-screen coding portion to focus on the direct-to-server path rather than the presigned-URL path.
+
+Java Implementation: Concurrent Upload Handler
+
+The interviewer asked for this directly on CoderPad: implement the upload handler in Java, store bytes in RAM, manage threads manually (no ThreadPoolExecutor).
+
+import java.util.*;
+import java.util.concurrent.*;
+
+public class ImageUploadService {
+
+    // In-memory "storage": imageId -> bytes (per interviewer's constraint)
+    private final Map<String, byte[]> storage = new ConcurrentHashMap<>();
+
+    // Source-of-truth status, read on WS (re)connect for SNAPSHOT replay
+    private final Map<String, String> status = new ConcurrentHashMap<>();
+
+    // Active WebSocket sessions: sessionId -> session handle
+    private final Map<String, WebSocketSession> wsSessions = new ConcurrentHashMap<>();
+
+    /**
+     * Upload a batch of images concurrently.
+     * Spawns one raw Thread per image. Each thread persists status first,
+     * then attempts a live WebSocket push. If the WS is not yet connected,
+     * the client will pick up state via SNAPSHOT on connect.
+     */
+    public void uploadBatch(String sessionId, List<ImageData> images) {
+        List<Thread> threads = new ArrayList<>(images.size());
+
+        for (ImageData image : images) {
+            Thread t = new Thread(() -> {
+                recordStatus(image.getId(), "STORING");
+                try {
+                    storage.put(image.getId(), image.getBytes());  // "store" to RAM
+                    recordStatus(image.getId(), "STORED");
+                    pushEvent(sessionId, eventJson(image.getId(), "STORED", null));
+                } catch (Exception e) {
+                    recordStatus(image.getId(), "FAILED");
+                    pushEvent(sessionId, eventJson(image.getId(), "FAILED", e.getMessage()));
+                }
+            }, "upload-" + image.getId());
+            threads.add(t);
+            t.start();
+        }
+
+        // Join all threads so we can send a COMPLETE event.
+        // Important: if interrupted mid-loop, we still finish joining the rest
+        // (the workers own the status writes the client cares about) and
+        // re-set the interrupt flag at the end.
+        boolean interrupted = false;
+        for (Thread t : threads) {
+            while (true) {
+                try {
+                    t.join();
+                    break;
+                } catch (InterruptedException e) {
+                    interrupted = true;  // remember, keep joining
+                }
+            }
+        }
+        if (interrupted) Thread.currentThread().interrupt();
+
+        pushEvent(sessionId, String.format(
+            "{\"sessionId\":\"%s\",\"status\":\"COMPLETE\",\"total\":%d}",
+            sessionId, images.size()));
+    }
+
+    private void recordStatus(String imageId, String s) {
+        status.put(imageId, s);  // in production: durable DB write
+    }
+
+    private void pushEvent(String sessionId, String msg) {
+        WebSocketSession session = wsSessions.get(sessionId);
+        if (session == null || !session.isOpen()) return;  // client catches up via SNAPSHOT
+        synchronized (session) {                           // WS sends are not thread-safe
+            session.send(msg);
+        }
+    }
+
+    private String eventJson(String imageId, String s, String err) {
+        return err == null
+            ? String.format("{\"imageId\":\"%s\",\"status\":\"%s\"}", imageId, s)
+            : String.format("{\"imageId\":\"%s\",\"status\":\"%s\",\"error\":\"%s\"}",
+                            imageId, s, err);
+    }
+
+    /** Called by the WebSocket handler on connect. Replays current state. */
+    public void registerSession(String sessionId, WebSocketSession ws,
+                                List<String> imageIds) {
+        wsSessions.put(sessionId, ws);
+        for (String id : imageIds) {
+            String s = status.getOrDefault(id, "PENDING");
+            ws.send(eventJson(id, s, null));
+        }
+    }
+}
+
+Three details the interviewer will press on:
+
+Interrupt handling. The join loop keeps joining on interrupt rather than bailing out. If we broke early, workers would keep running unattended and the COMPLETE event would never fire. We re-set the interrupt flag at the end so the caller can still detect the interrupt.
+
+WebSocket thread safety. Most WebSocket libraries (Spring, Jetty) do not allow concurrent send() calls on one session. Synchronize on the session handle or serialize sends through a per-session queue.
+
+Status is recorded before the push. If the client's WebSocket reconnects, registerSession replays current state from the status map. Push is an optimization; the map is the source of truth.
+
+The interviewer disallowed ThreadPoolExecutor and wanted raw Thread objects. State the production alternative out loud: "In production I'd use a bounded thread pool or Java 21 virtual threads (Thread.ofVirtual().start(...)), but I'll use raw threads per the constraint." Virtual threads are the modern idiomatic answer and worth mentioning even if you're not allowed to use them.
+
+The join() loop ties up the HTTP request thread for the duration of the batch. For a few small images that's fine; for dozens of MB-sized images you'd detach the workers and return 202 immediately, firing the COMPLETE event from the last worker instead of from the request handler. Raise this trade-off before the interviewer asks.
+
+Common Pitfalls
+
+Choosing short polling by default. Short polling is the simplest implementation but delivers the worst user experience for this requirement ("update the user as soon as possible"). If you reach for polling without discussing WebSocket first, it signals you haven't internalized the real-time constraint.
+
+Uploading images serially. Spawning one thread and looping through images one by one defeats the entire purpose. Make sure your design explicitly spawns concurrent work units, one per image or one per batch chunk.
+
+Forgetting WebSocket multiplexing. A single WebSocket connection can carry events for all images in a batch. You do not need one connection per image.
+
+Not handling partial failure. In a batch of 5 images, 3 might succeed and 2 might fail. Your status model must support per-image FAILED without aborting the others. Never mark the session FAILED because one image failed.
+
+Jumping to pub/sub prematurely. At Craigslist scale, sticky routing by session_id is the right default. The upload worker and the WebSocket handler live in the same process, so a direct in-process call delivers the status. Reach for Redis Pub/Sub or Kafka only when you need to decouple WebSocket gateways from upload servers (different scaling curves, millions of idle connections, or survive-restart requirements). Naming pub/sub as the first answer signals over-engineering.
+
+Treating WebSocket as the source of truth. If a worker finishes before the client opens the WebSocket, a push-only design loses the event silently. Persist status to the DB first, push as an optimization, and replay current state on WS connect. This is the single most common correctness bug in this problem.
+
+No idempotency key on the upload POST. Network blips are routine on mobile; a retried multi-MB upload without an idempotency key doubles the storage cost and creates duplicate listings. Always ask for Idempotency-Key.
+
+Trusting client-reported MIME type. Content-Type: image/jpeg on a multipart part says nothing about the bytes. Sniff magic bytes before storing. Apple interviewers on security-adjacent teams will pull on this.
+
+Interview Checklist
+
+Requirements
+
+  Clarified per-image storage completion (not HTTP byte-progress) as the channel's purpose
+
+  Identified per-image status (not just a batch result) and idempotent retry as core functional needs
+
+  Back-of-envelope: ~1,000 images/sec peak, ~500 MB/sec ingress, no exotic infrastructure needed
+
+Data Model
+
+  UploadSession and Image entities with status field as the source of truth
+
+API Design
+
+  Justified WebSocket over long/short polling with realistic latency numbers
+
+  Idempotency-Key header on POST
+
+  GET session-state endpoint as a catch-up/reconnect fallback
+
+High-Level Design
+
+  Upload service spawns concurrent workers, one per image
+
+  Addressed the 202-vs-WS-connect race: DB as source of truth, SNAPSHOT replay on connect
+
+  Sticky routing as the default; pub/sub only as the scale-out upgrade
+
+  Mentioned presigned-URL alternative as the preferred high-scale architecture
+
+  Validated uploads (magic bytes, size limit) before spawning workers
+
+Scaling and Trade-offs
+
+  Thread bounding / queue overflow
+
+  WebSocket vs. long polling vs. short polling trade-off table
+
+  Idempotency and WS reconnect semantics
+
+  Direct-upload presigned-URL alternative
+
+  Partial failure handling (per-image retry, not whole-batch abort)
+
+Coding (if asked)
+
+  Raw Thread objects per image, not ThreadPoolExecutor
+
+  ConcurrentHashMap for in-memory storage, status, and WS sessions
+
+  Status recorded before WS push so reconnects replay correctly
+
+  Synchronized session.send() (WebSocket sends are not thread-safe)
+
+  Interrupt loop keeps joining (workers must finish) and re-sets the interrupt flag
+
+  Mentioned production alternatives (virtual threads, fire-and-forget)
+
+Summary
+
+ConcernDecision
+Status notificationWebSocket push with DB-backed SNAPSHOT replay on connect
+Source of truthImage row in DB; WebSocket is a push optimization
+Concurrency modelOne worker per image; join workers to fire a batch COMPLETE event
+StorageObject store (S3/GCS); presigned URLs at higher scale
+Partial failurePer-image FAILED status; batch continues; per-image retry endpoint
+IdempotencyClient-supplied Idempotency-Key on the POST; 24 h TTL
+Scale boundary~1,000 images/sec peak. Sticky routing first, pub/sub only when needed
+Upload validationMagic-bytes sniff, per-image size limit, async moderation hook
+
+The defining property of this design: the DB-persisted image status is the source of truth; WebSocket push is an optimization that shaves latency to RTT, with a SNAPSHOT replay on connect so the client never misses an event. Everything else (presigned URLs, pub/sub, thread bounding) is an extension of that core model.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

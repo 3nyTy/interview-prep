@@ -1,0 +1,59 @@
+===H1===
+Kubernetes Service Filter & Dependency Chain
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/kubernetes-service-filter-and-dependency-chain
+===BODY===
+Apple
+Coding·60 minMembers
+Kubernetes Service Filter & Dependency Chain
+Implement filters over Kubernetes service records, then compute dependency chains and query status along the chain. A final open-ended follow-up asks how to expose the code as an MCP server for agents while reducing noise.
+MLE
+Infra Eng
+SWE
+graph
+dfs
+dependency-resolution
+json
+tool-use
+medium
+Frequency
+Single report
+Last asked
+2026-05-14
+Stage
+onsite-coding
+Requirements
+
+Given a collection of Kubernetes services with attributes, status, and dependencies:
+
+Implement filters by requested service attributes.
+
+Build or traverse dependency chains.
+
+Query status along a dependency chain.
+
+Handle missing dependencies and cycles.
+
+Discuss how this code would become a tool server for an agent and how the agent should avoid noisy output.
+
+Notes
+
+Use a service id -> service map for filtering and adjacency lists for dependencies. Dependency-chain queries should define direction: upstream dependencies vs downstream dependents. Cycle handling is important; use visiting / visited states or BFS with a seen set.
+
+The MCP follow-up is a design signal: expose narrow tools such as filter_services, get_dependency_chain, and summarize_status, return structured JSON, cap result sizes, and include confidence / truncation metadata so the agent does not flood users with raw cluster state.
+
+Preparation
+
+Implement attribute filtering with composable predicates.
+
+Implement DFS / BFS dependency traversal with cycle detection.
+
+Prepare a structured tool API with input schema, output schema, pagination, and error cases.
+
+Practice explaining noise controls: severity thresholds, result limits, dedupe, and summarization.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

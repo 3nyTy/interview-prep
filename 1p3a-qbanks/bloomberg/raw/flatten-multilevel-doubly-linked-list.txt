@@ -1,0 +1,79 @@
+===H1===
+Flatten a Multilevel Doubly Linked List
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/flatten-multilevel-doubly-linked-list
+===BODY===
+Bloomberg
+Coding·60 minFree preview
+Flatten a Multilevel Doubly Linked List
+Flatten a doubly linked list whose nodes carry an extra child pointer into a single-level doubly linked list, in-place. A long-running Bloomberg classic that appears in phone screens and onsite rounds alike.
+SWE
+linked-list
+dfs
+recursion
+medium
+Frequency
+Low
+Last asked
+2026-01-22
+Stage
+phone-screen · onsite-coding
+Requirements
+
+A doubly linked list contains nodes with prev, next, and an additional child pointer. The child may point to another doubly linked list, and those nodes may themselves have children — producing a multilevel tree-like structure.
+
+Write a function that flattens the structure into a single-level doubly linked list. After flattening:
+
+A node curr with a child list must have all of that child list inserted between curr and curr.next.
+
+All child pointers in the result must be null.
+
+The mutation must preserve the doubly-linked invariant — every node's prev and next are correctly wired.
+
+Function signature (Java / Python idiomatic):
+
+Node flatten(Node head)
+
+Follow-ups interviewers ask:
+
+Walk through your pointer updates with a small example and confirm prev is rewritten in both directions.
+
+Implement both a recursive and an iterative version. The iterative version is the more interesting one because of the explicit stack and the question of where to push pending next nodes.
+
+Discuss space complexity: O(depth) for recursion (stack frames), O(depth) for iteration (explicit stack).
+
+Examples
+
+Input:  head = [1,2,3,4,5,6,null,null,null,7,8,9,10,null,null,11,12]
+Output: [1,2,3,7,8,11,12,9,10,4,5,6]
+
+Input:  head = [1,2,null,3]
+Output: [1,3,2]
+
+Edge cases interviewers probe: empty list, a head with only a child (no next), a child list whose tail itself has a child.
+
+Notes
+
+The canonical clean solution is a DFS that, on each node with a child, splices the flattened child list in between curr and curr.next, then continues from the saved next. Time O(n), space O(depth).
+
+The most common bug is forgetting to set prev on the original curr.next to point back to the tail of the spliced child list — interviewers will catch this in dry-run.
+
+An equivalent iterative form uses an explicit stack and pushes the original next before descending into the child. This makes the splicing logic more local but the pointer bookkeeping noisier.
+
+Bloomberg interviewers consistently push for the iterative version after the recursive one. Have both ready and be able to argue why neither is strictly better in production code (iteration sidesteps stack-depth limits; recursion is easier to read).
+
+Preparation
+
+Hand-derive the pointer updates on a 3-level example on paper before writing code — most bugs come from getting prev wrong, not the splice itself.
+
+Implement once recursively, then rewrite iteratively from scratch without looking; this is the variant most likely to trip you up.
+
+Drill dry-run narration: walk through every pointer assignment out loud, naming both the node and its target. Bloomberg explicitly grades this verbal step.
+
+Be ready to discuss why neither BFS nor level-order is the natural fit here — the structural insight is depth-first by construction.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

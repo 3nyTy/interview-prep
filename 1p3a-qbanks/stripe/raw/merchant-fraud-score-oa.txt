@@ -1,0 +1,60 @@
+===H1===
+Merchant Fraud Score (OA)
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/merchant-fraud-score-oa
+===BODY===
+Stripe
+Coding·60 minMembers
+Merchant Fraud Score (OA)
+OA. Given transactions, fraud-scoring rules, and a baseline merchant score, compute each merchant's final fraud score by applying rule contributions over their transactions.
+SWE
+string
+payment
+medium
+Frequency
+Low
+Last asked
+2026-07-25
+Stage
+oa · phone-screen
+Requirements
+
+Inputs:
+
+transaction = ["merchant1,980,customer1,15", ...] — each row contains merchant_id, amount, customer ID, and a timestamp.
+
+rules = ["1500,2,8,12", ...] — each rule contains a threshold and additive score values keyed to transaction properties.
+
+merchants = ["merchant1,20", ...] — the base score per merchant.
+
+Output: ["merchant1,50", ...] — the final score per merchant after applying every matching rule across that merchant's transactions.
+
+Notes
+
+The rule grammar is the most ambiguous part; exact semantics for every score component remain incomplete.
+
+The implementation is roughly 50 lines in a common interview language.
+
+This prompt family also appears in phone screens where AI assistance may be explicitly permitted. Confirm the live round's tool rules before starting.
+
+Solution skeleton
+
+Parse transactions, rules, and merchant baselines into typed records, then initialize one running score per merchant.
+
+Keep the unrecovered grammar behind two small functions—one that decides whether a rule matches a transaction and one that returns its score contribution—so parsing, evaluation, and aggregation can be tested independently without assuming missing semantics.
+
+For T transactions, R rules, and M merchants, the direct evaluator is O(T·R + M) time with O(M) score storage beyond the parsed input. Add an index only if the clarified rule grammar exposes a useful lookup key.
+
+Preparation
+
+Drill rule-engine problems: parse a list of rules, group transactions, and accumulate per-entity totals.
+
+Pre-write a small apply_rule(transaction, rule, current_score) skeleton so multiple rules remain composable.
+
+Practice CSV-style parsing and integer arithmetic; do not assume floating-point money values.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

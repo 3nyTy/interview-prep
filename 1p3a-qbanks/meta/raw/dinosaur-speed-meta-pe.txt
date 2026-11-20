@@ -1,0 +1,57 @@
+===H1===
+Dinosaur Speed (Meta PE classic)
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/dinosaur-speed-meta-pe
+===BODY===
+Meta
+Coding·45 minMembers
+Dinosaur Speed (Meta PE classic)
+Meta Production Engineer classic. Given timestamps when dinosaurs cross sensor lines, pair them up so each pair represents the same dinosaur, and compute speeds. Time-window pairing + binary search.
+Perf Eng
+Infra Eng
+array
+binary-search
+two-pointer
+interval
+medium
+Frequency
+Low
+Last asked
+2026-08-15
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Two sensor lines a fixed distance apart; each line records timestamps when something crosses it.
+
+A "dinosaur" pair = a crossing at line 1 followed by a crossing at line 2 within a reasonable window.
+
+Pair them greedily by minimum time delta, compute speed for each pair.
+
+Follow-ups: filter on a speed threshold, handle multiple dinosaurs in flight, return only pairs that exceed N mph.
+
+Examples
+
+Line A: [1, 5, 10]; Line B: [2, 6, 12]; distance = 100. Pairs: (1,2), (5,6), (10,12); speeds 100/1, 100/1, 100/2.
+
+Notes
+
+PE-track-specific — this prompt is rarely seen outside Production Engineer loops.
+
+Time-window pairing is the standard pattern; binary-search the matching candidate within [t + min_dt, t + max_dt].
+
+Common bug: O(n²) brute-force pairing when O(n log n) two-pointer / binary-search is expected.
+
+Preparation
+
+Write the binary-search version from memory in under 12 min.
+
+Practice the speed-threshold follow-up (filter + return list).
+
+Pair with the standard PE phone-screen partner problem: top-N frequent words from a file.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

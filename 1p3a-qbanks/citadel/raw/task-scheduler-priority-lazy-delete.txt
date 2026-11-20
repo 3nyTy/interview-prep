@@ -1,0 +1,62 @@
+===H1===
+Task Scheduler with Priority + Lazy Deletion
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/task-scheduler-priority-lazy-delete
+===BODY===
+Citadel / Citadel Securities
+Coding·60 minMembers
+Task Scheduler with Priority + Lazy Deletion
+Citadel SWE intern onsite round 4: design an in-memory task scheduler that supports insert, delete, and execute-highest-priority. Reported solution uses a priority queue with a lazy-deletion marker so cancellation does not require an `O(n)` heap scan. The same family anchors a 90-minute C++ round in Citadel GQS onsites, framed as a scheduler whose callers register tasks together with their arguments.
+SWE
+heap
+data-structure
+scheduling
+hashmap
+medium
+Frequency
+Low
+Last asked
+2026-07-17
+Stage
+onsite-coding
+Requirements
+
+Support:
+
+insert(task_id, priority) — add a task with the given priority.
+
+delete(task_id) — cancel a task by id. Subsequent execute calls must skip it.
+
+execute() -> task_id — pop and return the highest-priority active task. Behavior on empty is up to the candidate (return sentinel, throw, block — clarify).
+
+The interviewer expects efficient amortized cost rather than worst-case O(log n) per op.
+
+Notes
+
+Lazy-delete pattern: keep a max-heap of (priority, task_id) and a separate set (or hashmap) of canceled task ids. delete is O(1) — just record the id in the canceled set. execute pops from the heap and discards any entry whose id is in the canceled set; the first non-canceled pop is returned.
+
+Amortized cost: each task is inserted into the heap at most once and popped at most once, so the total work is O(n log n) across n operations even though individual execute calls may discard multiple stale entries.
+
+Watch the priority update follow-up. If the prompt also supports re-prioritizing an existing task, insert a fresh (new_priority, task_id) entry and rely on lazy-delete to skip the old one. Track the current priority in a separate hashmap so execute can compare the popped entry's priority against the latest known priority and discard stale ones.
+
+Edge cases: deleting an id that is not in the queue (no-op), executing on an empty queue, executing when every remaining entry is canceled. State each behavior up front.
+
+Memory growth: the canceled-set grows monotonically until those tasks are eventually popped and discarded. For long-running schedulers, garbage-collect on a periodic compaction pass or cap canceled-set size with a watermark.
+
+The family also appears in Citadel GQS onsites as a 90-minute C++ implementation round: build a scheduler where callers add tasks and pass arguments along with them. The scheduling policy is left open in that framing — clarify whether execution order is priority-based, FIFO, or time-triggered before committing to a data structure.
+
+Preparation
+
+Implement the lazy-delete priority-queue pattern once in Python with heapq. It reappears in many "design a scheduler / cache / streaming problem" prompts and is the cheapest tool for delete-by-id over a heap.
+
+Drill the analogous LC families: top-k with deletion, median maintenance with removal. Both use the same canceled-set trick.
+
+Be ready to argue amortized O(log n) per operation out loud — the worst case is a single execute that discards many stale entries, but charged against the operations that inserted them.
+
+For interviews that want stricter worst-case bounds, sketch an alternative using a balanced BST (std::set of (priority, id)) keyed appropriately, with O(log n) insert / delete / max-extract.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

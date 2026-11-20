@@ -1,0 +1,55 @@
+===H1===
+Alien Dictionary
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/alien-dictionary
+===BODY===
+ByteDance / TikTok
+CodingMembers
+Alien Dictionary
+The standard Alien Dictionary problem: infer a valid character order from words already sorted under an unknown alphabet. The implementation must include every character, avoid duplicate indegree increments, detect impossible ordering constraints, and explain each graph update.
+SWE
+Infra Eng
+graph
+topological-sort
+hard
+Frequency
+Low · New
+Last asked
+2026-09-02
+Stage
+onsite-coding
+Requirements
+
+Given words sorted according to an unknown alphabet, infer one valid ordering of the alphabet's characters.
+
+Include characters that have no incoming or outgoing dependency.
+
+Build ordering constraints from the first differing character in each adjacent word pair.
+
+Do not increase indegree twice for the same directed edge.
+
+Return failure when the constraints are invalid or cyclic.
+
+Notes
+
+Explain graph-node initialization before adding edges; silently inserting characters inside a later branch can obscure missing isolated nodes.
+
+Duplicate edges must not inflate indegree.
+
+Dry-run the graph construction and ordering process before declaring the implementation complete. An indentation error and unexplained graph update were treated as significant signals even after the candidate found the bug.
+
+A USDS second coding round uses an Alien Dictionary variant. Its specific changes are unspecified; do not assume that every boundary rule above carries over unchanged.
+
+Preparation
+
+Implement graph construction and ordering from scratch, narrating why only the first differing character creates a constraint.
+
+Drill isolated characters, duplicate edges, cycles, and a longer word preceding its exact prefix.
+
+Run one manual trace focused only on indegree changes and queue contents.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

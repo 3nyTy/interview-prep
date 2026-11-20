@@ -1,0 +1,78 @@
+===H1===
+SRE Python Fundamentals — Five-Question Set
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/sre-python-fundamentals-set
+===BODY===
+Citadel / Citadel Securities
+Coding·60 minMembers
+SRE Python Fundamentals — Five-Question Set
+Complete five short Python tasks in CoderPad: repeated output with blank-line separation, reverse-order squaring, FizzBuzz, word-frequency counting, and the second-largest unique integer with a `None` fallback. The coding set shares a one-hour first round with a verbal system-design prompt.
+Infra Eng
+python
+cs-fundamentals
+easy
+Frequency
+Single report
+Last asked
+2026-08-05
+Stage
+tech-screen
+Requirements
+
+Complete all five Python tasks:
+
+Write a function that accepts an integer n and a string message, then prints the message n times with a blank line between consecutive copies.
+
+Write a function that accepts a list of numbers and returns a new list containing their squares in reverse order.
+
+Write a function that accepts an integer n and prints the values from 1 through n, replacing multiples of 3 with Fizz, multiples of 5 with Buzz, and multiples of both with FizzBuzz.
+
+Write a function that accepts a string and returns a dictionary mapping each word to its occurrence count.
+
+Write a function that accepts a list of integers and returns the second-largest unique value. Return None when fewer than two unique values exist.
+
+Examples
+
+Reverse-order squares: [1, 2, 3] -> [9, 4, 1]
+
+FizzBuzz for n = 5: 1, 2, Fizz, 4, Buzz
+
+Word counts: "the cat sat on the mat" -> {"the": 2, "cat": 1, "sat": 1, "on": 1, "mat": 1}
+
+Second-largest unique value:
+
+[3, 1, 4, 4, 5, 5, 2] -> 4
+
+[7, 7, 7] -> None
+
+[-1, -2] -> -2
+
+Notes
+
+The five exercises form the Python coding portion of a one-hour SRE first round. The interview switches to a verbal system-design problem after coding.
+
+Preserve the requested output behavior: the first and third tasks print, while the second, fourth, and fifth tasks return values.
+
+Solution skeleton
+
+For repeated output, emit the blank separator only before copies after the first; this avoids both a leading blank line and an extra separator after the last copy.
+
+Reverse-order squaring is a single pass over a reverse iterator, producing one squared output per input element.
+
+For FizzBuzz, test divisibility by both 3 and 5 before the individual cases so common multiples are not consumed by an earlier branch.
+
+For word counts, state the tokenization and case-sensitivity assumptions before using a frequency map; whitespace splitting is sufficient only when punctuation handling is outside the contract.
+
+For the second-largest value, track the largest and second-largest distinct values in one pass, ignore duplicates, and avoid a nonnegative sentinel so negative-only inputs remain correct. This takes O(n) time and O(1) auxiliary space.
+
+Preparation
+
+Implement the five tasks back-to-back in a single timed CoderPad-style session, including the empty, singleton, duplicate-only, and negative-number cases implied by the prompts.
+
+Rehearse explaining Python choices while coding, especially the distinction between producing console output and returning a value.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

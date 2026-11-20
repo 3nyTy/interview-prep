@@ -1,0 +1,49 @@
+===H1===
+Phone Screen: Word Search on Straight 8-Direction Lines
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/phone-screen-word-search-straight-line
+===BODY===
+Uber
+Coding·60 minMembers
+Phone Screen: Word Search on Straight 8-Direction Lines
+Recurring phone-screen prompt. Given a 2D character grid and a target word, decide whether the word appears along any single straight line in 8 directions (up/down/left/right + 4 diagonals). No turns allowed. Follow-ups extend to turning paths and skip-letter matching.
+SWE
+array
+string
+dfs
+medium
+Frequency
+Medium
+Last asked
+2026-05-12
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input: 2D character grid of size R × C, target string word.
+
+A match is a straight line of len(word) cells, starting at any cell and moving in one of 8 fixed directions, where the characters read in order equal word.
+
+Output: boolean (or list of starting (r, c) matches).
+
+Notes
+
+Brute force: for each cell, try each of 8 directions; walk len(word) steps, bailing on out-of-bounds or mismatch. Time O(R · C · 8 · L) where L = len(word).
+
+Because no turn is allowed, the problem does not require DFS or backtracking; this is the key distinction from LC 79 (Word Search).
+
+Follow-up 1 — turns allowed: now becomes classic DFS / backtracking (LC 79), O(R · C · 4^L) worst case.
+
+Follow-up 2 — straight line again but characters may be interleaved with arbitrary letters (e.g. "uber" matches "u_b_e_r" on the line, as long as the order is preserved): for each direction, run a two-pointer through the line's characters; total time still O(R · C · max(R, C)) because each cell is the start of at most 8 lines.
+
+Preparation
+
+Drill LC 79 (Word Search) and LC 212 (Word Search II), then handicap yourself to the no-turn version — fewer cases to track.
+
+Pre-write the 8-direction delta array [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)] so the round opens with a clean grid template.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,65 @@
+===H1===
+Rotten Oranges / Multi-Source BFS (taxis)
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/rotten-oranges-multi-source-bfs-taxis
+===BODY===
+Google
+Coding·40 minMembers
+Rotten Oranges / Multi-Source BFS (taxis)
+LC 542 / 994 variant — for every cell, distance to the nearest active source (a 'taxi'). Multi-source BFS is the canonical solution.
+SWE
+MLE
+grid
+bfs
+medium
+Frequency
+Low
+Last asked
+2026-09-08
+Stage
+onsite-coding · phone-screen
+Requirements
+
+Grid where some cells are sources (taxis / rotten oranges / gates); compute distance from every other cell to the nearest source.
+
+Multi-source BFS: enqueue all sources at distance 0 simultaneously, expand layer by layer.
+
+Follow-up reported: handle moving sources / time-varying placement (recompute periodically vs incremental update).
+
+Signal-propagation variant
+
+The city grid contains signal sources S, blockers B, empty cells ., and targets T.
+
+All sources emit simultaneously. Each unit of time, signals move one cell up, down, left, or right; blockers cannot be crossed.
+
+Return the minimum time until every target receives a signal, or -1 if any target is unreachable.
+
+Follow-up: choose at most one blocker to destroy so that the time required to reach all targets is minimized.
+
+Examples
+
+Grid [[2,1,1],[1,1,0],[0,1,1]] (rotting-oranges variant): return number of minutes until all reachable 1s become 2 (4).
+
+Taxi variant: for each empty cell, distance to nearest taxi.
+
+Notes
+
+BFS from all sources simultaneously is O(mn); per-source BFS is O(mn × #sources).
+
+The moving-source follow-up trades exactness for amortized cost — common answer is periodic rebuild with bounded staleness.
+
+For the signal variant, use the maximum source-distance over targets as the completion time; an unreachable target makes that candidate infeasible. Agree that no targets requires zero time. A correct baseline for destroying at most one blocker is to run multi-source BFS with no deletion, then once with each blocker made traversable, restoring it before the next trial. Minimize the completion time across feasible trials; return -1 if none is feasible. With B blockers on an R by C grid, this takes O((B + 1) * R * C) time and O(R * C) reusable auxiliary space. A BFS state that allows each path to break its own blocker does not enforce one shared destroyed blocker for all targets.
+
+Preparation
+
+Drill multi-source BFS from memory in under 10 min.
+
+Prep a 2-minute pitch on incremental-vs-rebuild trade-off for the moving-source follow-up.
+
+Practice the rotting-oranges / walls-and-gates / 01-matrix triplet — all share the multi-source BFS skeleton.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

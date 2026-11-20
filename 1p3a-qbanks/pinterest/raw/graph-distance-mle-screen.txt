@@ -1,0 +1,46 @@
+===H1===
+Graph Distance / Connectivity (MLE Phone Variant)
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/graph-distance-mle-screen
+===BODY===
+Pinterest
+Coding·60 minMembers
+Graph Distance / Connectivity (MLE Phone Variant)
+Pinterest's graph-focused MLE teams (PinSAGE / PinnerSAGE adjacent) sometimes ask a graph problem framed in Pinterest product terms rather than a LeetCode problem. The base ask is connectivity / shortest distance over the inferred graph; specific prompts vary by interviewer.
+MLE
+graph
+bfs
+dfs
+union-find
+medium
+Frequency
+Single report
+Last asked
+2026-03-15
+Stage
+phone-screen
+Requirements
+
+Model pins, boards, users, or another product surface as a graph, then answer connectivity and shortest-distance queries. Clarify whether edges are directed or weighted and whether queries are single-source, multi-source, or repeated.
+
+Notes
+
+Use DFS/BFS for connectivity, BFS for unweighted shortest distance, Dijkstra for non-negative weighted edges, and union-find when the workload is connectivity-only with incremental edge additions.
+
+Repeated all-pairs queries may justify precomputation only when the graph is small or dense enough; product graphs usually favor sparse adjacency and per-query traversal or landmarks.
+
+Define nodes and edge semantics before selecting the algorithm—the product framing does not change the graph invariants.
+
+Preparation
+
+Implement BFS, DFS, Dijkstra, topological sort, and union-find from scratch.
+
+Given one product scenario, state the node types, edge direction, weight meaning, and expected sparsity.
+
+Compare single-source, multi-source, and repeated-query strategies with explicit complexity bounds.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,48 @@
+===H1===
+Spreadsheet Cell Relationships
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/spreadsheet-cell-relationships
+===BODY===
+Amazon
+Coding·30 minMembers
+Spreadsheet Cell Relationships
+Design spreadsheet cells with value/formula relationships. The candidate explicitly identified the prompt family with LC 631 (Design Excel Sum Formula) and LC 3484 (Design Spreadsheet).
+SWE
+graph
+data-structure
+medium
+Frequency
+Single report
+Last asked
+2026-08-27
+Stage
+onsite-coding
+Requirements
+
+Build a spreadsheet-like data structure whose cells can store values and participate in cell relationships or formulas.
+
+The prompt family is explicitly identified with LC 631, Design Excel Sum Formula, and LC 3484, Design Spreadsheet.
+
+Clarify which API is required: direct cell assignment and formula-based sums, formula evaluation, or both.
+
+Notes
+
+The exact API shape varies between the two named canonical forms, so confirm the supported cell operations before implementation.
+
+Treat cell references as dependencies and discuss how an update reaches dependent cells.
+
+Represent each cell as either a literal or a formula plus referenced cells, and maintain reverse dependency edges. Replacing a formula must detach its old edges before attaching the new ones; reject or explicitly define cycles.
+
+Choose one evaluation policy and state it clearly: recompute with DFS and memoization on read, or propagate dirty/eager updates through reverse dependencies. Both require cycle detection and cache invalidation discipline.
+
+Preparation
+
+Implement both named public variants without copying an external solution, then compare eager recomputation with evaluation on read.
+
+Add tests for overwriting a formula cell, chains of dependencies, repeated references, and invalid cell identifiers.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

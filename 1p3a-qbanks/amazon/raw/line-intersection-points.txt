@@ -1,0 +1,63 @@
+===H1===
+Line Intersection Points
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/line-intersection-points
+===BODY===
+Amazon
+Coding·30 minMembers
+Line Intersection Points
+Given a list of segments described by their two endpoints, return every pairwise intersection point. A computational-geometry problem that doubles as an OOD round — define point/segment classes and discuss precision.
+SWE
+array
+oop-design
+medium
+Frequency
+Single report
+Last asked
+2026-03-17
+Stage
+onsite-coding
+Requirements
+
+Input: list of segments, each as two (x, y) endpoints.
+
+Output: list of intersection points (deduplicated). Decide with the interviewer whether endpoints that touch count.
+
+Handle parallel, collinear-overlapping, and degenerate (zero-length) segments.
+
+Examples
+
+segments = [((0, 0), (4, 4)), ((0, 4), (4, 0)), ((1, 1), (3, 1))]
+# intersections: (2,2) between the diagonals, (1,1)/(3,1) where the horizontal segment meets each diagonal
+
+Notes
+
+The brute-force O(n^2) pairwise check is acceptable for this round; if the interviewer pushes for scale, mention the Bentley-Ottmann sweep-line algorithm but don't try to write it in 30 minutes.
+
+Pair-wise intersection uses the parametric form P + t * (Q - P) with t1, t2 in [0, 1]. Solve a 2×2 linear system with the determinant; treat |det| < eps as parallel.
+
+Floating-point dedup is annoying — round to a fixed epsilon or rationalize and keep (num, den) pairs.
+
+Parametrize each segment as P + t * (Q - P) with t in [0, 1]. For two segments, solve the 2x2 linear system for (t1, t2); the determinant is (Q1-P1) x (Q2-P2) (2D cross product). Treat |det| < eps as parallel and fall through to the collinear-overlap branch.
+
+The collinear-overlap branch needs its own code path: project both segments onto the dominant axis (whichever of dx, dy is larger in absolute value) and compute the 1D interval intersection. Forgetting this branch is the most common bug — pure-parametric solutions silently return "no intersection" for overlapping segments.
+
+Floating-point dedup is harder than it looks. Two options: (a) round each coordinate to a fixed epsilon and key the set by the rounded pair; (b) keep results as rational (num, den) pairs and dedup exactly. Mention both; pick (a) for time.
+
+Preparation
+
+Solve LC 149 (Max Points on a Line) and review the parametric segment-segment intersection formula on paper.
+
+Pre-build a Point / Segment class skeleton — Amazon expects OOD structure even for math-heavy prompts.
+
+Practice an edge-case checklist: parallel, collinear-overlap, endpoint touch, zero-length, near-degenerate.
+
+Layered drill: (1) implement the parametric 2-segment intersection on paper without code, then transcribe; (2) add the collinear-overlap branch with axis projection; (3) wrap in an O(n^2) outer loop with the rounded-coordinate dedup set; (4) verbally outline the Bentley-Ottmann sweep-line upgrade and its O((n+k) log n) complexity for follow-up.
+
+Edge-case checklist: parallel non-overlapping, collinear partial overlap, collinear full containment, endpoint-touching, zero-length segment, near-degenerate (one segment almost a point).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,87 @@
+===H1===
+Verbal Java / CS-Fundamentals Quiz
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/verbal-java-cs-fundamentals
+===BODY===
+Oracle
+Other·30 minMembers
+Verbal Java / CS-Fundamentals Quiz
+Verbal trivia rounds appear frequently inside Oracle coding screens. Common items include abstract class vs interface, HashMap collision handling, immutable objects, public-API concerns, networking fundamentals, and how to write unit tests and explain their benefits.
+SWE
+Infra Eng
+cs-fundamentals
+verbal
+networking
+operating-systems
+domain-knowledge
+Frequency
+High
+Last asked
+2026-08-19
+Stage
+phone-screen · onsite-coding
+Requirements
+
+A 5-15 minute verbal quiz on Java idioms and CS fundamentals, typically sandwiched between resume walk-through and the coding problem.
+
+Sometimes folded into the coding round itself: the interviewer pauses mid-problem to ask a trivia question, with the answer affecting the framing of the rest of the round.
+
+Recurring items reported across multiple Oracle loops.
+
+Notes
+
+Recurring questions (consolidated)
+
+abstract class vs interface in Java:
+
+Abstract classes can have state and concrete methods; classes can extend only one. Interfaces (post-Java 8) can have default methods but no instance state, and a class can implement many. Use interface for capability contracts, abstract class for shared partial implementation.
+
+HashMap collision handling:
+
+Java's HashMap uses separate chaining with a linked list; since Java 8, buckets convert to a balanced (red-black) tree when chain length exceeds 8 entries (under a threshold-based heuristic), and revert to a list when shrunk. Open addressing is the alternative strategy (used by IdentityHashMap in Java).
+
+Java collections, PriorityQueue, and HashMap:
+
+Expect direct knowledge checks on collection semantics and the choice of data structure before or after the coding prompt.
+
+What is immutable software / immutable objects?:
+
+Immutable objects cannot be modified after construction. Benefits: thread-safety without locks, safe hash-map keys, simpler reasoning. Implementation in Java: final fields, no setters, defensive-copy mutable inputs.
+
+What changes when your code becomes a public API?:
+
+Versioning / backwards compatibility, input validation at the boundary, documented thread-safety contract, no breaking changes within a major version, explicit error semantics, performance SLAs, rate limiting, auth.
+
+Multi-threading: which operations need protection? (one OHAI round explicitly drilled this):
+
+Reads and writes on shared mutable state. Use locks, synchronized, volatile (for visibility, not atomicity), or concurrent-collection classes (ConcurrentHashMap, AtomicReference).
+
+Networking — how does Linux distribute NIC packets across cores? (one verbal round):
+
+RSS (Receive Side Scaling) hashes the packet 5-tuple (src/dst IP, src/dst port, protocol) and steers each flow to a specific CPU's RX queue. RPS (Receive Packet Steering) is the software equivalent for NICs without RSS. RFS (Receive Flow Steering) extends RPS to route packets to the CPU running the consuming application thread.
+
+Java internals behind project decisions:
+
+Resume deep dives can pivot from an architecture choice into the Java runtime or collection behaviour that made the choice appropriate.
+
+How these questions show up
+
+As a standalone gate ("explain X") before any code is written.
+
+As a probe within the algorithm round ("by the way, how does HashMap handle collisions?" — usually 30-60 seconds, then back to coding).
+
+As context for a follow-up ("now that you have a HashMap-based solution, what would change if you needed it to be thread-safe?").
+
+Preparation
+
+Maintain a flashcard set covering the items above; refresh the day before any Oracle round.
+
+For each item, prepare a 30-second answer (definition + one trade-off) and a 90-second deeper answer (with one concrete example).
+
+For Java specifics, brush up on collections (HashMap, ConcurrentHashMap, TreeMap), concurrency (synchronized, volatile, AtomicReference), and JVM basics (garbage collection generations, JIT, classloader hierarchy) — interviewers tend to drill the area closest to whatever the coding problem touched.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

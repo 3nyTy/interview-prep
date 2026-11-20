@@ -1,0 +1,68 @@
+===H1===
+Video-Keyword Association Review System
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/video-keyword-association-review-system
+===BODY===
+ByteDance / TikTok
+System Design·60 minMembers
+Video-Keyword Association Review System
+Design a service where users submit batches of 50+ videos and 1000+ keywords, then the system evaluates association between videos and keywords while supporting updates, versioning, and resumable upload.
+SWE
+schema-design
+versioning
+ingestion
+video-generation
+retrieval
+job-system
+medium
+Frequency
+Low
+Last asked
+2026-07-07
+Stage
+onsite-system-design
+Requirements
+
+Design a backend module for checking associations between uploaded videos and keyword sets. The prompt is long and product-specific; the stable requirements are:
+
+A user can submit a batch containing 50+ videos and 1000+ keywords.
+
+The system evaluates the association / relevance between each video and the keyword set.
+
+Users can update a prior submission, so the design needs versioning rather than destructive overwrite.
+
+Uploads may be interrupted and resumed.
+
+The interviewer expects schema design and a typed design explanation even if no diagram tool is available.
+
+Key design decisions:
+
+Data model for submissions, submission versions, video assets, keyword sets, evaluation jobs, and per-version results.
+
+Whether to compute every video-keyword pair eagerly or use indexing / embedding retrieval to reduce candidate pairs before scoring.
+
+How resumable upload state is represented and how incomplete batches are isolated from active versions.
+
+How result recomputation works when only a subset of videos or keywords changes.
+
+Notes
+
+The prompt has both system-design and schema-design flavor. Start by normalizing entities and version ownership before drawing workers.
+
+The resource constraint is the cross product: 50 videos x 1000 keywords per submission, multiplied by repeated updates. A naive full recompute may be acceptable for small traffic but needs an incremental path for production scale.
+
+The interviewer may require a text-only design if the coding interface has no diagram canvas. Practice expressing tables, relationships, and dataflow in plain text.
+
+Preparation
+
+Drill versioned data models: immutable submission versions plus pointers to the active version.
+
+Prepare an ingestion pipeline with resumable upload, asset processing, association scoring, and result publication.
+
+Practice explaining eager all-pairs scoring vs. candidate-generation-plus-reranking trade-offs.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

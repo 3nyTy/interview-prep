@@ -1,0 +1,62 @@
+===H1===
+Support Ticket Routing & Claiming System
+===URL===
+https://www.1point3acres.com/interview/problems/company/airbnb/ticket-routing-system-design
+===BODY===
+Airbnb
+System DesignMembers
+Support Ticket Routing & Claiming System
+Design an internal support system where tickets can be submitted via email, a public API, and a web contact form; each agent sees and claims tickets matching routing rules (e.g. language, location); and managers can view metrics such as average first-response time and average close time over a chosen window. The graded decisions are normalizing multi-channel ingestion into one ticket model, a rules-based routing/claim path that avoids double-claim races, and a metrics pipeline that aggregates over rolling time windows without scanning full history.
+SWE
+service-design
+schema-design
+metrics
+concurrency
+medium
+Frequency
+Single report
+Last asked
+2026-06-17
+Stage
+onsite-system-design
+Requirements
+
+Functional
+
+Accept ticket submission from three channels — email, public API, and a web contact form — and normalize them into a single canonical ticket model.
+
+Route tickets to agents by configurable rules (language, location, and similar attributes); an agent views and claims eligible tickets.
+
+A claimed ticket is owned by exactly one agent — no double-claim.
+
+Managers can query metrics over a time window: average first-response time and average close (resolution) time.
+
+Non-functional / decisions to surface
+
+Concurrency-safe claiming when multiple agents race for the same ticket.
+
+A rules engine that is reconfigurable without redeploying.
+
+Metric aggregation over arbitrary time ranges that does not scan the full ticket history per query.
+
+Notes
+
+Ingestion. Front each channel with an adapter that maps to a canonical Ticket(id, source, requester, language, region, status, created_at, first_response_at, closed_at), then push onto an ingestion queue so a spike on any one channel is absorbed before it hits the core store.
+
+Routing / claim. Model routing rules as predicates over ticket attributes and let agents pull from a filtered view. Make the claim atomic — UPDATE tickets SET owner = :agent WHERE id = :id AND owner IS NULL (or a short-lived distributed lock) — so exactly one racing agent wins.
+
+Metrics. Stamp first_response_at and closed_at on state transitions, then precompute per-bucket rollups (e.g. hourly aggregates of response/close durations) so a manager's window query reads rollups instead of scanning raw tickets.
+
+Clarification is half the round. Candidates report that under-scoping the requirements up front (which channels, per-rule routing, which metrics) eats the design budget — timebox clarification to roughly ten minutes and lock scope before drawing, or the real design ends up rushed.
+
+Preparation
+
+Pre-script the canonical ticket schema plus the three channel adapters; be ready to draw the ingestion path in under five minutes.
+
+Drill the atomic-claim pattern (conditional update vs distributed lock) and the time-windowed-metrics rollup pattern — these are the two decision points the round actually grades.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

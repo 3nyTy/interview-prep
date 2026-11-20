@@ -1,0 +1,86 @@
+===H1===
+Job Scheduler / ETL Pipeline System Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/job-scheduler-etl-pipeline
+===BODY===
+Microsoft
+System Design·45 minMembers
+Job Scheduler / ETL Pipeline System Design
+HE SD slot. Design a system that schedules and executes long-running ETL jobs reliably, with retry and dependency semantics.
+SWE
+distributed-systems
+scheduling
+etl
+messaging
+medium
+Frequency
+Single report
+Last asked
+2026-01-26
+Stage
+onsite-system-design
+Requirements
+
+Functional
+
+Register a job with a schedule (cron-like) and a dependency on other jobs.
+
+Execute on time, exactly once per scheduled tick (or at-least-once with downstream idempotency).
+
+Track job status (pending / running / succeeded / failed / retrying).
+
+Surface a job-level retry policy.
+
+Provide an admin UI / API for inspection and manual triggers.
+
+Non-functional
+
+10K active job definitions.
+
+Per-tick fan-out can spike to thousands of concurrent runs.
+
+A run may last seconds to many hours.
+
+Survive worker crashes mid-run.
+
+Notes
+
+Components.
+
+Scheduler: stateful service holding the schedule store. Wakes per minute, computes which jobs are due, enqueues run tasks. Single-leader (with standby failover via ZooKeeper / etcd) to avoid double-scheduling.
+
+Job queue: durable queue (Kafka / SQS) holding (run_id, job_id, attempt). Workers pull.
+
+Worker pool: stateless executors. Auto-scaled on queue depth. Each worker picks a task, marks the run as running in the durable store, executes, and marks succeeded / failed on completion.
+
+State store: durable DB (PostgreSQL) recording job definitions, runs, retry counts, dependency graph.
+
+Dependency engine: when a run completes, look up downstream jobs in the dependency DAG; enqueue them if their other upstreams are also satisfied.
+
+Load balancer + cache for the admin UI / API.
+
+Exactly-once semantics. True exactly-once is hard; practical answer is at-least-once enqueue + idempotent job logic enforced via run-id-keyed dedup at the worker boundary. Worker checks state_store.run_status(run_id); if already running / succeeded by another worker, skip.
+
+Worker-crash recovery. Worker holds a heartbeat lease on its run (TTL on the state store row). On crash, lease expires; the scheduler reaps and re-enqueues with attempt += 1 up to the retry policy max.
+
+Retry policy. Exponential backoff with jitter, capped at max-attempts. Permanent failures move to a dead-letter state for operator review.
+
+Dependency graph. Cycle detection at registration time (Kahn topo sort). Run-time, when a node finishes, only its direct downstreams are evaluated — keep the engine local rather than re-computing the full DAG.
+
+Observability. Per-job latency histogram, success rate, queue depth dashboards. Alert on rising queue depth (workers under-provisioned) or rising failure rate.
+
+Preparation
+
+Pre-write the four-component diagram (scheduler / queue / workers / state store).
+
+Know the exactly-once → at-least-once + idempotency framing; this is the standard answer.
+
+Drill the worker-crash story: heartbeat lease, scheduler reap, re-enqueue with attempt counter.
+
+Pre-rehearse the dependency DAG handling and cycle-detection step.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

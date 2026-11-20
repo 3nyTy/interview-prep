@@ -1,0 +1,46 @@
+===H1===
+Sum Root-to-Leaf Numbers
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/sum-root-to-leaf-numbers
+===BODY===
+Meta
+CodingMembers
+Sum Root-to-Leaf Numbers
+Solve the LC 129 prompt: treat each root-to-leaf sequence of digits as a number and return the sum of all such numbers. Follow-ups compare recursive and iterative traversal and ask what happens when the tree is very deep.
+SWE
+tree
+tree-traversal
+dfs
+recursion
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-coding
+Requirements
+
+Each binary-tree node contains one digit. Concatenate the digits along every root-to-leaf path to form a number.
+
+Return the sum of all root-to-leaf numbers.
+
+Follow-up: describe an iterative implementation and the failure mode of recursive traversal on a very deep tree.
+
+Notes
+
+Carry the numeric prefix as traversal state: next = prefix × 10 + node.value. Add it to the total only when the node has no children.
+
+Visit each node once for O(n) time. Recursion uses O(h) call-stack space, while an explicit stack avoids call-stack overflow but can hold O(n) nodes in the worst case.
+
+Preparation
+
+Implement both recursive and iterative depth-first versions and compare their auxiliary-space behavior.
+
+Dry-run a single-node tree, a skewed tree, and a tree containing zero-valued nodes.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

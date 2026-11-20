@@ -1,0 +1,65 @@
+===H1===
+Two-Day Log Intersection under Memory Limit
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/two-logs-intersection-memory-limit
+===BODY===
+Google
+Coding·45 minMembers
+Two-Day Log Intersection under Memory Limit
+PhD intern coding round 1: two log files with `(timestamp, obj_id, client_id)` entries. Find `obj_id`s that (a) appear in both files and (b) have at least two distinct `client_id`s. Follow-up imposes a memory limit, expecting external sort + two-pointer.
+SWE
+Infra Eng
+hashmap
+two-pointer
+streaming
+medium
+Frequency
+Single report
+Last asked
+2025-11-27
+Stage
+onsite-coding
+Requirements
+
+Input: two log files; each line is (timestamp, obj_id, client_id).
+
+Find every obj_id such that:
+
+(a) appears in both files, and
+
+(b) is associated with at least 2 distinct client_ids (aggregated across both files).
+
+Follow-up 1: complexity of set-intersection on the file contents.
+
+Follow-up 2: memory cannot hold either file fully — design a streaming solution.
+
+Examples
+
+File A:  (t1, X, c1), (t2, X, c2), (t3, Y, c1)
+File B:  (t4, X, c1), (t5, Z, c2)
+→ Only X is in both files; X has 2 distinct clients {c1, c2}.
+Output: [X]
+
+Notes
+
+In-memory solution: build a hashmap obj_id → set(client_id) while scanning each file; intersect keys across the two hashmaps at the end.
+
+Memory-limited solution: external sort each file by obj_id, then run a merge / two-pointer scan over both sorted files. For each matching obj_id group, count distinct client_id on the fly (HyperLogLog if duplicates are large).
+
+The interviewer explicitly preferred sort + two-pointer over a streaming hashmap — be prepared to defend the choice (sort is O(n log n) on disk vs O(n) RAM-bound for the hashmap).
+
+For distributed scale, hash-partition by obj_id and run the same algorithm per partition.
+
+Preparation
+
+Practice external-sort / merge-step problems (classic in-memory merge / k-way-merge / partition problems — and discuss disk-based variants verbally).
+
+Drill the streaming hashmap vs external sort trade-off conversation.
+
+Have ready: HyperLogLog (or Count-Min Sketch) one-liner for approximate distinct-count under tight memory.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

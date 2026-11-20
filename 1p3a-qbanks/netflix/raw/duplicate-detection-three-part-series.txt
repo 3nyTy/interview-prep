@@ -1,0 +1,109 @@
+===H1===
+Duplicate Detection Three Part Series
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/duplicate-detection-three-part-series
+===BODY===
+Duplicate Detection Three Part Series
+
+<https://www.1point3acres.com/interview/problems/company/netflix/duplicate-detection-three-part-series>
+
+Netflix
+Coding
+
+60 min
+Members
+Duplicate Detection I / II / III
+
+A three-part duplicate-detection series often restyled as watch-history episode IDs or show names. The third part may require bucketization or a longest-unique-subarray variant.
+
+SWE
+hashmap
+set
+sliding-window
+bucket-sort
+array
+medium
+Frequency
+Medium
+Last asked
+2026-05-26
+Stage
+phone-screen  onsite-coding
+Requirements
+Part 1: given a list of IDs, return whether any duplicate exists.
+Part 2: given K, return whether the same ID appears at indices i and j with |i - j| <= K.
+Part 3A: given threshold T, return whether two IDs in the current window have value distance <= T.
+Part 3B: show-name variant asks for the longest contiguous subarray with all unique names.
+A phone-screen string-array trio often runs as: (1) longest contiguous run of identical strings, (2) longest contiguous subarray with no repeated string, then (3) the disjoint-character pair count (its own card).
+The interviewer may ask for strings instead of integers; explain when bitmasking works and when it does not.
+Examples
+has_duplicate([55, 66, 77, 88, 99]) == False
+has_duplicate([55, 66, 77, 88, 66]) == True
+near_duplicate([1, 2, 3, 1, 2, 3], K=3) == True
+same_series([1, 5, 100], T=4) == True
+
+Notes
+Part 1 is a hash set.
+Part 2 is either a last-seen index map or a sliding window set of size K.
+Part 3 with |nums[i] - nums[j]| <= T is the canonical value-window-duplicate problem. Bucket width T + 1 gives O(n) expected time: compare the current bucket and adjacent buckets, then evict indices older than K if the K-window version is active.
+If the variant removes the index-window constraint and only asks for any pair within value threshold, sorting also works in O(n log n).
+Longest unique subarray uses a sliding window map from item to last index.
+Bitmasking only applies when each string can be represented as a fixed alphabet set, such as lowercase letters. It is not a general solution for arbitrary show names.
+Preparation
+Implement the three duplicate-detection versions back-to-back.
+Be able to derive bucket ID for negative integers correctly: use floor division semantics or normalize values.
+Prepare tests for K = 0, T = 0, duplicates exactly at distance K, and negative IDs.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Examples
+Notes
+Preparation
+Related discussions  5
+?????
+?? ?? ????
+????
+?Netflix technical ????
+????????
+Related questions
+
+Other Netflix questions sharing tags with this one
+
+Homepage Viewport / Shelf Dedupe
+Medium
+set
+array
+medium
++4
+User Engagement Pattern Classification
+Single report
+hashmap
+array
+medium
++1
+Number Pairs That Match Target
+Single report
+hashmap
+array
+medium
++1
+Movie History Friends I / II
+Single report
+hashmap
+set
+medium
++1
+Count Disjoint String Pairs
+Low
+hashmap
+medium
+bitmask
++1
+Code editor
+
+---

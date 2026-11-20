@@ -1,0 +1,148 @@
+===H1===
+Global Config Deployment System
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/global-config-deployment-system
+===BODY===
+Global Config Deployment System
+
+<https://www.1point3acres.com/interview/problems/company/netflix/global-config-deployment-system>
+
+Netflix
+System Design
+
+60 min
+Members
+Global Config Deployment System
+
+Design a control plane that publishes versioned config, rolls it out progressively by region / cohort with bake times and health gates, and rolls back instantly to a known-good immutable version.
+
+SWE
+Infra Eng
+ci-cd
+distributed-systems
+versioning
+caching
+config-management
+scaling
+hard
+Frequency
+Single report
+Last asked
+2026-01-29
+Stage
+onsite-system-design
+Design a Global Config Deployment System
+
+Design a configuration deployment system that safely rolls out config changes across the globe. The system should let operators publish new config versions, progressively deploy them by region or cohort, verify rollout health, and roll back quickly if a bad config causes incidents.
+
+This is a classic control-plane interview problem: the interesting part is not storing the config blob, but coordinating versioning, staged rollout, global propagation, local consumption, and rollback safety.
+
+Phase 1: Requirements
+Functional Requirements
+Operators can publish versioned config changes for one or more services
+Operators can define rollout strategy by region, cluster, service, or percentage cohort
+Services can fetch or subscribe to the latest approved config for their environment
+The system validates and monitors deployments before advancing rollout stages
+Operators can instantly roll back to a previous known-good version
+
+Keep the initial scope tight. Defer collaborative editing, policy-as-code, and cross-namespace transactions unless the interviewer explicitly asks for them.
+
+Non-Functional Requirements
+Requirement	Target	Rationale
+Availability	Config reads continue during control-plane degradation	Services should not depend on one global endpoint staying healthy
+Propagation	Newly promoted config reaches target regions within 30-60 seconds; full staged rollout may take minutes	Separate transport latency from intentional bake time
+Safety	Bad config should be detected before full rollout	Misconfigurations can cause widespread incidents
+Consistency	Each instance applies one immutable version atomically	Avoid partially applied config
+Auditability	Every publish, approval, stage transition, and rollback is traceable	Operational systems need accountability
+
+State the consistency model explicitly: global simultaneity is usually unnecessary, but each client must switch atomically to a fully validated immutable version.
+
+Capacity Estimation
+
+Assume a Netflix-scale internal platform:
+
+Metric	Value
+Config namespaces / services	5,000
+Regions / cells / clusters	200
+Active service instances	100,000
+Steady-state config reads	~20,000 QPS globally
+Config publishes	~500/day
+Average config size	50 KB
+
+Storage estimate:
+
+5,000 namespaces x 100 retained versions x 50 KB = 25 GB of config payloads
+Audit metadata adds tens of GB per year
+
+This is a read-heavy system. The main scaling problem is global fan-out and safe propagation, not raw write throughput.
+
+Phase 2: Data Model
+Core Entities
+ConfigNamespace
+??? namespace_id (PK)
+??? service_name
+??? environment (prod, staging, dev)
+??? schema_version
+??? owner_team
+??? created_at
+??? updated_at
+
+ConfigVersion
+??? version_id (PK)
+??? namespace_id (FK)
+??? version_number
+??? content_hash
+??? config_blob_uri
+??? created_by
+??? validation_status (pending, passed, failed)
+??? approval_status (draft, approved, rejected)
+??? created_at
+??? immutable = true
+
+RolloutPlan
+??? rollout_id (PK)
+??? version_id (FK)
+??? strategy (all_at_once, staged, percentage, canary)
+??? stages[]
+??? current_stage
+??? status (scheduled, running, paused, completed, rolled_back, failed)
+??? started_at
+??? completed_at
+
+RolloutTarget
+??? target_id (PK)
+??? rollout_id (FK)
+??? region
+??? cluster
+??? service_group
+??? cohort_percent
+??? desired_version
+
+ClientLease
+??? client_id
+??? namespace_id
+??? region
+??? current_version
+??? last_heartbeat_at
+??? last_acknowledged_version
+
+AuditEvent
+??? event_id (PK)
+??? entity_type
+??? entity_id
+??? actor
+??? action
+??? metadata
+??? created_at
+
+Storage Choices
+Data	Store	Why
+Namespace metadata / rollout state	PostgreSQL	Transactional control-plane state
+Immutable config payloads	Blob store (S3/GCS)	Cheap durable versioned storage
+Hot manifests	Redis / in-memory cache	Fast regional lookups
+Audit trail	Postgres + warehouse sink	Traceability plus analytics
+Rollout events	Kafka / PubSub	Decouples propagation and monitoring
+
+Store large config payloads separately from workflow state. The clean split: ke
+
+---

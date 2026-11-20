@@ -1,0 +1,120 @@
+===H1===
+Streaming Social-Media Mentions & Aggregation
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/streaming-social-media-mentions-aggregation
+===BODY===
+Bloomberg
+System Design·60 minMembers
+Streaming Social-Media Mentions & Aggregation
+Design a system that ingests a stream of social posts and news articles, extracts company / ticker mentions, supports windowed visualizations from minutes to days, lets users subscribe to entities and get notifications, and supports keyword search across the raw corpus at very high QPS. A wide-scope SD prompt typical of the open-ended Bloomberg onsite round.
+SWE
+streaming
+kafka
+ingestion
+search
+feed
+notification
+scaling
+ambiguous-spec
+hard
+Frequency
+Single report
+Last asked
+2026-02-22
+Stage
+onsite-system-design
+Requirements
+
+Design a backend system supporting the following capabilities. The interviewer will mix and match — clarify which sub-system is the focus before diving in.
+
+Functional requirements:
+
+Ingest raw posts and articles from external feeds (social media, news wires). Extract company / ticker mentions from raw text.
+
+Compute per-entity mention counts across configurable time windows (30-minute, hourly, daily, weekly). Window semantics (tumbling vs sliding) should be discussed — tumbling is the default.
+
+Visualize aggregated counts as time-series charts. Up to 10–30 minutes of lag is acceptable before a new window is visible.
+
+Let users subscribe to one or more entities, with filters (e.g., "only show mentions > N per hour") and push notifications.
+
+Full-text keyword search across the raw corpus: hundreds of thousands of documents, hundreds of thousands of QPS at peak, arbitrary keyword combinations.
+
+Handle bursty input (breaking news, meme-stock spikes) without dropping data.
+
+Non-functional requirements / scale anchors:
+
+Input rate: discuss the rough peak (e.g., millions of events per minute during news bursts).
+
+Search query rate: ~100k QPS sustained.
+
+Storage: raw corpus retained for at least the longest supported visualization window (weeks); aggregated counters retained longer.
+
+Aggregation freshness: at most 10–30 minutes behind real-time.
+
+Notes
+
+The prompt is intentionally over-specified. The interviewer cares about how you partition it. Treat as four loosely coupled sub-systems.
+
+Ingestion + entity extraction:
+
+Front the system with a high-throughput append-only log (Kafka or equivalent) sharded by source. Producers write raw documents; the log is the durable source of truth and the seam for replays.
+
+A stateless extraction worker pool consumes the log, runs an entity-recognition model (or a curated symbol dictionary), and writes two outputs: (doc_id, raw_text) to a document store, and (entity, doc_id, timestamp) events to a second Kafka topic.
+
+Idempotency comes from the document id; replays during outages are safe.
+
+Windowed aggregation:
+
+A stream-processing layer (Flink, Spark Streaming) consumes the entity-event topic and maintains tumbling-window counts per (entity, window). Sliding windows can be derived from finer tumbling windows at query time to keep the aggregator simple.
+
+Aggregated counts land in a time-series store (e.g., a wide-column DB partitioned by entity and clustered by window_start). Reads are then a primary-key lookup.
+
+The 10–30 minute freshness budget allows micro-batching to amortize the write cost — exploit it.
+
+Search:
+
+The full-text search workload is too large for ad-hoc scans. Build an inverted index (Elasticsearch / Lucene / a custom shard) keyed on tokens, with posting lists pointing to document ids and shards by document-id hash.
+
+Hot-query caching at the edge handles repeat searches; precomputed top entities cover the long tail of common lookups.
+
+Discuss the choice between exact and approximate matching for autocomplete (trie / FST) versus full search (Elasticsearch). Bloomberg interviewers in this slot push for a clean separation of the two paths.
+
+Subscription + notification:
+
+A subscription registry (a relational store is sufficient — write volume is low) holds (user, entity, filter) rows.
+
+The aggregator emits an event per finished window per entity; a notification dispatcher joins this stream against the subscription registry and sends pushes via a separate per-channel queue.
+
+Filters that depend on aggregated thresholds are evaluated server-side; filters on raw events live in the extraction pipeline.
+
+Burst handling:
+
+The log absorbs spikes via partition scaling and producer back-pressure. Aggregators auto-scale by partition count; the document store handles tail load through write batching.
+
+For hot entities (meme stock, breaking news), a per-entity hot-shard escape hatch routes traffic to dedicated partitions; document the hand-off rules.
+
+Decision points to flag explicitly:
+
+Tumbling vs sliding windows (default tumbling; derive sliding at read time).
+
+One database or two (one time-series + one document store, plus a search index — three is the minimum that scales cleanly).
+
+Exact vs approximate counts (exact for low-cardinality entities; sketches like Count-Min for the long tail).
+
+Synchronous vs asynchronous notification delivery (asynchronous, with at-least-once semantics and idempotent consumers).
+
+Preparation
+
+Drill the four-sub-system decomposition as a script: ingestion → aggregation → search → subscription. Bloomberg explicitly grades whether you cut the problem cleanly before diving into any one piece.
+
+Prepare reusable scale numbers: peak QPS, daily document count, storage estimate per retained window. Bring back-of-envelope arithmetic out loud.
+
+Practice the "think easy" pivot: when the interviewer pushes back on complexity, fold features by acknowledging the freshness budget ("10-minute lag means I can batch") or the cardinality skew ("99% of queries hit < 1% of entities; cache those").
+
+Be ready to draw a single diagram showing the four sub-systems with the Kafka topics as the seams; the diagram is the artifact the interviewer scores from.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

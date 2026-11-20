@@ -1,0 +1,212 @@
+===H1===
+Implement TF-IDF from Scratch
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/implement-tf-idf-from-scratch
+===BODY===
+Apple
+CodingMembers
+Implement TF-IDF from Scratch
+This is an Apple Machine Learning Engineer phone screen Tech1 coding round.
+SWE
+medium
+hashmap
+math
+string-processing
+Frequency
+Single report
+Last asked
+2026-04-09
+Stage
+phone-screen
+Problem Overview
+
+This is an Apple Machine Learning Engineer phone screen Tech1 coding round. The ask is simple: implement a simple TF-IDF from scratch. No scikit-learn, no TfidfVectorizer. Pseudocode is accepted (one reported candidate wrote pseudo code and moved on), but a clean Python implementation is better.
+
+The interviewer is checking:
+
+Do you know the TF-IDF formula and what each piece is doing?
+
+Can you produce working code in standard Python: tokenize, count, compute the two factors, combine?
+
+Do you name the ambiguities out loud (which TF variant, which IDF smoothing) instead of picking silently?
+
+The whole problem fits in 15 lines of Python. The grading is on precision, not volume.
+
+Clarify Before Coding
+
+TF variant. Raw count c(t, d), frequency c(t, d) / |d|, or log-scaled 1 + log(c(t, d))? The scikit-learn default is raw count. Ask.
+
+IDF variant. The textbook form is log(N / df(t)). Scikit-learn uses a smoothed form: log((1 + N) / (1 + df(t))) + 1. The smoothing prevents division-by-zero for unseen words and keeps IDF positive. Pick one and say so.
+
+Normalization. Most implementations L2-normalize the final TF-IDF vectors so cosine similarity is just a dot product. Mention this.
+
+Output shape. Dense (D, V) matrix or sparse dicts? For the whiteboard, dense is fine. For real corpora, sparse.
+
+Tokenization. Lowercase + word-character split is the standard baseline. Ask whether they want stopword removal or stemming; default to no.
+
+Settle these in 30 seconds and start writing.
+
+The Formula
+
+For a term t, document d, and corpus of N documents:
+
+TF(t, d)   = count of t in d                          (raw)
+             or count(t, d) / len(d)                   (frequency)
+
+DF(t)      = number of documents that contain t
+
+IDF(t)     = log(N / DF(t))                            (textbook)
+             or log((1 + N) / (1 + DF(t))) + 1         (smoothed)
+
+TFIDF(t,d) = TF(t, d) * IDF(t)
+
+A term that appears in every document gets IDF = 0 (textbook) or a small positive floor (smoothed). A term unique to one document gets a high IDF. That is the whole point: rare words carry more signal.
+
+Recommended Solution
+
+Standard library only. Three short functions, then one driver.
+
+import re
+import math
+from collections import Counter
+
+_TOKEN_RE = re.compile(r"[a-z0-9]+")
+
+def tokenize(text: str) -> list[str]:
+    return _TOKEN_RE.findall(text.lower())
+
+def compute_idf(corpus_tokens: list[list[str]]) -> dict[str, float]:
+    """Smoothed IDF. Keeps values finite and positive."""
+    n = len(corpus_tokens)
+    df: Counter[str] = Counter()
+    for tokens in corpus_tokens:
+        for tok in set(tokens):      # count each doc once per term
+            df[tok] += 1
+    return {tok: math.log((1 + n) / (1 + d)) + 1.0 for tok, d in df.items()}
+
+def tfidf(doc_tokens: list[str], idf: dict[str, float]) -> dict[str, float]:
+    """TF-IDF for one doc as a sparse dict. Raw-count TF."""
+    tf = Counter(doc_tokens)
+    return {tok: count * idf.get(tok, 0.0) for tok, count in tf.items()}
+
+def l2_normalize(vec: dict[str, float]) -> dict[str, float]:
+    norm = math.sqrt(sum(v * v for v in vec.values()))
+    if norm == 0.0:
+        return vec
+    return {k: v / norm for k, v in vec.items()}
+
+def fit_transform(corpus: list[str]) -> tuple[dict[str, float], list[dict[str, float]]]:
+    """Fit IDF on the corpus and return (idf, list of L2-normalized TF-IDF vectors)."""
+    corpus_tokens = [tokenize(doc) for doc in corpus]
+    idf = compute_idf(corpus_tokens)
+    vectors = [l2_normalize(tfidf(toks, idf)) for toks in corpus_tokens]
+    return idf, vectors
+
+Walk through while you type:
+
+Tokenize with a regex. Lowercase, keep word characters. Say out loud that a production system would swap in spaCy or a real tokenizer.
+
+DF counter. Iterate over set(tokens) per doc so a term appearing three times in one document still only contributes 1 to its DF.
+
+Smoothed IDF. Add 1 to both N and DF inside the log, add 1 outside. Both smoothings are there for different reasons: the inside one avoids log(anything / 0), the outside one guarantees IDF is never zero, so terms that appear in every document still carry a small nonzero weight.
+
+TF-IDF per doc as a sparse dict. Efficient, and easy to cosine-similarity with another sparse dict.
+
+L2-normalize so cosine similarity reduces to a plain dot product.
+
+Dense Matrix Variant
+
+If the interviewer wants an (N, V) matrix (the scikit-learn API shape), build a vocab and fill a NumPy array:
+
+import numpy as np
+
+def fit_transform_dense(corpus: list[str]) -> tuple[list[str], np.ndarray]:
+    corpus_tokens = [tokenize(doc) for doc in corpus]
+
+    # Vocabulary sorted for determinism.
+    vocab = sorted({tok for toks in corpus_tokens for tok in toks})
+    idx = {tok: i for i, tok in enumerate(vocab)}
+
+    n, v = len(corpus), len(vocab)
+    tf = np.zeros((n, v), dtype=float)
+    for i, toks in enumerate(corpus_tokens):
+        for tok in toks:
+            tf[i, idx[tok]] += 1.0
+
+    # Smoothed IDF, vectorized.
+    df = (tf > 0).sum(axis=0)                          # (V,)
+    idf = np.log((1 + n) / (1 + df)) + 1.0             # (V,)
+
+    tfidf = tf * idf                                   # (N, V) broadcast
+
+    # L2 normalize each row.
+    norms = np.linalg.norm(tfidf, axis=1, keepdims=True)
+    norms[norms == 0] = 1.0
+    return vocab, tfidf / norms
+
+The dense version is closer to sklearn.feature_extraction.text.TfidfVectorizer output. It also lets you compute pairwise cosine similarity with one matmul: tfidf @ tfidf.T.
+
+Worked Example
+
+corpus = [
+    "the cat sat on the mat",
+    "a dog chased the cat",
+    "dogs and cats are pets",
+]
+
+idf, vectors = fit_transform(corpus)
+# "the" and "cat" appear in 2 of 3 docs, so they share the same (lower) IDF.
+# "pets", "mat", "dog", etc. appear in only 1 doc, so they get a higher IDF.
+
+# Cosine similarity between doc 0 and doc 1:
+def dot(a, b):
+    return sum(v * b.get(k, 0.0) for k, v in a.items())
+
+sim = dot(vectors[0], vectors[1])
+
+Two sentences to say after the run:
+
+"Doc 0 and doc 1 overlap on 'the' and 'cat'. Both have the same IDF in this tiny corpus, so the ranking between them falls back to counts."
+
+"With a realistic corpus, 'the' would appear in nearly every document and its IDF would collapse toward zero, while 'cat' would stay high. That is when TF-IDF starts to beat raw BoW."
+
+That shows you understand what the numbers mean, not just how to produce them.
+
+Complexity
+
+Let N be the number of documents, L the average document length, V the vocabulary size.
+
+Tokenize + count: O(N * L) time.
+
+Compute DF / IDF: O(N * L) time, O(V) memory.
+
+Sparse TF-IDF per doc: O(L) time, O(L) memory per doc (distinct tokens per doc).
+
+Dense TF-IDF matrix: O(N * V) memory. Blows up quickly; use sparse for anything real.
+
+Smoothing and Edge Cases Worth Naming
+
+Unseen terms at query time. Return 0.0 from idf.get(tok, 0.0). Unknown token contributes nothing to the score. Already baked into the implementation above.
+
+Empty document. tfidf returns {}. l2_normalize returns {}. Cosine similarity against it is 0. No crash.
+
+Term in every document. Textbook IDF would give 0 (term contributes nothing). Smoothed IDF gives log((1+N)/(1+N)) + 1 = 1. Either answer is defensible; say which you picked.
+
+Sublinear TF (1 + log(count)). A common variant that down-weights high counts. Worth naming as the alternative to raw count.
+
+What to Say Out Loud
+
+"Two pieces: TF counts how often a term appears in a document, IDF down-weights terms that appear in many documents. Multiply them."
+
+"I am using raw-count TF and smoothed IDF so I never divide by zero and IDF is always at least 1."
+
+"I L2-normalize the vectors so cosine similarity is a dot product."
+
+"Sparse dicts for production. Dense NumPy matrix if the interviewer wants the scikit-learn API shape."
+
+That is the round. Fifteen lines of Python, one formula, four small decisions named out loud.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

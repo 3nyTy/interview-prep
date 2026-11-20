@@ -1,0 +1,62 @@
+===H1===
+Grant / Revoke / Check Access on Hierarchy
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/grant-revoke-access-tree
+===BODY===
+Pinterest
+Coding·60 minMembers
+Grant / Revoke / Check Access on Hierarchy
+Design an access-control class on a static hierarchy (world → country → city). `grant_access(entity, group)` and `revoke_access(entity, group)` must be O(1); `check_access(entity, group)` is O(depth) by walking up the hierarchy and OR-ing access bits along the path. The trick is to look up the tree, not down, at check time.
+SWE
+tree
+tree-broadcast
+hashmap
+access-control
+object-design
+medium
+Frequency
+Low
+Last asked
+2026-08-21
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Implement a class managing access of advertisers (or any entity) to groups that live in a static hierarchy. A group is identified by a path through the hierarchy — for example world, country/us, city/sf.
+
+class AccessControl:
+    grant_access(entity, group)    # O(1) target
+    revoke_access(entity, group)   # O(1) target
+    check_access(entity, group)    # O(depth of hierarchy)
+
+Semantics: if an entity is granted access to country/us, it implicitly has access to every city under country/us. check_access(entity, 'city/sf') must return true.
+
+Notes
+
+The intended data structure is a Map<entity, Set<group>> for direct grants, plus the hierarchy as a parent-pointer tree.
+
+check_access(entity, group) walks from group up to the root, returning true the first time it finds an ancestor in the entity's grant set. This is O(depth) — the depth of the hierarchy, not the size of the tree. The depth-of-tree complexity target is the giveaway that the lookup direction is bottom-up rather than top-down.
+
+A common stuck point: candidates start by trying to broadcast grant_access('country/us') to every descendant city, which kills the O(1) write target. The correct insight is to keep grants narrow and resolve breadth at read time.
+
+Revoke is symmetric: remove the specific group from the entity's direct-grant set. It does not clear descendants because inherited access is never materialized; later checks simply stop finding the removed grant. Any separate grant on another ancestor or descendant remains in effect.
+
+An interviewer follow-up sometimes asks for list_entities(group) — that reverses the direction and is best served by an inverted index Map<group, Set<entity>> maintained alongside the primary map.
+
+Minority variant: the class exposes deny_access rather than revoke_access, and both grants and denials apply to a subtree. Clarify whether a nearer denial overrides an ancestor grant before coding. The efficiency discussion may compare descendant BFS with timestamp/version metadata resolved while walking toward the root.
+
+Preparation
+
+Pre-sketch the two maps (entity → granted-groups, and the static parent-pointer hierarchy) before writing any methods. Naming the maps on the whiteboard usually unblocks the bottom-up insight.
+
+Implement check_access first; the O(depth) constraint forces the right design choice and the other two methods fall out trivially.
+
+Drill the symmetric list_entities(group) follow-up — same idea, opposite direction — so you can answer the interviewer's variant without restructuring.
+
+Define and test a precedence rule for overlapping ancestor grants and descendant denials.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

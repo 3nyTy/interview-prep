@@ -1,0 +1,208 @@
+===H1===
+Vectorized K-Means in NumPy or PyTorch
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/vectorized-k-means-in-numpy-or-pytorch
+===BODY===
+Apple
+Coding·45 minMembers
+Vectorized K-Means in NumPy or PyTorch
+Implement K-means with tensor operations rather than Python loops. Interviewers care about broadcasting, `unsqueeze`, `keepdim`, centroid updates, and whether the implementation stays efficient.
+MLE
+numpy
+pytorch
+classification
+ml-knowledge
+medium
+Frequency
+Low
+Last asked
+2026-03-25
+Stage
+phone-screen · onsite-coding
+Problem Overview
+
+You are asked to implement K-Means clustering from scratch in NumPy or PyTorch. The interviewer expects:
+
+Comfort with tensor/array syntax: keepdim, unsqueeze, reshape, axis conventions.
+
+A fully vectorized implementation using broadcasting. Naive Python for loops over points or clusters are not acceptable.
+
+A correct understanding of the Lloyd iteration: assign, update, repeat until convergence.
+
+Input is a data matrix X of shape (N, D) and an integer K. Output is the final K × D centroid matrix and an N-length vector of cluster assignments.
+
+Clarify Before Coding
+
+Initialization? Random points from X, random in the data range, or k-means++? Random sample from X is fine unless the interviewer pushes. k-means++ is a good follow-up to mention.
+
+Stopping condition? Fixed max_iter, or early stop when assignments stop changing (or centroids move less than tol)? Implement one, mention both.
+
+Distance metric? Euclidean (squared) by default. K-Means is defined for squared L2; cosine or L1 gives you a different algorithm (k-medoids / spherical k-means).
+
+Empty clusters? If a centroid wins no points, strategies are: reinitialize to a random point, split the largest cluster, or leave the old centroid. Pick one and say so.
+
+Framework? NumPy or PyTorch. The shape and broadcasting logic are identical; only the API changes.
+
+The Algorithm
+
+Lloyd's algorithm alternates two steps:
+
+Assign each point to the nearest centroid.
+
+Update each centroid to the mean of its assigned points.
+
+Repeat until assignments stop changing or max_iter is reached.
+
+The one trick worth calling out is the pairwise distance matrix. You want an (N, K) matrix where entry (i, j) is the squared distance from point i to centroid j. Broadcasting gives you this in one line:
+
+X:         (N, D)
+centroids: (K, D)
+X[:, None, :]        -> (N, 1, D)
+centroids[None, :, :] -> (1, K, D)
+diff = X[:, None, :] - centroids[None, :, :]   # (N, K, D)
+dists = (diff ** 2).sum(axis=-1)               # (N, K)
+
+An equivalent trick avoids the (N, K, D) intermediate by expanding |x - c|^2 = |x|^2 - 2 x·c + |c|^2:
+
+dists = (X ** 2).sum(1, keepdims=True) - 2 * X @ centroids.T + (centroids ** 2).sum(1)
+
+This version is memory-friendlier for large N, K, D and is what production libraries use.
+
+NumPy Reference Solution
+
+import numpy as np
+
+def kmeans(
+    X: np.ndarray,
+    k: int,
+    max_iter: int = 100,
+    tol: float = 1e-4,
+    seed: int = 0,
+) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Args:
+        X: (N, D) data matrix.
+        k: number of clusters.
+    Returns:
+        centroids: (k, D) final centroids.
+        labels:    (N,)   cluster id for each point.
+    """
+    rng = np.random.default_rng(seed)
+    n, d = X.shape
+
+    # Init: pick k distinct points from X.
+    idx = rng.choice(n, size=k, replace=False)
+    centroids = X[idx].copy()
+
+    for _ in range(max_iter):
+        # Assign: squared L2 distance via the expansion trick, shape (N, K).
+        x_sq = (X ** 2).sum(axis=1, keepdims=True)          # (N, 1)
+        c_sq = (centroids ** 2).sum(axis=1)                 # (K,)
+        cross = X @ centroids.T                             # (N, K)
+        dists = x_sq - 2 * cross + c_sq                     # (N, K)
+        labels = dists.argmin(axis=1)                       # (N,)
+
+        # Update: mean of points per cluster, vectorized with one-hot masks.
+        new_centroids = np.empty_like(centroids)
+        for j in range(k):
+            mask = labels == j
+            if mask.any():
+                new_centroids[j] = X[mask].mean(axis=0)
+            else:
+                # Empty cluster: reinitialize to a random data point.
+                new_centroids[j] = X[rng.integers(n)]
+
+        # Converged if centroids barely moved.
+        shift = np.linalg.norm(new_centroids - centroids)
+        centroids = new_centroids
+        if shift < tol:
+            break
+
+    return centroids, labels
+
+The per-cluster for j in range(k) loop is acceptable because k is small. What must stay vectorized is the distance computation and the assignment, which are O(N * K * D) and dominate.
+
+If the interviewer wants the update step fully vectorized too, use a one-hot matrix:
+
+onehot = np.zeros((n, k))
+onehot[np.arange(n), labels] = 1                 # (N, K)
+counts = onehot.sum(axis=0)                      # (K,)
+counts = np.maximum(counts, 1)                   # avoid divide-by-zero
+centroids = (onehot.T @ X) / counts[:, None]     # (K, D)
+
+Note this snippet silently produces a zero-vector centroid for any empty cluster (sum of zero points divided by the clamped count of 1). In practice you still need to detect empty clusters (onehot.sum(0) == 0) and reseed them from the data, as the loop version does.
+
+PyTorch Reference Solution
+
+The interviewer may specifically ask for PyTorch. The shape math is identical; what they watch for is correct use of unsqueeze, keepdim, and torch.cdist or manual broadcasting.
+
+import torch
+
+def kmeans_torch(
+    X: torch.Tensor,      # (N, D)
+    k: int,
+    max_iter: int = 100,
+    tol: float = 1e-4,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    n, d = X.shape
+    # Init from random data points.
+    perm = torch.randperm(n, device=X.device)
+    centroids = X[perm[:k]].clone()
+
+    for _ in range(max_iter):
+        # (N, 1, D) - (1, K, D) -> (N, K, D) -> sum over D
+        diff = X.unsqueeze(1) - centroids.unsqueeze(0)       # (N, K, D)
+        dists = (diff ** 2).sum(dim=-1)                      # (N, K)
+        labels = dists.argmin(dim=1)                         # (N,)
+
+        # Vectorized update via one-hot.
+        onehot = torch.zeros(n, k, device=X.device, dtype=X.dtype)
+        onehot.scatter_(1, labels.unsqueeze(1), 1.0)         # (N, K)
+        counts = onehot.sum(dim=0).clamp(min=1)              # (K,)
+        new_centroids = (onehot.t() @ X) / counts.unsqueeze(1)  # (K, D)
+
+        # Reseed empty clusters.
+        empty = (onehot.sum(dim=0) == 0)
+        if empty.any():
+            rand_idx = torch.randint(0, n, (int(empty.sum()),), device=X.device)
+            new_centroids[empty] = X[rand_idx]
+
+        shift = torch.linalg.norm(new_centroids - centroids)
+        centroids = new_centroids
+        if shift < tol:
+            break
+
+    return centroids, labels
+
+torch.cdist(X, centroids, p=2) is the one-liner equivalent of the broadcasting block and is fine to use unless the interviewer asks you to do it by hand.
+
+The unsqueeze pattern is what they listen for: X.unsqueeze(1) turns (N, D) into (N, 1, D), centroids.unsqueeze(0) turns (K, D) into (1, K, D), and the subtraction broadcasts to (N, K, D). If you reach for a Python loop over points or clusters here, you will fail the round.
+
+Complexity
+
+Per iteration:
+
+Assignment step: O(N * K * D) time, O(N * K) memory for the distance matrix.
+
+Update step: O(N * D) time.
+
+Total: O(T * N * K * D) for T iterations. K-Means converges to a local optimum in a small number of iterations (T on the order of 10-50) but the solution depends on initialization.
+
+Follow-Ups the Interviewer Might Push
+
+k-means++ initialization. Instead of picking k points uniformly, pick the first at random, then each next centroid with probability proportional to squared distance to the nearest already-chosen centroid. Gives provably better expected loss.
+
+How do you pick k? Elbow method on inertia, silhouette score, gap statistic. None of these are the "right" answer; the point is to name one and know its limitation.
+
+Convergence guarantees. Lloyd's algorithm monotonically decreases the sum of squared distances and always converges to a local minimum, but not the global one. Run multiple random restarts and keep the best.
+
+Mini-batch K-Means. For very large N, update centroids with a running average over sampled mini-batches instead of full passes. Trades a tiny bit of quality for a large speedup.
+
+Soft assignment (EM / GMM). Replace argmin with a softmax over negative distances. Leads into Gaussian mixture models if the interviewer wants to go deeper.
+
+The core thing they are checking is whether you can write the vectorized Lloyd loop on a blank screen without reaching for sklearn.cluster.KMeans. The distance broadcasting block and the one-hot update are the two patterns worth having memorized.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

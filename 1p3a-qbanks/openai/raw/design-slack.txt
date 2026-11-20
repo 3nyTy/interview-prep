@@ -1,0 +1,159 @@
+===H1===
+Slack
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/design-slack
+===BODY===
+OpenAI
+System Design·60 minMembers
+Slack
+Design Slack: DM + channels, multi-device delivery, notifications, scale (large channel / sharding).
+SWE
+EM
+messaging
+Frequency
+Low
+Last asked
+2026-05-05
+Stage
+phone-screen · onsite-system-design
+Requirements
+
+DM + Channel
+
+Multi-device delivery
+
+Notification
+
+File sharing and message deletion
+
+Multi-tenancy (workspace isolation)
+
+Scale (large channel / sharding)
+
+Notes
+
+Cover DM first, then channels (bottom-up).
+
+Redis Pub/Sub for large-channel fan-out — interviewer may not know it; sketch the flow on a diagram.
+
+Large channel = pull model; DM and small channel = push model. If asked 'can we unify to pull?', say no — client would need to actively refresh to get messages.
+
+Cover multi-device proactively; don't wait to be asked. Don't bloat the inbox by session — when a user reads a message, delete it from all their session inboxes.
+
+Always cover scalability (cache + sharding) — don't push it to the last 5 minutes.
+
+Service decomposition
+
+Name the service boundaries explicitly; "why keep user data separate from message data?" is a frequent probe:
+
+Message Service — stores and retrieves chat messages (the high-write, sharded data plane).
+
+Channel Service — owns channel membership and user lists (user_to_channels / channel_to_users), serves the fan-out recipient set.
+
+Gateway Service — stateless WebSocket front door; holds connections, no per-connection message state.
+
+Notification Service — drives online (in-app/WebSocket) vs offline (push) alerts.
+
+Walk the message path end-to-end on the diagram: Client → Gateway → DB (durable write) → Pub/Sub → Gateway → recipient.
+
+Canonical messaging skeleton
+
+Two-layer delivery: persist the message + per-recipient inbox row first (durable write), then best-effort pub/sub broadcast to connected chat-server processes which forward over WebSocket. The persistence layer guarantees eventual delivery; pub/sub provides the sub-second latency. Offline clients pull accumulated inbox entries on reconnect with a per-device cursor / sequence number to detect gaps.
+
+Adaptive fan-out partitioning: for small channels and DMs, publish per-recipient (one channel per user, no wasted delivery). For large channels above a threshold (commonly ~25 members), pivot to publish-by-chat — every server hosting at least one member subscribes once, and fans out locally. The pivot keeps Redis fan-out from blowing up on broadcast-heavy channels.
+
+Multi-device sync: per-device inbox rows + monotonic sequence numbers. Read receipts mark messages delivered per device; presence updates write on connect/disconnect events only, not on every heartbeat, to avoid write amplification.
+
+Pub/Sub backbone: Redis vs Kafka
+
+The dispatcher between gateway servers is a deep-dive the interviewer drives — have the trade-off ready, don't just say "Redis Pub/Sub":
+
+Redis Pub/Sub: low-latency, fire-and-forget; messages are dropped if no subscriber is connected (no replay). Fits the best-effort broadcast layer where the durable inbox already guarantees delivery.
+
+Kafka: persistent, partitioned log with replay and consumer offsets — better when you need durability/replay in the transport itself or want to decouple notification/indexing consumers. Costs higher latency and operational weight.
+
+Be explicit about the broadcast decision: publish to every gateway (simple, wasteful at scale) vs only the gateways hosting a channel member (requires a channel→gateway routing map). The map keeps fan-out cost proportional to actual subscribers.
+
+Multi-tenancy design
+
+Enterprise chat is distinguished by strict workspace isolation — missing this is a common failure mode:
+
+Add workspace_id (or team_id) as a column in every database table; include it in all shard keys and indexes.
+
+Auth tokens must be scoped to a specific workspace; validate the workspace ID on every API call.
+
+Apply row-level security or logical partitioning so one company's queries cannot touch another's rows.
+
+Rate-limit per workspace to prevent resource monopolization ("noisy neighbor" problem).
+
+Shard by channel_id (not workspace_id) to avoid hot partitions on large workspaces; workspace_id filters within shards.
+
+Encrypt data both at rest and in transit (TLS on the wire, encryption on stored messages/files) — enterprise tenants expect it and it pairs with the isolation story.
+
+Database schema patterns
+
+Two bidirectional mapping tables are needed for efficient lookups:
+
+user_to_channels (user_id, channel_id, workspace_id) — "what channels is this user in?" (used for fan-out recipient list and notification targeting)
+
+channel_to_users (channel_id, user_id, workspace_id) — "who is in this channel?" (used for rendering member list and fan-out at small-channel threshold)
+
+Both tables hold redundant data (denormalization) intentionally — the write amplification is acceptable for the read-latency wins.
+
+Message IDs and ordering
+
+For concurrent messages within a channel, a plain timestamp is insufficient:
+
+Use Snowflake-style IDs: timestamp_ms + sequence_number + server_id — globally unique, time-sortable, generated without a central lock.
+
+"Loose ordering" is acceptable: if two messages arrive within the same millisecond, client-side sort by full Snowflake ID as tiebreaker.
+
+If the interviewer pushes for strict ordering: a single-leader (primary) write path per channel shard guarantees linearizability at the cost of write throughput — trade-off must be articulated. Frame it as eventual consistency (gets there) vs strong consistency (always correct instantly).
+
+Fault tolerance and reconnection
+
+Proactively cover failure scenarios — interviewers will ask if you don't:
+
+Client reconnect: exponential backoff with jitter to avoid thundering-herd (mass reconnect storm after a gateway restart).
+
+Missed messages: on reconnect, client sends its last-seen sequence number; server replays inbox from that cursor — the same per-device sequence number used for multi-device sync.
+
+Gateway statelessness: keep WebSocket gateway servers stateless (no per-connection message state) so they can be added/removed freely; connection state lives in a shared routing table (e.g., Redis).
+
+Database failover: async replication with promoted replica on primary failure; brief inconsistency window is acceptable (eventual consistency tier).
+
+Protocol split
+
+Use WebSocket for server-to-client delivery (push, persistent connection) and standard HTTP POST for client-to-server message sending. This asymmetry simplifies load-balancing on the write path and avoids tying send throughput to WebSocket connection limits.
+
+Scale reference numbers
+
+At the target scale: millions of concurrent users, thousands of workspaces, channels with 10,000+ members, sub-1-second delivery SLA. Use concrete numbers ("for a 10,000-member channel") when walking through fan-out — vague language is a signal of shallow preparation.
+
+Preparation
+
+Walk through a canonical Slack-style messaging design end-to-end (workspaces / channels / message fan-out / presence / read receipts / search) as your baseline before adding any AI flavor
+
+Drill the two-layer (durable-write-then-pubsub) delivery skeleton until you can sketch it in 3 minutes
+
+Drawing tool fluency matters
+
+Pre-bake a multi-device inbox design with per-device sequence numbers
+
+Have a crisp answer for "when do you switch from per-user to per-channel fan-out" — the threshold + reasoning matters more than a specific number
+
+Pre-bake multi-tenancy: know workspace_id-in-every-table, workspace-scoped auth tokens, per-workspace rate limiting, and at-rest/in-transit encryption cold
+
+Treat database schema as the one near-certain deep dive — be able to draw the two mapping tables, shard key, and indexes on demand
+
+Know Snowflake ID construction and the loose-ordering vs strict-ordering trade-off
+
+Be ready to defend a Pub/Sub choice — Redis (low-latency, no replay) vs Kafka (persistent, replayable) — and the broadcast-to-all vs route-to-member-gateways decision
+
+Rehearse fault-tolerance narrative (exponential backoff reconnect, sequence-cursor gap fill, stateless gateways) so you can raise it proactively — waiting to be asked is a failure signal
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,53 @@
+===H1===
+Extend Queue: Min-Size & Min-Sum Selector
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/queue-extension-min-size-min-sum
+===BODY===
+Goldman Sachs
+Coding·60 minMembers
+Extend Queue: Min-Size & Min-Sum Selector
+Extend a basic `Queue` class with two selectors over a collection of queues: find the queue with the minimum size, and find the queue with the minimum sum of elements. Tests data-structure design and operation-cost trade-off discussion.
+SWE
+data-structure
+object-design
+heap
+medium
+Frequency
+Single report
+Last asked
+2025-06-09
+Stage
+onsite-coding
+Requirements
+
+Given a basic Queue class supporting enqueue / dequeue, extend the surrounding container to support two additional operations over a collection of such queues:
+
+findQueueWithMinSize() — return the queue (or its index) with the smallest current length.
+
+findQueueWithMinSum() — return the queue (or its index) with the smallest current sum of elements.
+
+The interviewer expects a discussion of which auxiliary structures to maintain, and how each enqueue / dequeue updates them.
+
+Notes
+
+Naïve solution: scan all queues for each query. O(K) per query where K is the number of queues. Fine if K is small; flag the cost up-front.
+
+Maintain a Map<queueId, size> and a min-heap keyed by size, with lazy deletion of stale entries. Each enqueue / dequeue updates the map and pushes a new heap entry; queries pop stale entries until the top is fresh. Amortized O(log K).
+
+Same skeleton for findQueueWithMinSum — track (queueId, sum) and another min-heap. enqueue(v) adds v; dequeue subtracts the dequeued value (so each queue's dequeue must know which value left).
+
+Threading note: if the interviewer makes the container concurrent, the heap-with-lazy-deletion strategy needs a single mutex around the maps; the heap can stay outside the lock.
+
+A TreeMap<Integer, Set<queueId>> is a cleaner alternative to lazy-deletion heaps and is worth mentioning as an option.
+
+Preparation
+
+Sketch the public API first, then list which auxiliary structures back each method and what each enqueue / dequeue mutates. This problem is graded on discussion as much as code.
+
+Practice expressing the trade-off between "scan on query" (cheap writes, expensive reads) and "maintain aggregates" (expensive writes, cheap reads) — Goldman interviewers consistently ask candidates to choose and justify.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

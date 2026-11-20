@@ -1,0 +1,77 @@
+===H1===
+Candy Crush 1D
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/candy-crush-1d
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Candy Crush 1D
+One-dimensional Candy-Crush style elimination: collapse runs of three or more equal adjacent values until nothing more can collapse. The Bloomberg twist usually involves a slightly non-standard input format (per-character or per-(value, count) pairs) that makes the obvious LeetCode-style solution fail a test case.
+SWE
+stack
+string-processing
+simulation
+medium
+Frequency
+Single report
+Last asked
+2026-01-22
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Given a one-dimensional sequence of characters or numeric values, repeatedly remove any maximal run of three or more consecutive equal elements. After every removal, neighbors that newly become adjacent may form new runs and must also be removed. Return the final sequence after no more removals are possible.
+
+Variants commonly asked at Bloomberg:
+
+Input is a raw string or array ("aaabbbc", [1,1,1,2,2]).
+
+Input is run-length encoded: a list of (value, count) pairs.
+
+The minimum run length to collapse may be 3 (default) or a configurable parameter k — clarify up front.
+
+Follow-ups:
+
+After collapsing a run, the previous and next groups may have the same value and combined count >= 3 — handle merging.
+
+What is the time complexity of your approach, and can you bound the total number of removals?
+
+Generalize to a streaming input: characters arrive one at a time, and after every character you return the current collapsed state.
+
+Examples
+
+Ground the example to whichever input format the interviewer dictates.
+
+Input:  "aaabbbacd"   k=3
+Process: remove 'aaa' -> "bbbacd" -> remove 'bbb' -> "acd"
+Output: "acd"
+
+Input:  RLE [(1,2),(2,3),(1,1)]   k=3
+Process: remove (2,3) -> [(1,2),(1,1)] -> merge -> [(1,3)] -> remove
+Output: []
+
+Notes
+
+The clean linear-time solution is a stack of (value, count) pairs: for each incoming element, if the top of the stack matches, increment its count; otherwise push a new pair. After each push, if the top's count reaches k, pop it. After processing all input, flatten the stack back.
+
+The trap people fall into is using the LeetCode 723 (2D Candy Crush) solution directly. The 1D version's stack approach is simpler and handles cascading merges correctly because the stack-top check naturally re-merges after a pop.
+
+Common failing test case when copy-pasting from a stale LeetCode solution: an input where, after a removal, the two neighbors are themselves identical and now form a new run of length >= k. Interviewers explicitly probe this case.
+
+If the input is RLE, the stack stores (value, count) pairs and the same merge-then-pop logic applies, just on counts that are larger than 1.
+
+Preparation
+
+Implement the (value, count) stack from scratch on paper before writing code.
+
+Construct two failing test cases by hand: one where cascading after removal merges two prior groups, one where the input is already empty.
+
+Be explicit about complexity: each element is pushed and popped at most once, total time O(n), space O(n) for the stack.
+
+Drill the streaming variant — append, check top, return current stack as a string — as a one-line extension of the batch solution.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

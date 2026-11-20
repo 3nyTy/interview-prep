@@ -1,0 +1,74 @@
+===H1===
+Implement Retryer
+===URL===
+https://www.1point3acres.com/interview/problems/company/airbnb/implement-retryer
+===BODY===
+Airbnb
+Coding·45 minMembers
+Implement Retryer
+Implement a `Retryer` that wraps a callable and retries on failure under a configurable policy such as maximum attempts, backoff, and retryable-exception filtering. The prompt also appears as an AI-assisted onsite implementation round where Claude Code is available.
+SWE
+object-design
+oop-design
+idempotency
+concurrency
+medium
+Frequency
+Low
+Last asked
+2026-08-19
+Stage
+tech-screen · phone-screen · onsite-coding
+Requirements
+
+Provide a default Retryer(max_attempts, backoff) that:
+
+Invokes the wrapped callable.
+
+On exception, sleeps according to backoff, increments the attempt counter, and retries until max_attempts is hit.
+
+Re-raises the last exception after exhausting retries.
+
+Make the design extensible to:
+
+Different backoff strategies (fixed, linear, exponential, exponential with jitter).
+
+A filter that decides whether a given exception is retryable.
+
+A circuit-breaker that gives up after consecutive failures across many calls.
+
+A pre- / post-attempt hook for logging or metrics.
+
+In the onsite AI-coding variant, implement the retry wrapper with Claude Code available and remain prepared to explain, test, and correct the generated changes.
+
+Notes
+
+Pull BackoffStrategy, RetryableFilter, and Hook out into protocols or abstract classes; the Retryer composes them.
+
+Exponential backoff with jitter: delay = min(cap, base * 2**attempt) * (0.5 + random()); jitter prevents synchronized retry storms.
+
+Retrying a non-idempotent operation requires an idempotency contract supplied by the caller. Surface that requirement in the API rather than silently retrying.
+
+For async callables, use a separate AsyncRetryer or an explicit branch that awaits coroutine functions.
+
+The extensibility discussion is part of the signal: explain how a new backoff strategy plugs in without modifying Retryer.
+
+AI assistance does not remove ownership of the code. Verify exception boundaries, attempt counting, sleep placement, and tests instead of accepting a generated wrapper as-is.
+
+Preparation
+
+Implement the synchronous Retryer with pluggable backoff and a retryable-exception filter in under 25 minutes.
+
+Layer on a Hook interface for on_attempt, on_failure, and on_success.
+
+Pre-write the asynchronous variant so you can sketch it quickly if asked.
+
+Run one AI-assisted rehearsal: prompt for the wrapper, review the diff, add failure-path tests, and explain every correction without relying on the tool.
+
+Be ready to discuss two specific edge cases: catching KeyboardInterrupt and retrying a non-idempotent resource operation.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

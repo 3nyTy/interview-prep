@@ -1,0 +1,54 @@
+===H1===
+Longest Repeating Character Replacement
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/longest-repeating-character-replacement
+===BODY===
+ByteDance / TikTok
+Coding·45 minMembers
+Longest Repeating Character Replacement
+The unmodified LeetCode 424 prompt: replace at most `k` characters in an uppercase string and return the longest substring that can be made entirely one repeated character.
+SWE
+string
+sliding-window
+medium
+Frequency
+Single report
+Last asked
+2026-07-23
+Stage
+onsite-coding
+Requirements
+
+Given an uppercase English string s and an integer k, choose a substring.
+
+Within that substring, replace at most k characters with any uppercase English letter.
+
+Return the maximum possible substring length whose characters can all be made identical.
+
+Examples
+
+Input: s = "ABAB", k = 2
+Output: 4
+
+Input: s = "AABABBA", k = 1
+Output: 4
+
+Notes
+
+The prompt was the unmodified LC 424 problem.
+
+The round began with a resume drill and a question about how an LLM could be applied to the team's existing system. The coding portion was completed quickly within a 45-minute interview.
+
+Preparation
+
+Derive the window-validity condition in terms of window length, the most frequent character, and the replacement budget.
+
+Practice explaining why the tracked maximum frequency does not need to decrease on every left-boundary move.
+
+Test k = 0, an all-identical string, alternating characters, and a budget larger than the string.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

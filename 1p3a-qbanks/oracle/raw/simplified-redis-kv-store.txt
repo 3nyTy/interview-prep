@@ -1,0 +1,69 @@
+===H1===
+Simplified Redis-Like KV / List Store
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/simplified-redis-kv-store
+===BODY===
+Oracle
+Coding·45 minMembers
+Simplified Redis-Like KV / List Store
+Implement a simplified Redis-like data structure in Go supporting strings, lists, and partial list-removal semantics. Asked as the screening (pre-VO) coding problem for an OCI loop. Expiration was an explicit deferred follow-up.
+SWE
+Infra Eng
+data-structure
+in-memory-database
+design
+mini-project
+medium
+Frequency
+Single report
+Last asked
+2026-02-04
+Stage
+phone-screen · tech-screen
+Requirements
+
+Operations to implement:
+
+set(key, value) — set key to a string value; override if it already exists.
+
+list_push(key, value) — push string value to the head of the list at key; create the list if it doesn't exist.
+
+get(key) — return the entry stored at key, which may be either a string (from set) or a list (from list_push).
+
+list_remove(key, value, count) — remove matching values from the list at key. If count > 0, remove the first count matching occurrences from the head. If count < 0, remove the last |count| matching occurrences from the tail. If count == 0, remove all matching occurrences.
+
+Expiration (TTL): explicitly deferred — mentioned in the prompt but not in scope for the initial implementation.
+
+Language: Go (the screening round was conducted in Go).
+
+Notes
+
+Underlying storage: a map[string]interface{} where the value is either a string or a *list.List (or a slice-based deque). Use a type switch in get.
+
+list_remove with count == 0 is the simplest: walk the list and drop every match. count > 0 requires a head-to-tail walk with an early stop after count removals. count < 0 requires a tail-to-head walk; either reverse iteration on a doubly-linked list, or reverse-then-do-forward-then-reverse on a slice.
+
+Type-safety: in idiomatic Go, prefer a tagged-union struct (type Entry struct { kind Kind; str string; lst *List }) over interface{} so the type switch is explicit.
+
+Concurrency: a single sync.RWMutex around the map is the right starting point. Per-key locks become useful only at high write throughput; not required for the screening prompt.
+
+Expiration follow-up (deferred): the simplest correct approach is lazy expiration on access plus an optional background sweeper. Real Redis uses an active-expiration sample-and-evict approach in addition to lazy access — mention this if the round extends.
+
+Edge cases:
+
+list_push on a key whose value is a string from a previous set — Redis would error (type mismatch); confirm with the interviewer.
+
+list_remove on a missing key — no-op or error; confirm.
+
+Preparation
+
+Implement the four operations end-to-end in Go in 25-30 minutes; have a tagged-union value type and a single mutex.
+
+Drill list_remove with all three count semantics (positive, zero, negative) using container/list from the Go stdlib.
+
+Be ready to describe the lazy + active expiration story if the round extends to TTL.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,70 @@
+===H1===
+Recommender Training Pipeline
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-recommender-training-pipeline
+===BODY===
+LinkedIn
+CodingMembers
+Recommender Training Pipeline
+Complete a text-embedding recommender training pipeline using member profiles, item text, and clicked/skipped labels. Implement the RecommenderTrainer data-loading, feature-preparation, and training methods; the interviewer also requested a handwritten MLP.
+MLE
+recommendation
+classification
+feature-engineering
+json
+ambiguous-spec
+Frequency
+Single report
+Last asked
+2026-09-06
+Stage
+phone-screen
+Requirements
+
+Complete the TODO methods in RecommenderTrainer: initialization, load_data(profile_text_path, item_text_path, labeled_dataset_folder), prepare_features(...), and train(...). Additional helper methods or classes are allowed.
+
+Load member-profile JSON, item-text JSON, and labeled member–item interactions. Labels distinguish clicked from skipped for a binary-classification task.
+
+Member profiles contain memberId, headline, title, positions, and educations. Position records include company, description, start date, and nullable end date; education records include school, description, start date, and nullable end date.
+
+Item records contain itemId and text; interaction records contain memberId, itemId, and label.
+
+Use the provided LocalLLM class, initialized with a model path, whose generate_embeddings(texts) method supplies textual embedding features for the recommender.
+
+Implement feature preparation and training. The interviewer additionally requested a handwritten MLP.
+
+Examples
+
+The supplied labeled-data excerpt is:
+
+LABELED_DATASET = [
+    {"memberId": 12345, "itemId": 23456, "label": "clicked"},
+    {"memberId": 12345, "itemId": 34567, "label": "skipped"},
+    ...
+]
+
+Notes
+
+The supplied data was illustrative rather than a runnable dataset. Pseudocode was requested, but the expected implementation granularity was not clearly specified.
+
+The interviewer initially described loader and trainer work, then said a dataloader was unnecessary while asking for an MLP. Clarify which TODO methods require code and which can remain pseudocode before implementation.
+
+The MLP architecture, loss function, embedding dimensions, and training hyperparameters were not specified. Confirm these choices instead of treating a particular configuration as required.
+
+A practice implementation can index profiles and items by ID, serialize their text fields consistently, and cache embeddings for repeated entities. Join each interaction to both embeddings, keep feature rows aligned with labels, and define explicit handling for missing IDs or unknown labels.
+
+One possible baseline concatenates member and item embeddings and maps clicked to 1 and skipped to 0. A small MLP can produce one logit per interaction and train with binary cross-entropy from logits. This is a practice choice, not a specified architecture.
+
+Split training and validation data before fitting learned preprocessing. For each training batch, clear gradients, compute predictions and loss, backpropagate, and update parameters. Evaluate held-out loss without updates; avoid duplicate interactions crossing the split.
+
+Preparation
+
+In 20 minutes, implement the ID joins and feature assembly with a deterministic embedding stub. Check row/label alignment, missing IDs, and repeated members or items.
+
+In 30 minutes, write one small MLP training step and check its gradients against finite differences. Verify that a step with a small learning rate reduces the loss on a fixed minibatch.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

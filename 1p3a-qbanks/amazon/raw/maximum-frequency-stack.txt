@@ -1,0 +1,45 @@
+===H1===
+Maximum Frequency Stack
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/maximum-frequency-stack
+===BODY===
+Amazon
+Coding·15 minMembers
+Maximum Frequency Stack
+Implement the unchanged Maximum Frequency Stack problem: pop the most frequent value, breaking ties by the most recent push.
+SWE
+stack
+data-structure
+Frequency
+Single report
+Last asked
+2026-09-01
+Stage
+phone-screen
+Requirements
+
+Support push(val) to insert an integer.
+
+Support pop() to remove and return the most frequent element.
+
+When multiple elements share the highest frequency, remove the one closest to the top of the stack.
+
+Notes
+
+The candidate explicitly confirmed the public Maximum Frequency Stack problem was unchanged, including its input/output contract.
+
+Three Leadership Principles questions left approximately 15 minutes for coding. The candidate became stuck revising an O(log n) approach and did not finish.
+
+Maintain a frequency per value, a stack of values for each attained frequency, and the current maximum frequency. A push increments the value count and appends it to that frequency bucket. A pop removes the last value in the maximum bucket, decrements its count, and lowers the maximum when the bucket empties. Lower buckets retain the earlier push records needed when frequencies fall. This preserves recency among tied values. Hash-map operations give expected amortized O(1) push/pop and O(n) space for n live pushes. The canonical contract guarantees pop is called only when nonempty.
+
+Preparation
+
+Implement frequency buckets in 15 minutes and trace ties followed by repeated pops.
+
+Compare against a plain-list oracle that recomputes frequencies and removes the latest occurrence of a most-frequent value.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

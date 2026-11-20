@@ -1,0 +1,64 @@
+===H1===
+String Compression (HackerRank OA, LeetCode 443)
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/string-compression-oa
+===BODY===
+Salesforce
+Coding·30 minMembers
+String Compression (HackerRank OA, LeetCode 443)
+First problem on the recent Staff SWE HackerRank OA: classic run-length string compression done in-place on a character array.
+SWE
+string
+two-pointer
+string-processing
+medium
+Frequency
+Single report
+Last asked
+2026-04-03
+Stage
+oa
+Requirements
+
+Input: a character array chars.
+
+Compress consecutive runs of the same character. A run of length 1 stays as the single character; a run of length k ≥ 2 becomes the character followed by the decimal digits of k.
+
+Modify chars in place. Return the new length.
+
+Use O(1) extra space (multi-digit counts must be written digit-by-digit; cannot allocate a separate buffer of size n).
+
+Examples
+
+chars = ['a','a','b','b','c','c','c']
+→ length 6, chars = ['a','2','b','2','c','3', _ ]
+
+chars = ['a']
+→ length 1, chars = ['a']
+
+chars = ['a','b','b','b','b','b','b','b','b','b','b','b','b']
+→ length 4, chars = ['a','b','1','2', _ , _ , _ , _ , _ , _ , _ , _ , _ ]   # 'b' run of 12
+
+Notes
+
+Two pointers: read walks the input, write walks the output. While the run continues, advance read and bump a count; once the run breaks, write the character at write, then if count > 1, write each digit of count in order.
+
+Writing digits: convert count to its decimal string, then copy character by character. Use a small fixed buffer (up to 6 digits is enough since len(chars) ≤ 2000 per the LC bound, more than enough in practice).
+
+Subtle bug: do not write the run-length digits inside the run loop — wait until the run ends so you don't overwrite unread characters that still belong to the same run.
+
+Edge cases: empty array (length 0); single character (no count written); run of length 10+ (multi-digit count must be written left-to-right so the decimal reads correctly).
+
+Preparation
+
+Implement the in-place two-pointer compressor from scratch in <10 minutes. Verify on the three examples above.
+
+Practise the multi-digit count branch explicitly — most bugs land there.
+
+Be ready for the decompression follow-up — reverse the operation, expanding "a2b3" back to "aabbb". Watch for ambiguity with multi-digit counts.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

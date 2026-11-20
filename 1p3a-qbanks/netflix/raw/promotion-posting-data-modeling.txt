@@ -1,0 +1,125 @@
+===H1===
+Promotion Posting Data Modeling
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/promotion-posting-data-modeling
+===BODY===
+Promotion Posting Data Modeling
+
+<https://www.1point3acres.com/interview/problems/company/netflix/promotion-posting-data-modeling>
+
+Netflix
+System Design
+
+60 min
+Members
+Promotion Posting System Data Model
+
+Design the relational schema for an internal tool that posts trailers/clips to many social platforms across regions and languages: campaigns, posts, creatives, localized content, multi-level budgets (cents/BIGINT), an approval workflow, and an audit log.
+
+SWE
+data-modeling
+schema-design
+database
+versioning
+hard
+Frequency
+Single report
+Last asked
+2026-01-03
+Stage
+onsite-system-design  onsite-deep-dive
+Design the Data Model for a Promotion Posting System
+
+Design a database schema for Netflix's internal tool used to post ads. Netflix employees use this tool to post trailers, clips, and announcements on social media apps like Facebook, YouTube, TikTok, Instagram, and X (Twitter).
+
+The database must handle:
+
+Posting to many platforms (like YouTube vs. TikTok).
+Different regions and languages (English in the US, Japanese in Japan).
+Money tracking (budgets and costs).
+Approvals (managers must say "yes" before a post goes live).
+Scheduling (picking a future time to post).
+
+This allows the interviewer to see how you design tables, relationships, and handle money. Do not worry about servers or hardware. Focus on the data.
+
+Phase 1: What We Need to Build
+System Features
+Users  Netflix employees who create ads. Some are writers, some are managers who approve ads.
+Campaigns  A big goal (like "Promote Stranger Things"). It has a total budget and start/end dates.
+Posts  A single message sent to one app (like one Tweet or one Instagram photo).
+Media Files  The actual images or videos. Each app has different rules (like video length or file size).
+Translations  Text for the post (headlines, hashtags) in different languages.
+Money Tracking  Track how much money is planned vs. how much is spent. We need to track this by Campaign, App, or Region.
+Approval Process  A post starts as a "Draft." A manager makes it "Approved." Then it becomes "Scheduled" and finally "Published."
+History Log  A record of who changed what and when. This helps us fix mistakes.
+Quality Requirements
+Requirement	Target	Why we need it
+Valid Data	No broken links	Everything must connect correctly (e.g., a post must belong to a campaign).
+Speed	Fast loading (< 200ms)	Marketers open dashboards often; the system must not feel slow.
+History	Keep all records	We need to prove who spent money or changed ads.
+Easy to Upgrade	Easy to add apps	New apps (like Threads) appear often; adding them shouldn't break the database.
+Size Estimation
+Metric	Value
+Employees	~5,000
+Campaigns per year	~20,000
+Posts	~200,000
+Media Files	~300,000
+Translations	~500,000
+Regions	~30
+Platforms	~5-7
+
+Note: We don't have a huge number of writes per second. However, reading data happens fast because the "Scheduler" (a computer program) constantly checks for posts that need to go live.
+
+Phase 2: Database Tables
+Table Definitions
+Employee
+??? id: UUID (PK)
+??? email: VARCHAR(255)
+??? name: VARCHAR(255)
+??? department: VARCHAR(100)
+??? role: VARCHAR(30)             -- marketer, approver, admin
+??? created_at: TIMESTAMP
+??? updated_at: TIMESTAMP
+
+Promotion
+??? id: UUID (PK)
+??? created_by: UUID (FK ? Employee)
+??? title: VARCHAR(255)
+??? content_title: VARCHAR(255)   -- Name of the show/movie
+??? content_type: VARCHAR(30)     -- series, film, documentary
+??? objective: VARCHAR(50)        -- marketing goal
+??? total_budget_cents: BIGINT    -- money in cents (no decimals)
+??? currency: VARCHAR(3)          -- USD, EUR, JPY
+??? start_date: DATE
+??? end_date: DATE
+??? status: VARCHAR(20)           -- draft, active, paused, archived
+??? created_at: TIMESTAMP
+??? updated_at: TIMESTAMP
+
+Platform
+??? id: UUID (PK)
+??? name: VARCHAR(50)             -- facebook, youtube, tiktok
+??? display_name: VARCHAR(100)    -- "Facebook", "YouTube"
+??? max_text_length: INTEGER
+??? supported_asset_types: JSONB  -- ["image", "video", "carousel"]
+??? aspect_ratios: JSONB          -- ["16:9", "9:16", "1:1"]
+??? max_video_duration_sec: INTEGER
+??? created_at: TIMESTAMP
+??? updated_at: TIMESTAMP
+
+Region
+??? id: UUID (PK)
+??? code: VARCHAR(10)             -- us, uk, jp, br
+??? name: VARCHAR(100)            -- United States, United Kingdom
+??? default_locale: VARCHAR(10)   -- en-US, en-GB, ja-JP
+??? timezone: VARCHAR(50)         -- America/New_York
+??? created_at: TIMESTAMP
+??? updated_at: TIMESTAMP
+
+Post
+??? id: UUID (PK)
+??? promotion_id: UUID (FK ? Promotion)
+??? platform_id: UUID (FK ? Platform)
+??? region_id: UUID (FK
+
+---

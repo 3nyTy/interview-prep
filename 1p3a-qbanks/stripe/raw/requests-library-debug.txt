@@ -1,0 +1,47 @@
+===H1===
+Requests Library Debug (BugSquash)
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/requests-library-debug
+===BODY===
+Stripe
+CodingMembers
+Requests Library Debug (BugSquash)
+Debug (BugSquash) round on a checkout of the Python `requests` library. Run the failing tests, trace into library internals, and fix the planted bugs. A newer alternative to the Mako round on the same format.
+SWE
+debugging
+code-reading
+python
+hard
+Frequency
+Low
+Last asked
+2026-06-10
+Stage
+onsite-coding
+Requirements
+
+A BugSquash round on a checkout of the Python requests library (a starter archive is provided). Run the failing tests, locate the planted bugs in the library internals, and fix them.
+
+One reported bug centers on the seekable concept (re-reading / rewinding a request body stream) — an unfamiliar corner of the library for most candidates.
+
+Notes
+
+Same format as the Mako debug round but on a different, less-practiced repo, so community knowledge is thin. The interviewer is typically familiar even if you are not.
+
+A useful tactic: when a test like test_1 fails, read the adjacent passing tests (test_0, test_2) — the suite is often serialized, with neighbors differing only in input, which quickly narrows where the bug must be.
+
+Time is tight; prioritize tracing from the failing test's assertion back into the library over reading the whole codebase.
+
+Preparation
+
+Step through requests internals (models.py, sessions.py, prepared-request body handling) with an IDE debugger before the interview.
+
+Practice the failing-test-first workflow: run the suite, pick one red test, set a breakpoint at its assertion, and trace inward.
+
+Read up on how requests handles re-sending a body (the seekable / rewind path) so the reported bug class isn't new to you.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

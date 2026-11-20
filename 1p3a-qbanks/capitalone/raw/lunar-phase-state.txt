@@ -1,0 +1,56 @@
+===H1===
+Lunar Phase State Lookup
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/lunar-phase-state
+===BODY===
+Capital One
+Coding·70 minMembers
+Lunar Phase State Lookup
+Given the moon's state on day 1 of the year, plus a target `(season, day)`, return the moon state on that date. The moon cycles through 8 states with a period of 8 days.
+SWE
+MLE
+math
+simulation
+easy
+oa
+codesignal
+ambiguous-spec
+Frequency
+Single report
+Last asked
+2026-01-27
+Stage
+oa
+Requirements
+
+The moon has 8 distinct states cycling with period 8 days.
+
+Inputs: initial_state (the state on January 1 of the year), season, and day (together specifying a target date in the year).
+
+Return the moon's state on that target date.
+
+Seasons are treated as fixed month spans in the prompt (typical interpretation: spring = Mar-May, summer = Jun-Aug, fall = Sep-Nov, winter = Dec-Feb). Confirm the exact season-to-month mapping with the interviewer at the start.
+
+Notes
+
+Convert (season, day) to a day-of-year integer D (with D = 1 corresponding to Jan 1).
+
+The answer is states[(initial_index + D - 1) % 8], where states is the cycle order.
+
+The arithmetic is trivial; the round-tripping bug is the season-to-month mapping. The prompt is deliberately under-specified — clarify before coding.
+
+Watch leap years if the prompt specifies one; otherwise assume non-leap.
+
+Preparation
+
+Write a season_day_to_doy helper with explicit month boundaries as constants. Do not hardcode magic numbers inline.
+
+Verify with a single sanity test (initial = 'new moon', target = Jan 9, expected = 'new moon' again on the 9th day with 8-day period).
+
+If the season mapping is ambiguous during the live attempt, narrate the assumption and proceed — interviewers grade the clarification reflex.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

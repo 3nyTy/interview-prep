@@ -1,0 +1,44 @@
+===H1===
+Merge Object Histories Across Two Tracking Systems
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/cross-system-object-tracker-history
+===BODY===
+Waymo
+CodingMembers
+Merge Object Histories Across Two Tracking Systems
+Implement an `ObjectTracker` that links IDs from tracking systems A and B, accepts observations from either system, and returns the combined chronological history for the underlying real-world object from either ID namespace.
+SWE
+object-design
+hashmap
+sorting
+streaming
+medium
+Frequency
+Single report
+Last asked
+2026-07-14
+Stage
+onsite-coding
+Requirements
+
+Two independent components, System A and System B, track real-world objects and assign system-local string IDs. The same real object may have different IDs in the two systems.
+
+Implement an ObjectTracker with these APIs:
+
+addLink(a_id, b_id): declare that an ID from System A and an ID from System B identify the same real object.
+
+addObservation(observation): add an observation emitted by either system.
+
+getHistory(system, id): query by an ID from either system and return the complete history for that real object.
+
+A returned history must include observations from both systems.
+
+Sort the result in chronological timestamp order.
+
+Preserve each observation's original source system, source ID, and metadata.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

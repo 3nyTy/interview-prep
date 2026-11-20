@@ -1,0 +1,70 @@
+===H1===
+Binary String Synchronous '01' → '10' Replacement
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/binary-string-01-10-swap
+===BODY===
+Salesforce
+Coding·30 minMembers
+Binary String Synchronous '01' → '10' Replacement
+Salesforce Futureforce 2026 Coding Challenge (intern OA). Given a binary string, every second all occurrences of `"01"` simultaneously become `"10"`. Repeat until the string is stable. Return the number of seconds taken.
+SWE
+string
+binary-string
+simulation
+greedy
+medium
+Frequency
+Single report
+Last asked
+2025-12-25
+Stage
+oa
+Requirements
+
+Input: binary string s of length n.
+
+Each tick, simultaneously rewrite every "01" pattern to "10". (All matches identified before any rewrite — non-overlapping handling: a "01" at index i is independent of any other match.)
+
+Repeat ticks until no "01" remains.
+
+Return the number of ticks performed.
+
+Naïve simulation passes only for tiny inputs because each 1 may have to bubble past many 0s and several 1s ahead of it can block it.
+
+Examples
+
+"010110"
+  tick 1 → "101010"
+  tick 2 → "110100"
+  tick 3 → "111000"
+→ 3 seconds
+
+"0011"
+  tick 1 → "0101"
+  tick 2 → "1010"
+  tick 3 → "1100"
+→ 3 seconds\n```\n\n## Notes
+
+- Naïve simulation scans O(n) characters per tick and may need O(n) ticks → O(n²) worst case (`"00...011...1"` with all 1s at the end pushing left).
+- The clean O(n) solution scans left to right and assigns each `1` an arrival time. Track:
+  - `zeros` = number of `0`s seen so far.
+  - `prev_time` = arrival time of the previous `1`.
+  For the current `1`: it cannot finish moving past its block of `0`s until at least `zeros` seconds have passed; it also cannot arrive at its final slot before the previous `1` did (otherwise they would collide). So:
+
+time = max(prev_time + 1, zeros)   # if zeros > 0; else this 1 is already in place
+
+The answer is the maximum `time` across all `1`s. Use `time = 0` for `1`s that have no `0` to their left.
+- Why the `prev_time + 1` term: two consecutive `1`s cannot occupy the same slot at the same tick — the later `1` must wait one extra second behind the earlier one.
+- Edge cases: all `0`s (0 seconds), all `1`s (0 seconds), `"01"` (1 second), `"10"` (0 seconds), no `0` before any `1` (0 seconds).
+- The required output is only the number of synchronous ticks; no final-string construction is needed in the optimized solution.
+
+## Preparation
+
+- Re-derive the `max(prev_time + 1, zeros)` recurrence on a piece of paper for `"0011"` and `"010110"` until both come out matching naïve simulation.
+- Implement both naïve simulation and the O(n) recurrence; cross-check on random binary strings of length 20-30.
+- Be ready to explain *why* the recurrence works — interviewers often ask for an inductive argument on the position of the k-th `1`.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,77 @@
+===H1===
+QR HackerRank: Profitable Pairs and Delivery Order
+===URL===
+https://www.1point3acres.com/interview/problems/company/akunacapital/qr-hackerrank-profitable-pairs-and-delivery-order
+===BODY===
+Akuna Capital
+CodingMembers
+QR HackerRank: Profitable Pairs and Delivery Order
+A two-question HackerRank OA: count positive-sum project pairs after subtracting costs, then return city delivery order by graph distance with id tie-breaks.
+RS
+SWE
+sorting
+two-pointer
+graph
+bfs
+medium
+Frequency
+Low
+Last asked
+2025-10-21
+Stage
+oa
+Requirements
+
+Question 1: Profitable Project Pairs
+
+Given arrays profit and implementationCost, define each project's net value as profit[i] - implementationCost[i]. Return the number of pairs (i, j) with 0 <= i < j < n such that:
+
+net[i] + net[j] > 0
+
+Question 2: Delivery Management System
+
+A manufacturing company delivers goods to cities connected by undirected roads.
+
+Rules:
+
+Cities are numbered from 1 to n.
+
+Some cities may be unreachable because the road graph is disconnected.
+
+Delivery order is sorted by distance from the manufacturing company.
+
+If multiple cities have the same distance, smaller city id comes first.
+
+Return an integer array containing the city delivery order.
+
+Examples
+
+For Delivery Management with cityNodes = 4, cityFrom = [1, 2, 2], cityTo = [2, 3, 4], company at city 1:
+
+City 2 is closest at distance 1.
+
+Cities 3 and 4 are both at distance 2; the smaller id goes first.
+
+Answer: [2, 3, 4].
+
+Notes
+
+Both problems belong to a rotating 3-problem HackerRank set (120 minutes) used for QR and SWE intern OAs; the third slot is usually the running-counter Array Challenge or a minimum-swaps-to-sort task, both of which appear as their own cards.
+
+For profitable pairs, transform to the net array, sort it, then use two pointers. For each left index, find how many right values make the sum positive. Complexity is O(n log n) for sorting and O(n) for the scan.
+
+For delivery order, run BFS from the manufacturing city to compute shortest unweighted distances. Sort reachable cities by (distance, city_id). If the prompt specifies inclusion of unreachable cities, clarify whether they should be omitted or appended; the visible prompt only says some cities may be unreachable.
+
+Preparation
+
+Practice the pair-counting invariant: after sorting, if net[l] + net[r] > 0, then all indices from l+1 through r pair with r.
+
+Implement BFS with adjacency lists and a distance array initialized to -1.
+
+Test duplicate net values, all-negative nets, disconnected graph components, and same-distance city tie-breaks.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

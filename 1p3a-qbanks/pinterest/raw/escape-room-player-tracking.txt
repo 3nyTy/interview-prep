@@ -1,0 +1,104 @@
+===H1===
+Escape Room / Room-by-Room Race
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/escape-room-player-tracking
+===BODY===
+Pinterest
+Coding·60 minFree preview
+Escape Room / Room-by-Room Race
+Design a small game-state data structure: `n` rooms and `m` players all start in room 0; each call advances one player to the next room. Support O(1) per-room headcount, O(1) per-player move, and a top-K leaderboard where farther rooms rank higher and arrival-order breaks ties within the same room. By far the most-recurring custom Pinterest coding prompt in the current rotation, asked at both phone and onsite.
+SWE
+MLE
+data-structure
+object-design
+hashmap
+linked-list
+leaderboard
+simulation
+medium
+Frequency
+High
+Last asked
+2026-09-03
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Implement a class with the following interface:
+
+Game(n_rooms, n_players)             // all players start in room 0
+void proceedToNextRoom(playerId)      // player advances by one room
+int  getPeople(roomId)                 // current headcount in roomId
+vector<int> getTop(k)                  // top-k player ids by rank
+
+Ranking rules:
+
+A player in a higher-numbered room ranks above any player in a lower-numbered room.
+
+Within the same room, the player who arrived earlier ranks above one who arrived later (FIFO tiebreaker per room).
+
+Complexity targets the interviewers will push for:
+
+proceedToNextRoom(playerId) → O(1) amortized.
+
+getPeople(roomId) → O(1).
+
+getTop(k) → O(N + k) or O(k) depending on the variant the interviewer asks for; the most common ask is to walk rooms from highest to lowest and emit players in arrival order.
+
+An alternate new-grad interface uses advance(player_id), get_room(player_id), and leaderboard(k). All players start at position 0 in a finite game with positions 0...R; advance and get_room must be O(1), while leaderboard must be O(N + k), where N is the number of players. The stated limits are up to 10^5 players, 10^4 rooms, and 10^6 calls to advance.
+
+Examples
+
+Game(5, 3)
+proceedToNextRoom(0)  // player 0: room 0 -> 1
+proceedToNextRoom(1)  // player 1: room 0 -> 1
+proceedToNextRoom(2)  // player 2: room 0 -> 1
+proceedToNextRoom(0)  // player 0: room 1 -> 2
+
+getTop(2)             // [0, 1] — player 0 advanced twice (top),
+                      // then player 1 (earlier into room 1 than player 2)
+getPeople(1)          // 2  (players 1 and 2)
+getPeople(2)          // 1  (player 0)
+
+The alternate interface makes the arrival-order tiebreak explicit:
+
+init(players=["A", "B"])
+advance("A")
+advance("B")
+get_room("A")  // 1
+get_room("B")  // 1
+leaderboard(2)    // ["A", "B"]
+
+Both players are in room 1, but A ranks first because A entered that room earlier.
+
+Notes
+
+The standard solution keeps a per-room doubly-linked list of player ids plus a playerId → (roomId, listNode) map. proceedToNextRoom then unlinks from the current room's list, links to the tail of the next room's list, and updates the map — all O(1).
+
+For getTop(k), iterate rooms from n_rooms - 1 down to 0, walking each room's list head → tail until k players have been collected. This is O(rooms + k) in the worst case; a separate non-empty-room index (sorted set or bitset) keeps it tight when the room count is large.
+
+A common bug: storing the doubly-linked-list node as a class variable instead of per-room state — multiple candidates have lost a passing round to this. Each room's list must be independent.
+
+An onsite variant asks for O(N + k) leaderboard where N is the number of populated rooms; the same data structures work, with the addition of a populated-room linked list.
+
+A simpler phone variant drops the leaderboard and asks only for proceedToNextRoom + getPeople; both of these stay O(1) with just the room → counter map plus the playerId → roomId map.
+
+Phone follow-ups can explicitly require complexity optimization and unit tests for corner cases after the base implementation works.
+
+Preparation
+
+White-board the data structure cold: draw two boxes (rooms vector + per-room DLL, plus the player → node map) and walk through the example end-to-end before writing any code.
+
+Implement the doubly-linked-list helper inline rather than reaching for LinkedHashSet / OrderedDict magic — interviewers want to see the pointer manipulation explicit because the FIFO-by-arrival invariant is the central correctness question.
+
+Drill the leaderboard walk separately: given a populated-room iterator, produce the top-k in O(k). Practice with k larger than the headcount in the top room so you cross a room boundary correctly.
+
+Add unit tests for tied positions, crossing room boundaries, repeated leaderboard calls, and advancing a player at the final room.
+
+Time yourself at 25 minutes for the base class + 15 minutes for the leaderboard follow-up. The interviewer typically asks the leaderboard variant if you finish the first half cleanly.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

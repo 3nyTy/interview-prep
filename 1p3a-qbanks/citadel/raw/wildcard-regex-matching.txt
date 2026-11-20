@@ -1,0 +1,59 @@
+===H1===
+Wildcard / Regex String Matching (`*` operator)
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/wildcard-regex-matching
+===BODY===
+Citadel / Citadel Securities
+Coding·45 minMembers
+Wildcard / Regex String Matching (`*` operator)
+Citsec EQR (NG QR) live-coding round: implement string matching where `*` is the only wildcard operator. The interviewer steers the candidate from recursion-with-memo to a two-pointer iterative solution after the initial submission.
+MLE
+RS
+string
+dp
+recursion
+two-pointer
+medium
+Frequency
+Single report
+Last asked
+2025-12-16
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Implement is_match(s, p) where p may contain literal characters and the wildcard *. The * semantics line up with the LeetCode wildcard family — clarify with the interviewer whether the variant is:
+
+LC 44 wildcard matching, where * matches any sequence (including empty) of any characters.
+
+LC 10 regex matching, where * matches zero or more of the preceding element.
+
+Reported framing matched the LC 10 regex form; the interviewer first accepted a recursive solution, then pushed for a pointer-based iterative version.
+
+Notes
+
+Recursive baseline: at each position, branch on the next pattern character — literal match requires exact letter alignment; c* either consumes zero pattern characters and stays at the same string index, or consumes one string character and stays at the same pattern index. Memoize on (i, j) to avoid the exponential branching of the naive recursion.
+
+DP table version: dp[i][j] = whether s[:i] matches p[:j]. Transition for the c* case is dp[i][j] = dp[i][j-2] or (match(s[i-1], c) and dp[i-1][j]). Time and space both O(mn); space compressible to O(n) with rolling rows.
+
+Two-pointer iterative form (LC 44 style): maintain (i, j, star_idx, match_idx) cursors so that on a future mismatch, the algorithm rewinds i back to match_idx + 1 and advances match_idx while j resets to star_idx + 1. Runs in O(m + n) amortized, O(1) space.
+
+The interviewer signal in this round was clearly pushing for the pointer rewind pattern — recursion was accepted as a first pass but the follow-up explicitly nudged toward the iterative version.
+
+Failure mode: getting the c* transition wrong. Mentally tag the two branches ("erase pattern pair" vs "consume one character") and verbalize them before coding.
+
+Preparation
+
+Drill both LC 10 and LC 44 in one session. Mastering the dp[i][j-2] (zero-occurrence) transition is the discriminator.
+
+Write the two-pointer rewind version from scratch — it is the canonical O(m+n) answer the interviewer wanted; the rewind pointer pattern is reusable for several other string-matching problems.
+
+Have a 30-second pitch ready comparing the DP and rewind solutions: DP is mechanical and easy to reason about complexity-wise; rewind is asymptotically faster and lower memory but tricky to write correctly under time pressure.
+
+Refresh recursion + memoization in Python with @lru_cache(maxsize=None) so the initial submission is fast.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

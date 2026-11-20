@@ -1,0 +1,56 @@
+===H1===
+Maximal Square (LeetCode 221)
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/maximal-square
+===BODY===
+Salesforce
+CodingMembers
+Maximal Square (LeetCode 221)
+The prompt is the unchanged LeetCode 221 Maximal Square problem: given a binary matrix, return the area of the largest square containing only `1` values. The expected explanation derives the dynamic-programming transition before implementation.
+SWE
+grid
+dp
+medium
+Frequency
+Single report
+Last asked
+2026-07-17
+Stage
+onsite-coding
+Requirements
+
+Input: an m x n binary matrix represented with "0" and "1" cells.
+
+Find the largest square whose cells are all "1".
+
+Return the square's area.
+
+Explain the dynamic-programming state and transition before or while implementing it.
+
+Examples
+
+Input: [["1","0","1","0","0"],["1","0","1","1","1"],["1","1","1","1","1"],["1","0","0","1","0"]]
+
+Output: 4
+
+Notes
+
+This is the unchanged LeetCode 221 problem.
+
+The interview explicitly tests the dynamic-programming reasoning, not only a memorized implementation.
+
+Let dp[r][c] be the side length of the largest all-1 square ending at (r, c). A 0 cell gives 0; a 1 cell gives 1 + min(up, left, diagonal). Square the largest side length seen to produce the required area.
+
+The full table takes O(mn) time and O(mn) space. A one-row implementation reduces auxiliary space to O(n) as long as it preserves the previous row's diagonal value before overwriting it.
+
+Preparation
+
+Derive the state transition from the three neighboring cells and explain why all three constrain the largest square ending at the current cell.
+
+Implement both a full-table version and a space-compressed version, then test single-row, single-column, and all-zero matrices.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

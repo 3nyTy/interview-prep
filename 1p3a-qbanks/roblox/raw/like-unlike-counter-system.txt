@@ -1,0 +1,631 @@
+===H1===
+Like / Unlike Counter System
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/like-unlike-counter-system
+===BODY===
+Roblox
+System Design·60 minMembers
+Like / Unlike Counter System
+Design a like / unlike service that supports per-user, per-item like state, list of items a user has liked, and an approximate or exact total like count per item — at platform scale (hundreds of millions of users, hot creator experiences pushing billions of likes/day). Interviewers focus on schema design, idempotency under retry, hot-shard handling, and the read-vs-write trade-off in the counter path.
+SWE
+Infra Eng
+system-design
+ranking
+caching
+scaling
+sharding
+schema-design
+idempotency
+hard
+Frequency
+Medium
+Last asked
+2026-07-23
+Stage
+phone-screen · oa · onsite-system-design
+Problem Statement
+
+Design a like/unlike system for Roblox Marketplace items, games, or experiences. Users should be able to like or favorite an item, unlike or unfavorite it, check whether they already liked an item, view the items they liked, and see the total like count for an item.
+
+This is a deceptively small system design problem. Interviewers usually care less about drawing many boxes and more about whether you can make the data model, state transitions, idempotency, count correctness, cache keys, and hot item strategy precise.
+
+Clarify count semantics early. A strong answer is: user state should be correct immediately, while item like counts can be exact but asynchronously updated. Trying to make every hot item's count both globally exact and real-time will create a bottleneck.
+
+The canonical scale target often uses 1M read QPS, 100K write QPS, hot marketplace items, and a list of liked items for a user. Lead with the state table and counter pipeline, then deep dive on hot item counters and reconciliation.
+
+The prompt may say "like/unlike"; others say "favorite/unfavorite" or include "dislike." Treat these as the same state-machine problem. Start with LIKE and NONE; if asked for dislikes, extend the state enum to LIKE, DISLIKE, and NONE.
+
+Phase 1: Requirements
+
+Functional Requirements
+
+Users should be able to like or favorite an item.
+
+Users should be able to unlike or unfavorite an item.
+
+Users should be able to check their status for an item: liked, not liked, and optionally disliked.
+
+Users should be able to list items they liked, with pagination.
+
+Users should be able to see the total like count for an item.
+
+Optional follow-ups:
+
+Show a leaderboard of most-liked items.
+
+Support DISLIKE in addition to LIKE.
+
+Push updated counts to clients shortly after a click.
+
+Support item types such as marketplace assets, games, and avatars.
+
+Do not jump straight to Kafka and Redis before defining the state transition rules. This interview often probes whether repeated like, repeated unlike, and like -> dislike transitions change counts correctly.
+
+Non-Functional Requirements
+
+RequirementTargetWhy it matters
+Read scaleUp to 1M QPS across status, counts, and liked-list readsCounts are shown on item pages and search/browse surfaces
+Write scaleUp to 100K writes/sec during burstsPopular items can receive bursts after launch or promotion
+Status latencyP95 under 100 msThe click should feel immediate
+Count latencyP95 under 50 ms from cacheItem pages and browse cards need fast display
+Count consistencyExact eventually, stale by seconds is acceptableCounts should not drift permanently, but do not need to be globally real-time
+Availability99.9%+Like/favorite is user-facing but should degrade gracefully
+IdempotencyRequiredRetries and double-clicks must not double-count
+
+Questions to ask:
+
+"Is unlike the only reverse action, or do we also need dislike?"
+
+"Do users need read-after-write consistency for their own status after clicking?"
+
+"Can the displayed count be delayed by a few seconds if it is eventually exact?"
+
+"Do we need to list users who liked an item, or only list items liked by a user?"
+
+"Should item counts be available on high-fanout surfaces such as search results?"
+
+Capacity Estimation
+
+Use the interviewer-provided scale if given:
+
+Writes:
+- Peak reaction writes: 100K/sec
+- Events per day at sustained peak: 100K * 86,400 ~= 8.6B events/day
+- Real average is lower, but design the hot path for burst absorption
+
+Reads:
+- Total read QPS: 1M/sec
+- Like count reads are highly skewed toward hot items
+- Status reads are more evenly distributed by user_id and item_id
+
+Storage:
+- 500M users
+- 100M items
+- Average active liked items per user: 200
+- Active like rows: 500M * 200 = 100B rows
+- Each row ~80-150 bytes before index overhead
+- Raw active reaction state is in the multi-TB range, so use horizontal partitioning
+
+The important capacity conclusion is that active likes must be sharded horizontally, but a single item's count is tiny. The hard part is hot-key updates and hot-key reads, not raw count storage.
+
+Phase 2: Data Model
+
+Core Entities
+
+Item
+- item_id
+- item_type: marketplace_item | game | avatar_asset | experience
+- creator_id
+- status
+- created_at
+
+UserItemReaction
+- user_id
+- item_id
+- state: LIKE | DISLIKE | NONE
+- updated_at
+- version
+- last_idempotency_key
+
+UserLikedItem
+- user_id
+- liked_at
+- item_id
+- item_type
+
+ItemLikeCount
+- item_id
+- like_count
+- dislike_count
+- updated_at
+- source_event_offset
+- is_reconciled
+
+ReactionEvent
+- event_id
+- idempotency_key
+- user_id
+- item_id
+- old_state
+- new_state
+- like_delta: -1 | 0 | 1
+- dislike_delta: -1 | 0 | 1
+- created_at
+- source_version
+
+Storage Layout
+
+Use separate read models instead of forcing one table to answer every query.
+
+1. Reaction State Table
+   Key:   (user_id, item_id)
+   Query: "has this user liked this item?"
+   Shard: user_id
+
+2. User Liked Items Table
+   Key:   (user_id, liked_at DESC, item_id)
+   Query: "list liked items for this user"
+   Shard: user_id
+
+3. Item Count Table
+   Key:   (item_id, shard_id) for write-side counters
+   Query: "show count for this item" through a materialized total
+   Shard: item_id + counter_shard for hot writes
+
+4. Reaction Event Log
+   Key:   event_id or stream offset
+   Query: replay, audit, reconciliation
+   Shard: item_id + counter_shard for counter workers
+
+Redis Key Design
+
+Be concrete in the interview. Roblox reports specifically mention interviewers asking for Redis keys and query shapes.
+
+# User status, short TTL because it is personalized
+reaction:{user_id}:{item_id} -> "LIKE" | "DISLIKE" | "NONE"
+
+# Item count, hot path for item pages and browse cards
+like_count:{item_id} -> { like_count, dislike_count, updated_at, source_event_offset }
+
+# Write-side counter shards, not read directly by normal clients
+like_count_shard:{item_id}:{shard_id} -> partial count
+
+# Hot item count replicas to avoid one Redis key becoming a read hotspot
+like_count_hot:{item_id}:{replica_id} -> same payload
+
+# User liked list page cache
+user_likes:{user_id}:{cursor_hash} -> [item_id, item_id, ...]
+
+# Idempotency result, short TTL
+idem:{user_id}:{idempotency_key} -> prior API response
+
+Do not store every liker under one item:{item_id}:users key for hot items. That creates a massive hot partition for popular items. Store source state by (user_id, item_id) and derive item counts asynchronously.
+
+State Transitions
+
+This table is the heart of correctness:
+
+Old stateNew statelike_deltadislike_deltaNotes
+NONELIKE+10New like
+LIKELIKE00Idempotent duplicate
+LIKENONE-10Unlike
+NONENONE00Duplicate unlike
+DISLIKELIKE+1-1Switch reaction
+LIKEDISLIKE-1+1Switch reaction
+DISLIKENONE0-1Remove dislike
+
+If the prompt only has like/unlike, drop the DISLIKE rows and keep the same approach.
+
+Phase 3: API Design
+
+Protocol Choice
+
+Use REST over HTTPS for the public client API:
+
+The operations map cleanly to resources.
+
+Mobile and web clients can use the same endpoints.
+
+Idempotency can be represented with an Idempotency-Key header.
+
+Use a durable event stream or CDC pipeline internally for count updates:
+
+User status changes are written to the source-of-truth reaction table.
+
+CDC or an outbox publishes state-change events.
+
+Counter workers consume those events and update sharded counters and caches.
+
+Like or Unlike an Item
+
+PUT /v1/items/{item_id}/reaction
+Authorization: Bearer <token>
+Idempotency-Key: 5f7c0d8e-...
+Content-Type: application/json
+
+{
+  "state": "LIKE"
+}
+
+Response: 200 OK
+{
+  "item_id": "item_123",
+  "state": "LIKE",
+  "previous_state": "NONE",
+  "count_status": "queued",
+  "client_like_delta": 1
+}
+
+Use PUT because the client is setting the desired final state. POST /like and POST /unlike also work, but PUT state=LIKE|NONE makes idempotency and transitions easier to reason about.
+
+Check User Status for an Item
+
+GET /v1/items/{item_id}/reaction
+Authorization: Bearer <token>
+
+Response: 200 OK
+{
+  "item_id": "item_123",
+  "state": "LIKE",
+  "updated_at": "2026-04-13T18:20:00Z"
+}
+
+Get Like Count for an Item
+
+GET /v1/items/{item_id}/like-count
+
+Response: 200 OK
+{
+  "item_id": "item_123",
+  "like_count": 1872394,
+  "updated_at": "2026-04-13T18:20:03Z",
+  "freshness": "eventual"
+}
+
+List Liked Items for a User
+
+GET /v1/users/me/liked-items?limit=50&cursor=eyJsaWtlZF9hdCI6...
+
+Response: 200 OK
+{
+  "items": [
+    { "item_id": "item_123", "liked_at": "2026-04-13T18:20:00Z" },
+    { "item_id": "item_456", "liked_at": "2026-04-12T09:10:00Z" }
+  ],
+  "next_cursor": "..."
+}
+
+Optional: Batch Counts for Browse Pages
+
+POST /v1/items/like-counts:batchGet
+Content-Type: application/json
+
+{
+  "item_ids": ["item_1", "item_2", "item_3"]
+}
+
+Response: 200 OK
+{
+  "counts": {
+    "item_1": 100,
+    "item_2": 28391,
+    "item_3": 42
+  }
+}
+
+Batch count reads matter for marketplace pages. If a browse page shows 40 items, calling GET /like-count 40 times wastes network and cache resources.
+
+Phase 4: High-Level Design
+
+Architecture
+
+Write Path: Like or Unlike
+
+Client sends PUT /v1/items/{item_id}/reaction with desired state and an idempotency key.
+
+Reaction API checks idem:{user_id}:{idempotency_key}. If this is a retry, return the previous result.
+
+Reaction API reads current state from ReactionCache or ReactionDB.
+
+Reaction API computes the transition delta from the state table.
+
+Reaction API performs a conditional write:
+
+Update UserItemReaction from old state to new state.
+
+Insert or delete UserLikedItem if the active liked list changes. Keep this in the same logical transaction/partition as the reaction row when possible; otherwise derive it from CDC and accept slight liked-list lag.
+
+Record idempotency result.
+
+The source table change is published through CDC or an outbox to ReactionEvent stream.
+
+Counter workers consume events and apply like_delta to the correct counter shard.
+
+A count publisher materializes the sum of the changed counter shards into CountDB and refreshes read-optimized Redis keys.
+
+API returns immediately after the source state write; count update is asynchronous.
+
+Use CDC or an outbox to avoid a dual-write bug. If the API writes the reaction row and then separately publishes to Kafka, a crash between those two operations creates a permanent count mismatch. CDC from the committed state change makes counter updates replayable.
+
+Read Path: Check Whether a User Liked an Item
+
+1. Client calls GET /v1/items/{item_id}/reaction.
+2. API checks reaction:{user_id}:{item_id}.
+3. On cache hit, return state.
+4. On miss, read UserItemReaction by (user_id, item_id), cache briefly, return state.
+
+This path is personalized and does not usually have extreme hot keys because it is distributed by user and item.
+
+Read Path: Get Total Like Count
+
+1. Client calls GET /v1/items/{item_id}/like-count.
+2. API checks like_count:{item_id}.
+3. If hot item, read one of like_count_hot:{item_id}:{replica_id}.
+4. On cache miss, read CountDB.
+5. Return count with updated_at/freshness metadata.
+
+The count can lag writes by seconds. If the product needs immediate visual feedback after a user clicks like, the client can optimistically adjust the displayed count by client_like_delta returned from the write API.
+
+For "reflect updates quickly" follow-ups, use optimistic UI for the clicking user. For everyone else, update cached counts every few hundred milliseconds to a few seconds. SSE or WebSocket is optional and only useful for pages where live count movement matters.
+
+Read Path: List Liked Items
+
+1. Client calls GET /v1/users/me/liked-items.
+2. API queries UserLikedItem by user_id with a cursor over liked_at DESC.
+3. API batch-fetches item metadata from ItemService.
+4. API returns a paginated list.
+
+Do not derive this by scanning all items or scanning count tables. The liked-list query must be user-keyed.
+
+Counter Pipeline
+
+Counter workers consume only state-change events with non-zero deltas.
+
+event: {
+  event_id: "evt_1",
+  item_id: "item_123",
+  user_id: "user_456",
+  old_state: "NONE",
+  new_state: "LIKE",
+  like_delta: 1,
+  source_version: 983
+}
+
+counter_shard = hash(user_id) % 256
+key = like_count_shard:{item_id}:{counter_shard}
+increment key by like_delta
+
+Workers update only the affected shard. A separate count publisher periodically materializes totals for changed items:
+
+CountDB[item_id] = sum(like_count_shard:{item_id}:0..255)
+Redis[like_count:{item_id}] = CountDB[item_id]
+
+Do not sum all shards on every public read. Sum shards on cache miss, scheduled refresh, or after a bounded batch of updates, then serve normal traffic from the materialized count cache.
+
+For hot items, maintain N replicated count keys:
+
+like_count_hot:{item_id}:0
+like_count_hot:{item_id}:1
+...
+like_count_hot:{item_id}:31
+
+Clients or API servers pick a replica by random or by request hash. The payload is the same; the replicas spread read QPS.
+
+Phase 5: Scaling and Trade-offs
+
+Hot Item Handling
+
+Hot items create two separate problems:
+
+Hot writes from many users liking the same item.
+
+Hot reads from many users viewing the same count.
+
+Hot Writes
+
+Avoid placing all writes for an item in one partition:
+
+Source state is keyed by (user_id, item_id), so writes distribute by user.
+
+Counter events are distributed across counter shards using hash(user_id) % N.
+
+Workers update item_id + shard_id, not a single item_id counter row.
+
+Aggregation is async, so write latency does not depend on summing shards.
+
+Hot Reads
+
+Avoid one Redis key becoming the bottleneck:
+
+Use app-server local cache for the hottest counts with a TTL of 1-5 seconds.
+
+Replicate hot count keys across multiple Redis keys.
+
+Batch count reads for browse surfaces.
+
+Use stale-if-error fallback: if Redis is degraded, serve the last known CountDB value.
+
+For hot items, key salting is useful for reads and counter writes, but it creates aggregation work. Say that explicitly. The trade-off is lower per-key load in exchange for slightly stale aggregated counts.
+
+Idempotency and Correctness
+
+Idempotency must cover these cases:
+
+User double-clicks like.
+
+Mobile client retries after timeout.
+
+API server times out after committing the state update.
+
+Counter worker reprocesses the same event after restart.
+
+Practical safeguards:
+
+API layer:
+- Require Idempotency-Key for mutation requests.
+- Store idempotency response by (user_id, idempotency_key) with TTL.
+- Use conditional write on (user_id, item_id, version).
+
+Event layer:
+- Include unique event_id and source_version.
+- Counter workers dedupe by event_id or process offsets transactionally.
+- Counter updates are commutative deltas, so replay can be corrected.
+
+Reconciliation:
+- Periodically recompute item counts from source reaction state.
+- Compare recomputed counts with CountDB.
+- Correct drift and emit monitoring alerts.
+
+Exact Count vs Real-Time Count
+
+There are three choices:
+
+ApproachProsConsRecommendation
+Synchronous count update on every writeSimple mental model, fresher countHot item bottleneck, higher write latency, harder multi-region behaviorAvoid for high scale
+Async count via event streamFast writes, absorbs bursts, replayableCounts lag by secondsBest default
+Approximate count onlyVery cheap and fastInterviewer may ask for exact countUse only as a display optimization
+
+The interview-safe answer:
+
+User status is strongly consistent for the user's write. Item count is exact once the event stream catches up, but the displayed value may be seconds stale.
+
+Data Store Choices
+
+DataGood choicesReason
+Reaction stateDynamoDB, Cassandra, Spanner, sharded MySQL/PostgresLarge key-value workload keyed by (user_id, item_id)
+User liked listSame store, separate table keyed by user_idEfficient pagination by user
+Event streamKafka, Kinesis, Pulsar, DB CDC streamDurable replay and burst absorption
+CountsRedis + sharded counter DBLow-latency reads plus durable materialized count
+MetadataExisting item/catalog serviceLikes should not own item details
+
+If the interviewer prefers relational storage, use sharded Postgres/MySQL with:
+
+CREATE TABLE user_item_reactions (
+  user_id BIGINT NOT NULL,
+  item_id BIGINT NOT NULL,
+  state TEXT NOT NULL,
+  updated_at TIMESTAMP NOT NULL,
+  version BIGINT NOT NULL,
+  last_idempotency_key TEXT,
+  PRIMARY KEY (user_id, item_id)
+);
+
+CREATE TABLE user_liked_items (
+  user_id BIGINT NOT NULL,
+  liked_at TIMESTAMP NOT NULL,
+  item_id BIGINT NOT NULL,
+  PRIMARY KEY (user_id, liked_at, item_id)
+);
+
+CREATE TABLE item_like_count_shards (
+  item_id BIGINT NOT NULL,
+  shard_id INT NOT NULL,
+  like_count BIGINT NOT NULL,
+  updated_at TIMESTAMP NOT NULL,
+  PRIMARY KEY (item_id, shard_id)
+);
+
+In DynamoDB, model UserItemReaction with partition key user_id and sort key item_id. Model liked-list pagination as a separate table with partition key user_id and sort key liked_at#item_id. Avoid relying on a filter expression over all reactions if heavy users can have many historical unliked rows.
+
+Multi-Region Strategy
+
+Start single-region unless the interviewer asks for global:
+
+Writes route to the user's home region to avoid conflicting reaction updates.
+
+Counts can be asynchronously replicated across regions.
+
+Read count caches are regional and may show slightly different values.
+
+For active-active writes, use last-write-wins by (updated_at, version) or route by user to one writer region.
+
+Do not let two regions independently increment and decrement the same item count without a source-of-truth state transition. Cross-region duplicate retries can otherwise create count drift that is difficult to explain.
+
+Reconciliation
+
+Even with CDC, build a reconciliation path:
+
+1. Scan UserItemReaction by item_id through a secondary index or offline data lake copy.
+2. Count rows where state = LIKE.
+3. Compare with CountDB.
+4. If mismatch exceeds threshold, correct CountDB and refresh Redis.
+5. Emit metrics by item_id, shard_id, and consumer lag.
+
+At very large scale, do not run this as an OLTP scan over production tables. Stream the reaction table into a data lake and run batch jobs there.
+
+Leaderboard Follow-Up
+
+If asked to show the most-liked items:
+
+Do not sort the full item table on every request.
+
+Maintain a Top-K structure from count update events.
+
+Use periodic snapshots for categories and geographies.
+
+Recompute from CountDB or the data lake for correctness.
+
+leaderboard:global:day
+leaderboard:category:{category_id}:day
+leaderboard:creator:{creator_id}:all_time
+
+For a high-traffic product, leaderboard freshness can be minutes, not milliseconds.
+
+Common Pitfalls
+
+Double-counting retries - If like increments a counter directly, a timeout and retry can add two likes for one user. Always compute deltas from the previous state.
+
+Using item_id as the only write partition - Popular items will hot-spot. Source writes should distribute by user, while item counts are derived through sharded counters.
+
+Claiming exact and real-time counts at 100K writes/sec - You can give the clicking user immediate optimistic feedback, but the globally exact count should be asynchronous.
+
+Forgetting the liked-items list - A count-only design does not satisfy "list the items liked by a user." Add a user-keyed read model.
+
+Dual-writing DB and Kafka without protection - If the API updates state and then crashes before publishing the event, counters drift. Prefer CDC or transactional outbox.
+
+Interview Checklist
+
+Before wrapping up, make sure you have covered:
+
+  Functional requirements: like/unlike, check status, list liked items, total count
+
+  Count consistency: exact eventually, not globally real-time
+
+  State transition table with idempotent duplicates
+
+  Source-of-truth reaction table keyed by (user_id, item_id)
+
+  User liked-items table keyed by user_id
+
+  Async CDC/event pipeline for counters
+
+  Sharded counters for hot items
+
+  Redis key shapes for status and counts
+
+  Hot-key mitigation for count reads
+
+  Reconciliation job for permanent correctness
+
+  Optional dislike and leaderboard extensions
+
+Summary
+
+AreaRecommended design
+Source of truthUserItemReaction(user_id, item_id, state, version)
+Like/unlike correctnessCompute deltas from old state to new state
+IdempotencyIdempotency key plus conditional state write
+Count updateCDC/outbox event stream into sharded counters
+Count semanticsExact eventually; displayed count may be stale
+Check statusRead reaction:{user_id}:{item_id} cache, fallback to state DB
+List liked itemsUser-keyed UserLikedItem table with cursor pagination
+Hot writesSource writes sharded by user; counter shards by item and user hash
+Hot readsRedis, local cache, hot-key replication, batch APIs
+Drift handlingOffline reconciliation from source reaction state
+
+The strongest interview answer is not "use Kafka and Redis." It is: store per-user reaction state as the source of truth, derive count deltas from state transitions, update item counts asynchronously through a replayable pipeline, and use sharded counters plus cache replication for hot items.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

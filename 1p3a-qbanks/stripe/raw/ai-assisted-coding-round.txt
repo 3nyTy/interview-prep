@@ -1,0 +1,59 @@
+===H1===
+AI-Assisted Coding Round (HackerRank)
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/ai-assisted-coding-round
+===BODY===
+Stripe
+Coding·60 minMembers
+AI-Assisted Coding Round (HackerRank)
+An onsite/tech-screen round run inside HackerRank with an embedded AI assistant. Candidates are given a problem — most often a rule parser that evaluates accept/block conditions over a list of transactions — and must solve it by driving the AI rather than coding by hand. How you prompt, validate, and reason about the AI's output is the graded signal.
+SWE
+ai-tools
+medium
+Frequency
+High
+Last asked
+2026-08-29
+Stage
+onsite-coding · tech-screen
+Requirements
+
+The round runs inside HackerRank with an embedded AI chat assistant. A detailed README ships with the task; read it first.
+
+Canonical task: write a rule parser. You are given a list of transactions and a list of rules; each rule names an action (accept / block) followed by an if clause. Match fields in a transaction against the conditions in the if clause and apply the rule's action.
+
+Part 1 uses simple flag rules such as BLOCK if fraud_flag and ACCEPT if trusted_partner.
+
+Part 2 extends the condition grammar with comparisons such as amount > 10000 and boolean AND / OR composition.
+
+Rules from both parts live in one processor and execute in insertion order. Once an earlier rule returns accept or block, later rules are not evaluated.
+
+Only ~30 minutes may be actual coding time in the standard rule-parser variant; active delegation to the assistant is part of the evaluation.
+
+Notes
+
+This format began appearing in loops around April 2026 and now shows up in many loops, replacing one traditional coding round. The recruiter sometimes only warns you a few days before.
+
+The task itself is easy, but the rubric is the hard part and remains inconsistent. Lean too hard on the AI and you may be challenged on whether you understand the code; write too much yourself and you may be challenged for underusing the assistant. Naming and test cases can receive close scrutiny.
+
+A productive workflow is to have the AI read the README and propose a plan, review and split that plan, ask it to implement bounded tasks and tests, then manually inspect and run the result. Drive it like an engineer coordinating implementation rather than issuing a one-shot prompt.
+
+The embedded assistant's model choice can materially affect pacing. Gemini Flash has been available in recent HackerRank sessions and responded much faster than some alternatives. Confirm the available models at the start of the round.
+
+The AI may over-engineer or silently drop a condition; reviewing and correcting its output is where the signal lives. Keep narrating while the model works so the interviewer can follow your judgment.
+
+FDE loops can use the same evaluation style for a 90-minute React/API extension: plan first, decompose work, delegate bounded tasks, review generated changes, and manually validate caching and UI behavior.
+
+Preparation
+
+Practice driving an AI coding assistant on small problems: state the problem, request a plan, split it into bounded tasks, request tests, and iterate on edge cases.
+
+Rehearse narrating why you accept or reject each AI suggestion — interviewers interrupt to probe your judgment on code you did not type.
+
+Build the habit of validating generated output against tests rather than trusting the first response, and be ready to take over a small edit yourself when that is faster.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,638 @@
+===H1===
+Design Roblox Wallet
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/design-roblox-wallet
+===BODY===
+Roblox
+System DesignMembers
+Design Roblox Wallet
+Design a Roblox wallet with balances, ledger entries, idempotent transfers, reconciliation, and fraud controls.
+SWE
+Infra Eng
+payment
+transactions
+idempotency
+database
+Frequency
+Single report
+Last asked
+2026-04-07
+Stage
+onsite-system-design
+Problem Statement
+
+Design a Roblox wallet that lets players hold a platform balance, receive rewards, send gifts or payments to other players, and inspect wallet history. The system should keep balances correct, prevent duplicate money movement, and make transaction status easy to understand.
+
+Common variants of this prompt include:
+
+Design Roblox wallet
+
+Design reward payment
+
+Design payments or gifts between players
+
+Design a low-QPS wallet/payment flow with unclear requirements
+
+The core of this prompt is wallet correctness: every balance must derive from an append-only ledger, and every transfer must be idempotent. Do not design it as "update sender balance, then update receiver balance" with no durable transaction record.
+
+If the interviewer says QPS is low, keep the base design simple: an API service, a wallet ledger database, idempotency keys, and a transaction state machine. Then offer queues, sharding, and reconciliation as scale or reliability follow-ups.
+
+Use ROBUX below as interview shorthand for a platform credit. This is a hypothetical interview design; real-money purchase flows, compliance, creator payouts, and marketplace policy details are out of scope unless the interviewer asks.
+
+Phase 1: Requirements (~5 minutes)
+
+Functional Requirements
+
+Users should be able to view wallet balance and transaction history.
+
+Users should be able to receive rewards from Roblox services, game experiences, events, or promotions.
+
+Users should be able to send gifts or payments to another player.
+
+The system should prevent duplicate transfers when clients or services retry requests.
+
+The system should expose transaction status such as pending, succeeded, failed, reversed, or under review.
+
+Operators should be able to audit and reconcile wallet movements for support, risk, and accounting workflows.
+
+Optional follow-ups:
+
+Delayed or scheduled payments.
+
+Refunds and chargebacks.
+
+Multi-currency wallets.
+
+Creator payouts to external payment rails.
+
+Fraud/risk holds before a transaction settles.
+
+Non-Functional Requirements
+
+RequirementTargetWhy it matters
+CorrectnessNo double debit, no lost credit, no negative available balanceWallet systems fail hardest on accounting bugs
+IdempotencyEvery client/service retry returns the same transaction resultMobile clients and internal jobs retry routinely
+Read latencyP95 under 100 ms for balance/historyWallet UI should feel responsive
+Write latencyP95 under 200-500 ms for simple transfersLow-QPS gift flow can be synchronous
+DurabilityEvery transaction and ledger entry must survive service crashesBalances are financial state
+AvailabilityBalance/history highly available; transfer writes can fail closedBetter to reject a transfer than corrupt balances
+AuditabilityAppend-only ledger and immutable transaction eventsRequired for support, fraud, and reconciliation
+Abuse controlRisk checks, limits, and holdsGift/payment systems attract account abuse
+
+Clarifying Questions
+
+What is the wallet unit?
+Assume a single platform currency or credit unit for the base design. Multi-currency can be added by including currency in every ledger row.
+
+Can users send value directly to each other?
+Assume yes for the observed gift/payment variant, but require recipient validation, limits, and risk checks.
+
+Are rewards issued by users or internal services?
+Assume rewards come from trusted internal services that call the wallet API with idempotency keys.
+
+Can available balance go negative?
+No. The ledger transaction should atomically check the sender's available balance before committing a debit.
+
+Do transfers need delayed execution?
+Not for the base prompt. If asked, reuse a scheduled transaction table plus worker, similar to the delayed payment system.
+
+Is external payment processing in scope?
+For this prompt, keep the wallet internal. External purchases, refunds, and creator payouts are separate integrations.
+
+Capacity Estimation
+
+Base interview assumption:
+- 100M monthly active users
+- 10M daily active wallet users
+- 5 balance/history reads per wallet user per day
+- 1 reward or gift write per 10 wallet users per day
+- Peak traffic is 20x average
+
+Reads:
+- 10M * 5 = 50M reads/day
+- Average ~= 580 reads/sec
+- Peak ~= 12K reads/sec
+
+Writes:
+- 10M / 10 = 1M wallet writes/day
+- Average ~= 12 writes/sec
+- Peak ~= 240 writes/sec
+
+Storage:
+- Ledger entry ~= 200-500 bytes before indexes
+- Most transfers create 2 ledger entries: sender debit and receiver credit
+- 1M transactions/day ~= 2M ledger rows/day
+- Hot OLTP storage can retain recent rows; immutable history can stream to warehouse/object storage
+
+The observed gift/payment variant may be explicitly low QPS. Say that low QPS does not remove the need for a ledger, transactions, idempotency, and auditability; it just means the first implementation can avoid heavy async infrastructure.
+
+Phase 2: Data Model (~5 minutes)
+
+Core Entities
+
+WalletAccount
+- account_id
+- user_id
+- currency
+- status: active | frozen | closed
+- created_at
+- updated_at
+
+WalletBalance
+- account_id
+- currency
+- available_amount
+- pending_amount
+- version
+- updated_at
+
+WalletTransaction
+- transaction_id
+- transaction_type: reward | gift | adjustment | refund | reversal
+- source_account_id: nullable for system-funded rewards
+- destination_account_id
+- amount
+- currency
+- status: pending | processing | succeeded | failed | reversed | under_review
+- idempotency_key
+- request_actor_type: user | internal_service | admin
+- request_actor_id
+- metadata
+- created_at
+- updated_at
+
+LedgerEntry
+- ledger_entry_id
+- transaction_id
+- account_id
+- direction: debit | credit
+- amount
+- currency
+- balance_after
+- entry_type: gift_debit | gift_credit | reward_credit | hold | release | reversal
+- created_at
+
+IdempotencyRecord
+- idempotency_key
+- actor_id
+- operation_type
+- transaction_id
+- request_hash
+- response_snapshot
+- expires_at
+- created_at
+
+RiskReview
+- review_id
+- transaction_id
+- decision: allow | hold | reject
+- reason_codes
+- created_at
+
+Relationships
+
+One user has one or more WalletAccount rows, usually one per currency.
+
+WalletBalance is a durable materialized projection of ledger state for fast reads.
+
+WalletTransaction is the user-visible operation.
+
+LedgerEntry is the immutable accounting record. A gift creates one debit and one credit in the same database transaction.
+
+IdempotencyRecord maps retries to the original transaction and response.
+
+RiskReview records why a transaction was allowed, held, or rejected.
+
+Invariants
+
+The ledger is append-only. Corrections use reversal entries, not mutation.
+
+A committed transfer has balanced ledger entries. The sum of debits and credits for a transaction should net to zero unless the source or sink is a platform account.
+
+Available balance never goes below zero.
+
+Idempotency keys are scoped to the caller and operation.
+
+Wallet balances can be rebuilt from ledger entries. The projection is useful for serving reads, but not sufficient for audit.
+
+Status changes are monotonic: pending -> succeeded, pending -> failed, pending -> under_review -> succeeded/failed, or succeeded -> reversed.
+
+Do not store only a mutable balance column. You need a ledger to answer "why did this user have this balance yesterday?" and to recover from bugs or partial failures.
+
+Phase 3: API Design (~5 minutes)
+
+Use REST for external/user-facing wallet APIs and gRPC or internal REST for trusted Roblox services issuing rewards. The important part is not the protocol; it is idempotency and clear state transitions.
+
+User APIs
+
+GET /api/wallet/balance
+Authorization: Bearer <user_token>
+
+200 OK
+{
+  "account_id": "acct_123",
+  "currency": "ROBUX",
+  "available_amount": 1250,
+  "pending_amount": 0,
+  "updated_at": "2026-05-17T12:00:00Z"
+}
+
+GET /api/wallet/transactions?cursor=abc&limit=25
+
+200 OK
+{
+  "transactions": [
+    {
+      "transaction_id": "txn_123",
+      "type": "gift",
+      "direction": "sent",
+      "counterparty_user_id": "user_456",
+      "amount": 100,
+      "currency": "ROBUX",
+      "status": "succeeded",
+      "created_at": "2026-05-17T12:01:00Z"
+    }
+  ],
+  "next_cursor": "def"
+}
+
+POST /api/wallet/gifts
+Idempotency-Key: client-generated-key
+
+{
+  "recipient_user_id": "user_456",
+  "amount": 100,
+  "currency": "ROBUX",
+  "message": "gg"
+}
+
+201 Created
+{
+  "transaction_id": "txn_123",
+  "status": "succeeded",
+  "sender_balance": {
+    "available_amount": 1150,
+    "currency": "ROBUX"
+  }
+}
+
+Internal Reward API
+
+POST /internal/wallet/rewards
+Idempotency-Key: reward-event-id
+
+{
+  "destination_user_id": "user_789",
+  "amount": 50,
+  "currency": "ROBUX",
+  "reason": "quest_completion",
+  "source_event_id": "event_abc",
+  "metadata": {
+    "experience_id": "exp_123",
+    "quest_id": "daily_1"
+  }
+}
+
+201 Created
+{
+  "transaction_id": "txn_reward_123",
+  "status": "succeeded"
+}
+
+Error Cases
+
+ErrorStatusResponse
+Missing/invalid auth401{ "error": "unauthorized" }
+Recipient not found404{ "error": "recipient_not_found" }
+Insufficient balance409{ "error": "insufficient_balance" }
+Duplicate idempotency key with same request200 or 201Return original response
+Duplicate idempotency key with different request409{ "error": "idempotency_key_reused" }
+Risk hold202{ "status": "under_review" }
+Frozen account403{ "error": "wallet_frozen" }
+
+For player-to-player gifts, use the authenticated sender from the session, not a request body field. Letting the client submit source_user_id is a simple spoofing bug.
+
+Phase 4: High-Level Design (~15-25 minutes)
+
+Architecture
+
+Core Components
+
+ComponentResponsibility
+Wallet APIAuthenticates users, validates requests, enforces idempotency headers
+Internal Wallet APIAccepts reward issuance from trusted services
+Risk and Limits ServiceChecks velocity limits, account status, recipient eligibility, fraud rules
+Wallet ServiceOwns transaction state machine and ledger writes
+Wallet Ledger DBStores accounts, balances, transactions, and ledger entries
+Idempotency TableDurable table that ensures retries map to the same result, ideally in the same transactional boundary as ledger writes
+Transactional OutboxPublishes wallet events only after DB commit
+Balance CacheSpeeds up balance reads, backed by DB source of truth
+Reconciliation JobsCompare balance projections, ledger sums, and downstream events
+
+Gift Flow
+
+Client sends POST /api/wallet/gifts with an idempotency key.
+
+API authenticates sender and validates recipient, amount, currency, and message.
+
+Wallet service reserves the idempotency key with a unique constraint on (actor_id, operation_type, idempotency_key):
+
+If the key exists with the same request hash and a completed response, return the stored response.
+
+If the key exists with the same request hash and an in-progress transaction, return the current transaction status.
+
+If the key exists with a different request hash, reject the request.
+
+Risk service checks account status, daily limits, suspicious velocity, and recipient constraints.
+
+Wallet service opens a database transaction.
+
+Wallet service locks the sender and recipient balance rows in a deterministic order.
+
+Wallet service checks sender available balance.
+
+Wallet service inserts WalletTransaction.
+
+Wallet service inserts debit and credit LedgerEntry rows.
+
+Wallet service updates WalletBalance for both accounts.
+
+Wallet service stores the idempotency response and an outbox event.
+
+Database commit completes the transfer.
+
+Outbox worker publishes wallet.transaction.succeeded for notifications, history indexing, analytics, and reconciliation.
+
+-- Inside one DB transaction:
+SELECT * FROM wallet_balances
+WHERE account_id IN (:sender_account_id, :recipient_account_id)
+ORDER BY account_id
+FOR UPDATE;
+
+-- Fail before writing ledger rows if sender balance is insufficient.
+UPDATE wallet_balances
+SET available_amount = available_amount - :amount,
+    version = version + 1
+WHERE account_id = :sender_account_id
+  AND available_amount >= :amount;
+
+-- If this updates 0 rows, rollback and return insufficient_balance.
+
+UPDATE wallet_balances
+SET available_amount = available_amount + :amount,
+    version = version + 1
+WHERE account_id = :recipient_account_id;
+
+INSERT INTO ledger_entries (... direction, account_id, amount, balance_after ...)
+VALUES
+  ('debit', :sender_account_id, :amount, :sender_balance_after),
+  ('credit', :recipient_account_id, :amount, :recipient_balance_after);
+
+Reward Flow
+
+Rewards are similar, but the source is a platform treasury account or a system-funded transaction:
+
+Reward service emits or calls with a stable source_event_id.
+
+Internal Wallet API uses source_event_id as the idempotency key.
+
+Wallet service validates the event source and reward policy.
+
+Wallet service credits the destination account and, if needed, debits a platform liability account.
+
+Event stream notifies the user and feeds analytics.
+
+For rewards, idempotency should be tied to the business event, not the HTTP request attempt. If a quest-completion event retries five times, the user should receive one reward.
+
+Balance Reads
+
+Balance reads can use a cache-aside pattern:
+
+Read wallet_balance:{account_id}:{currency} from cache.
+
+If present and fresh, return it.
+
+If missing, read WalletBalance from DB and populate cache.
+
+On committed writes, update or invalidate the cache for affected accounts.
+
+The source of truth is the ledger and transaction history. WalletBalance is the durable read projection, and the cache is only a performance layer.
+
+History Reads
+
+Use WalletTransaction and LedgerEntry for authoritative history. For large history or search filters, stream wallet events into a search/read model:
+
+partition by user_id
+
+order by created_at plus transaction_id
+
+cursor pagination
+
+denormalize counterparty display names carefully, or fetch them from profile service at read time
+
+Phase 5: Scaling & Trade-offs (~15-20 minutes)
+
+Synchronous vs Asynchronous Writes
+
+For the observed low-QPS gift/payment variant, synchronous writes are the simplest correct answer:
+
+one API request
+
+one database transaction
+
+immediate success/failure response
+
+no queue required for the critical ledger mutation
+
+Add async processing when:
+
+risk review may take seconds or minutes
+
+rewards arrive as event streams
+
+downstream notifications and analytics should not block the wallet write
+
+external payment processors are involved
+
+bursty campaigns create high reward volume
+
+Putting the ledger mutation itself behind a queue can make user feedback harder. If you choose async, return pending, make status polling clear, and still enforce idempotency before enqueueing.
+
+Ledger Correctness
+
+The design should make these guarantees:
+
+Atomicity: debit and credit commit together.
+
+Isolation: concurrent transfers from the same account cannot overspend.
+
+Idempotency: retries do not create extra ledger entries.
+
+Recoverability: every transaction status can be reconstructed from ledger and events.
+
+Auditability: support can explain every balance change.
+
+Implementation options:
+
+Single relational database transaction for low/moderate QPS.
+
+Account-sharded ledger database when write QPS grows.
+
+Serial execution by account shard for very high contention accounts.
+
+Double-entry ledger with platform accounts for rewards, refunds, and adjustments.
+
+Account Locking and Deadlocks
+
+When a transfer touches two accounts, lock balance rows in a deterministic order:
+
+lock_order = sorted([sender_account_id, recipient_account_id])
+
+This prevents request A from locking sender then recipient while request B locks recipient then sender. If account IDs are partitioned across shards, route the transaction through a transfer coordinator or account-pair shard for cross-shard operations.
+
+Idempotency Deep Dive
+
+Idempotency should store:
+
+caller identity
+
+operation type
+
+idempotency key
+
+request hash
+
+transaction ID
+
+final or current response snapshot
+
+Rules:
+
+Same key + same request returns the original response.
+
+Same key + same in-progress request returns the current transaction status, not a second transfer.
+
+Same key + different request returns an error.
+
+Client-provided keys are required for user gifts.
+
+Server-generated business event IDs are required for rewards.
+
+Enforce idempotency with a unique database constraint, not only an in-memory check.
+
+Idempotency records should live at least as long as client retry windows and reward replay windows.
+
+Fraud, Risk, and Abuse
+
+Roblox-style wallet/gift systems need risk controls:
+
+daily and hourly send limits
+
+account age and trust checks
+
+recipient blocklist or parental controls
+
+suspicious many-to-one or one-to-many gift patterns
+
+velocity limits after password reset or login from a new device
+
+holds for high-risk transactions
+
+admin reversal workflow
+
+Risk can either reject before the ledger commit or put the transaction into under_review with pending funds. Do not credit the recipient as spendable if the transaction is still under review.
+
+Holds and Pending Balance
+
+If the interviewer asks for review or delayed settlement:
+
+Move sender funds from available_amount to pending_amount.
+
+Insert a hold ledger entry.
+
+Mark the transaction under_review or pending.
+
+On approval, release pending from sender and credit recipient.
+
+On rejection, move pending back to available.
+
+This is more complex than the base synchronous gift flow but useful for fraud checks and delayed payment follow-ups.
+
+Sharding
+
+Start with a single relational database for the base answer. If scaling is required:
+
+shard accounts by account_id or user_id
+
+keep all ledger entries for one account on the same shard
+
+route balance reads and writes through a shard map
+
+handle cross-shard transfers with a transaction coordinator or escrow/platform clearing account
+
+stream ledger events from all shards into a global warehouse for reconciliation
+
+The main trade-off is complexity. Cross-shard distributed transactions are hard; do not introduce them unless scale demands it.
+
+Reconciliation
+
+Run periodic jobs that check:
+
+WalletBalance.available_amount + pending_amount equals the sum of ledger entries for each account
+
+every succeeded transaction has the expected ledger entries
+
+every outbox event was published exactly once or safely deduplicated downstream
+
+reward source events map to exactly one wallet transaction
+
+cache values match DB projections
+
+If a mismatch is found, freeze affected accounts or transactions, alert operators, and repair with explicit adjustment/reversal entries.
+
+Common Pitfalls
+
+Skipping requirements clarification. The prompt may be intentionally vague. Ask whether the interviewer wants wallet UI features, player-to-player gifts, rewards, delayed payment, or payment-rail integration.
+
+Using mutable balances as the only source of truth. A wallet needs an append-only ledger and transaction history so every balance can be audited.
+
+Ignoring idempotency. Retried gift or reward requests are normal. Without idempotency, the system can double-credit rewards or double-debit users.
+
+Over-engineering low QPS. A queue, distributed saga, and multi-region active-active ledger may distract from the core if the interviewer says concurrency is low. Start simple, then scale.
+
+Crediting high-risk transfers immediately. If fraud review exists, separate available and pending balances so questionable funds are not instantly spendable.
+
+Interview Checklist
+
+  Clarify wallet scope: rewards, gifts, balance/history, delayed payment, or external payments
+
+  Define wallet account, transaction, ledger entry, balance, and idempotency records
+
+  Use one atomic transaction for debit and credit in the base design
+
+  Explain idempotency for both client gifts and service-issued rewards
+
+  Discuss risk checks, limits, holds, and account freezes
+
+  Keep asynchronous components out of the critical path unless needed
+
+  Add outbox events for notifications, analytics, and reconciliation
+
+  Explain how reconciliation detects and repairs drift
+
+Summary
+
+AreaRecommended answer
+Source of truthAppend-only ledger plus wallet transaction records
+Balance readsDurable WalletBalance projection, optionally cached for hot reads
+Gift write pathSynchronous API with DB transaction, deterministic row locks, and idempotency
+Reward write pathInternal API or event consumer keyed by business event ID
+ConsistencyStrong consistency for balance mutation; eventual consistency for notifications/search
+Abuse controlsRisk checks, velocity limits, account status, holds, and reversals
+ScalingSingle relational DB first; account sharding and async event processing as follow-ups
+ReconciliationPeriodic ledger-vs-balance checks and outbox/event validation
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

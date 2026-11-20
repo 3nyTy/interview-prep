@@ -1,0 +1,58 @@
+===H1===
+Validate Binary Search Tree
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/validate-binary-search-tree
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Validate Binary Search Tree
+Validate whether a binary tree is a binary search tree (LeetCode 98). A staple Bloomberg phone-screen problem, paired with Longest Palindromic Substring in the same round; the interviewer probes the bounds-based versus in-order approaches and the integer-overflow edge.
+SWE
+tree
+bst
+dfs
+tree-traversal
+medium
+Frequency
+Single report
+Last asked
+2026-06-16
+Stage
+phone-screen
+Requirements
+
+Given the root of a binary tree, determine whether it is a valid binary search tree (BST). A valid BST satisfies, for every node: the entire left subtree holds keys strictly less than the node's key, the entire right subtree holds keys strictly greater, and both subtrees are themselves valid BSTs.
+
+Function signature:
+
+boolean isValidBST(TreeNode root)
+
+Follow-ups:
+
+Compare the recursive (min, max) bounds approach with the in-order-traversal approach (an in-order walk of a BST must be strictly increasing).
+
+Decide how duplicates are treated — strictly increasing rejects equal keys; confirm with the interviewer.
+
+Handle nodes at the integer extremes so the bounds check does not falsely pass or overflow.
+
+Notes
+
+The classic bug is checking only the immediate parent rather than carrying down the full (low, high) bound; a node can be larger than its parent yet still violate an ancestor's bound.
+
+Two clean canonical forms: pass nullable / long bounds down the recursion, or keep a prev pointer during an in-order traversal and assert prev < current.
+
+The overflow trap: comparing against Integer.MIN_VALUE / Integer.MAX_VALUE with int bounds breaks when a node actually holds those values — use nullable bounds or long.
+
+This is the first of two phone-screen problems (paired with Longest Palindromic Substring); finishing it quickly buys time for the second.
+
+Preparation
+
+Implement both the bounds-based recursion and the in-order version, and be ready to switch to whichever you did not write first.
+
+Dry-run a tree that is locally valid but globally invalid (a right-subtree node smaller than a higher ancestor) and narrate the bound at each step.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

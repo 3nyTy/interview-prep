@@ -1,0 +1,80 @@
+===H1===
+System Design: Real-Time Restaurant Leaderboard
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/system-design-realtime-restaurant-leaderboard
+===BODY===
+DoorDash
+System DesignMembers
+System Design: Real-Time Restaurant Leaderboard
+Design a system that continuously displays the ten restaurants with the most orders in a sliding one-hour window. Second-level freshness is acceptable, approximate answers are allowed, and extensions cover per-city leaderboards, late or duplicate events, and stream-processor recovery.
+SWE
+leaderboard
+streaming
+top-k
+sliding-window
+sharding
+dedup
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-system-design
+Requirements
+
+Functional
+
+Ingest order events continuously.
+
+Display the ten restaurants with the most orders during the previous sliding hour.
+
+Update the displayed ranking with roughly second-level freshness.
+
+Support an optional extension for historical lookback.
+
+Follow-up: return a separate top ten for each user's city.
+
+Non-functional
+
+Approximate results are acceptable if the error trade-off is explained.
+
+Handle restaurants whose event volume is much hotter than the rest of the keyspace.
+
+Handle late and duplicate order events using event time and a unique event ID.
+
+Recover the streaming computation after a worker failure without losing the ability to replay retained events.
+
+Design decisions
+
+Choose a representation for the one-hour sliding window and explain its update cost.
+
+Choose between exact aggregation and a memory-efficient approximate counter, including the direction of estimation error.
+
+Choose a partitioning strategy that avoids concentrating a hot restaurant on one worker.
+
+Notes
+
+Clarify order-event rate, acceptable freshness, exact versus approximate output, sliding versus fixed windows, and historical-query requirements before drawing the pipeline.
+
+Minute buckets make expiration cheaper but can retain events for up to one extra bucket width; second-level display refresh does not by itself make window membership second-accurate. Use finer buckets or an event-time expiry queue when that error is unacceptable.
+
+A Count-Min Sketch overestimates point counts because of collisions and cannot enumerate the top restaurants by itself. Pair it with a bounded heavy-hitter candidate structure, then rank candidates by their estimates; otherwise retain exact per-key counts.
+
+The per-city extension changes the aggregation key to include both city and restaurant.
+
+Preparation
+
+Draw the full order-event pipeline and implement the sliding hour with minute buckets, including bucket expiry.
+
+Drill hot-key splitting and the second aggregation step required to merge a restaurant's partial counts.
+
+Compare exact counters with a Count-Min Sketch and explain why its estimate is biased upward.
+
+Rehearse duplicate suppression, late-event policy, checkpoint recovery, and replay from the message queue.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

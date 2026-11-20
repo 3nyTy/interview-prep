@@ -1,0 +1,60 @@
+===H1===
+Transformer Attention Mask and Heads Coding
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/transformer-attention-mask-and-heads-coding
+===BODY===
+Apple
+Coding·45 minMembers
+Transformer Attention Mask and Heads Coding
+Apple AIML / MLE rounds can ask live ML coding around Transformer internals: implement or debug attention, add heads, add masks, and reason about tensor shapes.
+MLE
+transformer
+attention
+pytorch
+debugging
+medium
+Frequency
+Low
+Last asked
+2026-06-16
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Implement or modify Transformer attention code.
+
+Expected tasks include:
+
+Explain self-attention inputs and outputs.
+
+Add multi-head structure.
+
+Add an attention mask.
+
+Keep tensor shapes correct across batch, heads, sequence, and hidden dimensions.
+
+Explain complexity and common failure modes.
+
+Notes
+
+The shape discipline is the signal. A standard layout is (batch, heads, seq, head_dim) for Q/K/V after projection and reshape. Scaled dot-product attention computes Q @ K^T / sqrt(head_dim), applies a mask before softmax, and multiplies by V.
+
+Masks should be added as large negative values before softmax, not after. Be explicit about broadcast shape: padding masks and causal masks usually broadcast differently.
+
+Some MLE phone screens, including Vision-team rounds, give this as a bare "implement multi-head attention from scratch" prompt with no starter code, so be ready to set up the Q/K/V projections, reshape into heads, and scaled dot-product yourself without a provided signature.
+
+Preparation
+
+Write a minimal PyTorch self-attention module from scratch.
+
+Drill the tensor shapes for projection, reshape, transpose, score matrix, softmax, and output projection.
+
+Add both padding mask and causal mask tests.
+
+Prepare complexity: O(batch * heads * seq^2 * head_dim) time and O(batch * heads * seq^2) attention memory.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

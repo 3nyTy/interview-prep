@@ -1,0 +1,70 @@
+===H1===
+OA: Maximum Items by Budget with Prefix Sums
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/oa-prefix-sum-budget-purchase
+===BODY===
+Uber
+Coding·90 minMembers
+OA: Maximum Items by Budget with Prefix Sums
+Hack2Hire OA problem. Stalls have non-decreasing prices. For each query `(pos, amount)`, starting from stall `pos`, buy at most one item per stall while moving right; maximize the number of items bought without exceeding `amount`.
+SWE
+array
+two-pointer
+easy
+Frequency
+Low
+Last asked
+2026-02-11
+Stage
+oa
+Requirements
+
+Input: integer array prices of length n (non-decreasing), arrays pos[] and amount[] of length q.
+
+For each query i: starting at 1-indexed position pos[i], you visit stalls pos[i], pos[i]+1, …, n. At each visited stall you may buy one item at its price.
+
+The total spent must not exceed amount[i].
+
+Output: array of length q where ans[i] is the maximum number of items buyable for query i.
+
+Constraints: n >= 1, pos.length == amount.length, 1 <= pos[i] <= n, 0 <= amount[i]. Use 64-bit prefix sums — in fixed-width integer languages the cumulative sum overflows 32 bits.
+
+Examples
+
+prices = [3, 4, 5, 5, 7]
+queries = [(2, 10), (1, 24), (5, 5)]
+Q1: from pos 2, prices [4,5,5,7]; pick 4+5 = 9 ≤ 10 → 2 items
+Q2: from pos 1, total = 24 ≤ 24 → 5 items
+Q3: from pos 5, only price 7 > 5 → 0 items
+Output: [2, 5, 0]
+
+prices = [1, 2, 2, 3, 6]
+queries = [(3, 4), (2, 7), (4, 10)]
+Q1: from pos 3, prices [2,3,6]; pick 2 ≤ 4 → 1 item
+Q2: from pos 2, prices [2,2,3,6]; pick 2+2+3 = 7 ≤ 7 → 3 items
+Q3: from pos 4, prices [3,6]; pick 3+6 = 9 ≤ 10 → 2 items
+Output: [1, 3, 2]
+
+Notes
+
+Because prices is non-decreasing, greedy from left always wins: buy stalls in order until the budget runs out.
+
+Precompute prefix sums prefix[i] = sum(prices[0..i−1]). For each query, search for the largest r such that prefix[r] − prefix[pos−1] ≤ amount, equivalently prefix[r] ≤ prefix[pos−1] + amount.
+
+Use bisect_right on prefix with lo = pos, hi = n + 1. The answer is (r − 1) − (pos − 1).
+
+Time: O(n + q log n).
+
+This is essentially LC 2389 (Longest Subsequence with Limited Sum) adapted to non-decreasing prices.
+
+Preparation
+
+Drill LC 2389 once; the pattern transfers directly.
+
+Practice bisect_left vs bisect_right and confirm with manual examples — getting this off by one is the typical bug for this problem family.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

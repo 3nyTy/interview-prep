@@ -1,0 +1,66 @@
+===H1===
+Minimum-Cost Path on a Grid with Fuel and Recharge Cells
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/shortest-path-grid-with-fuel
+===BODY===
+ByteDance / TikTok
+Coding·60 minMembers
+Minimum-Cost Path on a Grid with Fuel and Recharge Cells
+Weighted-cost grid traversal from top-left to bottom-right with a fuel budget that depletes per step, can be refilled at marked cells, and is bounded by some cells being fully blocked.
+SWE
+grid
+dijkstra
+bfs
+dp
+hard
+Frequency
+Single report
+Last asked
+2026-04-05
+Stage
+phone-screen · onsite-coding
+Requirements
+
+You are given an m x n grid with three parallel arrays plus an integer fuel cap:
+
+grid_cost[i][j]: cost paid when entering cell (i, j) (including the start)
+
+blocked[i][j]: True if the cell cannot be entered
+
+recharge[i][j]: True if stepping on the cell refills fuel back to K
+
+K: maximum fuel capacity
+
+You start at (0, 0) (paying its cost) with a full tank of K fuel, and want to reach (m-1, n-1). Each step into a non-recharge cell consumes one unit of fuel; recharge cells reset fuel to K. Return the minimum total cost, or -1 if unreachable. Fuel may be 0 exactly upon arrival.
+
+def minCost(grid_cost, blocked, recharge, K) -> int: ...
+
+Follow-up: if K is very large so that O(m * n * K) is too big, what do you do?
+
+Notes
+
+The natural model is Dijkstra over (row, col, fuel_remaining) states with edge weight equal to the destination cell's grid_cost. The state space is O(m * n * K) and Dijkstra runs in O(mnK log(mnK)).
+
+Key invariant: at any cell with recharge[i][j] == True, fuel resets to K after entering, so the state collapses to (i, j, K) for those cells — exploit this to prune.
+
+For the large-K follow-up: if K >= m + n, fuel never limits you and the problem reduces to plain weighted shortest path on the grid. More generally, build a "recharge-graph" whose nodes are start + recharge cells + goal, with edge weights computed by shortest-path inside the fuel envelope between pairs.
+
+Watch the entry cost on start: (0, 0)'s grid_cost is paid up front per the spec.
+
+Common bug: using BFS instead of Dijkstra because the grid looks unweighted — but grid_cost makes edge weights heterogeneous.
+
+Preparation
+
+Drill the (state, distance) Dijkstra template with a 3-tuple state; heapq in Python is enough.
+
+Code the basic version first, then add the recharge-graph reduction as a separate enhancement.
+
+Trace it on a 3×3 toy with one recharge cell and K = 2 to convince yourself fuel state transitions are correct.
+
+Be ready to discuss when BFS-with-state suffices (uniform cost) versus when you need Dijkstra (varying cost).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,95 @@
+===H1===
+Document / Layer — Apply, Undo, Commit Batch, Redo
+===URL===
+https://www.1point3acres.com/interview/problems/company/figma/document-layer-apply-undo
+===BODY===
+Figma
+Coding·60 minFree preview
+Document / Layer — Apply, Undo, Commit Batch, Redo
+Figma's signature phone-screen coding question. Build a Document made of layers, where each layer holds key/value properties. Implement applying a property to a layer and undoing operations, then extend to batched commits and redo. Algorithmically light; the challenge is a clean state model and handling the verbose, awkward spec.
+SWE
+MLE
+object-design
+data-structure
+stack
+simulation
+python
+medium
+Frequency
+High
+Last asked
+2026-07-06
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Implement a Document class whose state is a set of layers; each layer has an id and a map of property key → value.
+
+Part 1 — apply & undo
+
+apply(id, property_name, value) — set a property on a specific layer (creating the layer if needed). A later apply to the same (id, property_name) overwrites the previous value; other properties on that layer are untouched.
+
+undo() — revert the most recent operation, restoring the exact prior state.
+
+Some variants also ask for get_layer_by_id(id) (or equivalent read accessor).
+
+Part 2 — batches
+
+commit_batch() — group the operations since the previous commit into one unit. After commit_batch, undo() must revert the whole batch as a single step (not one apply at a time). Applies still take effect immediately; the commit only changes undo granularity.
+
+A common follow-up is to make batch-undo space-efficient (do not store every intermediate state).
+
+Part 3 — redo
+
+redo() — re-apply the most recently undone operation or batch. Supporting redo means undo cannot simply discard history.
+
+Edge cases interviewers probe
+
+undo() when there is nothing left to undo.
+
+Coalescing repeated writes: apply(1,'color','red') then apply(1,'color','blue') within a batch should not require storing both — store only what is needed to reverse the batch.
+
+Examples
+
+doc = Document()
+doc.apply(1, "color", "green")        # Layer 1: {color: green}
+doc.apply(2, "shape", "triangle")     # Layer 1: {color: green}, Layer 2: {shape: triangle}
+doc.apply(1, "color", "blue")         # Layer 1: {color: blue},  Layer 2: {shape: triangle}
+doc.undo()                            # Layer 1: {color: green}, Layer 2: {shape: triangle}
+
+Batch + redo variant:
+
+apply(Layer(1, {"color": "green"}))
+apply(Layer(2, {"shape": "triangle", "color": "blue"}))
+apply(Layer(1, {"color": "pink"}))
+commit_batch()
+apply(Layer(1, {"color": "blue"}))
+apply(Layer(1, {"color": "white"}))
+commit_batch()
+# State: Layer 1 {color: white}, Layer 2 {shape: triangle, color: blue}
+# Undo the last batch -> Layer 1 {color: pink}, Layer 2 {shape: triangle, color: blue}
+
+Notes
+
+This is the most reliably recurring Figma coding question across years and roles (SWE and MLE phone screens). Interviewers supply the test harness; getting the provided tests to pass on the first run is the bar.
+
+Conflicting reports on batch semantics — clarify before coding. Candidates have hit two framings: (a) on commit_batch, store the oldest value per touched property and ignore intermediate states, using a delimiter/marker to bound the batch on the undo stack; (b) store a Deque<List<Operation>> of operations per batch. Both can pass, but interviewers push on the space-efficient version — ask which inverse representation they want before committing to a data structure.
+
+The spec as written by the interviewer often differs slightly from community prep (simpler or differently-worded conditions). Re-read carefully; over-fitting to a remembered version has actively hurt candidates.
+
+A simpler phone-screen variant assumes every layer already exists when apply is called — no creation path to build. Confirm whether apply must create missing layers before designing your data model.
+
+Language traps to avoid: in Go, cannot assign to struct field in map (mutate via a temp struct or use pointers); in C++, do not store the address of a range-loop local in a member.
+
+Treat undo/redo as two stacks (or a history list with a cursor); a per-operation inverse (old value, or "property did not exist") makes reversal O(1) and avoids snapshotting the whole document.
+
+Preparation
+
+Implement the full apply / undo / commit_batch / redo class from scratch in your interview language and run it against your own assert-based test harness until first-run green.
+
+Practice the inverse-operation representation: for each apply, record what is needed to undo it (previous value, or a tombstone if the key was absent), and rehearse coalescing repeated writes within a batch.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

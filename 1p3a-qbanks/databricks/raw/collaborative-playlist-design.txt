@@ -1,0 +1,51 @@
+===H1===
+Collaborative Playlist Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/collaborative-playlist-design
+===BODY===
+Databricks
+System DesignMembers
+Collaborative Playlist Design
+Design a shared playlist app — add, remove, and reorder songs — that multiple users edit collaboratively. Distributed scale is explicitly out of scope: the round is scored on data modeling for the ordered song list and on API / event design for propagating one user's edits to the others. The same prompt covers both the frontend screen and the onsite frontend system-design round.
+SWE
+frontend
+data-modeling
+api-design
+medium
+Frequency
+Low · New
+Last asked
+2026-07-30
+Stage
+phone-screen · onsite-system-design
+Requirements
+
+Design a shared playlist application with three core operations: addSong, removeSong, reorderSong.
+
+Multiple users collaborate on the same playlist; a modification made by one user must become visible to the other users.
+
+Distributed-systems scale is explicitly out of scope — the round is scored on data modeling and API design.
+
+Expect deep probing on the database schema and on the exact shape and purpose of each API.
+
+Follow-ups:
+
+How does one user's modification propagate to the other users?
+
+For an event / webhook-based sync design, enumerate the exact event payload emitted by each mutating API.
+
+Notes
+
+Modeling the playlist as a single ordered list of songs draws pushback as inefficient (every reorder rewrites the whole list). A row-per-song schema where each row stores its neighboring songs — a linked-list layout — is accepted: writes become cheap, reads become more expensive. Be ready to defend that trade-off explicitly.
+
+The frontend prompt pool appears small: the same playlist prompt covers both the "front-end system programming" screen and the onsite frontend system-design round.
+
+A coding component can be attached to the screen version; budget time accordingly even if the round stays verbal.
+
+Databases and APIs are probed in more depth than typical frontend design rounds — practice writing concrete table schemas and endpoint signatures, not just box diagrams.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

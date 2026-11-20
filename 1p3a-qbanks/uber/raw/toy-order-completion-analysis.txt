@@ -1,0 +1,146 @@
+===H1===
+Toy Order Completion Analysis
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/toy-order-completion-analysis
+===BODY===
+Uber
+CodingMembers
+Toy Order Completion Analysis
+A lightweight analytics exercise on a toy orders dataset: compute a simple slice metric (e.g. completion rate for a given city and order type), define the numerator/denominator precisely, handle edge cases, then reason through a short root-cause case study for why the metric might be low.
+MLE
+data-analysis
+pandas
+python
+metrics
+troubleshooting
+easy
+Frequency
+Single report
+Last asked
+2026-03-24
+Stage
+onsite-coding
+Problem
+
+You are given a small table of orders and asked for a simple slice metric, for example:
+
+What is the completion rate for a given city and order_type?
+
+How would you define the numerator and denominator?
+
+What edge cases would you guard against?
+
+The emphasis is on clean reasoning rather than memorized pandas syntax. If you do not remember the exact DataFrame APIs, you can treat the dataset as a plain Python structure such as a list of dictionaries or a dict-of-dicts and still solve the question correctly.
+
+Clarify the metric definition up front. In many real datasets, you would want to ask whether the denominator includes:
+
+all orders in the slice
+
+only terminal orders
+
+or only orders that reached a certain stage
+
+For a toy dataset, the default assumption is usually:
+
+numerator = rows with status == "completed"
+
+denominator = all rows in the filtered slice
+
+unless there are non-terminal states such as pending or in_progress that should be excluded.
+
+After the metric calculation, there is a short case-study follow-up:
+
+If completion rate is low, what might be causing it?
+
+How would you investigate the root cause?
+
+What product, operational, or ML changes would you try?
+
+A representative toy schema could look like this:
+
+rows = [
+    {"order_id": 1, "city": "SF", "order_type": "grocery", "status": "completed"},
+    {"order_id": 2, "city": "SF", "order_type": "grocery", "status": "cancelled"},
+    {"order_id": 3, "city": "SF", "order_type": "ride", "status": "completed"},
+    {"order_id": 4, "city": "NYC", "order_type": "grocery", "status": "failed"},
+]
+
+Recommended Solution
+
+The strongest answer starts by defining the metric precisely:
+
+Filter to the requested city and order type
+
+Let completion rate be completed_orders / total_orders_in_slice
+
+Handle the empty-slice case explicitly
+
+Call out any assumptions about whether non-terminal rows are included
+
+If you have pandas available, the solution is short:
+
+def completion_rate_pandas(df, city: str, order_type: str) -> float:
+    mask = (df["city"] == city) & (df["order_type"] == order_type)
+    subset = df.loc[mask, "status"]
+    if subset.empty:
+        return 0.0
+    return subset.eq("completed").mean()
+
+If you can ignore pandas syntax, solve the same logic directly in Python:
+
+def completion_rate(rows: list[dict], city: str, order_type: str) -> float:
+    filtered = [
+        row for row in rows
+        if row["city"] == city and row["order_type"] == order_type
+    ]
+    if not filtered:
+        return 0.0
+
+    completed = sum(1 for row in filtered if row["status"] == "completed")
+    return completed / len(filtered)
+
+If a dict-of-dicts style solution is wanted, the exact same logic still works:
+
+def completion_rate_dict(data: dict[str, dict], city: str, order_type: str) -> float:
+    total = 0
+    completed = 0
+
+    for row in data.values():
+        if row["city"] != city or row["order_type"] != order_type:
+            continue
+        total += 1
+        if row["status"] == "completed":
+            completed += 1
+
+    return 0.0 if total == 0 else completed / total
+
+This runs in O(n) time. The list-based version above uses O(n) extra space because it materializes the filtered rows, while the counting version uses O(1) extra space.
+
+For the case-study follow-up, a strong answer is structured instead of speculative. Common reasons for low completion rate include:
+
+supply-demand imbalance in a city or time window
+
+poor dispatch or ranking decisions
+
+inaccurate ETA or pricing that leads to user cancellations
+
+courier cancellations, long pickup times, or merchant inventory issues
+
+payment failures, fraud rules, or address quality problems
+
+A solid investigation plan is:
+
+Break the metric down by city, neighborhood, hour, order type, merchant, and cancel reason.
+
+Compare low-performing slices against healthy baselines.
+
+Inspect funnel drop-off points such as accepted, picked up, and delivered.
+
+Check whether model outputs such as ETA, dispatch ranking, or fraud decisions are correlated with failures.
+
+Reasonable improvements include better courier-order matching, targeted incentives during supply shortages, ETA model calibration, and clearer operational guardrails for high-failure merchants or areas.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

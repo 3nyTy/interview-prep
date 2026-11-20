@@ -1,0 +1,124 @@
+===H1===
+Audit Logs Service
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/audit-logs-service
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Audit Logs Service
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+System Design
+·
+60 min
+Members
+Audit Logs Service
+
+Design an audit-log service where users can query audit events for their own account. The round focuses on transaction-log storage, scaling the write and query paths, and keeping account-scoped queries low latency.
+
+SWE
+distributed-systems
+storage
+scaling
+sharding
+access-control
+medium
+Frequency
+Single report
+Last asked
+2026-06-25
+Stage
+onsite-system-design
+Requirements
+Users can query audit logs that belong to their own account.
+Audit events are generated from account activity and must be retained as an append-style transaction log.
+Query path must support low latency for account-scoped lookups.
+Design the storage model for transaction logs and query indexes.
+Discuss how the service scales as log volume and account count grow.
+Authorization is part of the read path: a user must not be able to query another account's audit log.
+Notes
+A clean design separates the write-optimized transaction log from the read-optimized account/time index. The source of truth can be append-only, while query serving uses partitioned indexes by account and timestamp.
+Sharding by account keeps most user queries single-shard and makes authorization checks local to the request context. The trade-off is handling very large accounts whose logs dominate a shard.
+Low latency depends on bounding query ranges: require account ID plus time range / pagination token, and avoid unbounded scans over the full log.
+Retention and compliance should be explicit. Audit logs usually need immutable storage, deletion policy discussion, and tamper-evident metadata even if the interviewer does not ask first.
+Deep dives to prepare: hot-account sharding, backfill / replay from the append log, index lag, and whether query results must be strongly consistent with just-written events.
+Preparation
+Sketch the write path: application event -> durable log -> async indexer -> account/time query store.
+Prepare a schema for (account_id, event_time, actor_id, action, resource, metadata) and explain which fields are indexed.
+Walk through one hot-account mitigation, such as splitting by (account_id, time_bucket) or adding virtual shards for large tenants.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Preparation
+Related discussions · 1
+🔑Snowflake Onsite 挂经
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Service Failure Forensics
+Single report
+distributed-systems
+medium
+graph
++2
+Frontend Grid: Robot Eats Candies
+Single report
+medium
+frontend
+bfs
++2
+Grep With Context Lines
+Single report
+medium
+string-processing
+parsing
++1
+Top-K Search Terms (Per-User Deduped)
+Single report
+medium
+hashmap
+set
++2
+Recipe as Contiguous Ingredient Subsequence
+Single report
+medium
+string
+hashing
++4
+Code editor

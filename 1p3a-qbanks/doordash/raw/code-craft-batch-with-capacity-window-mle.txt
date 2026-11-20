@@ -1,0 +1,60 @@
+===H1===
+Code Craft: Batch with Capacity & Time Window (MLE)
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/code-craft-batch-with-capacity-window-mle
+===BODY===
+DoorDash
+Coding·60 minMembers
+Code Craft: Batch with Capacity & Time Window (MLE)
+MLE PhD intern coding round. Given timepoints `1, 3, 5, ...` and per-batch constraints `(capacity B, window W)`, group timepoints into the minimum number of batches such that each batch holds at most B items and the latest item in a batch is within W time units of the earliest. Follow-up extends to a meeting-room-2 style sweep-line variant.
+MLE
+greedy
+sliding-window
+interval
+heap
+medium
+Frequency
+Single report
+Last asked
+2026-02-07
+Stage
+phone-screen
+Requirements
+
+Input: a sorted list of timepoints, a batch capacity B, a window length W.
+
+Group timepoints into batches such that:
+
+Each batch holds ≤ B timepoints.
+
+For each batch, max(batch) − min(batch) ≤ W.
+
+Output: minimum number of batches.
+
+Follow-up: rebrand as "riders picking up orders" — given pickup intervals, compute the minimum number of riders / batches needed using a sweep-line / meeting-room-2 pattern.
+
+Notes
+
+Greedy works because the input is sorted: open a batch starting at the earliest unbatched timepoint, fill with as many subsequent timepoints as possible up to capacity B, closing when the next timepoint would exceed the window or capacity.
+
+Equivalent to interval-cover by capped-size windows.
+
+Time complexity O(n) after the input is sorted; if not sorted, O(n log n).
+
+The candidate is also asked to author test cases and run them — keep a 3-test scaffold ready (small / boundary / capacity-exceeded).
+
+The follow-up extension ("riders picking up orders") is classic LC 253 "Meeting Rooms II" — sweep with a min-heap of active end-times. Different objective (concurrent rooms vs batch grouping) so don't conflate the two algorithms.
+
+Preparation
+
+Drill the greedy + window pattern on sorted data.
+
+Drill LC 253 separately for the sweep-line follow-up.
+
+Practice writing self-authored test cases — interviewers explicitly grade this.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

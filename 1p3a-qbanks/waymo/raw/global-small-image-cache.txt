@@ -1,0 +1,47 @@
+===H1===
+Design a Global Cache for Small Images
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/global-small-image-cache
+===BODY===
+Waymo
+System DesignMembers
+Design a Global Cache for Small Images
+Design a global small-image caching service backed by a fixed single database and serving hundreds of thousands of requests per second. Cover reads, updates, cache hierarchy, refresh or invalidation, and failures while allowing brief staleness.
+SWE
+caching
+cdn
+scaling
+database
+distributed-systems
+hard
+Frequency
+Single report
+Last asked
+2026-07-14
+Stage
+onsite-system-design
+Requirements
+
+Design a global service that serves small images.
+
+Support hundreds of thousands of image requests per second across multiple regions.
+
+Keep the read path highly performant through an explicit cache hierarchy.
+
+Support images being updated in the backing database.
+
+Define a cache invalidation or refresh mechanism; serving stale images for a short period after an update is acceptable.
+
+Explain failure handling for the database and every cache layer.
+
+Notes
+
+The service is backed by a single database. Treat that as a fixed constraint rather than redesigning the source of truth.
+
+Make the freshness trade-off explicit: brief staleness is allowed, so the design should explain how that allowance protects read latency and origin load.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

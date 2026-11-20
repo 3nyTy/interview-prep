@@ -1,0 +1,61 @@
+===H1===
+Distinct Cyclic Number Pairs
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/distinct-cyclic-number-pairs
+===BODY===
+Roblox
+Coding·50 minMembers
+Distinct Cyclic Number Pairs
+Count index pairs whose integers have equal digit lengths and whose decimal strings are cyclic rotations of one another. The initial pairwise rotation check missed hidden-test performance expectations; the target complexity is linear in the number of input digits through canonical grouping.
+SWE
+array
+string-processing
+hashmap
+codesignal
+medium
+Frequency
+Single report
+Last asked
+2026-08-12
+Stage
+oa
+Requirements
+
+int solution(int[] A)
+
+Return the number of distinct index pairs in A whose values form a cyclic pair.
+
+Two values form a cyclic pair when one value's decimal digits can be cyclically rotated to produce the other value.
+
+Both values must contain the same number of digits; values with different digit lengths cannot form a pair.
+
+Count each qualifying pair once.
+
+Examples
+
+A = [1001, 1100, 110, 11]
+output = 1
+
+1001 and 1100 form the only cyclic pair. Although 110 and 11 share similar visible digits, their digit lengths differ.
+
+Notes
+
+Converting values to strings preserves zeros that move to the end of a rotated representation, as in the 1001 / 1100 pair.
+
+Use the lexicographically smallest full-length rotation as the canonical key. Stream the array through a frequency map: add the key's existing count to the answer, then increment that count, which counts every index pair exactly once.
+
+A pair-by-pair implementation that tries every rotation runs in O(N² · L). Computing each canonical key with a linear-time minimal-rotation algorithm gives O(N · L) total time; explicitly materializing all L rotations instead takes O(N · L²) time.
+
+The task appeared as one of two questions in a 50-minute intern assessment.
+
+Preparation
+
+Implement canonical rotation twice: first by enumerating rotations, then with a linear-time minimal-rotation routine; verify that both return the same key on random short strings.
+
+Dry-run the streaming frequency-map count on duplicates, periodic digit strings, rotations containing zero, and equal-looking values with different digit lengths.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

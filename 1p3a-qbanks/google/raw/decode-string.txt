@@ -1,0 +1,58 @@
+===H1===
+Decode String
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/decode-string
+===BODY===
+Google
+Coding·40 minMembers
+Decode String
+LeetCode 394. Decode `k[group]` expansion. Iterative stack solution; Google variants swap the syntax (e.g. `(group){k}`) or add nesting rules.
+SWE
+MLE
+string
+stack
+parsing
+medium
+Frequency
+Low
+Last asked
+2026-07-29
+Stage
+onsite-coding
+Requirements
+
+Input: encoded string like "3[a2[c]]".
+
+Output: decoded expansion "accaccacc".
+
+Iterative stack: keep a stack of (prev_string, repeat_count); on ], pop and concatenate.
+
+Examples
+
+"3[a]2[bc]" → "aaabcbc".
+
+"2[abc]3[cd]ef" → "abcabccdcdcdef".
+
+"3[a2[c]]" → "accaccacc".
+
+Notes
+
+Google variants include alternative syntax (group){k} (postfix repeat), nested grouping with curly braces, and escape characters.
+
+A scale follow-up asks how the interface and memory strategy should change when the encoded string is extremely long.
+
+Recursive solution is cleaner but the iterative stack is more robust to bizarre input.
+
+Preparation
+
+Write the iterative-stack version from memory in under 10 min.
+
+Practice the postfix-syntax variant (parse direction reversed).
+
+Drill the decode side together with the encode-shortest dual problem as a pair.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

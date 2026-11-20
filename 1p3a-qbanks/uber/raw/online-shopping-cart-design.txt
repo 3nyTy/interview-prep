@@ -1,0 +1,608 @@
+===H1===
+Design an Online Shopping Cart
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/online-shopping-cart-design
+===BODY===
+Uber
+System DesignMembers
+Design an Online Shopping Cart
+Design an online shopping cart system for a marketplace-style product, with the key constraint of one active cart per merchant per user. The core difficulty lies in modeling per-merchant carts, handling concurrent updates from multiple devices, choosing the right database and indexes, and deciding whether to snapshot product price and metadata inside the cart. A reported follow-up extends the problem with a streaming-analytics requirement to rank highest average-rated products over arbitrary time windows.
+SWE
+system-design
+schema-design
+concurrency
+idempotency
+caching
+sharding
+redis
+kafka
+data-modeling
+streaming
+Frequency
+Single report
+Last asked
+2026-02-14
+Stage
+onsite-system-design
+Design an Online Shopping Cart
+
+Problem Statement
+
+Design an online shopping cart system for a marketplace-style product. A user can browse products from many merchants, but this variant requires one active cart per merchant per user.
+
+At minimum, the system should support:
+
+adding items to a cart
+
+updating item quantities
+
+removing items from a cart
+
+fetching the current cart state quickly
+
+handing a merchant cart off to checkout
+
+The interesting parts are usually not the UI details, but rather:
+
+how to model one cart per merchant
+
+how to handle concurrent cart updates from multiple devices or retries
+
+how to choose the database and indexes
+
+whether to store product price and metadata as a snapshot inside the cart or always read fresh data from downstream services
+
+A follow-up extends the problem with an analytics requirement:
+
+show products with the highest average rating over the last 1 hour, 1 day, or an arbitrary time range
+
+That extension is not core cart functionality, but it is a good Phase 5 deep dive because it forces a discussion of pre-aggregation, time-window queries, and the split between OLTP cart writes and OLAP ranking reads.
+
+Phase 1: Requirements (~5 minutes)
+
+Functional Requirements
+
+Create and fetch merchant carts: A signed-in user can have multiple active carts, one per merchant.
+
+Mutate cart items: Users can add an item, change quantity, or remove an item from a merchant cart.
+
+Show current cart totals: The system returns line items, subtotal, fees, and an estimated total.
+
+Support checkout handoff: A merchant cart can be submitted to checkout for final pricing and inventory validation.
+
+Sync across devices: Cart changes made on one device should appear on another device quickly enough for a normal shopping experience.
+
+Keep the initial scope to signed-in users and server-side carts. Anonymous cart merge, coupons, bundles, inventory reservation, and abandoned-cart notifications are natural follow-ups, but they should stay below the line unless the interviewer asks for them.
+
+Non-Functional Requirements
+
+RequirementTargetWhy it matters
+Scale10M daily shoppers, 50M active cartsLarge enough to require sharding and caching
+Read latencyP95 under 100ms for cart fetchCart UI should feel instant
+Write latencyP95 under 200ms for add/update/removeMutations must feel responsive
+Availability99.95%Cart failures directly block revenue
+ConsistencyStrong within a single merchant cartUsers should not see quantity flicker or duplicate line items
+DurabilityNo lost confirmed mutations“Added to cart” must survive retries and reconnects
+
+Clarifying Questions
+
+These are the questions worth asking before drawing anything:
+
+Is there one global cart or one cart per merchant?
+For this problem, assume one active cart per merchant per user.
+
+Do we reserve inventory when an item is added?
+Default answer: no. We validate availability on add-to-cart opportunistically, but the hard reservation happens at checkout.
+
+Should the cart store price snapshots?
+Yes. Store the last known unit price and product snapshot in the cart for a stable UX, then revalidate at checkout.
+
+Can the same user update the cart from multiple devices?
+Yes. This is what makes optimistic concurrency or per-cart serialization important.
+
+Is the rating/top-products requirement part of the main cart service?
+Treat it as a follow-up extension with a separate analytics pipeline.
+
+Capacity Estimation
+
+Assumptions:
+- 10M daily active shoppers
+- 3 cart mutations per shopper per day
+- 20 cart reads per shopper per day
+- average 5 items per active merchant cart
+
+Writes:
+- 30M cart mutations/day
+- 30M / 86,400 ~= 347 writes/second average
+- Assume 20x peak during traffic bursts
+- Peak ~= 7,000 writes/second
+
+Reads:
+- 200M cart reads/day
+- 200M / 86,400 ~= 2,315 reads/second average
+- Assume 10x peak
+- Peak ~= 23,000 reads/second
+
+Storage:
+- 50M active carts
+- 5 items/cart average => 250M cart-item rows
+- If a cart item with snapshots is ~250 bytes, raw cart-item storage is ~62.5 GB
+- This is manageable in a sharded OLTP store, but reads should still be cached
+
+This scale is not massive by modern commerce standards. The hard parts are not raw throughput alone; the real signal is whether the data model handles per-cart correctness, retries, and efficient access patterns.
+
+Phase 2: Data Model (~5 minutes)
+
+Core Entities
+
+Cart {
+  cart_id: UUID
+  user_id: UUID
+  merchant_id: UUID
+  status: Enum (active, checked_out, abandoned, expired)
+  currency: String
+  item_count: Integer
+  subtotal_amount: Decimal
+  version: Long
+  created_at: Timestamp
+  updated_at: Timestamp
+  expires_at: Timestamp | null
+}
+
+CartItem {
+  cart_id: UUID
+  sku_id: UUID
+  product_id: UUID
+  quantity: Integer
+  unit_price_snapshot: Decimal
+  title_snapshot: String
+  image_url_snapshot: String
+  availability_snapshot: Enum (in_stock, low_stock, unknown)
+  added_at: Timestamp
+  updated_at: Timestamp
+}
+
+CartMutation {
+  mutation_id: UUID
+  cart_id: UUID
+  user_id: UUID
+  idempotency_key: String
+  operation_type: Enum (add_item, update_qty, remove_item, clear_cart)
+  payload_json: JSON
+  response_json: JSON
+  created_at: Timestamp
+}
+
+CheckoutIntent {
+  checkout_id: UUID
+  cart_id: UUID
+  merchant_id: UUID
+  pricing_version: String
+  inventory_validated_at: Timestamp
+  created_at: Timestamp
+}
+
+Recommended Schema and Indexes
+
+If the interviewer asks specifically about schema and indexes, this is a clean answer:
+
+CREATE TABLE carts (
+  cart_id UUID PRIMARY KEY,
+  user_id UUID NOT NULL,
+  merchant_id UUID NOT NULL,
+  status TEXT NOT NULL,
+  currency TEXT NOT NULL,
+  item_count INT NOT NULL,
+  subtotal_amount NUMERIC(12,2) NOT NULL,
+  version BIGINT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL,
+  expires_at TIMESTAMPTZ
+);
+
+CREATE UNIQUE INDEX ux_active_cart_user_merchant
+  ON carts (user_id, merchant_id)
+  WHERE status = 'active';
+
+CREATE INDEX ix_carts_user_updated_at
+  ON carts (user_id, updated_at DESC);
+
+CREATE INDEX ix_carts_expiry
+  ON carts (status, expires_at);
+
+CREATE TABLE cart_items (
+  cart_id UUID NOT NULL,
+  sku_id UUID NOT NULL,
+  product_id UUID NOT NULL,
+  quantity INT NOT NULL,
+  unit_price_snapshot NUMERIC(12,2) NOT NULL,
+  title_snapshot TEXT NOT NULL,
+  image_url_snapshot TEXT,
+  availability_snapshot TEXT NOT NULL,
+  added_at TIMESTAMPTZ NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL,
+  PRIMARY KEY (cart_id, sku_id)
+);
+
+CREATE INDEX ix_cart_items_product
+  ON cart_items (product_id);
+
+CREATE TABLE cart_mutations (
+  mutation_id UUID PRIMARY KEY,
+  cart_id UUID NOT NULL,
+  user_id UUID NOT NULL,
+  idempotency_key TEXT NOT NULL,
+  operation_type TEXT NOT NULL,
+  payload_json JSONB NOT NULL,
+  response_json JSONB,
+  created_at TIMESTAMPTZ NOT NULL
+);
+
+CREATE UNIQUE INDEX ux_cart_mutations_cart_idempotency
+  ON cart_mutations (cart_id, idempotency_key);
+
+Why These Keys Work
+
+(user_id, merchant_id) uniquely identifies the active merchant cart
+This directly encodes the business rule and avoids duplicate active carts.
+
+(cart_id, sku_id) is the natural key for line items
+It supports point reads and upserts for a specific item within a cart.
+
+version enables optimistic concurrency control
+This is the cleanest default for multi-device updates.
+
+Persist idempotency keys with a unique constraint
+This lets the service safely deduplicate client retries and, if needed, replay the prior response.
+
+updated_at and expires_at indexes support operational jobs
+They help with abandoned-cart cleanup, notifications, and lifecycle management.
+
+If the interviewer pushes for DynamoDB, the same logical model adapts to a partition key like USER#{user_id} and sort key MERCHANT#{merchant_id} or CART#{cart_id}. But for this prompt, a relational OLTP store is usually easier to defend because concurrent cart mutations need transactional correctness and simple unique constraints.
+
+Phase 3: API Design (~5 minutes)
+
+Protocol Choice
+
+REST for cart reads and mutations
+
+Internal gRPC/HTTP for pricing, catalog, and inventory validation
+
+Kafka or event bus for downstream cart-change events, analytics, and abandoned-cart workflows
+
+Fetch Merchant Carts
+
+GET /v1/users/{userId}/carts
+
+Response:
+{
+  "carts": [
+    {
+      "merchant_id": "m_123",
+      "cart_id": "c_1",
+      "item_count": 3,
+      "subtotal_amount": 42.50,
+      "updated_at": "2026-02-10T18:00:00Z"
+    }
+  ]
+}
+
+GET /v1/users/{userId}/carts/{merchantId}
+
+Response:
+{
+  "cart_id": "c_1",
+  "merchant_id": "m_123",
+  "version": 17,
+  "items": [
+    {
+      "sku_id": "sku_1",
+      "quantity": 2,
+      "unit_price_snapshot": 12.50
+    }
+  ],
+  "subtotal_amount": 25.00
+}
+
+Mutate a Cart
+
+Use an idempotency key plus an expected version:
+
+PATCH /v1/users/{userId}/carts/{merchantId}
+Idempotency-Key: 8d3e...
+
+{
+  "expected_version": 17,
+  "operations": [
+    {
+      "type": "set_quantity",
+      "sku_id": "sku_1",
+      "quantity": 3
+    }
+  ]
+}
+
+{
+  "cart_id": "c_1",
+  "new_version": 18,
+  "subtotal_amount": 37.50,
+  "conflict": false
+}
+
+If expected_version is stale, return 409 Conflict with the latest cart version and body.
+
+Checkout Handoff
+
+POST /v1/users/{userId}/carts/{merchantId}/checkout
+
+Response:
+{
+  "checkout_id": "chk_1",
+  "cart_id": "c_1",
+  "pricing_revalidated": true,
+  "inventory_validated": true,
+  "status": "ready_for_payment"
+}
+
+The combination of Idempotency-Key and expected_version is a strong answer because it addresses retries and concurrency directly.
+
+Phase 4: High-Level Design (~15-25 minutes)
+
+Core Request Flow
+
+1. Fetch cart
+
+Client requests GET /v1/users/{userId}/carts/{merchantId}.
+
+Cart service checks Redis using a key like cart:{user_id}:{merchant_id}.
+
+On cache hit, return the cached cart snapshot.
+
+On miss, read from the primary DB, rebuild the response, and populate cache.
+
+2. Add or update item
+
+Client sends a mutation with Idempotency-Key and expected_version.
+
+Cart service loads the active merchant cart row and line items.
+
+The service validates SKU ownership and fetches the latest price/availability, ideally through cached reads or lightweight service calls rather than putting heavy downstream calls on the critical path.
+
+Inside one DB transaction:
+
+insert or update the cart_items row
+
+recompute item_count and subtotal_amount
+
+increment version
+
+record the idempotent mutation and outbox event
+
+Invalidate or update the Redis cache entry.
+
+Publish a cart-updated event asynchronously.
+
+3. Checkout
+
+Client submits checkout for one merchant cart.
+
+Cart service asks pricing and inventory services for final validation.
+
+If validation passes, create a checkout intent and lock the cart against further mutation or transition it to checked_out.
+
+Hand off to the checkout/payment flow.
+
+Why A Relational Primary Store Is Reasonable
+
+A relational store is a strong default because:
+
+a merchant cart is a small transactional aggregate
+
+cart-item upserts fit naturally into SQL transactions
+
+unique constraints cleanly enforce one active cart per (user_id, merchant_id)
+
+optimistic locking with version is straightforward
+
+You can still shard horizontally by hashing user_id or cart_id.
+
+Cache Strategy
+
+Cache the full merchant-cart response in Redis for fast reads.
+
+Use short TTLs such as 1-5 minutes plus write-through or explicit invalidation after mutations.
+
+Do not treat Redis as the source of truth.
+
+Cross-Service Boundaries
+
+Catalog service provides product metadata and merchant ownership.
+
+Pricing service provides the current price, promotions, tax estimate inputs, and pricing version.
+
+Inventory service provides soft availability signals; hard reservation happens later.
+
+Checkout service owns the order/payment flow after the cart is finalized.
+
+Multi-Device Sync
+
+For the “update from web and mobile at the same time” variant, there are two reasonable answers:
+
+simplest: clients refetch the cart on screen focus, app resume, or after a successful mutation
+
+nicer UX: publish cart_updated events to a push/WebSocket layer so other active sessions refresh immediately
+
+It is fine to start with client refetch and mention push-based sync as an upgrade.
+
+The cart should usually store a snapshot of title, image, and unit price. This makes reads cheap and stable, while checkout still revalidates against the source systems for correctness.
+
+Phase 5: Scaling & Trade-offs (~15-20 minutes)
+
+Deep Dive 1: Concurrent Cart Updates
+
+This is the most likely follow-up.
+
+If a user updates the same merchant cart from web and mobile at the same time, you want to avoid lost updates.
+
+The clean default is optimistic concurrency control:
+
+every cart has a version
+
+client sends expected_version
+
+DB update includes WHERE cart_id = ? AND version = ?
+
+if zero rows update, return 409 Conflict
+
+This works well because:
+
+most carts are low-contention
+
+it avoids holding long locks
+
+the API semantics are easy to explain
+
+If the interviewer pushes on hot contention, discuss two upgrades:
+
+Per-cart serialized worker or partitioned queue
+Route all mutations for the same cart_id to the same worker shard.
+
+Server-side merge semantics
+Operations like add one unit or remove sku if present are easier to merge safely than raw read-modify-write retries from clients. Set quantity usually still needs version checks.
+
+Deep Dive 2: Choosing the Shard Key
+
+There are two common answers:
+
+Shard by user_id
+Best when most queries are user-centric: fetch all carts for a user, load one merchant cart for a user.
+
+Shard by cart_id
+Best when everything already starts from cart identifiers and write distribution matters more than user fan-in.
+
+For this prompt, user_id is a good logical partition key because the dominant access pattern is user cart lookup, and one user usually owns only a handful of merchant carts.
+
+Deep Dive 3: Price and Inventory Correctness
+
+There is an unavoidable trade-off:
+
+Fresh reads from pricing/inventory on every cart fetch improve correctness
+
+Cached snapshots improve latency and reduce downstream load
+
+The pragmatic design is:
+
+validate on mutation
+
+show snapshot data on read
+
+revalidate strictly at checkout
+
+That gives a stable UI without pretending the cart is a reservation ledger.
+
+Deep Dive 4: Cleanup and Lifecycle
+
+Active carts can accumulate indefinitely, so you need lifecycle management:
+
+expire abandoned carts after a configurable window
+
+archive or delete expired cart rows asynchronously
+
+emit cart-abandoned events for remarketing workflows
+
+preserve checked-out carts separately for debugging and audit
+
+Follow-up Extension: Highest Average-Rated Products Over Time Windows
+
+One reported variant asks for:
+
+highest average-rated products in the last 1 hour
+
+highest average-rated products in the last 1 day
+
+highest average-rated products in an arbitrary time range
+
+This is a different workload from carts, so split it into a separate analytics pipeline.
+
+Data Model for Rating Aggregation
+
+RatingEvent {
+  rating_id: UUID
+  product_id: UUID
+  user_id: UUID
+  score: Integer   -- 1..5
+  event_ts: Timestamp
+}
+
+ProductRatingBucket {
+  product_id: UUID
+  bucket_start: Timestamp   -- e.g. minute or hour bucket
+  bucket_granularity: Enum (minute, hour)
+  rating_sum: Long
+  rating_count: Long
+}
+
+Architecture
+
+ingest rating events into Kafka
+
+use a stream processor such as Flink/Kafka Streams to maintain time-bucketed aggregates
+
+store bucketed sums and counts in an OLAP-friendly store such as ClickHouse, Pinot, or Druid
+
+materialize precomputed top-K lists for common windows like 1h and 1d into Redis
+
+Why Buckets Help
+
+To answer an arbitrary range query, you do not want to scan every raw rating event. Instead:
+
+pre-aggregate by product and minute/hour bucket
+
+sum rating_sum and rating_count over the requested interval
+
+compute avg = sum / count
+
+For top average-rated products, add a minimum review-count threshold so one 5-star review does not dominate the ranking.
+
+Do not bolt this ranking query directly onto the cart OLTP database. Cart mutations and time-windowed analytical ranking are different access patterns and should not fight over the same primary store.
+
+Common Pitfalls
+
+Missing the one-cart-per-merchant requirement: If you start with one global cart, your schema and checkout flow will drift immediately from the real prompt.
+
+Ignoring concurrent updates: Interviewers often ask this on purpose. If you have no conflict strategy, the design feels incomplete.
+
+Treating the cart as a hard inventory reservation: That is much more expensive and changes the design significantly. Clarify the expectation first.
+
+Using only timestamps for correctness: Timestamps are not enough for conflict detection. Use explicit versions or serialized processing.
+
+Interview Checklist
+
+Clarify that there is one active cart per merchant per user
+
+State whether inventory is soft-checked on add and hard-validated at checkout
+
+Present a schema with a unique active-cart constraint
+
+Explain optimistic concurrency with version and Idempotency-Key
+
+Choose a shard key and justify it from the access pattern
+
+Separate cart OLTP from rating/top-products analytics if the follow-up appears
+
+Summary Table
+
+AreaRecommended answer
+Primary storeSharded relational DB
+CacheRedis for full cart snapshots
+ConcurrencyOptimistic locking with cart version
+Key invariantOne active cart per (user_id, merchant_id)
+Checkout correctnessRevalidate price and inventory at checkout
+Analytics follow-upSeparate Kafka + stream processing + OLAP stack
+
+If you are short on time, land the core cart design first: requirements, schema, API, concurrency, and checkout validation. The rating/top-products requirement is a strong extension only after the transactional design is clearly correct.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

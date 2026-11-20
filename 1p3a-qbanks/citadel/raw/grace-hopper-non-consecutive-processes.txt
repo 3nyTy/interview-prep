@@ -1,0 +1,57 @@
+===H1===
+Non-Consecutive Process Allocation Counting (Modulo 1e9 + 7)
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/grace-hopper-non-consecutive-processes
+===BODY===
+Citadel / Citadel Securities
+Coding·75 minMembers
+Non-Consecutive Process Allocation Counting (Modulo 1e9 + 7)
+Citadel SWE Campus Assessment (HackerRank). Count the number of ways to allocate `n_processes` to `n_intervals` consecutive time slots such that the same process never occupies two consecutive slots. Returns the count modulo `10^9 + 7`. Combinatorial closed-form is the intended fast path.
+SWE
+oa
+math
+dp
+easy
+Frequency
+Single report
+Last asked
+2025-12-22
+Stage
+oa
+Requirements
+
+Given n_processes distinct processes and n_intervals consecutive time slots, count the number of allocations where:
+
+Every slot is assigned exactly one process.
+
+No process occupies two consecutive slots.
+
+Return the count modulo 10^9 + 7.
+
+Notes
+
+Combinatorial argument: slot 0 admits n_processes choices; every subsequent slot admits n_processes - 1 choices (any process except the one in the previous slot). Total count is n_processes * (n_processes - 1) ^ (n_intervals - 1) modulo 10^9 + 7.
+
+DP framing as a sanity check: dp[i] = (n - 1) * dp[i - 1] with dp[1] = n. Solves to the same closed form.
+
+For exponentiation under modulus, use fast modular exponentiation (pow(base, exp, MOD) in Python; iterative square-and-multiply in C++ / Java). Avoids O(n_intervals) multiplication loops when n_intervals is large.
+
+Edge cases: n_intervals == 0 returns 1 (empty allocation) or 0 by convention — clarify. n_processes == 1 returns 1 if n_intervals <= 1, otherwise 0 (cannot avoid consecutive same-process).
+
+Common slip: building a 2D dp[i][j] of "slot i uses process j" and not noticing that every row is the same shape, missing the collapse to the closed form. The 2D DP is correct but O(n_processes * n_intervals) — too slow when both are large.
+
+Preparation
+
+Internalize the closed-form derivation by trying small cases by hand: n=3, m=3 enumerates the 12 valid sequences out of 27 total, matching 3 * 2^2 = 12.
+
+Practice modular exponentiation from scratch — it appears in many competitive-programming counting problems and is a 10-line routine worth committing to memory.
+
+Be ready to defend the DP collapse out loud: each row of the 2D DP table is identical because the constraint only references the previous slot's choice. Mention this when explaining the optimization.
+
+Refresh the modular arithmetic invariants: (a * b) % m = ((a % m) * (b % m)) % m. Apply consistently, especially inside the exponentiation loop, to avoid 64-bit overflow.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

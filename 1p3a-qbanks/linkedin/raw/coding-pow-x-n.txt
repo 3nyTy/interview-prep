@@ -1,0 +1,53 @@
+===H1===
+Pow(x, n) (LC 50)
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-pow-x-n
+===BODY===
+LinkedIn
+CodingMembers
+Pow(x, n) (LC 50)
+Implement `pow(x, n)` for positive and negative integer exponents. The round expects an O(log n) solution in both recursive and iterative form, plus explicit handling of the minimum signed-integer exponent where ordinary negation overflows.
+SWE
+math
+recursion
+complexity-analysis
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-coding
+Requirements
+
+Implement pow(x, n), where n may be negative. Treat the remaining numeric behavior conventionally, including the x = 0 boundary.
+
+Start with the O(n) repeated-multiplication baseline, then derive an O(log n) implementation.
+
+Write both recursive and iterative versions and compare readability against call-stack usage.
+
+Explain what happens when n is the minimum signed integer. Negating that value in the same integer width overflows; promote it to a wider type first or handle the boundary explicitly.
+
+Notes
+
+Fast exponentiation repeatedly squares the base while halving a non-negative exponent. The iterative form multiplies an accumulator whenever the current exponent bit is set; the recursive form computes one half-power and squares it. Both take O(log |n|) time; recursion uses O(log |n|) stack space while iteration uses O(1) auxiliary space.
+
+Normalize n in a wider signed type before negating it. For a negative exponent, invert the base and then process -n; a zero base with a negative exponent is undefined, so clarify or reject that case rather than dividing by zero.
+
+The evaluation emphasizes boundary analysis and explanation quality more than raw algorithmic difficulty.
+
+Walk through zero exponent, negative exponent, zero base, and the minimum-integer exponent before declaring the implementation complete.
+
+Preparation
+
+Implement both formulations from memory and annotate the invariant that reduces the remaining exponent each step.
+
+Test a boundary matrix covering positive, zero, and negative exponents plus the minimum representable exponent.
+
+Practice stating the time and auxiliary-space costs of the recursive and iterative forms without relying on the code.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

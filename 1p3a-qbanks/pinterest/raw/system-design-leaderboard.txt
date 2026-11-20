@@ -1,0 +1,54 @@
+===H1===
+System Design: Leaderboard / Category Ranking
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/system-design-leaderboard
+===BODY===
+Pinterest
+System Design·60 minMembers
+System Design: Leaderboard / Category Ranking
+Design a per-category leaderboard service — for each category, show the top-K most-clicked posts in near-real time. The standard Redis-sorted-set solution is the expected starting point; the round goes deep on category cardinality, write rate, and consistency.
+SWE
+leaderboard
+redis
+ranking
+caching
+storage
+scaling
+medium
+Frequency
+Low
+Last asked
+2026-07-18
+Stage
+onsite-system-design
+Requirements
+
+Design a leaderboard service that returns the top-K posts, pins, or users for a category. Address the query API, real-time score updates, deterministic tie-breaking, millions of categories, hot categories, and historical or rolling windows.
+
+Notes
+
+Use one Redis sorted set per category: ZINCRBY for each engagement and ZREVRANGE 0 K-1 for reads. Writes are O(log n); returning K members is O(log n + K). Memory is one entry per active (category, item) pair.
+
+Shard categories by a stable hash so one category's update and read path reaches one owner. Asynchronous stream consumption makes the leaderboard eventually consistent; state the allowed lag.
+
+Keep click count as the sorted-set score. For a deterministic secondary order, maintain a separate first-achieved timestamp or monotonic sequence and resolve equal-score groups in the service, or use a bounded composite encoding only after proving the maximum count and tie-field ranges fit Redis's exact-integer double range. Do not combine raw Unix timestamps with ZINCRBY click increments.
+
+Rolling windows can use minute buckets and merge the active buckets at query time, or maintain a separate windowed aggregate with expiration events. Explain the write/read/memory trade-off.
+
+For a hot category, batch increments at stream consumers or route that category to a dedicated owner. Splitting one category across writers requires an explicit merge and consistency contract.
+
+Preparation
+
+Draw the event stream, category owner, Redis cluster, and read path.
+
+Test a tie between two items and a one-click difference to prove the secondary key can never overtake the primary count.
+
+Walk a three-bucket rolling-window query and the expiration of the oldest bucket.
+
+Quantify batching lag and hot-category write reduction.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

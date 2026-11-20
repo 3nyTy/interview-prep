@@ -1,0 +1,66 @@
+===H1===
+Parse Email Addresses from a Log String
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/parse-emails-state-machine
+===BODY===
+Microsoft
+Coding·45 minMembers
+Parse Email Addresses from a Log String
+Single-pass character scanner over a long log string with `;`-separated email records. Each record may have an optional display name and comments anywhere; deduplicate and return the list of emails.
+SWE
+parsing
+state-machine
+string-processing
+hard
+dedup
+Frequency
+Single report
+Last asked
+2026-02-01
+Stage
+onsite-coding
+Requirements
+
+Input is a single (potentially very large) string. Records are separated by ;. Each record represents an email address but may contain:
+
+A leading display name ("John Doe" <john@example.com>).
+
+Parenthesized comments anywhere (john(work)@example.com or (internal) john@example.com).
+
+Quoted regions containing literal semicolons that must not be treated as record separators.
+
+Return the list of unique email addresses parsed out, in order of first appearance.
+
+Notes
+
+The problem reduces to a single-character state machine. The state set candidates use:
+
+NORMAL — outside quotes and parens, accumulating an email candidate.
+
+IN_QUOTES — inside "...", semicolons are literal, \" escapes a quote.
+
+IN_PAREN — inside (...), semicolons are literal, parens nest.
+
+IN_ANGLE — inside <...>, the angle contents are the email.
+
+At each character, look at the current state, advance / change state, and decide whether to append to the current email accumulator or discard. On ; while in NORMAL, finalize the accumulator (extract the @-containing token, strip surrounding whitespace), insert into an ordered set, reset.
+
+Regex is a trap — the quoted / parenthesized / angle-bracketed nesting is not a regular language, and any regex you write will mis-handle at least one of the interviewer's adversarial inputs.
+
+For deduplication, an OrderedDict (Python) or LinkedHashSet (Java) preserves insertion order while keeping O(1) membership.
+
+Common reported failure mode: candidates start with a regex pass, get it 80% right in 20 minutes, then spend the rest of the round patching nested-paren edge cases. The state machine is faster to write correctly even though it looks longer.
+
+Preparation
+
+Write a four-state character scanner on paper; type out the (state, char) → next_state transition table before opening the editor.
+
+Pre-write the "extract @-containing token from a <...>-or-bareword string" helper.
+
+Drill on adversarial inputs: "John;Doe" <a@b>; (c@d); e@f, nested parens (a (b) c), escaped quotes inside quoted display names.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

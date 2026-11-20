@@ -1,0 +1,87 @@
+===H1===
+Minimum Operations to Reduce an Integer to 0 (LeetCode 2571)
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/minimum-operations-reduce-to-zero
+===BODY===
+Salesforce
+Coding·30 minMembers
+Minimum Operations to Reduce an Integer to 0 (LeetCode 2571)
+Recurring HackerRank coding problem on the Salesforce OA. Given a positive integer `n`, in each operation you may add or subtract any power of 2; return the minimum number of operations to reduce `n` to 0.
+SWE
+bit-manipulation
+greedy
+math
+medium
+Frequency
+Low
+Last asked
+2026-04-03
+Stage
+oa · phone-screen
+Requirements
+
+Input: positive integer n with a bound that may extend to 10⁹.
+
+Operation: pick any k ≥ 0 and either add 2^k or subtract 2^k from the current value.
+
+Goal: reach 0 in the minimum number of operations.
+
+Examples
+
+n = 39
+  add       1 → 40   = 0b101000
+  subtract  8 → 32   = 0b100000
+  subtract 32 → 0
+→ 3 operations
+
+n = 54
+  54 = 0b110110
+  add 2     → 56   = 0b111000   (turns the run of trailing 1s into one carry)
+  add 8     → 64
+  subtract 64 → 0
+→ 3 operations
+
+n = 1
+→ 1 operation
+
+Notes
+
+The greedy works on the binary representation. Look at the lowest set bit b:
+
+If b stands alone (the bit above it is 0), subtracting b clears it in one op. Cost 1; recurse on n - b.
+
+If b is the bottom of a run of 1s (length ≥ 2), it is cheaper to add b — this carries through the run and produces a single 1 higher up. Cost 1; recurse on n + b.
+
+Equivalent formulation: count the minimum number of ±2^k terms whose sum is n. Non-Adjacent Form (NAF) decomposition gives exactly this count and matches the greedy above.
+
+Implementation (Python):
+def minOps(n):
+    ops = 0
+    while n:
+        b = n & -n           # lowest set bit
+        if n & (b << 1):     # next bit also set → run of 1s, add to carry
+            n += b
+        else:                # isolated 1 → subtract
+            n -= b
+        ops += 1
+    return ops
+
+Time O(log n), space O(1).
+
+DP / BFS solutions are tempting but blow up on n near 10⁹. Use the greedy.
+
+Edge cases: n = 0 should return 0 (loop body skipped); powers of two need exactly 1 op.
+
+Preparation
+
+Walk the greedy on 39 and 54 by hand until the run-of-1s vs isolated-1 decision is automatic.
+
+Implement the bit-trick version (b = n & -n) and verify on n = 0, 1, 7, 8, 15, 39, 54, 2^31 - 1.
+
+Be ready for the follow-up "reconstruct the actual operations" — the same loop, but record ±b at each step.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,65 @@
+===H1===
+Merge K Sorted Streams (OOD + Algorithm)
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/merge-k-sorted-streams-ood
+===BODY===
+Citadel / Citadel Securities
+Coding·45 minMembers
+Merge K Sorted Streams (OOD + Algorithm)
+Two flavors of merge-K appear in Citsec phone screens: a C++ OOD variant where the candidate fills in an abstract `Stream` class given a template heavy with `shared_ptr` and type aliases, and a tighter algorithm-only variant with a timestamp tie-break that nudges the standard LC 23 solution.
+SWE
+heap
+merge
+data-structure
+code-reading
+oop-design
+medium
+Frequency
+Low
+Last asked
+2026-01-16
+Stage
+phone-screen
+Requirements
+
+Two reported framings.
+
+Framing A — OOD-driven C++ variant. The interviewer supplies a partial codebase containing:
+
+An abstract base class declaring methods (e.g. next(), hasNext(), peek()).
+
+A container class wrapping the input streams, with some helper methods stubbed out.
+
+Type aliases such that every input array and object is wrapped in std::shared_ptr.
+
+The candidate must implement the missing methods so that iterating the container yields the merge of all input streams in ascending order. The algorithm is standard k-way merge; the difficulty comes from reading the scaffold and using shared_ptr idioms correctly.
+
+Framing B — algorithm-only with tie-break. Standard "merge k sorted lists" (interface is up to the candidate). The twist: list elements carry a timestamp field, and when multiple lists have the same timestamp at their heads, those elements must be merged together (e.g. summed or grouped) before being emitted, rather than picked in arbitrary order.
+
+Notes
+
+The canonical solution for both framings is a min-heap keyed on (value, stream_id), popping the minimum and pushing the next element from the same stream. Time O(N log k) for total N elements and k streams.
+
+For Framing A, the time sink is interface comprehension, not the algorithm — budget the first 5-10 minutes for reading the supplied code and asking clarifying questions about the abstract methods. Verbalize what shared_ptr ownership transfer means whenever you copy or move the wrapped objects.
+
+For Framing B, the tie-break wraps the standard solution: pop all entries that share the current minimum timestamp before advancing, then merge them according to the spec. Be explicit about whether "merge" means sum, concatenate, or apply a domain-specific reducer — the interviewer expects the clarifying question.
+
+Complexity discussion is expected at the end: O(N log k) time, O(k) heap space.
+
+Common failure mode in Framing A: not noticing that the supplied container method already advances the underlying stream, leading to skipped elements.
+
+Preparation
+
+Implement merge-K from scratch in C++ at least once using std::priority_queue with a custom comparator on shared_ptr<Node>; familiarity with the comparator-by-greater idiom is essential under time pressure.
+
+Practice reading a 100-line C++ class skeleton in under 5 minutes and listing the methods you need to fill. Cite which calls return owning vs borrowing pointers.
+
+Drill the tie-break variant against the plain LC 23 problem to internalize the difference; the timestamp grouping is the only behavioral delta.
+
+Refresh std::shared_ptr mechanics: copy bumps refcount, std::move does not, dereferencing a moved-from pointer is undefined behavior.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

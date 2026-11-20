@@ -1,0 +1,82 @@
+===H1===
+Count Paths That Can Form a Palindrome in a Tree
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/count-palindrome-paths-tree
+===BODY===
+Uber
+CodingMembers
+Count Paths That Can Form a Palindrome in a Tree
+Given a tree where each edge carries a lowercase character, count the unordered pairs of distinct nodes whose path edge-characters can be rearranged into a palindrome. The path is palindrome-formable when at most one character has an odd count, which maps to a 26-bit parity bitmask combined over root-to-node paths.
+SWE
+tree
+bitmask
+bit-manipulation
+hashmap
+dfs
+palindromes
+hard
+Frequency
+Single report
+Last asked
+2026-03-22
+Stage
+oa · onsite-coding
+Count Paths That Can Form a Palindrome in a Tree
+
+You are given a 0-indexed tree with n nodes represented by a parent array parent, where parent[0] = -1 and parent[i] is the parent of node i for i > 0.
+
+You are also given a string s of length n, where s[i] is the lowercase character assigned to the edge between i and parent[i]. Since the root has no incoming edge, s[0] can be ignored.
+
+For any two nodes u and v, consider the characters assigned to the edges on the unique path between them. That path can form a palindrome if those characters can be rearranged into a palindrome.
+
+Return the number of unordered pairs of distinct nodes (u, v) such that the edge characters on the path between u and v can form a palindrome.
+
+Examples
+
+Example 1:
+
+Input: parent = [-1,0,0,1,1,2], s = "acaabc"
+
+Output: 8
+
+Explanation:
+
+The valid pairs are (0,1), (0,2), (1,3), (1,4), (1,5), (2,3), (2,5), and (3,5). Each corresponding path has at most one character with odd frequency.
+
+Example 2:
+
+Input: parent = [-1,0,0,0,0], s = "aaaaa"
+
+Output: 10
+
+Explanation:
+
+Every path consists only of the character a, so every pair of distinct nodes is valid.
+
+Example 3:
+
+Input: parent = [-1,0,1], s = "abc"
+
+Output: 2
+
+Explanation:
+
+The valid pairs are (0,1) and (1,2). The path (0,2) uses characters b and c, which cannot be rearranged into a palindrome.
+
+Constraints
+
+1 <= parent.length == s.length <= 10^5
+
+parent[0] == -1
+
+0 <= parent[i] < parent.length for i > 0
+
+parent represents a valid tree
+
+s consists of lowercase English letters
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

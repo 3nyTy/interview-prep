@@ -1,0 +1,44 @@
+===H1===
+Edit Distance (LC 72) with a Follow-Up Variant
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/edit-distance-one-reverse
+===BODY===
+Amazon
+CodingMembers
+Edit Distance (LC 72) with a Follow-Up Variant
+Classic Edit Distance (LC 72): minimum insert/delete/replace operations to turn word1 into word2, coded in full with the standard dp[i][j] formulation. Follow-up (discussion only): one whole-string reverse is additionally allowed — explain how the formulation changes. Asked in the coding half of a four-round NG loop.
+SWE
+dp
+string
+medium
+Frequency
+Single report
+Last asked
+2026-07-14
+Stage
+onsite-coding
+Requirements
+
+Given two strings, return the minimum number of single-character operations (insert, delete, replace) needed to transform one into the other. Code the standard dp[i][j] formulation — dp[i][j] = minimum operations to turn the first i characters of word1 into the first j characters of word2 — and walk through the three-way transition.
+
+Follow-up (idea only, no code): one additional operation is allowed — reversing the entire string, at most once. Discuss how the answer changes.
+
+Notes
+
+The base problem is expected to land quickly and cleanly; interview time is weighted toward the follow-up discussion.
+
+An accepted line of reasoning for the follow-up treats the reverse as one extra candidate: compare the plain edit distance against the distance from the reversed source string, add the reverse's own operation cost to the latter, and take the minimum.
+
+The round mixes resume conversation with the coding, so keep the DP explanation tight rather than lecture-length.
+
+Preparation
+
+Re-code the classic edit-distance DP from a blank buffer until the table setup and transitions take under ten minutes.
+
+Practice variant analysis aloud: adding a new global operation (reverse, swap, rotate) as an extra candidate in the recurrence — the follow-up grades reasoning, not code.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

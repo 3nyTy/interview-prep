@@ -1,0 +1,54 @@
+===H1===
+System Design: Personalized Chatbot Recommending Pins
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/system-design-personalized-chat-recommend
+===BODY===
+Pinterest
+System Design·60 minMembers
+System Design: Personalized Chatbot Recommending Pins
+Design a chatbot that converses with the user and recommends pins inline. Combines an LLM conversational layer with a Pinterest-style retrieval / ranking stack on the back end. New prompt — exact framing not fully transcribed; treat as a hybrid LLM-agent + recommendation design.
+MLE
+mlsd
+chat
+llm-agent
+recommendation
+rag
+retrieval
+hard
+Frequency
+Single report
+Last asked
+2026-02-11
+Stage
+onsite-system-design
+Requirements
+
+Design a conversational product that disambiguates intent, recommends relevant pins inline, personalizes results, and updates recommendations as the dialogue changes. Clarify latency, safety, persistence, and evaluation requirements before choosing the architecture.
+
+Notes
+
+Use the language model to interpret and reformulate conversational intent, then call a bounded retrieve_pins(query, filters, user_context) tool backed by candidate generation and ranking. Keep ranking authority in the recommender rather than relying on free-form generation.
+
+Personalization enters both the conversation context and ranker features. Separate durable user interests from short-lived session intent and define how users can override either.
+
+Stream partial text if generation dominates latency, but set independent budgets for retrieval, ranking, and model inference. Add timeouts and a non-personalized fallback.
+
+Evaluate recommendation engagement, conversational task success, unsafe or irrelevant suggestions, latency, and repeated-recommendation rate. Offline relevance alone is insufficient.
+
+State retention and privacy rules for conversation history before using it as a feature.
+
+Preparation
+
+Draw the conversational layer, typed retrieval tool, candidate generator, ranker, and response renderer.
+
+Write the tool schema and two failure responses: retrieval timeout and no safe result.
+
+Define one offline metric, one online recommendation metric, one conversation-quality metric, and two safety guardrails.
+
+Walk a multi-turn example where session intent overrides the long-term profile.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

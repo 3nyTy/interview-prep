@@ -1,0 +1,59 @@
+===H1===
+Org Tree Lowest Common Department
+===URL===
+https://www.1point3acres.com/interview/problems/company/atlassian/org-tree-lowest-common-department
+===BODY===
+Atlassian
+Coding·60 minFree preview
+Org Tree Lowest Common Department
+Given a company organization tree where internal nodes are departments or groups and leaves are employees, return the lowest department that contains every requested employee. Variants expand from two employees to an arbitrary set, then to employees or orgs with multiple parents and dynamic membership changes.
+SWE
+MLE
+tree
+tree-traversal
+medium
+testing
+Frequency
+High
+Last asked
+2026-02-15
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Model an organization as a tree of departments / groups, with employees attached as leaves or as members of a group.
+
+Given two or more employees, return the closest common department/group that contains all of them.
+
+Be ready to define the input shape yourself: candidates used parent pointers, explicit tree nodes, and employee-to-group mappings.
+
+Write and run test cases; several candidates were evaluated on clarifying input format and edge cases before coding.
+
+Follow-ups include:
+
+Employees can belong to multiple departments.
+
+A department or org can belong to multiple parent orgs, turning the structure into a DAG.
+
+Membership can be added, removed, or dynamically adjusted.
+
+Analyze time and space complexity, then discuss the optimal structure for repeated queries.
+
+Notes
+
+This is one of Atlassian's highest-repeat coding prompts across SWE, intern, and MLE loops.
+
+The interviewer may expect a complete local tree setup rather than a LeetCode-style harness. Budget time for building fixtures and tests.
+
+For the multi-parent variant, clarify whether any common ancestor is acceptable, whether the lowest one is unique, and how ties should be returned.
+
+Preparation
+
+Implement the parent-pointer solution, the DFS path-to-root solution, and the multi-query preprocessing version.
+
+Add tests for unknown employees, same employee twice, employees in ancestor/descendant groups, and multiple-parent DAG ties.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

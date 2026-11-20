@@ -1,0 +1,142 @@
+===H1===
+GPU Credits / GPU Credit 2
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/gpu-credits
+===BODY===
+OpenAI
+Coding·75 minMembers
+GPU Credits / GPU Credit 2
+Simulate a GPU credit grant system: grant credit with an expiration time, subtract on consumption, query balance. Latest 'GPU Credit 2' variant adds 'subtract affects future + drain from earliest-expiring grant first' semantics.
+SWE
+algorithm
+data-structure
+simulation
+medium
+Frequency
+High
+Last asked
+2026-08-28
+Stage
+phone-screen
+Requirements
+
+create_grant(amount, expire_at): issue a credit grant.
+
+subtract(amount, at_time): consume credit, draining earliest-expiring first; may span multiple grants.
+
+get_balance(at_time): balance at a given time.
+
+Latest variant: a subtract at at_time continues to affect future balances (already-consumed stays consumed).
+
+Interviewer hands you 6 test cases covering all scenarios upfront; no follow-up.
+
+Alternate canonical variant — keyed grants + out-of-order events
+
+A common rotation gives each grant an id and a relative expiration, and explicitly stresses out-of-order command arrival (subtract at t=30 may arrive before the grant that activates it):
+
+class GPUCredit:
+    def add_credit(
+        self,
+        credit_id: str,   # unique
+        amount: int,
+        timestamp: int,   # grant becomes active at `timestamp`
+        expiration: int,  # DURATION, not an absolute end: grant is valid through
+                          # `timestamp + expiration` INCLUSIVE
+    ) -> None: ...
+
+    def subtract(self, amount: int, timestamp: int) -> None: ...
+        # Burn from grants that expire SOONEST first. Never raises;
+        # the running balance may go negative and stays negative until later grants top it up.
+
+    def get_balance(self, timestamp: int) -> int | None: ...
+        # Replay every event up to `timestamp` from scratch, then sum surviving credit.
+        # Returns None when (a) no grant is active at `timestamp`, or (b) the
+        # replayed balance is negative. A balance of exactly 0 returns 0, not None.
+
+Key edge cases to confirm in tests: subtract arriving before any add_credit; a query before any grant's start time; a query after all grants expire; one subtract draining across multiple grants ordered by expiration.
+
+Additional invariant: assume at most one event (add_credit or subtract) per timestamp — no tie-breaking needed within a single tick.
+
+Examples
+
+# Priority: burn the credit expiring soonest first
+gpu = GPUCredit()
+gpu.add_credit('a', 4, 20, 40)  # valid 20–60
+gpu.add_credit('b', 3, 30, 10)  # valid 30–40 (expires sooner)
+gpu.subtract(2, 30)
+assert gpu.get_balance(30) == 5   # b has 1 left, a has 4
+assert gpu.get_balance(40) == 5   # both still valid at t=40
+assert gpu.get_balance(41) == 4   # b expired; only a remains
+
+# Drain spanning 3 grants, partial on the last (expiration-ordered)
+gpu = GPUCredit()
+gpu.add_credit('c1', 20, 10, 30)  # valid through 40 (dies first)
+gpu.add_credit('c2', 20, 40, 30)  # valid through 70
+gpu.add_credit('c3', 20, 20, 30)  # valid through 50
+gpu.add_credit('c4', 20, 30, 30)  # valid through 60
+gpu.subtract(45, 30)              # 20 from c1, 20 from c3, 5 from c4
+assert gpu.get_balance(30) == 15  # c1 & c3 empty; c4 has 15 left
+assert gpu.get_balance(55) == 35  # c4 has 15, c2 has 20; c1/c3 expired
+
+# Out-of-order arrival
+gpu = GPUCredit()
+gpu.subtract(4, 30)              # arrives before the grant
+gpu.add_credit('a', 4, 20, 30)  # valid 20–50
+assert gpu.get_balance(20) == 4  # subtraction hasn't happened yet
+assert gpu.get_balance(30) == 0  # 4 added − 4 used = 0 (returns 0, not None)
+assert gpu.get_balance(50) == 0  # still valid, still 0
+
+# Negative balance → None
+gpu = GPUCredit()
+gpu.add_credit('openai', 10, 10, 30)
+gpu.subtract(100, 20)
+assert gpu.get_balance(10) == 10  # before usage
+assert gpu.get_balance(20) is None  # balance is −90
+
+Notes
+
+A practical implementation follow-up asks how credits would be enforced in production; one accepted framing is tier-aware rate limiting on top of the credit ledger.
+
+Key data structure: sorted-by-expire_at structure (SortedList or heap with lazy deletion).
+
+Very mechanical — pass all 6 tests, you're done.
+
+The None-on-negative rule is the silent failure case interviewers probe: a balance of 0 from real cancellation is not None — only a truly negative balance (e.g., -90 from over-burn) collapses to None. In the keyed variant, get_balance returns 0 when credits exactly cancel usage, and None only when the replayed balance goes below zero.
+
+Minority variant: an earlier framing had zero balance also collapsing to None in the keyed variant — clarify before coding.
+
+Two solving strategies
+
+Replay from scratch (default, latency-tolerant): record every event; on get_balance(t), filter to events at-or-before t, sort by timestamp, replay add/subtract while ignoring grants already expired at t. Interviewers often say not to worry about speed, so recomputing per query is acceptable — get the logic right first.
+
+Incremental with a min-heap (the optimization ask): keep a heap of active grants keyed by expiration; each subtract pops the soonest-expiring grant. Cache prior results so the same t isn't recomputed. This is the natural follow-up once correctness is in.
+
+Easy-to-miss correctness traps
+
+Off-by-one on expiry: a grant expiring at 40 is still valid at 40 and gone only at 41 (timestamp + expiration is inclusive).
+
+Timing matters — don't naively net: you cannot just sum all add amounts and subtract all usage; when each subtract lands (and which grants were live then) changes later balances.
+
+Order-independence: never assume add_credit precedes the matching subtract; a subtract for t=30 can arrive before the grant that activates at t=20.
+
+What candidates report on the call
+
+The "GPU Credit 2" / "GPU Credit II" extension is now the common form — the same ledger with an added layer of follow-ups; strong candidates finish the implementation in under 30 minutes and spend the rest on optimization discussion.
+
+A heapq / priority-queue is the natural structure for the follow-up; have the import heapq API at your fingertips so you don't stall on it.
+
+A recurring pattern: the candidate writes correctly and fast but the interviewer points out a bug before the candidate spots it, and the round still ends positively — communication while debugging matters as much as the fix.
+
+Preparation
+
+sortedcontainers or heapq + lazy delete both work
+
+Decide upfront how to track each grant's remaining amount
+
+Have edge cases ready: spanning multiple grants, already-expired grants, grants with same expire time
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,862 @@
+{
+  "company": "jpmorgan",
+  "display_name": "JPMorgan Chase",
+  "qbank_count": 24,
+  "questions_scraped": 24,
+  "site_total_count": 84,
+  "oj_count": 60,
+  "external_count": 0,
+  "description": "JPMorgan Chase's engineering loop is predictable but operationally uneven: a light HackerRank-style OA is followed by a Super Day with coding, code review, system design, and behavioral rounds rotating across candidates. The technical bar skews practical: simple algorithms, review of production-ish Java code, concurrency/style critiques, and system designs around traffic, search, inventory, payments, and URL routing.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/jpmorgan",
+  "scraped_at": "2026-09-20",
+  "source": "1point3acres qbank (logged-in session)",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "customer-request-pr-review",
+      "title": "Customer Request PR Review",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-07-10",
+      "stage": "onsite-coding",
+      "access": "Free preview",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "code-review",
+        "code-reading",
+        "refactoring",
+        "concurrency",
+        "testing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "code-review",
+        "code-reading",
+        "refactoring",
+        "concurrency",
+        "testing",
+        "medium"
+      ],
+      "overview": "Review a production-style customer-request class or PR and identify engineering issues before coding a small algorithm. The recurring critique areas are hard-coded values, single-responsibility violations, global variables, thread safety, low-level concurrency primitives such as `volatile`, and general maintainability.",
+      "source_count": 9,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/customer-request-pr-review"
+    },
+    {
+      "n": 2,
+      "slug": "zero-compaction-array-coding",
+      "title": "Zero Compaction Array Coding",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-23",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "two-pointer",
+        "simulation",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "two-pointer",
+        "simulation",
+        "easy"
+      ],
+      "overview": "After the code-review portion, the interviewer asked the original LeetCode Move Zeroes prompt. The candidate solved it quickly and used the remaining time for conversation, which reinforces that clarity and edge cases matter more than algorithmic depth in this slot.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/zero-compaction-array-coding"
+    },
+    {
+      "n": 3,
+      "slug": "prerequisite-cycle-oa",
+      "title": "Prerequisite Cycle OA",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-23",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "graph",
+        "topological-sort",
+        "cycle-detection",
+        "oa",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "graph",
+        "topological-sort",
+        "cycle-detection",
+        "oa",
+        "medium"
+      ],
+      "overview": "The OA used the original LeetCode Course Schedule prompt: given course prerequisites, decide whether all courses can be completed. It appeared in a two-question, medium-difficulty HackerRank assessment.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/prerequisite-cycle-oa"
+    },
+    {
+      "n": 4,
+      "slug": "interval-consolidation-oa",
+      "title": "Interval Consolidation OA",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-23",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "interval",
+        "sorting",
+        "array",
+        "oa",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "interval",
+        "sorting",
+        "array",
+        "oa",
+        "medium"
+      ],
+      "overview": "The OA used the original LeetCode Merge Intervals prompt: given intervals, merge all overlapping intervals and return the consolidated list. It was paired with the prerequisite-cycle OA in the same assessment.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/interval-consolidation-oa"
+    },
+    {
+      "n": 5,
+      "slug": "markdown-table-of-contents",
+      "title": "Markdown Table of Contents",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-03-14",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "parsing",
+        "simulation",
+        "oa",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "parsing",
+        "simulation",
+        "oa",
+        "easy"
+      ],
+      "overview": "Given an array of document lines, generate a table of contents: lines starting with `#` are chapters, lines starting with `##` are sections under the latest chapter, and other lines are ignored.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/markdown-table-of-contents"
+    },
+    {
+      "n": 6,
+      "slug": "interval-sign-flips",
+      "title": "Interval Sign Flips",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-11-19",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "interval",
+        "array",
+        "prefix-sum",
+        "simulation",
+        "oa",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "interval",
+        "array",
+        "prefix-sum",
+        "simulation",
+        "oa",
+        "easy"
+      ],
+      "overview": "Given an integer array and a list of intervals, flip the sign of every element inside each interval, then return the final array.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/interval-sign-flips"
+    },
+    {
+      "n": 7,
+      "slug": "minimum-swaps-sort-descending",
+      "title": "Minimum Swaps to Sort Descending",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-10-29",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "RS"
+      ],
+      "tags": [
+        "array",
+        "sorting",
+        "cycle-detection",
+        "oa",
+        "medium"
+      ],
+      "roles_slug": [
+        "rs"
+      ],
+      "tags_slug": [
+        "array",
+        "sorting",
+        "cycle-detection",
+        "oa",
+        "medium"
+      ],
+      "overview": "Given an array, compute the minimum number of swaps needed to sort it in decreasing order.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/minimum-swaps-sort-descending"
+    },
+    {
+      "n": 8,
+      "slug": "split-array-left-sum-greater",
+      "title": "Split Array: Left Sum Greater",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-09-05",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "RS"
+      ],
+      "tags": [
+        "array",
+        "prefix-sum",
+        "oa",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe",
+        "rs"
+      ],
+      "tags_slug": [
+        "array",
+        "prefix-sum",
+        "oa",
+        "easy"
+      ],
+      "overview": "Given an integer array, count how many split positions divide it into a left sublist and a right sublist such that the left sum is greater than the right sum.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/split-array-left-sum-greater"
+    },
+    {
+      "n": 9,
+      "slug": "circular-active-computers-window",
+      "title": "Circular Active Computers Window",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-07-29",
+      "stage": "oa · tech-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "sliding-window",
+        "array",
+        "binary-string",
+        "oa",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "sliding-window",
+        "array",
+        "binary-string",
+        "oa",
+        "easy"
+      ],
+      "overview": "Given `n` computers arranged in a circle as 0/1 states, find the maximum number of active computers in any `k` adjacent computers.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/circular-active-computers-window"
+    },
+    {
+      "n": 10,
+      "slug": "delete-one-character-positions",
+      "title": "Delete-One-Character Positions",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-07-29",
+      "stage": "oa · tech-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "two-pointer",
+        "string-processing",
+        "oa",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "two-pointer",
+        "string-processing",
+        "oa",
+        "easy"
+      ],
+      "overview": "Given strings `s1` and `s2`, where `s2` can be obtained by deleting one character from `s1`, return all deletion positions that make the transformation valid.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/delete-one-character-positions"
+    },
+    {
+      "n": 11,
+      "slug": "alternating-triplets",
+      "title": "Alternating Triplets",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-06-30",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "simulation",
+        "oa",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "simulation",
+        "oa",
+        "easy"
+      ],
+      "overview": "Given an array, inspect every adjacent triple and count triples where the middle element is greater than both neighbors or less than both neighbors.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/alternating-triplets"
+    },
+    {
+      "n": 12,
+      "slug": "alphanumeric-vowel-consonant-count",
+      "title": "Alphanumeric Vowel / Consonant Count",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-06-30",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "string-processing",
+        "parsing",
+        "oa",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "string-processing",
+        "parsing",
+        "oa",
+        "easy"
+      ],
+      "overview": "Determine whether a string contains only letters and digits; if it does, count vowel and consonant letters.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/alphanumeric-vowel-consonant-count"
+    },
+    {
+      "n": 13,
+      "slug": "minimum-cpu-cores",
+      "title": "Minimum CPU Cores",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-03-31",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "RS"
+      ],
+      "tags": [
+        "interval",
+        "sorting",
+        "scheduling",
+        "oa",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe",
+        "rs"
+      ],
+      "tags_slug": [
+        "interval",
+        "sorting",
+        "scheduling",
+        "oa",
+        "easy"
+      ],
+      "overview": "Given process start and end times, compute the minimum number of CPU cores required so every process can run. Endpoints are inclusive, so a process ending at time `t` overlaps a process starting at `t`.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/minimum-cpu-cores"
+    },
+    {
+      "n": 14,
+      "slug": "minimum-anagram-edits",
+      "title": "Minimum Anagram Edits",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-03-18",
+      "stage": "oa · tech-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "hashmap",
+        "string",
+        "string-processing",
+        "oa",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "hashmap",
+        "string",
+        "string-processing",
+        "oa",
+        "easy"
+      ],
+      "overview": "Compute the minimum number of character operations needed to make one string an anagram of another. One OA variant provides two strings directly; another splits a numeric string into two halves and compares those halves.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/minimum-anagram-edits"
+    },
+    {
+      "n": 15,
+      "slug": "grouped-binary-substrings",
+      "title": "Grouped Binary Substrings",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-03-14",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "RS"
+      ],
+      "tags": [
+        "binary-string",
+        "string",
+        "string-processing",
+        "oa",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe",
+        "rs"
+      ],
+      "tags_slug": [
+        "binary-string",
+        "string",
+        "string-processing",
+        "oa",
+        "easy"
+      ],
+      "overview": "Count substrings of a binary string where the number of `0`s equals the number of `1`s and all `0`s and all `1`s appear in two contiguous groups, such as `000111`, `111000`, `01`, or `10`.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/grouped-binary-substrings"
+    },
+    {
+      "n": 16,
+      "slug": "url-shortener-with-click-tracking",
+      "title": "URL Shortener With Click Tracking",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-04-22",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "url-shortener",
+        "caching",
+        "storage",
+        "analytics-dashboard",
+        "scaling",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "url-shortener",
+        "caching",
+        "storage",
+        "analytics-dashboard",
+        "scaling",
+        "medium"
+      ],
+      "overview": "Design a URL-shortening service, then extend it to track clicks. Interviewers usually stay at overall architecture depth: encoding, redirect path, storage, collision handling, latency, and analytics write flow.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/url-shortener-with-click-tracking"
+    },
+    {
+      "n": 17,
+      "slug": "property-rental-search-system",
+      "title": "Property Rental Search System",
+      "category": "system-design",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-02-08",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "search",
+        "payment",
+        "caching",
+        "storage",
+        "scaling",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "search",
+        "payment",
+        "caching",
+        "storage",
+        "scaling",
+        "medium"
+      ],
+      "overview": "Redesign a property-rental website for global customers on cloud infrastructure. The prompt names payment, view, guest, search, and update services, with emphasis on fast, secure search and property browsing.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/property-rental-search-system"
+    },
+    {
+      "n": 18,
+      "slug": "million-user-flash-sale-system",
+      "title": "Million-User Flash Sale System",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-06-21",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "flash-sale",
+        "queueing",
+        "rate-limiting",
+        "idempotency",
+        "scaling",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "flash-sale",
+        "queueing",
+        "rate-limiting",
+        "idempotency",
+        "scaling",
+        "medium"
+      ],
+      "overview": "Design a system that handles a million-user flash-sale event. The expected discussion covers necessary components, happy and unhappy paths, and smoothing high-concurrency traffic.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/million-user-flash-sale-system"
+    },
+    {
+      "n": 19,
+      "slug": "shopping-cart-latency-and-inventory",
+      "title": "Shopping Cart Latency and Inventory",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-06-23",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "caching",
+        "storage",
+        "messaging",
+        "scaling",
+        "backend",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "caching",
+        "storage",
+        "messaging",
+        "scaling",
+        "backend",
+        "medium"
+      ],
+      "overview": "Design or improve an e-commerce shopping/cart system with fast user-facing operations, out-of-stock handling, duplicate-order prevention, and safe concurrent purchase of scarce inventory. Some versions frame it as improving an existing system; another asks for a shopping-website design with two focused deep dives.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/shopping-cart-latency-and-inventory"
+    },
+    {
+      "n": 20,
+      "slug": "superday-behavioral-round",
+      "title": "Super Day Behavioral Round",
+      "category": "behavioral",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-08-20",
+      "stage": "onsite-bq",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "RS"
+      ],
+      "tags": [
+        "leadership",
+        "project-deep-dive",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "rs"
+      ],
+      "tags_slug": [
+        "leadership",
+        "project-deep-dive",
+        "medium"
+      ],
+      "overview": "JPMorgan Chase behavioral rounds are conventional but broad: project walkthroughs, proud work, blockers, conflict, leadership, helping colleagues, and collaboration scenarios. Managers may also ask about past work in detail.",
+      "source_count": 8,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/superday-behavioral-round"
+    },
+    {
+      "n": 21,
+      "slug": "agentic-portfolio-workflow-deep-dive",
+      "title": "Agentic Portfolio Workflow Deep Dive",
+      "category": "other",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-04",
+      "stage": "tech-screen",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "llm",
+        "agents",
+        "agentic-workflow",
+        "tool-use",
+        "deep-dive"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "llm",
+        "agents",
+        "agentic-workflow",
+        "tool-use",
+        "deep-dive"
+      ],
+      "overview": "The first half of an Applied AI Engineer screen is a project deep dive into an agentic portfolio workflow: model and provider choices, workflow behavior, ownership of endpoints, data access and entitlements, agent-orchestrator composition, and firsthand MCP server work. The interviewer then checks motivation and role alignment before moving to Python coding.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/agentic-portfolio-workflow-deep-dive"
+    },
+    {
+      "n": 22,
+      "slug": "cpp-virtual-destructor-pointer-review",
+      "title": "C++ Virtual / Destructor / Pointer Review",
+      "category": "other",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-15",
+      "stage": "onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "RS"
+      ],
+      "tags": [
+        "cpp",
+        "code-reading",
+        "object-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "rs"
+      ],
+      "tags_slug": [
+        "cpp",
+        "code-reading",
+        "object-design",
+        "medium"
+      ],
+      "overview": "Quant finance onsite includes C++ code-reading and language-semantics questions around virtual functions, destructors, dangling pointers, and pointer-vs-reference differences.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/cpp-virtual-destructor-pointer-review"
+    },
+    {
+      "n": 23,
+      "slug": "domino-tiling-recurrences",
+      "title": "Domino Tiling Recurrences",
+      "category": "other",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-15",
+      "stage": "tech-screen · onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "rs"
+      ],
+      "tags": [
+        "dp",
+        "combinatorics",
+        "math-reasoning",
+        "medium"
+      ],
+      "roles_slug": [
+        "rs"
+      ],
+      "tags_slug": [
+        "dp",
+        "combinatorics",
+        "math-reasoning",
+        "medium"
+      ],
+      "overview": "Quant finance screeners ask for tiling counts and, more importantly, the intuition behind the recurrence. The first-round version uses a `2 x N` rectangle with `1 x 2` / `2 x 1` dominoes; an onsite fo...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/domino-tiling-recurrences"
+    },
+    {
+      "n": 24,
+      "slug": "quant-probability-and-statistics-orals",
+      "title": "Quant Probability and Statistics Orals",
+      "category": "other",
+      "duration": "45 min",
+      "frequency": "Low",
+      "last_asked": "2026-01-15",
+      "stage": "tech-screen · onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "rs"
+      ],
+      "tags": [
+        "probability",
+        "expected-value",
+        "combinatorics",
+        "math-reasoning",
+        "medium"
+      ],
+      "roles_slug": [
+        "rs"
+      ],
+      "tags_slug": [
+        "probability",
+        "expected-value",
+        "combinatorics",
+        "math-reasoning",
+        "medium"
+      ],
+      "overview": "Quant finance rounds include oral probability and statistics: nested radicals, couple-selection probability, dice expected value, first-heads coin-toss probability, and tests for whether a sample foll...",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/jpmorgan/quant-probability-and-statistics-orals"
+    }
+  ]
+}

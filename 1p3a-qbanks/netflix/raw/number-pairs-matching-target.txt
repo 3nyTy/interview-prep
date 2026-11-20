@@ -1,0 +1,136 @@
+===H1===
+Number Pairs Matching Target
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/number-pairs-matching-target
+===BODY===
+Number Pairs Matching Target
+
+<https://www.1point3acres.com/interview/problems/company/netflix/number-pairs-matching-target>
+
+Netflix
+Coding
+
+60 min
+Members
+Number Pairs That Match Target
+
+Return every distinct expression string "a{op}b" from a list where one of +,-,*,/ yields the target (order matters, integer-only division, no divide-by-zero, dedupe identical strings).
+
+SWE
+hashmap
+array
+math
+medium
+Frequency
+Single report
+Last asked
+2026-01-01
+Stage
+phone-screen  onsite-coding
+Problem Statement
+
+You are provided with a list of integers called nums and a specific number called target. You need to find all pairs of numbers from the list that result in target when you perform one of the four basic math operations: addition (+), subtraction (-), multiplication (*), or division (/).
+
+For every valid pair (a, b) that equals the target, you must return a string formatted like "a{op}b". For example: "2+4" or "3*2".
+
+Rules:
+
+Order counts: "2+4" and "4+2" are treated as two different pairs if they both equal the target.
+Division rules: Only count division if it divides evenly (no remainder). You cannot divide by zero.
+Indices must differ: You must use numbers from different positions in the list. If the same number appears more than once, treat each one as a separate item.
+Unique strings: If the same expression string is created by different pairs of indices, include that string only once in your final list.
+
+You can return the list of strings in any order.
+
+Sample Cases
+
+Case 1:
+
+Input: nums = [2, 4, 6, 3], target = 6
+
+Output: ["2+4", "4+2", "2*3", "3*2"]
+
+Explanation:
+
+2 + 4 = 6
+4 + 2 = 6
+2 * 3 = 6
+3 * 2 = 6
+
+Case 2:
+
+Input: nums = [1, 2, 3, 4], target = 2
+
+Output: ["1*2", "2*1", "2/1", "4/2", "3-1", "4-2"]
+
+Explanation:
+
+1 * 2 = 2
+2 * 1 = 2
+2 / 1 = 2
+4 / 2 = 2
+3 - 1 = 2
+4 - 2 = 2
+
+Case 3:
+
+Input: nums = [5, 10, 2], target = 5
+
+Output: ["10/2", "10-5"]
+
+Explanation:
+
+10 / 2 = 5
+10 - 5 = 5
+Input Limits
+2 <= nums.length <= 100
+-1000 <= nums[i] <= 1000
+-10000 <= target <= 10000
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Problem Statement
+Sample Cases
+Input Limits
+Related discussions  0
+Related questions
+
+Other Netflix questions sharing tags with this one
+
+User Engagement Pattern Classification
+Single report
+hashmap
+array
+medium
++1
+Count Disjoint String Pairs
+Low
+hashmap
+medium
+bitmask
++1
+Homepage Viewport / Shelf Dedupe
+Medium
+array
+medium
+dedup
++4
+JSON Path Query / Inverted Index
+Low
+hashmap
+medium
+json
++4
+Merge Intervals
+Single report
+array
+medium
+interval
++1
+Code editor
+
+---

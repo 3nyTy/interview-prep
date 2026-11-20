@@ -1,0 +1,53 @@
+===H1===
+Real-Time AI Product Feature
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/real-time-ai-product-feature
+===BODY===
+OpenAI
+System DesignMembers
+Real-Time AI Product Feature
+Design a user-facing AI product feature that serves a large audience with real-time or streaming responses. Cover streaming API choices, request admission and queueing, cost controls, frontend error handling, observability, and how the design changes at 10× scale.
+SWE
+fullstack
+streaming
+api-design
+rate-limiting
+sse
+websocket
+Frequency
+Single report
+Last asked
+2026-08-08
+Stage
+onsite-system-design
+Requirements
+
+Design an AI-backed product feature for a large user base with real-time or streaming responses.
+
+Define the client/backend API and choose an appropriate streaming transport, including SSE versus WebSocket.
+
+Handle request rate limiting, queueing, and overload behavior around the model-serving path.
+
+Address caching and token or compute-cost control.
+
+Explain how the frontend renders partial responses and recovers from stream or request errors.
+
+Include monitoring, logging, and a debugging path for production failures.
+
+Revisit the design under a 10× scale increase.
+
+Notes
+
+This is product-oriented system design: connect backend reliability and cost decisions to the visible frontend experience. State trade-offs instead of presenting each component as an automatic choice.
+
+Preparation
+
+Practice drawing the request lifecycle from browser submission through admission, model execution, streaming delivery, cancellation, and error recovery.
+
+Prepare one concrete production story involving LLMs, high concurrency, or real-time systems, including the failure mode, debugging path, and trade-off you chose.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

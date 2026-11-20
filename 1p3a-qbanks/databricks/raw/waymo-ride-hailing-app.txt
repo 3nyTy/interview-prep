@@ -1,0 +1,802 @@
+===H1===
+Design an Autonomous Vehicle Ride-Hailing App (Waymo-like)
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/waymo-ride-hailing-app
+===BODY===
+Databricks
+System DesignMembers
+Design an Autonomous Vehicle Ride-Hailing App (Waymo-like)
+Design a user-facing autonomous-vehicle ride-hailing app (Waymo-like): request a ride, match a vehicle, track the trip, and handle lifecycle and edge cases.
+SWE
+product-design
+location
+system-design
+medium
+Frequency
+Single report
+Last asked
+2025-10-09
+Stage
+onsite-system-design
+Problem Statement
+
+Design an app for users to book rides with autonomous cars, similar to Waymo. The system must handle booking rides, matching users with cars, tracking the ride, and making sure the service is reliable.
+
+What You Need to Design
+
+The interviewer will look at how you handle user interactions. You need to:
+
+List the exact data sent and received by the API.
+
+Choose the right HTTP methods (GET, POST, PUT, DELETE).
+
+Design the database tables and how they connect.
+
+List all the services needed and what they do.
+
+Plan for problems like system crashes, high traffic, and data safety.
+
+Choose how the system communicates (REST, RPC, WebSocket).
+
+Explain how to lock a price so it doesn't change during booking.
+
+Decide which tasks happen instantly (synchronous) and which happen later (asynchronous).
+
+Create rules for cancelling rides and retrying failed actions.
+
+Explain how the system assigns cars to users.
+
+Common Interview Questions
+
+API Design: What exact data do we send to book a ride?
+
+Communication Protocol: When should we use REST, RPC, or WebSocket?
+
+Price Locking: How do we keep the price the same while the user is booking?
+
+Concurrency: What happens if two users try to book the same car at the exact same time?
+
+Failure Handling: How does the system fix itself if a service crashes in the middle of a task?
+
+Cancellations: How do we handle it when a user cancels the ride at different times?
+
+Peak Traffic: How does the system handle a sudden spike in requests during rush hour?
+
+Atomicity: Which actions must happen all at once or not at all?
+
+Vehicle Dispatch: How do we assign cars quickly to reduce waiting time?
+
+Real-time Updates: How do we show users exactly where the car is?
+
+Proposed Solution
+
+Note: This is an example solution. You should try to solve the problem yourself first. There are many right answers in system design. Interviewers care about how you think and the choices you make.
+
+Step 1: Understanding the Goals
+
+First, let's define what the system must do.
+
+Core Features (What we must build)
+
+User Management: Sign up, log in, and edit profiles.
+
+Ride Booking: Request a ride, see the price, and confirm.
+
+Vehicle Matching: Connect a user with an empty car.
+
+Real-time Tracking: See where the car is and when it will arrive.
+
+Ride Lifecycle: Manage the ride from start to finish.
+
+Payment Processing: Calculate the cost, charge the user, and send a receipt.
+
+Cancellations: Handle cancellations by the user or the system.
+
+Notifications: Send updates to the user's phone.
+
+Out of Scope (What we will not build)
+
+Managing the fleet of cars (maintenance, repair).
+
+The software that drives the car (AI navigation).
+
+Legal rules and safety checks.
+
+Customer support help desk.
+
+Rewards or coupons.
+
+System Performance Needs
+
+Availability: The booking system must work 99.9% of the time.
+
+Latency: Booking requests should take less than 2 seconds. Location updates should take less than 500ms.
+
+Consistency: Prices and payments must always be accurate.
+
+Scalability: Must support millions of users in many cities.
+
+Reliability: Never double-book a car. Calculate fares correctly.
+
+Platform Details
+
+We are building the backend (servers and APIs).
+
+Mobile apps (iOS/Android) will use our APIs.
+
+Step 2: Estimating Scale
+
+Let's guess the size of the system for a big city setup.
+
+Users and Traffic
+
+Active Users: 10 million per month.
+
+Daily Users: 2 million per day.
+
+Busy Times: 20% of all rides happen during a 2-hour rush hour.
+
+Total Rides: 1 million per day.
+
+Active Rides: About 40,000 cars driving at once during rush hour.
+
+Request Load
+
+Ride Requests: Average 12 per second. Peak is about 150 per second.
+
+Location Updates: 40,000 cars sending 1 update per second = 40,000 writes per second.
+
+Read Requests: Users checking status = 200,000 reads per second.
+
+Data Storage
+
+User Data: 10 GB total.
+
+Ride History: About 1.8 TB per year.
+
+Location Data: About 20 TB per month (if kept for 30 days).
+
+Total Storage: About 25-30 TB per year.
+
+Internet Speed (Bandwidth)
+
+Location Updates: About 128 Mbps.
+
+API Traffic: About 6 Mbps.
+
+Total Peak Speed: Around 150-200 Mbps.
+
+What this tells us:
+
+We need microservices that can scale easily.
+
+We need to split the database by city (Sharding).
+
+We need a cache (like Redis) for data we use often.
+
+We need message queues to handle the heavy stream of location data.
+
+Step 3: API Design
+
+Here are the specific API commands the app will use.
+
+1. User Service APIs
+
+Register User
+
+POST /api/v1/users/register
+Request:
+{
+  "email": "user@example.com",
+  "password": "hashed_password",
+  "phone": "+1234567890",
+  "name": "John Doe"
+}
+
+Response (201 Created):
+{
+  "user_id": "uuid-1234",
+  "email": "user@example.com",
+  "name": "John Doe",
+  "created_at": "2025-01-15T10:00:00Z"
+}
+
+Authenticate User
+
+POST /api/v1/users/login
+Request:
+{
+  "email": "user@example.com",
+  "password": "hashed_password"
+}
+
+Response (200 OK):
+{
+  "access_token": "jwt_token_here",
+  "refresh_token": "refresh_token_here",
+  "expires_in": 3600,
+  "user_id": "uuid-1234"
+}
+
+2. Ride Service APIs
+
+Get Price Estimate
+
+POST /api/v1/rides/estimate
+Request:
+{
+  "user_id": "uuid-1234",
+  "pickup_location": {
+    "latitude": 37.7749,
+    "longitude": -122.4194,
+    "address": "123 Market St, SF"
+  },
+  "dropoff_location": {
+    "latitude": 37.8044,
+    "longitude": -122.2712,
+    "address": "456 Broadway, Oakland"
+  },
+  "vehicle_type": "standard",
+  "requested_at": "2025-01-15T10:00:00Z"
+}
+
+Response (200 OK):
+{
+  "estimate_id": "est-5678",
+  "distance_miles": 12.5,
+  "duration_minutes": 25,
+  "base_fare": 5.00,
+  "per_mile_rate": 2.50,
+  "estimated_total": 36.25,
+  "surge_multiplier": 1.0,
+  "price_locked_until": "2025-01-15T10:05:00Z",
+  "currency": "USD"
+}
+
+Request Ride
+
+POST /api/v1/rides/request
+Request:
+{
+  "user_id": "uuid-1234",
+  "estimate_id": "est-5678",
+  "pickup_location": {
+    "latitude": 37.7749,
+    "longitude": -122.4194,
+    "address": "123 Market St, SF"
+  },
+  "dropoff_location": {
+    "latitude": 37.8044,
+    "longitude": -122.2712,
+    "address": "456 Broadway, Oakland"
+  },
+  "payment_method_id": "pm-9012",
+  "special_requests": "wheelchair accessible"
+}
+
+Response (201 Created):
+{
+  "ride_id": "ride-3456",
+  "status": "SEARCHING",
+  "estimated_price": 36.25,
+  "price_locked": true,
+  "created_at": "2025-01-15T10:01:00Z"
+}
+
+Get Ride Status
+
+GET /api/v1/rides/{ride_id}
+
+Response (200 OK):
+{
+  "ride_id": "ride-3456",
+  "status": "EN_ROUTE",
+  "vehicle_id": "veh-7890",
+  "vehicle_info": {
+    "make": "Waymo",
+    "model": "Jaguar I-PACE",
+    "license_plate": "ABC123",
+    "current_location": {
+      "latitude": 37.7850,
+      "longitude": -122.4100
+    }
+  },
+  "pickup_eta_minutes": 3,
+  "dropoff_eta_minutes": 28,
+  "fare": {
+    "base_fare": 5.00,
+    "distance_fare": 31.25,
+    "estimated_total": 36.25
+  }
+}
+
+Cancel Ride
+
+POST /api/v1/rides/{ride_id}/cancel
+Request:
+{
+  "user_id": "uuid-1234",
+  "reason": "changed_plans",
+  "cancelled_at": "2025-01-15T10:02:30Z"
+}
+
+Response (200 OK):
+{
+  "ride_id": "ride-3456",
+  "status": "CANCELLED",
+  "cancellation_fee": 0.00,
+  "refund_amount": 0.00
+}
+
+3. Vehicle Service APIs
+
+Find Available Vehicles
+
+POST /api/v1/vehicles/search
+Request:
+{
+  "location": {
+    "latitude": 37.7749,
+    "longitude": -122.4194
+  },
+  "radius_miles": 5,
+  "vehicle_type": "standard"
+}
+
+Response (200 OK):
+{
+  "vehicles": [
+    {
+      "vehicle_id": "veh-7890",
+      "location": {
+        "latitude": 37.7800,
+        "longitude": -122.4150
+      },
+      "eta_minutes": 3,
+      "battery_level": 85
+    }
+  ],
+  "total_available": 12
+}
+
+Update Vehicle Location (Internal API)
+
+POST /api/v1/vehicles/{vehicle_id}/location
+Request:
+{
+  "latitude": 37.7850,
+  "longitude": -122.4100,
+  "heading": 90,
+  "speed_mph": 25,
+  "timestamp": "2025-01-15T10:01:30Z"
+}
+
+Response (204 No Content)
+
+4. Payment Service APIs
+
+Process Payment
+
+POST /api/v1/payments/charge
+Request:
+{
+  "ride_id": "ride-3456",
+  "user_id": "uuid-1234",
+  "amount": 36.25,
+  "currency": "USD",
+  "payment_method_id": "pm-9012"
+}
+
+Response (200 OK):
+{
+  "payment_id": "pay-1111",
+  "status": "SUCCEEDED",
+  "amount": 36.25,
+  "receipt_url": "https://receipts.example.com/pay-1111"
+}
+
+5. Notification Service APIs (Internal)
+
+Send Push Notification
+
+POST /api/v1/notifications/push
+Request:
+{
+  "user_id": "uuid-1234",
+  "title": "Your ride is arriving",
+  "message": "Your Waymo will arrive in 1 minute",
+  "data": {
+    "ride_id": "ride-3456",
+    "type": "ride_arriving"
+  }
+}
+
+Response (202 Accepted)
+
+Communication Protocols
+
+REST APIs: Used for normal tasks like logging in, booking, and paying.
+
+WebSocket: Used for live updates (like seeing the car move on the map).
+
+gRPC: Used for servers to talk to each other quickly.
+
+Step 4: Database Schema
+
+Here is how we organize the data.
+
+User Table
+
+CREATE TABLE users (
+  user_id UUID PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  phone VARCHAR(20) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  profile_image_url TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_email (email),
+  INDEX idx_phone (phone)
+);
+
+Payment Methods Table
+
+CREATE TABLE payment_methods (
+  payment_method_id UUID PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES users(user_id),
+  type ENUM('credit_card', 'debit_card', 'digital_wallet'),
+  last_four VARCHAR(4),
+  is_default BOOLEAN DEFAULT FALSE,
+  stripe_payment_method_id VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_user_id (user_id)
+);
+
+Vehicles Table
+
+CREATE TABLE vehicles (
+  vehicle_id UUID PRIMARY KEY,
+  make VARCHAR(100),
+  model VARCHAR(100),
+  license_plate VARCHAR(20) UNIQUE NOT NULL,
+  vehicle_type ENUM('standard', 'xl', 'premium'),
+  status ENUM('AVAILABLE', 'EN_ROUTE', 'IN_RIDE', 'OFFLINE', 'MAINTENANCE'),
+  current_latitude DECIMAL(10, 8),
+  current_longitude DECIMAL(11, 8),
+  battery_level INTEGER,
+  last_location_update TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_status (status),
+  INDEX idx_location (current_latitude, current_longitude),
+  INDEX idx_type_status (vehicle_type, status)
+);
+
+Rides Table
+
+CREATE TABLE rides (
+  ride_id UUID PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES users(user_id),
+  vehicle_id UUID REFERENCES vehicles(vehicle_id),
+  status ENUM('SEARCHING', 'MATCHED', 'EN_ROUTE', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'),
+
+  pickup_latitude DECIMAL(10, 8) NOT NULL,
+  pickup_longitude DECIMAL(11, 8) NOT NULL,
+  pickup_address TEXT,
+
+  dropoff_latitude DECIMAL(10, 8) NOT NULL,
+  dropoff_longitude DECIMAL(11, 8) NOT NULL,
+  dropoff_address TEXT,
+
+  estimated_distance_miles DECIMAL(6, 2),
+  estimated_duration_minutes INTEGER,
+  estimated_price DECIMAL(10, 2),
+  final_price DECIMAL(10, 2),
+
+  requested_at TIMESTAMP NOT NULL,
+  matched_at TIMESTAMP,
+  picked_up_at TIMESTAMP,
+  completed_at TIMESTAMP,
+  cancelled_at TIMESTAMP,
+
+  cancellation_reason VARCHAR(255),
+  cancellation_fee DECIMAL(10, 2) DEFAULT 0.00,
+
+  INDEX idx_user_id (user_id),
+  INDEX idx_vehicle_id (vehicle_id),
+  INDEX idx_status (status),
+  INDEX idx_requested_at (requested_at)
+);
+
+Price Estimates Table
+
+CREATE TABLE price_estimates (
+  estimate_id UUID PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES users(user_id),
+
+  pickup_latitude DECIMAL(10, 8) NOT NULL,
+  pickup_longitude DECIMAL(11, 8) NOT NULL,
+  dropoff_latitude DECIMAL(10, 8) NOT NULL,
+  dropoff_longitude DECIMAL(11, 8) NOT NULL,
+
+  distance_miles DECIMAL(6, 2),
+  duration_minutes INTEGER,
+  base_fare DECIMAL(10, 2),
+  per_mile_rate DECIMAL(10, 2),
+  estimated_total DECIMAL(10, 2),
+  surge_multiplier DECIMAL(3, 2) DEFAULT 1.0,
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  expires_at TIMESTAMP NOT NULL,
+
+  INDEX idx_user_id_created (user_id, created_at),
+  INDEX idx_expires_at (expires_at)
+);
+
+Payments Table
+
+CREATE TABLE payments (
+  payment_id UUID PRIMARY KEY,
+  ride_id UUID NOT NULL REFERENCES rides(ride_id),
+  user_id UUID NOT NULL REFERENCES users(user_id),
+  payment_method_id UUID REFERENCES payment_methods(payment_method_id),
+
+  amount DECIMAL(10, 2) NOT NULL,
+  currency VARCHAR(3) DEFAULT 'USD',
+  status ENUM('PENDING', 'SUCCEEDED', 'FAILED', 'REFUNDED'),
+
+  stripe_payment_intent_id VARCHAR(255),
+  stripe_charge_id VARCHAR(255),
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  INDEX idx_ride_id (ride_id),
+  INDEX idx_user_id (user_id),
+  INDEX idx_status (status)
+);
+
+Vehicle Locations Table (History)
+
+CREATE TABLE vehicle_locations (
+  location_id BIGSERIAL PRIMARY KEY,
+  vehicle_id UUID NOT NULL REFERENCES vehicles(vehicle_id),
+  latitude DECIMAL(10, 8) NOT NULL,
+  longitude DECIMAL(11, 8) NOT NULL,
+  heading DECIMAL(5, 2),
+  speed_mph DECIMAL(5, 2),
+  timestamp TIMESTAMP NOT NULL,
+
+  INDEX idx_vehicle_timestamp (vehicle_id, timestamp DESC),
+  INDEX idx_timestamp (timestamp)
+) PARTITION BY RANGE (timestamp);
+-- Partition by month for efficient querying and archival
+
+Database Choices
+
+PostgreSQL: Used for the main data (users, rides, money). It is very safe and reliable. It also has PostGIS for map logic.
+
+TimescaleDB: Used for car location history. It is built to handle huge amounts of data that comes in constantly over time.
+
+Redis: Used as a cache. It stores things we need instantly, like which cars are free right now.
+
+Step 5: System Architecture
+
+Diagram
+
+┌─────────────────────────────────────────────────────────────────┐
+│                         Mobile Apps / Web                       │
+│                    (iOS, Android, Web Browser)                  │
+└──────────────────┬──────────────────────────┬───────────────────┘
+                   │                          │
+                   ├── REST APIs              |── WebSocket
+                   │                          │
+┌──────────────────▼──────────────────────────▼───────────────────┐
+│                      API Gateway / Load Balancer                │
+│              (NGINX, AWS ALB, Route53 for DNS)                  │
+└──┬────────┬───────────┬─────────────┬──────────┬───────────┬────┘
+   │        │           │             |          │           │
+   │        │           │             │          │           │
+┌──▼────┐ ┌─▼───────┐ ┌─▼────────┐ ┌──▼──────┐ ┌─▼────────┐ ┌▼──────┐
+│ User  │ │  Ride   │ │ Vehicle  │ │ Payment │ │ Notif.   │ │Pricing│
+│Service│ │ Service │ │ Service  │ │ Service │ │ Service  │ │Service│
+└───┬───┘ └────┬────┘ └────┬─────┘ └────┬────┘ └────┬─────┘ └───┬───┘
+    │          │           │            │           │           │
+    └──────────┴───────────┴────────────┴───────────┴───────────┘
+                                   │
+                    ┌──────────────┼──────────────┐
+                    │              │              │
+            ┌───────▼──────┐  ┌────▼─────┐  ┌─────▼──────┐
+            │  PostgreSQL  │  │  Redis   │  │ TimescaleDB│
+            │   (Primary)  │  │  (Cache) │  │ (Locations)│
+            └──────────────┘  └──────────┘  └────────────┘
+                    │
+            ┌───────▼──────────────────┐
+            │   Message Queue          │
+            │  (Kafka / RabbitMQ)      │
+            │  - Location Updates      │
+            │  - Ride Events           │
+            │  - Payment Processing    │
+            └───────┬──────────────────┘
+                    │
+        ┌───────────┴───────────┐
+        │                       │
+┌───────▼────────┐    ┌─────────▼────────┐
+│ Analytics      │    │ External Services│
+│ Pipeline       │    │ - Stripe (Pay)   │
+│ (Spark/Flink)  │    │ - Twilio (SMS)   │
+└────────────────┘    │ - FCM (Push)     │
+                      └──────────────────┘
+
+Main Components
+
+API Gateway: The front door. It checks logins and sends requests to the right place.
+
+User Service: Handles user accounts.
+
+Ride Service: The "brain" that manages the ride from booking to drop-off.
+
+Vehicle Service: Tracks where cars are and if they are free.
+
+Pricing Service: Calculates how much a ride costs.
+
+Payment Service: Talks to the bank (Stripe) to charge money.
+
+Notification Service: Sends texts and push alerts.
+
+Message Queue (Kafka): Helps services talk to each other without waiting.
+
+Redis (Cache): Stores fast data like "Who is online?" and "Is this car free?".
+
+Databases: PostgreSQL for important records. TimescaleDB for location history.
+
+Step 6: Deep Dive
+
+The interviewer will likely ask for details on these specific topics.
+
+6.1 Locking the Price
+
+Problem: Prices change based on demand. If a user sees a price, takes 2 minutes to decide, and then books, the price might have changed. This is bad for users.
+
+Solution: Use a temporary lock in Redis.
+
+Get Estimate: The Pricing Service calculates a price. It saves this price in Redis with an ID and a 5-minute timer (TTL).
+
+Book Ride: When the user books, they send the Estimate ID.
+
+Validate: The system checks Redis. If the ID is there, the price is valid. If it expired, the user must get a new estimate.
+
+Why this works: It is simple and protects the user from surprise price hikes.
+
+6.2 Handling Ride Requests Safely
+
+Problem: Booking a ride involves many steps: checking the user, finding a car, assigning the car, and saving the ride. If step 3 fails, steps 1 and 2 must be undone.
+
+Solution: The "Saga Pattern" (A step-by-step process with undo options).
+
+The Steps:
+
+Start Request: Create a ride record as SEARCHING. Return the ID to the user.
+
+Find Car: A background worker looks for a nearby car.
+
+If no car: Set status to CANCELLED and tell the user.
+
+Assign Car (Atomic): Lock the car record in the database so no one else can take it. Update the car to EN_ROUTE and the ride to MATCHED at the same exact time.
+
+If car is taken: Try the next car.
+
+Notify User: Send a message saying "Car Found!".
+
+Key Concept: We use database locks (SELECT FOR UPDATE) to make sure two people don't book the same car at once.
+
+6.3 Live Location Updates
+
+Problem: 40,000 cars send updates every second. Users need to see this on their map live.
+
+Solution: Use Batches for cars and WebSockets for users.
+
+For Cars (Sending Data):
+
+Cars don't send every single second individually. They group (batch) 2-3 seconds of data and send it at once via HTTP.
+
+The server saves this to Redis (for "right now" data) and Kafka (for history).
+
+For Users (Receiving Data):
+
+The user's app opens a WebSocket connection. This is like a permanent phone line to the server.
+
+The server checks Redis every few seconds.
+
+If the car moved, the server pushes the new location directly to the user's phone through the WebSocket.
+
+6.4 Managing Cancellations
+
+Problem: Users can cancel anytime. We need rules for fees.
+
+Solution: A State Machine.
+
+Status: SEARCHING: Cancel fee is $0. (We haven't found a car yet).
+
+Status: MATCHED: Cancel fee is $0. (Grace period).
+
+Status: EN_ROUTE:
+
+If cancelled quickly (< 2 mins): $0.
+
+If cancelled late (> 2 mins): $5 fee (Driver wasted gas).
+
+Status: IN_PROGRESS: Fee is 50% of the fare.
+
+How it works: When a cancel comes in, we check the status, apply the fee, and free up the car immediately so it can take another passenger.
+
+6.5 Handling Failures and High Traffic
+
+Circuit Breaker:
+If the Payment Service breaks, we don't want the whole app to freeze. We wrap the payment call in a "Circuit Breaker." If it fails 5 times, we stop calling it and just queue the payment for later. The user can still ride; we charge them when the system is fixed.
+
+Rate Limiting:
+To stop spam, we limit requests.
+
+Booking requests: Max 5 per minute per user.
+
+Global limit: Protect the servers from crashing if traffic spikes.
+
+Autoscaling:
+We use Kubernetes. If the CPU gets too busy (over 70%), the system automatically turns on more servers. When traffic drops, it turns them off to save money.
+
+Step 7: Fixing Performance Issues
+
+7.1 Single Points of Failure
+
+Problem: If the main database breaks, everything stops.
+Fix: Use replicas. Have one main database and two backups. If the main one dies, a backup takes over automatically.
+
+7.2 Database Hotspots
+
+Problem: Too many people booking in New York at once can slow down the database.
+Fix: Sharding. Split the database by city. San Francisco rides go to Server A. New York rides go to Server B. This spreads the load.
+
+7.3 Bandwidth Usage
+
+Problem: Sending location data as text (JSON) uses too much data.
+Fix: Compress the data. Use a binary format (like Protocol Buffers) which is much smaller than text.
+
+7.4 Payment Delays
+
+Problem: Waiting for the bank to confirm payment makes the user wait at the end of the ride.
+Fix: Make it Asynchronous. When the ride ends, tell the user "Done!" immediately. Then, process the payment in the background. If it fails, retry later or ask the user for a new card next time.
+
+Conclusion
+
+This design creates a strong ride-hailing system.
+
+Key Strengths:
+
+Clear Rules: APIs and databases are well-defined.
+
+Safety: Uses locking to prevent double-bookings.
+
+Speed: Uses WebSockets for live maps and caching for fast lookups.
+
+Resilience: Can handle crashes and high traffic without stopping.
+
+Trade-offs:
+
+It is complex to build (requires many pieces like Kafka, Redis, Microservices).
+
+Payments are "eventually consistent" (might take a few seconds to settle), which creates a small risk of failed payments after the ride ends.
+
+Future Improvements:
+
+Add Machine Learning to predict where cars should wait before users even book.
+
+Add support for shared rides (pooling).
+
+Add better routing based on live traffic.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

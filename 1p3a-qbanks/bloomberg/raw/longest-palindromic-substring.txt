@@ -1,0 +1,56 @@
+===H1===
+Longest Palindromic Substring
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/longest-palindromic-substring
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Longest Palindromic Substring
+Find the longest palindromic substring of a string (LeetCode 5). A Bloomberg phone-screen problem asked alongside Validate BST. Expand-around-center is the expected baseline; the 'can you do better' push points at Manacher's O(n).
+SWE
+string
+dp
+two-pointer
+palindromes
+medium
+Frequency
+Single report
+Last asked
+2026-06-16
+Stage
+phone-screen
+Requirements
+
+Given a string s, return the longest contiguous substring of s that reads the same forwards and backwards. If several substrings tie for the maximum length, any one of them is acceptable unless the interviewer asks for the first.
+
+Function signature:
+
+String longestPalindrome(String s)
+
+Follow-ups:
+
+Start from expand-around-center O(n^2) time / O(1) space, then discuss the DP table alternative and its O(n^2) space cost.
+
+When pushed for better than quadratic, describe Manacher's algorithm for O(n).
+
+State time and space complexity explicitly and defend the data-structure choice.
+
+Notes
+
+Expand-around-center must handle 2n - 1 centers: one centered on each character (odd-length palindromes) and one centered on each gap between adjacent characters (even-length). Forgetting the even centers is the common miss.
+
+The DP formulation fills dp[i][j] = "is s[i..j] a palindrome", building by substring length; it is easier to reason about but costs O(n^2) space.
+
+Manacher's is the expected answer to the "can you do better" probe; be ready to at least sketch the transformed-string + radius-array idea even if you do not code it fully.
+
+Preparation
+
+Implement expand-around-center cleanly with a single helper that takes a left/right pair, and verify it on both odd- and even-length cases.
+
+Rehearse a one-minute Manacher explanation so the optimization follow-up does not catch you flat.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

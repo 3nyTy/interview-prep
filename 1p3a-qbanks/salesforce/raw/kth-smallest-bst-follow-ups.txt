@@ -1,0 +1,59 @@
+===H1===
+Kth Smallest in a BST (LeetCode 230) with Follow-Ups
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/kth-smallest-bst-follow-ups
+===BODY===
+Salesforce
+CodingMembers
+Kth Smallest in a BST (LeetCode 230) with Follow-Ups
+Return the kth-smallest value in a binary search tree, then optimize repeated order-statistic queries under frequent inserts and deletes. Further follow-ups move the structure into a database index and introduce tenant-scoped visibility that can invalidate globally maintained subtree counts.
+SWE
+bst
+tree-traversal
+data-structure
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-coding
+Requirements
+
+Given a binary search tree and an integer k, return the kth-smallest element.
+
+Implement an iterative traversal that can stop as soon as the kth element is reached.
+
+Follow-up: the tree is modified frequently and kth-smallest queries are also frequent. Redesign the node metadata and update path to support efficient queries.
+
+Follow-up: move the data from an in-memory tree into a database table and explain the corresponding index structure.
+
+Follow-up: different tenants can see different subsets of the shared data. Compare isolated and shared representations, and explain how visibility filtering changes the meaning of kth-smallest.
+
+Notes
+
+Iterative in-order traversal uses an explicit stack: push the left spine, pop one node at a time, decrement k, and return when k == 0. It visits only the required prefix in O(h + k) time and uses O(h) space.
+
+For frequent updates and queries, store each node's subtree size. Compare k with left_size + 1 to choose the next branch, and repair sizes along every insertion or deletion path. Query and update costs are O(h), or O(log n) when the tree remains balanced.
+
+A persistent index needs the same order-statistic idea in its on-disk nodes, such as child cardinalities in a balanced search-tree index. Counts must match the tenant-visible subset; global counts cannot answer a filtered query unless the index or maintained aggregates include the tenant boundary.
+
+The base implementation is expected to stop as soon as the kth value is reached rather than traverse the entire tree.
+
+The frequent-update follow-up grades both sides of the trade-off: faster order-statistic queries must include the maintenance cost paid by inserts and deletes.
+
+The database pivot tests whether the same metadata idea can be translated into an on-disk index rather than repeated as an in-memory-only answer.
+
+Tenant isolation creates the key invariant trap: global order metadata does not automatically represent the subset visible to one tenant. Call out that breakage before comparing isolated and shared representations.
+
+Preparation
+
+Implement iterative kth-smallest, then augment a BST with subtree sizes and trace both an insertion and a deletion through the metadata updates.
+
+Practise explaining when a cached aggregate becomes invalid after authorization filtering, and compare dedicated-per-tenant storage with a shared indexed representation.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,58 @@
+===H1===
+Application-to-Exchange Routing OOD with Sliding-Window Alerts
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/application-exchange-routing-alerting
+===BODY===
+Citadel / Citadel Securities
+Coding·60 minMembers
+Application-to-Exchange Routing OOD with Sliding-Window Alerts
+Citadel SWE intern onsite round 3: simulate a routing system where applications register subscriptions to exchanges; design when to raise an alert if a single exchange takes on too many subscriptions in a time window. Follow-ups push into distributed control plane design.
+SWE
+sliding-window
+oop-design
+data-structure
+rate-limiting
+medium
+Frequency
+Single report
+Last asked
+2026-01-28
+Stage
+onsite-coding · onsite-system-design
+Requirements
+
+Maintain an in-order stream of (application_id, exchange_id, timestamp) events. Each application can register against multiple exchanges. The class must:
+
+Accept events in arrival order via register(application_id, exchange_id, timestamp).
+
+Trigger an alert when any single exchange accumulates "too many" registered applications. The candidate defines the exact threshold and time window during the clarification phase.
+
+The interviewer expects the candidate to propose the alerting logic, not be handed it. Reported design: sliding-window counter per exchange.
+
+Notes
+
+Sliding-window data structure: per exchange_id, keep a deque (or sorted queue) of recent registration timestamps. On each new event, drop timestamps older than now - W from the front; if the resulting size exceeds threshold K, raise an alert. Time O(1) amortized per event.
+
+Threshold / window tuning is half the discussion. Interviewer reportedly probed both whether K should depend on the historical baseline (rolling average) and how to suppress repeat alerts during a sustained overload (cooldown timer per exchange).
+
+Distributed follow-up: scale to a multi-node control plane. Standard answers — shard by exchange_id, use a per-shard counter, gossip aggregated counts on a heartbeat for cross-shard global thresholds, or front the whole thing with a stream processor (Kafka + windowed aggregation in Flink / KSQL).
+
+Failure mode: starting with a global counter across all exchanges and only later realizing per-exchange windowing is required. State the per-exchange model up front.
+
+Multi-condition follow-up: simultaneously enforce per-exchange overload, per-application duplicate registration, and global throughput — model each as an independent rule object reading the same event stream.
+
+Preparation
+
+Build the sliding-window-counter pattern (deque of timestamps + threshold check) from scratch once; it reappears across rate-limiter and abuse-detection problems and is faster to draw than to re-derive each time.
+
+Practice the clarification-first opening on ambiguous OOD prompts: explicitly negotiate the threshold, window length, and alert lifecycle before writing code. This round graded that step heavily.
+
+Have a 60-second distributed scaling pitch ready: shard by exchange, replicate state via consistent-hash ring, fold per-shard windows on a coordinator at heartbeat intervals.
+
+Refresh the standard rate-limit algorithms (token bucket, leaky bucket, sliding window log, sliding window counter) so you can defend why sliding-window-counter is the correct match for this alert prompt rather than the others.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

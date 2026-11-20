@@ -1,0 +1,1353 @@
+{
+  "company": "anthropic",
+  "display_name": "Anthropic",
+  "qbank_count": 35,
+  "questions_scraped": 35,
+  "site_total_count": 134,
+  "oj_count": 78,
+  "external_count": 21,
+  "description": "Anthropic runs an unusually small, transparent technical question bank — the recruiter typically names which prompt family you'll see days before the round, so candidates can target preparation precisely instead of guessing. Bars are calibrated for problem-solving velocity and follow-up depth rather than novelty; offers are decided by hiring committee + reference check, and the culture round on AI-safety alignment is the single most common rejection point even for candidates who clear every technical stage.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/anthropic",
+  "scraped_at": "2026-09-20",
+  "source": "1point3acres qbank (logged-in session)",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "coding-q2-file-deduplication",
+      "title": "Coding Q2 — File Deduplication",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Very high",
+      "last_asked": "2026-09-02",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "filesystem",
+        "hashing",
+        "python",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "filesystem",
+        "hashing",
+        "python",
+        "medium"
+      ],
+      "overview": "Walk a directory tree and group duplicate files. Two-layer dedup: first by file size, then by content hash. The base problem is short; the follow-ups about IO/CPU bounds, hash choice, and scale dominate the round.",
+      "source_count": 19,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/coding-q2-file-deduplication"
+    },
+    {
+      "n": 2,
+      "slug": "coding-q1-image-processing",
+      "title": "Coding Q1 — Image Processing Pipeline",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Very high",
+      "last_asked": "2026-08-30",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "concurrency",
+        "multiprocessing",
+        "pillow",
+        "python",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "concurrency",
+        "multiprocessing",
+        "pillow",
+        "python",
+        "medium"
+      ],
+      "overview": "The other Q1 prompt: apply a sequence of image transformations (grayscale, flip, scale, blur, rotate) to a directory of images using a Python imaging library, then optimize with multiprocessing/multithreading for a target wall-clock budget.",
+      "source_count": 18,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/coding-q1-image-processing"
+    },
+    {
+      "n": 3,
+      "slug": "coding-q1-web-crawler",
+      "title": "Coding Q1 — Concurrent Web Crawler",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "High",
+      "last_asked": "2026-09-09",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Free preview",
+      "roles": [
+        "SWE",
+        "MLE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "concurrency",
+        "threading",
+        "async",
+        "bfs",
+        "python",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "concurrency",
+        "threading",
+        "async",
+        "bfs",
+        "python",
+        "medium"
+      ],
+      "overview": "Implement a same-domain web crawler given a pre-supplied `htmlParser.getUrls(url)` helper. Starts as a single-threaded BFS; the bulk of the round is the follow-up to parallelize it (threads, processes, or async) and reason about scaling across machines.",
+      "source_count": 14,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/coding-q1-web-crawler"
+    },
+    {
+      "n": 4,
+      "slug": "agents-coding-llm-tool-use",
+      "title": "Agents / Coding with LLMs",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "High",
+      "last_asked": "2026-09-04",
+      "stage": "phone-screen · tech-screen",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "RE",
+        "RS",
+        "MLE"
+      ],
+      "tags": [
+        "llm",
+        "agents",
+        "tool-use",
+        "prompt-engineering",
+        "colab",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "re",
+        "rs",
+        "mle"
+      ],
+      "tags_slug": [
+        "llm",
+        "agents",
+        "tool-use",
+        "prompt-engineering",
+        "colab",
+        "medium"
+      ],
+      "overview": "Research-track 1-of-N option: write code in Colab that uses an LLM (via the Anthropic API) as a building block — designing prompts and a tool-use loop to solve a multi-step problem. Open-book on documentation; starter API code is supplied so you don't memorize syntax.",
+      "source_count": 9,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/agents-coding-llm-tool-use"
+    },
+    {
+      "n": 5,
+      "slug": "coding-q3-stack-trace",
+      "title": "Coding Q3 — Stack Trace Reconstruction",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "High",
+      "last_asked": "2026-08-16",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "two-pointer",
+        "string-processing",
+        "stack",
+        "python",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "two-pointer",
+        "string-processing",
+        "stack",
+        "python",
+        "medium"
+      ],
+      "overview": "Given a stream of `enter <func>` / `exit <func>` lines representing a program's execution, reconstruct the active call stack at every point and compress consecutive identical traces. Bonus follow-ups include denoising and handling traces where only the last m frames are visible. The inverse rotation starts from timestamped stack samples and emits ordered start/end events, with recursion, debounce, and streaming constraints.",
+      "source_count": 13,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/coding-q3-stack-trace"
+    },
+    {
+      "n": 6,
+      "slug": "coding-q2-lru-cache-durability",
+      "title": "Coding Q2 — In-Memory Cache: Bug-Fix + Durability",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "High",
+      "last_asked": "2026-06-04",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "caching",
+        "persistence",
+        "python",
+        "kwargs",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "caching",
+        "persistence",
+        "python",
+        "kwargs",
+        "medium"
+      ],
+      "overview": "A pre-written `LRU` class wrapping a generic callable is provided. Part 1: find the bug in `generate_key` (it doesn't correctly hash `*args/**kwargs`). Part 2: extend the cache to survive process crashes by persisting state and recovering on restart.",
+      "source_count": 9,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/coding-q2-lru-cache-durability"
+    },
+    {
+      "n": 7,
+      "slug": "coding-q4-distributed-mode-median",
+      "title": "Coding Q4 — Distributed Mode / Median",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Medium",
+      "last_asked": "2026-09-04",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "distributed-systems",
+        "map-reduce",
+        "bandwidth",
+        "python",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "distributed-systems",
+        "map-reduce",
+        "bandwidth",
+        "python",
+        "hard"
+      ],
+      "overview": "10 worker nodes hold disjoint shards of a large numeric dataset. Find the global mode (most common value) and global median using `send`/`recv`/`barrier` primitives with a fixed read bandwidth of 10 bytes/sec and inter-node bandwidth of 1 byte/sec. The grade is on iterative optimization, not the first solution.",
+      "source_count": 6,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/coding-q4-distributed-mode-median"
+    },
+    {
+      "n": 8,
+      "slug": "oa-in-memory-database",
+      "title": "OA — In-Memory Database (4-Level CodeSignal)",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-18",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "oa",
+        "codesignal",
+        "oop",
+        "ttl",
+        "snapshot",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "oa",
+        "codesignal",
+        "oop",
+        "ttl",
+        "snapshot",
+        "medium"
+      ],
+      "overview": "The canonical Anthropic OA. CodeSignal, 90 minutes, gated 4-level CRUD on an in-memory key/value/field database. Each level depends on the prior. Modern variants drop compare-set/delete and replace level 4 with backup/restore or look-back time travel.",
+      "source_count": 6,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/oa-in-memory-database"
+    },
+    {
+      "n": 9,
+      "slug": "coding-q6-tokenizer",
+      "title": "Coding Q6 — Longest-Match Tokenizer",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Medium",
+      "last_asked": "2026-06-26",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "string-processing",
+        "greedy",
+        "trie",
+        "python",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "string-processing",
+        "greedy",
+        "trie",
+        "python",
+        "medium"
+      ],
+      "overview": "Given a vocabulary mapping tokens to ids (plus a sentinel `UNK`), implement a longest-match tokenizer over a text string. The base solution is two nested loops; optimizations and follow-ups (consecutive UNK merging, vocab-length bound, trie acceleration) drive the score.",
+      "source_count": 7,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/coding-q6-tokenizer"
+    },
+    {
+      "n": 10,
+      "slug": "oa-recipe-manager",
+      "title": "OA — Recipe Manager (4-Level CodeSignal)",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Medium",
+      "last_asked": "2026-06-16",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "oa",
+        "codesignal",
+        "oop",
+        "versioning",
+        "user-system",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "oa",
+        "codesignal",
+        "oop",
+        "versioning",
+        "user-system",
+        "medium"
+      ],
+      "overview": "Recent OA variant. CodeSignal, 90 minutes, 4 levels. CRUD on recipes (case-insensitive names), sorting by ingredient count, attaching a user model with edit permissions, and a version-history layer with rollback.",
+      "source_count": 6,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/oa-recipe-manager"
+    },
+    {
+      "n": 11,
+      "slug": "oa-bank-system",
+      "title": "OA — Bank System with Transfer/Accept and Merge",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Medium",
+      "last_asked": "2026-06-15",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Fellows"
+      ],
+      "tags": [
+        "oa",
+        "codesignal",
+        "oop",
+        "transactions",
+        "merge",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "fellows"
+      ],
+      "tags_slug": [
+        "oa",
+        "codesignal",
+        "oop",
+        "transactions",
+        "merge",
+        "medium"
+      ],
+      "overview": "AI Safety Fellow OA variant. CodeSignal, 4 levels on a simple bank: deposits, withdrawals, a two-step `transfer + transfer_accept` flow with on-hold balances, and an account-merge step that has to survive the merged account being recreated later.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/oa-bank-system"
+    },
+    {
+      "n": 12,
+      "slug": "coding-design-data-batcher",
+      "title": "Coding & Design — Weighted Data Batcher with Checkpointing",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Medium",
+      "last_asked": "2026-05-14",
+      "stage": "phone-screen · tech-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RE",
+        "RS"
+      ],
+      "tags": [
+        "sampling",
+        "checkpointing",
+        "iterator",
+        "python",
+        "hard"
+      ],
+      "roles_slug": [
+        "mle",
+        "re",
+        "rs"
+      ],
+      "tags_slug": [
+        "sampling",
+        "checkpointing",
+        "iterator",
+        "python",
+        "hard"
+      ],
+      "overview": "A research-track 1-of-N coding-and-design problem. Build a `DataBatcher` that samples weighted batches from a `DataRegistry`, supports deterministic save/resume via an `offset` argument, and handles the case where `batch_size` is not divisible by the sum of weights.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/coding-design-data-batcher"
+    },
+    {
+      "n": 13,
+      "slug": "oa-task-management",
+      "title": "OA — Task Manager (TTL + Snapshot)",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Low",
+      "last_asked": "2026-08-21",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "codesignal",
+        "data-structure",
+        "snapshot",
+        "ttl",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "codesignal",
+        "data-structure",
+        "snapshot",
+        "ttl",
+        "medium"
+      ],
+      "overview": "CodeSignal four-level task manager. Levels 1–2 are CRUD on a per-user task list; Level 3 adds TTL-based auto-deletion; Level 4 requires a time-travel snapshot — `get_task_list(user, at_timestamp)` must return that user's tasks as of any past moment.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/oa-task-management"
+    },
+    {
+      "n": 14,
+      "slug": "coding-bootloader",
+      "title": "Coding — Bootloader Instruction Simulator (Fix the Loop)",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Low",
+      "last_asked": "2026-07-18",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "simulation",
+        "cycle-detection",
+        "parsing",
+        "python",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "simulation",
+        "cycle-detection",
+        "parsing",
+        "python",
+        "medium"
+      ],
+      "overview": "SWE coding prompt seen in both phone and virtual-onsite loops. A list of `plus` / `next` / `jump` instructions mutates an accumulator and program counter; first detect the loop, then identify or repair the single bad instruction that makes execution cycle.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/coding-bootloader"
+    },
+    {
+      "n": 15,
+      "slug": "oa-file-systems",
+      "title": "OA — File Systems",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Low",
+      "last_asked": "2026-05-28",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "oa",
+        "codesignal",
+        "oop",
+        "filesystem",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "oa",
+        "codesignal",
+        "oop",
+        "filesystem",
+        "medium"
+      ],
+      "overview": "Recently observed CodeSignal OA in the file-system family — implement a simplified file system with paths, directory traversal, and (in the final level) an LLM-related extension. Public details are thin; the third level in particular is reported as bug-prone in the supplied helpers.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/oa-file-systems"
+    },
+    {
+      "n": 16,
+      "slug": "oa-fellows-dns-resolver",
+      "title": "OA — DNS Resolver (Fellows CodeSignal, Round 1)",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Low",
+      "last_asked": "2026-05-27",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "Fellows"
+      ],
+      "tags": [
+        "codesignal",
+        "simulation",
+        "recursion",
+        "medium"
+      ],
+      "roles_slug": [
+        "fellows"
+      ],
+      "tags_slug": [
+        "codesignal",
+        "simulation",
+        "recursion",
+        "medium"
+      ],
+      "overview": "First of two Fellows CodeSignal OAs (Spring 2026 rotation). 90 minutes, Python, proctored. Implement a simplified DNS resolver step-by-step against a fixed unit-test harness — early steps cover basic name lookup, later steps layer aliasing, fallback, error handling, cycle detection, caching, and concurrency.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/oa-fellows-dns-resolver"
+    },
+    {
+      "n": 17,
+      "slug": "oa-worker-management",
+      "title": "OA — Worker / Employee Grant Management",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Low",
+      "last_asked": "2026-05-10",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "oa",
+        "codesignal",
+        "oop",
+        "interval",
+        "payroll",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "oa",
+        "codesignal",
+        "oop",
+        "interval",
+        "payroll",
+        "medium"
+      ],
+      "overview": "Recent OA variant present on the worker/employee scheduling theme. Track employees clocking in and out, apply promotions taking effect on the next office entry, and aggregate granted bonuses across overlapping work sessions.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/oa-worker-management"
+    },
+    {
+      "n": 18,
+      "slug": "rl-fundamentals-grpo-debug",
+      "title": "RL Fundamentals — GRPO Debug",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Low",
+      "last_asked": "2026-03-02",
+      "stage": "phone-screen · tech-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "RE",
+        "RS",
+        "MLE"
+      ],
+      "tags": [
+        "reinforcement-learning",
+        "grpo",
+        "pytorch",
+        "ml-knowledge",
+        "debugging",
+        "hard"
+      ],
+      "roles_slug": [
+        "re",
+        "rs",
+        "mle"
+      ],
+      "tags_slug": [
+        "reinforcement-learning",
+        "grpo",
+        "pytorch",
+        "ml-knowledge",
+        "debugging",
+        "hard"
+      ],
+      "overview": "Debug a GRPO training script (typically three implanted bugs), then defend the underlying RL math: ratio clipping, advantage normalization, on-policy vs. off-policy effects. The last 15 minutes pivot to a knowledge interrogation tied to the code you just fixed.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/rl-fundamentals-grpo-debug"
+    },
+    {
+      "n": 19,
+      "slug": "ml-programming-screen",
+      "title": "ML Programming Screen — QKV Attention & einsum",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Low",
+      "last_asked": "2026-02-18",
+      "stage": "phone-screen · tech-screen",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RE",
+        "RS"
+      ],
+      "tags": [
+        "transformer",
+        "attention",
+        "einsum",
+        "numpy",
+        "pytorch",
+        "ml-knowledge",
+        "hard"
+      ],
+      "roles_slug": [
+        "mle",
+        "re",
+        "rs"
+      ],
+      "tags_slug": [
+        "transformer",
+        "attention",
+        "einsum",
+        "numpy",
+        "pytorch",
+        "ml-knowledge",
+        "hard"
+      ],
+      "overview": "One of the research-track 1-of-N phone screens. ~40 minutes of programming with sequence models / scaled dot-product attention, plus short ML knowledge questions. Comfort with einsum and reading mathematical equations is explicitly called out by the recruiter.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/ml-programming-screen"
+    },
+    {
+      "n": 20,
+      "slug": "prompting-engineering-with-llms",
+      "title": "Prompting and Engineering with LLMs (Colab)",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Low",
+      "last_asked": "2026-01-31",
+      "stage": "phone-screen · tech-screen",
+      "access": "Members",
+      "roles": [
+        "RE",
+        "RS",
+        "MLE"
+      ],
+      "tags": [
+        "llm",
+        "prompting",
+        "colab",
+        "evaluation",
+        "medium"
+      ],
+      "roles_slug": [
+        "re",
+        "rs",
+        "mle"
+      ],
+      "tags_slug": [
+        "llm",
+        "prompting",
+        "colab",
+        "evaluation",
+        "medium"
+      ],
+      "overview": "Research-track 1-of-N option, distinct from the Agents/Coding round: a Colab-based 55-minute exercise centered on designing prompts for a defined task and engineering the surrounding evaluation/scaffolding code.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/prompting-engineering-with-llms"
+    },
+    {
+      "n": 21,
+      "slug": "performance-engineer-take-home",
+      "title": "Performance Engineer Take-Home — Kernel Optimization",
+      "category": "coding",
+      "duration": "120 min",
+      "frequency": "Low",
+      "last_asked": "2025-12-11",
+      "stage": "take-home",
+      "access": "Members",
+      "roles": [
+        "Perf Eng"
+      ],
+      "tags": [
+        "gpu",
+        "kernel",
+        "optimization",
+        "memory-coalescing",
+        "loop-unrolling",
+        "hard"
+      ],
+      "roles_slug": [
+        "perf-eng"
+      ],
+      "tags_slug": [
+        "gpu",
+        "kernel",
+        "optimization",
+        "memory-coalescing",
+        "loop-unrolling",
+        "hard"
+      ],
+      "overview": "Performance Engineer track replaces the standard coding phone screen with a 2-hour AI-allowed take-home: optimize a mocked GPU-kernel-style core function. Scoring is by measured speedup; passing scores reported in the 600/1000 range with ~8× speedup.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/performance-engineer-take-home"
+    },
+    {
+      "n": 22,
+      "slug": "sd-q1-inference-api",
+      "title": "System Design Q1 — Inference API / Batched GPU Serving",
+      "category": "system-design",
+      "duration": "55 min",
+      "frequency": "Very high",
+      "last_asked": "2026-08-31",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "llm-inference",
+        "batching",
+        "kv-cache",
+        "gpu",
+        "scaling",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "llm-inference",
+        "batching",
+        "kv-cache",
+        "gpu",
+        "scaling",
+        "hard"
+      ],
+      "overview": "The default Anthropic system-design round. Design an LLM inference API that batches requests across GPUs efficiently. Interviewers dive deep on a few areas — GPU utilization, scale-out under traffic spikes, prefill/decode separation — rather than walk a full BBYE-style template.",
+      "source_count": 20,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/sd-q1-inference-api"
+    },
+    {
+      "n": 23,
+      "slug": "onsite-design-doc-review",
+      "title": "Onsite Design Doc Review",
+      "category": "system-design",
+      "duration": "55 min",
+      "frequency": "High",
+      "last_asked": "2026-08-31",
+      "stage": "onsite-system-design · phone-screen",
+      "access": "Members",
+      "roles": [
+        "EM",
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "design-review",
+        "critique",
+        "new-round",
+        "medium"
+      ],
+      "roles_slug": [
+        "em",
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "design-review",
+        "critique",
+        "new-round",
+        "medium"
+      ],
+      "overview": "A newer onsite round, particularly common for EM candidates and increasingly for senior IC loops. The interviewer hands the candidate a design doc (sometimes one straight from the team's own backlog) and asks them to critique it — surface risks, propose alternatives, identify gaps.",
+      "source_count": 8,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/onsite-design-doc-review"
+    },
+    {
+      "n": 24,
+      "slug": "sd-q3-model-distribution",
+      "title": "System Design Q3 — Model Weight Distribution",
+      "category": "system-design",
+      "duration": "55 min",
+      "frequency": "High",
+      "last_asked": "2026-08-21",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "Infra Eng",
+        "SWE"
+      ],
+      "tags": [
+        "distribution",
+        "bandwidth",
+        "tree-broadcast",
+        "bittorrent",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "infra-eng",
+        "swe"
+      ],
+      "tags_slug": [
+        "distribution",
+        "bandwidth",
+        "tree-broadcast",
+        "bittorrent",
+        "medium"
+      ],
+      "overview": "Push a multi-hundred-GB model checkpoint from a model repo to several hundred hosts in a cluster, given a 10 Gbps bandwidth budget on every link. Design the fastest distribution strategy; expect to evolve from naive download → tree broadcast → chunked BitTorrent-style swarm. A phone-screen variant shares one 10 Gbps budget between worker upload and download, then probes deployment observability and readiness-gated routing.",
+      "source_count": 13,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/sd-q3-model-distribution"
+    },
+    {
+      "n": 25,
+      "slug": "sd-q4-1to1-chat-system",
+      "title": "System Design Q4 — 1-on-1 Chat System",
+      "category": "system-design",
+      "duration": "55 min",
+      "frequency": "High",
+      "last_asked": "2026-08-21",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "chat",
+        "websocket",
+        "kafka",
+        "redis",
+        "presence",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "chat",
+        "websocket",
+        "kafka",
+        "redis",
+        "presence",
+        "medium"
+      ],
+      "overview": "Design a 1-on-1 chat system (no groups, no channels). Single device per user, focused on message delivery, presence detection, offline-recipient queueing, session storage, and the tradeoff between Kafka and Redis for the message bus.",
+      "source_count": 11,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/sd-q4-1to1-chat-system"
+    },
+    {
+      "n": 26,
+      "slug": "sd-q2-prompt-playground",
+      "title": "System Design Q2 — Prompt Playground (Product Design)",
+      "category": "system-design",
+      "duration": "55 min",
+      "frequency": "High",
+      "last_asked": "2026-08-03",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "product-design",
+        "schema-design",
+        "sharing",
+        "ux",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "product-design",
+        "schema-design",
+        "sharing",
+        "ux",
+        "medium"
+      ],
+      "overview": "Despite the SD label, Q2 is closer to product design. Design a prompt playground similar to Anthropic's Console. The interviewer supplies the deployment diagram (client → web server → database) and tells you not to draw architecture — focus on user flows, schema, sharing semantics, and UX edge cases.",
+      "source_count": 11,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/sd-q2-prompt-playground"
+    },
+    {
+      "n": 27,
+      "slug": "sd-q5-data-infrastructure",
+      "title": "System Design Q5 — Data Infrastructure",
+      "category": "system-design",
+      "duration": "55 min",
+      "frequency": "Low",
+      "last_asked": "2026-09-07",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "DS",
+        "Infra Eng"
+      ],
+      "tags": [
+        "data-engineering",
+        "ingestion",
+        "etl",
+        "access-control",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "ds",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "data-engineering",
+        "ingestion",
+        "etl",
+        "access-control",
+        "medium"
+      ],
+      "overview": "A data-engineering / data-infra system design: design a system that ingests large-scale data, processes it, and serves it to many stakeholders with varying access needs and sensitivities. Specifics have not yet been publicly documented; the recruiter blurb spells out the expected coverage.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/sd-q5-data-infrastructure"
+    },
+    {
+      "n": 28,
+      "slug": "ml-configuration-system",
+      "title": "ML Configuration System",
+      "category": "system-design",
+      "duration": "55 min",
+      "frequency": "Low",
+      "last_asked": "2026-04-17",
+      "stage": "phone-screen · tech-screen",
+      "access": "Members",
+      "roles": [
+        "RE",
+        "RS",
+        "MLE"
+      ],
+      "tags": [
+        "config-management",
+        "ml-infra",
+        "design",
+        "python",
+        "medium"
+      ],
+      "roles_slug": [
+        "re",
+        "rs",
+        "mle"
+      ],
+      "tags_slug": [
+        "config-management",
+        "ml-infra",
+        "design",
+        "python",
+        "medium"
+      ],
+      "overview": "A 1-of-N research-track option. Design and partially implement an ML configuration system — schemas, inheritance/overrides, validation, and reproducibility. Specifics of the task have not been publicly documented; treat this card as the structural shell.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/ml-configuration-system"
+    },
+    {
+      "n": 29,
+      "slug": "recruiter-screen-why-anthropic",
+      "title": "Recruiter Screen — Why Anthropic Deep-Dive",
+      "category": "behavioral",
+      "duration": "30 min",
+      "frequency": "Very high",
+      "last_asked": "2026-09-07",
+      "stage": "recruiter-screen",
+      "access": "Members",
+      "roles": [
+        "All"
+      ],
+      "tags": [
+        "recruiter",
+        "behavioral",
+        "ai-safety",
+        "screening"
+      ],
+      "roles_slug": [
+        "all-roles"
+      ],
+      "tags_slug": [
+        "recruiter",
+        "behavioral",
+        "ai-safety",
+        "screening"
+      ],
+      "overview": "Anthropic's recruiter screen is unusually substantive. Skips resume walkthroughs, opens straight on Why Anthropic, and probes the candidate's familiarity with Anthropic's published research, blog posts, and policy stances. Failing to pass this round prevents reaching technical interviews.",
+      "source_count": 18,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/recruiter-screen-why-anthropic"
+    },
+    {
+      "n": 30,
+      "slug": "onsite-hm-behavioral",
+      "title": "Hiring Manager Round — Behavioral & Collaboration",
+      "category": "behavioral",
+      "duration": "55 min",
+      "frequency": "Very high",
+      "last_asked": "2026-09-04",
+      "stage": "onsite-bq",
+      "access": "Members",
+      "roles": [
+        "All"
+      ],
+      "tags": [
+        "behavioral",
+        "collaboration",
+        "leadership",
+        "mentorship",
+        "impact"
+      ],
+      "roles_slug": [
+        "all-roles"
+      ],
+      "tags_slug": [
+        "behavioral",
+        "collaboration",
+        "leadership",
+        "mentorship",
+        "impact"
+      ],
+      "overview": "Standard hiring-manager behavioral round, distinct from the Culture round. Focuses on past project impact, collaboration with non-engineering partners, mentorship, and roadmap influence. Reported as the round most likely to feel uneven — HM engagement varies a lot.",
+      "source_count": 21,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/onsite-hm-behavioral"
+    },
+    {
+      "n": 31,
+      "slug": "onsite-culture-ai-safety",
+      "title": "Culture Round — AI-Safety Alignment Behavioral",
+      "category": "behavioral",
+      "duration": "55 min",
+      "frequency": "Very high",
+      "last_asked": "2026-08-30",
+      "stage": "onsite-bq",
+      "access": "Members",
+      "roles": [
+        "All"
+      ],
+      "tags": [
+        "culture",
+        "ai-safety",
+        "values",
+        "critical-thinking"
+      ],
+      "roles_slug": [
+        "all-roles"
+      ],
+      "tags_slug": [
+        "culture",
+        "ai-safety",
+        "values",
+        "critical-thinking"
+      ],
+      "overview": "Anthropic's culture round is the round that decides the most loops. AI-safety alignment is screened through behavioral framing — interviewers want concrete personal experience that maps to specific Anthropic values, plus the ability to thoughtfully critique Anthropic itself.",
+      "source_count": 29,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/onsite-culture-ai-safety"
+    },
+    {
+      "n": 32,
+      "slug": "onsite-project-deep-dive",
+      "title": "Project Deep-Dive — Technical Presentation",
+      "category": "behavioral",
+      "duration": "55 min",
+      "frequency": "Very high",
+      "last_asked": "2026-08-21",
+      "stage": "onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "All"
+      ],
+      "tags": [
+        "presentation",
+        "technical-deep-dive",
+        "project-retro"
+      ],
+      "roles_slug": [
+        "all-roles"
+      ],
+      "tags_slug": [
+        "presentation",
+        "technical-deep-dive",
+        "project-retro"
+      ],
+      "overview": "Present a past technical project of your choice for 20–25 minutes, then field 25–30 minutes of deep-dive Q&A. Interviewers probe architecture decisions, tradeoffs, your personal role, and what you'd do differently. The round is universal across roles and is one of the most consistent positive signals when done well.",
+      "source_count": 18,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/onsite-project-deep-dive"
+    },
+    {
+      "n": 33,
+      "slug": "mech-interp-take-home",
+      "title": "Mechanistic Interpretability Take-Home — Sample-Aspect Double Descent",
+      "category": "other",
+      "duration": "240 min",
+      "frequency": "Single report",
+      "last_asked": "2026-04-19",
+      "stage": "take-home",
+      "access": "Members",
+      "roles": [
+        "RE",
+        "RS"
+      ],
+      "tags": [
+        "take-home",
+        "interpretability",
+        "double-descent",
+        "linear-regression",
+        "experiment-design",
+        "hard"
+      ],
+      "roles_slug": [
+        "re",
+        "rs"
+      ],
+      "tags_slug": [
+        "take-home",
+        "interpretability",
+        "double-descent",
+        "linear-regression",
+        "experiment-design",
+        "hard"
+      ],
+      "overview": "Mechanistic-interpretability team take-home: design and run an experiment that reproduces sample-aspect double descent on a small model, explain why double descent occurs using theory, and propose a fix. Deliverable is a slide deck or notebook plus a live discussion.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/mech-interp-take-home"
+    },
+    {
+      "n": 34,
+      "slug": "ml-take-home-research",
+      "title": "ML Take-Home (4–5 hours)",
+      "category": "other",
+      "duration": "240 min",
+      "frequency": "Low",
+      "last_asked": "2026-02-13",
+      "stage": "take-home",
+      "access": "Members",
+      "roles": [
+        "RE",
+        "RS",
+        "MLE",
+        "Fellows"
+      ],
+      "tags": [
+        "take-home",
+        "ml-experiment",
+        "pandas",
+        "numpy",
+        "matplotlib",
+        "live-review",
+        "hard"
+      ],
+      "roles_slug": [
+        "re",
+        "rs",
+        "mle",
+        "fellows"
+      ],
+      "tags_slug": [
+        "take-home",
+        "ml-experiment",
+        "pandas",
+        "numpy",
+        "matplotlib",
+        "live-review",
+        "hard"
+      ],
+      "overview": "Research-track alternative to the live ML screen. A self-contained 4-hour ML problem on the candidate's own machine or Colab, immediately followed by a 40-minute live review where you present results, walk through code or slides, and field questions. Open-book on docs; no AI tools.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/ml-take-home-research"
+    },
+    {
+      "n": 35,
+      "slug": "performance-engineer-modeling",
+      "title": "Performance Modeling — Matmul Arithmetic Intensity",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2025-12-11",
+      "stage": "onsite-research · tech-screen",
+      "access": "Members",
+      "roles": [
+        "Perf Eng",
+        "MLE"
+      ],
+      "tags": [
+        "gpu",
+        "a100",
+        "matmul",
+        "arithmetic-intensity",
+        "performance-modeling",
+        "ml-knowledge",
+        "hard"
+      ],
+      "roles_slug": [
+        "perf-eng",
+        "mle"
+      ],
+      "tags_slug": [
+        "gpu",
+        "a100",
+        "matmul",
+        "arithmetic-intensity",
+        "performance-modeling",
+        "ml-knowledge",
+        "hard"
+      ],
+      "overview": "An onsite round for the Performance Engineer track: estimate wall-clock time for matrix multiplications of varying `(m, k, n)` on a given A100 40 GB GPU, then extend to a 72-layer pipeline alternating between two matmul patterns and reason about pipeline/tensor parallelism.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/anthropic/performance-engineer-modeling"
+    }
+  ]
+}

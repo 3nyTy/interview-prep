@@ -1,0 +1,53 @@
+===H1===
+Employee Hierarchy Add / Delete
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/employee-hierarchy-add-delete
+===BODY===
+Google
+Coding·45 minMembers
+Employee Hierarchy Add / Delete
+Design an employee hierarchy class that supports adding employees under managers and deleting employees by id. Follow-ups cover deleting managers, deleting the CEO, cycle handling, and choosing a replacement manager by seniority.
+SWE
+tree
+hashmap
+object-design
+medium
+Frequency
+Single report
+Last asked
+2026-06-10
+Stage
+onsite-coding
+Requirements
+
+Build an employee class / hierarchy manager.
+
+addEmployee(employee_id, manager_id): add an employee under an existing manager; the manager is guaranteed to be added before the employee.
+
+deleteEmployee(employee_id): remove an employee by id.
+
+Handle manager deletion, CEO deletion, and invalid structures such as reporting cycles.
+
+Follow-up: each employee has a level / seniority. When deleting a manager, promote the most senior employee in that manager's group as the replacement; if multiple employees share the highest level, choose the one who joined earliest.
+
+Notes
+
+Use maps from id to node and id to children; keep parent pointers so deletes do not require a full traversal.
+
+CEO deletion needs an explicit policy: reject, promote a child, or create a new root. State the policy and keep it consistent.
+
+For the seniority follow-up, maintain insertion order on nodes and compare (level desc, insertion_order asc).
+
+Preparation
+
+Implement tree mutation operations with parent pointers.
+
+Practice deleting an internal node while reconnecting children.
+
+Add cycle checks with DFS or parent-chain walking before accepting a new edge.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

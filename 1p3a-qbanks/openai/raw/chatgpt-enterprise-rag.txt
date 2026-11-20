@@ -1,0 +1,133 @@
+===H1===
+ChatGPT Enterprise (RAG ML System Design)
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/chatgpt-enterprise-rag
+===BODY===
+OpenAI
+System Design·60 minMembers
+ChatGPT Enterprise (RAG ML System Design)
+Design ChatGPT Enterprise: enterprise users upload internal data; the system gives them a customized ChatGPT based on that data.
+MLE
+RE
+rag
+retrieval
+ml-knowledge
+Frequency
+Single report
+Last asked
+2026-03-22
+Stage
+onsite-system-design
+The Challenge
+
+Build an intelligent chatbot system that uses Retrieval-Augmented Generation (RAG) to answer user queries — a business tool in the style of Glean that searches company data and synthesizes clear, sourced answers using an LLM.
+
+Main Goals
+
+More than basic RAG: full chatbot system with multi-user support, permissions, and data safety — not a tutorial-level prototype.
+
+Business requirements: multi-tenancy, access control (who can see what), and citation tracking.
+
+Answer quality: responses must be grounded in retrieved data, with hallucination prevention and source attribution.
+
+Latency: fast retrieval without sacrificing answer quality.
+
+Requirements
+
+Be ready to discuss each of these technical areas in depth:
+
+Embeddings: how to produce text embeddings; which models (contrastive learning + hard-negative sampling); trade-offs between dense and sparse representations.
+
+Vector database: selection criteria (Pinecone, Weaviate, Chroma, etc.); ANN index choices (HNSW); tenant-scoped index vs. shared index + filter.
+
+Chunking strategy: how to split large documents for retrieval; chunk size trade-offs; metadata extraction per chunk.
+
+Retrieval strategy: semantic search vs. hybrid (dense + sparse) retrieval; when to use each; handling factual vs. open-ended queries; handling vague or ambiguous questions.
+
+Reranking: pointwise vs. pairwise vs. listwise reranking; model options (cross-encoder, LambdaMART); when to add a reranking stage.
+
+Prompt engineering: how to construct prompts so the LLM uses retrieved context correctly and does not fabricate.
+
+Citations: how to track and surface source attribution end-to-end.
+
+Caching: embedding cache; semantic cache for popular queries; latency impact.
+
+Evaluation metrics: retrieval recall/precision; end-to-end response quality; hallucination detection.
+
+Conversation history: how to maintain and inject session context across turns.
+
+Security and access control: ensuring users see only permitted documents; multi-tenancy isolation.
+
+System Design
+
+Key structural decisions to articulate:
+
+Pipeline separation: keep ingestion (chunking, embedding, indexing) cleanly separate from retrieval and generation; each scales independently.
+
+Component boundaries: how ingestion service, retrieval service, and generation service communicate; API shape between them.
+
+Three-stage retrieval: candidate generation → ranking (e.g., LambdaMART or cross-encoder reranker) → LLM reranking/synthesis.
+
+Multi-tenancy isolation: tenant-scoped index or per-tenant namespace with access control enforcement at retrieval time.
+
+Chat history storage: database schema for session logs; how to bound context window usage.
+
+Scaling: batch processing for document ingestion; horizontal scaling of retrieval; handling millions of documents.
+
+Examples
+
+Retrieval architecture: dense + sparse hybrid retrieval
+
+3-stage: candidate generation → LambdaMART ranking → LLM reranking
+
+Chunking strategy, metadata extraction, multi-tenancy isolation
+
+Evaluation: retrieval recall/precision, end-to-end response quality
+
+Drilled point: pointwise vs listwise reranking tradeoff. A common flame-out pattern: propose pointwise, get pressed on weaknesses, drift into listwise joint-optimization and inter-document dependencies without crisp scoping — end-of-loop feedback comes back as "some gaps." Have the listwise comparison ready before the question lands.
+
+Preparation
+
+Full RAG: embedding model (contrastive learning + sampling), ANN index (HNSW), hybrid retrieval, reranking
+
+Pointwise / pairwise / listwise reranking comparison
+
+Multi-tenancy isolation: tenant-scoped index + access control
+
+Latency reduction: embedding cache, semantic query cache, batch ingestion
+
+Hallucination mitigation: grounding constraints in prompt, fallback when no relevant docs retrieved
+
+Evaluation: RAGAS or equivalent; offline recall/precision + online quality signals
+
+Reference reading
+
+Public architecture guides worth skimming before the loop (build your own design from requirements — don't memorize these verbatim):
+
+Designing High-Performing RAG Systems
+
+Microsoft Azure — RAG Solution Design and Evaluation Guide
+
+Galileo AI — Mastering RAG: Enterprise RAG Architecture
+
+AWS — What is Retrieval-Augmented Generation?
+
+Notes
+
+Common mistakes to avoid
+
+Treating it as a tutorial: the interviewer expects enterprise-level thinking — authentication, authorization, session tracking, observability.
+
+Single-turn focus: the system must handle multi-turn conversation; forgetting conversation history management is a common gap.
+
+No evaluation plan: failing to specify how you'd measure retrieval quality and answer correctness signals weak ownership.
+
+Ignoring scale: no plan for millions of documents, high-concurrency retrieval, or ingestion throughput.
+
+Ignoring safety: omitting data privacy, access control, and tenant isolation.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

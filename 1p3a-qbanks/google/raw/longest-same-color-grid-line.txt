@@ -1,0 +1,52 @@
+===H1===
+Longest Same-Color Grid Sequence
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/longest-same-color-grid-line
+===BODY===
+Google
+CodingMembers
+Longest Same-Color Grid Sequence
+Given a grid of colors, return the longest consecutive same-color sequence along a horizontal, vertical, or diagonal line.
+SWE
+array
+grid
+Frequency
+Single report
+Last asked
+2026-09-08
+Stage
+phone-screen
+Requirements
+
+Input is a two-dimensional grid of colors such as R, G, and B.
+
+Return the length of the longest consecutive sequence of a single color horizontally, vertically, or diagonally.
+
+Examples
+
+R R R G
+R R B B
+G R R R
+B G B R
+
+Answer: 4
+
+Notes
+
+Track the length of a same-color run ending at each cell in four directions: horizontal, vertical, down-right diagonal, and down-left diagonal. For each direction, extend the predecessor's run by one only when its color equals the current cell; otherwise start at one.
+
+Process rows from top to bottom and columns left to right. Horizontal state reads the current row's previous column; the other directions read the previous row. Take the maximum over all cells and directions. This checks straight consecutive lines, not connected regions or paths that turn.
+
+Four constant-time transitions per cell give O(rows * columns) time. Keeping all states uses O(rows * columns) space; rolling previous/current rows reduces auxiliary space to O(columns). Clarify empty-grid behavior before coding.
+
+Preparation
+
+Implement the four-direction DP in 15 minutes and trace the given grid to identify its longest line.
+
+Compare the DP with a direct straight-line scan on small grids; include one row, one column, alternating colors, and both diagonal orientations.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

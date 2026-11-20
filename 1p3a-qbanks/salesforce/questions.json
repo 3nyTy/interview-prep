@@ -1,0 +1,1324 @@
+{
+  "company": "salesforce",
+  "display_name": "Salesforce",
+  "qbank_count": 36,
+  "questions_scraped": 36,
+  "site_total_count": 116,
+  "oj_count": 80,
+  "external_count": 0,
+  "description": "Salesforce's loop is bank-driven: a small set of coding prompts (LFU Cache, Flatten JSON, linked-list dedup, frontend curry + traffic light, OA HackerRank classics) and one signature system design (Coffee Ordering, with its SQL follow-ups) cover the bulk of recent rounds. Down-leveling at offer time is common — the HM screen and behavioural depth materially shape the final level, often more than coding correctness alone.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/salesforce",
+  "scraped_at": "2026-09-20",
+  "source": "1point3acres qbank (logged-in session)",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "minimum-word-transformation-steps",
+      "title": "Minimum One-Character Word Transformations",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-24",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "graph",
+        "string",
+        "bfs",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "graph",
+        "string",
+        "bfs",
+        "medium"
+      ],
+      "overview": "Find the minimum number of steps required to transform `startWord` into `endWord`. Each step may change one character, and intermediate words are constrained by `wordsList`.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/minimum-word-transformation-steps"
+    },
+    {
+      "n": 2,
+      "slug": "find-the-celebrity",
+      "title": "Find the Celebrity",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-24",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "graph",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "graph",
+        "medium"
+      ],
+      "overview": "Given `n` people and a helper `knows(a, b)`, return the celebrity if one exists, otherwise return `-1`. A celebrity knows nobody, while everyone else knows the celebrity.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/find-the-celebrity"
+    },
+    {
+      "n": 3,
+      "slug": "valid-word-abbreviation",
+      "title": "Valid Word Abbreviation (LeetCode 408) with Follow-Up Variant",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-16",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "parsing",
+        "backtracking",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "parsing",
+        "backtracking",
+        "medium"
+      ],
+      "overview": "Validate whether an abbreviation legally represents a word by interpreting each number as a run of skipped characters and matching literal letters in place. The follow-up reverses the task: generate every legal abbreviation while merging adjacent omitted characters into a single count.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/valid-word-abbreviation"
+    },
+    {
+      "n": 4,
+      "slug": "lowest-common-ancestor-parent-pointers",
+      "title": "Lowest Common Ancestor with Parent Pointers (LeetCode 1650)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-16",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "two-pointer",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "two-pointer",
+        "medium"
+      ],
+      "overview": "Given two nodes in a binary tree where each node has a parent pointer and the root is unavailable, return their lowest common ancestor; the interview expects the constant-space pointer-switching solution and an explanation of the disconnected-tree case. A follow-up replaces the tree with a multi-parent DAG, where common ancestry can be non-unique.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/lowest-common-ancestor-parent-pointers"
+    },
+    {
+      "n": 5,
+      "slug": "kth-smallest-bst-follow-ups",
+      "title": "Kth Smallest in a BST (LeetCode 230) with Follow-Ups",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-16",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "bst",
+        "tree-traversal",
+        "data-structure",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "bst",
+        "tree-traversal",
+        "data-structure",
+        "medium"
+      ],
+      "overview": "Return the kth-smallest value in a binary search tree, then optimize repeated order-statistic queries under frequent inserts and deletes. Further follow-ups move the structure into a database index and introduce tenant-scoped visibility that can invalidate globally maintained subtree counts.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/kth-smallest-bst-follow-ups"
+    },
+    {
+      "n": 6,
+      "slug": "optimal-account-balancing",
+      "title": "Optimal Account Balancing (LeetCode 465)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-07-25",
+      "stage": "—",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "transactions",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "transactions",
+        "hard"
+      ],
+      "overview": "The Futureforce university-recruiting prompt is the unchanged LeetCode 465 problem: consolidate a set of person-to-person transactions and return the minimum number of additional transfers required to settle every net balance.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/optimal-account-balancing"
+    },
+    {
+      "n": 7,
+      "slug": "delete-character-minimize-unique-segments",
+      "title": "Delete One Character Type, Minimize Unique-Character Segments",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Single report",
+      "last_asked": "2026-07-25",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "string-processing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "string-processing",
+        "medium"
+      ],
+      "overview": "Choose one character value, delete every occurrence of it from the input string, then partition the remaining string into the minimum number of contiguous segments such that no segment contains a repeated character. Return the smallest segment count achievable over all deletion choices.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/delete-character-minimize-unique-segments"
+    },
+    {
+      "n": 8,
+      "slug": "maximal-rectangle",
+      "title": "Maximal Rectangle (LeetCode 85)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-07-17",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "grid",
+        "stack",
+        "monotonic-stack",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "grid",
+        "stack",
+        "monotonic-stack",
+        "hard"
+      ],
+      "overview": "The prompt is the unchanged LeetCode 85 Maximal Rectangle problem: given a binary matrix, return the area of the largest rectangle containing only `1` values. The expected path converts each row into a histogram and derives the monotonic-stack procedure for the largest rectangle.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/maximal-rectangle"
+    },
+    {
+      "n": 9,
+      "slug": "maximal-square",
+      "title": "Maximal Square (LeetCode 221)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-07-17",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "grid",
+        "dp",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "grid",
+        "dp",
+        "medium"
+      ],
+      "overview": "The prompt is the unchanged LeetCode 221 Maximal Square problem: given a binary matrix, return the area of the largest square containing only `1` values. The expected explanation derives the dynamic-programming transition before implementation.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/maximal-square"
+    },
+    {
+      "n": 10,
+      "slug": "campaign-cost-weekly-partition",
+      "title": "Campaign Cost Weekly Partition",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-22",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "dp",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "dp",
+        "medium"
+      ],
+      "overview": "Given an array of campaign costs and an integer number of weeks, split the campaigns into exactly that many contiguous non-empty groups. The cost of a week is the maximum campaign cost assigned to that week; minimize the sum of those weekly maxima.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/campaign-cost-weekly-partition"
+    },
+    {
+      "n": 11,
+      "slug": "string-compression-oa",
+      "title": "String Compression (HackerRank OA, LeetCode 443)",
+      "category": "coding",
+      "duration": "30 min",
+      "frequency": "Single report",
+      "last_asked": "2026-04-03",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "two-pointer",
+        "string-processing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "two-pointer",
+        "string-processing",
+        "medium"
+      ],
+      "overview": "First problem on the recent Staff SWE HackerRank OA: classic run-length string compression done in-place on a character array.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/string-compression-oa"
+    },
+    {
+      "n": 12,
+      "slug": "maximum-palindromic-strings",
+      "title": "Maximum Number of Palindromic Strings (OA)",
+      "category": "coding",
+      "duration": "30 min",
+      "frequency": "Single report",
+      "last_asked": "2026-03-19",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "greedy",
+        "palindromes",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "greedy",
+        "palindromes",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "First problem on a recent Salesforce fulltime OA (HackerRank, 2 problems / 60 min). Given an array of lowercase strings, you may swap characters between any two distinct strings any number of times. Return the maximum number of strings you can make palindromic.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/maximum-palindromic-strings"
+    },
+    {
+      "n": 13,
+      "slug": "maximum-requests-in-time-window",
+      "title": "Maximum Requests in a Time Window (OA)",
+      "category": "coding",
+      "duration": "30 min",
+      "frequency": "Single report",
+      "last_asked": "2026-03-19",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "sliding-window",
+        "two-pointer",
+        "sorting",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "sliding-window",
+        "two-pointer",
+        "sorting",
+        "easy"
+      ],
+      "overview": "Second problem on the same recent Salesforce OA (HackerRank, 2 problems / 60 min). Given a list of integer timestamps and a window size W, find the maximum number of timestamps that fit inside any contiguous window of length W (window = `[start, start + W - 1]`).",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/maximum-requests-in-time-window"
+    },
+    {
+      "n": 14,
+      "slug": "web-crawler-mini-project",
+      "title": "Onsite Mini Project — Concurrent Web Crawler",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-03-10",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "SWE"
+      ],
+      "tags": [
+        "python",
+        "concurrency",
+        "web-crawler",
+        "mini-project",
+        "async",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "swe"
+      ],
+      "tags_slug": [
+        "python",
+        "concurrency",
+        "web-crawler",
+        "mini-project",
+        "async",
+        "medium"
+      ],
+      "overview": "Salesforce AI Engineer onsite \"Hands-on Mini Project\" round: implement a small end-to-end project on the spot. A representative instance is a concurrent web crawler that scrapes a specified site, orders the results per a given rule, and exports to CSV. Code-while-narrating is part of the signal.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/web-crawler-mini-project"
+    },
+    {
+      "n": 15,
+      "slug": "code-review-oa",
+      "title": "Code Review OA — Python Files (Salesforce / Slack)",
+      "category": "coding",
+      "duration": "120 min",
+      "frequency": "Single report",
+      "last_asked": "2026-03-05",
+      "stage": "oa · take-home",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "code-review",
+        "code-reading",
+        "sql",
+        "security",
+        "race-condition",
+        "python",
+        "take-home",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "code-review",
+        "code-reading",
+        "sql",
+        "security",
+        "race-condition",
+        "python",
+        "take-home",
+        "medium"
+      ],
+      "overview": "Salesforce / Slack joint OA in a code-review format: candidate is given several Python files (SQL inserts, queries, etc.) and asked to leave at least 10 comments identifying bugs and design issues across different areas. Take-home format with a 24-hour window despite the recruiter's stated 1-2 hour estimate.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/code-review-oa"
+    },
+    {
+      "n": 16,
+      "slug": "array-left-right-duplicate-check",
+      "title": "Array Left / Right Duplicate Check (Binary Strings)",
+      "category": "coding",
+      "duration": "20 min",
+      "frequency": "Single report",
+      "last_asked": "2025-12-25",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "hashmap",
+        "string",
+        "binary-string",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "hashmap",
+        "string",
+        "binary-string",
+        "easy"
+      ],
+      "overview": "First problem on the Salesforce Futureforce 2026 Coding Challenge (intern OA). For each index of an integer array, output whether the value appears earlier in the array and whether it appears later. Encode both answers as binary strings of length n.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/array-left-right-duplicate-check"
+    },
+    {
+      "n": 17,
+      "slug": "binary-string-01-10-swap",
+      "title": "Binary String Synchronous '01' → '10' Replacement",
+      "category": "coding",
+      "duration": "30 min",
+      "frequency": "Single report",
+      "last_asked": "2025-12-25",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "binary-string",
+        "simulation",
+        "greedy",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "binary-string",
+        "simulation",
+        "greedy",
+        "medium"
+      ],
+      "overview": "Salesforce Futureforce 2026 Coding Challenge (intern OA). Given a binary string, every second all occurrences of `\"01\"` simultaneously become `\"10\"`. Repeat until the string is stable. Return the number of seconds taken.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/binary-string-01-10-swap"
+    },
+    {
+      "n": 18,
+      "slug": "typescript-refactor-oa",
+      "title": "TypeScript Refactor OA (HackerRank — fullstack)",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Low",
+      "last_asked": "2026-07-25",
+      "stage": "oa · onsite-coding · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "refactoring",
+        "code-reading",
+        "typescript",
+        "frontend",
+        "fullstack",
+        "oop-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "refactoring",
+        "code-reading",
+        "typescript",
+        "frontend",
+        "fullstack",
+        "oop-design",
+        "medium"
+      ],
+      "overview": "Salesforce uses an existing-codebase exercise in full-stack loops: the detailed TypeScript form asks candidates to fix snapshot tests, add coverage, and refactor duplicated conditional logic while keeping tests green. A newer 90-minute OA includes a thinner Java Spring variant in which candidates modify the supplied project until its test cases pass.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/typescript-refactor-oa"
+    },
+    {
+      "n": 19,
+      "slug": "minimum-operations-reduce-to-zero",
+      "title": "Minimum Operations to Reduce an Integer to 0 (LeetCode 2571)",
+      "category": "coding",
+      "duration": "30 min",
+      "frequency": "Low",
+      "last_asked": "2026-04-03",
+      "stage": "oa · phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "bit-manipulation",
+        "greedy",
+        "math",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "bit-manipulation",
+        "greedy",
+        "math",
+        "medium"
+      ],
+      "overview": "Recurring HackerRank coding problem on the Salesforce OA. Given a positive integer `n`, in each operation you may add or subtract any power of 2; return the minimum number of operations to reduce `n` to 0.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/minimum-operations-reduce-to-zero"
+    },
+    {
+      "n": 20,
+      "slug": "frontend-traffic-light",
+      "title": "Frontend Traffic Light (HTML / CSS / JS)",
+      "category": "coding",
+      "duration": "30 min",
+      "frequency": "Low",
+      "last_asked": "2026-01-30",
+      "stage": "phone-screen · tech-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "frontend",
+        "traffic-light",
+        "javascript",
+        "state-machine",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "frontend",
+        "traffic-light",
+        "javascript",
+        "state-machine",
+        "medium"
+      ],
+      "overview": "Salesforce's signature frontend coding round, asked even of generalist / backend candidates applying to fullstack-titled roles. Build a traffic light that cycles red 4s → green 1s → yellow 1s using only HTML, CSS, and vanilla JavaScript (no React allowed in the CoderPad sandbox).",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/frontend-traffic-light"
+    },
+    {
+      "n": 21,
+      "slug": "frontend-currying-add-numbers",
+      "title": "Frontend Curry: addTwoNumbers → addThreeNumbers(a)(b)(c)",
+      "category": "coding",
+      "duration": "30 min",
+      "frequency": "Low",
+      "last_asked": "2026-01-30",
+      "stage": "phone-screen · tech-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "currying",
+        "frontend",
+        "javascript",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "currying",
+        "frontend",
+        "javascript",
+        "easy"
+      ],
+      "overview": "Salesforce's recurring fullstack phone-screen warm-up. Given `addTwoNumbers(a, b) = a + b`, implement a curried `addThreeNumbers(a)(b)(c)` that returns `a + b + c`. Frequently extended into a generic `curry` or `addN` variadic version.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/frontend-currying-add-numbers"
+    },
+    {
+      "n": 22,
+      "slug": "linked-list-remove-duplicates",
+      "title": "Singly Linked List — Remove Duplicate Values",
+      "category": "coding",
+      "duration": "30 min",
+      "frequency": "Low",
+      "last_asked": "2026-01-30",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "linked-list",
+        "hashmap",
+        "deduplication",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "linked-list",
+        "hashmap",
+        "deduplication",
+        "easy"
+      ],
+      "overview": "Online assessment classic asked in Salesforce's HackerRank OA, both SMTS and MTS levels. Given a singly linked list, keep only the first occurrence of each value and remove every later node with a value seen earlier. Return the head of the modified list.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/linked-list-remove-duplicates"
+    },
+    {
+      "n": 23,
+      "slug": "lfu-cache",
+      "title": "LFU Cache (LeetCode 460)",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Low",
+      "last_asked": "2026-01-28",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "linked-list",
+        "hashmap",
+        "design",
+        "caching",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "linked-list",
+        "hashmap",
+        "design",
+        "caching",
+        "hard"
+      ],
+      "overview": "Implement an O(1) LFU (Least Frequently Used) cache supporting `get(key)` and `put(key, value)` under a fixed capacity. Asked both as a phone-screen coding problem and as the second coding round in onsite loops.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/lfu-cache"
+    },
+    {
+      "n": 24,
+      "slug": "longest-subsequence-substring",
+      "title": "Longest Subsequence of X That Is a Substring of Y",
+      "category": "coding",
+      "duration": "30 min",
+      "frequency": "Low",
+      "last_asked": "2026-01-20",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "dp",
+        "two-pointer",
+        "subsequence",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "dp",
+        "two-pointer",
+        "subsequence",
+        "medium"
+      ],
+      "overview": "Second problem on Salesforce's SMTS HackerRank OA: given strings `x` and `y`, find the length of the longest subsequence of `x` that also appears as a contiguous substring of `y`.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/longest-subsequence-substring"
+    },
+    {
+      "n": 25,
+      "slug": "flatten-nested-json",
+      "title": "Flatten Nested JSON / HashMap to String",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Low",
+      "last_asked": "2026-01-11",
+      "stage": "onsite-coding · phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "recursion",
+        "dfs",
+        "json",
+        "hashmap",
+        "string",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "recursion",
+        "dfs",
+        "json",
+        "hashmap",
+        "string",
+        "medium"
+      ],
+      "overview": "Given a nested JSON object (or equivalent nested HashMap), flatten it into a single-level representation. The natural representation is dotted key paths (`a.b.c -> value`) — recursion on values that are themselves objects, base case on scalars.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/flatten-nested-json"
+    },
+    {
+      "n": 26,
+      "slug": "coffee-ordering-system",
+      "title": "Coffee Ordering System Design",
+      "category": "system-design",
+      "duration": "45 min",
+      "frequency": "Medium",
+      "last_asked": "2026-02-09",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Free preview",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "system-design",
+        "coffee-ordering",
+        "schema-design",
+        "sql",
+        "notification",
+        "scaling",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "system-design",
+        "coffee-ordering",
+        "schema-design",
+        "sql",
+        "notification",
+        "scaling",
+        "medium"
+      ],
+      "overview": "Salesforce's signature backend SD prompt: design an online coffee ordering / management service end-to-end. Interviewers compress the design into 30 minutes and then drill on SQL queries and edge cases (\"customers who never ordered\", \"top spender last month\"), so a clean ER model and explicit notification flow are weighted more than novel architecture.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/coffee-ordering-system"
+    },
+    {
+      "n": 27,
+      "slug": "enterprise-messaging-collaboration-system",
+      "title": "Design an Enterprise Messaging / Collaboration System",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-16",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "messaging",
+        "chat",
+        "access-control",
+        "schema-design",
+        "search",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "messaging",
+        "chat",
+        "access-control",
+        "schema-design",
+        "search",
+        "medium"
+      ],
+      "overview": "Design an enterprise messaging product with direct messages, group channels, durable history, read receipts, search, presence, offline delivery, and strict cross-organization isolation. The round focuses on tenant-aware storage and search, deterministic per-conversation ordering, compact read watermarks, and server-enforced permissions.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/enterprise-messaging-collaboration-system"
+    },
+    {
+      "n": 28,
+      "slug": "google-sheets-design",
+      "title": "Design a Collaborative Spreadsheet (Google Sheets)",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-03-10",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "SWE"
+      ],
+      "tags": [
+        "system-design",
+        "google-sheets",
+        "concurrency",
+        "data-modeling",
+        "schema-design",
+        "versioning",
+        "snapshot",
+        "websocket",
+        "storage",
+        "hard"
+      ],
+      "roles_slug": [
+        "mle",
+        "swe"
+      ],
+      "tags_slug": [
+        "system-design",
+        "google-sheets",
+        "concurrency",
+        "data-modeling",
+        "schema-design",
+        "versioning",
+        "snapshot",
+        "websocket",
+        "storage",
+        "hard"
+      ],
+      "overview": "Salesforce AI Engineer onsite system-design round. Design a web service like Google Sheets, with the interviewer steering focus onto the backend and data model — concurrency control for simultaneous editors, storage of large sheets, snapshot / version backup.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/google-sheets-design"
+    },
+    {
+      "n": 29,
+      "slug": "rate-limiter-user-configurable-quota",
+      "title": "Rate Limiter for Expensive API with User-Configurable Monthly Quota",
+      "category": "system-design",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-30",
+      "stage": "onsite-system-design · tech-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "system-design",
+        "rate-limiting",
+        "throttling",
+        "caching",
+        "redis",
+        "quotas",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "system-design",
+        "rate-limiting",
+        "throttling",
+        "caching",
+        "redis",
+        "quotas",
+        "medium"
+      ],
+      "overview": "Tech-screen system-design round in the Salesforce MTS/SMTS loop. The product has one expensive API; each customer can set their own monthly call limit via dashboard. Design the rate-limiting layer that enforces those quotas, accepts updates to them, and explains overage behaviour.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/rate-limiter-user-configurable-quota"
+    },
+    {
+      "n": 30,
+      "slug": "async-job-task-system",
+      "title": "Design an Async Job / Task System",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-09",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "system-design",
+        "job-system",
+        "scheduling",
+        "queueing",
+        "idempotency",
+        "retry",
+        "storage",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "system-design",
+        "job-system",
+        "scheduling",
+        "queueing",
+        "idempotency",
+        "retry",
+        "storage",
+        "medium"
+      ],
+      "overview": "First system-design round in the Salesforce LMTS onsite. Design a generic async job execution service — API surface, state machine, retry, idempotency, storage choice. Not asking for novel architecture, but for the candidate to explain a complete service cleanly end-to-end.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/async-job-task-system"
+    },
+    {
+      "n": 31,
+      "slug": "high-throughput-cache-design",
+      "title": "Design a High-Throughput Distributed Cache",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-09",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "system-design",
+        "caching",
+        "sharding",
+        "distributed-systems",
+        "concurrency",
+        "scaling",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "system-design",
+        "caching",
+        "sharding",
+        "distributed-systems",
+        "concurrency",
+        "scaling",
+        "hard"
+      ],
+      "overview": "Second system-design round in the Salesforce LMTS onsite — distinct from the service-design round earlier in the loop. Design an in-memory caching layer (Redis-class) that fronts a primary database, with explicit attention to eviction, consistency, hot keys, and sharding under high concurrent load.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/high-throughput-cache-design"
+    },
+    {
+      "n": 32,
+      "slug": "analytics-dashboard-llm-product",
+      "title": "Design an Analytics Metrics Dashboard for ChatGPT / LLM Service",
+      "category": "system-design",
+      "duration": "45 min",
+      "frequency": "Low",
+      "last_asked": "2026-03-10",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "system-design",
+        "analytics-dashboard",
+        "streaming",
+        "data-engineering",
+        "data-modeling",
+        "scaling",
+        "llm",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "system-design",
+        "analytics-dashboard",
+        "streaming",
+        "data-engineering",
+        "data-modeling",
+        "scaling",
+        "llm",
+        "medium"
+      ],
+      "overview": "Salesforce backend SD prompt asked in onsite VOs and tech-screens: design an analytics dashboard that pulls metrics from an existing LLM service (\"ChatGPT-like\"). Interviewers explicitly de-scope frontend UI and model design — the round is about the back-end data pipeline that aggregates raw events into queryable metrics (DAU, latency percentiles, error rates, token counts).",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/analytics-dashboard-llm-product"
+    },
+    {
+      "n": 33,
+      "slug": "hm-and-bq-rounds",
+      "title": "Hiring Manager + Behavioral Rounds",
+      "category": "behavioral",
+      "duration": "45 min",
+      "frequency": "High",
+      "last_asked": "2026-08-24",
+      "stage": "recruiter-screen · phone-screen · onsite-bq",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "behavioral",
+        "bq",
+        "star",
+        "leadership",
+        "conflict",
+        "mentorship",
+        "ownership",
+        "why-company",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "behavioral",
+        "bq",
+        "star",
+        "leadership",
+        "conflict",
+        "mentorship",
+        "ownership",
+        "why-company",
+        "medium"
+      ],
+      "overview": "Salesforce loops include a 30–45 minute Hiring Manager (HM) screen plus dedicated BQ time inside many technical rounds. The HM screen can be a pure-BQ chat, a project-and-tech-stack discussion, or a chat-plus-surprise-coding mix; in every shape, the interaction can materially affect progression and final level. Recurring prompts cover communication, mentorship, conflict, ownership, and post-failure retrospectives.",
+      "source_count": 14,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/hm-and-bq-rounds"
+    },
+    {
+      "n": 34,
+      "slug": "ai-ml-fundamentals-oral",
+      "title": "AI / ML Fundamentals Oral Round (AI Engineer)",
+      "category": "other",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-03-10",
+      "stage": "phone-screen · tech-screen",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "ml-knowledge",
+        "llm",
+        "transformer",
+        "attention",
+        "rag",
+        "evaluation",
+        "inference",
+        "cs-fundamentals",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "ml-knowledge",
+        "llm",
+        "transformer",
+        "attention",
+        "rag",
+        "evaluation",
+        "inference",
+        "cs-fundamentals",
+        "medium"
+      ],
+      "overview": "Third virtual interview in the Salesforce AI Engineer (SMTS) loop. Verbal ML / LLM fundamentals quiz covering ML basics, model-serving practicalities, and LLM-specific concepts (Transformers, context engineering, RAG, grounding, guardrails). No coding; structured Q&A.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/ai-ml-fundamentals-oral"
+    },
+    {
+      "n": 35,
+      "slug": "project-deep-dive-ai-engineer",
+      "title": "Project Architecture Deep Dive (AI Engineer / Backend)",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-07-17",
+      "stage": "onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "SWE"
+      ],
+      "tags": [
+        "deep-dive",
+        "presentation",
+        "ml-knowledge",
+        "llm-agent",
+        "system-design",
+        "kafka",
+        "messaging",
+        "concurrency",
+        "race-condition",
+        "circuit-breaker",
+        "transactions",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "swe"
+      ],
+      "tags_slug": [
+        "deep-dive",
+        "presentation",
+        "ml-knowledge",
+        "llm-agent",
+        "system-design",
+        "kafka",
+        "messaging",
+        "concurrency",
+        "race-condition",
+        "circuit-breaker",
+        "transactions",
+        "medium"
+      ],
+      "overview": "Salesforce dedicates a round to one past project and drills into architecture, trade-offs, challenges, scale, and hindsight. AI Engineer versions favor agent orchestration and ML-system decisions; a backend version uses a notification system to probe service decomposition, event-driven messaging, failure handling, consumer concurrency, and production operations.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/project-deep-dive-ai-engineer"
+    },
+    {
+      "n": 36,
+      "slug": "cloud-domain-knowledge-round",
+      "title": "Cloud / Domain Knowledge Oral Round (GCP / AWS / K8s)",
+      "category": "other",
+      "duration": "45 min",
+      "frequency": "Low",
+      "last_asked": "2026-03-04",
+      "stage": "phone-screen · tech-screen",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "domain-knowledge",
+        "cs-fundamentals",
+        "infra",
+        "cloud",
+        "verbal",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "domain-knowledge",
+        "cs-fundamentals",
+        "infra",
+        "cloud",
+        "verbal",
+        "medium"
+      ],
+      "overview": "Salesforce GCP / Public-Cloud-team loops include a dedicated domain-knowledge round drilling on cloud platform internals and Kubernetes — even if the candidate's background is on a different cloud. Concept fluency on K8s, cloud pipelines, and (where relevant) cloud-migration experience.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/salesforce/cloud-domain-knowledge-round"
+    }
+  ]
+}

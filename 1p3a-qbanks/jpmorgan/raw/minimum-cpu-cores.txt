@@ -1,0 +1,66 @@
+===H1===
+Minimum CPU Cores
+===URL===
+https://www.1point3acres.com/interview/problems/company/jpmorgan/minimum-cpu-cores
+===BODY===
+JPMorgan Chase
+Coding·60 minMembers
+Minimum CPU Cores
+Given process start and end times, compute the minimum number of CPU cores required so every process can run. Endpoints are inclusive, so a process ending at time `t` overlaps a process starting at `t`.
+SWE
+RS
+interval
+sorting
+scheduling
+oa
+easy
+Frequency
+Low
+Last asked
+2026-03-31
+Stage
+oa
+Requirements
+
+Input: n processes, with arrays start and end.
+
+Process i runs from start[i] through end[i], both inclusive.
+
+One CPU core can run only one process at a time.
+
+Return the minimum number of cores needed to schedule all processes.
+
+Examples
+
+start = [1, 3, 4]
+end   = [3, 5, 6]
+
+Process 1 uses a core from 1 through 3.
+Process 2 starts at 3, so it overlaps process 1 at time 3.
+With two cores, process 3 can reuse the first core from 4 through 6.
+
+Return 2
+
+Notes
+
+This is the meeting-rooms overlap pattern, but inclusive endpoints mean starts at time t must be counted before ends at time t are released.
+
+Clean solutions:
+
+sort all starts and ends, then sweep with two pointers using start <= end as overlap
+
+or create events where starts sort before ends at the same timestamp
+
+The endpoint rule is the main trap. The common meeting-room convention start < end is wrong for this prompt.
+
+Preparation
+
+Implement the two-pointer sweep and explicitly test equal endpoints.
+
+Write one event-sweep version as a backup; make the tie-breaker start-before-end.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

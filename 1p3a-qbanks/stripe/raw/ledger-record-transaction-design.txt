@@ -1,0 +1,108 @@
+===H1===
+Design a Ledger Service (Record Transaction + Merchant Balance)
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/ledger-record-transaction-design
+===BODY===
+Stripe
+System Design·60 minMembers
+Design a Ledger Service (Record Transaction + Merchant Balance)
+Onsite system design. Build a ledger with a `record_transaction` API and a `merchant_balance` query API. Interviewer drills heavily on money modeling and consistency under concurrent writes.
+SWE
+system-design
+payment
+idempotency
+storage
+hard
+Frequency
+Medium
+Last asked
+2026-08-29
+Stage
+phone-screen · onsite-system-design
+Requirements
+
+record_transaction(merchant_id, amount, currency, txn_id, ...): append-only event for a payment.
+
+merchant_balance(merchant_id, currency, as_of=…): return the merchant's current balance, optionally at a historical time.
+
+Strong correctness target: balance reads must reflect all acknowledged writes; double-recording a txn_id is forbidden.
+
+The canonical OA framing exposes a small API surface up front (interviews typically open by nailing the signatures before discussing the system):
+
+// Append-only: record one financial event for a merchant.
+void recordTransaction(String merchantId, Transaction transaction)
+//   Transaction(String txnId, long amountCents, String type, Instant occurredAt)
+//   type ∈ {"payment_received", "payout", "refund", ...}; amount is integer minor units (cents), never a float.
+
+// Read the merchant's balance, split into settled vs in-flight funds.
+Balance getBalance(String merchantId)
+//   Balance { long available; long pending; }
+//   available = funds that have settled and are withdrawable; pending = recorded but not yet cleared.
+
+A read returns the balance split, e.g. { available: 5000, pending: 0 } after a single recorded 5000-cent payment.
+
+Scale / constraints
+
+Payment throughput consistent with a payments platform (thousands of TPS per merchant fleet; a large platform handles millions of transactions per day).
+
+Reads of merchant_balance are higher volume than writes.
+
+Money must be modeled in integer minor units (no floats). Currencies tracked separately.
+
+Key decisions to surface
+
+How to model price / money in the API and on disk (the source report notes the interviewer spent ~half the round on this).
+
+Idempotency on record_transaction via txn_id.
+
+Whether merchant_balance is computed from event scan, snapshot + tail, or cached projection.
+
+Sharding by merchant_id and how cross-merchant transfers (if any) are handled.
+
+Notes
+
+Interviewer is reported as aggressive; expect repeated push-back on modeling decisions before moving on.
+
+One source report explicitly notes the interviewer expected payments-domain depth — be ready to discuss double-entry bookkeeping, refunds, disputes.
+
+The canonical idempotency design on Stripe's public API uses an Idempotency-Key header on every mutating endpoint, scoped per (account, key, request-fingerprint) so a retry with the same key but a different body fails fast instead of silently succeeding. Pair that with exponential backoff on the client (2^n plus random jitter) to avoid thundering-herd on retries. Bringing this exact framing into the round signals payments-domain literacy.
+
+For schema migrations on a live ledger, the published four-phase dual-write playbook is the standard answer: (1) dual-write to old + new with offline backfill, (2) cut over reads behind a diff'ing experiment library, (3) flip write-path with the new table as source-of-truth and the old as archive, (4) delete old data lazily once no callers remain. Mention this when the interviewer probes "how would you change the storage layout without downtime."
+
+For aggregation patterns on the read path (merchant_balance queries), the canonical streaming-counter playbook applies: per-merchant rolling sums maintained by a stream processor with event-time windows + watermarks, hot merchants split via random-suffix sharding (merchant_id:0..N partition keys, with the suffix stripped before SUM aggregation downstream). Layer reconciliation on top: a periodic batch job replays raw events from the event store and diffs the result against the live aggregate, catching processing drift before it leaks into a customer report.
+
+Design-probe checklist (the aggressive follow-ups to pre-stage answers for)
+
+The interviewer drills into specific subsystems after the API sketch; have a crisp answer ready for each:
+
+Double-entry bookkeeping: every money movement posts two entries (a debit and a credit) so the ledger always balances; decide whether the API enforces this or layers it above raw events.
+
+Idempotency: which unique key guarantees exactly-once processing of a re-sent transaction (txn_id as the dedupe key, persisted before the write commits).
+
+Historical queries: how to answer "what was the balance at time T" — snapshot + tail replay, or event scan up to as_of.
+
+Reconciliation: how to cross-check the ledger against external systems (bank settlement files) and surface drift.
+
+Concurrency: how to serialize two transactions hitting the same merchant account at once (per-merchant serialization / optimistic version check) without losing or double-counting.
+
+Partitioning: sharding strategy as data grows, and the cost it imposes on cross-merchant queries.
+
+Audit trail: append-only immutability plus retention to meet legal/compliance rules for financial records.
+
+Error handling: what happens on a mid-transaction failure, and how a reversal/compensating entry undoes a recorded event (never an in-place edit).
+
+Preparation
+
+Internalize the canonical industry framings for idempotency keys and zero-downtime ledger migrations; the patterns described above show up almost verbatim in interviewer drill-downs.
+
+Practice modeling Money as {amount_in_minor_units: int, currency: str} and walking through addition/refund edge cases.
+
+Be ready to defend snapshot-plus-tail balance queries with concrete numbers: snapshot every N events, replay tail on read.
+
+Practice the "snapshot every N events + replay tail" framing with explicit numbers (e.g. snapshot every 10k events, replay at most 10k on a balance read), then defend the choice of N against an aggressive follow-up about read latency vs storage cost.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

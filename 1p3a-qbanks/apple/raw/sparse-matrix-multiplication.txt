@@ -1,0 +1,46 @@
+===H1===
+Sparse Matrix Multiplication (LC 311)
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/sparse-matrix-multiplication
+===BODY===
+Apple
+CodingMembers
+Sparse Matrix Multiplication (LC 311)
+Implement the canonical LC 311 sparse-matrix multiplication task, then explain how to store sparse matrices and avoid unnecessary work on zero entries.
+SWE
+medium
+grid
+hashmap
+Frequency
+Single report
+Last asked
+2026-08-26
+Stage
+phone-screen
+Requirements
+
+Implement the canonical LC 311 Sparse Matrix Multiplication task.
+
+Given two dimensionally compatible matrices, return their matrix product.
+
+Follow up by optimizing the implementation for sparse inputs and explaining how the sparse matrices should be stored.
+
+Notes
+
+For A of shape m × k and B of shape k × n, the dense baseline visits every (i, t, j) triple. The sparse version should instead store only nonzero entries. A practical row-oriented plan is to index each row t of B as (j, value) pairs, iterate each nonzero A[i][t], and accumulate A[i][t] * B[t][j] into C[i][j] for the stored entries in that row of B. This skips every multiplication whose left or right operand is zero.
+
+Excluding result initialization, the work is proportional to building the sparse indexes plus the nonzero pairs that actually meet on the shared dimension: O(nnz(A) + nnz(B) + Σ_(i,t):A[i][t]≠0 nnz(B[t])). A dense result also costs O(mn) to initialize, while a sparse accumulator uses space proportional to its stored output entries. Clarify the expected input and output representation, validate A.cols == B.rows, and handle zero-only rows or columns without materializing unnecessary entries.
+
+Preparation
+
+Implement the canonical prompt end to end and state the matrix dimensions at each step.
+
+Rehearse explaining how sparse matrices can be stored without retaining every zero entry.
+
+Practice clarifying the expected sparse representation before optimizing the baseline implementation.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

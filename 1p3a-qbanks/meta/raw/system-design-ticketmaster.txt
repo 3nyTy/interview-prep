@@ -1,0 +1,64 @@
+===H1===
+System Design — Ticketmaster / Ticketing
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/system-design-ticketmaster
+===BODY===
+Meta
+System Design·45 minMembers
+System Design — Ticketmaster / Ticketing
+Ticket-purchase system: seat inventory, hold/reserve flow, flash-sale concurrency. Reservation TTL + distributed locking is the central trade-off.
+SWE
+MLE
+Infra Eng
+concurrency
+distributed-lock
+ttl
+flash-sale
+medium
+Frequency
+Low
+Last asked
+2026-04-22
+Stage
+onsite-system-design
+Requirements
+
+Functional: browse events, view seat map, hold seats for N minutes, complete purchase, release on timeout.
+
+Scale: bursty (concert on-sale → 100k+ concurrent holds within seconds).
+
+Decisions:
+
+Seat hold semantics: pessimistic lock (DB row lock) vs optimistic (status + version) vs distributed Redis lock with TTL.
+
+Inventory consistency: strong within an event partition; sharded by event_id.
+
+Flash-sale handling: queue + admission control; Redis-backed counters; pre-warm caches.
+
+Payment flow: idempotent state machine (held → paying → confirmed / released).
+
+Notes
+
+One reported failure mode: interviewer interrupts mid-design and narrows to "single-machine ticket system for one school" — be ready to scope down and restart from brute force when the interviewer pivots.
+
+The standard prep template is the baseline; differentiation comes from arguing TTL choices, retry semantics, and idempotency.
+
+Lock storage choice: prefer Redis SET key value NX EX seconds (atomic, auto-expires) over DB row locks (long interactive transactions tie up connections and risk deadlocks). For multi-ticket carts hashing to the same Redis node, fold the lock acquires into a single Lua script for atomicity.
+
+TTL expiring mid-payment is the classic trap. Either extend the lock when Stripe PaymentIntent starts, or accept the rare "paid but seat lost" outcome and refund automatically.
+
+Search path is independent of the booking path — push event metadata into Elasticsearch via CDC so browse stays fast even during on-sale meltdowns.
+
+Preparation
+
+Drill the held→paying→confirmed state machine on paper until automatic.
+
+Memorize one Redis-lock-with-TTL implementation; know its failure modes (clock skew, client crash).
+
+Practice scope-shifting: be able to redesign for 1 server, 10 servers, and global multi-region in 2 minutes each.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

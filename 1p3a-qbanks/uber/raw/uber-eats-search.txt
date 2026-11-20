@@ -1,0 +1,496 @@
+===H1===
+Uber Eats Search
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/uber-eats-search
+===BODY===
+Uber
+System DesignMembers
+Uber Eats Search
+Design the Uber Eats search system for a Machine Learning Engineer onsite: a geo-aware restaurant and menu-item search that combines query understanding, hybrid candidate retrieval, hard marketplace filtering, and personalized ML ranking under a tight latency budget. The core challenge is connecting retrieval, ranking, online serving, feedback logging, and offline training into one coherent loop optimized toward completed orders.
+MLE
+mlsd
+search
+retrieval
+ranking
+recommendation
+ann
+location
+geohash
+feature-engineering
+ab-testing
+two-tower
+Frequency
+Low
+Last asked
+2026-03-06
+Stage
+onsite-system-design
+Uber Eats Search
+
+Problem Statement
+
+Design the Uber Eats search system. A user opens Uber Eats, types a query such as pizza, boba, chipotle bowl, or late night burger, and expects highly relevant results nearby within a few hundred milliseconds.
+
+The system should combine:
+
+query understanding for dish, cuisine, brand, and intent parsing
+
+candidate retrieval from restaurants and menu items
+
+personalized ranking based on user context, location, freshness, and predicted conversion
+
+hard constraints such as delivery radius, merchant open status, and item/menu availability
+
+continuous learning from impressions, clicks, carts, and completed orders
+
+A strong design connects retrieval, ranking, online serving, feedback logging, and offline training into one coherent system, rather than proposing a single giant model or treating this as a pure search-index problem.
+
+Phase 1: Requirements (~5 minutes)
+
+Functional Requirements
+
+Accept free-text queries such as cuisines, dishes, restaurant names, and vague intents like healthy lunch.
+
+Return relevant nearby results across merchants and menu items that can actually fulfill the order.
+
+Rank results using ML with personalization, context, and marketplace features.
+
+Log user interactions including impressions, clicks, add-to-cart events, and completed orders.
+
+Continuously refresh searchable content as menus, availability, hours, and merchant metadata change.
+
+For the first design, keep autocomplete, ads blending, and multilingual support out of scope unless the interviewer asks. A focused search-results page is enough to build a strong core design.
+
+Non-Functional Requirements
+
+RequirementTargetWhy it matters
+Search latencyP95 under 300 ms end to endUsers abandon slow search quickly
+Peak traffic20K search QPS globallyMeal times create synchronized spikes
+FreshnessMenu/open-state changes visible within 1-5 minutesStale results damage trust
+Availability99.9%+Search is a primary discovery entry point
+Ranking qualityOptimize order rate / long-term satisfaction, not only CTRClickbait results can hurt conversion
+ObservabilityFull request tracing and per-stage metricsSearch issues are hard to debug without stage-level visibility
+
+Clarifying Questions
+
+These are the questions worth asking before you draw:
+
+What are we searching over?
+Good default: both restaurants and dishes.
+
+What counts as success?
+Best default: completed orders, with clicks and add-to-cart as intermediate signals.
+
+How personalized should results be?
+Default: modest personalization layered on top of relevance and hard marketplace constraints.
+
+How fresh must the index be?
+Default: near-real-time for open/closed state and inventory-like changes, slower for model retrains.
+
+Do we need semantic search or just keyword matching?
+Default: hybrid retrieval, combining lexical matching with embeddings.
+
+Capacity Estimation
+
+Assumptions:
+- 20K peak search QPS globally
+- Average query fanout: 3 candidate sources
+- Each source returns top 200 candidates before filtering
+- Final ranker scores top 300 candidates
+
+Online serving:
+- 20K QPS * 300 scored candidates = 6M candidate scores/sec at peak
+- With a lightweight tree model or compact neural scorer, this is feasible with horizontally scaled ranking pods
+
+Logging:
+- Assume 5 events/search on average across impression/click/cart/order
+- 20K QPS * 5 = 100K events/sec peak into the feedback pipeline
+
+Index size:
+- 1M active merchants globally
+- 100M menu items/documents after per-item search indexing
+- Search index is large enough to require sharding by geography and replication for availability
+
+The ranking model is rarely the main storage bottleneck. The heavier systems burden is keeping the search index and online features fresh while meeting tight latency targets.
+
+Phase 2: Data Model (~5 minutes)
+
+Core Entities
+
+Merchant {
+  merchant_id: UUID
+  name: String
+  cuisine_tags: Array<String>
+  location: Point
+  delivery_radius_meters: Integer
+  open_status: Boolean
+  rating: Float
+  prep_time_minutes: Integer
+}
+
+MenuItem {
+  item_id: UUID
+  merchant_id: UUID
+  name: String
+  description: String
+  price_cents: Integer
+  available: Boolean
+  embedding_vector: Vector
+}
+
+SearchDocument {
+  doc_id: String
+  entity_type: Enum (merchant, menu_item)
+  entity_id: UUID
+  text_fields: JSON
+  geo_cell: String
+  searchable_terms: Array<String>
+  embedding_vector: Vector
+  last_indexed_at: Timestamp
+}
+
+SearchRequest {
+  request_id: UUID
+  user_id: UUID | null
+  query: String
+  lat: Double
+  lng: Double
+  filters: JSON
+  request_ts: Timestamp
+}
+
+SearchImpression {
+  request_id: UUID
+  result_id: String
+  rank: Integer
+  features_snapshot: JSON
+  shown_at: Timestamp
+}
+
+SearchFeedbackEvent {
+  request_id: UUID
+  user_id: UUID | null
+  result_id: String
+  event_type: Enum (click, add_to_cart, order, skip)
+  event_ts: Timestamp
+}
+
+Important Feature Groups
+
+Query features: tokens, normalized query, detected cuisine/dish/brand intent, spelling confidence
+
+User features: past cuisines, price sensitivity, reorder affinity, dietary preferences
+
+Marketplace features: ETA, delivery fee, surge, merchant open state, stock or item availability
+
+Entity features: textual relevance, popularity, ratings, conversion priors
+
+Interaction features: historical CTR, add-to-cart rate, order rate by query-entity pair
+
+Storage Choices
+
+Search index such as Elasticsearch / OpenSearch / Vespa for lexical retrieval and filtered lookup
+
+Vector index or ANN service for semantic retrieval over merchant and menu embeddings
+
+Online feature store / Redis for low-latency dynamic features
+
+Data lake + warehouse for training data generation and offline analysis
+
+Model registry for ranker versioning and safe rollout
+
+Separate immutable-ish document data from highly dynamic marketplace features. Rebuilding the full index for every merchant open-state change is too slow; overlay fast-changing features at serving time.
+
+Phase 3: API Design (~5 minutes)
+
+Protocol Choice
+
+HTTP/gRPC for the online search request path
+
+Kafka/PubSub for merchant updates, menu updates, and interaction logging
+
+Batch/stream pipelines for training data generation and model refresh
+
+Search API
+
+GET /v1/eats/search?q=pizza&lat=37.77&lng=-122.42&limit=20
+
+Response:
+{
+  "request_id": "srch_123",
+  "query_understanding": {
+    "intent": "dish",
+    "normalized_query": "pizza"
+  },
+  "results": [
+    {
+      "entity_type": "merchant",
+      "entity_id": "m_101",
+      "name": "Tony's Pizza",
+      "eta_minutes": 24,
+      "delivery_fee_cents": 199,
+      "score": 0.93
+    }
+  ]
+}
+
+Merchant/Menu Update Event
+
+{
+  "event_type": "menu_item_updated",
+  "merchant_id": "m_101",
+  "item_id": "i_77",
+  "available": true,
+  "name": "Pepperoni Pizza",
+  "updated_at": "2025-11-14T19:22:00Z"
+}
+
+Feedback Logging Event
+
+{
+  "request_id": "srch_123",
+  "user_id": "u_55",
+  "result_id": "m_101",
+  "rank": 2,
+  "event_type": "order",
+  "event_ts": "2025-11-14T19:23:08Z"
+}
+
+In practice, log both the server-side ranked result set and the client-side rendered impression. That distinction matters because network drops, pagination, and UI changes can otherwise corrupt training labels.
+
+Phase 4: High-Level Design (~15-25 minutes)
+
+End-to-End Query Flow
+
+The client sends a query with user context and location.
+
+Query understanding normalizes the text, handles spelling, detects entities like cuisine vs dish vs brand, and may classify vague intent.
+
+Hybrid retrieval gathers candidates from multiple sources:
+
+lexical search for exact or partial token matches
+
+semantic retrieval for paraphrases like late night snack or healthy bowl
+
+popularity / fallback retrieval for sparse or ambiguous queries
+
+Hard filters remove impossible candidates:
+
+outside delivery area
+
+currently closed
+
+unavailable menu items
+
+filtered-out cuisines or price bands
+
+Online feature service fetches dynamic signals such as ETA, fee, merchant reliability, and user affinity.
+
+Ranking model scores the remaining candidates, for example estimating:
+
+probability of click
+
+probability of add to cart
+
+probability of completed order
+
+a blended business objective
+
+Re-ranking applies diversity, deduplication, fairness, and optional sponsored-slot policies.
+
+The system returns the final ranked page and logs impressions for later training.
+
+Example Latency Budget
+
+Target P95: 300 ms end to end
+
+- network + gateway: 40 ms
+- query understanding: 20 ms
+- candidate retrieval: 60 ms
+- hard filtering: 20 ms
+- feature fetch: 50 ms
+- ranking + re-ranking: 60 ms
+- response serialization / buffer: 50 ms
+
+A stage-by-stage budget shows that the design is operationally realistic.
+
+Why Multi-Stage Ranking Matters
+
+Do not run a heavy model over the entire corpus. A practical design uses:
+
+Stage 1 retrieval: fast recall-oriented candidate generation
+
+Stage 2 ranker: richer ML model over a few hundred candidates
+
+Stage 3 re-ranker: light business logic and result shaping
+
+This is the standard way to balance relevance quality with a tight latency budget.
+
+Query Understanding Deep Dive
+
+For Uber Eats, query understanding is often the highest-leverage ML layer before ranking:
+
+spell correction: shwarma -> shawarma
+
+synonym mapping: boba ~= bubble tea
+
+entity detection: chipotle may mean a brand or a flavor
+
+intent understanding: cheap sushi near me combines cuisine + price intent + location context
+
+You can implement this with a mix of:
+
+learned embeddings
+
+lightweight classifiers
+
+dictionary / ontology rules
+
+curated synonym tables from search logs
+
+Search quality usually depends on a blend of ML and rules. Purely learned systems struggle with marketplace constraints and rare but business-critical edge cases.
+
+Offline Training Pipeline
+
+The feedback loop is a core part of the answer:
+
+Log server-ranked results, rendered impressions, rank position, and feature snapshots.
+
+Join later clicks, carts, and completed orders.
+
+Correct for position bias where possible so the model does not simply learn existing rank placement.
+
+Train retrieval embeddings and ranking models separately.
+
+Validate offline with ranking metrics such as NDCG and calibration.
+
+Roll out online with A/B tests using order conversion, search success rate, and latency guardrails.
+
+Offline metrics are useful but insufficient. Final relevance quality should be validated with online experiments because user behavior changes under different rankings.
+
+Candidate Model Choices
+
+Retrieval:
+
+BM25 / lexical scorer for exact matching
+
+dual-encoder embeddings for semantic retrieval
+
+Ranking:
+
+gradient-boosted trees for strong tabular baselines
+
+compact deep ranker when cross features and sequence behavior matter
+
+Re-ranking:
+
+rule-based or small model for diversity and business constraints
+
+Naming a specific model family is less important than explaining why each stage exists and what signals it uses.
+
+Phase 5: Scaling & Trade-offs (~15-20 minutes)
+
+1. Freshness vs Complexity
+
+Menu and availability changes happen continuously. The key trade-off is:
+
+reindexing everything gives clean semantics but is too slow
+
+serving-time feature overlays are fast but increase system complexity
+
+A practical split is:
+
+index slower-changing text and embeddings
+
+serve fast-changing availability, ETA, and fee features online
+
+2. Lexical vs Semantic Retrieval
+
+lexical search is precise and easy to debug
+
+semantic retrieval helps recall on vague or paraphrased queries
+
+hybrid retrieval increases quality but adds infra and ranking complexity
+
+The safe answer is a hybrid setup with lexical recall as the fallback path.
+
+3. Clicks vs Orders as Labels
+
+clicks are abundant but noisy
+
+orders are sparse but aligned with business value
+
+A strong ranking strategy uses:
+
+clicks and carts for upper-funnel training signal
+
+orders and reorder behavior for downstream objective alignment
+
+explicit debiasing or inverse-propensity-style thinking when possible
+
+4. Cold Start
+
+For new users:
+
+rely more on location, popularity, cuisine priors, and time-of-day context
+
+For new merchants or dishes:
+
+use content features, merchant metadata, cuisine embeddings, and exploration traffic
+
+5. Failure Handling
+
+If a component fails, degrade gracefully:
+
+vector retrieval down -> fallback to lexical only
+
+personalization unavailable -> use generic ranking features
+
+feature store latency spike -> use cached defaults or last-known values
+
+Search can still be useful in degraded mode.
+
+6. Bias and Feedback Loops
+
+Search systems can easily amplify already-popular merchants. Watch for:
+
+exposure concentration
+
+position bias
+
+rich-get-richer loops for incumbents
+
+unfair treatment of new but relevant merchants
+
+Possible mitigations:
+
+controlled exploration
+
+debiased training data
+
+diversity constraints
+
+explicit marketplace fairness metrics
+
+Common Pitfalls
+
+Pitfall: Treating search as just an inverted index problem. For Uber Eats, marketplace constraints and ranking objectives are central.
+
+Pitfall: Optimizing only CTR. High-click results can still convert poorly if ETA, price, or merchant quality are bad.
+
+Pitfall: Ignoring logging design. Without impression logs joined to downstream outcomes, you cannot train or debug the ranker correctly.
+
+Summary Table
+
+LayerMain jobGood talking point
+Query understandingParse intent and normalize textSearch quality often fails before ranking even starts
+RetrievalRecall a few hundred plausible candidatesHybrid lexical + semantic is usually best
+FilteringRemove undeliverable or unavailable resultsBusiness constraints must override relevance
+RankingPredict user value and order likelihoodOptimize toward orders, not only clicks
+Re-rankingDiversity, fairness, sponsored blendingFinal shaping is not the same as core relevance
+Feedback loopImprove models continuouslyLogging and experimentation are first-class parts of the system
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

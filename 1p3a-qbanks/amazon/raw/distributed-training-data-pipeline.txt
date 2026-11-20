@@ -1,0 +1,78 @@
+===H1===
+Distributed Training Data Pipeline (FAR)
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/distributed-training-data-pipeline
+===BODY===
+Amazon
+System Design·60 minMembers
+Distributed Training Data Pipeline (FAR)
+Design a distributed pipeline for LLM training-data preprocessing: ingest from S3 / streaming, tokenize, deduplicate, quality-filter, and output sharded training corpora. Amazon FAR onsite Staff-level system-design round.
+MLE
+RE
+Infra Eng
+system-design
+storage
+scaling
+dedup
+hard
+Frequency
+Single report
+Last asked
+2026-03-21
+Stage
+onsite-system-design
+Requirements
+
+Source: object storage (S3) for raw text, plus optional streaming sources (Kafka).
+
+Stages: extraction → tokenization → dedup (exact + near-duplicate via MinHash/LSH) → quality filtering (heuristic + classifier) → sharded output.
+
+Non-functional: petabyte scale, idempotent re-runs, deterministic shard assignment, observability per stage.
+
+Examples
+
+A typical reference architecture: S3 → Kafka → tokenizer workers → dedup service → quality filter → output store.
+
+Notes
+
+A complete-but-shallow diagram does not pass — Principal-SDE bar requires trade-off depth: "why Kafka vs Kinesis," "where does it break at scale," "how do you maintain determinism."
+
+Dedup is the most interesting axis: bring up exact dedup (MinHash signatures + LSH buckets) and near-dup thresholds, plus the cost trade-off vs accuracy.
+
+Reproducibility matters at the data-training level — sharding by content hash, not by partition index, makes shards stable across re-runs.
+
+The dedup stage is where Principal-bar rounds spend the most time. Exact dedup on document hash is cheap (one Bloom filter pass); near-dup via MinHash + LSH is where the trade-offs live: signature length k controls Jaccard estimation variance, band count b and rows-per-band r set the S-curve threshold via 1 - (1 - s^r)^b. Be ready to derive the (b, r) you'd pick for a target Jaccard cutoff of ~0.8.
+
+Sharding by content hash (not partition index) is the determinism unlock. Re-running the pipeline on the same corpus must produce byte-identical shards or training reproducibility is gone; partition-index sharding breaks the moment upstream parallelism changes.
+
+Quality filtering is a cascade: cheap heuristics first (language ID, length, symbol ratio, perplexity threshold from a small KenLM), then a learned classifier on the survivors. Inverting the order wastes GPU on garbage.
+
+The pipeline-to-trainer boundary is the most common failure mode: trainers stall on dataloader starvation when the upstream tokenizer can't keep up. The fix is a decoupled object-store-backed shard format (WebDataset / Mosaic MDS / Parquet) with a fixed shard size so trainers can prefetch deterministically.
+
+On the training side itself, the shard / all-gather / reduce-scatter decomposition (FSDP-style) is the standard memory-vs-communication trade-off: full sharding minimizes memory but doubles communication, gradient-only sharding keeps parameters resident at the cost of activation memory.
+
+Observability per stage means emitting (records_in, records_out, bytes_in, bytes_out, p50/p99 latency) per worker — without this you cannot answer "where does it break at scale" with anything concrete.
+
+Preparation
+
+Skim a recent open-weights technical report's data-pipeline section (the canonical pattern is: extract → tokenize → exact-dedup → near-dedup → quality filter → shard) and write the 6-box diagram from memory.
+
+Drill the trade-off vocabulary: throughput vs latency, exactly-once vs at-least-once, deterministic sharding vs hash-based shuffling.
+
+Have 2 concrete "where this breaks at scale" stories ready (hot keys in MinHash buckets, runaway re-tokenization on corrupt input).
+
+Practice a 3-minute MinHash + LSH derivation on the whiteboard: signature length, band/row trade-off, target Jaccard threshold.
+
+Layered drill: (1) whiteboard the 6-box pipeline (extract -> tokenize -> exact-dedup -> near-dup -> quality filter -> shard) from memory in 3 minutes; (2) zoom into near-dup and derive the MinHash signature length and LSH (b, r) for a target Jaccard threshold; (3) zoom into the shard-format boundary and explain how you'd make re-runs deterministic; (4) zoom into the trainer side and explain dataloader-side prefetch + FSDP-style parameter sharding.
+
+Memorize the LSH S-curve formula P(collision) = 1 - (1 - s^r)^b and be able to sketch it for two (b, r) choices on the board.
+
+Have 2 concrete "breaks at scale" stories with numbers: hot keys in MinHash buckets when the corpus contains millions of near-identical boilerplate pages; dataloader starvation when tokenizer throughput drops below trainer consumption rate.
+
+Drill the trade-off vocabulary out loud: throughput vs latency, exactly-once vs at-least-once, deterministic sharding vs hash-shuffling, full-shard vs grad-shard, push vs pull from object store.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

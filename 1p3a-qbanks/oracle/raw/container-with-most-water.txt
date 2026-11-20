@@ -1,0 +1,53 @@
+===H1===
+Container With Most Water (LC 11)
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/container-with-most-water
+===BODY===
+Oracle
+Coding·45 minMembers
+Container With Most Water (LC 11)
+Find the maximum-area container formed by two vertical lines from a non-negative integer array — explicit LeetCode 11. Asked verbatim in an OCI phone screen, paired with behavioural questions about approaching unfamiliar problems.
+SWE
+array
+two-pointer
+greedy
+medium
+Frequency
+Single report
+Last asked
+2026-01-06
+Stage
+phone-screen
+Requirements
+
+Input: a non-negative integer array height[] where height[i] is the length of the i-th vertical line at x-coordinate i.
+
+Output: the maximum area of water a container can hold, defined as max over (i, j) of (j - i) * min(height[i], height[j]).
+
+Return the maximum area, not the indices.
+
+Notes
+
+The optimal O(n) solution is the two-pointer sweep: start with pointers at both ends; at each step, record the area, then advance the pointer at the shorter line (the only side that could yield a taller bound on a subsequent step).
+
+Correctness intuition: moving the taller side inward can only shrink the width without ever raising the height ceiling (which is set by the shorter side). So advancing the shorter side is the only direction that can possibly improve the answer.
+
+The brute-force O(n²) enumeration is well-known to TLE on the LeetCode hidden tests; the OCI version uses the same constraints.
+
+Common bug: incrementing both pointers on ties or only the left pointer regardless of heights — both quietly miss the optimum.
+
+For the OCI version, the interviewer used this round partially as a behavioural probe ("how do you approach an unfamiliar problem with limited information?") before the algorithmic part. Talk through the two-pointer rationale aloud.
+
+Preparation
+
+Solve LeetCode 11 ("Container With Most Water") and articulate the correctness argument for the two-pointer advance rule in one paragraph.
+
+Drill the related LC 42 ("Trapping Rain Water") for a potential follow-up — same kind of two-pointer reasoning but with a different objective.
+
+Practise narrating the algorithmic reasoning out loud while coding; the OCI interviewer in this round used it as a soft behavioural probe.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,62 @@
+===H1===
+Rectangle Copy Inside a 2-D Array with O(1) Memory
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/rectangle-copy-o1-memory
+===BODY===
+Waymo
+Coding·45 minMembers
+Rectangle Copy Inside a 2-D Array with O(1) Memory
+Onsite coding: copy a rectangular sub-region of a 2-D array to another non-overlapping position in the same array, using strictly O(1) auxiliary memory. The interesting case is overlapping source and destination, which forces a directional copy order.
+SWE
+grid
+array
+simulation
+memory-bounded
+medium
+Frequency
+Single report
+Last asked
+2026-01-23
+Stage
+onsite-coding
+Requirements
+
+Input: a 2-D array, a source rectangle (r0, c0, height, width), and a destination top-left (dr, dc).
+
+Copy the source rectangle so that the destination rectangle holds the same values as the source rectangle held before the copy started.
+
+Use only O(1) auxiliary memory — no temporary 2-D buffer, no per-row scratch array.
+
+Source and destination may overlap.
+
+Notes
+
+For non-overlapping regions, any traversal order works.
+
+For overlapping regions, pick the traversal order based on the offset direction (analogous to memmove):
+
+If dr > r0, copy rows bottom-to-top to avoid overwriting source rows that have not yet been read.
+
+If dr < r0, copy rows top-to-bottom.
+
+Within each row, if dc > c0 copy right-to-left; otherwise left-to-right.
+
+If dr == r0, fall back to the per-column rule on dc.
+
+Boundary checks: clip the rectangles against the array, validate that dr + height ≤ rows, dc + width ≤ cols.
+
+Mention memmove as the canonical analog — the interviewer wants to see that you recognize the overlapping-copy pattern, not just the brute-force case.
+
+Preparation
+
+Implement memmove semantics for a 1-D array first; the 2-D case is just two nested directional walks.
+
+Draw the four quadrants of (sign(dr - r0), sign(dc - c0)) on paper and label which traversal order each requires.
+
+Pre-write a tiny test that copies a rectangle onto its own shifted position and verifies cell-by-cell that no source value is overwritten before being read.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

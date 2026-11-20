@@ -1,0 +1,611 @@
+===H1===
+In-Memory KV Cache With WAL
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/in-memory-kv-cache-with-wal
+===BODY===
+Databricks
+System Design·60 minMembers
+In-Memory KV Cache With WAL
+Design a single-machine in-memory cache for a web service, then add persistence with a write-ahead log and discuss scaling via sharding and lock-contention reduction.
+SWE
+Infra Eng
+in-memory-database
+persistence
+concurrency
+caching
+medium
+Frequency
+Medium
+Last asked
+2026-07-28
+Stage
+onsite-system-design
+In-Memory KV Cache with WAL Log
+
+Problem Statement
+
+Design a low-latency in-memory key-value cache that supports GET, PUT, and DELETE, but unlike a typical best-effort cache, it must also provide durability for acknowledged writes using a Write-Ahead Log (WAL).
+
+The cache should recover quickly after crashes, support TTL-based expiration, handle hot keys, and scale horizontally across many machines. Think of this as a system that sits between applications and a slower backing store, but must not lose recently acknowledged writes just because a cache node restarts.
+
+Disclaimer: This is a sample interview-oriented solution. In a real interview, start by clarifying durability guarantees and whether this cache is the source of truth or just a fast front layer in front of a database.
+
+For this walkthrough, assume the cache is not the long-term system of record, but it must preserve acknowledged writes across process and machine failures within a region so applications do not see recent state disappear after a restart.
+
+Phase 1: Requirements (~5 minutes)
+
+Functional Requirements
+
+Read cached values by key with very low latency
+
+Write or update values with optional TTL
+
+Delete keys explicitly
+
+Recover acknowledged writes after process crash or node restart using WAL replay
+
+Scale horizontally by partitioning keys across shards
+
+Replicate data so a single node failure does not make a shard unavailable
+
+Evict cold items when memory pressure rises
+
+Non-Functional Requirements
+
+Scale: 500k read RPS, 100k write/delete RPS at peak
+
+Latency: p99 reads under 5 ms, p99 writes under 15 ms
+
+Availability: 99.95% within a region
+
+Durability: no loss of acknowledged writes for single-node failures; preferably survive one replica failure as well
+
+Consistency: per-key strong consistency for writes on the primary path; replica reads may be slightly stale unless caller requests strong reads
+
+Recovery: shard restart should recover in minutes, not hours
+
+Capacity Estimation
+
+Assumptions:
+- 10 million hot keys
+- Average key size: 32 bytes
+- Average value size: 1 KB
+- Metadata overhead per item: ~150 bytes
+- Replication factor: 3
+
+Memory per entry:
+32 B key + 1024 B value + 150 B metadata ≈ 1.2 KB
+
+Working set:
+10M * 1.2 KB ≈ 12 GB logical data
+
+With RF=3:
+12 GB * 3 = 36 GB replicated memory footprint
+
+Write throughput into WAL:
+100k writes/s * ~1.1 KB/record ≈ 110 MB/s logical append rate
+With replication to 3 nodes, network traffic is several hundred MB/s across the cluster
+
+If one shard node comfortably handles:
+- 50k reads/s
+- 10k writes/s
+- 4-8 GB hot set
+
+Then we likely want:
+- ~10 primary shards for write throughput
+- plus headroom -> start with 16-24 shards
+
+Call out early that this is not "just Redis." The interviewer is probing whether you understand the tension between cache latency and database-like durability.
+
+Phase 2: Data Model (~5 minutes)
+
+Core Entities
+
+CacheEntry {
+  key: String
+  value: Bytes
+  version: Long          -- monotonically increasing per key or per shard
+  expires_at_ms: Long?   -- null means no TTL
+  last_access_ms: Long
+  size_bytes: Integer
+}
+
+WALRecord {
+  lsn: Long              -- log sequence number
+  op: Enum(PUT, DELETE)
+  key: String
+  value: Bytes?          -- only for PUT
+  expires_at_ms: Long?
+  checksum: String
+  created_at_ms: Long
+}
+
+SnapshotManifest {
+  shard_id: String
+  snapshot_id: String
+  max_lsn: Long
+  object_path: String
+  created_at: Timestamp
+}
+
+ShardAssignment {
+  shard_id: String
+  hash_range_start: Bytes
+  hash_range_end: Bytes
+  leader_node_id: String
+  replica_node_ids: [String]
+  config_version: Long
+}
+
+What Must Be Durable?
+
+WAL records must be durable before a write is acknowledged
+
+Snapshot metadata must be durable so recovery knows the last safe checkpoint
+
+TTL metadata must be durable too, otherwise expired keys may incorrectly reappear after restart
+
+The actual in-memory eviction structure can be approximate, such as TinyLFU or segmented LRU. It does not need to be persisted exactly; only the key/value state and TTL/version metadata must survive recovery.
+
+Phase 3: API Design (~5 minutes)
+
+Protocol Choice
+
+For a cache, I would use gRPC or a lightweight binary protocol rather than REST because:
+
+requests are small and latency-sensitive
+
+multiplexed persistent connections reduce overhead
+
+internal service clients can use generated stubs
+
+In the interview, gRPC is a pragmatic default.
+
+Public APIs
+
+service CacheService {
+  rpc Get(GetRequest) returns (GetResponse);
+  rpc Put(PutRequest) returns (PutResponse);
+  rpc Delete(DeleteRequest) returns (DeleteResponse);
+}
+
+message GetRequest {
+  string key = 1;
+  bool require_leader_read = 2;
+}
+
+message GetResponse {
+  bool found = 1;
+  bytes value = 2;
+  int64 version = 3;
+  int64 expires_at_ms = 4;
+}
+
+message PutRequest {
+  string key = 1;
+  bytes value = 2;
+  int64 ttl_ms = 3;
+  string idempotency_key = 4;
+}
+
+message PutResponse {
+  int64 version = 1;
+  int64 committed_lsn = 2;
+}
+
+message DeleteRequest {
+  string key = 1;
+  string idempotency_key = 2;
+}
+
+message DeleteResponse {
+  int64 committed_lsn = 1;
+}
+
+Internal Replication APIs
+
+AppendWal(shard_id, term, wal_records[])
+AckWal(shard_id, max_lsn)
+InstallSnapshot(shard_id, snapshot_id, object_path, max_lsn)
+Heartbeat(shard_id, term, commit_lsn)
+
+Semantics
+
+PUT is successful only after WAL durability and replication quorum on the chosen write path
+
+GET returns a miss if the key is absent or TTL has expired
+
+DELETE is represented as a tombstone in WAL so recovery is deterministic
+
+idempotency keys protect clients from retry-induced duplicate writes after timeout
+
+Phase 4: High-Level Design (~15-25 minutes)
+
+Architecture Diagram
+
+Request and Replication Path
+
+Node Internals and Control Plane
+
+Core Design
+
+The system is a sharded, replicated cache cluster:
+
+keys are partitioned by consistent hashing or range sharding
+
+each shard has one leader and two followers
+
+the leader handles all writes for that shard
+
+values are stored in memory for fast reads
+
+every write is appended to a WAL before it is acknowledged
+
+periodic snapshots prevent replaying an unbounded log during restart
+
+This is conceptually similar to combining:
+
+a cache hot path for reads
+
+a replicated log for durability
+
+periodic checkpointing for fast recovery
+
+Write Path
+
+For a PUT(key, value, ttl):
+
+Client SDK hashes the key and routes the request to the shard leader
+
+Leader validates request and assigns the next LSN
+
+Leader appends the record to local WAL buffer
+
+WAL is flushed to local SSD, typically using group commit every 1-2 ms
+
+Leader sends the WAL record to followers
+
+Followers durably append the record and acknowledge the append
+
+Once a quorum has durably appended the WAL record, the write is considered committed
+
+Leader applies the mutation to in-memory state and advances the shard commit index
+
+Followers apply committed records to memory in log order before serving them on follower reads
+
+Response returns version and committed_lsn
+
+Why this ordering?
+
+WAL before memory avoids acknowledging data that cannot be recovered
+
+quorum before ack avoids losing acknowledged writes if the leader dies immediately after local fsync
+
+If the interviewer pushes on latency, say you would use micro-batching and group commit. Fsync per request is too expensive at 100k writes/s.
+
+Read Path
+
+For a GET(key):
+
+Client routes to the shard
+
+By default it reads from the leader; follower reads are an opt-in fast path for slightly stale data
+
+The chosen node checks its in-memory map at its current applied LSN
+
+If entry is expired, it returns a miss and schedules lazy cleanup
+
+If entry is present and valid, it returns immediately
+
+This keeps the read path very short:
+
+no disk I/O
+
+no coordination on cache hit
+
+only memory lookup plus TTL check
+
+Delete Path
+
+Deletes are handled as tombstones:
+
+Append DELETE to WAL
+
+Replicate to quorum
+
+Remove from in-memory map or mark as tombstone
+
+The tombstone is important because otherwise restart from snapshot could resurrect deleted data.
+
+Eviction and TTL
+
+TTL and eviction solve different problems:
+
+TTL defines correctness and freshness
+
+Eviction handles memory pressure
+
+Recommended approach:
+
+store expires_at_ms with every entry
+
+remove expired entries lazily on read and eagerly in background sweeps
+
+use TinyLFU + segmented LRU for eviction under pressure
+
+do not WAL-log pure eviction events because eviction is not a logical delete
+
+If an item is evicted but still valid, it becomes a normal cache miss and can be repopulated from backing storage.
+
+Snapshot and Recovery Flow
+
+Snapshotting
+
+Periodically, each shard leader:
+
+Creates a consistent point-in-time snapshot of in-memory state up to max_lsn
+
+Uploads snapshot files to object storage
+
+Publishes a SnapshotManifest
+
+Marks WAL segments below max_lsn as compactable once followers have also advanced
+
+Snapshots should be incremental or copy-on-write so they do not block the write path for long.
+
+Recovery
+
+On restart:
+
+Load the latest snapshot for the shard
+
+Read its max_lsn
+
+Replay WAL segments after that LSN
+
+Rebuild the in-memory hash table
+
+Rejoin the shard as follower first
+
+Shard Placement and Failover
+
+The placement service stores:
+
+shard ownership
+
+current leader per shard
+
+replica membership
+
+config version
+
+Use Raft or a similar consensus-backed control plane for leader election. On leader failure:
+
+control plane promotes a follower with the highest committed LSN
+
+routers refresh shard map
+
+writes resume to the new leader
+
+Because all acknowledged writes required quorum durability, the promoted follower should already contain committed state.
+
+Backing Store Interaction
+
+This cache typically fronts a slower durable database or object store.
+
+Three common models:
+
+Write-through cache
+
+synchronously write the backing store and cache as part of one request path before ack
+
+simplest mental model for callers
+
+higher write latency because the backing store is on the critical path
+
+Write-behind cache
+
+acknowledge after the cache commit, then flush to backing storage asynchronously
+
+lowest application write latency
+
+highest risk if the cache tier is the only durable copy for too long
+
+Cache-aside with durable cache state
+
+app writes backing DB first, then updates cache
+
+cache durability mainly improves restart behavior and reduces cold misses
+
+For this interview, I would say:
+
+if the cache is authoritative for recent session or coordination state, use the replicated WAL path described above
+
+if the database is source of truth, prefer cache-aside or carefully designed write-through semantics, while WAL still helps fast warm recovery
+
+Phase 5: Scaling & Trade-offs (~15-20 minutes)
+
+1. Meeting the Write Latency Goal
+
+The main bottleneck is WAL fsync and replication.
+
+Mitigations:
+
+group commit every 1-2 ms
+
+batch replication records
+
+keep WAL on local NVMe SSD
+
+use one WAL writer thread per shard or per core group
+
+separate the network replication pipeline from client request threads
+
+Trade-off:
+
+larger batches improve throughput but increase tail latency
+
+2. Preventing Hot-Key Overload
+
+Hot keys can overload one shard even if overall traffic is balanced.
+
+Options:
+
+replicate hot values to followers and allow follower reads
+
+use request coalescing for concurrent misses
+
+if the workload allows decomposition, split one logical hot item into multiple subkeys or buckets
+
+add short-lived near-cache inside clients for read-mostly keys
+
+If the interviewer asks about hot keys, do not jump directly to "reshard the cluster." A single key cannot be split by normal hashing. You need replication, key-specific fanout, or application-level decomposition.
+
+3. Snapshot Strategy
+
+Without snapshots, restart time grows linearly with WAL size.
+
+Better approach:
+
+snapshot every N GB of WAL or every few minutes
+
+keep WAL in segment files
+
+upload compacted snapshots to object storage
+
+delete old segments only after snapshot durability and follower advancement are confirmed
+
+Trade-off:
+
+more frequent snapshots reduce recovery time
+
+but they consume CPU, memory bandwidth, and object storage bandwidth
+
+4. Consistency Trade-offs
+
+Choices:
+
+Leader-only reads: strongest consistency, higher load on leader
+
+Follower reads: lower latency and better scale, but slightly stale
+
+Ack after local WAL only: lower write latency, but acknowledged writes can be lost on immediate leader failure
+
+Ack after quorum WAL: stronger durability, slightly slower writes
+
+For Databricks-style interviews, I would explicitly choose:
+
+quorum WAL durability for writes
+
+leader reads by default for correctness-sensitive clients
+
+follower reads as an opt-in mode for read-heavy workloads
+
+5. Memory Management and Eviction
+
+Challenges:
+
+large values increase GC or allocator pressure
+
+fragmentation can hurt effective memory utilization
+
+pure LRU can be polluted by scans
+
+Better design:
+
+store values in slab-allocated arenas or pooled buffers
+
+use approximate admission and eviction such as TinyLFU
+
+keep metadata compact and cache-friendly
+
+6. Multi-Region Story
+
+If asked about multi-region:
+
+keep one write leader region per shard
+
+replicate asynchronously to secondary regions
+
+serve local reads from regional replicas when staleness is acceptable
+
+Trade-off:
+
+synchronous cross-region quorum would severely hurt write latency
+
+So I would optimize for single-region strong durability first, then extend to async disaster recovery across regions.
+
+7. Failure Modes
+
+Important cases to discuss:
+
+crash after WAL append but before in-memory apply
+
+crash after local fsync but before follower quorum
+
+follower lag during snapshot compaction
+
+partial WAL record at end of file due to crash
+
+duplicate client retries after timeout
+
+Mitigations:
+
+only acknowledge after commit quorum
+
+use checksums and record length framing in WAL
+
+keep commit index separate from appended-but-uncommitted records
+
+use idempotency keys or client sequence numbers
+
+Do not claim "WAL means no data loss" without defining the acknowledgement point. WAL on the leader alone is not enough if the leader can fail before replication.
+
+Common Pitfalls
+
+Applying to memory before WAL durability leads to acknowledged writes disappearing after restart.
+
+Treating eviction as a logical delete is incorrect. Eviction is a memory-management event, not a user-visible mutation.
+
+Ignoring tombstones can cause deleted keys to reappear after snapshot restore and WAL replay.
+
+Using exact LRU everywhere sounds nice but is often too expensive at large scale. Approximate policies are usually the practical choice.
+
+Replaying an unbounded WAL makes restart time unacceptable. You need snapshots and log compaction.
+
+Interview Checklist
+
+  Clarified whether the cache is source of truth or a front layer
+
+  Defined durability precisely for acknowledged writes
+
+  Chose a shard + leader/follower replication model
+
+  Explained WAL-before-memory ordering
+
+  Covered TTL, eviction, and tombstones separately
+
+  Described snapshotting, replay, and compaction
+
+  Addressed hot keys and failover
+
+  Explained consistency and latency trade-offs clearly
+
+Summary
+
+AreaChoiceWhy
+PartitioningSharded clusterScale reads and writes horizontally
+Write pathLeader append to WAL, quorum replicate, then ackPreserves acknowledged writes
+Read pathIn-memory lookup with TTL checkKeeps hit latency very low
+RecoverySnapshot + WAL replayFast restart without replaying entire history
+DeletionsTombstones in WALPrevents deleted keys from reappearing
+EvictionTinyLFU or segmented LRUPractical under memory pressure
+FailoverConsensus-based leader promotionRestores availability after node loss
+Multi-regionAsync replicationKeeps write latency reasonable
+
+The key interview insight is that this system sits in the uncomfortable middle ground between a cache and a database. To do well, be explicit about the exact acknowledgement point, the durability contract, and how WAL, snapshots, TTL, eviction, and failover all interact.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

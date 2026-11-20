@@ -1,0 +1,60 @@
+===H1===
+Hash Collision: Causes, Resolution, Complexity
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/hash-collision-fundamentals
+===BODY===
+Goldman Sachs
+Other·30 minMembers
+Hash Collision: Causes, Resolution, Complexity
+Verbal CS-fundamentals question: explain time complexity of hashmap operations, the cause of hash collisions, and the standard collision-resolution strategies. Common in VP-level phone screens as a fit-and-fundamentals warm-up.
+SWE
+cs-fundamentals
+hashmap
+verbal
+complexity-analysis
+easy
+Frequency
+Single report
+Last asked
+2024-11-21
+Stage
+phone-screen
+Requirements
+
+Be prepared to discuss, without writing code:
+
+Time complexity of hashmap operations — average O(1) for insert / lookup / delete; worst case O(n) when all keys hash to the same bucket (e.g. adversarial input or a degenerate hash function).
+
+What causes hash collisions — finite bucket count, non-uniform hash function, adversarial input crafted to land in one bucket.
+
+Resolution strategies:
+
+Separate chaining — each bucket holds a linked list (or a small tree, as in Java 8+ HashMap which converts to a red-black tree past a threshold).
+
+Open addressing — probe to the next slot via linear probing, quadratic probing, or double hashing. Used in Python's dict, Robin Hood hashing, etc.
+
+Rehashing / resizing — grow the table and re-insert when load factor exceeds a threshold (typically 0.75 for chaining, 0.5 for open addressing).
+
+Production considerations — adversarial-input resilience (random seeded hash, SipHash in Python), cache locality (open addressing wins), memory overhead (chaining loses), wall-clock behavior under heavy collision.
+
+Notes
+
+Java 8+ HashMap is the canonical reference: chaining + tree-bin conversion at 8 entries per bucket.
+
+Python dict uses open addressing with perturbation; CPython 3.6+ preserves insertion order via a separate index array.
+
+Goldman interviewers like the "what happens at load factor 1.0" probe — answer: average bucket length grows, lookup degrades to O(load), and a resize is typically triggered before this point.
+
+Preparation
+
+Be able to articulate both chaining and open addressing in 90 seconds each.
+
+Memorize Java's tree-bin threshold (8 entries) and the typical load-factor trigger (0.75) — small concrete numbers earn credit.
+
+Practice the "why might a hashmap be O(n) worst case in production" answer, with adversarial-hash as the central example.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

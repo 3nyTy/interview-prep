@@ -1,0 +1,58 @@
+===H1===
+Valid Parentheses with Wildcard '*' and DFS All Strings
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/valid-parentheses-with-wildcard
+===BODY===
+ByteDance / TikTok
+Coding·60 minMembers
+Valid Parentheses with Wildcard '*' and DFS All Strings
+Validate a parenthesis string where `*` can act as `(`, `)`, or empty. Follow-up: enumerate every valid concrete string the input can produce.
+SWE
+string
+stack
+dfs
+backtracking
+testing
+medium
+Frequency
+Single report
+Last asked
+2026-01-30
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Given a string containing only (, ), and *, return whether the string is valid where * may be treated as (, ), or the empty string. Then, as a follow-up, return every distinct valid concrete string that the input can produce by DFS-expanding each *.
+
+def checkValidString(s: str) -> bool: ...
+def allValidStrings(s: str) -> List[str]: ...
+
+The interviewer also expects you to write your own test cases and run them on the chosen editor (Lark in the reported round).
+
+Notes
+
+Validity check optimal in O(n) with two counters: low (minimum possible open count) and high (maximum possible open count). Update both per character; if high drops below 0, fail; clamp low at 0. At the end, low == 0 ⇒ valid.
+
+Alternative: two-stack approach tracking indices of ( and * separately; on a ) pop from ( stack first, else from * stack.
+
+For the all-strings DFS, branch each * into three children ((, ), empty), prune on running balance < 0, and dedupe at the end (a set is fine).
+
+Common bug: failing to clamp low at 0 in the linear-time check produces false negatives on strings like (*)).
+
+For the enumeration variant, the state space is exponential in the count of *; interviewers expect you to call this out and discuss pruning, not optimize beyond the obvious backtracking.
+
+Preparation
+
+Drill the low/high two-counter linear check until you can derive both invariants verbally.
+
+Code the backtracking enumeration separately, with an explicit prune on negative balance.
+
+Practice writing 4-5 test cases yourself: empty string, all *, balanced, deeply unbalanced, mixed.
+
+Have a validate(s) helper ready to verify each enumerated candidate during the DFS.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

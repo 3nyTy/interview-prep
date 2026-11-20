@@ -1,0 +1,140 @@
+===H1===
+Flight Tracker — User Location at a Given Time
+===URL===
+https://www.1point3acres.com/interview/problems/company/ramp/flight-user-location
+===BODY===
+Ramp
+CodingFree preview
+Flight Tracker — User Location at a Given Time
+Given a list of flights (departure/arrival airport + time, user_id), answer where a given user was at a given time, plus which user took the most flights. Binary search over each user's chronologically-sorted flights, with careful edge cases.
+SWE
+binary-search
+array
+simulation
+io
+medium
+Frequency
+Low
+Last asked
+2026-06-01
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Given a list of flights, each shaped like:
+
+{
+  "departure_airport": "SFO",
+  "departure_time": "2021-10-26T16:15:00Z",
+  "arrival_airport": "JFK",
+  "arrival_time": "2021-10-26T21:34:00Z",
+  "user_id": 1
+}
+
+Implement (at least) two queries:
+
+get_user_with_most_flights() — the user who took the most flights.
+
+get_user_location(user_id, time) — the airport the user is at (or associated with) at time.
+
+The location rules carry most of the difficulty:
+
+In the air (between a flight's departure and arrival time) → return an empty string.
+
+On the ground between two flights (landed and waiting) → the arrival airport of the most recent completed flight.
+
+Before the first flight departs → the departure airport of the first flight.
+
+After the last flight lands → the final arrival airport.
+
+The canonical OA shape models each record as a small frozen dataclass and exposes the two parts as separate signatures:
+
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Flight:
+    user_id: str
+    depart_airport: str
+    depart_time: int
+    arrive_airport: str
+    arrive_time: int
+
+Part 1 — most flights (warm-up):
+
+from typing import Optional
+
+def get_user_with_most_flights(flights: list[Flight]) -> Optional[str]:
+    ...
+    # Returns the user_id with the most flight records.
+    # Tie-break: lexicographically smallest tied user_id (keeps test output deterministic).
+    # Returns None if the flight list is empty.
+
+Part 2 — location at a timestamp (the core; usually a class so repeated queries reuse the preprocessing):
+
+class FlightHistory:
+    def __init__(self, flights: list[Flight]):
+        ...
+    def location_at(self, user_id: str, time: int) -> Optional[str]:
+        ...
+        # Before the user's first departure  -> first flight's depart_airport.
+        # In flight                          -> "".
+        # Landed and waiting between flights -> previous flight's arrive_airport.
+        # After the last arrival             -> final arrive_airport.
+        # Returns None if the user has no flight history.
+
+Assume each user's flights do not overlap and every flight has depart_time < arrive_time — a robust constructor validates both and raises ValueError on a violation.
+
+Examples
+
+The flights list above (user 1 has SFO→JFK→MIA→MSY, user 2 has SFO→SEA→JFK) is the actual prompt data. Queries take a user_id and an ISO-8601 time and return the airport string under the rules above.
+
+Synthesized single-user demo (integer times, SFO --10→20--> JFK --30→40--> LAX):
+
+location_at("u1", 5)   # "SFO"  (before first departure)
+location_at("u1", 15)  # ""     (in flight)
+location_at("u1", 25)  # "JFK"  (landed, waiting)
+location_at("u1", 50)  # "LAX"  (after final arrival)
+location_at("u3", 10)  # None   (unknown user)
+
+Notes
+
+This is the most recognizable Ramp coding question and appears in both the phone screen and the onsite coding round. It is also published on third-party practice sites, so expect interviewers to assume some familiarity — still walk through your exploration rather than racing to the answer.
+
+Sort each user's flights by time once, then binary search the time axis; the core algorithm is easy, but aligning the four boundary cases (in-air, layover, pre-first, post-last) is where candidates lose time and miss a final edge case.
+
+The harness adds engineering friction beyond the algorithm: you may need to import the data file from a different folder than the test, explore the JSON by printing it first, and write your tests with pytest. Leave time to get bug-free, not just "mostly working."
+
+Times are ISO-8601 strings — parse to comparable timestamps before searching.
+
+Half-open interval boundary table
+
+Treat each flight as a half-open interval on the time axis; this resolves the exact-boundary moments unambiguously:
+
+Query timeUser isReturn
+time < first depart_timenot yet departedfirst flight's depart_airport
+time == depart_timein flight""
+depart_time <= time < arrive_timein flight""
+time == arrive_timelandedthat flight's arrive_airport
+arrive_time <= time < next depart_timelanded, waitingprevious arrive_airport
+time >= last arrive_timeafter final arrivalfinal arrive_airport
+
+Key edge: at a departure the user is already in the air; at an arrival the user is already at the destination. The single binary-search branch (last flight with depart_time <= time, then compare against its arrive_time) collapses the between-flight and after-final-flight cases into one path, since the last departed flight is the user's latest known location once it has arrived.
+
+Unknown user vs in-air
+
+Distinguish the two "empty-ish" answers: an unknown user_id (no history) returns None, whereas a known user currently in flight returns "". Don't conflate them.
+
+Suggested preprocessing
+
+Bucket flights into a dict[user_id → flights sorted by depart_time] plus a parallel list of departure times per user; bisect_right(departures, time) - 1 gives the candidate flight (index -1 ⇒ before first departure). Query is O(log F_u); preprocessing is O(N log N). Validate overlap and depart_time < arrive_time during the same pass. If both parts are asked in one class, compute the per-user flight counts in that same preprocessing pass.
+
+Preparation
+
+Implement get_user_location from scratch and unit-test all four boundary cases (in-air, between-flights, before-first, after-last) plus the exact-boundary moments (precisely at a departure or arrival time).
+
+Practice the CPython mechanics cold: parse ISO-8601 timestamps, bisect over a sorted key list, and structure a small pytest file that imports a module from a sibling directory.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

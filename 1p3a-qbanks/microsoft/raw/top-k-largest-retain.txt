@@ -1,0 +1,63 @@
+===H1===
+Top-K Largest Elements (Retain / Rank Stores)
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/top-k-largest-retain
+===BODY===
+Microsoft
+Coding·45 minMembers
+Top-K Largest Elements (Retain / Rank Stores)
+The recurring MAI phone-screen coding warm-up: return the top-K elements of a list under a simple ranking rule. It appears as direct top-K selection, retaining the K largest in original order, or ranking business candidates by a composite key.
+MLE
+SWE
+heap
+top-k
+sorting
+easy
+Frequency
+Low
+Last asked
+2026-08-04
+Stage
+phone-screen
+Requirements
+
+Three shapes of the same top-K selection round, each running about 10-20 minutes after the BQ section of a 45-minute MAI phone screen:
+
+Shape 1 — Retain the K largest, original order
+
+input:  nums (list of ints), k (int)
+output: the original list with only the K largest values kept; smaller values removed, remaining elements stay in their original order
+
+Shape 2 — Rank stores by a composite key
+
+input:  list of business candidates, each with (score, distance, isOpen)
+output: the top-K candidates sorted by score descending, ties broken by distance ascending
+
+Clarify up front how isOpen is used — the prompt lists it as a field but does not always state whether closed candidates are filtered out before ranking.
+
+Shape 3 — Return the K largest values
+
+input:  nums (list of ints), k (int)
+output: the K largest values
+
+The direct-return form leaves output order and duplicate handling unstated; clarify those points and the valid range of k before coding.
+
+Notes
+
+All three shapes are heap / partial-sort exercises. A size-K min-heap gives O(N log K); heapq.nlargest(k, items, key=...) handles the composite-key shape directly. For Shape 1, find the K-th largest value first (quickselect or heap), then sweep the original list keeping elements >= that threshold — watch the duplicates-at-threshold case, where several elements tie at the cutoff and you can end up keeping more than K. Clarify the tie rule before coding.
+
+The round grades clean tie-handling and a stated complexity as much as a working answer, and you write your own test cases.
+
+Preparation
+
+Implement both a size-K min-heap selection and a quickselect-threshold sweep; be able to say when each is preferable.
+
+Pre-write a composite-key comparator (primary descending, secondary ascending) and rehearse heapq.nlargest.
+
+Practice the two clarifying questions: duplicate handling at the cutoff, and whether a boolean field (isOpen) filters or just tie-breaks.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

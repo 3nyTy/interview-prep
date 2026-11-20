@@ -1,0 +1,46 @@
+===H1===
+Remove Nth Node From End of List
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/lc-remove-nth-from-end
+===BODY===
+Meta
+Coding·20 minMembers
+Remove Nth Node From End of List
+Classic LC 19 — remove the Nth-from-end node of a singly-linked list in one pass. Asked as the second phone-screen problem in a Sr SDE loop.
+SWE
+linked-list
+two-pointer
+easy
+Frequency
+Single report
+Last asked
+2026-05-08
+Stage
+phone-screen
+Requirements
+
+Input: head of singly-linked list, integer n (1-indexed from the tail).
+
+Return the modified head after removing the n-th node from the end.
+
+Constraint: do it in one pass.
+
+Notes
+
+Two-pointer pattern: advance fast by n+1 steps then walk both pointers until fast is null. slow.next is the target's predecessor.
+
+A sentinel/dummy head removes the special case of deleting the original head.
+
+Edge cases: list of length 1, n == length, n == 1.
+
+Preparation
+
+Drill the sentinel-head pattern; it generalizes to a family of linked-list deletion problems.
+
+Verbalize the invariant ("after the first loop, fast is n ahead of slow") — interviewers grade clarity on this kind of problem more than the code.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

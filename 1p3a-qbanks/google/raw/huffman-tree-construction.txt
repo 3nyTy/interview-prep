@@ -1,0 +1,53 @@
+===H1===
+Huffman Tree Construction
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/huffman-tree-construction
+===BODY===
+Google
+Coding·45 minMembers
+Huffman Tree Construction
+Classic Huffman build from a frequency map. L6 onsite coding — interviewer expects 25 min of code-then-discuss.
+SWE
+tree
+heap
+greedy
+hard
+Frequency
+Low
+Last asked
+2026-06-01
+Stage
+onsite-coding
+Requirements
+
+Input: map of symbol → frequency.
+
+Output: a Huffman tree (or equivalent prefix-code map).
+
+Algorithm: priority queue / min-heap of nodes ordered by frequency; pop two smallest, merge into a parent with summed frequency, push back; iterate until one node remains.
+
+Examples
+
+{"a": 5, "b": 9, "c": 12, "d": 13, "e": 16, "f": 45} → standard Huffman tree with f near the root.
+
+Notes
+
+L6 onsite — interviewer expects clean code with a documented tree node, plus a discussion of encoding / decoding correctness.
+
+Common follow-up: how to produce the code table (DFS from root, accumulating bits).
+
+Trade-off discussion: Huffman is optimal for known per-symbol probability but not for adaptive / streaming inputs.
+
+Preparation
+
+Write the heap-based Huffman build from memory in under 15 min.
+
+Drill the encode + decode helpers (DFS to build the code map; tree walk to decode).
+
+Be ready to compare against arithmetic coding (better compression, costlier).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

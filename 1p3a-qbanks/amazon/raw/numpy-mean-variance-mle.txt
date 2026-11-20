@@ -1,0 +1,48 @@
+===H1===
+NumPy Mean and Variance with MLE Follow-Up
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/numpy-mean-variance-mle
+===BODY===
+Amazon
+Coding·15 minMembers
+NumPy Mean and Variance with MLE Follow-Up
+Write NumPy computations for mean and variance, then discuss maximum-likelihood estimation.
+RS
+MLE
+numpy
+probability
+Frequency
+Single report
+Last asked
+2026-09-01
+Stage
+onsite-coding
+Requirements
+
+Write a NumPy function that computes the mean.
+
+Compute the variance as part of the same numerical exercise.
+
+Follow-up: discuss maximum-likelihood estimation in connection with the mean and variance calculations.
+
+Notes
+
+Asked in an ADS L6 Applied Scientist loop. Behavioral discussion left approximately 15 minutes for coding.
+
+Array shape, reduction axis, variance convention, and the exact MLE follow-up are unspecified; establish these before choosing an implementation.
+
+After agreeing on the reduction axis, compute the mean in floating point and reduce squared deviations from that mean. Use keepdims while centering an array so broadcasting aligns correctly. Population variance divides by N; an unbiased sample-variance estimate divides by N-1 and requires N > 1. Define empty-input behavior before dividing.
+
+As a preparation model, if observations are assumed independent Gaussian samples, maximizing likelihood gives the sample mean and variance with divisor N, not N-1. This Gaussian assumption is a practice case, not an additional interview requirement. Constant observations give zero variance, a degenerate boundary for a strictly positive Gaussian variance. Two reduction passes take O(N) time; a vectorized centered temporary can require O(N) additional memory.
+
+Preparation
+
+Implement axis-aware mean and both variance conventions; check a short vector and a small matrix against hand calculations.
+
+Derive the independent-Gaussian log-likelihood derivatives and explain the N versus N-1 distinction without assuming the interview specifies that model.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

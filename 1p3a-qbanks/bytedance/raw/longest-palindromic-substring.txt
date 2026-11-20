@@ -1,0 +1,51 @@
+===H1===
+Longest Palindromic Substring (LeetCode 5)
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/longest-palindromic-substring
+===BODY===
+ByteDance / TikTok
+Coding·60 minMembers
+Longest Palindromic Substring (LeetCode 5)
+Return the longest contiguous palindromic substring. A follow-up requires Manacher's algorithm rather than the classic expand-around-center baseline.
+SWE
+string
+palindromes
+dp
+medium
+Frequency
+Low
+Last asked
+—
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Given a string, return a longest contiguous substring that reads the same forward and backward.
+
+Follow-up: replace the classic baseline with Manacher's algorithm.
+
+The exact function signature, character set, constraints, and tie behavior are unspecified; clarify them before coding.
+
+Notes
+
+The baseline expands around every odd and even center, updating the best interval whenever matching characters extend farther. It runs in O(n²) time and O(1) auxiliary space.
+
+A dynamic-programming table is also O(n²) time but uses O(n²) space, so it is usually less attractive unless the interviewer asks for the recurrence.
+
+Manacher's algorithm inserts separators so odd- and even-length palindromes share one representation. Maintain the center and right boundary of the farthest-reaching palindrome, seed each radius from its mirror when that index lies inside the boundary, then expand and update the boundary.
+
+The Manacher pass is O(n) time and O(n) space. Keep the radius definition and transformed-to-original index mapping explicit; most implementation errors come from mixing those coordinate systems.
+
+Preparation
+
+Implement expand-around-center from a blank editor and trace both odd- and even-length answers.
+
+Implement Manacher's algorithm without a template, then explain the mirror-radius invariant and why the total expansion work is linear.
+
+Dry-run a one-character string, an all-equal string, an even-length answer, and competing maximum-length answers; verify that the returned substring boundaries remain valid.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

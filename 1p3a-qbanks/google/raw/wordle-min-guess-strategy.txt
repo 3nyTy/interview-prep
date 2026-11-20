@@ -1,0 +1,65 @@
+===H1===
+Wordle-Style 5-Letter Minimum-Guess Strategy
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/wordle-min-guess-strategy
+===BODY===
+Google
+Coding·45 minMembers
+Wordle-Style 5-Letter Minimum-Guess Strategy
+Phone screen coding: given a black-box oracle that tells you whether a specific letter is at a specific position in a hidden 5-letter word, design an algorithm to identify the word in as few oracle calls as possible. Follow-up assumes a dictionary of candidate words is available.
+SWE
+algorithm-design
+greedy
+hard
+Frequency
+Single report
+Last asked
+2025-12-15
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Hidden word: a 5-letter string from a..z.
+
+Oracle: query(pos: int, letter: char) -> bool returns whether position pos (0-indexed) holds letter.
+
+Return the hidden word.
+
+Primary metric: minimize the number of query calls.
+
+Brute-force baseline: 5 × 26 = 130 calls.
+
+Follow-up
+
+A dictionary of candidate 5-letter words is available; design the strategy to use bigram/letter-frequency information to cut the expected number of calls.
+
+Examples
+
+HiddenWord = "GRAPE"
+query(0, 'A') → false
+query(0, 'G') → true   // first letter found
+...
+
+Notes
+
+Without the dictionary, query positions in order; per position, query letters in descending frequency (e, t, a, o, i, n, ...) and stop as soon as one returns true.
+
+With the dictionary, maintain a candidate set; at each step pick the (position, letter) query whose true/false outcome splits the candidate set most evenly (entropy maximization).
+
+Mention information theory: each query yields ≤ 1 bit, so the absolute lower bound on calls is ceil(log2(|candidates|)).
+
+Don't waste minutes on a closed-form optimum — the interviewer mostly wants you to articulate the entropy heuristic and pick one reasonable scoring function.
+
+Preparation
+
+Drill information-theoretic puzzles (egg drop, twenty questions) to internalize the entropy-split heuristic.
+
+Practice maintaining a candidate set under positive/negative oracle feedback (filter on each query result).
+
+Be ready with a one-liner on Wordle's known optimal first guess (SOARE / CRANE) for intuition; do not hard-code it.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

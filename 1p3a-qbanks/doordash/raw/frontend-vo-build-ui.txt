@@ -1,0 +1,70 @@
+===H1===
+Frontend VO: Build UI from Mockup with API
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/frontend-vo-build-ui
+===BODY===
+DoorDash
+Coding·75 minMembers
+Frontend VO: Build UI from Mockup with API
+Frontend phone-screen and onsite coding rounds. Given a mock API and a design mockup, build the UI to match in HackerRank's in-browser editor. Variants include adding filter buttons, conditional category rendering, see-more / collapse behavior, and an exact CSS / flexbox layout match. Tests both React / TypeScript fluency and ability to work in the platform's editor.
+SWE
+frontend
+react
+fullstack
+api-integration
+medium
+Frequency
+Low
+Last asked
+2026-03-20
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input: a mockup image; a mock API endpoint returning JSON data.
+
+Output: a React + TypeScript component (or vanilla JS depending on team) that renders the data to match the mockup.
+
+Common feature additions added across rounds:
+
+Filter buttons that filter the rendered list by a tag / response field.
+
+A new category with its own filter behavior.
+
+A "see more / see less" toggle that expands or collapses a list section.
+
+Pixel-perfect CSS to match the mockup (flexbox layouts with image + price + category).
+
+Run in HackerRank in-browser editor — no local IDE, no live preview unless the platform supports it.
+
+Notes
+
+The most reported friction is the in-browser editor: candidates lose time on console.log undefined debugging because they're not familiar with the platform. Set up a HackerRank free account and run through their React playground before the round.
+
+Watch for subtle mockup details that the interviewer expects pixel-accurate: image aspect ratio inside a flexbox row, price formatting (decimal places, currency symbol), spacing between buttons.
+
+The "see more / see less" pattern is a common timing trap — implement it last, after the data layer + filters are stable.
+
+CSS file is usually provided; do not rewrite from scratch unless the layout requires it.
+
+TypeScript types for the API response are a graded signal; do not use any for the response shape.
+
+The 2-question pattern (phone screen → VO) means the VO round is an extension of the phone-screen prompt; same data model, more interactions. Candidates who pass the phone screen should re-read their own code from that round.
+
+Preparation
+
+Spend 1–2 hours in HackerRank's React playground. Get fluent in their editor shortcuts and console output handling.
+
+Build a small reference project: list view + filter buttons + collapsible section + flexbox row layout. Memorize the boilerplate.
+
+Practice writing TypeScript types for arbitrary JSON shapes in under 2 minutes.
+
+Pre-write a formatPrice(n: number): string helper that matches common conventions ($12.99, $1,234.56).
+
+For the second-round VO: bring a written component skeleton (functional component + useState + useEffect + map render) so the round opens with structure already in place.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

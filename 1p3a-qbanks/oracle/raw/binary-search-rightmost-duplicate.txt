@@ -1,0 +1,65 @@
+===H1===
+Binary Search — Rightmost Index of Duplicate
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/binary-search-rightmost-duplicate
+===BODY===
+Oracle
+Coding·30 minMembers
+Binary Search — Rightmost Index of Duplicate
+In a sorted array with duplicate values, find the rightmost (last) occurrence index of a target value using binary search. Asked as the coding portion of an OCI IC4 phone screen after a 30-minute resume walk-through.
+SWE
+Infra Eng
+array
+binary-search
+easy
+Frequency
+Single report
+Last asked
+2025-07-07
+Stage
+phone-screen
+Requirements
+
+Input: a sorted array of integers (ascending) that may contain duplicates, and a target value.
+
+Output: the largest index i such that arr[i] == target. Return -1 if the target is not present.
+
+Must use binary search — linear scan is not accepted.
+
+Notes
+
+Standard right-boundary binary search:
+lo, hi = 0, n - 1
+result = -1
+while lo <= hi:
+    mid = (lo + hi) // 2
+    if arr[mid] == target:
+        result = mid
+        lo = mid + 1       # keep searching right
+    elif arr[mid] < target:
+        lo = mid + 1
+    else:
+        hi = mid - 1
+return result
+
+The key inversion vs the textbook "first occurrence" version: on equality, push lo = mid + 1 (move right) instead of hi = mid - 1 (move left).
+
+Common bug: forgetting to update result on equality before advancing the pointer — the loop exits without ever recording the matching index.
+
+For finding both boundaries simultaneously, run the algorithm twice (left + right) and return (left, right), the count being right - left + 1.
+
+Equivalent to LeetCode 34 ("Find First and Last Position of Element in Sorted Array").
+
+Preparation
+
+Implement both the leftmost and rightmost binary-search variants from scratch in under 10 minutes each.
+
+Walk through the algorithm on [1, 2, 2, 2, 3], target=2 → return index 3. Trace lo, hi, mid after each iteration.
+
+This round was 30 minutes for resume + 30 for the problem — get coding done in under 15 minutes so any follow-up (counting occurrences, generalising to non-integer arrays) fits comfortably.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

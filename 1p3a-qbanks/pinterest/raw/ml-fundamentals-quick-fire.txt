@@ -1,0 +1,73 @@
+===H1===
+ML Fundamentals Quick-Fire
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/ml-fundamentals-quick-fire
+===BODY===
+Pinterest
+Other·30 minMembers
+ML Fundamentals Quick-Fire
+First half of the MLE phone screen — and occasionally a warm-up on technical-screen / onsite — is a rapid verbal quiz on overfitting, bias-variance, L1 vs L2, vanishing gradients (with placement: input-side vs output-side), and learning-rate behavior. Wrong answers lose the round before coding even starts.
+MLE
+ml-knowledge
+verbal
+cs-fundamentals
+medium
+Frequency
+High
+Last asked
+2026-07-16
+Stage
+phone-screen · onsite-research
+Requirements
+
+A rapid-fire verbal quiz, typically 5–10 short questions in 20–30 minutes. Recurring asks:
+
+What is overfitting? How do you detect and prevent it?
+
+Why is regularization used?
+
+Bias vs variance — definition, trade-off, what changes each.
+
+L1 vs L2 regularization — what's the difference, when do you use each?
+
+Gradient vanishing / exploding — what causes it, and in a fully-connected network does it happen near the input side or the output side?
+
+Which activation functions better avoid vanishing gradients?
+
+Which architectural choices reduce vanishing gradients? Explain how residual or skip connections improve gradient flow through deep networks.
+
+What role do normalization methods such as batch normalization play?
+
+Dropout — how does it work, when do you turn it off?
+
+Learning rate — what happens with too-large or too-small LR? At what value does loss start to fluctuate?
+
+Cross-entropy loss — derive it for binary classification.
+
+Train accuracy high / test accuracy low — diagnose the cause.
+
+Model parameters going to zero — what does that indicate?
+
+Notes
+
+Most candidates lose this round on the gradient-vanishing direction question. In a deep fully-connected network with sigmoid / tanh activations, vanishing gradients accumulate as the backward pass propagates away from the loss, i.e. they hit the input-side layers harder. Saying "input side" is the expected answer.
+
+The L1 vs L2 question is graded on more than "L1 sparsifies, L2 doesn't" — interviewers push on the geometry (L1 corners → sparse) and on when each is appropriate (L1 for feature selection, L2 for general regularization / numerical stability).
+
+The "where does training data come from" follow-up on a system-design prompt is in the same family — "from user history" is repeatedly flagged as insufficient. Have a concrete positives-vs-negatives sampling story prepared.
+
+Speed matters. Interviewers expect 30–60-second answers per question; spending 3 minutes on overfitting means the rest of the quiz doesn't fit.
+
+Preparation
+
+Write down a 60-second answer for each question above and rehearse it cold. The answers should be brief but include a concrete example, not just a textbook definition.
+
+Cross-check the gradient-vanishing direction by deriving it on a 3-layer toy network — knowing why the answer is "input side" (the product of activation derivatives shrinks as you propagate backward) is the depth interviewers grade on.
+
+Pre-stage 3 concrete project anecdotes for the "diagnose train-high test-low" follow-up — interviewers always pivot from the textbook answer to your own experience.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

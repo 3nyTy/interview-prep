@@ -1,0 +1,281 @@
+===H1===
+UNet Debugging for Image MLE
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/unet-debugging-for-image-mle
+===BODY===
+Apple
+Coding·45 minMembers
+UNet Debugging for Image MLE
+Image / video MLE phone screen asking ML concepts plus a PyTorch UNet debugging task: fix tensor shape, decoder boolean, final kernel size, and number of classes.
+MLE
+pytorch
+debugging
+ml-knowledge
+vlm
+medium
+Frequency
+Single report
+Last asked
+2026-02-25
+Stage
+phone-screen
+Problem Overview
+
+This is an Apple Machine Learning Engineer phone screen round that has tripped up candidates who did not prepare. You are given a mostly-correct PyTorch implementation of the UNet from the original Ronneberger et al. 2015 paper, along with a target input/output spec. The code does not run (or runs and produces the wrong output shape). Your job is to fix it.
+
+The canonical debugging task includes four specific bugs to find:
+
+The input tensor shape passed into the model
+
+A boolean flag in the decoder block (controls whether to upsample or concat)
+
+The kernel size in the final 1x1 conv block
+
+The num_classes parameter of the UNet
+
+It is four number changes. The trick is that you only catch them if you already know the paper's architecture. Walking in cold and trying to read 200 lines of PyTorch in 20 minutes is brutal.
+
+The interviewer is testing:
+
+Do you know the canonical UNet shape math (input 572 x 572, output 388 x 388, two classes)?
+
+Can you trace tensor shapes layer-by-layer under pressure and spot where they stop matching?
+
+Can you read PyTorch nn.Module code fluently?
+
+Preparation: the Canonical UNet
+
+Open the paper's Figure 1 once before the interview and commit these numbers:
+
+Input: 1 x 572 x 572 (grayscale cell images, not 512 or 256)
+
+Output: 2 x 388 x 388 (two class probability maps)
+
+Encoder: 4 down-stages. Each stage is Conv3x3 -> ReLU -> Conv3x3 -> ReLU -> MaxPool2x2. Channels double each stage: 64, 128, 256, 512.
+
+Bottleneck: 1024 channels.
+
+Decoder: 4 up-stages. Each stage is UpConv2x2 -> Concat(skip) -> Conv3x3 -> ReLU -> Conv3x3 -> ReLU. Channels halve each stage.
+
+Final: Conv1x1 maps 64 channels to num_classes = 2.
+
+The two things that surprise people:
+
+The conv blocks are valid padding, not same. Every 3x3 conv shrinks H and W by 2. That is why 572 in gives 388 out.
+
+Skip connections are center-cropped, not padded, because the decoder feature map is smaller than the matching encoder feature map.
+
+If you know these seven numbers (572, 388, 2, 64/128/256/512/1024) and the valid-padding shrinkage, the debug becomes a three-minute exercise.
+
+The Four Bugs, in Order
+
+Bug 1: Input Tensor Shape
+
+The test driver probably looks like:
+
+x = torch.randn(1, 1, 512, 512)   # BUG
+model = UNet(num_classes=3)        # BUG
+y = model(x)
+assert y.shape == (1, 2, 388, 388)
+
+The assertion says the target output is 2 x 388 x 388. Output 388 with valid padding implies input 572. Change the test input to:
+
+x = torch.randn(1, 1, 572, 572)
+
+State out loud as you fix it: "UNet uses valid padding, so input 572 gives output 388. The test is wrong."
+
+Bug 2: Decoder Boolean
+
+The decoder block has a boolean flag that selects the upsampling strategy. A common buggy pattern picks the flag's default wrong, so the post-concat channel count no longer matches what the downstream DoubleConv was sized for:
+
+class UpBlock(nn.Module):
+    def __init__(self, in_ch, out_ch, bilinear=True):   # BUG: wrong default
+        super().__init__()
+        if bilinear:
+            # Upsample keeps the channel count at in_ch.
+            self.up = nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True)
+        else:
+            # Transposed conv halves it to in_ch // 2.
+            self.up = nn.ConvTranspose2d(in_ch, in_ch // 2, kernel_size=2, stride=2)
+        # self.conv assumes the transposed-conv branch: post-concat width is in_ch.
+        self.conv = DoubleConv(in_ch, out_ch)
+
+    def forward(self, x, skip):
+        x = self.up(x)
+        x = torch.cat([center_crop(skip, x), x], dim=1)
+        return self.conv(x)
+
+Trace it for up1 (in_ch=1024, skip c4 has 512 channels):
+
+bilinear=True (buggy default): up(x) has 1024 channels, concat with skip gives 1024 + 512 = 1536. But DoubleConv(1024, 512) expects 1024. Runtime error: expected input ... to have 1024 channels, but got 1536 channels instead.
+
+bilinear=False (fix): up(x) has 512 channels, concat gives 512 + 512 = 1024. Matches DoubleConv(1024, 512). Works.
+
+The fix is one word:
+
+self.up1 = UpBlock(1024, 512, bilinear=False)
+self.up2 = UpBlock(512, 256, bilinear=False)
+self.up3 = UpBlock(256, 128, bilinear=False)
+self.up4 = UpBlock(128, 64, bilinear=False)
+
+The original paper uses transposed convolutions, so bilinear=False is the paper-faithful choice. If the flag in your buggy file is named differently (use_skip, concat, bias, inplace), the debugging pattern is the same: trace channels before and after each op and find the first mismatch.
+
+Bug 3: Final Block Kernel Size
+
+The final layer maps 64 channels to num_classes with a 1x1 conv. A common bug: someone wrote 3 instead of 1.
+
+self.final = nn.Conv2d(64, num_classes, kernel_size=3)   # BUG
+# fix:
+self.final = nn.Conv2d(64, num_classes, kernel_size=1)
+
+How to notice: a 3x3 final conv without padding would shrink the output from 388 to 386, breaking the shape assertion. A 1x1 conv is the canonical choice because it is a per-pixel linear classifier over the channel dimension.
+
+Bug 4: num_classes
+
+The paper's cell-segmentation task has two classes (cell, background). The test asserts y.shape == (1, 2, 388, 388), so:
+
+model = UNet(num_classes=3)   # BUG
+# fix:
+model = UNet(num_classes=2)
+
+Trivial once you read the assertion. Easy to miss if you are fixating on the architecture and not the test harness.
+
+Reference Implementation (so you can debug against it)
+
+A minimal, correct UNet you can keep in your head:
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+def center_crop(x: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+    """Center-crop x to match target's H and W."""
+    _, _, h, w = x.shape
+    _, _, th, tw = target.shape
+    dh = (h - th) // 2
+    dw = (w - tw) // 2
+    return x[:, :, dh : dh + th, dw : dw + tw]
+
+class DoubleConv(nn.Module):
+    """Two 3x3 convs with valid padding and ReLU."""
+    def __init__(self, in_ch, out_ch):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Conv2d(in_ch, out_ch, kernel_size=3),   # valid padding
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_ch, out_ch, kernel_size=3),
+            nn.ReLU(inplace=True),
+        )
+
+    def forward(self, x):
+        return self.net(x)
+
+class DownBlock(nn.Module):
+    def __init__(self, in_ch, out_ch):
+        super().__init__()
+        self.pool = nn.MaxPool2d(2)
+        self.conv = DoubleConv(in_ch, out_ch)
+
+    def forward(self, x):
+        return self.conv(self.pool(x))
+
+class UpBlock(nn.Module):
+    def __init__(self, in_ch, out_ch):
+        super().__init__()
+        self.up = nn.ConvTranspose2d(in_ch, in_ch // 2, kernel_size=2, stride=2)
+        self.conv = DoubleConv(in_ch, out_ch)
+
+    def forward(self, x, skip):
+        x = self.up(x)
+        skip = center_crop(skip, x)
+        x = torch.cat([skip, x], dim=1)
+        return self.conv(x)
+
+class UNet(nn.Module):
+    def __init__(self, in_channels: int = 1, num_classes: int = 2):
+        super().__init__()
+        self.in_conv = DoubleConv(in_channels, 64)
+        self.down1 = DownBlock(64, 128)
+        self.down2 = DownBlock(128, 256)
+        self.down3 = DownBlock(256, 512)
+        self.down4 = DownBlock(512, 1024)
+
+        self.up1 = UpBlock(1024, 512)
+        self.up2 = UpBlock(512, 256)
+        self.up3 = UpBlock(256, 128)
+        self.up4 = UpBlock(128, 64)
+
+        self.final = nn.Conv2d(64, num_classes, kernel_size=1)
+
+    def forward(self, x):
+        c1 = self.in_conv(x)        # encoder skip 1
+        c2 = self.down1(c1)         # skip 2
+        c3 = self.down2(c2)         # skip 3
+        c4 = self.down3(c3)         # skip 4
+        c5 = self.down4(c4)         # bottleneck
+
+        u1 = self.up1(c5, c4)
+        u2 = self.up2(u1, c3)
+        u3 = self.up3(u2, c2)
+        u4 = self.up4(u3, c1)
+
+        return self.final(u4)
+
+Smoke test:
+
+x = torch.randn(1, 1, 572, 572)
+y = UNet(num_classes=2)(x)
+assert y.shape == (1, 2, 388, 388)
+
+Layer-by-Layer Shape Trace (memorize this)
+
+Use this table to find where a buggy UNet diverges. Every row is what the canonical architecture produces for input 1 x 572 x 572:
+
+StageOpOutput shape
+in_convDoubleConv(1, 64)64 x 568 x 568
+down1MaxPool + DoubleConv(64, 128)128 x 280 x 280
+down2MaxPool + DoubleConv(128, 256)256 x 136 x 136
+down3MaxPool + DoubleConv(256, 512)512 x 64 x 64
+down4MaxPool + DoubleConv(512, 1024)1024 x 28 x 28
+up1UpConv + Concat(crop c4) + DoubleConv512 x 52 x 52
+up2UpConv + Concat(crop c3) + DoubleConv256 x 100 x 100
+up3UpConv + Concat(crop c2) + DoubleConv128 x 196 x 196
+up4UpConv + Concat(crop c1) + DoubleConv64 x 388 x 388
+finalConv1x1(64, num_classes)num_classes x 388 x 388
+
+Every 3x3 valid conv shrinks H and W by 2. Every MaxPool halves them. Every UpConv doubles them. Memorize the shrinkage rules, and you can re-derive the whole table at the whiteboard in a minute.
+
+Debug Procedure at the Interview
+
+Apply this every time, in order:
+
+Read the test driver first. It tells you the target output shape and therefore the correct input shape and num_classes. Two bugs (1 and 4) live here.
+
+Instrument forward with print(x.shape). At the top of each block, print input and output shapes. Run. The first mismatch is the first bug.
+
+Check the final layer. Should be Conv2d(64, num_classes, 1). If kernel_size is anything else, the spatial dims will shift by (k - 1).
+
+Check the decoder flags. Look for any if gate on the up-conv-and-concat step. A buggy flag kills the skip path silently and shows up as a channel-count mismatch when DoubleConv runs on the un-concatenated tensor.
+
+The whole debug is four targeted edits, each backed by one shape you already know.
+
+Complexity
+
+UNet parameter count at the canonical sizes is about 31M. A single forward pass on 1 x 572 x 572 is a few GFLOPs. For the phone screen you are not asked about this, but if they ask: the encoder and decoder are symmetric, and the bottleneck DoubleConv(512, 1024) plus its inverse DoubleConv(1024, 512) dominate both the parameter count and the FLOPs.
+
+What to Say Out Loud
+
+"UNet uses valid padding, so the spatial dimensions shrink on every 3x3 conv. Input 572, output 388. That tells me the test input shape."
+
+"The target output has two channels, so num_classes = 2."
+
+"Final layer is a 1x1 conv. Any other kernel breaks the output spatial shape."
+
+"Decoder step is up-conv, then center-crop-and-concat the matching encoder skip, then two 3x3 convs. If there is a flag gating that, it must be on."
+
+That framing reads as paper-familiar rather than as debugging-by-flailing, which is what separates candidates who cleared this round from the ones who did not.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

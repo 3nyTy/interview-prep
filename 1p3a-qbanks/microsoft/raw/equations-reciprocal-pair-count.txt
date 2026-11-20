@@ -1,0 +1,57 @@
+===H1===
+Count Positive Pairs Satisfying 1/x + 1/y = 1/N
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/equations-reciprocal-pair-count
+===BODY===
+Microsoft
+Coding·45 minMembers
+Count Positive Pairs Satisfying 1/x + 1/y = 1/N
+HackerRank OA staple branded "Equations". Given N ≤ 10⁶, count ordered positive-integer pairs (x, y) with 1/x + 1/y = 1/N. The naive scan TLEs; the right answer reduces to a divisor count.
+SWE
+math
+medium
+oa
+Frequency
+Low
+Last asked
+2026-03-26
+Stage
+oa
+Requirements
+
+Given a positive integer N (up to 10^6), count the number of ordered positive-integer pairs (x, y) such that:
+
+1/x + 1/y = 1/N
+
+Some test cases push N to 10^6 with sub-second timing. The naive double-loop over x and y will TLE.
+
+Notes
+
+Rearrange algebraically:
+
+1/x + 1/y = 1/N
+=> Ny + Nx = xy
+=> xy - Nx - Ny = 0
+=> (x - N)(y - N) = N^2
+
+So every valid (x, y) corresponds to a factorization N² = a · b with a = x - N, b = y - N both positive. The count of ordered pairs equals the number of divisors of N².
+
+Computing the divisor count of N² from its prime factorization: if N = Π p_i^e_i then N² = Π p_i^(2 e_i) and d(N²) = Π (2 e_i + 1). Factor N by trial division up to √N (O(√N) per query) and you are done.
+
+Why ordered pairs: (x, y) and (y, x) correspond to swapping (a, b) factorizations; unless a = b they count twice.
+
+Time complexity: O(√N) per query. Space O(log N).
+
+Preparation
+
+Derive the (x - N)(y - N) = N^2 rearrangement on paper before the round — interviewers expect to see this step explained, not skipped.
+
+Pre-write a trial-division prime factorization helper. It is reusable across every number-theory OA prompt.
+
+Be ready to handle multiple queries — if the OA submits 10 queries with N close to 10^6, batch the factorization by sieving up to 10^3 for the smallest factor of each integer.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

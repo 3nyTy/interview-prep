@@ -1,0 +1,49 @@
+===H1===
+Maximum Distinct Elements After K Swaps
+===URL===
+https://www.1point3acres.com/interview/problems/company/akunacapital/maximum-distinct-after-k-swaps
+===BODY===
+Akuna Capital
+CodingMembers
+Maximum Distinct Elements After K Swaps
+Given arrays a and b of n integers and at most k swaps (any a[i] with any b[j]), return the maximum number of distinct elements achievable in a. Greedy: spend swaps replacing duplicate slots in a with values from b that are not yet present in a.
+SWE
+RS
+hashmap
+greedy
+array
+medium
+Frequency
+Low
+Last asked
+2025-10-29
+Stage
+oa
+Requirements
+
+Given two arrays a and b, each with n integers, you may swap any element of a with any element of b, at most k times. Return the maximum number of distinct elements achievable in a.
+
+Examples
+
+n = 5
+a = [2, 3, 3, 2, 2]
+b = [1, 3, 2, 4, 1]
+k = 2
+
+Swap a[2] with b[0] and a[4] with b[3] to get a = [2, 3, 1, 2, 4], which has 4 distinct values. Answer: 4.
+
+Notes
+
+A useful swap takes a position in a that currently holds a duplicate (so removing one copy costs nothing) and brings in a value from b that does not yet appear in a (so it adds a new distinct value). Count the distinct values already in a, the number of "free" duplicate slots, and the pool of candidate new values available in b. The achievable distinct count is the current distinct count plus the number of beneficial swaps you can actually perform, bounded by k, by the duplicate slots, and by the supply of new values in b.
+
+Preparation
+
+Build frequency maps for a and b, then count duplicate slots and new-value candidates.
+
+Test cases where k exceeds the useful swaps, where b has no new values, and where a is already all distinct.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

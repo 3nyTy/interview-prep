@@ -1,0 +1,43 @@
+===H1===
+Palindrome Linked List (LC 234) + Engineering Follow-Up
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/palindrome-linked-list
+===BODY===
+Microsoft
+CodingMembers
+Palindrome Linked List (LC 234) + Engineering Follow-Up
+Determine whether a singly linked list is a palindrome using O(1) auxiliary space. The follow-up requires restoring the list to its original structure before returning.
+SWE
+linked-list
+two-pointer
+palindromes
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-coding
+Requirements
+
+Given the head of a singly linked list, determine whether its values form a palindrome.
+
+Use O(1) auxiliary space.
+
+Follow-up: restore the linked list to its original structure before returning so callers do not observe a mutated input.
+
+Notes
+
+The space-bounded approach finds the midpoint with fast and slow pointers, reverses the second half, and compares the two halves. The engineering follow-up adds a second reversal after comparison to reconnect the original structure. Mentioning this side effect proactively demonstrates production-minded API discipline.
+
+Preparation
+
+Implement the odd-length and even-length cases without allocating an auxiliary value array.
+
+Add restoration to the implementation, then write tests that compare the full node chain before and after the call.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,125 @@
+===H1===
+Min Coins to Pay with Change Allowed
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/min-coins-with-change
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Min Coins to Pay with Change Allowed
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+·
+45 min
+Members
+Min Coins to Pay with Change Allowed
+
+Coin denominations `{1, 5, 10, 50, 100, 200}` available in unlimited supply. Pay an exact amount `n`, but overpayment is allowed and the change comes back in the same denominations. Return the minimum total number of coins exchanged (paid + returned).
+
+SWE
+dp
+greedy
+math
+medium
+Frequency
+Single report
+Last asked
+2026-02-25
+Stage
+phone-screen
+Requirements
+Denominations: {1, 5, 10, 50, 100, 200}, each available in unlimited quantity.
+Target amount: n.
+The payer may overpay; if they do, the recipient returns exact change using the same denominations.
+Output: minimum number of coins that change hands across the entire transaction (payment coins + change coins).
+Examples
+n = 41
+output = 3   # pay 50 + 1 = 51, get back 10 → 2 + 1 = 3 coins
+
+Notes
+The straightforward LC 322 (coin change) DP gives the minimum number of coins to make exactly n, but ignores the overpayment + change option. This problem reduces to: min over (paid_amount ≥ n) of (coins_to_make(paid_amount) + coins_to_make(paid_amount − n)).
+Because denominations are bounded and small, coins_to_make(x) is solvable by the canonical 1-D DP in O(x × |denoms|).
+The remaining question is what upper bound on paid_amount is sufficient. The maximum useful overpayment is bounded by the largest denomination (paying with an extra 200 and getting 200 back is never better than not paying it), so it is enough to enumerate paid_amount ∈ [n, n + 200].
+Greedy on this denomination set works for coins_to_make(x) because {1, 5, 10, 50, 100, 200} is a canonical greedy coin system. Verify this with the interviewer; for non-canonical sets the DP is required.
+Edge cases: n = 0 (zero coins), n < smallest denomination (must overpay), n that is a multiple of the largest denomination (no change needed).
+Several candidates report failing this round because they treat it as plain LC 322 and miss the overpayment branch.
+Preparation
+Implement coins_to_make(x) with both the greedy and the DP approaches; prove the greedy correctness on this denomination set.
+Implement the outer loop over paid_amount ∈ [n, n + max_denom] and minimize the sum.
+Drill the example n = 41 by hand: the greedy-only answer is 5 coins (10+10+10+10+1); the with-change answer is 3 coins.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Examples
+Notes
+Preparation
+Related discussions · 1
+🔑Snowflake 技术一面挂经
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Maximum Number of Events That Can Be Attended
+Single report
+greedy
+medium
+heap
++1
+Serialize and Deserialize Dictionary Trie
+Single report
+medium
+trie
+compression
++2
+Frontend Grid: Robot Eats Candies
+Single report
+medium
+frontend
+bfs
++2
+Throne Inheritance
+Single report
+medium
+tree
+hashmap
++1
+Copy List with Random Pointer
+Single report
+medium
+linked-list
+hashmap
+Code editor

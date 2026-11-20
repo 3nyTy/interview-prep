@@ -1,0 +1,63 @@
+===H1===
+Splitwise / Settle Group Balances
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/splitwise-settle-balances
+===BODY===
+Pinterest
+Coding·60 minMembers
+Splitwise / Settle Group Balances
+Group of friends takes a trip; each person has paid an arbitrary subset of the bills. Output any valid sequence of paybacks `(from, to, amount)` that zeros every person's net balance. The minimum-number-of-transactions variant is the bonus follow-up, not the base ask.
+SWE
+MLE
+hashmap
+greedy
+object-design
+medium
+Frequency
+Medium
+Last asked
+2026-08-18
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input: a list of transactions, each {from, to, amount}. The to field can be a single recipient or a list (split equally among them, in which case amount is the total to be divided).
+
+Output: any list of paybacks {payer, receiver, amount} such that, after applying them on top of the original transactions, every person has a net balance of zero.
+
+The base ask is not minimum-transaction-count. Any valid settlement is accepted.
+
+Examples
+
+input:
+transactions = [
+  { 'payer': 'Alice',   'amount': 4000, 'payees': ['Bob', 'Alice', 'Charlie', 'Daisy'] },
+  { 'payer': 'Charlie', 'amount': 2000, 'payees': ['Alice', 'Charlie'] }
+]
+output:
+[
+  { 'payer': 'Bob',   'amount': 1000, 'payees': ['Alice'] },
+  { 'payer': 'Daisy', 'amount': 1000, 'payees': ['Alice'] }
+]
+
+Alice's $4000 splits evenly across all four payees (herself included), so each owes $1000; Charlie's $2000 splits between Alice and Charlie ($1000 each). After netting, Alice is owed $2000, Charlie zeroes out, and only Bob and Daisy still owe $1000 apiece — both to Alice.
+
+Notes
+
+The simple-and-accepted approach: compute each person's net balance, then repeatedly pair the most-negative balance with the most-positive balance (max-heap on absolute value of debt). On each step, settle min(|debt|, |credit|), push back the remainder. This produces a valid (and reasonably tight, though not minimum) plan in O(n log n).
+
+The follow-up — minimum number of transactions — is NP-hard in general (equivalent to multi-way partition); the canonical interview answer is a backtracking enumeration over subsets of zero-sum partitions. This is a known harder follow-up; don't volunteer it unless asked.
+
+Be careful with the to-as-list variant: when a payer splits a $90 bill across three recipients including themselves, each recipient owes $30 to the payer and the payer's own net effect is +$60 (not zero, not $90). Walk this on a tiny example before coding.
+
+Preparation
+
+Draft the per-person net-balance computation in 5 minutes, then the heap-based pairing in another 10. Get a working base solution out before optimizing.
+
+Prepare a one-paragraph explanation of why minimum-transaction-count is NP-hard so you can name-drop it if the interviewer pushes — this is enough to signal awareness without burning time on a hard implementation.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,92 @@
+===H1===
+Social Media Sentiment Tracking
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/social-media-sentiment-tracking
+===BODY===
+Social Media Sentiment Tracking
+
+<https://www.1point3acres.com/interview/problems/company/netflix/social-media-sentiment-tracking>
+
+Netflix
+System Design
+
+60 min
+Members
+Social Media Sentiment Tracking
+
+Design a system that tracks public sentiment toward Netflix on social media over time: ingest posts, classify sentiment, aggregate, and surface trends so the team can see opinion shift around launches or price changes.
+
+MLE
+DS
+SWE
+data-engineering
+streaming
+mlsd
+ingestion
+medium
+Frequency
+Single report
+Last asked
+2026-02-02
+Stage
+onsite-system-design
+The Challenge
+
+Design a system that tracks how people feel about Netflix on social media over time. The system must collect posts, classify sentiment as positive or negative, aggregate results, and expose trends so teams can see how public opinion changes around launches, pricing changes, or major announcements.
+
+Structure To Lead With
+
+Split the design into ingestion, aggregation, and offline ML. Ingestion collects posts from social platforms, aggregation buckets sentiment by time and topic, and the ML path trains or updates the sentiment classifier.
+
+Notes
+Clarify source coverage, rate limits, deduplication, and whether private or deleted content is out of scope.
+Define metrics beyond raw positive/negative counts: volume-normalized sentiment, moving averages, anomaly detection, and confidence bands.
+Treat the model as replaceable behind a scoring service; the system design should still work if the classifier improves over time.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+The Challenge
+Structure To Lead With
+Notes
+Related discussions  0
+Related questions
+
+Other Netflix questions sharing tags with this one
+
+Data Engineering Movie Success Pipeline
+Low
+data-engineering
+streaming
+medium
++3
+Homepage Video Recommendation System
+Single report
+mlsd
+medium
+recommendation
++1
+Spam Email Detection
+Single report
+mlsd
+medium
+classification
++2
+WAL Log Enrichment Pipeline
+Single report
+data-engineering
+streaming
+kafka
++4
+Count Disjoint String Pairs
+Low
+medium
+bitmask
+string
++1
+Code editor
+
+---

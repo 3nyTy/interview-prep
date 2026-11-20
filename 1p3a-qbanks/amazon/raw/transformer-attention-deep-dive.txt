@@ -1,0 +1,96 @@
+===H1===
+Transformer / Attention Deep-Dive
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/transformer-attention-deep-dive
+===BODY===
+Amazon
+Other·60 minMembers
+Transformer / Attention Deep-Dive
+Applied Scientist / MLE rounds drill the full Transformer stack: self-attention math, encoder vs decoder masking, multi-head intuition, optimizer choice, and modern variants (Flash Attention, RoPE, KV cache).
+RS
+MLE
+transformer
+ml-knowledge
+pytorch
+medium
+Frequency
+Medium
+Last asked
+2026-08-14
+Stage
+phone-screen · onsite-research · onsite-deep-dive
+Requirements
+
+Be able to derive scaled dot-product attention from first principles: softmax(QK^T / sqrt(d_k)) V, why the scaling, why softmax.
+
+Explain encoder vs decoder roles, where masks apply, and when you'd use only one stack.
+
+Discuss multi-head reasoning: why split heads, parameter count, head dimension trade-off.
+
+Connect to modern systems: KV cache use during inference, Flash Attention's memory-efficient kernel, RoPE positional encoding formula.
+
+Compare MHA, MQA, and GQA, including the inference-time reason to share key/value heads.
+
+Name representative encoder-only and decoder-only model families and explain when each architecture is appropriate.
+
+Examples
+
+Recent question stems:
+
+"Walk me through Transformer architecture. When would you use only encoder vs only decoder?"
+
+"Why divide by sqrt(d_k) in attention?"
+
+"Write the RoPE formula on the board."
+
+"Compare Adam vs AdamW. When would you switch to SGD with momentum?"
+
+"What is distributed training? List the parallelism strategies (DP, TP, PP) and when each shines."
+
+"What is the difference between MHA, MQA, and GQA?"
+
+"Which current models use encoder-only or decoder-only architectures?"
+
+Notes
+
+Several Applied Scientist loops explicitly ask for the math (Q K^T / sqrt(d_k), RoPE rotation matrix) on the board — recite, don't paraphrase.
+
+Practical follow-ups dominate: "How did you mask in your multi-turn agent?", "What happens when context length exceeds the trained position range?". Recall a project example for each axis.
+
+KV cache, Flash Attention, RoPE often come up together — they each address a different scaling pain (memory, throughput, length generalization).
+
+The 1/sqrt(d_k) scale is not cosmetic: as d_k grows, the variance of Q·K^T grows linearly, pushing softmax into saturated regions where gradients vanish. Dividing by sqrt(d_k) keeps the pre-softmax logits at unit-variance scale.
+
+Multi-head is not just "more capacity": a single head averages across subspaces, which destroys distinct relational signals (syntactic vs. positional vs. semantic). With h heads at dim d_k = d_model / h, total parameter count is identical to a single d_model-wide head — the win is representational, not parametric.
+
+Decoder causal mask is implemented as logits.masked_fill(mask == 0, -inf) before softmax; padding masks are applied the same way along the key axis. Off-by-one in the mask is the single most common bug — the position attending to itself must be unmasked.
+
+KV cache: at inference step t, only the new q_t is computed; K, V for positions 0..t-1 are cached and concatenated with the new k_t, v_t. Memory grows as O(layers × heads × seq_len × head_dim × 2) per request — this is what drives GPU-memory budgeting for long-context serving.
+
+Flash Attention's trick: tile Q, K, V into SRAM-sized blocks, compute attention block-by-block with an online softmax (running max + denominator), and recompute on backward rather than materializing the (N, N) attention matrix. Net effect: same numerical result, O(N) memory instead of O(N²), and 2-4× wall-clock speedup.
+
+RoPE applies a per-position rotation in 2D subspaces of Q and K. Because it rotates q and k by the same angle delta when their relative position is fixed, q·k only depends on the relative offset — that's the relative-position property.
+
+On AS phone screens the transformer oral can decide the round on its own: a clean grid-BFS-tier coding warm-up does not offset shaky attention answers.
+
+Preparation
+
+Re-implement scaled dot-product attention and a single Transformer block in raw PyTorch (no nn.MultiheadAttention); time yourself to under 15 minutes.
+
+On a whiteboard, write the rotary formula (x1, x2) → (x1 cos θ - x2 sin θ, x1 sin θ + x2 cos θ) from memory and explain why it preserves relative position.
+
+Memorize the Flash-Attention block-tiling intuition (tile QK^T in SRAM, recompute on backward) — one sentence is enough but it must be precise.
+
+Prep a 30-second "my multi-turn agent did X" story that can absorb context-overflow follow-ups.
+
+Drill ladder: (1) whiteboard the formula and the sqrt(d_k) justification; (2) implement scaled-dot-product attention in raw PyTorch on a (B=2, H=4, T=16, D=8) tensor; (3) add a causal mask and verify by inspection that position t only sees 0..t; (4) extend to multi-head with view + transpose; (5) bolt on a tiny KV-cache loop and confirm step-t output matches the equivalent full-sequence forward.
+
+Memorize the four scaling pain points and which mechanism addresses each: memory at long context → Flash Attention; KV memory at inference → KV cache / MQA / GQA; absolute-position generalization → RoPE / ALiBi; throughput at training → tensor / sequence parallelism.
+
+Prep a 30-second story per axis ("I hit OOM at 32k context and switched to GQA + paged KV cache") — interviewer almost always pivots from theory to a project anecdote.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

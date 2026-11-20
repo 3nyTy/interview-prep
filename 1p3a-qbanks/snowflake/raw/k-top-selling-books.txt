@@ -1,0 +1,154 @@
+===H1===
+K Top Selling Books
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/k-top-selling-books
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+K Top Selling Books
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+Members
+K Top Selling Books
+
+Design a data structure that tracks cumulative book sales and returns the top sellers after each update.
+
+SWE
+top-k
+heap
+hashmap
+sorting
+medium
+Frequency
+Single report
+Last asked
+2026-02-01
+Stage
+phone-screen · onsite-coding
+Tracking Top Selling Books
+
+We need to build a system that keeps track of total book sales. It should also give us a list of the top-selling books every time we update the sales data.
+
+Class Requirements
+
+You need to implement the BestSellerTracker class with the following methods:
+
+BestSellerTracker(): Sets up the tracker with no sales data initially.
+List<String> bestSellers(Map<String, Integer> sales, Integer k): Adds new sales numbers to the existing totals for each book. After updating the totals, it returns the top k book titles.
+Ranking Rules
+
+Sort the books using this order:
+
+Sales Count: Books with higher total sales come first.
+Alphabetical Order: If two books have the exact same sales total, pick the title that is "larger" alphabetically (for example, "beta" comes before "alpha").
+
+Note: If the requested k is bigger than the total number of books tracked, simply return all the books in the correct order.
+
+Sample Cases
+
+Case 1:
+
+Input: ["BestSellerTracker","bestSellers","bestSellers"] [[],[{"a":5,"b":10,"c":15},2],[{"a":20,"b":20,"c":5},2]]
+
+Output: [null,["c","b"],["b","a"]]
+
+Breakdown:
+
+First Update: We add sales {a:5, b:10, c:15}. The totals are now {a:5, b:10, c:15}. The top 2 books are "c" (15) and "b" (10).
+Second Update: We add more sales {a:20, b:20, c:5} to the old totals.
+Book "a": 5 + 20 = 25
+Book "b": 10 + 20 = 30
+Book "c": 15 + 5 = 20
+New totals are {a:25, b:30, c:20}. The top 2 are now "b" (30) and "a" (25).
+
+Case 2:
+
+Input: ["BestSellerTracker","bestSellers"] [[],[{"alpha":4,"beta":4,"gamma":1},5]]
+
+Output: [null,["beta","alpha","gamma"]]
+
+Breakdown: "alpha" and "beta" are tied with 4 sales each. Since "beta" is alphabetically larger than "alpha", "beta" is placed first.
+
+Technical Limits
+0 <= sales.size() <= 10^4
+0 <= sales[title] <= 10^6
+1 <= title.length <= 100
+1 <= k <= 10^4
+The bestSellers method will be called at most 10^4 times.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Tracking Top Selling Books
+Class Requirements
+Ranking Rules
+Sample Cases
+Technical Limits
+Related discussions · 0
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Top-K Search Terms (Per-User Deduped)
+Single report
+hashmap
+heap
+top-k
++2
+Maximum Number of Events That Can Be Attended
+Single report
+heap
+sorting
+medium
++1
+Throne Inheritance
+Single report
+hashmap
+medium
+tree
++1
+Copy List with Random Pointer
+Single report
+hashmap
+medium
+linked-list
+Document Target Coverage and Minimum Window
+Single report
+hashmap
+medium
+sliding-window
++1
+Code editor

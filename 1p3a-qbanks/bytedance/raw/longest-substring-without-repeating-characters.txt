@@ -1,0 +1,49 @@
+===H1===
+Longest Substring Without Repeating Characters
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/longest-substring-without-repeating-characters
+===BODY===
+ByteDance / TikTok
+CodingMembers
+Longest Substring Without Repeating Characters
+Given a string, return the length of its longest substring containing no repeated characters. The exact interview signature, character set, constraints, and examples remain unspecified.
+SWE
+string
+sliding-window
+hashmap
+medium
+Frequency
+Single report
+Last asked
+—
+Stage
+phone-screen
+Requirements
+
+Given a string s, return the length of the longest substring containing no repeated characters.
+
+The chosen substring must be contiguous, and every character inside it must be distinct.
+
+The exact function signature, character set, constraints, and empty-input contract are unspecified; clarify them before coding.
+
+Notes
+
+Scan from left to right while storing each character's latest index. When a character repeats inside the active range, move the left boundary to one position after its previous index; never move the left boundary backward.
+
+Update the latest index and the best length after restoring the no-duplicate invariant. A count-map window is also valid, but the latest-index form avoids repeated single-step shrinking.
+
+The canonical scan runs in O(n) time and O(min(n, |alphabet|)) auxiliary space.
+
+Preparation
+
+Implement both the latest-index and count-map versions from a blank editor, then explain the invariant each version maintains.
+
+Dry-run empty input, one repeated character, a repeat outside the active range, and a repeat of the current leftmost character.
+
+Verify that the left boundary uses max(left, previous_index + 1) so an old occurrence cannot move the window backward.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

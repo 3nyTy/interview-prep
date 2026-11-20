@@ -1,0 +1,46 @@
+===H1===
+Second-Smallest Unique Element
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/second-smallest-unique-element
+===BODY===
+Goldman Sachs
+Coding·60 minMembers
+Second-Smallest Unique Element
+Return the second-smallest value among elements that occur exactly once in the input array. Intern-level Superday warm-up.
+SWE
+array
+hashmap
+easy
+Frequency
+Single report
+Last asked
+2024-11-14
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input: an integer array (may contain duplicates).
+
+Output: the second-smallest value among elements that appear exactly once in the input.
+
+If fewer than two unique values exist, behavior was not pinned down — clarify with the interviewer (typical answers: throw, return null, return -1).
+
+Notes
+
+Two-pass solution: build a Map<value, count>; then scan the values where count == 1 and track the two smallest. O(n) time, O(n) space.
+
+One-pass alternative: maintain smallest and secondSmallest slots, plus a Set of values seen more than once that must be excluded; trickier to implement correctly.
+
+Edge cases: input length < 2; all elements duplicates; negative values (don't assume positive).
+
+Preparation
+
+Implement the two-pass form (clean and explicit); then mention the one-pass form as a follow-up.
+
+Drill the related LC 215 "Kth Largest Element" for muscle memory on quickselect, which Goldman interviewers occasionally offer as a generalization.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

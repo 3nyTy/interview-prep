@@ -1,0 +1,55 @@
+===H1===
+Elements Appearing More Than n/3 in a Sorted Array
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/sorted-array-elements-more-than-one-third
+===BODY===
+ByteDance / TikTok
+Coding·60 minMembers
+Elements Appearing More Than n/3 in a Sorted Array
+Given a sorted array of length at least 3, return every value whose frequency is greater than `n / 3`. Examples include `[1,1,2,4,4] -> [1,4]`; follow-up requires time complexity below `O(n)` by exploiting sorted order.
+SWE
+array
+binary-search
+medium
+Frequency
+Single report
+Last asked
+2026-06-26
+Stage
+tech-screen
+Requirements
+
+Given a sorted array nums with len(nums) >= 3, return all numbers that appear more than len(nums) / 3 times.
+
+Follow-up: solve it in less than O(n) time by using the fact that the array is sorted.
+
+Examples
+
+[1, 2, 3]             -> []
+[1, 1, 2, 3, 4]       -> [1]
+[1, 1, 2, 4, 4]       -> [1, 4]
+[1, 2, 3, 4, 5, 6, 7] -> []
+
+Notes
+
+Linear baseline: scan runs and collect values whose run length exceeds n / 3.
+
+Sublinear follow-up: in a sorted array, any value with frequency > n/3 must cover one of the probe positions around n/3 or 2n/3. Check those candidate values and use binary search boundaries to count their occurrences.
+
+Return unique values only; the two probe positions may land inside the same run.
+
+The interviewer gave hints when the candidate got stuck, but the expected insight is the sorted-array candidate reduction.
+
+Preparation
+
+Practice deriving why there can be at most two answers above the one-third threshold.
+
+Implement lower_bound / upper_bound from scratch in your interview language.
+
+Test arrays where both answers exist, no answer exists, and the candidate probes point to the same value.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

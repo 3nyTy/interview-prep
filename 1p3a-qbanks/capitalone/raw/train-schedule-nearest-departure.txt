@@ -1,0 +1,58 @@
+===H1===
+Train Schedule Nearest Departure
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/train-schedule-nearest-departure
+===BODY===
+Capital One
+Coding·70 minMembers
+Train Schedule Nearest Departure
+Given a sorted list of daily departure times and the current time, return how long ago the most recent train left (in minutes). If the current time is before the day's first train, the answer wraps to the previous day's last departure.
+SWE
+binary-search
+array
+easy
+oa
+codesignal
+Frequency
+Single report
+Last asked
+2026-01-18
+Stage
+oa
+Requirements
+
+Input: a sorted list of HH:MM departure times for the day, and a current time HH:MM.
+
+Return the number of minutes since the most recent departure (≤ current time).
+
+If the current time is before the first departure of the day, the most recent departure is the previous day's last train; subtract from 24*60 accordingly.
+
+Examples
+
+departures = ["1:10", "3:20", "5:20"]
+current    = "3:40"
+
+Most recent departure: 3:20
+Return 20
+
+Notes
+
+Convert all times to minutes-since-midnight integers up front.
+
+Binary search for the largest departure ≤ current. The standard pattern is bisect_right(departures, current) - 1.
+
+If the index is -1, wrap to the previous day's last departure: answer = current + (24*60 - departures[-1]).
+
+Watch for departures exactly equal to the current time — these count as 0 minutes ago, not a missed train.
+
+Preparation
+
+Implement with binary search; the linear scan is fine for the typical input size but the interviewer will ask about the log-n version regardless.
+
+Drill the wrap-around case explicitly. current = "0:30", departures = ["6:00", "23:50"] should return 40 minutes (last train was 23:50 yesterday, current is 0:30 today).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

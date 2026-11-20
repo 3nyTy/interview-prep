@@ -1,0 +1,103 @@
+===H1===
+Data Engineering Movie Success Pipeline
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/data-engineering-movie-success-pipeline
+===BODY===
+Data Engineering Movie Success Pipeline
+
+<https://www.1point3acres.com/interview/problems/company/netflix/data-engineering-movie-success-pipeline>
+
+Netflix
+Other
+
+60 min
+Members
+Data Engineering Movie Success Pipeline
+
+DataEng phone screens combine SQL, pipeline design, production data-quality concerns, and a short event-stream coding exercise around movie launch success.
+
+DS
+data-engineering
+sql
+etl
+streaming
+data-modeling
+medium
+Frequency
+Low
+Last asked
+2026-03-25
+Stage
+phone-screen
+Requirements
+First 30 minutes: SQL over movie and user tables to measure success of a newly launched movie.
+Discuss what tables and metrics are needed.
+Queries use common constructs: GROUP BY, SUM, CTEs, filters, and joins.
+Production pipeline discussion: data checks, partition key, data skew, scheduling, and failure handling.
+Final coding: classify user-movie event streams by completion percentage, such as 30 / 50 / 80 percent watched, and return sorted results.
+Metrics To Prepare
+Starts, completes, completion rate, watch time, unique viewers, repeat views.
+Funnel by day since launch.
+Segmentation by geography, device, acquisition channel, and recommendation surface.
+Data-quality checks: null IDs, duplicate events, late events, event-time vs processing-time drift.
+Notes
+The round is fast. Write simple SQL first, then refine.
+Partition by event date for common launch-window analysis; consider movie ID bucketing if one title is extremely hot.
+Data skew needs an answer: salting hot keys, two-stage aggregation, or separate heavy-hitter path.
+For event-stream coding, decide whether multiple events per user/movie should keep max progress or latest progress.
+Preparation
+Write SQL for top movies by complete views, completion rate, and next-movie transition.
+Practice describing a production DAG: ingestion, validation, transform, aggregate, publish, alert.
+Implement a small stream classifier and sort by count descending.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Metrics To Prepare
+Notes
+Preparation
+Related discussions  3
+???DE ??
+??DE10?????
+?Netflix technical ????
+Related questions
+
+Other Netflix questions sharing tags with this one
+
+Social Media Sentiment Tracking
+Single report
+data-engineering
+streaming
+medium
++2
+WAL Log Enrichment Pipeline
+Single report
+data-engineering
+streaming
+kafka
++4
+Count Disjoint String Pairs
+Low
+medium
+bitmask
+string
++1
+Homepage Video Recommendation System
+Single report
+medium
+recommendation
+mlsd
++1
+Command Executor with Undo and Tags
+Medium
+medium
+data-structure
+stack
++3
+Code editor
+
+---

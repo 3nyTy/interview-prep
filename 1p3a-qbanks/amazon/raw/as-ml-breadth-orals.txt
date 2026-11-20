@@ -1,0 +1,100 @@
+===H1===
+ML Breadth Orals — Linear / Logistic / Random Forest / Optimizers
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/as-ml-breadth-orals
+===BODY===
+Amazon
+Other·60 minMembers
+ML Breadth Orals — Linear / Logistic / Random Forest / Optimizers
+Applied Scientist phone-screen / breadth round that drills classical ML: linear regression assumptions, why squared loss, logistic regression with log loss, Random Forest feature selection, Adam vs SGD, and a trick question on optimization landscapes.
+RS
+MLE
+ml-knowledge
+math-reasoning
+probability
+medium
+Frequency
+Medium
+Last asked
+2026-09-01
+Stage
+phone-screen · onsite-research
+Requirements
+
+Linear regression: state assumptions (linearity, independence, homoscedasticity, Gaussian noise), justify squared loss via MLE.
+
+Logistic regression: derive the log-loss as MLE under Bernoulli, explain why log and not raw probability.
+
+Random Forest: how is the feature subset chosen at each split (typically sqrt(p)), why bagging reduces variance.
+
+Optimizers: Adam vs AdamW (decoupled weight decay), vs SGD with momentum — when each wins.
+
+High-discrimination trick question that recurs: two two-layer NNs, one narrow and one wide — which is more prone to getting trapped in local minima? (Answer: the narrow one; over-parameterization smooths the loss landscape.)
+
+Statistics and experimentation: bias-variance trade-off, A/B-test design and analysis, unexpected experimental outcomes, and power analysis.
+
+ML breadth: supervised vs. unsupervised learning, anomaly-detection approaches, choosing k, visualization, and bagging vs. boosting.
+
+ADS L6 breadth variant: discuss the origins of NLP and early embedding models, then identify a recent LLM embedding model you have used and compare its strengths and weaknesses. Follow-ups can focus on text-embedding-3-small versus text-embedding-3-large when those models appear in your answer.
+
+Examples
+
+Verbatim from one Amazon AS phone screen:
+
+"What are the assumptions of linear regression? Why squared loss?"
+
+"What is logistic regression? Why log?"
+
+"What is Random Forest? How are features selected at each split?"
+
+"Explain Adam. Pros and cons vs SGD."
+
+"Two NNs, both two layers, one narrow and one wide — which is more easily trapped in local minima?"
+
+"Explain the bias-variance trade-off."
+
+"How would you design and analyze an A/B test, and what unexpected outcomes could appear?"
+
+"Compare supervised and unsupervised learning; how would you build and visualize an anomaly detector?"
+
+Notes
+
+The narrow-vs-wide trick is well-grounded in the modern loss-landscape literature; interviewers cite this as a high-discrimination question.
+
+This round is straight orals — no coding, fast pace. Lean on definitions plus a 1-line intuition each.
+
+The interviewer may pivot from breadth orals into a hand-written DP question in the same slot, so leave gas in the tank.
+
+For the Adam update, memorize all four lines in order: m_t = β1 m_{t-1} + (1-β1) g_t; v_t = β2 v_{t-1} + (1-β2) g_t²; bias-correct m̂ = m_t / (1-β1^t), v̂ = v_t / (1-β2^t); update θ ← θ - lr * m̂ / (√v̂ + ε). AdamW changes only the update line: weight decay is decoupled (θ ← θ - lr * (m̂ / (√v̂ + ε) + λ θ)) rather than baked into the gradient.
+
+The squared-loss-from-MLE derivation: assume y = wx + ε, ε ~ N(0, σ²); the log-likelihood is -1/(2σ²) Σ (y_i - wx_i)² + const; maximizing this equals minimizing the sum of squared residuals. Same shape derivation for logistic regression under a Bernoulli likelihood yields the -Σ [y log p + (1-y) log(1-p)] cross-entropy.
+
+Random Forest: at each split, sample sqrt(p) features (classification) or p/3 (regression); the random feature subset decorrelates trees, which is what makes bagging actually reduce variance — averaging fully-correlated trees does nothing.
+
+Wide vs narrow networks and local minima: in the over-parameterized regime, most local minima sit on a connected low-loss manifold and SGD finds flat basins; in a narrow network, the loss surface is genuinely non-convex with sharp isolated minima. Hence: wider net → easier optimization, not harder.
+
+Optimizer cheat-sheet: SGD+momentum wins on convex / well-conditioned problems and on ConvNets at scale; Adam wins on sparse-gradient regimes (NLP, embeddings, RL); AdamW wins on transformers where the decoupled decay matters for generalization; Lion has shown wins at large scale with lower memory but is less battle-tested.
+
+Preparation
+
+Memorize each derivation: squared-loss-from-MLE, log-loss-from-MLE, Adam update rule (m_t = β1 m + (1-β1) g, v_t = β2 v + (1-β2) g^2, θ ← θ - lr * m̂ / (√v̂ + ε)).
+
+Brush up on the loss-landscape intuition: in the over-parameterized regime, most local minima sit on a connected low-loss manifold, which is why width helps escape sharp local pockets.
+
+Pre-rehearse 3-sentence comparative pros/cons for every optimizer pair you might be asked about (Adam vs AdamW, Adam vs SGD+momentum, AdamW vs Lion).
+
+Drill one calibration story per classical model: linearity assumption violation in linear regression, class-imbalance handling in logistic regression, feature-importance interpretation in Random Forest.
+
+Drill ladder: (1) write the four Adam lines from memory in under 30 seconds; (2) derive squared-loss-from-MLE on paper in under 2 minutes; (3) same for log-loss-from-MLE; (4) explain in one breath why sqrt(p) feature sampling matters in Random Forest.
+
+Build a one-line intuition per concept ("linear regression assumes Gaussian noise → MLE = least squares", "Adam is per-parameter adaptive LR with momentum", "bagging reduces variance, not bias; boosting does the opposite") — orals reward speed, not depth.
+
+Have a calibration story per classical model: linearity assumption violation (residual plot), class imbalance (resampling vs. class weights vs. focal loss), feature importance gotcha (correlated features split importance).
+
+Pre-rehearse three optimizer comparisons cold: Adam vs AdamW, Adam vs SGD+momentum, AdamW vs Lion — 3 sentences each, ending with "I'd pick X here because".
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

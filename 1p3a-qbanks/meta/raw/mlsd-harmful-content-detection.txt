@@ -1,0 +1,55 @@
+===H1===
+MLSD — Harmful / Weapon-Sales Content Detection
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/mlsd-harmful-content-detection
+===BODY===
+Meta
+System Design·45 minMembers
+MLSD — Harmful / Weapon-Sales Content Detection
+Integrity-style MLSD: detect harmful content (weapon sales, harmful ads) at scale. Weak labels, active learning, policy alignment, and precision-recall trade-offs are the live discussion points.
+MLE
+RS
+mlsd
+integrity
+weak-supervision
+active-learning
+hard
+Frequency
+Medium
+Last asked
+2026-08-13
+Stage
+onsite-system-design
+Requirements
+
+Functional: classify posts / ads as harmful with sufficient precision to action; minimize false-positives that violate creators.
+
+Pipeline: text + image multi-modal embedding → binary or multi-label classifier; downstream policy mapping.
+
+Labels: small high-precision human-reviewed set + large weakly-labeled set (heuristics, user reports); active-learning loop.
+
+Metrics: precision @ fixed recall (or AUC-PR); per-policy slice precision; reviewer agreement.
+
+Operational: human-review queue prioritization, model-confidence routing, feedback ingestion.
+
+Coverage of harmful-ad sub-variant: also pull advertiser signal (history, payment, account age).
+
+Notes
+
+Reports mention interviewers ask about handling label noise, policy nuance, and reviewer-disagreement resolution — not just model architecture.
+
+Be ready to argue per-policy thresholds (different precision targets for hate-speech vs spam).
+
+Preparation
+
+Memorize a weak-supervision pipeline: programmatic labels → noise-aware loss → small clean set for calibration.
+
+Prep an active-learning loop pitch: uncertainty sampling, diversity sampling, periodic reviewer assignment.
+
+Rehearse a 3-sentence answer for "how do you measure policy drift?".
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

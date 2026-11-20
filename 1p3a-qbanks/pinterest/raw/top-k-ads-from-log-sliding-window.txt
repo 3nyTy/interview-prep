@@ -1,0 +1,53 @@
+===H1===
+Top-K Ads from Log + Sliding-Window Ingest
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/top-k-ads-from-log-sliding-window
+===BODY===
+Pinterest
+Coding·60 minMembers
+Top-K Ads from Log + Sliding-Window Ingest
+Two-part ads round: (1) given a static impression log, return the top-K advertisers by impression count; (2) extend to a streaming `ingestImpressions` that scores the top-K within a sliding time window. The streaming follow-up is the scored portion.
+SWE
+MLE
+hashmap
+heap
+sliding-window
+top-k
+streaming
+ads
+medium
+Frequency
+Single report
+Last asked
+2025-12-10
+Stage
+onsite-coding
+Requirements
+
+Part 1 — getCommonAds(log, k): given a list of impression records, each tagged with an advertiser id and a timestamp, return the top-K advertisers by total impression count. Tie-break is unspecified; use insertion order or lexicographic, and announce your choice.
+
+Part 2 — ingestImpressions(impression): convert Part 1 into a streaming API where impressions arrive one at a time and the top-K query is restricted to a sliding time window (e.g. the last 60 minutes). The interviewer typically defines the window length.
+
+Notes
+
+Part 1 is a straightforward hashmap-count + heap-top-K (O(n + n log k)). Get this out fast — under 10 minutes — to leave time for Part 2.
+
+Part 2's standard structure: per-advertiser deque of timestamps in the window, plus a global heap or sorted structure keyed by current count. On each new impression, evict the head of the advertiser's deque while it's older than now - window, update count, push to the structure. On each query, do the same eviction lazily for any popped heap entries that disagree with the deque-derived count.
+
+A common bug: forgetting that eviction has to happen per-advertiser on every ingest for that advertiser AND on every query for advertisers near the heap top. The cleanest design uses lazy deletion — pop the heap top and re-verify against the deque, retrying until consistent.
+
+If the window is large and the impression rate is high, the deque grows linearly. The interviewer may push toward a bucketed counter (1-minute buckets, sum across buckets in window) to bound memory. Mention this as a follow-up direction.
+
+Preparation
+
+Implement Part 1 in under 10 minutes including the heap-vs-sort decision and tie-break announcement.
+
+Implement Part 2's deque + lazy-heap design once end-to-end; the lazy-deletion pattern is the hardest part to get bug-free under time pressure.
+
+Practice the verbal walkthrough of bucketed-counter memory bounds ("if QPS is X and window is W, deque memory is X·W; with 1-minute buckets it's W counters").
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,48 @@
+===H1===
+Minimum Bills and Coins for an Amount
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/min-bills-coins-change
+===BODY===
+Amazon
+CodingMembers
+Minimum Bills and Coins for an Amount
+Onsite coding. Given a monetary amount, return the minimum count of bills and coins using denominations 20/10/5/1 and 0.25/0.10/0.05/0.01 (e.g. 6.35 → one 5, one 1, one 0.25, one 0.10). Follow-up 1: add an early-exit `break` when the remaining amount hits 0, and answer where execution jumps afterward (first statement after the loop). Follow-up 2: respect a finite per-denomination drawer inventory and return 'cannot make change' when an exact amount is impossible.
+SWE
+greedy
+math
+easy
+Frequency
+Single report
+Last asked
+2026-06-22
+Stage
+onsite-coding
+Requirements
+
+Given a monetary amount, compute the minimum number of bills and coins that sum to it exactly.
+
+Denominations: bills 20, 10, 5, 1; coins 0.25, 0.10, 0.05, 0.01.
+
+Example: 6.35 → one 5, one 1, one 0.25, one 0.10.
+
+Notes
+
+Canonical (US) denominations make the greedy largest-first sweep optimal; state that the greedy is correct for this denomination set — it is not optimal for arbitrary denominations, and saying so signals depth.
+
+Convert to integer cents first to avoid floating-point drift (6.35 → 635 cents); dividing dollars directly invites 0.1 + 0.2 != 0.3 bugs.
+
+Follow-up 1 — early exit: add if remaining == 0: break. The interviewer then asks where control flows after the break — to the first statement after the loop, not the next loop iteration. Be precise about loop control flow.
+
+Follow-up 2 — bounded drawer: each denomination now has a limited stock. Take min(remaining // denom, stock[denom]) at each step; if you finish the sweep with a non-zero remainder, return "cannot make change." With a finite drawer the greedy can fail to find an exact combination that exists, so flag that limitation if pressed.
+
+Preparation
+
+Write the integer-cents greedy and verify 6.35 and a few amounts by hand.
+
+Add the bounded-inventory variant and a test where greedy is forced to report failure, then articulate the control-flow answer for the break follow-up out loud.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

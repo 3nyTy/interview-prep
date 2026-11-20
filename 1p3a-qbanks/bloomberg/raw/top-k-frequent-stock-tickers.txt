@@ -1,0 +1,74 @@
+===H1===
+Top-K Frequent Tickers (Stock Leaderboard)
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/top-k-frequent-stock-tickers
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Top-K Frequent Tickers (Stock Leaderboard)
+Design a data structure that supports inserting stock ticker symbols (or transactions), removing them, and returning the current top-K most-frequent tickers. Bloomberg's house variant: emphasizes API-rate awareness and explicit input / output formats rather than the textbook LeetCode "return top K" snapshot.
+SWE
+data-structure
+hashmap
+heap
+top-k
+streaming
+medium
+Frequency
+Low
+Last asked
+2026-01-26
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Build a class that supports:
+
+insert(symbol) — record one new occurrence of symbol.
+
+delete(symbol) — remove one occurrence of symbol. Removing a non-existent symbol is undefined / no-op (clarify with the interviewer).
+
+topK(int k) — return the k symbols with the highest current frequency. Ties may be broken by symbol order or insertion order; clarify.
+
+The phrasing usually arrives wrapped in a market-data story: ticks stream in for symbols (AAPL, MSFT, BBG); the consumer asks for the current top-K every few seconds. The interviewer cares about which call is hot — most teams report that topK is called far more often than insert/delete and the trade-off should reflect that.
+
+Follow-ups:
+
+Why is a single HashMap<symbol, count> insufficient if topK is called once a second? (Re-scanning the map is O(n) per call.)
+
+Walk through a HashMap + min-heap-of-size-K approach: heap size capped at k, push when count beats the current min. Time per topK becomes O(n log k); per insert is O(1) amortized for the count, plus heap-maintenance complexity.
+
+Compare against a TreeMap<count, set<symbol>> (bucketed-by-frequency) for O(1) topK reads at the cost of more complex insert / delete bookkeeping.
+
+Scale follow-up: "What if there are billions of symbols a day, or topK is called millions of times per second?" Discuss sharded counts + a periodic merger, and approximate algorithms (Count-Min Sketch + heap of estimates) when exactness is negotiable.
+
+Examples
+
+insert('AAPL'); insert('MSFT'); insert('AAPL'); insert('GOOG')
+topK(2)   -> ['AAPL', 'MSFT']  // or ['AAPL', 'GOOG']
+delete('AAPL')
+topK(2)   -> ['AAPL', 'MSFT']  // ties acceptable
+
+Notes
+
+The textbook LeetCode "Top K Frequent Elements" is a snapshot — given a static array, return the top K. Bloomberg's version is the online form: state mutates, queries are repeated. Treat it as a data-structure design problem, not a single-pass algorithm.
+
+The classic optimal structure pairs HashMap<symbol, count> with HashMap<count, DoublyLinkedListNode> of frequency buckets, an LFU-cache-style layout. insert / delete are O(1) and topK walks the buckets from the highest down. Trade-off: implementation complexity is high; for k small and topK infrequent, the heap approach is simpler and still acceptable.
+
+For very-high QPS or unbounded symbol cardinality, sketch-based estimators (Count-Min Sketch sized for the desired error bound) replace exact counts, and a heap of estimated top-K is maintained separately. Document the accuracy trade-off explicitly when proposing this.
+
+A common interviewer trap is asking for the LeetCode 692 "Top K Frequent Words" tie-break (lexicographic) on top of the online structure. Confirm the tie-break rule before writing code.
+
+Preparation
+
+Implement the HashMap + min-heap version first, then refactor into the LFU-style bucketed layout — both come up.
+
+Be able to derive the bucketed O(1) topK from the LFU cache problem on paper. The Bloomberg ask is structurally the same as an LFU cache without the capacity bound.
+
+Practice articulating the choice between exact and approximate solutions in terms of QPS and cardinality assumptions — interviewers grade the trade-off conversation as heavily as the code.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

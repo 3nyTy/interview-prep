@@ -1,0 +1,274 @@
+===H1===
+Count Value Occurrences in a Binary Tree
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/count-value-occurrences-in-a-binary-tree
+===BODY===
+Apple
+CodingMembers
+Count Value Occurrences in a Binary Tree
+You are given the root of a binary tree (not a BST, just a generic binary tree) and a target value x. Count how many nodes in the tree have node.val == x.
+SWE
+medium
+tree
+tree-traversal
+Frequency
+Single report
+Last asked
+2025-12-10
+Stage
+phone-screen
+Problem Overview
+
+You are given the root of a binary tree (not a BST, just a generic binary tree) and a target value x. Count how many nodes in the tree have node.val == x.
+
+This is a two-part question. Part 1 is the straightforward traversal. Part 2 is where the interview actually lives: the hiring manager will push on how to make it faster in a production setting, including parallelism, concurrency with writers, and single-threaded speedups.
+
+Clarify Before Coding
+
+Is it a BST? If so, duplicates may be confined to one side and you can prune. For a generic binary tree, you must visit every node.
+
+How big and how deep? A tree with 10^5 nodes in a skewed shape makes recursion unsafe. This drives the recursive-vs-iterative choice.
+
+One query or many? If many queries hit the same tree, preprocessing into an index beats re-traversing every time (see Follow-Up 3).
+
+Mutable during reads? Sets up the locking discussion in Follow-Up 2.
+
+Part 1: Sequential Count
+
+Problem Statement
+
+from typing import Optional
+
+class TreeNode:
+    def __init__(self, val: int, left: "Optional[TreeNode]" = None,
+                 right: "Optional[TreeNode]" = None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+def count_value(root: Optional[TreeNode], x: int) -> int:
+    """
+    Return the number of nodes whose val equals x.
+    The tree is a general binary tree (no BST ordering assumption).
+    """
+    pass
+
+Example
+
+         3
+        / \
+       1   3
+      / \   \
+     3   2   3
+
+count_value(root, 3) -> 4
+count_value(root, 2) -> 1
+count_value(root, 9) -> 0
+
+Solution (Recursive DFS)
+
+Every node must be visited exactly once (it is not a BST, so there is no way to prune). Recursion is the cleanest expression:
+
+def count_value(root: Optional[TreeNode], x: int) -> int:
+    if root is None:
+        return 0
+    return (1 if root.val == x else 0) \
+         + count_value(root.left, x) \
+         + count_value(root.right, x)
+
+Complexity:
+
+Time: O(n) where n is the number of nodes. Every node is visited once.
+
+Space: O(h) for the recursion stack, where h is tree height. O(log n) balanced, O(n) worst case (skewed tree).
+
+Solution (Iterative DFS)
+
+If the tree could be very deep (e.g., 10^5 nodes in a linked-list shape), the recursive version risks a stack overflow. Switch to an explicit stack:
+
+def count_value(root: Optional[TreeNode], x: int) -> int:
+    if root is None:
+        return 0
+    count = 0
+    stack = [root]
+    while stack:
+        node = stack.pop()
+        if node.val == x:
+            count += 1
+        if node.left:  stack.append(node.left)
+        if node.right: stack.append(node.right)
+    return count
+
+Complexity: Same O(n) time, O(h) extra space, but the heap, not the call stack, holds the frontier.
+
+Do not overthink Part 1. Spending 10 minutes here leaves no time for the follow-ups, which are what the interviewer is actually grading.
+
+Part 2: Make It Faster (Follow-Ups)
+
+After Part 1, the interviewer asks three progressively deeper questions:
+
+How would you speed this up for a huge tree?
+
+How would you make it safe under concurrent writes (locking)?
+
+How would you speed it up without multithreading?
+
+Each pushes you toward a different dimension of the problem.
+
+Follow-Up 1: Parallel Traversal
+
+Idea. A binary tree is naturally divide-and-conquer: the left and right subtrees are independent. Recurse on both in parallel and sum the results.
+
+from concurrent.futures import ThreadPoolExecutor
+
+# One shared pool. Creating a pool per call kills you with thread churn.
+_POOL = ThreadPoolExecutor(max_workers=8)
+
+def count_value_parallel(root, x, depth_cutoff=3):
+    if root is None:
+        return 0
+    if depth_cutoff <= 0:
+        # Below the cutoff, fall back to sequential. Task overhead dominates
+        # once subtrees get small.
+        return count_value(root, x)
+
+    left_future  = _POOL.submit(count_value_parallel, root.left,  x, depth_cutoff - 1)
+    right_count  = count_value_parallel(root.right, x, depth_cutoff - 1)
+    return (1 if root.val == x else 0) + left_future.result() + right_count
+
+Key points to raise out loud:
+
+A depth cutoff is essential. Spawning a task for every node is strictly slower than sequential because task submission, queueing, and join costs dominate for tiny subtrees.
+
+Pick the cutoff to avoid pool starvation. The code above can have up to 2^depth_cutoff - 1 tasks in flight at once. If that exceeds max_workers, pool workers can end up blocked on result() for tasks still sitting in the queue (classic thread-pool-recursion deadlock). Rule of thumb: keep 2^depth_cutoff <= max_workers, or use a work-stealing executor that handles this pattern safely.
+
+Speedup is bounded by tree balance. A perfectly balanced tree parallelizes close to linearly up to num_workers. A skewed tree (linked-list shape) sees no speedup at all, because one subtree always has all the work.
+
+The GIL matters in Python. This code is pure-Python pointer chasing and integer comparison, which is CPU-bound, so the GIL serializes it and ThreadPoolExecutor buys you little. In Java, C++, Go, or Rust you get real parallelism. In Python, reach for multiprocessing or a fork/join library, or acknowledge the limitation.
+
+Fork/join is the right abstraction. Java's ForkJoinPool with RecursiveTask, or Rust's rayon::join, are textbook fits and handle the pool-starvation issue automatically via work stealing. Mention them.
+
+Follow-Up 2: Locking for Concurrent Writers
+
+The previous answer assumes the tree is immutable during counting. If writers can mutate the tree concurrently (insert, delete, rebalance), plain DFS will read torn state: a freed node, a pointer rewritten mid-read, a subtree grafted twice.
+
+Option A: Global Reader-Writer Lock
+
+Simplest correct answer: every counter takes a read lock, every mutator takes a write lock.
+
+class Tree:
+    def __init__(self, root):
+        self.root = root
+        # threading.Lock is a mutex; for real RW semantics use a library
+        # (readerwriterlock) or implement a simple counting one.
+        self.rw = ReaderWriterLock()
+
+    def count(self, x):
+        with self.rw.read_lock():
+            return count_value(self.root, x)
+
+    def insert(self, val):
+        with self.rw.write_lock():
+            _insert_unlocked(self.root, val)
+
+Pro: Trivially correct. Multiple counters can proceed in parallel (they all hold read locks).
+
+Con: Counters block all writers for the entire traversal, and vice versa. On a big tree with frequent writes, you have killed your throughput.
+
+Option B: Fine-Grained Hand-Over-Hand Locking
+
+Give every node a lock. The counter holds the lock on the current node, acquires the child's lock before descending, then releases the parent's. Writers do the same while mutating.
+
+Pro: Readers and writers in disjoint subtrees do not block each other. Scales much better under contention.
+
+Con: Dramatically more bookkeeping, deadlock-prone if lock ordering is inconsistent, and ~40 bytes per node in overhead. Rebalancing operations that need to hold multiple ancestor locks get ugly fast.
+
+Option C: Snapshot / Copy-on-Write (the answer Apple likely wants)
+
+If reads dominate and writes are rare or batched, use an immutable persistent tree or a copy-on-write snapshot. The counter reads a snapshot pointer once and traverses it lock-free; writers publish a new root atomically.
+
+# Pseudocode
+def count(root_ref, x):
+    root = root_ref.load()         # one atomic read of the current snapshot
+    return count_value(root, x)    # traversal is fully lock-free from here
+
+Pro: Zero lock contention on reads. Counter never blocks, never sees a torn tree.
+
+Con: Writers pay O(h) to rebuild the spine. Memory pressure if snapshots are held too long.
+
+Why it fits Apple: this is the pattern used inside CoreFoundation, Swift's copy-on-write collections, and most modern query engines. Naming it scores points.
+
+What to Say
+
+A strong answer walks the ladder: "The simplest correct answer is a reader-writer lock around the whole tree. If read contention becomes the bottleneck, I'd move to hand-over-hand locking, but that's expensive. If the workload is read-heavy (which a counting query suggests), copy-on-write snapshots give lock-free reads and are what I'd actually ship."
+
+Follow-Up 3: Speed Up Without Multithreading
+
+The interviewer closes by removing the crutch. You must make the single-threaded path faster. Good answers:
+
+1. Precompute a Value Index
+
+If count_value is called many times with different x, a single O(n) preprocessing pass builds a hash map value -> count, and every subsequent query is O(1).
+
+from collections import Counter
+
+class ValueIndex:
+    def __init__(self, root):
+        self.counts = Counter()
+        self._dfs(root)
+
+    def _dfs(self, node):
+        if node is None:
+            return
+        self.counts[node.val] += 1
+        self._dfs(node.left)
+        self._dfs(node.right)
+
+    def query(self, x):
+        return self.counts[x]
+
+Time: O(n) build, O(1) query.
+
+Space: O(k) where k is the number of distinct values.
+
+Invalidation: if the tree mutates, you must update the counts (or rebuild on write). Same amortization trade-off as an index in a database.
+
+2. Cache Subtree Counts for the Queried Value
+
+If x is fixed and the tree mutates occasionally, store subtree_count[node] for the target value. A mutation invalidates only the path from the mutated node to the root (O(h) work, not O(n)).
+
+3. Morris Traversal
+
+Eliminates the recursion stack entirely, giving O(1) extra space without threads. Slightly higher constant factor per node, but no stack-overflow risk on pathologically deep trees.
+
+4. Iterate Over a Linearized Layout
+
+If you control the tree representation, store nodes in a contiguous array (BFS order or Euler tour). A linear scan is a single pass over sequential memory: no pointer chasing, maximal cache-line utilization, and trivially SIMD-vectorizable for the equality check.
+
+# Linearized representation: just an array of values.
+def count_linear(values, x):
+    return sum(1 for v in values if v == x)
+    # In C/C++ this compiles to a vectorized loop comparing 8-16 ints per instruction.
+
+This is often faster than the parallel tree traversal from Follow-Up 1, because memory bandwidth and branch prediction, not CPU cores, are the real bottleneck for a query this simple. Pointing this out is the insight the interviewer is hoping for.
+
+5. Bloom Filter / Set Membership Short-Circuit
+
+If most queries are for values that do not exist in the tree, a Bloom filter at the root answers "definitely not present" in O(1) and skips the traversal entirely. Useful only when negative queries dominate.
+
+Key Insight
+
+The hiring-manager progression is the real lesson:
+
+Parallelism helps only when the algorithm allows it (balanced tree) and only in a language where it is real (not GIL-bound Python).
+
+Locking is a gradient, not a switch. Coarse RW lock, then hand-over-hand, then copy-on-write. Pick the rung that matches the read/write ratio.
+
+Single-threaded speedups are usually about memory, not CPU. An index, a linearized layout, or a Morris traversal beat adding threads for a scan this simple.
+
+Say these three things out loud and you have given the hiring-manager answer, regardless of which specific code you wrote.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,71 @@
+===H1===
+Phone Keypad — Letter Combinations / Word Filter
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-phone-letter-combinations
+===BODY===
+LinkedIn
+Coding·55 minMembers
+Phone Keypad — Letter Combinations / Word Filter
+The classic phone-keypad letter-combinations problem shows up nearly every recent loop, often as the screen warm-up. A common variant: given a digit string and a dictionary of words, return which words can be typed on the keypad — the structural twist that turns it into a hash / trie problem rather than pure backtracking.
+SWE
+backtracking
+string
+hashmap
+trie
+medium
+Frequency
+Medium
+Last asked
+2026-03-02
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Two reported framings:
+
+Variant A — classic. Given a string of digits 2..9, return all letter combinations the digits could represent on a phone keypad. Backtracking, O(3^N × 4^M) time.
+
+Variant B — dictionary lookup. Given a digit string and a list of words, return the words that map to the digit string (each letter's keypad digit, concatenated). The clean solution precomputes word -> digit_string and bucket-groups words by their digit signature; lookups become O(1). The naive backtrack-then-check approach also works but is the slower answer the interviewer probes against.
+
+Follow-ups reported:
+
+Optimize repeated queries. Build a trie keyed by digit prefixes so that a streaming sequence of digits reports matches incrementally.
+
+Constrained dictionary. Limit to the top-K most frequent words — combine with a heap.
+
+Internationalized keypads. Discuss what changes if letters per key are user-configurable.
+
+Examples
+
+Variant A:
+
+Input:  "23"
+Output: ["ad","ae","af","bd","be","bf","cd","ce","cf"]
+
+Variant B:
+
+digits = "228"
+words  = ["cat", "bat", "act", "cab"]
+keypad = { 2: "abc", 8: "tuv" }
+Each word -> digit string: cat -> 228, bat -> 228, act -> 228, cab -> 222
+Output: ["cat", "bat", "act"]
+
+Notes
+
+Recognizing variant B as a signature-bucketing problem (compute the digit signature once per word, group by it) is the differentiator. Candidates who only solve it by backtracking and then filtering against the dictionary leave performance on the table.
+
+The trie follow-up is the natural bridge to the autocomplete / typeahead system-design round — interviewers sometimes use this question as a coding warm-up for that SD slot.
+
+Preparation
+
+Write the classic backtracking version (variant A) in < 5 minutes from muscle memory.
+
+Implement the signature-bucketing solution for variant B; you should be able to reach for defaultdict(list) automatically.
+
+Sketch a trie node implementation with children: dict[str, TrieNode] and words: list[str] so the follow-up is a 10-line extension, not a re-architecture.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

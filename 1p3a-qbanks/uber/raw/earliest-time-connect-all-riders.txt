@@ -1,0 +1,68 @@
+===H1===
+Earliest Time to Connect All Riders
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/earliest-time-connect-all-riders
+===BODY===
+Uber
+CodingMembers
+Earliest Time to Connect All Riders
+Given timestamped ride logs where each entry links two riders, find the earliest timestamp at which every rider that appears anywhere in the logs belongs to a single connected component. Return "-1" if full connection never happens. A union-find / connected-component problem in the LeetCode 1101 family.
+SWE
+union-find
+graph
+medium
+Frequency
+Single report
+Last asked
+2026-05-22
+Stage
+phone-screen · onsite-coding
+Earliest Time to Connect All Riders
+
+You are given logs, where logs[i] = [timestamp, riderA, riderB] indicates that riderA and riderB shared a ride at timestamp. The logs are sorted in strictly increasing timestamp order.
+
+Two riders are connected if they shared a ride directly or can be linked transitively through other riders. Return the earliest timestamp when every rider that appears anywhere in logs belongs to a single connected component. If this never happens, return "-1".
+
+In this practice version, timestamps are represented as strings so the input can stay in a simple string[][] format. Because the logs are already sorted, you only need to return the first timestamp that completes the full connection.
+
+Follow-up note: If the stream can also contain block events such as ["1670000541", "Bob", "Dan", "blocked"], edges can disappear over time. Plain Union-Find no longer works online because deletions break monotonicity. Typical solutions use offline processing with rollback Union-Find or another dynamic-connectivity technique.
+
+Examples
+
+Example 1:
+
+Input: logs = [["1","Alice","Boo"],["2","Charlie","Dan"],["3","Bob","Charlie"],["4","Alice","Evel"],["5","Bob","Alice"]]
+
+Output: "5"
+
+Explanation:
+
+At timestamp 5, the edge between Bob and Alice merges the two remaining groups into one connected component.
+
+Example 2:
+
+Input: logs = [["1","Alice","Boo"],["2","Charlie","Dan"],["3","Bob","Charlie"],["4","Alice","Evel"],["5","Bob","Dan"]]
+
+Output: "-1"
+
+Explanation:
+
+Even after the final log, {Alice, Boo, Evel} and {Bob, Charlie, Dan} remain disconnected.
+
+Constraints
+
+1 <= logs.length <= 10^5
+
+logs[i].length == 3
+
+1 <= timestamp.length, riderA.length, riderB.length <= 20
+
+riderA != riderB
+
+logs is sorted by strictly increasing timestamp
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

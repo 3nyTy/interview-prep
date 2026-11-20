@@ -1,0 +1,50 @@
+===H1===
+Time-Based Key-Value Store (LC 981)
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/time-based-key-value-store-lc981
+===BODY===
+Oracle
+CodingMembers
+Time-Based Key-Value Store (LC 981)
+Implement the LC 981 time-based key-value store: record values for keys at timestamps and retrieve the value associated with the latest timestamp not greater than the query time. A recent IC4 screen used the prompt on HackerRank without requiring code execution.
+SWE
+hashmap
+binary-search
+medium
+Frequency
+Low · New
+Last asked
+2026-08-28
+Stage
+phone-screen
+Requirements
+
+Implement a TimeMap that stores multiple timestamped values for each key.
+
+set(key, value, timestamp) records the value for that key at the supplied timestamp.
+
+get(key, timestamp) returns the value associated with the greatest stored timestamp less than or equal to the query timestamp.
+
+Return an empty value when no qualifying timestamp exists.
+
+Notes
+
+The full version is the original LeetCode 981 prompt. Another phone screen used a simplified variant, so clarify the exact missing-key and timestamp semantics before coding.
+
+Keep an append-only list of (timestamp, value) pairs per key. Because set timestamps are strictly increasing, each list stays sorted without insertion work; get uses binary search for the rightmost timestamp not greater than the query.
+
+This gives O(1) amortized time for set, O(log k) time for get over k versions of one key, and O(N) total storage. Handle a missing key and a query earlier than the first stored timestamp without indexing an empty result.
+
+The IC4 HackerRank screen did not require running the code; the candidate was expected to present a clean implementation and walk through it.
+
+Preparation
+
+Implement TimeMap once with a standard binary-search helper and once with a handwritten right-bound search; test exact timestamps, between-version queries, early queries, and missing keys.
+
+In five minutes, explain why append-only storage is valid, derive the per-operation complexity, and walk through the boundary case where every stored timestamp is greater than the query.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

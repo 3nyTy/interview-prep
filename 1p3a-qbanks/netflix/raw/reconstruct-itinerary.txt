@@ -1,0 +1,115 @@
+===H1===
+Reconstruct Itinerary
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/reconstruct-itinerary
+===BODY===
+Reconstruct Itinerary
+
+<https://www.1point3acres.com/interview/problems/company/netflix/reconstruct-itinerary>
+
+Netflix
+Coding
+
+60 min
+Members
+Reconstruct Itinerary
+
+Order all tickets into one itinerary starting at JFK, using every ticket exactly once and choosing the lexicographically smallest path (Hierholzer / Eulerian path).
+
+SWE
+graph
+dfs
+backtracking
+hard
+Frequency
+Single report
+Last asked
+2026-01-09
+Stage
+phone-screen  onsite-coding
+Problem Requirements
+
+You are given a list of airline tickets. Each ticket shows where a flight starts and where it ends, written as [from, to]. Your task is to arrange these flights in the correct order to build a complete travel plan.
+
+Here are the rules you must follow:
+
+Start Point: The traveler always starts at "JFK". Your path must begin there.
+Order: If there is more than one valid way to arrange the flights, choose the path that comes first alphabetically (smallest lexical order).
+Example: A path going to ["JFK", "LGA"] is chosen over ["JFK", "LGB"] because "LGA" comes before "LGB".
+Validity: You can assume that a valid path always exists.
+Usage: You must use every single ticket exactly once.
+Sample Inputs and Outputs
+
+Example 1:
+
+Input: tickets = [["MUC","LHR"],["JFK","MUC"],["SFO","SJC"],["LHR","SFO"]]
+
+Output: ["JFK","MUC","LHR","SFO","SJC"]
+
+Example 2:
+
+Input: tickets = [["JFK","SFO"],["JFK","ATL"],["SFO","ATL"],["ATL","JFK"],["ATL","SFO"]]
+
+Output: ["JFK","ATL","JFK","SFO","ATL","SFO"]
+
+Explanation: We chose the first itinerary because "ATL" is alphabetically smaller than "SFO". Therefore, we visit "ATL" before "SFO" when leaving "JFK" for the first time.
+
+Technical Limits
+List Size: There are between 1 and 300 tickets.
+Ticket Size: Each ticket contains exactly 2 items (origin and destination).
+Code Length: Airport codes are exactly 3 characters long.
+Characters: Airport codes use only uppercase English letters.
+Movement: The departure airport is never the same as the arrival airport (from is not to).
+Interview Follow-Up Question
+
+Challenge: How would you change your solution if you needed to return all possible valid itineraries, rather than just the one that comes first alphabetically?
+
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Problem Requirements
+Sample Inputs and Outputs
+Technical Limits
+Interview Follow-Up Question
+Related discussions  0
+Related questions
+
+Other Netflix questions sharing tags with this one
+
+Topological Sort / Course Schedule for Ads
+High
+graph
+backtracking
+topological-sort
++3
+Ads Frequency Cap / Limiter
+High
+hard
+ads
+rate-limiting
++5
+Promotion Posting System Data Model
+Single report
+hard
+data-modeling
+schema-design
++2
+Compute Resource Scheduling for ML Jobs
+Low
+hard
+ml-infra
+scheduling
++4
+Basic Calculator
+Single report
+hard
+stack
+parsing
++1
+Code editor
+
+---

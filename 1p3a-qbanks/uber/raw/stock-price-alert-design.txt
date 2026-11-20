@@ -1,0 +1,589 @@
+===H1===
+Design a Stock Price Alert Notification System
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/stock-price-alert-design
+===BODY===
+Uber
+System DesignMembers
+Design a Stock Price Alert Notification System
+Design a stock-price alert system that ingests live quotes and delivers notifications without scanning every subscription on each update. One rotation uses absolute threshold crossings; a newer canonical variant triggers on an X% move over one user-selected rolling time unit, then removes the subscription after its first trigger or after one inactive month.
+SWE
+system-design
+notification
+messaging
+kafka
+streaming
+idempotency
+sharding
+state-machine
+Frequency
+Single report
+Last asked
+2026-07-28
+Stage
+onsite-system-design
+Design a Stock Price Alert Notification System
+
+Problem Statement
+
+Design a stock price alert notification system similar to a Robinhood-style watchlist alert feature.
+
+At minimum, the system should support:
+
+creating alerts like "notify me when AAPL goes above $220"
+
+pausing or deleting alerts
+
+ingesting real-time stock price updates
+
+detecting threshold crossings quickly
+
+notifying users through push, email, or SMS
+
+This is not a trading engine or exchange matching system. The interesting parts are usually:
+
+how you index millions of alerts so each quote update does not scan everything
+
+how you define trigger semantics clearly
+
+how you decouple market-data ingestion from slower notification delivery
+
+how you handle hot symbols and bursty market moves
+
+Key questions to clarify up front: whether you only need simple above/below alerts, whether after-hours quotes count, and whether alerts should fire once per crossing or repeatedly while the condition remains true.
+
+Phase 1: Requirements (~5 minutes)
+
+Functional Requirements
+
+Create and manage alerts: A user can create, pause, resume, or delete stock price alerts.
+
+Ingest live market prices: The system continuously receives quote updates for supported symbols.
+
+Detect threshold crossings: The system evaluates whether a new quote crosses a user-defined threshold.
+
+Send notifications quickly: Triggered alerts are delivered through configured channels such as push, email, or SMS.
+
+Show active alerts and alert history: Users can list their current alerts and recent triggered notifications.
+
+Keep the initial scope tight: simple threshold alerts such as price_above and price_below. Percent-change alerts, watchlist digests, options alerts, and portfolio-wide rules are natural follow-ups, but they should stay below the line unless the interviewer expands the prompt.
+
+Non-Functional Requirements
+
+RequirementTargetWhy it matters
+Scale10M users, 50M active alertsLarge enough that alert evaluation must be indexed
+Quote ingestion40K updates/sec average, 200K peakMarket data can spike during volatility
+Alert latencyP95 under 3 seconds from quote receipt to enqueue notificationAlerts should feel near real time
+Availability99.9%+ during market hoursUsers expect alerts during important price moves
+CorrectnessAvoid duplicate or missed alerts for the same crossingA noisy alert product quickly loses trust
+OperabilitySupport replay, debugging, and provider retriesNotification systems fail in messy ways
+
+Clarifying Questions
+
+These are the questions worth asking before you draw the design:
+
+What alert types are in scope?
+I would start with price_above and price_below only.
+
+When should an alert fire?
+The clean default is once per threshold crossing.
+Example: an above $220 alert fires when price moves from below 220 to at-or-above 220, not on every tick while price remains above 220.
+
+When does the alert become eligible again?
+It becomes eligible again only after the price crosses back to the other side of the threshold.
+
+Which price source are we using?
+Assume an upstream market-data provider already gives us normalized quotes. We are not designing exchange connectivity from scratch.
+
+Do after-hours quotes count?
+Reasonable default: yes, as long as the quote feed marks market session clearly.
+
+What if the user creates an alert when the condition is already true?
+Reasonable default: do not fire immediately. Anchor the alert to the current latest quote and only fire on the next qualifying crossing after creation.
+
+Capacity Estimation
+
+Assumptions:
+- 10M total users
+- 50M active alerts
+- 8,000 supported symbols
+- 40K quote updates/second average during market hours
+- 200K quote updates/second peak during volatile windows
+
+Alert storage:
+- Each alert rule ~= 200 bytes of metadata
+- 50M * 200 bytes ~= 10 GB raw before indexes/replication
+
+Quote ingest:
+- Each normalized quote ~= 120 bytes
+- 40K * 120 bytes ~= 4.8 MB/s average ingress
+- 200K * 120 bytes ~= 24 MB/s peak ingress
+
+Notification bursts:
+- If 0.5% of active alerts trigger during a sharp move:
+- 50M * 0.5% = 250,000 triggered alerts
+- These can arrive in a short burst and must be queued asynchronously
+
+The key insight is that this is a symbol-partitioned threshold-matching problem, not a per-user polling problem. You do not want to evaluate every user's alert on every quote update.
+
+Phase 2: Data Model (~5 minutes)
+
+Core Entities
+
+UserAlert {
+  alert_id: UUID
+  user_id: UUID
+  symbol: String
+  condition_type: Enum (price_above, price_below)
+  threshold_price: Decimal(18,6)
+  armed_after_sequence: Long
+  channels: Set<Enum(push, email, sms)>
+  status: Enum (active, paused, deleted)
+  created_at: Timestamp
+  updated_at: Timestamp
+}
+
+LatestQuote {
+  symbol: String
+  price: Decimal(18,6)
+  quote_ts: Timestamp
+  source_sequence: Long
+  market_session: Enum (pre_market, regular, after_hours)
+}
+
+AlertTrigger {
+  trigger_id: UUID
+  alert_id: UUID
+  user_id: UUID
+  symbol: String
+  threshold_price: Decimal(18,6)
+  observed_price: Decimal(18,6)
+  quote_ts: Timestamp
+  dedupe_key: String
+  created_at: Timestamp
+}
+
+AlertDelivery {
+  delivery_id: UUID
+  trigger_id: UUID
+  channel: Enum (push, email, sms)
+  provider_message_id: String | null
+  status: Enum (queued, sent, failed)
+  attempted_at: Timestamp
+}
+
+UserNotificationPreference {
+  user_id: UUID
+  push_enabled: Boolean
+  email_enabled: Boolean
+  sms_enabled: Boolean
+  quiet_hours_config: JSON | null
+}
+
+Key Modeling Decisions
+
+Model alerts as durable rules, not as transient jobs
+Alert configuration belongs in a durable source of truth such as a relational store.
+
+Keep quotes and triggers separate
+LatestQuote represents market state, while AlertTrigger is an immutable event derived from it.
+
+Use a dedupe key per trigger
+A key such as alert_id:source_sequence is a practical way to prevent duplicate downstream sends.
+
+Anchor each alert to a creation baseline
+Persist the latest known quote sequence at alert-creation time. This prevents the system from immediately firing an alert just because the condition was already true when the user created it.
+
+Make config ordering explicit
+Alert creation and quote updates must be ordered consistently per symbol. A practical answer is to feed both quote events and alert-config-change events into one symbol-partitioned evaluator log so the evaluator sees a single per-symbol order.
+
+Storage Choices
+
+Relational DB for alert CRUD and user notification preferences
+
+Kafka / durable log for a symbol-ordered evaluator stream plus alert_triggered
+
+Stream processor state store such as Flink/Kafka Streams state backed by RocksDB for per-symbol threshold indexes and last-seen quote state
+
+Delivery log store for sent/failed notification history
+
+The relational DB is the source of truth for alert configuration, but it should not sit on the hot path for threshold matching on every quote tick.
+
+Phase 3: API Design (~5 minutes)
+
+Protocol Choice
+
+REST for user alert management and history reads
+
+Kafka/internal event streams for quote ingestion, config propagation, and trigger fanout
+
+Push/email/SMS provider APIs for notification fanout
+
+Create Alert
+
+POST /v1/alerts
+Idempotency-Key: 0f2e...
+
+{
+  "symbol": "AAPL",
+  "condition_type": "price_above",
+  "threshold_price": 220.00,
+  "channels": ["push", "email"]
+}
+
+{
+  "alert_id": "alrt_123",
+  "status": "active",
+  "symbol": "AAPL",
+  "condition_type": "price_above",
+  "threshold_price": 220.00
+}
+
+Update or Pause Alert
+
+PATCH /v1/alerts/alrt_123
+
+{
+  "status": "paused"
+}
+
+List User Alerts
+
+GET /v1/users/{userId}/alerts?status=active
+
+{
+  "alerts": [
+    {
+      "alert_id": "alrt_123",
+      "symbol": "AAPL",
+      "condition_type": "price_above",
+      "threshold_price": 220.00,
+      "status": "active"
+    }
+  ]
+}
+
+Alert History
+
+GET /v1/users/{userId}/alerts/history?cursor=...&limit=20
+
+Internal Quote Event Contract
+
+{
+  "symbol": "AAPL",
+  "price": 220.15,
+  "quote_ts": "2025-12-18T15:30:02.120Z",
+  "source_sequence": 99887766,
+  "market_session": "regular"
+}
+
+State the trigger semantics explicitly in the API discussion: an alert fires on a crossing, not on every quote that satisfies the condition. That one sentence prevents a lot of ambiguity later.
+
+Phase 4: High-Level Design (~15-25 minutes)
+
+Core Request Flows
+
+1. Create or update an alert
+
+The client calls the Alert API.
+
+The Alert API validates the symbol, threshold, and notification channels.
+
+The service reads the latest known quote/sequence for that symbol and stores it as armed_after_sequence.
+
+The service writes the alert rule into the relational DB.
+
+The service publishes an alert_config_changed event carrying armed_after_sequence.
+
+A merge stage appends that config change into the same symbol-ordered evaluator log used for quote processing.
+
+The stream evaluator consumes that unified per-symbol stream and updates its threshold index.
+
+This keeps alert CRUD durable while still letting evaluation stay in-memory and fast.
+
+2. Ingest and normalize quotes
+
+An upstream market-data adapter receives raw quote updates from providers or internal pricing systems.
+
+The normalizer:
+
+validates the payload
+
+converts to a canonical symbol and decimal price format
+
+attaches a monotonic source_sequence
+
+publishes the normalized quote to quote_updates
+
+Partition the quote stream by symbol. That is the natural key because all alerts for a symbol depend on the same price stream. Config changes should be merged into the same symbol-ordered evaluator stream so alert activation and quote processing have a single per-symbol order.
+
+3. Evaluate threshold crossings
+
+This is the heart of the design.
+
+For each symbol, the evaluator keeps:
+
+the previous quote for that symbol
+
+a sorted index of active price_above alerts by threshold
+
+a sorted index of active price_below alerts by threshold
+
+When a new quote arrives, compare old_price and new_price.
+
+If price moved up:
+
+fetch all price_above alerts with thresholds in (old_price, new_price]
+
+filter to alerts where armed_after_sequence < current source_sequence
+
+only evaluate alerts whose config change has already appeared in the unified symbol stream
+
+emit one alert_triggered event per matching alert
+
+If price moved down:
+
+fetch all price_below alerts with thresholds in [new_price, old_price)
+
+filter to alerts where armed_after_sequence < current source_sequence
+
+only evaluate alerts whose config change has already appeared in the unified symbol stream
+
+emit one alert_triggered event per matching alert
+
+This is why a sorted threshold index matters. You want a range query, not a full scan.
+
+This crossing-based design naturally handles large jumps. If a stock moves from $215 to $223 in one quote update, the system still fires alerts for $216, $220, and $222 because they all lie inside the crossed range.
+
+4. Prevent duplicates and stale-trigger bugs
+
+Two common problems are duplicate sends and stale quotes.
+
+Mitigations:
+
+ignore quotes whose source_sequence is older than the symbol's last processed sequence
+
+generate a dedupe key like alert_id:source_sequence
+
+make notification workers idempotent against that dedupe key
+
+That gives you at-least-once internal processing with effectively-once user-visible notifications.
+
+5. Send notifications asynchronously
+
+The notification orchestrator consumes alert_triggered events and then:
+
+loads the user's notification preferences
+
+decides which channels are enabled
+
+writes a delivery-log row
+
+calls APNs/FCM, email, or SMS providers
+
+retries failures with backoff
+
+The quote-evaluation path should never wait on provider latency.
+
+Why This Split Works
+
+Relational DB handles durable alert configuration cleanly
+
+Kafka decouples quotes and delivery, while preserving a unified per-symbol evaluation order
+
+Stream state gives fast per-symbol range matching
+
+Async notification fanout absorbs bursty trigger volume
+
+History store supports user-facing audit and debugging
+
+Phase 5: Scaling & Trade-offs (~15-20 minutes)
+
+1. Why scanning the database will fail
+
+The naive design is:
+
+receive a quote update
+
+query the database for all alerts on that symbol
+
+filter them in application code
+
+That breaks quickly for popular symbols like AAPL, TSLA, or NVDA.
+
+A better design keeps the evaluation path in a partitioned stream processor with a sorted threshold index per symbol.
+
+Do not propose querying the relational alert table for every quote tick. Even if each query is indexed by symbol, popular symbols can still have enormous alert sets and create read amplification during volatility.
+
+2. Trigger semantics and re-arming
+
+This is a likely follow-up because the product definition matters.
+
+For an above $220 alert:
+
+fire when price crosses from below to at-or-above 220
+
+do not fire again while price stays above 220
+
+allow it to fire again only after price drops back below 220 and later crosses upward again
+
+if the user creates the alert while price is already above 220, anchor it to the current quote and wait for a future downward-then-upward crossing
+
+The crossing-based state machine is simpler and less spammy than "send a notification on every qualifying quote."
+
+3. Hot-symbol skew
+
+Partitioning by symbol is the right default, but it can create skew.
+
+If one symbol becomes too hot, you have two common upgrades:
+
+Threshold-bucket sub-sharding
+Split one symbol's alerts into threshold buckets, then broadcast the quote to the relevant symbol shards.
+
+Separate heavy-symbol workers
+Move the heaviest symbols to dedicated evaluator partitions so they do not starve the long tail.
+
+This is the same general idea as isolating hot keys in other distributed systems.
+
+4. Config-change ordering vs quote ordering
+
+There is a subtle race here:
+
+user creates an alert
+
+a new quote arrives at almost the same time
+
+the system must decide whether that quote was "before" or "after" the alert became active
+
+The clean answer is:
+
+merge both quotes and config-change events into one symbol-ordered evaluator stream
+
+process that stream in one evaluator partition per symbol
+
+treat the alert as active only after its config event has appeared in that stream
+
+That gives you a deterministic per-symbol ordering model instead of hand-waving over timing races between API writes and stream processing.
+
+5. Notification burst handling
+
+A single market move can trigger hundreds of thousands of alerts.
+
+Design responses:
+
+enqueue notifications to Kafka/SQS-like queues instead of sending inline
+
+separate evaluation throughput from provider throughput
+
+apply per-user or per-channel rate limits if product rules allow it
+
+prioritize push over email/SMS when channels need graceful degradation
+
+The product can tolerate slightly delayed email better than slightly delayed detection.
+
+6. Exactly-once is unrealistic end-to-end
+
+External providers can timeout, retry, or accept a request and fail to return a clean acknowledgement.
+
+So the practical answer is:
+
+at-least-once inside the event pipeline
+
+idempotent delivery records at the notification layer
+
+dedupe keys so users rarely see duplicates
+
+That is much more defensible than promising perfect exactly-once delivery all the way to a phone lock screen.
+
+7. Replay and backfill
+
+If the evaluator had a bug or trigger semantics changed, replay matters.
+
+Kafka helps because you can:
+
+replay the unified symbol-ordered evaluator stream for a recent window
+
+rebuild the state store from quote events plus alert-config-change events in that stream
+
+audit what should have triggered and compare against actual delivery logs
+
+This matters because alert products often face correctness disputes from users.
+
+8. Quote quality and stale data
+
+You also need to say what happens with duplicate or out-of-order quotes:
+
+keep the latest processed source_sequence per symbol
+
+ignore older events
+
+monitor gaps in the quote stream
+
+alert on evaluator lag during market hours
+
+If the interviewer asks about corporate actions like stock splits, the clean answer is to run a separate adjustment workflow that rewrites thresholds or pauses affected alerts until thresholds are normalized.
+
+Notes
+
+Alternate canonical variant — rolling-window percentage jump
+
+Ingest fresh exchange prices continuously.
+
+Let each user subscribe to an alert for an X% price movement over exactly one rolling unit: minute, hour, day, week, month, or year.
+
+Interpret the window relative to the current timestamp rather than as a calendar-aligned interval.
+
+Treat the subscription as one-shot: remove it after the first trigger, and also remove it if one month passes without a trigger.
+
+Clarify the exact reference-price rule inside the rolling window before designing the evaluator.
+
+Compare architecture choices explicitly, with particular attention to storage footprint and alert latency.
+
+Common Pitfalls
+
+Scanning all alerts per quote: This is the main architectural mistake. The correct framing is indexed threshold matching per symbol.
+
+Firing repeatedly while the price stays above or below the threshold: That creates alert spam and usually means the trigger semantics were never clarified.
+
+Putting notification provider calls on the quote path: Provider APIs are slower and less reliable than quote processing. Keep them asynchronous.
+
+Ignoring out-of-order quote events: Without sequence handling, a late quote can trigger false alerts or re-trigger old ones.
+
+Immediate firing on alert creation: If the price is already on the satisfied side when the alert is created, many products do not notify immediately. Clarify the product rule and, by default, anchor the alert to the latest quote.
+
+Hand-waving config/quote races: If alert creation and quote ingestion are processed on unrelated paths with no ordering rule, the activation semantics break down. Use a per-symbol ordering model.
+
+Over-designing a trading system: The prompt is about alerts, not order books, execution, settlement, or compliance workflows.
+
+Interview Checklist
+
+Clarify that the product is a price alert system, not a trading engine
+
+Define once-per-crossing alert semantics explicitly
+
+Partition quote processing by symbol
+
+Explain the sorted threshold index for range-based matching
+
+Separate alert CRUD storage from the real-time evaluation path
+
+Keep notification delivery asynchronous and idempotent
+
+Call out skew, replay, and stale-quote handling
+
+Summary Table
+
+AreaRecommended answer
+Primary config storeRelational DB for alert rules and user preferences
+Realtime backboneKafka-backed symbol-ordered evaluator stream plus trigger events
+EvaluatorStream processor keyed by symbol
+Hot stateState store with last quote plus sorted thresholds
+Trigger semanticsFire once per threshold crossing
+Delivery modelAsync notification fanout with dedupe keys
+
+If you are short on time in the interview, land these five points clearly: crossing semantics, symbol partitioning, sorted-threshold matching, async notifications, and duplicate/stale-event handling. That is enough to show strong judgment for this prompt.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

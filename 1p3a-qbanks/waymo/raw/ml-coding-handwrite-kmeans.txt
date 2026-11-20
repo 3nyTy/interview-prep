@@ -1,0 +1,67 @@
+===H1===
+Hand-Write K-Means Clustering (NumPy)
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/ml-coding-handwrite-kmeans
+===BODY===
+Waymo
+Coding·60 minMembers
+Hand-Write K-Means Clustering (NumPy)
+ML coding round: hand-implement K-means in NumPy with explicit attention to broadcasting and vectorization. Explicit per-sample Python loops over the assignment / update steps are docked. Same family as the broader 'ML coding' round, which can also surface logistic regression, linear regression closed-form, attention, or a small transformer block.
+MLE
+numpy
+pytorch
+ml-knowledge
+gradient-descent
+linear-regression
+attention
+transformer
+medium
+Frequency
+Medium
+Last asked
+2026-05-13
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Implement K-means clustering from scratch using NumPy only (no scikit-learn, no SciPy).
+
+Standard signature: kmeans(X, k, n_iter, seed=None) -> (centroids, labels) where X has shape (n, d), centroids has shape (k, d), labels has shape (n,).
+
+Initialize centroids randomly from the input rows (k-means++ is a fair follow-up).
+
+Iterate n_iter rounds (or until convergence) of assignment + centroid update.
+
+Vectorize both the assignment and update steps using NumPy broadcasting; explicit Python for loops over samples or clusters are penalized.
+
+Notes
+
+Vectorized assignment: dists = np.linalg.norm(X[:, None, :] - centroids[None, :, :], axis=-1) produces an (n, k) matrix; labels = dists.argmin(axis=1). Cost is O(n · k · d) per iteration and is fully broadcast — no Python loops.
+
+Vectorized update: use np.add.at(new_centroids, labels, X) for the sum and np.bincount(labels, minlength=k) for counts; divide. Alternative: one-hot encode labels into shape (n, k) and matmul against X. Both avoid Python loops.
+
+Empty-cluster handling: if a cluster has zero assignees, re-seed it from the farthest point under the current centroid set; otherwise the matmul update produces NaNs.
+
+Numerical stability: when computing squared distances explicitly, prefer ||x||² - 2·x·c + ||c||² expansion — pre-compute ||x||² outside the loop, saving O(n · d) per iteration. Be explicit about avoiding the negative-rounding artifact: np.maximum(d2, 0) before sqrt.
+
+Convergence test: stop when labels are unchanged or when centroid drift ||C_t − C_{t-1}||_F < eps. The interviewer in this round graded the convergence criterion as a separate signal.
+
+The broader ML coding round also surfaces logistic regression with gradient descent, linear regression closed-form (XᵀX)⁻¹Xᵀy, hand-written scaled-dot-product attention, and a tiny transformer block on top of the materials the recruiter sends ahead of time. Prepare all five at the same fluency.
+
+Preparation
+
+Write K-means in under 25 minutes, NumPy only, twice. Time yourself; common failure is spending the round debugging the broadcasting shapes rather than discussing trade-offs.
+
+Refresh NumPy broadcasting and einsum notation — interviewers often probe whether the candidate can re-express the same algorithm two different ways.
+
+Implement k-means++ initialization as a follow-up exercise.
+
+Pre-derive the closed-form linear-regression formula and rehearse explaining why centering / regularization matters.
+
+For the transformer-block follow-up, hand-write scaled-dot-product attention with masking and multi-head support in under 20 minutes.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,79 @@
+===H1===
+Code Craft: Bootstrap Aggregated API
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/code-craft-bootstrap-aggregated-api
+===BODY===
+DoorDash
+Coding·60 minMembers
+Code Craft: Bootstrap Aggregated API
+The second-most-common Code Craft prompt. Given three internal services (consumer / payment / address), implement a single bootstrap endpoint that takes a `user_id`, fans out to all three downstream APIs, and assembles the responses into one composite payload. Resilience to partial downstream failure is the central signal.
+SWE
+api-integration
+circuit-breaker
+object-design
+json
+medium
+Frequency
+High
+Last asked
+2026-09-09
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input: a user_id.
+
+Three downstream services are provided as mock classes inside the starter file:
+
+ConsumerService.getUserById(user_id, shouldFail) → {first_name, last_name, consumer_id, email, roles}
+
+PaymentsService.getPaymentMethodsByConsumerId(consumer_id, shouldFail) → {default_card, gift_cards}
+
+AddressService.getAddressByConsumerId(consumer_id, shouldFail) → {lat, lng, address, address_id}
+Each method takes a shouldFail boolean used to inject failures; on failure it returns a non-200 status code rather than throwing.
+
+Output: a single composite response object combining the relevant fields from all three downstream responses. The exact field shape is part of the clarification — the interviewer expects the candidate to negotiate it.
+
+Resilience requirement: a downstream failure must not fail the whole request. The composite response should include the fields that succeeded; failed sub-fields are set to null or omitted, and the overall response is still returned with a 200.
+
+Retry policy is open — the interviewer wants the candidate to propose one.
+
+Notes
+
+Standard structure: a BootstrapService with one orchestrator method that calls the three downstream services and a per-call helper that wraps retry + failure-handling logic. Keep the orchestrator linear and readable.
+
+Dependency order matters: PaymentsService and AddressService both depend on consumer_id from the ConsumerService response. If ConsumerService fails, the entire bootstrap call has no recovery path — surface this distinction in the clarification phase. The two consumer-id-keyed calls can run in parallel once ConsumerService succeeds.
+
+Retry strategy: 2–3 attempts with exponential backoff and jitter is a safe default. Mention but don't necessarily implement: circuit breaker once a downstream is consistently failing, bulkhead pattern to bound thread pools per downstream.
+
+The Java version takes long because of the mock class boilerplate (5+ inner classes for responses). Read the starter file first and only paraphrase the parts you need. Python is often the faster choice here too.
+
+Common failure mode in this round: candidates miss that shouldFail is the only injection point and end up writing complicated try/catch blocks. The cleanest pattern is a safeCall(supplier, retries) wrapper that returns Optional / null on terminal failure.
+
+Several candidates report finishing the implementation and spending the remaining 20+ minutes on a deep-dive — be ready to discuss observability (per-downstream success counters, p99 latency, error budgets), schema versioning of the composite response, and partial-response signaling to the caller (HTTP 207 Multi-Status vs 200 with a partial=true flag).
+
+Production follow-ups
+
+What if a downstream's p99 spikes — per-downstream timeout less than the SLA, hedged request after (SLA − slack), fallback to last-known-good cache for address / default card.
+
+What if the bootstrap endpoint is called 1000× per second — short-TTL Redis cache keyed by (user_id, version), cache-aside read; invalidation on a payment-method-update event.
+
+What if a downstream is permanently degraded — circuit breaker; surface degraded mode via response metadata; alarm on sustained open state.
+
+How do you test it — table-driven tests over the 8 combinations of (consumer fails / payments fails / address fails); contract tests against each downstream mock.
+
+Rusty Java concurrency skills can consume the implementation slot and leave time to run only the happy path. Account for concurrency setup when budgeting time for failure-path checks.
+
+Preparation
+
+Write the basic implementation cold in 30 minutes (three sequential calls with try/catch, return a composite). Then refactor to a single safeCall helper.
+
+Practice listing the 8 failure combinations from memory and saying which response shape each produces — this is the most common second-half follow-up.
+
+Be ready to discuss whether to parallelize the two consumer-id-dependent calls and what observability you'd add to detect downstream regressions.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

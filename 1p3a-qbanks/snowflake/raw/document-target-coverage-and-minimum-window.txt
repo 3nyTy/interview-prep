@@ -1,0 +1,324 @@
+===H1===
+Document Target Coverage and Minimum Window
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/document-target-coverage-and-minimum-window
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Document Target Coverage and Minimum Window
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+Members
+Document Target Coverage and Minimum Window
+
+You are given: A document string with arbitrary characters (letters, digits, punctuation, etc.) A targets list of words The interview progresses in 3 parts: 1.
+
+SWE
+sliding-window
+hashmap
+string
+medium
+Frequency
+Single report
+Last asked
+2025-12-05
+Stage
+phone-screen · onsite-coding
+Document Target Match and Shortest Window
+Problem Summary
+
+You are given:
+
+A document string containing text (letters, numbers, punctuation).
+A targets list of words to look for.
+
+The interview has three steps:
+
+Check if all the target words exist in the document.
+Count how many times each target word appears.
+Find the shortest piece of text that contains all the target words.
+
+Key Rule: targets do not have punctuation, but the document does. You must ignore punctuation when matching.
+
+Example: The target "isnt" should match the word "isn't" in the document.
+Input and Output Example
+document = "This is an example document. This document isn't very special."
+targets = ["document", "document", "isnt"]
+
+
+Expected result:
+
+match = True
+count = {
+    "document": 2,
+    "isnt": 1,
+}
+sub_doc = "document. This document isn't"
+
+Step 1: Check for Missing Words
+Requirement
+
+Return True if every word in targets is found in the document.
+
+If a word is listed twice in targets, it must appear at least twice in the document.
+
+Solution Approach
+
+First, we need to "clean" or normalize the words. We convert everything to lowercase and remove symbols. This allows "isn't" to match "isnt".
+
+Then we compare the counts:
+
+Count the frequency of each word in targets.
+Go through the document, clean each word, and count it if it is in our list.
+Check if we found enough of every word.
+from collections import Counter
+
+def normalize_word(s: str) -> str:
+    # Keep only letters and numbers, then convert to lowercase
+    return "".join(ch.lower() for ch in s if ch.isalnum())
+
+def coverage_match(document: str, targets: list[str]) -> bool:
+    # Count what we need
+    need = Counter(normalize_word(t) for t in targets)
+    need.pop("", None) # Remove empty strings if they exist
+    
+    if not need:
+        return True
+
+    have = Counter()
+    for raw in document.split():
+        word = normalize_word(raw)
+        # Only count words we actually look for
+        if word in need:
+            have[word] += 1
+
+    # Check if we have enough of every target word
+    return all(have[w] >= c for w, c in need.items())
+
+Step 1 Complexity
+Metric	Complexity
+Time	O(n + m)
+Space	O(u)
+
+n = number of words in document, m = number of targets, u = unique target words.
+
+Step 2: Count Word Frequency
+Requirement
+
+Return a count of how many times each target word appears in the document.
+
+Use the cleaned (normalized) version of the word.
+The output map should list each unique target word once.
+Solution Approach
+
+We use the same cleaning logic as Step 1. We simply iterate through the document and update the count for any word that is in our target list.
+
+from collections import Counter
+
+def target_counts(document: str, targets: list[str]) -> dict[str, int]:
+    normalized_targets = [normalize_word(t) for t in targets]
+    target_set = {t for t in normalized_targets if t}
+    
+    # Initialize counts to 0
+    counts = {t: 0 for t in target_set}
+
+    for raw in document.split():
+        word = normalize_word(raw)
+        if word in counts:
+            counts[word] += 1
+
+    return counts
+
+Step 2 Complexity
+Metric	Complexity
+Time	O(n + m)
+Space	O(u)
+Step 3: Find the Smallest Window
+Requirement
+
+Find the shortest substring in document that contains all the target words.
+
+If you cannot find one, return an empty string "".
+Match words using the cleaning rules (ignore punctuation).
+The output must be the original text (keep the punctuation and capital letters exactly as they were).
+Solution Approach
+
+We use the Sliding Window technique.
+
+Tokenize: Break the document into a list. For every word, store the original text, the cleaned text, and its start/end position indices.
+Expand: Move a right pointer to include words in our window.
+Shrink: Once the window has all the required words, move the left pointer to make the window smaller.
+Track Best: Keep track of the smallest valid window seen so far.
+Result: Use the stored start/end indices to return the exact string from the original document.
+from collections import Counter, defaultdict
+
+def tokenize_with_spans(document: str) -> list[tuple[str, str, int, int]]:
+    tokens: list[tuple[str, str, int, int]] = []
+    n = len(document)
+    i = 0
+    while i < n:
+        # Skip whitespace to find start of a word
+        while i < n and document[i].isspace():
+            i += 1
+        if i >= n:
+            break
+        start = i
+        
+        # Find end of the word
+        while i < n and not document[i].isspace():
+            i += 1
+        end = i
+        
+        raw = document[start:end]
+        norm = normalize_word(raw)
+        tokens.append((raw, norm, start, end))
+    return tokens
+
+def min_cover_sub_document(document: str, targets: list[str]) -> str:
+    need = Counter(normalize_word(t) for t in targets)
+    need.pop("", None)
+    if not need:
+        return ""
+
+    tokens = tokenize_with_spans(document)
+    if not tokens:
+        return ""
+
+    required_total = sum(need.values())
+    window = defaultdict(int)
+    formed = 0
+
+    best_len = float("inf")
+    best_range: tuple[int, int] | None = None
+    left = 0
+
+    # Expand the window with 'right' pointer
+    for right in range(len(tokens)):
+        _, norm_r, _, _ = tokens[right]
+        if norm_r in need:
+            window[norm_r] += 1
+            if window[norm_r] <= need[norm_r]:
+                formed += 1
+
+        # Shrink the window with 'left' pointer if valid
+        while formed == required_total and left <= right:
+            _, _, start_l, _ = tokens[left]
+            _, _, _, end_r = tokens[right]
+            cur_len = end_r - start_l
+            
+            # Update best result if this window is smaller
+            if cur_len < best_len:
+                best_len = cur_len
+                best_range = (start_l, end_r)
+
+            _, norm_l, _, _ = tokens[left]
+            if norm_l in need:
+                window[norm_l] -= 1
+                if window[norm_l] < need[norm_l]:
+                    formed -= 1
+            left += 1
+
+    if best_range is None:
+        return ""
+    start, end = best_range
+    return document[start:end]
+
+Step 3 Complexity
+Metric	Complexity
+Time	O(n + m)
+Space	O(n + u)
+
+n = number of document tokens, m = number of targets, u = unique target words.
+
+Extra Discussion
+If the interviewer asks about matching many patterns in a long stream of characters (not separated by spaces), mention using a Trie.
+However, for this problem where we split by words (tokens), HashMaps combined with a Sliding Window are usually the best and simplest choice.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Document Target Match and Shortest Window
+Problem Summary
+Input and Output Example
+Step 1: Check for Missing Words
+Requirement
+Solution Approach
+Step 1 Complexity
+Step 2: Count Word Frequency
+Requirement
+Solution Approach
+Step 2 Complexity
+Step 3: Find the Smallest Window
+Requirement
+Solution Approach
+Step 3 Complexity
+Extra Discussion
+Related discussions · 0
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Recipe as Contiguous Ingredient Subsequence
+Single report
+string
+sliding-window
+medium
++4
+Top-K Search Terms (Per-User Deduped)
+Single report
+hashmap
+medium
+set
++2
+Forest Parent Array Delete Node
+Single report
+hashmap
+medium
+tree
++1
+Filter System with Dynamic Blacklist
+Single report
+hashmap
+medium
+oop-design
++3
+K Top Selling Books
+Single report
+hashmap
+medium
+top-k
++2
+Code editor

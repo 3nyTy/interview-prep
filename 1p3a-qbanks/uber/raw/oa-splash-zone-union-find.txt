@@ -1,0 +1,86 @@
+===H1===
+OA: Splash Zone / Balls Connection
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/oa-splash-zone-union-find
+===BODY===
+Uber
+Coding·90 minMembers
+OA: Splash Zone / Balls Connection
+Hack2Hire OA problem (companion to Pipeline Throughput). Balls live on a 2D grid; two balls connect if they share a row or column and their Manhattan-along-the-axis distance is ≤ `d`. Connections cascade transitively into clusters. Counting clusters yields the minimum number of triggers to vacuum the board.
+SWE
+union-find
+graph
+hard
+Frequency
+Medium
+Last asked
+2026-06-04
+Stage
+oa
+Requirements
+
+Input: a list of ball positions points[], where points[i] = [x_i, y_i], and an integer threshold d.
+
+Two balls are directly attracted when the Euclidean distance between them is strictly less than d — i.e. (x1 - x2)² + (y1 - y2)² < d². A distance of exactly d does not qualify.
+
+Minority variant: some candidates report a grid/axis-aligned connection rule instead — two balls connect when they share a row (y1 == y2) or a column (x1 == x2) and the absolute difference on the other axis is ≤ d. This changes both the geometry (axis-aligned, not Euclidean) and the boundary (≤ not <); clarify before coding which rule applies.
+
+Attraction is transitive (chain reaction): if A attracts B and B attracts C, then starting the process from any one of A, B, C absorbs all three within the same second.
+
+In one second you pick one not-yet-absorbed ball and start its chain reaction.
+
+Output: the minimum number of seconds to absorb every ball. This equals the number of connected components (minimum number of starting triggers).
+
+def min_seconds_to_absorb(points: list[list[int]], d: int) -> int: ...
+    # Returns the number of connected components under the "Euclidean distance < d" rule.
+    # Edge: distance exactly == d does NOT connect (strict <). Compare squared distance
+    #   (x1-x2)**2 + (y1-y2)**2 < d*d to stay in integer arithmetic / avoid sqrt rounding.
+    # A single ball (n == 1) returns 1.
+
+Examples
+
+points = [[0,0],[1,0],[2,0],[10,0]], d = 2 → 2. Balls 0–1 and 1–2 are each closer than 2, so {0,1,2} is one component; ball 3 is isolated. Two activations.
+
+points = [[0,0],[3,0],[0,4]], d = 6 → 1. All pairwise distances (3, 4, 5) are below 6, so one component.
+
+points = [[0,0],[2,0],[4,0]], d = 2 → 3. Adjacent distances are exactly 2, which fails the strict < test, so every ball is isolated.
+
+Notes
+
+The intended solution is union-find (union-by-rank + path compression) over the "is connected" relation, then count distinct roots. Brute DFS/BFS on the implicit graph is equally correct.
+
+With 1 <= points.length <= 1000, the straightforward O(n²) pairwise scan — test every pair, union if dx*dx + dy*dy < d*d — comfortably fits the limits. No spatial index is needed.
+
+Use squared-distance integer comparison (dx*dx + dy*dy < d*d); do not take sqrt, which introduces floating-point rounding right at the < d boundary that Example 3 is designed to probe.
+
+Coordinates range over -10^6 <= x_i, y_i <= 10^6 and 1 <= d <= 10^6, so dx*dx + dy*dy and d*d can reach ~8e12 — fine for 64-bit integers (Python is arbitrary-precision, but flag it in typed languages).
+
+Watch the strict-inequality corner case (== does not connect) and the single-ball case (n == 1 → 1 second).
+
+Bucket-and-scan optimization (for the axis-aligned minority variant)
+
+If the round actually uses the row/column rule above, the geometry collapses to 1D per axis and admits a faster pass than O(n²):
+
+For each row y, sort balls by x; union adjacent pairs whose x differ by ≤ d. Symmetric pass over each column.
+
+Count distinct union-find roots at the end. Coordinate compression / hashmap-of-row / hashmap-of-column handles sparse coordinates.
+
+This is the line-sweep / interval-merge shape common to several Uber OA problems. It is not applicable to the Euclidean rule, where proximity is not separable per axis.
+
+Preparation
+
+Write a clean union-find with path compression and union-by-rank from memory; you will want it instantiated within the first 5 minutes.
+
+Drill the strict-< boundary explicitly with the d = 2 / distance-exactly-2 case so you don't off-by-one the inequality.
+
+Practice squared-distance comparison and confirm you never call sqrt.
+
+Re-derive the inverse-Ackermann amortized bound for union-find once so you can defend the complexity claim; interviewers occasionally probe it.
+
+If the variant ambiguity surfaces, be ready to switch between the Euclidean pairwise scan and the bucket-and-scan axis-aligned approach.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

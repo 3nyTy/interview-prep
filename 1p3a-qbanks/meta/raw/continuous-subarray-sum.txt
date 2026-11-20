@@ -1,0 +1,44 @@
+===H1===
+Continuous Subarray Sum
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/continuous-subarray-sum
+===BODY===
+Meta
+Coding·20 minMembers
+Continuous Subarray Sum
+LC 523 — find a contiguous subarray (length ≥ 2) whose sum is a multiple of `k`. Asked as the second E5 phone-screen problem.
+SWE
+array
+hashmap
+prefix-sum
+math
+medium
+Frequency
+Single report
+Last asked
+2026-04-23
+Stage
+phone-screen
+Requirements
+
+Input: integer array nums, integer k.
+
+Return True iff there is a contiguous subarray of length ≥ 2 whose sum is a non-zero multiple of k (or any multiple if k == 0).
+
+Notes
+
+Prefix-sum modulo k trick: store the first index where each prefix_sum % k value was seen. If the same remainder appears at indices i < j with j - i ≥ 2, the subarray (i, j] is a multiple of k.
+
+Edge cases: zeros in the array (two consecutive zeros are always a valid subarray), k == 0 (degenerates to finding two consecutive zeros), negative numbers (% semantics differ across languages — verify your language's behavior).
+
+Preparation
+
+Memorize the seed entry: seen = {0: -1} so a subarray starting at index 0 still satisfies the j - i ≥ 2 constraint.
+
+Be ready to defend the language-specific % behavior — interviewers often probe this for C++ / Java candidates.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,67 @@
+===H1===
+Reverse Nodes in K-Group (incomplete tail variant)
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/reverse-nodes-in-k-group
+===BODY===
+ByteDance / TikTok
+Coding·60 minMembers
+Reverse Nodes in K-Group (incomplete tail variant)
+Reverse a linked list in groups of K. Variants flip the convention for the final partial group, split into a two-step problem (single-list reverse warmup first, then grouped reverse), or invert the task entirely — reverse the order of the K-groups while keeping each group's internal order intact.
+SWE
+MLE
+linked-list
+two-pointer
+hard
+Frequency
+Medium
+Last asked
+2026-08-06
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Given the head of a linked list and an integer k, reverse the nodes of the list k at a time and return the modified list.
+
+def reverseKGroup(head: ListNode, k: int) -> ListNode: ...
+
+Reported variants:
+
+Reverse the final partial group too (non-canonical) — the LeetCode standard leaves the trailing fewer-than-k nodes untouched, but reports here specifically ask to reverse the tail group anyway.
+
+Warmup two-parter: first implement a plain single-list reverse, then extend to the grouped version in the same round. A fresh phone-screen variant used exactly this two-step setup and ended before a third follow-up after debugging consumed time.
+
+Build your own ListNode and test scaffolding: the platform (Lark or HackerRank) does not give a prebuilt linked-list helper, so you must produce a working class plus at least one constructed test case.
+
+Reverse group order, not within groups (MLE/RS phone screen): keep each K-group's internal order intact but reverse the sequence of the groups themselves — e.g. with k = 3, 1→2→3→4→5→6 becomes 4→5→6→1→2→3. This is a different muscle from the canonical in-group reversal; clarify which one is wanted before coding.
+
+Edge probes: explain why k = 1 is a no-op and clarify what to do if k > length; one recent variant guarantees k <= length but still asks how you would handle the unguaranteed case.
+
+Notes
+
+Iterative pattern: walk a pointer k nodes forward to confirm a full group exists, reverse the segment, splice the reversed segment back, and advance the "before-group" anchor pointer.
+
+Watch the splice carefully: keep references to group_start and next_group_head before mutating in-place.
+
+For the "reverse the partial tail too" variant, drop the length check at the front of the loop and unconditionally reverse whatever remains.
+
+Standard complexities: O(n) time, O(1) extra space (iterative); the recursive version is O(n/k) stack depth.
+
+Common bug: forgetting to set the new tail's .next = None after splicing, leading to a cycle that hangs your test driver.
+
+For the reverse-group-order variant, do not touch internal links at all: walk K nodes to detach each group, then re-link the groups back-to-front. A clean approach is to collect group head/tail pairs, then splice them in reverse.
+
+Preparation
+
+Write a ListNode class plus from_list / to_list helpers ahead of time — you will need them on a blank editor.
+
+Drill plain reverse first, then grouped reverse, then the "reverse tail too" variant.
+
+Practice on k = 2 and k = 3 with both even and odd list lengths; trace pointer moves carefully.
+
+Be ready to explain in-place pointer rewiring at the whiteboard without a reverse helper — interviewers often disallow building an intermediate list.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,56 @@
+===H1===
+SQL Query Plan Optimizer
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/sql-query-plan-optimizer
+===BODY===
+Databricks
+Coding·60 minMembers
+SQL Query Plan Optimizer
+Given a node-based representation of a SQL query plan, implement optimizer rewrites such as predicate pushdown and make the transformed plan runnable.
+SWE
+Infra Eng
+sql
+query-optimization
+tree
+hard
+Frequency
+Single report
+Last asked
+2026-01-10
+Stage
+onsite-coding
+Requirements
+
+Input is a data structure representing a SQL query / logical plan.
+
+Implement at least two optimizer rewrites.
+
+The central expected rewrite is predicate pushdown.
+
+The transformed plan must run or evaluate correctly against the provided framework.
+
+Explain the conditions under which a rewrite is valid.
+
+Notes
+
+This round expects database-systems familiarity. If predicate pushdown is unfamiliar, the prompt becomes much harder.
+
+Read the node types carefully before coding; the representation itself is part of the challenge.
+
+Start with a conservative rewrite that preserves semantics, then add a second simple optimization if time allows.
+
+Know the canonical safety conditions: a predicate p on table T can be pushed below a Filter/Project only if p references columns produced by T and not by computed expressions introduced above (otherwise the column does not exist below). Pushing through an INNER JOIN is safe when p references only one side; pushing through the null-producing side of an OUTER JOIN is unsafe because the rewrite turns the outer join into an effective inner join (nulls fabricated by the join no longer satisfy p). Aggregations block pushdown unless p references only group-by keys.
+
+Preparation
+
+Review selection pushdown, projection pushdown, filter-join interactions, and logical-plan trees.
+
+Implement a tiny logical-plan AST with Scan, Filter, Project, and Join, then write rewrite passes.
+
+Practice explaining when pushdown is unsafe, such as predicates involving computed columns or outer joins.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

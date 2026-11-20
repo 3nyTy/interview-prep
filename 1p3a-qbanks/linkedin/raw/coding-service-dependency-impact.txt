@@ -1,0 +1,67 @@
+===H1===
+Service Dependency Impact Propagation
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-service-dependency-impact
+===BODY===
+LinkedIn
+Coding·60 minMembers
+Service Dependency Impact Propagation
+Given a JSON manifest mapping services to their `read_from` and `write_to` paths, and a list of deleted paths, identify which services are impacted. Three escalating sub-tasks layer a directory-tree projection and a service dependency chain on top of a basic intersection scan. The AI-coding round template — long prompt, IDE-context loading, assistant-driven implementation.
+SWE
+Infra Eng
+graph
+dfs
+bfs
+topological-sort
+tree
+ai-tools
+medium
+Frequency
+Single report
+Last asked
+2025-12-22
+Stage
+onsite-coding
+Requirements
+
+The interviewer hands a JSON-shaped manifest:
+
+{
+  "svcA": { "read_from": "/data/raw/orders", "write_to": "/data/clean/orders" },
+  "svcB": { "read_from": "/data/clean/orders", "write_to": "/reports/daily" },
+  "svcC": { "read_from": "/data/raw/logs", "write_to": "/data/clean/logs" }
+}
+
+Sub-tasks:
+
+Direct impact. Given deleted_paths = ["/data/raw/orders", ...], return all services whose read_from or write_to matches a deleted path.
+
+Subtree impact. A deleted path also affects services whose paths share a parent prefix. Project the universe of paths into a directory tree; for each deleted path, mark its entire subtree as affected. Avoid double-counting when two deleted paths share a parent — only the affected subtrees that share a common root parent collapse into one walk.
+
+Transitive impact. Services form a chain via write_to → read_from. If svcA is impacted, every downstream consumer of its outputs is also impacted. Return, per deleted path, the ordered list of impacted services in topological order.
+
+AI-coding format. The round is delivered in a coderpad with an in-IDE assistant. Both the candidate and the interviewer typically struggle with the IDE for the first few minutes — practice loading the manifest into the assistant's context before starting to code.
+
+Notes
+
+The first sub-task is a hashmap intersection; resist over-engineering it.
+
+Building the directory tree once and indexing services into each tree node makes sub-task 2 cheap — for each deleted path, walk down to its node and return every service under it.
+
+Sub-task 3 is Kahn's topological sort over a graph where (svc_u → svc_v) exists when svc_u.write_to is a prefix of (or equals) svc_v.read_from. Be explicit about the ordering definition so the output passes the spec.
+
+Hand-coding all three sub-tasks from scratch is hard inside the time box. The expected workflow is: outline the structure, hand the manifest to the assistant, let it generate the trie + topo-sort skeleton, then dry-run examples.
+
+Preparation
+
+Pre-build a mental template for path-trie + value-buckets-per-node; it powers both this question and the system-design typeahead round.
+
+Drill Kahn's topological sort to where it can be written in < 5 minutes.
+
+Practice driving the AI-coding tool — load context, prompt for the algorithm, dry-run, ask the assistant to extend tests. Speed on the tooling is the dominant cost in the round.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,55 @@
+===H1===
+OS Fundamentals & Concurrency Drill
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/os-fundamentals-and-concurrency
+===BODY===
+Apple
+OtherMembers
+OS Fundamentals & Concurrency Drill
+Apple Core OS / low-level teams open with a hiring-manager round that stays almost entirely on OS fundamentals: process vs thread, CPU scheduling, synchronization primitives (mutex / semaphore / condition variable), race conditions and deadlock, escalating to multi-core synchronization.
+SWE
+Infra Eng
+operating-systems
+concurrency
+race-condition
+threading
+medium
+Frequency
+Single report
+Last asked
+2026-06-15
+Stage
+phone-screen
+Requirements
+
+This hiring-manager round is a conversational drill on operating-system fundamentals (no LeetCode-style coding). Be ready to explain and reason about:
+
+Processes vs threads: address space, context, and when to use each.
+
+CPU scheduling: common policies and their trade-offs.
+
+Synchronization primitives: mutex, semaphore, and condition variable, and when each is appropriate.
+
+Race conditions: how they arise and how to prevent them.
+
+Deadlock: the four necessary conditions, plus detection, prevention, and avoidance.
+
+Multi-core synchronization: the harder thread, covering memory visibility, atomics and memory barriers, cache coherence, and lock design under true parallelism.
+
+Notes
+
+The round rewards fluency over recitation. Follow-ups tend to move from a single-core mental model into true multi-core behavior, where naive locking reasoning breaks down. Be precise about what a mutex guarantees versus a condition variable, and why a semaphore is more than just a counter.
+
+Preparation
+
+Re-derive the classic synchronization problems (producer-consumer, readers-writers) using a mutex plus condition variable, by hand.
+
+Walk through the four Coffman deadlock conditions and give a concrete prevention strategy for each.
+
+Review multi-core memory models: atomicity, ordering and memory barriers, and why cache coherence matters for lock-free reasoning.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,123 @@
+===H1===
+Priority Task Executor
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/priority-task-executor
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Priority Task Executor
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+Members
+Priority Task Executor
+
+Implement `addTask(task_id, priority, timestamp)` and `executeTask()`. The same task may be added multiple times at different timestamps; execution is priority-ordered, and an occurrence must be skipped if that task has already executed.
+
+SWE
+object-design
+data-structure
+scheduling
+dedup
+medium
+Frequency
+Single report
+Last asked
+2026-08-01
+Stage
+onsite-coding
+Requirements
+Implement addTask(task_id, priority, timestamp) to record a task.
+The same task ID may be added more than once, including at different timestamps.
+Implement executeTask() to choose the next task according to priority.
+If the selected task ID has already executed, skip that occurrence and continue.
+Notes
+The prompt is an object-design implementation exercise.
+Clarify priority direction, timestamp tie-breaking, the return contract, and exhausted-queue behavior before coding; these details are not fixed in the prompt.
+A complete implementation without running tests was considered a material miss.
+The interviewer expected an efficient design to emerge quickly and independently, with clear communication throughout.
+Canonical implementation skeleton:
+Store every occurrence in a priority queue keyed by normalized priority, normalized timestamp, and an insertion sequence number. Normalize the directions only after clarifying the contract; the sequence number gives a total order when the stated keys tie.
+Keep an executed_task_ids set. executeTask() pops occurrences until it finds a task ID outside the set; under a return-next-task contract, add that ID to the set before returning it. If the method executes work inline, first clarify whether a failed execution consumes the task ID.
+This lazy-deletion invariant avoids scanning the queue when a task executes: the heap contains unprocessed occurrences, while the set identifies IDs whose one allowed execution has completed or been committed.
+With n queued occurrences, addTask is O(log n). If one call discards k stale occurrences, executeTask is O((k + 1) log n); across the full run, each occurrence is popped at most once. Space is O(n + u) for u executed task IDs.
+Preparation
+Implement the two-method API from scratch and exercise it with repeated task IDs at different timestamps.
+Build a compact test checklist covering priority ordering, duplicate IDs, and skipping occurrences after a task has executed.
+Hand-trace a heap containing two occurrences of one task plus a competing task, then repeat with equal priority and timestamp keys and an exhausted queue; verify both the chosen order and every stale pop.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Preparation
+Related discussions · 1
+🔑雪花 onsite 挂经
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Serialize and Deserialize Dictionary Trie
+Single report
+data-structure
+medium
+trie
++2
+Design Circular Queue
+Single report
+data-structure
+medium
+queue
++1
+Max Credits with K Classes (Interval-Style)
+Low
+scheduling
+medium
+dp
++3
+Frontend Grid: Robot Eats Candies
+Single report
+medium
+frontend
+bfs
++2
+Word Search
+Single report
+medium
+grid
+backtracking
++1
+Code editor

@@ -1,0 +1,63 @@
+===H1===
+Onsite System Design: Nearby Driver Proximity Service
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/onsite-sd-nearby-driver-proximity-service
+===BODY===
+Uber
+System Design·45 minMembers
+Onsite System Design: Nearby Driver Proximity Service
+Design a proximity service that ingests frequently changing driver locations and returns eligible drivers within a rider's search radius. The round compares uniform grids, quadtrees, and Geohash/S2; then probes boundary cells, four-second update cadence, city partitioning, driver-state filtering, and map-result debouncing.
+SWE
+geohash
+streaming
+scaling
+hard
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-system-design
+Requirements
+
+Ingest (driver_id, latitude, longitude, timestamp, status) updates from a large moving-driver population; each active driver may update about once every four seconds.
+
+Given a rider position and radius, return nearby eligible drivers with low latency.
+
+Filter out drivers who are already assigned or otherwise unavailable.
+
+Partition the workload so ordinary proximity queries do not cross cities.
+
+Keep current location state in the low-latency path while sending historical trajectories to a separate asynchronous store.
+
+Stabilize results for the client map so small location changes do not make displayed drivers jump excessively.
+
+Choose and defend a spatial-index strategy: uniform grid, density-adaptive quadtree, or Geohash/S2.
+
+Notes
+
+A uniform grid is simple but creates overloaded cells in dense city centers.
+
+A quadtree adapts to density, but continuously moving drivers increase tree-maintenance cost.
+
+Geohash/S2 represents locations with hierarchical cell identifiers. A radius query must enumerate every cell that can intersect the query area at the chosen resolution, then exact-filter candidate coordinates. The current cell plus its immediate neighbors is sufficient only when the cell geometry and requested radius prove that coverage; a fixed 3-by-3 neighborhood is not a general rule.
+
+For a hierarchical hexagonal index, choose ring depth from the requested radius and cell resolution rather than hard-coding one ring.
+
+Separate latest-location serving from trajectory retention: current state can stay in memory, while historical updates flow asynchronously to a time-series or analytical store.
+
+Key follow-ups are spatial-boundary correctness, hot-city write pressure, city-level partitioning, availability filtering, and client-side/result debouncing.
+
+Preparation
+
+Draw the ingest, latest-state, radius-query, and history paths, then calculate write QPS from the four-second update interval under several assumed active-driver counts.
+
+Practice comparing grid, quadtree, and Geohash/S2 on density skew, update cost, boundary handling, and distributed partitioning.
+
+Put the rider near a cell boundary at two resolutions, derive the cells or ring depth needed for the requested radius, and verify that exact post-filtering removes out-of-radius candidates without dropping in-radius drivers.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

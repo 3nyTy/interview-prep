@@ -1,0 +1,62 @@
+===H1===
+In-Place Sub-Matrix Move
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/in-place-submatrix-move
+===BODY===
+Microsoft
+Coding·45 minMembers
+In-Place Sub-Matrix Move
+Given a large matrix and the coordinates of a smaller embedded sub-matrix, move the sub-matrix to a new location within the larger matrix — in-place — handling overlap correctly.
+SWE
+grid
+simulation
+medium
+Frequency
+Single report
+Last asked
+2026-04-07
+Stage
+onsite-coding
+Requirements
+
+Inputs:
+
+M — outer matrix with dimensions R × C.
+
+(r1, c1, r2, c2) — coordinates of the sub-matrix to move (top-left and bottom-right inclusive).
+
+(dr, dc) — target top-left for the sub-matrix.
+
+Operate in-place on M. Cells vacated by the move should be cleared to a fill value (e.g. 0). The source and destination regions may overlap.
+
+Notes
+
+The overlap is the trick. Without overlap, you copy source cells one at a time to the destination, then zero the source. With overlap, naive forward copy clobbers values you have not yet read.
+
+Standard fix: choose the traversal direction based on the move vector.
+
+If dr > 0 (moving down), iterate rows from bottom to top.
+
+If dr < 0 (moving up), iterate rows from top to bottom.
+
+Same for column direction with dc.
+
+This is the same trick memmove uses for overlapping regions. Time O(W · H) where W × H is the sub-matrix size; space O(1) extra.
+
+A cleaner alternative — useful when the prompt asks you to defend correctness more than minimize allocations — is to compute the (source ∩ destination) overlap rectangle first, copy only the non-overlapping source cells into a scratch buffer, then copy the rest in-place. This is O(W · H) extra in the worst case (entire sub-matrix is non-overlapping with destination) but is easier to reason about.
+
+Source clearing must skip cells already covered by the destination — clearing the entire source rectangle would zero out cells you just wrote to. Walk the source rectangle and clear only positions outside the destination rectangle.
+
+Preparation
+
+Pre-write the iteration-direction logic; the four-case truth table (dr sign × dc sign) is small enough to memorize.
+
+Practice on adversarial overlap: source (0,0)-(2,2) moved to (1,1) — verify both forward and reverse traversal give the right answer.
+
+Pre-rehearse the explanation of "in-place" — interviewers will probe whether O(W·H) scratch counts as in-place. Answer: typically yes if the scratch is bounded by sub-matrix size, but be ready to demonstrate the no-scratch version.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

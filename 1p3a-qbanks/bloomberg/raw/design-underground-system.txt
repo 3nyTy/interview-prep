@@ -1,0 +1,63 @@
+===H1===
+Design Underground System
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/design-underground-system
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Design Underground System
+A variant of Design Underground System (LeetCode 1396): track customer check-in/check-out events keyed by id and report average travel time between station pairs. An onsite coding round that explicitly grades communication during implementation; clarify the variant's twist before coding.
+SWE
+oop-design
+hashmap
+design-implementation
+data-structure
+medium
+Frequency
+Single report
+Last asked
+2026-06-16
+Stage
+onsite-coding
+Requirements
+
+Design a class that records customers entering and leaving stations and reports the average travel time between station pairs.
+
+class UndergroundSystem:
+    def checkIn(self, id: int, stationName: str, t: int) -> None
+    def checkOut(self, id: int, stationName: str, t: int) -> None
+    def getAverageTime(self, startStation: str, endStation: str) -> float
+
+checkIn(id, station, t) records that customer id entered station at time t. A customer has at most one open check-in at a time.
+
+checkOut(id, station, t) records that customer id left station at time t, closing the matching check-in.
+
+getAverageTime(start, end) returns the average travel time over all customers who traveled from start to end; at least one such trip is guaranteed.
+
+This round is a variant of the base problem — clarify the exact twist before writing code (for example a time-windowed average, directionality rules, or per-customer filtering). The interviewer explicitly grades that you keep narrating your approach while implementing.
+
+Follow-ups:
+
+Maintain a running (total_time, count) per route versus storing every trip — which to pick and why.
+
+Handle a customer with an open check-in and no matching check-out yet.
+
+Notes
+
+The canonical layout is two hash maps: one keyed by customer id holding the open (station, t), and one keyed by the (start, end) route holding (total_time, count). Every operation, including getAverageTime, is then O(1).
+
+Because the prompt is a variant, the interviewer is likely to layer an extra requirement mid-round; surface clarifying questions early rather than committing to a data model and reworking it.
+
+Keep stating intent out loud — this slot weights continuous communication during coding as heavily as a correct first cut.
+
+Preparation
+
+Implement the canonical two-map version cold, then practice extending it live (sliding-window average, top routes by traffic) since the asked form deviates from the base.
+
+Write the clarifying questions for the variant on the scratch pad before any code lands.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

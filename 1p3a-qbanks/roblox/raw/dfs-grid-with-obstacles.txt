@@ -1,0 +1,252 @@
+===H1===
+Grid Pathfinding with Obstacles (DFS)
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/dfs-grid-with-obstacles
+===BODY===
+Roblox
+Coding·45 minMembers
+Grid Pathfinding with Obstacles (DFS)
+Classic 2D grid reachability problem reported in the ads-team phone screen: given a grid with obstacles, determine whether a path exists from a start cell to a goal cell. Solved with DFS or BFS; complexity discussion expected.
+SWE
+dfs
+bfs
+grid
+graph
+easy
+Frequency
+Single report
+Last asked
+2026-02-28
+Stage
+phone-screen
+Problem Overview
+
+You are given a 2D grid of characters representing a board. Each cell is one of:
+
+'W' — a walk cell. From here the player moves 1 step to any of the four orthogonal neighbours.
+
+'J' — a jump cell. From here the player moves exactly 2 cells in any of the four orthogonal directions (skipping over the cell in between).
+
+'#' — an obstacle. The player cannot stand on this cell.
+
+The move type at each step is determined by the cell the player is currently on, not where they are moving to. A move is valid only if the landing cell is inside the grid and is not an obstacle (the player may "fly over" an obstacle when jumping — only the landing square matters).
+
+You are also given a start and a target coordinate, both guaranteed to be inside the grid and to land on a non-obstacle cell.
+
+The prompt asks two parts on the same call:
+
+Part 1 — can the player reach the target? Solve with DFS.
+
+Part 2 (follow-up) — what is the minimum number of moves to the target? Solve with BFS.
+
+Example
+  grid = ["WWW",
+          "W#W",
+          "WWW"]
+  start  = (0, 0)
+  target = (2, 2)
+
+  Part 1 -> True   (an L-shaped path exists around the obstacle)
+  Part 2 -> 4      (four moves: e.g. down, down, right, right)
+
+Part 1: Can the Player Reach the Target?
+
+Problem Statement
+
+Return True if the player can reach target from start under the move rules above, and False otherwise. The prompt specifically asks for a DFS.
+
+from typing import List, Tuple
+
+def can_reach(grid: List[str], start: Tuple[int, int], target: Tuple[int, int]) -> bool:
+    pass
+
+Approach
+
+The grid is a directed graph: each non-obstacle cell is a node, and outgoing edges from a cell depend on whether it is 'W' (four 1-step neighbours) or 'J' (four 2-step neighbours). Reachability is "is there any path from start to target," which a DFS answers in linear time.
+
+Recurse from the start cell. At each visited cell (r, c):
+
+If (r, c) == target, return True.
+
+Determine the step size from grid[r][c] — 2 for 'J', 1 for 'W'.
+
+For each of the four directions, compute the landing cell, reject if it is out of bounds, an obstacle, or already visited, otherwise recurse.
+
+A visited set prevents cycles. The recursion terminates because every cell is pushed at most once.
+
+Solution
+
+from typing import List, Tuple
+
+DIRS = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+
+def can_reach(grid: List[str], start: Tuple[int, int], target: Tuple[int, int]) -> bool:
+    if not grid or not grid[0]:
+        return False
+
+    rows, cols = len(grid), len(grid[0])
+    if start == target:
+        return True
+
+    visited = {start}
+
+    def dfs(r: int, c: int) -> bool:
+        if (r, c) == target:
+            return True
+        step = 2 if grid[r][c] == 'J' else 1
+        for dr, dc in DIRS:
+            nr, nc = r + dr * step, c + dc * step
+            if nr < 0 or nr >= rows or nc < 0 or nc >= cols:
+                continue
+            if grid[nr][nc] == '#':
+                continue
+            if (nr, nc) in visited:
+                continue
+            visited.add((nr, nc))
+            if dfs(nr, nc):
+                return True
+        return False
+
+    return dfs(*start)
+
+Why DFS Is Enough
+
+Part 1 only asks for existence of any path, not the shortest one. DFS visits each reachable cell at most once thanks to the visited set, and returns as soon as it lands on the target. There is no need to consider distances.
+
+Complexity:
+
+Time: O(R * C) — each cell is entered at most once and produces at most four neighbour checks.
+
+Space: O(R * C) for the visited set and the recursion stack in the worst case.
+
+Part 2: Shortest Number of Moves
+
+Problem Statement
+
+Return the minimum number of moves required to reach target from start. Return -1 if the target is unreachable.
+
+from typing import List, Tuple
+
+def shortest_path(grid: List[str], start: Tuple[int, int], target: Tuple[int, int]) -> int:
+    pass
+
+Why DFS Stops Working
+
+DFS finds a path but not necessarily the shortest one — the first path it stumbles on depends on the order it explores neighbours. To get shortest paths on a graph with unit-weight edges (every walk and every jump counts as one move), the standard tool is BFS: it visits cells in order of increasing distance from the start, so the first time the target is reached the recorded distance is minimal.
+
+Approach
+
+Plain BFS from start. The queue holds (row, col, distance) triples. For each dequeued cell, look up grid[r][c] to decide whether moves are 1-step or 2-step, then enqueue every valid landing cell that hasn't been visited. Return distance + 1 the first time a neighbour matches the target — that early-return is the optimization that lets us skip enqueuing the target itself.
+
+The only twist relative to a textbook grid BFS is that the step size is cell-dependent — the cell you are currently on dictates how far you go.
+
+Solution
+
+from collections import deque
+from typing import List, Tuple
+
+DIRS = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+
+def shortest_path(grid: List[str], start: Tuple[int, int], target: Tuple[int, int]) -> int:
+    if not grid or not grid[0]:
+        return -1
+    if start == target:
+        return 0
+
+    rows, cols = len(grid), len(grid[0])
+    visited = {start}
+    queue = deque([(start[0], start[1], 0)])
+
+    while queue:
+        r, c, d = queue.popleft()
+        step = 2 if grid[r][c] == 'J' else 1
+        for dr, dc in DIRS:
+            nr, nc = r + dr * step, c + dc * step
+            if nr < 0 or nr >= rows or nc < 0 or nc >= cols:
+                continue
+            if grid[nr][nc] == '#':
+                continue
+            if (nr, nc) in visited:
+                continue
+            if (nr, nc) == target:
+                return d + 1
+            visited.add((nr, nc))
+            queue.append((nr, nc, d + 1))
+
+    return -1
+
+Why BFS Gives the Minimum
+
+BFS explores the graph in layers — all cells at distance d are dequeued before any cell at distance d + 1. With unit-weight edges (each move costs 1), the layer index equals the shortest distance from the start. Because each cell is enqueued at most once (thanks to visited), the first time the target appears it is on a shortest path.
+
+Obstacles affect landing, not flying over them: a 'J' cell can jump over a '#' as long as the destination cell is non-obstacle. This matches the natural reading of "jump" — the player leaves one cell and lands on another, ignoring whatever is in between.
+
+Complexity:
+
+Time: O(R * C) — every cell is enqueued at most once and produces a constant amount of work per dequeue.
+
+Space: O(R * C) for the visited set and the queue.
+
+Alternate Canonical Variant — Basic Obstacle Grid
+
+You are given a 2D grid of characters and two coordinates start and end. The player begins at start and may move one step at a time in any of the four orthogonal directions (up, down, left, right). Each cell is one of:
+
+'.' — an empty cell the player can stand on.
+
+'#' — an obstacle. The player cannot enter this cell.
+
+Return true if the player can reach end from start, otherwise false.
+
+start and end are each given as a length-2 array [row, col].
+
+The expected solution is DFS.
+
+Examples
+
+Example 1:
+
+Input: grid = [[".",".",".","."],[".","#","#","."],[".","#",".","."],[".",".",".","."]], start = [0,0], end = [2,3]
+
+Output: true
+
+Explanation:
+
+A valid path is (0,0) -> (1,0) -> (2,0) -> (3,0) -> (3,1) -> (3,2) -> (3,3) -> (2,3). Walking along the top row to (0,3) and then down also works.
+
+Example 2:
+
+Input: grid = [[".",".",".","."],["#","#","#","#"],[".",".",".","."]], start = [0,0], end = [2,3]
+
+Output: false
+
+Explanation:
+
+A wall of obstacles in row 1 separates the top row from the bottom row, so no path exists.
+
+Example 3:
+
+Input: grid = [[".",".","."]], start = [0,1], end = [0,1]
+
+Output: true
+
+Explanation:
+
+Start equals end and the cell is not an obstacle.
+
+Constraints
+
+1 <= grid.length, grid[i].length <= 100
+
+grid[i][j] is '.' or '#'.
+
+start.length == end.length == 2
+
+0 <= start[0], end[0] < grid.length
+
+0 <= start[1], end[1] < grid[0].length
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,482 @@
+===H1===
+House Robber Series
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/house-robber-series
+===BODY===
+Databricks
+CodingMembers
+House Robber Series
+The House Robber DP family: maximize the sum of values from non-adjacent houses, with follow-ups such as a circular street and a binary-tree variant.
+SWE
+dp
+array
+medium
+Frequency
+Single report
+Last asked
+2025-11-18
+Stage
+phone-screen · onsite-coding
+What You Need to Do
+
+You are a professional robber. You plan to rob houses on a specific street. Each house has some money inside.
+
+There is one specific rule: The security system is connected. You cannot rob two houses that are next to each other. If you do, the alarm goes off.
+
+You have a list of numbers. Each number is the money in one house. You need to find the maximum total money you can steal without triggering the alarm.
+
+This problem tests your skills in:
+
+Dynamic Programming (breaking a big problem into smaller steps)
+
+Space optimization (using less memory, changing O(n) to O(1))
+
+Handling constraints (dealing with circular streets or different gap rules)
+
+The Core Problem
+
+Problem Requirements
+
+You are given a list of integers called nums. This represents the money in each house. You must return the maximum money you can rob.
+
+Rule: You cannot rob adjacent houses (houses side-by-side).
+
+Examples
+
+# Example 1
+nums = [1, 2, 3, 1]
+# Output: 4
+# Why: Rob house 0 (money=1) and house 2 (money=3).
+# Total = 1 + 3 = 4
+
+# Example 2
+nums = [2, 7, 9, 3, 1]
+# Output: 12
+# Why: Rob house 0 (money=2), house 2 (money=9), and house 4 (money=1).
+# Total = 2 + 9 + 1 = 12
+
+# Example 3
+nums = [5, 3, 4, 11, 2]
+# Output: 16
+# Why: Rob house 0 (money=5) and house 3 (money=11).
+# Total = 5 + 11 = 16
+
+Constraints
+
+nums length is between 1 and 100.
+
+Money in each house is between 0 and 400.
+
+Method 1: Recursion with Memory
+
+How It Works
+
+At every house i, you have two choices:
+
+Rob house i: You get nums[i] plus the max money from two houses ago (i-2).
+
+Skip house i: You get the max money from the previous house (i-1).
+
+The formula is:
+
+dp(i) = max(nums[i] + dp(i-2), dp(i-1))
+
+Base cases (where we start):
+
+House 0: Rob it.
+
+House 1: Pick the bigger amount between House 0 and House 1.
+
+Time Complexity
+
+O(n): We use memoization (saving answers), so we solve each subproblem once.
+
+O(2^n): Without memoization, this would be too slow.
+
+Space Complexity
+
+O(n): We need space for the recursion stack and the saved answers.
+
+Code
+
+def rob(nums):
+    """Recursive solution with memory."""
+    memo = {}
+
+    def dp(i):
+        # Stop if index is invalid
+        if i < 0:
+            return 0
+        if i == 0:
+            return nums[0]
+
+        # Check if we already know the answer
+        if i in memo:
+            return memo[i]
+
+        # Option 1: Rob current + money from 2 houses ago
+        rob_current = nums[i] + dp(i - 2)
+        # Option 2: Skip current, keep money from 1 house ago
+        skip_current = dp(i - 1)
+
+        memo[i] = max(rob_current, skip_current)
+        return memo[i]
+
+    return dp(len(nums) - 1)
+
+# Test
+print(rob([1, 2, 3, 1]))        # 4
+print(rob([2, 7, 9, 3, 1]))     # 12
+print(rob([5, 3, 4, 11, 2]))    # 16
+
+Method 2: Building a Table (Iterative)
+
+How It Works
+
+We solve the problem from the first house to the last house using a loop.
+
+Make a list called dp. dp[i] stores the max money we can get up to house i.
+
+Set dp[0] to the value of the first house.
+
+Set dp[1] to the max of the first two houses.
+
+Loop through the rest. For each house, calculate max(rob current, skip current).
+
+The last number in the list is the answer.
+
+Time Complexity
+
+O(n): We go through the list once.
+
+Space Complexity
+
+O(n): We create a list of size n.
+
+Code
+
+def rob(nums):
+    """Iterative solution with O(n) space."""
+    n = len(nums)
+
+    # Check for empty or single house
+    if n == 0:
+        return 0
+    if n == 1:
+        return nums[0]
+
+    # Create table
+    dp = [0] * n
+    dp[0] = nums[0]
+    dp[1] = max(nums[0], nums[1])
+
+    # Fill table
+    for i in range(2, n):
+        dp[i] = max(nums[i] + dp[i - 2], dp[i - 1])
+
+    return dp[n - 1]
+
+# Test
+print(rob([1, 2, 3, 1]))        # 4
+print(rob([2, 7, 9, 3, 1]))     # 12
+
+Visual Example
+
+For nums = [2, 7, 9, 3, 1]:
+
+Index:   0   1   2   3   4
+nums:    2   7   9   3   1
+dp:      2   7  11  11  12
+
+Step-by-step:
+dp[0] = 2 (Rob house 0)
+dp[1] = 7 (Rob house 1 is better than 0)
+dp[2] = 11 (Rob house 2 + house 0: 9 + 2 = 11)
+dp[3] = 11 (Skip house 3, keep 11)
+dp[4] = 12 (Rob house 4 + house 2: 1 + 11 = 12)
+
+Method 3: Saving Space (Best Solution)
+
+How It Works
+
+Notice that to calculate the current value, we only need the answers from the previous two steps. We do not need the whole dp list.
+
+We can use two variables:
+
+prev2: Max money up to house i-2
+
+prev1: Max money up to house i-1
+
+At each step, we calculate the new max and shift our variables forward.
+
+Time Complexity
+
+O(n): One pass through the list.
+
+Space Complexity
+
+O(1): We only use two variables.
+
+Code
+
+def rob(nums):
+    """Optimized solution with O(1) space."""
+    if not nums:
+        return 0
+    if len(nums) == 1:
+        return nums[0]
+
+    # Variables for previous two steps
+    prev2 = nums[0]  # dp[i-2]
+    prev1 = max(nums[0], nums[1])  # dp[i-1]
+
+    # Iterate starting from 3rd house
+    for i in range(2, len(nums)):
+        current = max(nums[i] + prev2, prev1)
+        prev2 = prev1
+        prev1 = current
+
+    return prev1
+
+# Test
+print(rob([1, 2, 3, 1]))        # 4
+print(rob([2, 7, 9, 3, 1]))     # 12
+print(rob([5, 3, 4, 11, 2]))    # 16
+
+Cleaner Version
+
+def rob(nums):
+    """Short and clean version."""
+    prev, curr = 0, 0
+
+    for num in nums:
+        # prev is money without robbing current
+        # curr is money if we try to rob current
+        prev, curr = curr, max(curr, prev + num)
+
+    return curr
+
+Variation 1: Houses in a Circle
+
+Problem Requirements
+
+The houses are in a circle. This means the first house is next to the last house. You cannot rob both of them.
+
+Examples
+
+nums = [2, 3, 2]
+# Output: 3
+# Why: House 0 and House 2 are neighbors. You can only pick House 1.
+
+nums = [1, 2, 3, 1]
+# Output: 4
+# Why: Rob house 0 and 2. (1 + 3 = 4).
+
+How It Works
+
+Since we can't rob the first and last house at the same time, we split the problem into two simple cases:
+
+Case 1: Rob houses from index 0 to n-2 (Ignore the last house).
+
+Case 2: Rob houses from index 1 to n-1 (Ignore the first house).
+
+Calculate the max money for both cases and pick the higher number.
+
+Time Complexity
+
+O(n): We run the linear solution twice.
+
+Space Complexity
+
+O(1).
+
+Code
+
+def rob_circular(nums):
+    """Solves the circular house problem."""
+    n = len(nums)
+
+    # Edge cases
+    if n == 0:
+        return 0
+    if n == 1:
+        return nums[0]
+    if n == 2:
+        return max(nums[0], nums[1])
+
+    # Helper function for linear houses
+    def rob_linear(houses):
+        prev, curr = 0, 0
+        for num in houses:
+            prev, curr = curr, max(curr, prev + num)
+        return curr
+
+    # Case 1: Exclude last house
+    case1 = rob_linear(nums[:-1])
+
+    # Case 2: Exclude first house
+    case2 = rob_linear(nums[1:])
+
+    return max(case1, case2)
+
+# Test
+print(rob_circular([2, 3, 2]))       # 3
+print(rob_circular([1, 2, 3, 1]))    # 4
+print(rob_circular([1, 2, 3]))       # 3
+print(rob_circular([1, 2, 1, 1]))    # 3
+
+Variation 2: Larger Gap Between Houses
+
+Problem Requirements
+
+The rule changes: You cannot rob two houses within a distance of k.
+
+k=1: Cannot rob adjacent houses (original problem).
+
+k=2: If you rob house i, you cannot rob i+1 or i+2.
+
+Examples
+
+# k = 2 (must skip 2 houses after robbing)
+nums = [5, 1, 3, 6, 7]
+# Output: 12
+# Strategy: Rob house 0 (5). Skip 1 and 2. Rob house 4 (7).
+# Total: 5 + 7 = 12
+
+How It Works
+
+The logic is similar, but we look further back.
+
+Rob house i: Add nums[i] to dp[i-k-1].
+
+Skip house i: Keep dp[i-1].
+
+Formula:
+
+dp[i] = max(nums[i] + dp[i-k-1], dp[i-1])
+
+Time Complexity
+
+O(n): One pass.
+
+Space Complexity
+
+O(n): For the array (can be reduced to O(k)).
+
+Code
+
+def rob_with_gap(nums, k):
+    """
+    Rob houses with gap constraint k.
+    """
+    n = len(nums)
+    if n == 0:
+        return 0
+    if n <= k:
+        return max(nums)  # Can only rob one house
+
+    # Create DP array
+    dp = [0] * n
+
+    # Handle the start (first k+1 houses)
+    for i in range(min(k + 1, n)):
+        if i == 0:
+            dp[i] = nums[i]
+        else:
+            dp[i] = max(dp[i - 1], nums[i])
+
+    # Fill the rest
+    for i in range(k + 1, n):
+        # Option 1: Rob current + best from k+1 spots ago
+        # Option 2: Skip current
+        dp[i] = max(nums[i] + dp[i - k - 1], dp[i - 1])
+
+    return dp[n - 1]
+
+# Test cases
+print(rob_with_gap([1, 2, 3, 1], k=1))        # 4
+print(rob_with_gap([2, 7, 9, 3, 1], k=1))     # 12
+print(rob_with_gap([5, 1, 3, 6, 7], k=2))     # 12
+print(rob_with_gap([5, 1, 3, 6, 7, 8], k=2))  # 13
+
+Tricky Situations
+
+Always test your code with these cases:
+
+Empty list: Return 0.
+
+One house: Return that house's value.
+
+Two houses: Return the larger of the two.
+
+All zeros: The answer is 0.
+
+Very large numbers: Be careful of overflow (less common in Python).
+
+Circular street with only 2 houses: You can only pick one.
+
+Where This is Used
+
+Scheduling: Choosing tasks that need a "cooldown" period.
+
+Investing: Picking investments where you can't pick two similar ones at the same time.
+
+Networking: Selecting nodes in a network that cannot interfere with each other.
+
+Similar Problems to Practice
+
+LeetCode 198: House Robber (The Basic One)
+
+LeetCode 213: House Robber II (The Circular One)
+
+LeetCode 337: House Robber III (The Tree One)
+
+LeetCode 740: Delete and Earn
+
+LeetCode 256: Paint House
+
+LeetCode 91: Decode Ways
+
+Efficiency Summary
+
+ApproachTimeSpaceNotes
+Recursive (no memory)O(2^n)O(n)Too slow.
+Recursive (with memory)O(n)O(n)Good logic, uses stack space.
+Iterative TableO(n)O(n)Standard DP solution.
+Space OptimizedO(n)O(1)Best solution.
+CircularO(n)O(1)Runs linear solution twice.
+Gap Constraint kO(n)O(k)Needs access to values k steps back.
+
+Variation 3: Houses in a Tree
+
+Problem: The houses are connected like a binary tree. If you rob a parent node, you cannot rob its direct children.
+
+Solution: Use a Depth First Search (DFS). For every node, return two values:
+
+Max money if we rob this node.
+
+Max money if we skip this node.
+
+def rob_tree(root):
+    def dfs(node):
+        if not node:
+            return (0, 0)  # (rob, skip)
+
+        left_rob, left_skip = dfs(node.left)
+        right_rob, right_skip = dfs(node.right)
+
+        # If we rob current: we MUST skip children
+        rob = node.val + left_skip + right_skip
+
+        # If we skip current: we can rob OR skip children (pick best)
+        skip = max(left_rob, left_skip) + max(right_rob, right_skip)
+
+        return (rob, skip)
+
+    rob, skip = dfs(root)
+    return max(rob, skip)
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

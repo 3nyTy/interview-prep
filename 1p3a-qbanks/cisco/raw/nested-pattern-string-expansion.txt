@@ -1,0 +1,64 @@
+===H1===
+Nested Pattern String Expansion
+===URL===
+https://www.1point3acres.com/interview/problems/company/cisco/nested-pattern-string-expansion
+===BODY===
+Cisco
+Coding·90 minFree preview
+Nested Pattern String Expansion
+Expand strings where parenthesized groups are followed by repeat counts in curly braces, including nested groups such as `(a(bc){2}){2}`.
+SWE
+string
+parsing
+stack
+medium
+Frequency
+Low
+Last asked
+2025-08-26
+Stage
+oa
+Requirements
+
+Input is one string inputStr.
+
+A pattern is a substring enclosed in parentheses, followed by a repeat count enclosed in curly braces.
+
+Expand each pattern by concatenating it with itself the requested number of times.
+
+Pattern-count pairs can be nested, such as (ef((ab){2}cd){2}){2}.
+
+Multi-digit counts can appear.
+
+Some inputs may contain spaces; skip irrelevant spaces if the statement permits them.
+
+Examples
+
+Input:
+
+(ab){3}
+
+Output:
+
+ababab
+
+Input:
+
+(a(bc){2}){2}
+
+Output:
+
+abcbcabcbc
+
+Notes
+
+A stack-based parser is the natural fit: keep the string accumulated before (, parse the substring up to ), read the following {number}, then repeat and append.
+
+Java candidates hit errors when comparing char to String, for example using != "}" instead of comparing against '}'.
+
+Hidden cases can stress nested groups and multi-digit repeat counts.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

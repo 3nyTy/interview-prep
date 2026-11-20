@@ -1,0 +1,94 @@
+===H1===
+Phone Screen: Minimize a Convex Function
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/phone-screen-convex-function-min
+===BODY===
+Uber
+Coding·60 minMembers
+Phone Screen: Minimize a Convex Function
+Recurring Uber phone-screen problem, especially for MLE / Senior MLE candidates. Given a black-box convex function `F(x)` defined on `[a, b]`, write a routine that finds the minimum by repeatedly probing `F`. Ternary search or analytic gradient-sign binary search both work.
+MLE
+SWE
+math-reasoning
+algorithm
+medium
+Frequency
+Medium
+Last asked
+2026-05-13
+Stage
+phone-screen · tech-screen
+Requirements
+
+Input: a callable F that you may evaluate at any x ∈ [a, b], and a tolerance eps (or maximum iteration count).
+
+Assumption: F is convex on [a, b].
+
+Output: an x_min such that |x_min − x_true| ≤ eps, where x_true is the true argmin of F on [a, b].
+
+The interviewer typically wants an algorithm better than brute force and explicitly optimizes for the number of function evaluations — F is treated as an expensive black box.
+
+The integer-domain flavor is often asked in two layers: (1) the 1D version on an integer interval, then (2) the 2D version on a bounded integer rectangle. Strict convexity implies a unique minimizer; the domain is inclusive on both ends.
+
+Notes
+
+Ternary search is the textbook solution: maintain [lo, hi], pick m1 = lo + (hi − lo)/3, m2 = hi − (hi − lo)/3. If F(m1) < F(m2), the minimum is in [lo, m2], else in [m1, hi]. Each iteration narrows the interval by 2/3.
+
+Golden-section search is the same idea but reuses one probe per iteration, halving the number of F evaluations; preferred in production.
+
+Binary search on the sign of the gradient is acceptable but requires computing or approximating F'. The candidate is usually not expected to derive analytic gradients — finite differences are fine.
+
+Convergence: O(log((b − a) / eps)) F evaluations.
+
+Edge cases: F constant on a sub-interval (ternary search still converges but m1 == m2 evaluations need care); [a, b] degenerate (a == b).
+
+For continuous F, terminate on (hi − lo) < eps or a fixed iteration count around 200; for an integer domain, switch to a small linear scan once (hi − lo) < 3 to avoid the m1 == m2 degenerate case.
+
+Integer-domain 1D solver — discrete-convex comparison
+
+On a strictly convex function over integer points lb <= x <= ub, you do not need ternary search at all: comparing g(mid) with its right neighbor g(mid + 1) tells you which half holds the minimum, giving a clean binary search with two evaluations per step.
+
+def argmin_1d(g, lb: int, ub: int) -> int:
+    # g is strictly convex over the integer interval [lb, ub]; returns the integer argmin.
+    left, right = lb, ub
+    while left < right:
+        mid = (left + right) // 2
+        if g(mid) <= g(mid + 1):
+            right = mid          # minimum is in [left, mid]
+        else:
+            left = mid + 1       # minimum is in [mid + 1, right]
+    return left
+    # Time: O(log(ub - lb + 1)) evaluations of g; Space: O(1).
+
+2D extension — bounded integer rectangle
+
+The follow-up extends to a strictly convex f(x, y) over an integer rectangle xlb <= x <= xub, ylb <= y <= yub; return the (x, y) that minimizes f. The interview-friendly assumption is that the projected objective h(x) = min_{ylb <= y <= yub} f(x, y) is itself unimodal on the integer x-grid — that is exactly what lets you reuse the 1D solver as a nested subroutine. Be explicit that this projection is not automatic for a fully general black-box 2D function; call out the assumption before coding.
+
+def argmin_2d(f, xlb: int, xub: int, ylb: int, yub: int) -> tuple[int, int]:
+    def best_y_for_x(x: int) -> int:
+        return argmin_1d(lambda y: f(x, y), ylb, yub)
+
+    def projected_value(x: int) -> int:        # h(x) = f(x, y_star(x))
+        return f(x, best_y_for_x(x))
+
+    best_x = argmin_1d(projected_value, xlb, xub)
+    return best_x, best_y_for_x(best_x)
+    # Time: O(log X * log Y) evaluations, X = xub-xlb+1, Y = yub-ylb+1; Space: O(1).
+
+Preparation
+
+Implement ternary search and golden-section search on paper before the round; both are short but easy to mis-bound.
+
+Also drill the integer-domain g(mid) vs g(mid+1) binary search and the nested-1D 2D version back-to-back — phone screens often start at 1D integer and escalate to the 2D rectangle within the same round.
+
+Be ready to discuss the trade-off between ternary search and Newton's method (Newton needs differentiability and a starting point near the optimum; ternary needs only convexity).
+
+For MLE flavor: be ready to extend to bounded-domain SGD or to a 1D line-search inside a larger optimizer.
+
+Practice both the continuous and integer-domain templates back-to-back — the same problem shows up in either flavor depending on how the interviewer frames F.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

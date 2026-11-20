@@ -1,0 +1,62 @@
+===H1===
+Loan Aggregation & Transaction Matching (Parent-Company Resolution)
+===URL===
+https://www.1point3acres.com/interview/problems/company/affirm/loan-aggregation-transaction-matching
+===BODY===
+Affirm
+Coding·60 minFree preview
+Loan Aggregation & Transaction Matching (Parent-Company Resolution)
+A multi-part live-coding problem: resolve each company to its topmost parent in a parent/child hierarchy, aggregate loans onto that top-level company, then match incoming transactions to the right loan. The challenge is reading comprehension and clean map manipulation over long boilerplate, not algorithms.
+SWE
+hashmap
+payment
+code-reading
+medium
+Frequency
+High
+Last asked
+2026-08-21
+Stage
+phone-screen · onsite-coding
+Requirements
+
+You are given a mapping of parent company → list of child companies, e.g. AA: [BB, CC], DD: [AA]. A company can itself be the child of another parent, so hierarchies chain (CC → AA → DD).
+
+Part 1 — Loan aggregation: for each customer's loan, resolve the company on the loan to its topmost parent (follow the parent chain until a company has no parent) and record/aggregate the loan under that top-level company. Print each loan's resulting info.
+
+Part 2 — Transaction matching: given a stream of transaction requests (each carrying a company / identifier), find which Part-1 loan each transaction matches.
+
+Follow-up: how would you productionize this, or handle it as a continuous stream of requests.
+
+The parent-company mapping may be nested through many levels, but the hierarchy is acyclic.
+
+Edge cases
+
+A parent company may have no child companies — guard map lookups before updating. This is the single most common bug.
+
+Be careful updating the nested map; missing keys are where candidates stall.
+
+Notes
+
+Despite suggestions of topological sort or union-find, no real algorithm is required — walking up the parent chain with a plain map suffices. Candidates who write a generic solution have been told to stop and just use the conditions given.
+
+The prompt and skeleton code are long; budget several minutes just to read. You must use the provided classes and helper functions rather than writing your own.
+
+Appears both as a phone screen (店面 / 电面) and as an onsite coding round; in multi-part variants Part 1 must pass before Part 2 unlocks.
+
+Interviewers often stay silent and give few hints even when you stall.
+
+Confirm the hierarchy contract before coding; the current variant permits arbitrarily deep nesting but excludes cycles.
+
+Preparation
+
+Practice walking a parent-pointer chain to its root with a while loop, handling roots (no parent) and guarding against cycles.
+
+Drill building and safely updating nested Map<String, Map<...>> structures (check-or-create keys).
+
+Rehearse reading a long statement and restating the exact requirements before coding—use only the conditions given, no generic over-engineering.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

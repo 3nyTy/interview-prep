@@ -1,0 +1,58 @@
+===H1===
+BST from Scratch (insert / search / delete) + Balancing Discussion
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/bst-from-scratch
+===BODY===
+Citadel / Citadel Securities
+Coding·45 minMembers
+BST from Scratch (insert / search / delete) + Balancing Discussion
+Citsec SWE Intern second phone screen: build a binary search tree class in C++ supporting insert, search, and delete; then defend the average / worst-case complexity and explain how to evolve it into an AVL or red-black tree.
+SWE
+bst
+tree
+data-structure
+complexity-analysis
+medium
+Frequency
+Single report
+Last asked
+2026-01-22
+Stage
+phone-screen
+Requirements
+
+Implement a BST class in C++ exposing:
+
+insert(key) — insert key; behavior on duplicates is at the candidate's discretion but must be specified.
+
+search(key) -> bool (or pointer to node).
+
+delete(key) — remove a key while preserving BST invariants.
+
+No balancing required in code, but the interviewer drills the complexity story afterward.
+
+Notes
+
+The hard step is delete: three cases (leaf, one child, two children). The two-child case requires replacing the node with its in-order successor (smallest in right subtree) or predecessor (largest in left subtree) and recursively deleting that node. Several candidates get tripped up on returning the correct subtree pointer after rewiring.
+
+Complexity: O(log n) average for all three operations on a balanced tree, O(n) worst case on a fully skewed tree (sorted insertion). State both explicitly; the interviewer probes the worst-case scenario.
+
+Balancing follow-up: an AVL tree maintains a per-node height and rebalances via single / double rotations whenever the height difference between subtrees exceeds 1. A red-black tree maintains a per-node color and uses recoloring + rotations on insert / delete to keep the longest root-to-leaf path within 2x the shortest. Be ready to name the rotation cases (LL, LR, RR, RL) and the red-black invariants without writing the full code.
+
+Memory ownership clarification: this round is in C++, and the interviewer expects clean unique_ptr / shared_ptr discipline or a raw-pointer scheme with explicit destructor cleanup. Mention which one and stick with it.
+
+Preparation
+
+Hand-write BST insert / search / delete in C++ on a whiteboard until the recursive return-pointer pattern in delete is automatic.
+
+Practice the AVL rotation cases by drawing each on paper; the interviewer often asks you to walk through a single insertion that triggers a double rotation.
+
+Memorize the red-black tree invariants: root is black, no two consecutive red nodes, every path root-to-NIL has the same black height. Be able to argue why these bound the longest path at 2 * log n.
+
+For C++ specifically, refresh recursive-delete semantics with unique_ptr (the implicit destructor cascades).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,56 @@
+===H1===
+ML Configuration System
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/ml-configuration-system
+===BODY===
+Anthropic
+System Design·55 minMembers
+ML Configuration System
+A 1-of-N research-track option. Design and partially implement an ML configuration system — schemas, inheritance/overrides, validation, and reproducibility. Specifics of the task have not been publicly documented; treat this card as the structural shell.
+RE
+RS
+MLE
+config-management
+ml-infra
+design
+python
+medium
+Frequency
+Low
+Last asked
+2026-04-17
+Stage
+phone-screen · tech-screen
+Requirements
+
+The round is one of the four to six choices on the research-track menu (alongside Coding & Design, ML Programming, Prompting & Engineering with LLMs, RL Fundamentals, and the ML Take-Home).
+
+Reported expectations:
+
+Design a config representation that supports composition (mixins/inheritance), overrides at the CLI/API layer, and validation against a schema.
+
+Reason about reproducibility: how do you guarantee that a training run can be re-launched from a frozen config, weeks later, on a different node?
+
+Trade off ergonomics (terse configs) vs. safety (strict schemas).
+
+Some candidates report a coding component ("flesh out the loader"); others report a discussion-only round.
+
+Notes
+
+The full prompt has not been publicly documented; candidates who explicitly asked for more detail did not get it.
+
+Expect overlap with how Hydra, OmegaConf, or pydantic-settings work; mention them by name.
+
+Preparation
+
+Read Hydra's documentation and reproduce its config-composition story in plain Python: base configs, group overrides, command-line interpolation.
+
+Be able to discuss pydantic for typed validation and the tradeoff vs. dynamic dataclasses.
+
+Think through what "reproducibility" actually requires (hashing the resolved config, freezing the env, version-pinning data).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

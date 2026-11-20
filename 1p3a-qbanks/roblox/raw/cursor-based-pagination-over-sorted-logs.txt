@@ -1,0 +1,251 @@
+===H1===
+Cursor-Based Pagination Over Sorted Logs
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/cursor-based-pagination-over-sorted-logs
+===BODY===
+Roblox
+CodingMembers
+Cursor-Based Pagination Over Sorted Logs
+Implement cursor-based pagination over sorted logs while preserving stable order and continuation semantics.
+SWE
+sorting
+streaming
+backend
+medium
+Frequency
+Single report
+Last asked
+2026-05-24
+Stage
+onsite-coding
+Problem Overview
+
+You are given each user's log entries as a list of sorted integers (timestamps). The interview starts with paginating a single user's logs by page size and page index, then asks you to design a cursor that paginates across every user's logs in globally sorted order.
+
+Part 1: Per-User Page Lookup
+
+Problem Statement
+
+Given every user's sorted log list, return the page of logs for a single user identified by userId. A page is described by pageSize and pageIndex. pageIndex = 0 returns the first pageSize entries, pageIndex = 1 returns the next pageSize entries, and so on.
+
+from typing import List
+
+class UserLogs:
+    def __init__(self, logsByUser: List[List[int]]):
+        pass
+
+    def get_page(self, userId: int, pageSize: int, pageIndex: int) -> List[int]:
+        """
+        Return the requested page of logs for `userId`.
+        Return an empty list if the page is past the end of the user's logs.
+        """
+        pass
+
+Example
+
+logsByUser = [
+    [1, 2, 3, 4, 5, 6],
+    [4, 5, 6, 7, 8],
+]
+logs = UserLogs(logsByUser)
+
+logs.get_page(0, 3, 0)  # [1, 2, 3]
+logs.get_page(0, 3, 1)  # [4, 5, 6]
+logs.get_page(1, 3, 0)  # [4, 5, 6]
+logs.get_page(1, 3, 1)  # [7, 8]
+logs.get_page(1, 3, 2)  # []
+
+Solution
+
+Slice the user's list from pageIndex * pageSize to pageIndex * pageSize + pageSize. Python slicing already clamps to the end of the list, so the final partial page and an out-of-range page index both fall out naturally.
+
+from typing import List
+
+class UserLogs:
+    def __init__(self, logsByUser: List[List[int]]):
+        self.logsByUser = logsByUser
+
+    def get_page(self, userId: int, pageSize: int, pageIndex: int) -> List[int]:
+        if userId < 0 or userId >= len(self.logsByUser):
+            return []
+        if pageSize <= 0 or pageIndex < 0:
+            return []
+
+        start = pageIndex * pageSize
+        end = start + pageSize
+        return self.logsByUser[userId][start:end]
+
+Complexity:
+
+Time: O(pageSize) per call.
+
+Space: O(pageSize) for the returned page.
+
+Part 2: Cursor-Based Pagination Across All Users
+
+Problem Statement
+
+Design a class that returns the next count logs across every user in globally sorted order. Each call also takes the cursor returned from the previous call and returns an updated cursor. The cursor type is yours to define. The first call is made with a "start" cursor; the last call should make it possible to detect that there are no more logs.
+
+from typing import Any, List, Tuple
+
+class GlobalLogCursor:
+    def __init__(self, logsByUser: List[List[int]]):
+        pass
+
+    def start_cursor(self) -> Any:
+        pass
+
+    def next(self, count: int, cursor: Any) -> Tuple[List[int], Any]:
+        """
+        Return:
+        - up to `count` next logs in globally sorted order
+        - the updated cursor to pass into the next call
+        """
+        pass
+
+Example
+
+logsByUser = [
+    [1, 2, 9, 10, 11],
+    [4, 5, 6, 7, 8],
+]
+paginator = GlobalLogCursor(logsByUser)
+
+cursor = paginator.start_cursor()
+page, cursor = paginator.next(3, cursor)  # [1, 2, 4]
+page, cursor = paginator.next(3, cursor)  # [5, 6, 7]
+page, cursor = paginator.next(3, cursor)  # [8, 9, 10]
+page, cursor = paginator.next(3, cursor)  # [11]
+page, cursor = paginator.next(3, cursor)  # []
+
+The globally sorted merge of the two lists is [1, 2, 4, 5, 6, 7, 8, 9, 10, 11]. Each call returns the next slice and advances the cursor.
+
+Cursor Design
+
+The cursor is a tuple of per-user read positions: cursor[u] is the index of the next unread log for user u. This representation is:
+
+Stateless on the server side — the cursor carries the full read position, so the class itself does not have to remember anything between calls.
+
+Cheap to compare and serialize — it is just a list of integers.
+
+Easy to detect completion — when every cursor[u] equals len(logsByUser[u]), there are no more logs.
+
+A pure global offset like "I have read 7 logs so far" would force the class to redo the global merge from scratch on every call to figure out where to resume. Storing the last-emitted value also breaks if multiple users share the same timestamp.
+
+Solution
+
+Rebuild a min-heap from the cursor positions at the start of each call. Pop up to count entries, advancing the per-user index for each popped log and pushing that user's next log if it exists. Return the collected logs and the new cursor.
+
+import heapq
+from typing import List, Tuple
+
+Cursor = Tuple[int, ...]
+
+class GlobalLogCursor:
+    def __init__(self, logsByUser: List[List[int]]):
+        self.logsByUser = logsByUser
+
+    def start_cursor(self) -> Cursor:
+        return tuple(0 for _ in self.logsByUser)
+
+    def next(self, count: int, cursor: Cursor) -> Tuple[List[int], Cursor]:
+        if count <= 0:
+            return [], cursor
+
+        positions = list(cursor)
+        heap = [
+            (self.logsByUser[userId][idx], userId)
+            for userId, idx in enumerate(positions)
+            if idx < len(self.logsByUser[userId])
+        ]
+        heapq.heapify(heap)
+
+        result: List[int] = []
+        while heap and len(result) < count:
+            value, userId = heapq.heappop(heap)
+            result.append(value)
+            positions[userId] += 1
+            next_idx = positions[userId]
+            if next_idx < len(self.logsByUser[userId]):
+                heapq.heappush(heap, (self.logsByUser[userId][next_idx], userId))
+
+        return result, tuple(positions)
+
+Complexity:
+
+Let U be the number of users and C be count.
+
+Time per call: O(U + C * log U) — O(U) to heapify the per-user heads from the cursor and O(log U) per emitted log.
+
+Space per call: O(U) for the heap and the new cursor.
+
+Edge Cases
+
+Some users have empty log lists — skip them when seeding the heap.
+
+count is larger than the remaining unread logs — return everything left and a cursor that points one past the end of every user.
+
+count <= 0 — return an empty list and the unchanged cursor.
+
+Two users have the same timestamp — the heap order between equal values is decided by userId, which is stable and deterministic.
+
+Test Cases
+
+def test_per_user_page():
+    logs = UserLogs([
+        [1, 2, 3, 4, 5, 6],
+        [4, 5, 6, 7, 8],
+    ])
+    assert logs.get_page(0, 3, 0) == [1, 2, 3]
+    assert logs.get_page(0, 3, 1) == [4, 5, 6]
+    assert logs.get_page(1, 3, 0) == [4, 5, 6]
+    assert logs.get_page(1, 3, 1) == [7, 8]
+    assert logs.get_page(1, 3, 2) == []
+
+def test_cursor_pagination():
+    paginator = GlobalLogCursor([
+        [1, 2, 9, 10, 11],
+        [4, 5, 6, 7, 8],
+    ])
+
+    cursor = paginator.start_cursor()
+    page, cursor = paginator.next(3, cursor)
+    assert page == [1, 2, 4]
+
+    page, cursor = paginator.next(3, cursor)
+    assert page == [5, 6, 7]
+
+    page, cursor = paginator.next(3, cursor)
+    assert page == [8, 9, 10]
+
+    page, cursor = paginator.next(3, cursor)
+    assert page == [11]
+
+    page, cursor = paginator.next(3, cursor)
+    assert page == []
+
+def test_cursor_with_empty_user():
+    paginator = GlobalLogCursor([
+        [],
+        [1, 2, 3],
+        [],
+    ])
+    cursor = paginator.start_cursor()
+    page, cursor = paginator.next(10, cursor)
+    assert page == [1, 2, 3]
+    assert cursor == (0, 3, 0)
+
+def test_cursor_with_duplicate_values():
+    paginator = GlobalLogCursor([
+        [1, 5],
+        [1, 5],
+    ])
+    cursor = paginator.start_cursor()
+    page, cursor = paginator.next(4, cursor)
+    assert page == [1, 1, 5, 5]
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

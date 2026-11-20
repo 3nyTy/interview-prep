@@ -1,0 +1,55 @@
+===H1===
+Symmetric Triplets
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/symmetric-triplets
+===BODY===
+Capital One
+Coding·70 minMembers
+Symmetric Triplets
+Count the number of length-3 contiguous substrings whose first and last characters match (case-insensitive). The classic Q1 of recent Capital One OAs — simple, but a quick win that frees time for the harder later problems.
+SWE
+MLE
+string
+easy
+oa
+codesignal
+Frequency
+Low
+Last asked
+2026-04-08
+Stage
+oa
+Requirements
+
+Input: a single string s.
+
+For every contiguous triplet s[i:i+3], increment a counter if s[i].lower() == s[i+2].lower().
+
+Return the total count.
+
+Strings of length < 3 return 0.
+
+Examples
+
+s = "axA"    -> 1   (a-x-A)
+s = "cxcbdb" -> 2   (c-x-c at i=0, b-d-b at i=3)
+
+Notes
+
+One pass over the string with an index loop; constant extra memory. The only non-trivial bit is the case-insensitive compare — normalise either both characters or the whole string up front.
+
+The middle character is irrelevant; do not be tempted to add it to the predicate.
+
+This is almost always Q1 on the OA. Finishing it in 3-4 minutes leaves a 65-minute budget for the heavier problems; spending more than 8 minutes here is a signal that something is wrong with the read.
+
+Preparation
+
+Write it without any standard-library help (no zip, no slicing) so the index arithmetic is automatic under pressure.
+
+Add a quick sanity test for non-ASCII input — interviewers occasionally throw a UTF-8 string at the same template; str.lower() is the safe normalisation.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

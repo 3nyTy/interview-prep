@@ -1,0 +1,166 @@
+===H1===
+Six Degrees of Collusion (OA)
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/six-degrees-of-collusion-oa
+===BODY===
+Stripe
+Coding·60 minMembers
+Six Degrees of Collusion (OA)
+HackerRank OA titled Six Degrees of Collusion. Parse transaction strings to identify users connected by shared identifiers, compute the size of the target user's fraud ring, then decide whether to block the ring using average risk score with trusted users excluded from the average but retained for connectivity.
+SWE
+graph
+union-find
+hashmap
+parsing
+payment
+medium
+Frequency
+Single report
+Last asked
+2026-06-24
+Stage
+oa
+Requirements
+
+Implement a cluster-detection system over transaction-log strings. The objective is to identify hidden fraud rings where user accounts are connected through shared identifiers such as device IDs, credit-card hashes, or IP-style resources. The prompt is split into progressive tasks.
+
+Task 1 — Direct Links
+
+Input:
+
+transactions: list of strings formatted as user_id,device_id.
+
+target_user: user ID to investigate.
+
+A user may appear multiple times with different identifiers. If Alice uses Device A and Device B, she links those devices together; anyone on Device A is therefore connected to anyone on Device B.
+
+Return a lexicographically sorted list of user IDs directly linked to the target user. Do not include the target user.
+
+def find_direct_links(transactions: list[str], target_user: str) -> list[str]: ...
+    # Gather every user on any device the target used; discard the target; sort ascending.
+    # Build device_to_users + user_to_devices; direct link = same device, one hop only.
+
+Task 2 — Fraud Ring Size
+
+Input:
+
+transactions: list of strings formatted as user_id,device_id,credit_card.
+
+target_user: user ID to investigate.
+
+A fraud ring is the full connected component of users linked by any chain of shared identifiers. If User A shares a device with User B, and User B shares a credit card with User C, all three users are in the same ring.
+
+Return an integer: the number of unique users in the target user's connected cluster, including the target user.
+
+def fraud_ring_size(transactions: list[str], target_user: str) -> int: ...
+    # BFS/union-find over user<->device and user<->card edges; return len(component).
+    # target_user absent from log -> ring size 0.
+
+Task 3 — Risk Scoring
+
+Input:
+
+transactions: list of strings formatted as user_id,device_id,credit_card,risk_score.
+
+target_user: user ID to investigate.
+
+risk_score is an integer between 0 and 100. A user has the same risk score across all transactions. Count each unique user once when calculating the average.
+
+A ring should be blocked if the average risk score of all users in the ring is strictly greater than 75.
+
+Trusted users have risk_score = 0. They still maintain graph connectivity, but are excluded from both the numerator and denominator of the average-risk calculation.
+
+Return the string true if the ring containing the target user should be blocked, and false otherwise.
+
+def should_block_ring(transactions: list[str], target_user: str) -> str: ...
+    # Reuse Task-2 traversal (score-0 users still expand the graph), then average
+    # only the non-zero-score users in the ring.
+    # Returns "true" iff strictly-greater-than-75; if every ring member has score 0
+    # (risk_count == 0), return "false".
+
+Examples
+
+Task 1:
+
+transactions = [
+  "Alice,D1",
+  "Bob,D1",
+  "Charlie,D2",
+  "David,D3",
+  "Eve,D1"
+]
+target_user = "Alice"
+
+["Bob", "Eve"]
+
+Alice used D1; Bob and Eve also used D1, so they are directly linked. Charlie and David do not share a device with Alice.
+
+Task 2:
+
+transactions = [
+  "Alice,D1,CC1",
+  "Bob,D1,CC2",
+  "Charlie,D2,CC2",
+  "David,D3,CC3",
+  "Eve,D3,CC4"
+]
+target_user = "Alice"
+
+3
+
+Alice links to Bob through D1; Bob links to Charlie through CC2. David and Eve form a separate component, so Alice's extended ring is {Alice, Bob, Charlie}.
+
+Task 3:
+
+transactions = [
+  "Alice,D1,CC1,90",
+  "Bob,D1,CC2,0",
+  "Charlie,D2,CC2,80"
+]
+target_user = "Alice"
+
+true
+
+Bob's score is 0, so Bob keeps Alice and Charlie connected but is excluded from the average. The computed average is (90 + 80) / 2 = 85; since 85 is greater than 75, the ring is blocked.
+
+Notes
+
+The most natural model is a bipartite graph or union-find over users and identifiers, then project the connected component back to unique users.
+
+Task 1 uses only device IDs and returns sorted neighboring users; later tasks use transitive connectivity across multiple identifier types.
+
+Be precise about the threshold: risk must be strictly greater than 75.
+
+Trusted users are the main edge case in Task 3: they are connectivity bridges but not members of the risk-average denominator.
+
+Suggested core data structure
+
+Keep symmetric adjacency maps per identifier type and grow them additively across tasks:
+
+Task 1: device_to_users, user_to_devices.
+
+Task 2: add card_to_users, user_to_cards; a users set; expand from the target with BFS, marking each device/card seen once so identifiers are not re-scanned.
+
+Task 3: add risk_by_user (unique user → score). Connectivity logic is unchanged from Task 2 — score-0 users are still enqueued and expand the ring; they are only skipped afterward when averaging.
+
+Edge cases and robust threshold check
+
+All-trusted ring: if every user in the ring has risk_score == 0 the denominator is 0 — return "false" (do not divide by zero).
+
+Avoid float rounding: compare with integer arithmetic, total_risk > 75 * risk_count, instead of total_risk / risk_count > 75, so the strict-inequality boundary is exact.
+
+Missing target: if target_user never appears in the log, its ring is empty (Task 2 size 0; Task 3 "false").
+
+Preparation
+
+Implement a reusable union-find that can union user nodes with typed identifier nodes, then collect users in a component.
+
+Drill CSV-like string parsing and stable output formatting before the timed OA.
+
+Write tests where a score-0 bridge connects two high-risk users, and where the average is exactly 75 and must not block.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

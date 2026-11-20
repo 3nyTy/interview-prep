@@ -1,0 +1,68 @@
+===H1===
+Merge K Sorted (Key, Value) Lists with Later Override
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/merge-k-sorted-key-value-lists
+===BODY===
+Oracle
+Coding·45 minMembers
+Merge K Sorted (Key, Value) Lists with Later Override
+Merge `k` linked lists, each holding `(key, value)` pairs sorted ascending by key. On key collision across lists, the later list (higher index) overrides the earlier list. Return one sorted output list. Asked in an OCI Consultant Engineer phone screen.
+SWE
+Infra Eng
+heap
+linked-list
+merge
+top-k
+medium
+Frequency
+Single report
+Last asked
+2025-11-20
+Stage
+phone-screen
+Requirements
+
+Input: k linked lists l_0, l_1, ..., l_{k-1}. Each list contains (key, value) pairs, sorted ascending by key. Keys within a single list are unique.
+
+For any key that appears in multiple lists, the value from the list with the highest index wins (i.e. l_2 overrides l_0 and l_1).
+
+Output: one merged linked list of (key, value) pairs sorted ascending by key, with overrides applied.
+
+Examples
+
+k = 3
+l_0 = [(1,70), (3,20), (5,30)]
+l_1 = [(2,40), (3,50)]
+l_2 = [(1,15), (4,80), (5,90)]
+
+Output: [(1,15), (2,40), (3,50), (4,80), (5,90)]
+
+Explanation: key 1 → l_2 overrides → 15; key 3 → l_1 overrides → 50; key 5 → l_2 overrides → 90.
+
+Notes
+
+The natural solution is a min-heap of (key, list_index, node) tuples, popping the smallest key at each step. On equal keys across multiple lists, the heap may yield several entries with the same key in arbitrary order — drain all entries with the current key before emitting, and keep the value from the largest list_index.
+
+The interviewer in this round probed whether the candidate had chosen the right kind of heap (min vs max). The min-heap on key is correct; the value-resolution step is independent of heap polarity.
+
+Time: O(N log k) where N is the total number of pairs across all lists. Space: O(k) for the heap.
+
+Alternative: pairwise merge in O(N log k) via tournament — same asymptotic, more code.
+
+For the override tie-break, an explicit pattern is: pop the heap and peek; while the next entry has the same key, pop it; among all popped entries, choose the one whose list_index is largest.
+
+Common follow-up (asked here): how would you optimise if k is very large but each list is short? Heap construction is O(k) regardless; the bottleneck is the per-pop log factor. There is no asymptotic improvement without structural assumptions.
+
+Preparation
+
+Implement the heap-based merger with the override tie-break by hand. Walk the example above through the heap state after each pop.
+
+Be able to articulate "min-heap on key, ties broken by largest list_index" in one sentence — the interviewer specifically asked about heap polarity here.
+
+Have the LeetCode 23 ("Merge k Sorted Lists") solution as muscle memory; this prompt is LC 23 plus a value-override rule.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

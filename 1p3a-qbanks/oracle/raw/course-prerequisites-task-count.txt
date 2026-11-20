@@ -1,0 +1,73 @@
+===H1===
+Maximum Completable Tasks with Prerequisites (Topological)
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/course-prerequisites-task-count
+===BODY===
+Oracle
+Coding·45 minMembers
+Maximum Completable Tasks with Prerequisites (Topological)
+Given tasks and prerequisite dependencies, return the maximum number of completable tasks when cycles make some tasks impossible. A later onsite used the ordered-output form as an LC 210 package-deployment reskin, so confirm whether the required result is a count or a deployment order.
+SWE
+Infra Eng
+graph
+topological-sort
+bfs
+dfs
+medium
+Frequency
+Low
+Last asked
+2026-08-11
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input: a list of tasks, each with a (possibly empty) list of prerequisite tasks.
+
+Output: the integer count of tasks that can be completed.
+
+A task is completable iff all of its prerequisites are completable and the task is not part of (or transitively dependent on) a cycle.
+
+Cycle semantics: every task that belongs to a strongly-connected component of size > 1, or transitively depends on such a component, cannot be completed.
+
+Notes
+
+This is topological sort with cycle detection. Two equivalent formulations:
+
+Kahn's algorithm: build in-degree counts; repeatedly pop nodes of in-degree 0; count pops. Any node never reaching in-degree 0 is in or below a cycle. Output = count of popped nodes.
+
+DFS with three-coloring: white (unvisited) / grey (on the recursion stack) / black (fully processed). A grey-on-grey edge proves a cycle; mark the current SCC and all its descendants as un-completable.
+
+The reporting candidate flagged HackerRank's I/O interface as the time sink — confirm the expected output format before optimising the algorithm. Common output shapes:
+
+Integer count of completable tasks (this round).
+
+Boolean: can all tasks be completed (LeetCode 207).
+
+Ordered list of tasks in completion order (LeetCode 210).
+
+Edge case: tasks with no prerequisites are always completable.
+
+Edge case: a self-loop (A depends on A) is a 1-node cycle; A is not completable.
+
+Common failure mode for this prompt: candidates compute the topological order correctly but emit the wrong return value (e.g. printing the order list instead of the count).
+
+Alternate canonical variant — package deployment order
+
+The same dependency-graph problem can be framed as deploying packages in a valid order, matching the ordered-output form rather than the completion-count form. Clarify the required return shape before coding.
+
+Preparation
+
+Implement Kahn's algorithm from scratch using a queue of in-degree-0 nodes. Time O(V + E), space O(V + E).
+
+Drill LeetCode 207 ("Course Schedule") and LeetCode 210 ("Course Schedule II") — same algorithm, different return values; this round asks for a third return shape.
+
+Spend the first 3 minutes on a HackerRank-style problem confirming the I/O format with the interviewer (or in the prompt UI) before coding. The reporting candidate lost significant time here.
+
+Have the cycle-detection-only short-circuit ready: if the interviewer reduces the problem to "are there any uncompletable tasks?", that is just "is there a cycle?".
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

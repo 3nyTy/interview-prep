@@ -1,0 +1,68 @@
+===H1===
+OA: Final Prices with Special Discount (Sum + Unsold Indices)
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/oa-final-prices-monotonic-stack
+===BODY===
+Uber
+Coding·90 minMembers
+OA: Final Prices with Special Discount (Sum + Unsold Indices)
+Hack2Hire OA problem, extension of LeetCode 1475. For each index `i`, the discount equals the first later price `prices[j] ≤ prices[i]`. Items with no qualifying `j` sell at full price. Output the total final sum and the 0-based ascending indices of items sold at full price.
+SWE
+array
+medium
+algorithm
+Frequency
+Low
+Last asked
+2026-04-01
+Stage
+oa
+Requirements
+
+Input: integer array prices of length n (price at each shop position). Constraints: 1 <= n <= 500, 1 <= prices[i] <= 10^3.
+
+For each index i: find the smallest j > i such that prices[j] ≤ prices[i].
+
+If such j exists: final price at i is prices[i] − prices[j].
+
+Otherwise: final price at i is prices[i] (sold at full price).
+
+Output (two parts): (1) the total of all final prices; (2) the indices sold at full price, 0-based, ascending, space-separated.
+
+The base LC shape instead returns the per-item answer array where answer[i] is the final price; the total + full-price-indices form above is the OA variant of the same computation.
+
+Examples
+
+prices = [8, 4, 6, 2, 3]
+Final:   [8−4, 4−2, 6−2, 2, 3]  = [4, 2, 4, 2, 3]
+Full-price indices: [3, 4]
+Output: total=15, indices="3 4"
+
+prices = [10, 1, 1, 6]   # equal-price discount case
+Final:   [10−1, 1−1, 1, 6] = [9, 0, 1, 6]
+# index 1 discounts against the EQUAL price at index 2 (≤, not <)
+Full-price indices: [2, 3]
+
+Notes
+
+Classic monotonic stack finding the next-smaller-or-equal value to the right.
+
+Walk left-to-right, maintaining a stack of indices whose prices are in non-increasing order. For each j, while prices[stack.top()] >= prices[j], pop, and credit the discount prices[j] to the popped index.
+
+The stack contents at the end are the indices that never got discounted → full-price indices, in ascending order.
+
+Critical condition: use >= (not >) so that an equal price still acts as a valid discount, matching the <= rule in the problem statement. The [10, 1, 1, 6] case is the minimal test that catches a >-instead-of->= bug.
+
+Preparation
+
+Drill LC 1475 (Final Prices With a Special Discount) — verbatim base problem.
+
+Drill LC 496 / 503 / 739 for adjacent monotonic-stack patterns.
+
+Make sure the stack pops on >=, not >; this is the single most common bug for this family.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

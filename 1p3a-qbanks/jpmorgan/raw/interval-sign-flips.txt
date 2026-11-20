@@ -1,0 +1,51 @@
+===H1===
+Interval Sign Flips
+===URL===
+https://www.1point3acres.com/interview/problems/company/jpmorgan/interval-sign-flips
+===BODY===
+JPMorgan Chase
+Coding·60 minMembers
+Interval Sign Flips
+Given an integer array and a list of intervals, flip the sign of every element inside each interval, then return the final array.
+SWE
+interval
+array
+prefix-sum
+simulation
+oa
+easy
+Frequency
+Single report
+Last asked
+2025-11-19
+Stage
+oa
+Requirements
+
+Input: an integer array arr and a list of intervals.
+
+For each interval, negate every number in the covered range: +1 -> -1, -5 -> 5, and so on.
+
+Apply intervals in order, then return the final array.
+
+Clarify whether interval endpoints are inclusive and whether indices are 0-based or 1-based before coding.
+
+Notes
+
+Direct simulation is fine if constraints are small. If the array and interval list are large, use a difference array over parity: each covered index only needs to know whether it was flipped an odd or even number of times.
+
+Inclusive endpoints are the likely off-by-one trap. In a difference-array solution, an inclusive interval [l, r] toggles at l and at r + 1.
+
+A value of 0 remains 0 after sign flips.
+
+Preparation
+
+Implement the direct simulation first, then rewrite it with a parity difference array.
+
+Test overlapping intervals, repeated identical intervals, a single-element interval, and an interval covering the whole array.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

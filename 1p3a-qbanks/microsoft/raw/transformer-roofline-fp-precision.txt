@@ -1,0 +1,60 @@
+===H1===
+Transformer Roofline + FP32→FP16 Drill
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/transformer-roofline-fp-precision
+===BODY===
+Microsoft
+Other·60 minMembers
+Transformer Roofline + FP32→FP16 Drill
+MAI AI-infra loop: read transformer code, compute matmul wall-clock from roofline, vibe-code CUDA in your own editor, then defend the residual-connection gradient path under FP32→FP16 casting.
+Infra Eng
+Perf Eng
+MLE
+transformer
+gpu
+kernel
+arithmetic-intensity
+numerical-stability
+ai-coding
+hard
+Frequency
+Single report
+Last asked
+2026-03-22
+Stage
+onsite-coding · onsite-deep-dive
+Requirements
+
+A four-round MAI infra loop with no LeetCode element. Each round runs ~45 minutes after a short resume drill:
+
+Round 1 — Resume / project pressure-test. Standard MAI deep-dive style: pick one infra project, defend ownership, defend trade-offs.
+
+Round 2 — Transformer code review + roofline. Walk the interviewer through a tiny transformer block. Given matrix shapes (M, K)·(K, N) and a GPU's peak FLOPs + HBM bandwidth, compute the arithmetic intensity 2·M·N·K / (bytes moved) and the roofline time bound — the operation is memory-bound when intensity < peak/bandwidth and compute-bound otherwise. Expect to do the dimensional analysis aloud and write the number on the board.
+
+Round 3 — CUDA vibe-coding. Open your IDE with the AI-coding tool of your choice (Cursor / Copilot / Claude Code) and write a small CUDA kernel for a matmul or reduction. The interviewer evaluates whether you collaborate fluently with the assistant, not whether you write kernels by hand. Candidates without a pre-configured AI environment have been penalized.
+
+Round 4 — Residual connections + FP32→FP16 cast. Whiteboard discussion: derive the gradient of y = x + f(x) and explain why the identity branch keeps gradient flow alive (∂L/∂x = ∂L/∂y · (1 + f'(x))). Then defend where FP16 cast points hurt — typically the small-magnitude gradients in deep layers underflow; mixed-precision training keeps the master weights in FP32 and casts down only for the forward / backward matmul.
+
+Notes
+
+Roofline mental model: time ≈ max(compute_time, memory_time) where compute_time = FLOPs / peak_TFLOPS and memory_time = bytes / bandwidth. For matmul, FLOPs = 2·M·N·K, bytes ≈ 2·(M·K + K·N + M·N) (FP16). On an A100 (312 TF FP16, 1.5 TB/s HBM) a 4096×4096×4096 matmul is compute-bound, while a tall-skinny 4096×1×4096 is bandwidth-bound — interviewers want you to surface the shape sensitivity.
+
+Mixed-precision pitfalls to name on demand: gradient underflow → loss scaling; epsilon in layernorm denominator → keep in FP32; accumulators in matmul → FP32 (bf16 skips this concern because of its wider exponent range).
+
+Residual-connection answer: the (1 + f'(x)) factor in the gradient keeps the lower bound away from zero even as f grows arbitrarily deep, which is the entire motivation for ResNet-style skip connections in Transformer feed-forward + attention layers.
+
+Preparation
+
+Memorize peak FP16 TFLOPS and HBM bandwidth for A100, H100, and your target hardware; interviewers expect numbers, not order-of-magnitude shrugs.
+
+Pre-configure your IDE for AI-assisted coding before the loop. Walk through a 10-minute kernel-writing session the night before so the tooling is muscle memory.
+
+Drill the residual gradient derivation on paper; the question reappears in every infra deep-dive.
+
+Read about mixed-precision training (loss scaling, master weights, BF16 vs FP16 trade-offs) until you can recite the contrast in two sentences.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

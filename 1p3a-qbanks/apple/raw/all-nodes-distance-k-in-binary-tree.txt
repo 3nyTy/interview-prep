@@ -1,0 +1,54 @@
+===H1===
+All Nodes Distance K in Binary Tree (LC 863)
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/all-nodes-distance-k-in-binary-tree
+===BODY===
+Apple
+CodingMembers
+All Nodes Distance K in Binary Tree (LC 863)
+Given a binary tree, target node, and distance K, return every node exactly K edges from the target. Follow-ups cover duplicate values, K larger than the tree height, collecting all nodes within K, and avoiding an explicit parent map.
+SWE
+tree
+graph
+bfs
+dfs
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-coding
+Requirements
+
+Given a binary tree, a target node, and an integer K, return all nodes whose distance from the target is exactly K edges.
+
+Return an empty list when no node exists at that distance, including when K is larger than the reachable depth.
+
+Node values may repeat, so visited state must identify nodes themselves rather than their values.
+
+Follow up by returning every node at distance less than or equal to K.
+
+Follow up by avoiding a separately stored parent mapping.
+
+Notes
+
+The direct approach first records each node's parent, then runs breadth-first search from the target over left, right, and parent edges. Track visited nodes by identity, not value. When the search reaches layer K, return that frontier without expanding it further. This takes O(n) time and O(n) auxiliary space.
+
+To avoid a parent map, let a depth-first search return the distance from each ancestor to the target. When the target is found, collect descendants at depth K. While recursion unwinds, collect from the opposite subtree at the remaining depth; if a child is distance d from the target, the opposite subtree starts at depth K - d - 2. This also takes O(n) time and uses O(h) recursion space excluding the output.
+
+Using values as visited keys is incorrect when different nodes share a value. For the within-K follow-up, collect every breadth-first layer from zero through K rather than only the final frontier.
+
+Preparation
+
+Implement the parent-aware version and the recursive distance-propagation version.
+
+Test duplicate values, K = 0, an unreachable K, a target at the root, and a target at a leaf.
+
+Modify the exact-distance implementation to collect every layer through K.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

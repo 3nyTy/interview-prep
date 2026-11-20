@@ -1,0 +1,1876 @@
+{
+  "company": "openai",
+  "display_name": "OpenAI",
+  "qbank_count": 52,
+  "questions_scraped": 52,
+  "site_total_count": 263,
+  "oj_count": 164,
+  "external_count": 47,
+  "description": "OpenAI pairs an unusually high raw-coding bar with explicit no-AI-tools rules during most interviews — a deliberate contrast with the product. Phone screens often run a single multi-part simulation for the full hour, and senior loops add deep ML and research-grounded system-design rounds that probe mechanism, not vocabulary.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/openai",
+  "scraped_at": "2026-09-20",
+  "source": "1point3acres qbank (logged-in session)",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "infection-spread-cellular-automata",
+      "title": "Infection Spread / Cellular Automata",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Very high",
+      "last_asked": "2026-09-09",
+      "stage": "phone-screen · tech-screen",
+      "access": "Free preview",
+      "roles": [
+        "SWE",
+        "MLE",
+        "RE",
+        "RS",
+        "EM"
+      ],
+      "tags": [
+        "algorithm",
+        "simulation",
+        "bfs",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "re",
+        "rs",
+        "em"
+      ],
+      "tags_slug": [
+        "algorithm",
+        "simulation",
+        "bfs",
+        "medium"
+      ],
+      "overview": "M×N grid with infected cells (X) and susceptible cells (./*); infection propagates each day under escalating rules. 5 sub-parts in 60 min; passing bar is typically solving the first 3 with clean BFS.",
+      "source_count": 46,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/infection-spread-cellular-automata"
+    },
+    {
+      "n": 2,
+      "slug": "social-network-follow-graph",
+      "title": "Social Network / Follow Graph",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Very high",
+      "last_asked": "2026-08-14",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "RE"
+      ],
+      "tags": [
+        "algorithm",
+        "graph",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "re"
+      ],
+      "tags_slug": [
+        "algorithm",
+        "graph",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Build a follower/followee data structure with timestamped queries and friend-of-friend recommendations.",
+      "source_count": 21,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/social-network-follow-graph"
+    },
+    {
+      "n": 3,
+      "slug": "distributed-cluster-count-topology",
+      "title": "Distributed Machine Cluster Count and Topology",
+      "category": "coding",
+      "duration": null,
+      "frequency": "High",
+      "last_asked": "2026-09-10",
+      "stage": "onsite-coding · phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "tree-broadcast",
+        "distributed-systems",
+        "recursion",
+        "state-machine",
+        "idempotency",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "tree-broadcast",
+        "distributed-systems",
+        "recursion",
+        "state-machine",
+        "idempotency",
+        "medium"
+      ],
+      "overview": "You are given a tree structure where each node represents a machine in a distributed cluster. Machines can only communicate with their direct parent or children via asynchronous message passing. The problem asks you to implement a receiveMessage() function that enables the cluster to count its own nodes, map the full tree topology, and handle duplicate or failed messages idempotently.",
+      "source_count": 13,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/distributed-cluster-count-topology"
+    },
+    {
+      "n": 4,
+      "slug": "autograd-hillis-steele-scan",
+      "title": "Autograd / Manual Backprop + Hillis-Steele Scan",
+      "category": "coding",
+      "duration": "75 min",
+      "frequency": "High",
+      "last_asked": "2026-08-28",
+      "stage": "tech-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "RS",
+        "RE",
+        "MLE"
+      ],
+      "tags": [
+        "ml-knowledge",
+        "autograd",
+        "pytorch",
+        "parallel-algorithm",
+        "math-reasoning",
+        "hard"
+      ],
+      "roles_slug": [
+        "rs",
+        "re",
+        "mle"
+      ],
+      "tags_slug": [
+        "ml-knowledge",
+        "autograd",
+        "pytorch",
+        "parallel-algorithm",
+        "math-reasoning",
+        "hard"
+      ],
+      "overview": "Given a sequence of square matrices: first write an in-place matmul, then explain why it can't backprop. Write an out-of-place version that works with autograd. Then hand-write the backward. Finally, implement forward + backward using a Hillis-Steele scan.",
+      "source_count": 8,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/autograd-hillis-steele-scan"
+    },
+    {
+      "n": 5,
+      "slug": "gpu-credits",
+      "title": "GPU Credits / GPU Credit 2",
+      "category": "coding",
+      "duration": "75 min",
+      "frequency": "High",
+      "last_asked": "2026-08-28",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "algorithm",
+        "data-structure",
+        "simulation",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "algorithm",
+        "data-structure",
+        "simulation",
+        "medium"
+      ],
+      "overview": "Simulate a GPU credit grant system: grant credit with an expiration time, subtract on consumption, query balance. Latest 'GPU Credit 2' variant adds 'subtract affects future + drain from earliest-expiring grant first' semantics.",
+      "source_count": 15,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/gpu-credits"
+    },
+    {
+      "n": 6,
+      "slug": "numpy-1nn-wx-b",
+      "title": "NumPy Puzzle: 1-NN Vectorization → Wx+b Network",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-08-21",
+      "stage": "tech-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RE"
+      ],
+      "tags": [
+        "ml-knowledge",
+        "numpy",
+        "linear-algebra",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "re"
+      ],
+      "tags_slug": [
+        "ml-knowledge",
+        "numpy",
+        "linear-algebra",
+        "medium"
+      ],
+      "overview": "Implement 1-NN classification in pure NumPy (no for-loops). Follow-up: rewrite as the forward pass of a neural network, forced into `Wx + b` form with an activation function.",
+      "source_count": 10,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/numpy-1nn-wx-b"
+    },
+    {
+      "n": 7,
+      "slug": "monster-battle-system",
+      "title": "Monster Battle System",
+      "category": "coding",
+      "duration": null,
+      "frequency": "High",
+      "last_asked": "2026-08-18",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "oop-design",
+        "simulation",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "oop-design",
+        "simulation",
+        "medium"
+      ],
+      "overview": "Design and implement a battle simulation system where two teams of monsters fight each other in turn-based combat. The problem is structured in three progressive parts: basic battle logic, elemental type effectiveness, and an optimized smart-targeting strategy. It is an Object-Oriented Design problem that emphasizes encapsulation, single responsibility, and extensibility.",
+      "source_count": 11,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/monster-battle-system"
+    },
+    {
+      "n": 8,
+      "slug": "transformer-bug-hunt",
+      "title": "Transformer Bug Hunt",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-08-13",
+      "stage": "tech-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RS",
+        "RE"
+      ],
+      "tags": [
+        "ml-knowledge",
+        "transformer",
+        "debugging",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "rs",
+        "re"
+      ],
+      "tags_slug": [
+        "ml-knowledge",
+        "transformer",
+        "debugging",
+        "medium"
+      ],
+      "overview": "A working-ish Transformer + train script + tests is provided with ~4 bugs planted. Find them so loss converges and outputs are correct. The appetizer of any ML coding round — almost guaranteed.",
+      "source_count": 13,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/transformer-bug-hunt"
+    },
+    {
+      "n": 9,
+      "slug": "memory-allocator",
+      "title": "Memory Allocator",
+      "category": "coding",
+      "duration": "75 min",
+      "frequency": "High",
+      "last_asked": "2026-08-05",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE",
+        "RE"
+      ],
+      "tags": [
+        "algorithm",
+        "data-structure",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "re"
+      ],
+      "tags_slug": [
+        "algorithm",
+        "data-structure",
+        "hard"
+      ],
+      "overview": "LeetCode 'Design Memory Allocator'. `Allocator(size=1000)` with `malloc(size) -> pointer` and `free(pointer) -> bool`. The interviewer explicitly rejects O(n) linked-list solutions and asks for a better approach.",
+      "source_count": 11,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/memory-allocator"
+    },
+    {
+      "n": 10,
+      "slug": "classifier-noisy-annotators",
+      "title": "Classifier with Noisy Annotators",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-07-17",
+      "stage": "tech-screen",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RS",
+        "RE"
+      ],
+      "tags": [
+        "ml-knowledge",
+        "data-cleaning",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "rs",
+        "re"
+      ],
+      "tags_slug": [
+        "ml-knowledge",
+        "data-cleaning",
+        "medium"
+      ],
+      "overview": "A classifier trains on data labeled by multiple human annotators, but some annotators are noisy. Task: identify the bad annotators, exclude their labels, check whether the classifier improves.",
+      "source_count": 10,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/classifier-noisy-annotators"
+    },
+    {
+      "n": 11,
+      "slug": "toy-language-type-inference",
+      "title": "Toy Language / Type Inference",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-07-13",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "RE"
+      ],
+      "tags": [
+        "algorithm",
+        "oop-design",
+        "recursion",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "re"
+      ],
+      "tags_slug": [
+        "algorithm",
+        "oop-design",
+        "recursion",
+        "medium"
+      ],
+      "overview": "Implement a type system for a toy language with primitives, generics, nested tuples, and function signatures. Core task: a type-inference engine that unifies generics with concrete call-site types and substitutes them in the return type.",
+      "source_count": 9,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/toy-language-type-inference"
+    },
+    {
+      "n": 12,
+      "slug": "data-labeling-task-scheduler",
+      "title": "Data Labeling Task Scheduler",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-07-10",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "RE",
+        "MLE"
+      ],
+      "tags": [
+        "algorithm",
+        "simulation",
+        "scheduling",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "re",
+        "mle"
+      ],
+      "tags_slug": [
+        "algorithm",
+        "simulation",
+        "scheduling",
+        "medium"
+      ],
+      "overview": "Build a scheduler for a data labeling platform: t tasks, m models, h human labelers. Emit a schedule (list of (task, model, human) tuples) under fairness + uniqueness constraints. Tied with infection-spread as the hottest 'new question'.",
+      "source_count": 8,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/data-labeling-task-scheduler"
+    },
+    {
+      "n": 13,
+      "slug": "durable-kv-store-serialization",
+      "title": "Durable Key-Value Store Serialization",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Medium",
+      "last_asked": "2026-08-19",
+      "stage": "onsite-coding · phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "io",
+        "filesystem",
+        "persistence",
+        "hashmap",
+        "parsing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "io",
+        "filesystem",
+        "persistence",
+        "hashmap",
+        "parsing",
+        "medium"
+      ],
+      "overview": "Implement a persistent key-value store that can serialize and deserialize data to/from a file system. The challenge is designing a custom binary encoding format — without JSON or pickle — that correctly round-trips keys and values containing arbitrary characters (newlines, emojis, null bytes, commas). A follow-up extends the problem to a chunked multi-file layout when each file is capped at 1 KB.",
+      "source_count": 6,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/durable-kv-store-serialization"
+    },
+    {
+      "n": 14,
+      "slug": "streaming-entropy",
+      "title": "Streaming Entropy (numerical stability + online accumulation)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-26",
+      "stage": "tech-screen",
+      "access": "Members",
+      "roles": [
+        "RS",
+        "RE",
+        "MLE"
+      ],
+      "tags": [
+        "numerical-stability",
+        "streaming",
+        "medium"
+      ],
+      "roles_slug": [
+        "rs",
+        "re",
+        "mle"
+      ],
+      "tags_slug": [
+        "numerical-stability",
+        "streaming",
+        "medium"
+      ],
+      "overview": "Given logits, compute the entropy of the distribution, handling exp/log numerical stability. Then make it streaming: logits arrive one at a time, accumulate entropy online.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/streaming-entropy"
+    },
+    {
+      "n": 15,
+      "slug": "chat-bot-system-refactoring",
+      "title": "Chat Bot System Refactoring",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Medium",
+      "last_asked": "2026-07-03",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "refactoring",
+        "oop-design",
+        "design-implementation",
+        "testing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "refactoring",
+        "oop-design",
+        "design-implementation",
+        "testing",
+        "medium"
+      ],
+      "overview": "You are given a legacy chat service codebase that supports various bots (AwayBot, MeetBot, TacoBot) triggered by slash commands. The task is to refactor the monolithic, global-state implementation into a clean object-oriented design using interfaces and — as a follow-up — an event-driven architecture with a central event bus.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/chat-bot-system-refactoring"
+    },
+    {
+      "n": 16,
+      "slug": "ip-address-cidr-iterator",
+      "title": "IP Address / CIDR Iterator (5-part)",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-01",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "algorithm",
+        "string",
+        "bit-manipulation",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "algorithm",
+        "string",
+        "bit-manipulation",
+        "medium"
+      ],
+      "overview": "Given IPv4 / CIDR notation, implement parsing, range iteration, containment checks, etc. 5 parts revealed one at a time; the next part unlocks only when the previous one passes its tests.",
+      "source_count": 6,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/ip-address-cidr-iterator"
+    },
+    {
+      "n": 17,
+      "slug": "shard-rebalance",
+      "title": "Shard Rebalance / Overlapping Key Range",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-06-26",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "algorithm",
+        "interval",
+        "simulation",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "algorithm",
+        "interval",
+        "simulation",
+        "medium"
+      ],
+      "overview": "Given a set of shards (each with id/start/end key range), support `add_shard / remove_shard` and implement `rebalance()` so that no more than `limit` shards overlap at any point. Trim excess, fill gaps, minimize data movement.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/shard-rebalance"
+    },
+    {
+      "n": 18,
+      "slug": "math-reasoning-stopping-time",
+      "title": "Math Reasoning: Stopping Time / Las Vegas Algorithm",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-05-31",
+      "stage": "tech-screen",
+      "access": "Members",
+      "roles": [
+        "RS",
+        "RE"
+      ],
+      "tags": [
+        "ml-knowledge",
+        "math-reasoning",
+        "probability",
+        "algorithm-design",
+        "hard"
+      ],
+      "roles_slug": [
+        "rs",
+        "re"
+      ],
+      "tags_slug": [
+        "ml-knowledge",
+        "math-reasoning",
+        "probability",
+        "algorithm-design",
+        "hard"
+      ],
+      "overview": "An oracle LLM does math reasoning; the 'solving time' follows a known distribution. Design a restart strategy to compress the expected solving time. Final part: find a strategy that beats single-threshold restart on worst-case performance.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/math-reasoning-stopping-time"
+    },
+    {
+      "n": 19,
+      "slug": "version-dependency",
+      "title": "Version Dependency",
+      "category": "coding",
+      "duration": "75 min",
+      "frequency": "Medium",
+      "last_asked": "2026-05-08",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "RE"
+      ],
+      "tags": [
+        "algorithm",
+        "graph",
+        "dependency-resolution",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "re"
+      ],
+      "tags_slug": [
+        "algorithm",
+        "graph",
+        "dependency-resolution",
+        "medium"
+      ],
+      "overview": "Given packages with version dependencies ('package A v1 requires B >= 2.0'), implement parsing, queries, and likely a SAT-like resolver. 4 sub-parts; very large code volume.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/version-dependency"
+    },
+    {
+      "n": 20,
+      "slug": "fault-tolerant-work-queue",
+      "title": "Fault-Tolerant Work Queue",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-13",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "Infra Eng"
+      ],
+      "tags": [
+        "queue",
+        "state-machine",
+        "retry",
+        "medium"
+      ],
+      "roles_slug": [
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "queue",
+        "state-machine",
+        "retry",
+        "medium"
+      ],
+      "overview": "Implement a work queue with `reserve`, `complete`, and `fail` operations, then extend it with reservation timeouts, retries, and a dead-letter queue. Timeout behavior and retry limits are intentionally underspecified, so clarify them before coding.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/fault-tolerant-work-queue"
+    },
+    {
+      "n": 21,
+      "slug": "masked-cross-entropy-loss",
+      "title": "Cross-Entropy Loss Implementation",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-07-10",
+      "stage": "tech-screen",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RE"
+      ],
+      "tags": [
+        "ml-knowledge",
+        "numpy",
+        "numerical-stability",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "re"
+      ],
+      "tags_slug": [
+        "ml-knowledge",
+        "numpy",
+        "numerical-stability",
+        "medium"
+      ],
+      "overview": "Implement cross-entropy loss from NumPy starter code, then extend it with masking and label smoothing while discussing the underlying ML concepts and the relationship to KL divergence.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/masked-cross-entropy-loss"
+    },
+    {
+      "n": 22,
+      "slug": "maximum-score-grid-path-limited-jumps",
+      "title": "Maximum-Score Grid Path with Limited Jumps",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-07-08",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "dp",
+        "grid",
+        "combinatorics",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "dp",
+        "grid",
+        "combinatorics",
+        "hard"
+      ],
+      "overview": "Given an integer grid, a top-row starting column, and a budget of at most K two-row jumps, maximize the score on a path to the bottom; then reconstruct an optimal path, count all optimal paths modulo 1e9+7, and incorporate adjacency-based bonuses.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/maximum-score-grid-path-limited-jumps"
+    },
+    {
+      "n": 23,
+      "slug": "implement-cd-command",
+      "title": "Implement a CD Command",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2025-12-27",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string-processing",
+        "stack",
+        "parsing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string-processing",
+        "stack",
+        "parsing",
+        "medium"
+      ],
+      "overview": "Implement a cd() method that behaves like running cd <destination> in a terminal and then calling pwd. The problem builds from relative-path normalization (handling .., ., repeated slashes, trailing slashes) through absolute paths and ~ expansion, to full symbolic-link resolution with cycle detection. A final follow-up explores why cd must be a shell built-in and how Linux resolves paths via inodes.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/implement-cd-command"
+    },
+    {
+      "n": 24,
+      "slug": "opensheet-spreadsheet",
+      "title": "OpenSheet: Spreadsheet with Cell Dependencies",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2025-11-21",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "graph",
+        "dfs",
+        "topological-sort",
+        "recursion",
+        "data-structure",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "graph",
+        "dfs",
+        "topological-sort",
+        "recursion",
+        "data-structure",
+        "medium"
+      ],
+      "overview": "Design and implement a spreadsheet system called OpenSheet that supports cell values, formulas, and automatic dependency resolution. The system must handle cell names (e.g. A1, B2), numeric literals, and arithmetic formulas referencing other cells, while detecting and rejecting circular dependencies. A follow-up asks for an optimized O(1) getCell via eager recomputation using a dependency graph and topological sort.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/opensheet-spreadsheet"
+    },
+    {
+      "n": 25,
+      "slug": "modal-lock-fair-modal-lock",
+      "title": "ModalLock and FairModalLock",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-08-27",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "concurrency",
+        "threading",
+        "python",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "concurrency",
+        "threading",
+        "python",
+        "hard"
+      ],
+      "overview": "A Python concurrency problem for ML Infra roles. Candidates implement two synchronization primitives — ModalLock (mode-aware shared lock allowing concurrent same-mode holders while blocking cross-mode) and FairModalLock (adds FIFO fairness across mode groups) — by filling in four methods in a provided file and passing five progressively unlocked test stages.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/modal-lock-fair-modal-lock"
+    },
+    {
+      "n": 26,
+      "slug": "sharded-matmul-backprop-debugging",
+      "title": "Sharded Matmul and Backprop Debugging",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-07-31",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RE"
+      ],
+      "tags": [
+        "autograd",
+        "linear-algebra",
+        "numpy",
+        "pytorch",
+        "parallelism",
+        "debugging",
+        "hard"
+      ],
+      "roles_slug": [
+        "mle",
+        "re"
+      ],
+      "tags_slug": [
+        "autograd",
+        "linear-algebra",
+        "numpy",
+        "pytorch",
+        "parallelism",
+        "debugging",
+        "hard"
+      ],
+      "overview": "Derive a simplified sharded matrix multiplication, implement its forward and backward behavior across devices with NumPy or PyTorch, and debug a fixed set of planted defects.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/sharded-matmul-backprop-debugging"
+    },
+    {
+      "n": 27,
+      "slug": "resumable-iterator",
+      "title": "Resumable Iterator with Multi-Dimensional Support",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-06-20",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "iterator",
+        "oop-design",
+        "recursion",
+        "python",
+        "testing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "iterator",
+        "oop-design",
+        "recursion",
+        "python",
+        "testing",
+        "medium"
+      ],
+      "overview": "You need to implement a resumable iterator system that supports pause and resume functionality through state management. The problem progresses in four steps: defining an abstract base class, implementing a 1D list iterator, extending to a 2D matrix iterator, and finally a 3D nested iterator — each with full get_state / set_state serialization semantics.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/resumable-iterator"
+    },
+    {
+      "n": 28,
+      "slug": "code-reading-pytorch-refactor",
+      "title": "Code Reading — 400-line PyTorch Refactor",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-03-09",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "RE",
+        "MLE"
+      ],
+      "tags": [
+        "code-reading",
+        "pytorch"
+      ],
+      "roles_slug": [
+        "re",
+        "mle"
+      ],
+      "tags_slug": [
+        "code-reading",
+        "pytorch"
+      ],
+      "overview": "A 400+ line PyTorch file is provided; complete 3 parts + 1 bonus. Lots of time/space complexity questions on the existing code. The codebase being modified is the noisy-annotator classifier seen elsewhere in the ML coding rounds.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/code-reading-pytorch-refactor"
+    },
+    {
+      "n": 29,
+      "slug": "in-memory-database-sql",
+      "title": "In-Memory Database with SQL Operations",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2025-11-07",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "in-memory-database",
+        "sql",
+        "data-structure",
+        "oop-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "in-memory-database",
+        "sql",
+        "data-structure",
+        "oop-design",
+        "medium"
+      ],
+      "overview": "Design and implement an in-memory database management system that supports basic SQL-like operations. The problem is structured in up to six progressive parts covering table creation, row insertion, column projection, WHERE filtering, ORDER BY sorting, and an optimization discussion around indexing strategies.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/in-memory-database-sql"
+    },
+    {
+      "n": 30,
+      "slug": "time-based-kv-store",
+      "title": "Time-Based Key-Value Store with Production Testing",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2025-10-19",
+      "stage": "oa · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "hashmap",
+        "binary-search",
+        "data-structure",
+        "concurrency",
+        "testing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "hashmap",
+        "binary-search",
+        "data-structure",
+        "concurrency",
+        "testing",
+        "medium"
+      ],
+      "overview": "Design and implement a time-based key-value data structure that stores multiple values for the same key at different timestamps and retrieves values based on temporal queries. The problem extends beyond basic implementation to cover test strategy with mock clocks, monotonic timestamp enforcement, and thread-safe concurrency approaches.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/time-based-kv-store"
+    },
+    {
+      "n": 31,
+      "slug": "payment-coffee-shop",
+      "title": "Payment / Coffee-Shop Ordering (read the prompt!)",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Very high",
+      "last_asked": "2026-09-10",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "payment",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "payment",
+        "medium"
+      ],
+      "overview": "'Payment' is the title, but the actual prompt is often a specific vertical — coffee-shop ordering, e-commerce checkout, etc. Read before you design; don't apply a generic payment template.",
+      "source_count": 31,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/payment-coffee-shop"
+    },
+    {
+      "n": 32,
+      "slug": "design-chess-game",
+      "title": "Design Chess.com (Online Chess Game)",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Very high",
+      "last_asked": "2026-09-09",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "websocket",
+        "redis",
+        "schema-design",
+        "distributed-systems",
+        "idempotency",
+        "scaling",
+        "concurrency",
+        "game-engine"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "websocket",
+        "redis",
+        "schema-design",
+        "distributed-systems",
+        "idempotency",
+        "scaling",
+        "concurrency",
+        "game-engine"
+      ],
+      "overview": "Design an online chess platform similar to Chess.com supporting real-time 1v1 games, matchmaking, and server-authoritative clock management. The core challenges are pairing players quickly by rating, propagating moves under 150ms via WebSocket, and maintaining sub-100ms clock accuracy without per-second database writes.",
+      "source_count": 19,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/design-chess-game"
+    },
+    {
+      "n": 33,
+      "slug": "design-sora-video-generation",
+      "title": "Design Sora / Video Generation Pipeline",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Very high",
+      "last_asked": "2026-08-20",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng",
+        "EM"
+      ],
+      "tags": [
+        "gpu",
+        "scheduling",
+        "messaging",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng",
+        "em"
+      ],
+      "tags_slug": [
+        "gpu",
+        "scheduling",
+        "messaging",
+        "medium"
+      ],
+      "overview": "A client sends a video-generation request; design the full scheduling + worker flow with limited / fluctuating GPU pool. Focus on failure-scenario handling.",
+      "source_count": 28,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/design-sora-video-generation"
+    },
+    {
+      "n": 34,
+      "slug": "design-cloud-ide",
+      "title": "Design a Cloud IDE",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Medium",
+      "last_asked": "2026-09-01",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng",
+        "EM"
+      ],
+      "tags": [
+        "sandbox",
+        "vm-management",
+        "websocket",
+        "kafka",
+        "streaming",
+        "scaling",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng",
+        "em"
+      ],
+      "tags_slug": [
+        "sandbox",
+        "vm-management",
+        "websocket",
+        "kafka",
+        "streaming",
+        "scaling",
+        "hard"
+      ],
+      "overview": "Design a cloud-based IDE similar to Replit or GitHub Codespaces, where users can write code, manage files, and run terminal commands entirely in the browser. The core challenges are VM lifecycle management, real-time terminal output streaming, and strong per-user isolation at scale. A current alternate rotation is host-centric rather than browser-based: the user connects over SSH, while a task scheduler manages work across the host fleet.",
+      "source_count": 6,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/design-cloud-ide"
+    },
+    {
+      "n": 35,
+      "slug": "real-time-ai-product-feature",
+      "title": "Real-Time AI Product Feature",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-08",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "fullstack",
+        "streaming",
+        "api-design",
+        "rate-limiting",
+        "sse",
+        "websocket"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "fullstack",
+        "streaming",
+        "api-design",
+        "rate-limiting",
+        "sse",
+        "websocket"
+      ],
+      "overview": "Design a user-facing AI product feature that serves a large audience with real-time or streaming responses. Cover streaming API choices, request admission and queueing, cost controls, frontend error handling, observability, and how the design changes at 10× scale.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/real-time-ai-product-feature"
+    },
+    {
+      "n": 36,
+      "slug": "mining-novel-data-unlabeled-corpus",
+      "title": "Mining Novel Data from Large Unlabeled Corpus",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-05-26",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "mlsd",
+        "data-mining",
+        "retrieval"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "mlsd",
+        "data-mining",
+        "retrieval"
+      ],
+      "overview": "An ML system-design prompt for ML engineers: mine new, unique information out of a very large unlabeled corpus, and locate the images that contain specific objects of interest. Only the core task is known; the detailed spec was not pinned down.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/mining-novel-data-unlabeled-corpus"
+    },
+    {
+      "n": 37,
+      "slug": "chatgpt-enterprise-rag",
+      "title": "ChatGPT Enterprise (RAG ML System Design)",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-03-22",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RE"
+      ],
+      "tags": [
+        "rag",
+        "retrieval",
+        "ml-knowledge"
+      ],
+      "roles_slug": [
+        "mle",
+        "re"
+      ],
+      "tags_slug": [
+        "rag",
+        "retrieval",
+        "ml-knowledge"
+      ],
+      "overview": "Design ChatGPT Enterprise: enterprise users upload internal data; the system gives them a customized ChatGPT based on that data.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/chatgpt-enterprise-rag"
+    },
+    {
+      "n": 38,
+      "slug": "gpt-3-playground",
+      "title": "GPT-3 Playground - Full-Stack Architecture",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2025-10-18",
+      "stage": "tech-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "fullstack",
+        "frontend",
+        "backend",
+        "api-integration",
+        "streaming",
+        "react",
+        "schema-design"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "fullstack",
+        "frontend",
+        "backend",
+        "api-integration",
+        "streaming",
+        "react",
+        "schema-design"
+      ],
+      "overview": "Design the high-level architecture for a GPT-3 Playground website that lets users experiment with GPT-3. The prompt spans both backend data organization and frontend state management, covering how to accept user prompts, stream model responses, manage parameters, and persist saved presets.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/gpt-3-playground"
+    },
+    {
+      "n": 39,
+      "slug": "image-sharing-content-deduplication",
+      "title": "Image Sharing with Content Deduplication",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-08-22",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "storage",
+        "deduplication",
+        "bandwidth",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "storage",
+        "deduplication",
+        "bandwidth",
+        "medium"
+      ],
+      "overview": "Design an image storage and sharing service with upload, view/download, and delete operations. Identical content should be stored once using a SHA-256 identity, with careful handling of concurrent uploads, metadata/blob consistency, failure recovery, and deletion lifecycle.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/image-sharing-content-deduplication"
+    },
+    {
+      "n": 40,
+      "slug": "crossword-puzzle-solver",
+      "title": "Design a Crossword Puzzle Solver",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-08-13",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "distributed-systems",
+        "dfs",
+        "job-system",
+        "scheduling",
+        "backtracking",
+        "messaging",
+        "redis",
+        "concurrency"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "distributed-systems",
+        "dfs",
+        "job-system",
+        "scheduling",
+        "backtracking",
+        "messaging",
+        "redis",
+        "concurrency"
+      ],
+      "overview": "Design a distributed service that solves crossword puzzles given a board (~50×50, ~100 slots) and a dictionary of ~1 million words. The central insight is that brute-force on a single machine is computationally infeasible (≈10^300 combinations), so the design must distribute a DFS search across a worker pool with task splitting, constraint propagation, and coordinated early termination.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/crossword-puzzle-solver"
+    },
+    {
+      "n": 41,
+      "slug": "design-ai-chatbot-system",
+      "title": "Design an AI Chatbot System",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-07-21",
+      "stage": "onsite-system-design · phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "frontend",
+        "fullstack",
+        "chat",
+        "streaming",
+        "sse",
+        "websocket",
+        "api-integration",
+        "access-control"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "frontend",
+        "fullstack",
+        "chat",
+        "streaming",
+        "sse",
+        "websocket",
+        "api-integration",
+        "access-control"
+      ],
+      "overview": "Design a simple AI chatbot system similar to ChatGPT's main interface. The prompt emphasizes frontend architecture and full-stack concepts, with no server-side persistence — all chat state lives in the browser. Key design decisions include streaming response delivery, client-side session management, and authentication flow.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/design-ai-chatbot-system"
+    },
+    {
+      "n": 42,
+      "slug": "multi-tenant-ci-cd-workflow",
+      "title": "Multi-Tenant CI/CD Workflow System",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-06-11",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "ci-cd",
+        "distributed-systems",
+        "idempotency",
+        "scheduling",
+        "docker",
+        "websocket",
+        "scaling",
+        "concurrency"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "ci-cd",
+        "distributed-systems",
+        "idempotency",
+        "scheduling",
+        "docker",
+        "websocket",
+        "scaling",
+        "concurrency"
+      ],
+      "overview": "Design a scalable, fault-tolerant CI/CD system for a multi-tenant environment that schedules and executes user-defined workflows in response to git pushes. The system must run each job exactly once (even across crashes), display real-time status to users, and keep tenants isolated from one another.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/multi-tenant-ci-cd-workflow"
+    },
+    {
+      "n": 43,
+      "slug": "design-slack",
+      "title": "Slack",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-05-05",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "EM"
+      ],
+      "tags": [
+        "messaging"
+      ],
+      "roles_slug": [
+        "swe",
+        "em"
+      ],
+      "tags_slug": [
+        "messaging"
+      ],
+      "overview": "Design Slack: DM + channels, multi-device delivery, notifications, scale (large channel / sharding).",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/design-slack"
+    },
+    {
+      "n": 44,
+      "slug": "rag-search-ml-design",
+      "title": "RAG / Search ML Design (oral)",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-03-22",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "RE",
+        "MLE"
+      ],
+      "tags": [
+        "ml-knowledge",
+        "retrieval"
+      ],
+      "roles_slug": [
+        "re",
+        "mle"
+      ],
+      "tags_slug": [
+        "ml-knowledge",
+        "retrieval"
+      ],
+      "overview": "An oral 'ML Design' round; interviewer often specializes in search and drills deep — embedding training (contrastive learning), retrieval flow, hybrid retrieval, ranking.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/rag-search-ml-design"
+    },
+    {
+      "n": 45,
+      "slug": "design-google-calendar",
+      "title": "Design Google Calendar",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-01-22",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "schema-design",
+        "caching",
+        "data-modeling",
+        "scaling"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "schema-design",
+        "caching",
+        "data-modeling",
+        "scaling"
+      ],
+      "overview": "Design Google Calendar: users create events and view their schedule across day / week / month / year ranges. The core challenges are fast retrieval for the different calendar views and near-real-time propagation of updates across devices.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/design-google-calendar"
+    },
+    {
+      "n": 46,
+      "slug": "design-url-shortener",
+      "title": "Design a URL Shortener",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-01-10",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "hashing",
+        "caching",
+        "scaling",
+        "database"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "hashing",
+        "caching",
+        "scaling",
+        "database"
+      ],
+      "overview": "Design a URL shortener that converts a long web address into a short alias and redirects clients to the original page (Bit.ly / TinyURL style). Surfaces key generation / hashing, the redirect path, storage, caching, and scale.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/design-url-shortener"
+    },
+    {
+      "n": 47,
+      "slug": "webhook-delivery-system",
+      "title": "Webhook Delivery System",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2025-11-19",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "messaging",
+        "retry",
+        "caching",
+        "scaling",
+        "schema-design",
+        "idempotency",
+        "http",
+        "backend",
+        "distributed-systems",
+        "queueing",
+        "webhook"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "messaging",
+        "retry",
+        "caching",
+        "scaling",
+        "schema-design",
+        "idempotency",
+        "http",
+        "backend",
+        "distributed-systems",
+        "queueing",
+        "webhook"
+      ],
+      "overview": "Design a highly scalable webhook delivery system that allows users to register callback URLs for specific events. The system must handle 1 billion events per day with reliable at-least-once delivery, including retry logic, caching, and failure isolation.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/webhook-delivery-system"
+    },
+    {
+      "n": 48,
+      "slug": "points-of-interest-yelp",
+      "title": "Points of Interest (POI) System / Yelp",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2025-10-07",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "location",
+        "geohash",
+        "scaling",
+        "sharding",
+        "caching",
+        "schema-design",
+        "database"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "location",
+        "geohash",
+        "scaling",
+        "sharding",
+        "caching",
+        "schema-design",
+        "database"
+      ],
+      "overview": "Design a scalable location-based service that allows users to discover nearby points of interest (POIs) such as restaurants, shops, and businesses. The system must handle 500 million locations worldwide, 100,000 queries per second (read-heavy), and return results in under 100 milliseconds. Geospatial indexing using Geohash or QuadTree is central to the solution.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/points-of-interest-yelp"
+    },
+    {
+      "n": 49,
+      "slug": "hm-bq-why-openai",
+      "title": "HM BQ — Why OpenAI / AI Safety / AGI",
+      "category": "behavioral",
+      "duration": "60 min",
+      "frequency": "Very high",
+      "last_asked": "2026-08-28",
+      "stage": "onsite-bq",
+      "access": "Members",
+      "roles": [
+        "All"
+      ],
+      "tags": [
+        "behavioral",
+        "why-company",
+        "culture-fit"
+      ],
+      "roles_slug": [
+        "all-roles"
+      ],
+      "tags_slug": [
+        "behavioral",
+        "why-company",
+        "culture-fit"
+      ],
+      "overview": "HM BQ round with high-frequency questions about why OpenAI, AGI, AI safety, hypothetical safety dilemmas, failure / conflict / pushback stories, reasons for past job changes.",
+      "source_count": 23,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/hm-bq-why-openai"
+    },
+    {
+      "n": 50,
+      "slug": "recruiter-hr-screen-bq",
+      "title": "Recruiter / HR Screen (BQ)",
+      "category": "behavioral",
+      "duration": "30 min",
+      "frequency": "High",
+      "last_asked": "2026-08-08",
+      "stage": "recruiter-screen",
+      "access": "Members",
+      "roles": [
+        "All"
+      ],
+      "tags": [
+        "behavioral"
+      ],
+      "roles_slug": [
+        "all-roles"
+      ],
+      "tags_slug": [
+        "behavioral"
+      ],
+      "overview": "HR runs standard BQ + process intro (timeline, salary expectations, location). Mandatory for every loop.",
+      "source_count": 9,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/recruiter-hr-screen-bq"
+    },
+    {
+      "n": 51,
+      "slug": "engineering-management-fundamentals",
+      "title": "Engineering Management Fundamentals & Team Operations",
+      "category": "behavioral",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-07",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "EM"
+      ],
+      "tags": [
+        "leadership",
+        "mentorship",
+        "ownership"
+      ],
+      "roles_slug": [
+        "em"
+      ],
+      "tags_slug": [
+        "leadership",
+        "mentorship",
+        "ownership"
+      ],
+      "overview": "A structured management round spanning leadership philosophy, one-on-ones, hands-on coding balance, hiring, mentorship, performance management, and team composition. The interviewer works through a broad prompt bank and asks for concrete examples.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/engineering-management-fundamentals"
+    },
+    {
+      "n": 52,
+      "slug": "technical-deep-dive",
+      "title": "Technical Deep Dive (slide-based)",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "Very high",
+      "last_asked": "2026-08-20",
+      "stage": "onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE",
+        "RE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "deep-dive",
+        "presentation",
+        "project-deep-dive"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "re",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "deep-dive",
+        "presentation",
+        "project-deep-dive"
+      ],
+      "overview": "Prepare slides about a past project; interviewer drills the technical detail. Research-org loop always has it; bar is high.",
+      "source_count": 25,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/openai/technical-deep-dive"
+    }
+  ]
+}

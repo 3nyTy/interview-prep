@@ -1,0 +1,49 @@
+===H1===
+Create Binary Tree from Descriptions (LC 2196)
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/create-binary-tree-from-descriptions-lc-2196
+===BODY===
+Amazon
+CodingMembers
+Create Binary Tree from Descriptions (LC 2196)
+Build a binary tree from parent-child descriptions and return its root. Follow-ups ask why a hashmap is useful, how it changes complexity, and whether the construction still works when descriptions arrive out of order.
+SWE
+tree
+hashmap
+data-structure
+medium
+Frequency
+Single report
+Last asked
+2026-08-17
+Stage
+onsite-coding
+Requirements
+
+Each description identifies a parent value, a child value, and whether that child is attached on the left or right.
+
+Create each tree node once, connect all described relationships, and return the root.
+
+Follow-up: justify using a hashmap and compare complexity with and without direct value-to-node lookup.
+
+Follow-up: descriptions may arrive out of order, so intermediate relationships may form several disconnected trees before the final tree is complete.
+
+Notes
+
+Parent and child nodes can both appear before their own surrounding relationships are known; node creation and edge attachment must therefore be independent of input order.
+
+The root is the created node that never appears as a child.
+
+Clarify whether values are unique and whether malformed input can assign one child to multiple parents.
+
+Preparation
+
+Implement a one-pass node map plus child-value set, then dry-run shuffled descriptions that initially form two forests.
+
+State the time and space complexity with hashmap lookup, and explain what repeated linear node searches would cost without it.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

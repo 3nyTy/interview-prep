@@ -1,0 +1,60 @@
+===H1===
+Cache with Rank-Based Eviction Policy
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-cache-rank-eviction
+===BODY===
+LinkedIn
+Coding·55 minMembers
+Cache with Rank-Based Eviction Policy
+Given an interface where every cached value implements `rank()`, build a cache whose eviction policy drops the lowest-`rank()` entry on overflow. Hashmap plus a min-heap on `rank` is the baseline; the interesting follow-up is a stable last-seen-timestamp tiebreaker via doubly-linked-list bookkeeping per rank bucket.
+SWE
+data-structure
+hashmap
+heap
+object-design
+medium
+Frequency
+Single report
+Last asked
+2026-01-22
+Stage
+phone-screen
+Requirements
+
+interface Rankable { int rank(); }
+
+class RankCache<K, V extends Rankable> {
+    RankCache(int capacity);
+    void put(K key, V value);
+    V get(K key);
+}
+
+On put, if the cache is at capacity, evict the entry whose value has the smallest rank(). Lookups by key are O(1); eviction is at worst O(log N).
+
+Baseline: HashMap<K, V> plus a PriorityQueue<(rank, key)>. Be ready to discuss stale entries in the heap (lazy deletion) — when get or put updates a key's value (and thus possibly its rank), the old heap entry is stale and gets skipped at pop time.
+
+Reported follow-ups:
+
+Tiebreaker on equal rank. Last-seen timestamp — the entry whose get is oldest evicts first. The clean structure is a TreeMap<Integer, DoublyLinkedList<Entry>> keyed by rank; each bucket maintains LRU order.
+
+rank() mutates over time. Push back on the design — base-eviction on a mutable value violates monotonicity. The expected response is naming the problem rather than implementing a workaround.
+
+Notes
+
+Asking why the eviction key is mutable is the high-signal moment of this round. Reported quote: "you're the first person to push back on this." The interviewer is checking whether the candidate distinguishes design questions from implementation questions.
+
+The TreeMap<rank, DLL<entry>> template is shared with Max Stack and LFU Cache; practicing one fluently covers the family.
+
+Preparation
+
+Implement the heap-with-lazy-deletion baseline cleanly; this should be muscle memory.
+
+Sketch the TreeMap-of-DLL design on paper.
+
+Rehearse the response to "but what if rank() mutates" — push back, then offer two acceptable workarounds (snapshot the rank at insertion vs re-heapify on observed change).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

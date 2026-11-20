@@ -1,0 +1,73 @@
+===H1===
+Rate Limiter (Design + Implementation)
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/rate-limiter-design-and-implementation
+===BODY===
+Microsoft
+System Design·60 minMembers
+Rate Limiter (Design + Implementation)
+Recurring Microsoft prompt that crosses categories. Some loops ask for a 30-minute coding implementation, others for a full system-design treatment, and one HE pairs both in the same round. Scale follow-up converges on 100K QPS.
+SWE
+MLE
+rate-limiting
+redis
+distributed-systems
+throttling
+medium
+Frequency
+Medium
+Last asked
+2026-04-21
+Stage
+onsite-coding · onsite-system-design
+Requirements
+
+The base ask is allow(client_id) -> bool that admits up to N requests per T seconds per client. Test cases the interviewer drives:
+
+Pure rate enforcement (5 requests / 10 seconds).
+
+Sliding-window precision — a request that arrived 11 seconds ago should not count.
+
+Burst handling — short spikes within the window must be admitted up to N.
+
+Common follow-ups:
+
+Scale to 100K QPS. What pieces sit on the request hot-path; where does state live; what is the failure mode.
+
+Distributed enforcement. Multiple gateway nodes; cannot trust local counters.
+
+Two rate limits compose (per-user + global). Reject if either is exceeded.
+
+Logger rate-limit variant. Same shape but the function is shouldPrintMessage(timestamp, message) and returns true at most once per message per window.
+
+Notes
+
+Algorithm choices. Sliding-window log is the textbook starting point — store every request timestamp in a deque per client, drop entries outside [now - T, now], admit when len(deque) < N. Trivially correct, but memory grows with N per active client. Token bucket and sliding-window counter are the standard upgrades.
+
+Token bucket is the dominant production choice: per client, store (current_tokens, last_refill_ts). On request, refill tokens += (now - last_refill_ts) · rate, cap at burst, decrement on admit. Memory is O(1) per client, refill is implicit (lazy), and bursts are naturally supported via the burst cap.
+
+Sliding-window counter (fixed-window + smooth-by-overlap) is the middle ground when you cannot afford the per-client deque but want sub-window precision: keep counters per minute, when a request arrives compute the weighted sum of the current minute and the previous minute proportional to where the rolling window cuts.
+
+100K QPS path. Put state in Redis. Each allow() becomes a single Redis call; race conditions are eliminated by wrapping the read-modify-write in a Lua script so the entire token-bucket update is atomic on the Redis side. A single Redis instance saturates around the 100K range — shard by client_id using consistent hashing across N Redis instances when you need to push higher.
+
+Distributed failure modes. Network partition between gateway and Redis: fail closed (reject) by default, because admitting unbounded traffic during a Redis outage propagates failure downstream. Clock skew across gateway nodes: irrelevant for token-bucket (Redis owns the clock); painful for any algorithm that timestamps on the gateway and merges later. Push rule changes to gateways via a config service (ZooKeeper / etcd) rather than re-deploying.
+
+Hot-key amplification. A single very-active client_id saturates one Redis shard. Mitigations: client-side budget (admit some fraction locally without consulting Redis); request batching; outright block abusive sources once detected.
+
+For the logger variant, the constraint is "at most one print per message per window". Implementation reduces to last_seen_ts[message] — admit when now - last_seen_ts[message] >= 10. The trick is memory bound: candidates who store every message forever fail the follow-up; the correct answer is bucketed eviction (message → ts evicted when ts is older than window).
+
+Preparation
+
+Pre-write a single-machine token bucket (10 lines) and a sliding-window log (10 lines). Drill switching between them mid-round when the interviewer changes the constraint.
+
+Memorize the Redis Lua atomic-update pattern: read counter, modify, conditionally write — wrapped in EVAL to avoid race.
+
+For the SD framing, lead with the requirements clarification (per-user vs global, soft vs hard limit, what to return on rejection), then the algorithm pick with a one-sentence justification, then the scale path (single host → Redis-backed → sharded Redis).
+
+For the 100K-QPS follow-up, name three knobs: algorithm pick, state store (Redis + Lua), and sharding strategy. Interviewers want all three.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

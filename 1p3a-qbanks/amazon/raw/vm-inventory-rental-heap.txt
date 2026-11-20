@@ -1,0 +1,68 @@
+===H1===
+VM Inventory Rental — Heap Simulation
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/vm-inventory-rental-heap
+===BODY===
+Amazon
+Coding·40 minMembers
+VM Inventory Rental — Heap Simulation
+n VM types with initial inventory. m customers each rent from the type with the largest current stock; revenue per rental equals max-stock + min-stock. Decrement stock and repeat. Return total revenue.
+SWE
+heap
+simulation
+greedy
+medium
+Frequency
+Single report
+Last asked
+2026-01-31
+Stage
+oa
+Requirements
+
+Input: inventory[] of size n (initial stocks per VM type), integer m (number of rentals).
+
+Each rental picks the VM type with the current maximum stock (ties broken arbitrarily); revenue = current_max + current_nonzero_min; that type's stock decreases by 1.
+
+Return total revenue across m rentals.
+
+Examples
+
+inventory = [3, 5], m = 4
+# step1: max=5, min=3, revenue+=8, inv=[3,4]
+# step2: max=4, min=3, revenue+=7, inv=[3,3]
+# step3: max=3, min=3, revenue+=6, inv=[3,2]
+# step4: max=3, min=2, revenue+=5, inv=[2,2]
+# total = 26
+
+Notes
+
+Max-heap on stocks gives O(log n) per rental. Maintain a separate variable tracking the global non-zero minimum, refreshing when the popped max equals the previous min (entire heap is uniform after the decrement).
+
+Be careful when the heap's max equals the min — every type drops together, so the min must also decrement.
+
+The simple max(...)/min(...) re-scan is O(n) per step; mention it as the brute force baseline and upgrade to the heap version.
+
+Closed-form acceleration when the same stock value is rented repeatedly: if the current max is M and there are k types at value M, the next k rentals each yield M + min_value; vectorize the loop to amortize the log n per step.
+
+For very large m and small range, a different representation (count of types per stock level) gives O((max_stock) log(max_stock)) instead of O(m log n). Mention this as the scaling story.
+
+Watch out for the global min: a heap on max does not give you the min for free. Track the min separately, refreshing only when the popped max's decremented value drops below the current min or when the heap becomes uniform.
+
+Preparation
+
+Drill heap-based greedy simulations (LC 1834 Single-Threaded CPU, LC 1942 The Number of the Smallest Unoccupied Chair).
+
+Walk through small examples on paper to internalize the min-tracking invariant.
+
+Prepare a one-line answer for the O(m log n) complexity claim, including why min-tracking is O(1) amortized.
+
+Implement the brute O(n)-per-step version first to lock in the spec, then refactor to a max-heap. Diff the outputs on randomized inputs to catch min-tracking bugs.
+
+Pre-think the answer to "what if rentals also restock?" — the heap needs to support increase-key, which usually pushes you to a SortedList or a segment tree over stock levels.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

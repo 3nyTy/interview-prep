@@ -1,0 +1,163 @@
+===H1===
+Onsite System Design: Driver Location Heatmap
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/onsite-sd-driver-location-heatmap
+===BODY===
+Uber
+System Design·60 minMembers
+Onsite System Design: Driver Location Heatmap
+The single most-asked Uber system design prompt. Design a service that ingests live driver locations and serves city-scale heatmap queries (and/or pushes real-time location to riders). Recruiters often pre-flag this prompt during the screen.
+SWE
+system-design
+storage
+scaling
+streaming
+hard
+Frequency
+Medium
+Last asked
+2026-05-15
+Stage
+onsite-system-design
+Requirements
+
+Functional:
+
+Ingest periodic (driver_id, lat, lng, timestamp) events from all active drivers (one update every 4–5 s per driver).
+
+Serve a heatmap query: "how many drivers are in each cell of a viewport over the last N minutes."
+
+Optionally, push the current location of a given driver to that driver's matched rider in real time.
+
+Internal-tool variant (commonly the actual prompt): the heatmap is an internal operations tool, with two explicit query modes:
+
+a real-time view over the last 20 minutes, and
+
+a historical lookback over the last 1 hour at 1-minute granularity, with scrubbing/replay across recent time buckets and filter/drill-down by city or region.
+
+Scale:
+
+1M concurrent active drivers globally; 5M+ heatmap viewers.
+
+p99 ingest-to-query latency: 1–2 s for heatmap; sub-second for rider push.
+
+Hot cities (NYC, SF) generate 10x the traffic of average cities.
+
+For the internal variant: target P95 < 1 s for common city-level requests, freshness 5–10 s, 99.9% availability.
+
+Design decisions the interviewer probes:
+
+Geo-index choice: Geohash vs Uber H3 hexagonal index.
+
+Storage: in-memory (Redis / KeyDB) vs streaming aggregations (Kafka + Flink) vs columnar (Druid / Pinot).
+
+Push vs pull for rider-facing updates.
+
+Notes
+
+Geo-indexing is the headline trade-off. Uber's H3 hexagonal grid is preferred over Geohash for heatmaps:
+
+Hexagons have uniform neighbor distances (Geohash cells distort near grid boundaries and at high latitudes).
+
+H3 supports multi-resolution (parent / child relations) so the same cell id works for zoomed-in and zoomed-out heatmap requests.
+
+Mentioning H3 by name has been cited as a strong signal — interviewers have asked candidates how they knew about it.
+
+Minority variant — geo-index deliberately de-emphasized: in the internal-tool version, the interviewer often steers away from H3 internals and toward data storage, stream processing, and historical query design. Keep the geo answer short: abstract the index behind an opaque cell_id so H3 / S2 / geohash / internal grid can be swapped later, and spend the round on rolling counts and historical aggregates. Clarify which emphasis the interviewer wants before going deep on hexagons.
+
+Ingest path: clients → API gateway → Kafka topic partitioned by geo_cell_hash(H3_cell_at_res_8). A stream processor (Flink / Spark Streaming) aggregates per-cell driver counts in 1–5 s windows and writes to Redis keyed by (cell_id, time_bucket).
+
+Query path: viewport → resolve viewport polygon to a set of H3 cells at the right resolution → batch-read Redis. Never scan Redis by bounding box; always start from the viewport-derived cell list.
+
+Rider push: a separate per-driver stream keyed by driver_id writes the latest location to a pub/sub channel; the matched rider's app subscribes to that channel.
+
+Cold/hot shard: hash-by-cell distributes load reasonably except in hot cities. Solve by sub-partitioning hot cells (cell_id + random_bucket(0..N)), aggregating client-side on read.
+
+Common follow-ups: how to handle drivers crossing cell boundaries; how to compress storage when most cells have 0 drivers (sparse arrays / bitmap); how to expire old data (TTL on Redis or windowed deletion in Flink).
+
+Stateful ingest + dual-window serving design (internal heatmap variant)
+
+When the prompt frames the heatmap as an internal ops tool needing both a live 20-minute view and a 1-hour historical replay, the discussion shifts from geo-index choice to the data pipeline. The core layers and their rationale:
+
+Ingestion (Kafka / PubSub): gateway validates the payload, attaches city_id, computes a cell_id, and appends to Kafka partitioned by driver_id. Kafka earns its place for three reasons: it absorbs bursty writes, gives durable per-driver ordering, and enables replay when aggregation logic changes.
+
+Hot state (Redis / streaming state store): holds latest driver state and current per-cell active counts for low-latency reads and mutable updates.
+
+Historical serving (OLAP — ClickHouse / Pinot / Druid): holds minute-level snapshot rows for cheap analytical scans and flexible filtering over the 1-hour window.
+
+Long-term retention (object storage): raw events archived for recovery, recomputation after cell-definition / business-logic changes, and offline analysis. One store is not ideal for every access pattern — that split is the answer.
+
+Stateful per-driver processing (avoids double-counting moving drivers). The stream processor keys events by driver_id and maintains a latest-state record. Per incoming event:
+
+Drop it if older than the driver's current last_event_ts (handles duplicates / out-of-order).
+
+Map lat/lng to cell_id.
+
+Compare against the driver's previous cell.
+
+If the driver moved cells, decrement the old cell's active count and increment the new cell's — a driver contributes to exactly one current cell. Incrementing the new cell without decrementing the old one is the classic bug that makes the heatmap meaningless.
+
+Refresh the driver's expiration timer.
+
+If a few standard zoom levels are supported, update all configured zoom levels in the same pass so the read path never has to remap cells.
+
+Real-time 20-minute view. Keep current active counts in the state store; the read path returns the current count, not a sum of trailing buckets. Suggested key shapes:
+
+realtime:{city_id}:{zoom}:{cell_id} -> active_driver_count
+driver:{driver_id}                  -> latest state (last_event_ts, current_cell_id, city_id)
+expiry:{minute_bucket}              -> drivers scheduled to expire at that minute
+
+Each key carries a ~2-hour TTL for cleanup safety, but correctness comes from the live count, not the TTL. A driver's contribution stays valid until it moves, goes offline, or expires after 20 minutes without a heartbeat.
+
+Historical aggregates. At the end of each minute the processor emits a snapshot of current active cell counts as rows to the OLAP store. Minute snapshots let the UI replay the past hour without ever touching raw pings. Example schema:
+
+CREATE TABLE heatmap_minute_aggregates (
+  city_id String,
+  zoom_level UInt8,
+  cell_id String,
+  minute_bucket DateTime,
+  active_driver_count UInt32
+)
+PARTITION BY toDate(minute_bucket)
+ORDER BY (city_id, zoom_level, minute_bucket, cell_id);
+
+Driver expiration. Two approaches: lazy (reconcile stale state on the driver's next heartbeat) or timer-based (processor schedules expiry and decrements the last known cell when now - last_event_ts > 20 min). Timer-based is cleaner here because the dashboard semantics are explicitly tied to a 20-minute freshness window.
+
+Backfill / reprocessing. When geo-bucketing or aggregation logic changes, replay Kafka for recent data and the object-store archive for older data. Interviewers often probe this ("what if last week's aggregation was wrong?"), so treat historical reprocessing as a first-class path, not just real-time serving.
+
+Core data model (entities worth naming): DriverLocationEvent (driver_id, event_ts, lat, lng, city_id, status), DriverLatestState (driver_id, last_event_ts, current_cell_id, city_id, expires_at), RealtimeCellCount (cell_id, city_id, active_driver_count, updated_at), HistoricalCellAggregate (cell_id, city_id, minute_bucket, active_driver_count, zoom_level).
+
+Query API sketch (internal REST):
+
+GET /internal/heatmap/realtime?city_id=sf&zoom=9&bbox=minLng,minLat,maxLng,maxLat
+GET /internal/heatmap/history?city_id=sf&zoom=9&start=...&end=...&step=1m
+
+Both return per-cell {cell_id, count} lists scoped to the viewport-derived cells; the historical endpoint nests them under per-minute_bucket series.
+
+Common pitfalls
+
+Double-counting moving drivers (increment-without-decrement).
+
+Serving history by scanning raw GPS pings instead of pre-aggregated minute buckets.
+
+Letting drivers with no recent heartbeat linger on the map forever (missing expiration).
+
+Over-investing in geospatial-index internals when the round is really about stream processing, storage layout, and serving strategy.
+
+Naive Redis bounding-box scan on the read path instead of viewport → cell-list → targeted reads.
+
+Preparation
+
+Read Uber's H3 introduction blog post; this is the single highest-leverage prep item for the geo-index-focused version of the round.
+
+Practice the requirements-to-numbers translation: 1M drivers × 0.2 updates/sec = 200K events/sec ingest (peak ~400K/sec); raw event ~120 bytes → ~24 MB/s → ~2 TB/day before compression; viewport at zoom 13 covers ~500 H3 cells; 5M concurrent viewports → 2.5B queries/sec without batching, ~5M with batching. ~100K active cells × 60 minute-buckets ≈ 6M aggregate rows/hour (~240 MB/hour compressed). Be able to state these numbers without paper.
+
+Pre-draw the ingest / aggregate / serve pipeline once; the round opens with you sketching it in <3 minutes so you can spend the rest of the time on follow-ups.
+
+Rehearse the dual-window split out loud: stateful per-driver counting → live current-count read path → minute-snapshot OLAP for the 1-hour replay → Kafka + object-store replay for backfill. Lead with double-counting prevention and expiration; mention H3 only briefly unless the interviewer pulls you there.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

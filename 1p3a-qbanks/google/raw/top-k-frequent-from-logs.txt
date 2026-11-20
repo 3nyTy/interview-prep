@@ -1,0 +1,76 @@
+===H1===
+Top-K Frequent in Large Logs
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/top-k-frequent-from-logs
+===BODY===
+Google
+Coding·45 minMembers
+Top-K Frequent in Large Logs
+Coding round staple: parse a log/chat stream and return the top-K most-frequent keys (users, IPs, words). Implementation walk-through covers heap vs quickselect vs bucket sort, complexity discussion, and scale-out follow-ups (large file, memory limit, distributed).
+SWE
+MLE
+heap
+hashmap
+scaling
+medium
+Frequency
+Medium
+Last asked
+2026-07-19
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input: either an integer array or a log/chat stream where each line ties a key (user id / IP / word) to an event.
+
+Return: the K keys with the highest count; ordering within the K is typically unspecified.
+
+Discuss whether the runtime can beat O(N log N), then walk through the classical approaches and pick one:
+
+Quickselect on (key, count) pairs — average O(n).
+
+Min-heap of size K over the count map — O(n log K).
+
+Merge sort / bucket sort on counts — O(n) with extra space.
+
+Be ready to write pseudo-code for at least two; one candidate was explicitly asked to walk through all three.
+
+Follow-ups
+
+Very large file: streaming — accumulate counts incrementally, then run the heap.
+
+Space optimization: when the full count map is too large, use external sort by key, then linear scan for counts, then top-K.
+
+Distributed: partition by hash of key, run local top-K (or full map) per shard, then merge into global top-K (count-min sketch acceptable as approximate).
+
+Examples
+
+Input:  chatLog = ["A says hi", "B says hi", "A says bye", "C says hi", "A says yo"], k=2
+Counts: A=3, B=1, C=1
+Output: [A, B]  // or [A, C] — ties allowed
+
+Notes
+
+The interviewer typically wants a discussion of the three implementations + complexity trade-off, not just one working solution.
+
+For the distributed follow-up, candidates that mention count-min sketch and topK per shard → global merge got positive feedback.
+
+The same family surfaces as "Top-K IPs", "Top-K chatters", and "Top-K words"; the technique is interchangeable.
+
+A recent variant uses a gigabyte-scale IP list and explicitly requires exact time and space complexity analysis.
+
+Preparation
+
+Practice writing quickselect with the partition step (and explain how to recover from a bad pivot).
+
+Be able to state amortized vs worst-case time for each approach.
+
+Have a one-line answer for streaming: "hashmap counts + heap of size K maintained online".
+
+Drill the distributed answer once: per-shard top-K, then K-way merge of the partial heaps.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

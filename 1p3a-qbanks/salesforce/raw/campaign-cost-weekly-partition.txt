@@ -1,0 +1,74 @@
+===H1===
+Campaign Cost Weekly Partition
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/campaign-cost-weekly-partition
+===BODY===
+Salesforce
+Coding·45 minMembers
+Campaign Cost Weekly Partition
+Given an array of campaign costs and an integer number of weeks, split the campaigns into exactly that many contiguous non-empty groups. The cost of a week is the maximum campaign cost assigned to that week; minimize the sum of those weekly maxima.
+SWE
+array
+dp
+medium
+Frequency
+Single report
+Last asked
+2026-06-22
+Stage
+onsite-coding
+Requirements
+
+Inputs: an integer array costs where costs[i] is the cost of campaign i, and an integer weeks.
+
+Partition the array into exactly weeks contiguous groups.
+
+Every campaign must be assigned to exactly one group, and each week must receive at least one campaign.
+
+The cost of one week is the maximum value inside that week's group.
+
+Return the minimum possible sum of weekly maxima across all weeks.
+
+Boundary cases to clarify before coding:
+
+If weeks > costs.length, there is no valid partition.
+
+If weeks == 1, the answer is max(costs).
+
+If weeks == costs.length, the answer is sum(costs).
+
+Examples
+
+costs = [2, 5, 4, 3, 7, 1, 6, 8]
+weeks = 3
+
+One optimal partition:
+[2] | [5, 4, 3] | [7, 1, 6, 8]
+weekly maxima = 2 + 5 + 8 = 15
+answer = 15
+
+Notes
+
+The direct dynamic-programming shape is dp[w][i] = minimum total cost to schedule the first i campaigns into w weeks.
+
+Transition: choose the start index j of the last week, keep a running maximum over costs[j..i-1], and minimize dp[w-1][j] + max(costs[j..i-1]).
+
+Valid states require w <= i; otherwise at least one week would be empty.
+
+Baseline complexity is O(weeks * n^2) time and O(weeks * n) space, reducible to O(n) space if only the previous week row is retained.
+
+The most common implementation bug is allowing an empty final week or using non-contiguous grouping. Keep loop bounds explicit: for dp[w][i], the last group start j ranges from w-1 through i-1.
+
+Preparation
+
+Write the dp[w][i] recurrence first, then test it on weeks = 1, weeks = n, and the sample above.
+
+Practise explaining why greedy splits fail: taking the largest campaign as a separate week can be locally attractive but may leave a worse maximum in the remaining segment.
+
+If time remains, compress the DP memory from a 2-D table to two 1-D arrays while preserving the same transition.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

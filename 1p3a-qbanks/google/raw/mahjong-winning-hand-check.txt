@@ -1,0 +1,64 @@
+===H1===
+Mahjong Winning Hand Detection (14 Tiles)
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/mahjong-winning-hand-check
+===BODY===
+Google
+Coding·45 minMembers
+Mahjong Winning Hand Detection (14 Tiles)
+Mountain View onsite coding round 1: given a hand of 14 tiles, decide whether it is a winning mahjong hand. The candidate must clarify the rule set (typically: 4 melds of three identical tiles or three consecutive ranks + 1 pair).
+SWE
+recursion
+simulation
+medium
+Frequency
+Low
+Last asked
+2026-07-20
+Stage
+onsite-coding
+Requirements
+
+Input: array of 14 integers representing tile values (clarify suit / range during the interview).
+
+A winning hand consists of:
+
+One pair (two identical tiles), and
+
+Four melds, each being either:
+
+A triplet (3 identical tiles), or
+
+A run (3 consecutive ranks in the same suit).
+
+Minority variant: A newer version instead specifies one pair plus two melds while retaining a 14-tile input. Because that accounts for only eight tiles, clarify the intended meld count and how the remaining six tiles should be handled before coding.
+
+Output: boolean.
+
+Notes
+
+Clarify the rules — the prompt is intentionally sparse. Confirm: are honor tiles (winds/dragons) included? Do flowers count? Multi-suit?
+
+Greedy + backtracking is the standard approach:
+
+Try every possible pair (tile, tile); remove the pair.
+
+On the remaining 12 tiles, repeatedly take the smallest remaining tile and try to form a triplet of it or a run starting at it; backtrack on failure.
+
+For 14 tiles this runs in well under 1 ms; the interviewer cares more about the case analysis and clean recursion than micro-optimizations.
+
+The same algorithm extends to special hands (seven pairs / 国士无双) if the interviewer adds them as a follow-up.
+
+Preparation
+
+Practice writing the backtracking decomposer for tiles / counters; the canonical "expression add operators" recursion trains the same backtracking skeleton.
+
+Have a tile-frequency-map mental model — sorting is the alternative but harder to reason about for runs across suits.
+
+Pre-plan for the inevitable rules clarification: pull out at least 3 questions before coding.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,105 @@
+===H1===
+Invoice / Payment Reconciliation
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/invoice-payment-reconciliation
+===BODY===
+Stripe
+Coding·60 minMembers
+Invoice / Payment Reconciliation
+Tech-screen and integration favorite. Given a payment and a list of invoices, decide which invoice the payment settles using progressively looser matching rules. The integration variant adds API calls and authorization headers.
+SWE
+string
+simulation
+api-integration
+payment
+medium
+Frequency
+High
+Last asked
+2026-08-13
+Stage
+phone-screen · tech-screen · onsite-coding
+Requirements
+
+Phone-screen variant (3 parts, ~45-60 min)
+
+Part 1: Match a payment to the invoice whose invoice_id exactly equals the payment's reference.
+
+Part 2: If no exact id match, match by amount; among equal-amount invoices pick the one with the earliest date.
+
+Part 3: Tie-break / additional rule (commonly: fuzzy "forgiveness" amount matching — see Notes; or prefer same-currency, or distribute one payment across multiple unpaid invoices). Most candidates run out of time here.
+
+Integration variant (60-75 min, onsite)
+
+Same matching logic but driven by HTTP API calls. You must include an Authorization header and POST invoice file content in the request body.
+
+Part 4 (per multiple reports) requires generating a unique idempotency / reconciliation id and threading it through follow-up calls; this is not in the warm-up example.
+
+Date parsing is a known time sink — some reports compare ISO strings directly; others parse with the standard library. Reports note candidates spend disproportionate time here.
+
+Canonical signature and I/O contract
+
+Inputs are CSV-style strings, not structs. The amount is an integer in cents; the due-date is YYYY-MM-DD.
+
+def reconcile_payment(payment: str, invoices: list[str], forgiveness: int = 0) -> str: ...
+    # payment  = "payment-id, amount, memo"   (memo may itself contain commas)
+    # invoice  = "invoice-id, due-date, amount"
+    # Match priority: ID  >  exact amount  >  fuzzy amount (only if forgiveness > 0).
+    # On any match return:
+    #   "Payment {payment-id} paid {amount} for invoice {invoice-id} due on {date}"
+    # On no match return:
+    #   "Payment {payment-id} could not be matched to any invoice"
+
+ID extraction: scan the memo case-insensitively for the marker paying for: or paying off:; the invoice id is the text after the marker, stripped.
+
+Memo-with-commas parsing: split the payment on ", ", take parts[0]/parts[1] as id/amount, then re-join parts[2:] with ", " so a comma inside the memo doesn't corrupt the note. Do the marker scan on the lowercased memo but slice the invoice id out of the original-case string to preserve id casing.
+
+Tie-break at every tier: among candidates pick the earliest due-date. Because dates are YYYY-MM-DD, plain string comparison sorts them correctly — no date parsing needed for ordering.
+
+Notes
+
+Phone-screen reports converge on 3/3 as the passing bar.
+
+Integration reports typically finish 2-3 of 4 parts in 60 minutes; getting Part 3 done with clean code is strong signal.
+
+Watch out for the epoch seconds vs ISO datetime confusion — one report flags this as a 10+ minute time sink.
+
+Handle a malformed / short payment string (missing amount or memo) gracefully rather than letting it throw — it shows up as an edge case.
+
+Part 3 — fuzzy "forgiveness" matching
+
+A common Part 3 shape adds a forgiveness tolerance to absorb bank fees / rounding (a customer owes 100 but a 2 fee means 98 arrives). The matching tiers run strictly in priority order:
+
+ID match — highest priority; wins even if the amount is wrong.
+
+Exact amount match — medium; an exact match always beats a fuzzy one, even when the fuzzy candidate has an older date.
+
+Fuzzy amount match — lowest; only when the others fail and forgiveness > 0.
+
+Fuzzy range is inclusive: an invoice qualifies when its amount is in [payment_amount - forgiveness, payment_amount + forgiveness]. Within the fuzzy tier still pick the earliest due-date. Test the boundary explicitly (difference exactly equal to forgiveness must qualify).
+
+The fuzzy pass should skip any invoice whose amount equals the payment exactly (inv_amount != payment_amount): those belong to the exact tier. Because the tiers run strictly in order, an exact match short-circuits before the fuzzy scan, so this guard only matters if you fold the two tiers into one loop.
+
+Clarifying questions worth asking up front
+
+On an ID match, must the amount also agree, or does the id alone win?
+
+Two invoices with the same amount and the same due-date — how to break the tie?
+
+Can amounts be zero or negative?
+
+Is the date format guaranteed YYYY-MM-DD?
+
+Preparation
+
+Pre-write helpers for: parse ISO date, compare amounts with rounding tolerance, group invoices by (customer, currency).
+
+Practice the integration variant against a public API: build a CLI that POSTs JSON with bearer auth, parses the response, and emits a deterministic id.
+
+Write your own test cases as you go — Stripe interviewers explicitly look for candidates who add tests under time pressure. Cover the priority order specifically: an ID match overriding a wrong amount, exact beating fuzzy, fuzzy firing only as a fallback, and earliest-date tie-breaks within each tier.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,60 @@
+===H1===
+Count Word Decompositions into Chemical Element Symbols
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/periodic-table-word-decomposition
+===BODY===
+Google
+Coding·45 minMembers
+Count Word Decompositions into Chemical Element Symbols
+Given the set of chemical-element symbols and a target word, return the number of distinct ways the word can be segmented entirely into valid symbols.
+SWE
+string
+dp
+medium
+Frequency
+Single report
+Last asked
+2026-07-14
+Stage
+phone-screen
+Requirements
+
+Input is the complete set of chemical-element symbols plus a target word.
+
+Count every distinct full decomposition of the word into valid symbols.
+
+A decomposition is valid only if the symbols cover the entire target in order.
+
+Clarify case handling because element symbols conventionally begin with an uppercase letter and may have a lowercase second letter.
+
+Examples
+
+Physics has four stated decompositions:
+
+P - H - Y - Si - C - S
+
+P - H - Y - Si - Cs
+
+P - H - Y - S - I - C - S
+
+P - H - Y - S - I - Cs
+
+The returned count is 4.
+
+Notes
+
+Confirm whether matching is case-sensitive and whether the caller supplies the symbol set or the implementation may treat the periodic table as fixed.
+
+The result counts decompositions, not merely whether at least one decomposition exists.
+
+Preparation
+
+Implement a suffix-count or prefix-count formulation and state what each state represents.
+
+Test a word with no decomposition, one decomposition, multiple decompositions, and overlapping one- and two-letter symbols.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,55 @@
+===H1===
+Count Connected Components (Union-Find)
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/count-connected-components-union-find
+===BODY===
+Amazon
+CodingMembers
+Count Connected Components (Union-Find)
+Given items joined by transitive 'same group' relations (products in a category, or graph edges), count the distinct groups and, in some variants, each group's size or whether an edge closes a cycle.
+SWE
+union-find
+graph
+bfs
+medium
+Frequency
+Low
+Last asked
+2026-05-22
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Given items and pairwise "same group" relations (two products share a category, or graph edges); the relation is transitive.
+
+Return the number of distinct groups / connected components; some variants also ask for each group's size.
+
+One phrasing additionally asks you to detect whether adding an edge closes a cycle.
+
+Examples
+
+Product-merge variant: tuples like (p1, p2) mean the two products share a category; report the final number of categories and the size of each.
+
+Graph variant: given n nodes and an edge list, count connected components.
+
+Notes
+
+Disjoint-Set Union with path compression + union by rank gives near-O(1) per operation; implement find and union over a parent array initialized to self.
+
+Keep a component counter that decrements on each successful union; a union whose endpoints already share a root indicates a cycle.
+
+A BFS/DFS flood-fill over an adjacency list is an accepted alternative and passed the product-merge phone screen — write whichever you do cleanly, though union-find is the expected optimal.
+
+For group sizes, maintain a size[] array updated during union so you can report sizes without a second pass.
+
+Preparation
+
+Write union-find from memory in under 5 minutes: parent + rank + size arrays, find with path compression, union returning whether a merge happened.
+
+Practice both the count-components and cycle-detection read-outs from the same structure.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,73 @@
+===H1===
+Minimum Height Difference Between Distant Peaks
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/minimum-height-difference-between-distant-peaks
+===BODY===
+Roblox
+CodingMembers
+Minimum Height Difference Between Distant Peaks
+Select two sufficiently distant peaks with minimum height difference, using sorting or indexed scanning to satisfy the distance constraint.
+SWE
+array
+sorting
+two-pointer
+medium
+Frequency
+Single report
+Last asked
+2025-12-09
+Stage
+phone-screen
+You are given an integer array heights representing the heights of mountain peaks along a ridge (in index order) and an integer gap.
+
+Return the minimum value of |heights[i] - heights[j]| over all index pairs (i, j) with |i - j| >= gap.
+
+If no such pair exists (i.e., gap exceeds the largest possible index distance heights.length - 1), return -1.
+
+This was observed from a Roblox online assessment (August 2025) as the second of two coding tasks in a 50-minute round.
+
+Examples
+
+Example 1:
+
+Input: heights = [1,5,3,9,7], gap = 2
+
+Output: 2
+
+Explanation:
+
+Valid pairs (|i - j| >= 2): (0,2)|1-3|=2, (0,3)|1-9|=8, (0,4)|1-7|=6, (1,3)|5-9|=4, (1,4)|5-7|=2, (2,4)|3-7|=4. Minimum is 2.
+
+Example 2:
+
+Input: heights = [10,20,30,40], gap = 3
+
+Output: 30
+
+Explanation:
+
+Only (0,3) satisfies |i - j| >= 3, giving |10 - 40| = 30.
+
+Example 3:
+
+Input: heights = [1,2,3], gap = 5
+
+Output: -1
+
+Explanation:
+
+No index pair is 5 apart in a length-3 array, so return -1.
+
+Constraints
+
+1 <= heights.length <= 10^4
+
+0 <= heights[i] <= 10^9
+
+1 <= gap <= 10^4
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

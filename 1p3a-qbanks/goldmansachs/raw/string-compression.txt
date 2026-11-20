@@ -1,0 +1,64 @@
+===H1===
+String Compression (Run-Length)
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/string-compression
+===BODY===
+Goldman Sachs
+Coding·60 minMembers
+String Compression (Run-Length)
+Run-length-encode a character array in place: `[a,a,b,b,c,c,c]` becomes `[a,2,b,2,c,3]`. Goldman's interviewers consistently expect the in-place version, not a fresh-allocation string output.
+SWE
+string
+two-pointer
+compression
+medium
+Frequency
+Low
+Last asked
+2024-12-27
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Modify a character array in place so that consecutive runs are replaced by <char><count>.
+
+A run of length 1 is written as just the character, with no 1 suffix.
+
+A run of length 10 or longer is written as the character followed by each digit of the count as a separate cell ([b,1,2] for 12 bs).
+
+Return the new length of the array; trailing cells may contain arbitrary content.
+
+public int compress(char[] chars)
+
+Examples
+
+Input:  ['a','a','b','b','c','c','c']
+Output: 6 — array prefix becomes ['a','2','b','2','c','3', ...]
+
+Input:  ['a']
+Output: 1 — array prefix is ['a']
+
+Input:  ['a','b','b','b','b','b','b','b','b','b','b','b','b']
+Output: 4 — array prefix becomes ['a','b','1','2']
+
+Notes
+
+Two-pointer (read, write) is the canonical solution. read scans the array; for each run, write emits the character and then the count digits.
+
+O(n) time, O(1) extra space. The hidden trap is the run-length-≥10 case: writing each digit individually requires either building a temporary buffer or writing in reverse and then reversing in place.
+
+Goldman's hidden tests do include long runs (≥10); a solution that hardcodes single-digit counts fails silently.
+
+Watch the trailing pointer — return write, not chars.length.
+
+Preparation
+
+Implement the in-place two-pointer form and verify the long-run case by hand.
+
+LC 443 "String Compression" is the canonical equivalent. The Goldman-tagged set on LeetCode features this problem prominently.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

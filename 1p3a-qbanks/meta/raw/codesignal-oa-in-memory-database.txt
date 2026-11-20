@@ -1,0 +1,64 @@
+===H1===
+CodeSignal OA — In-Memory Database
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/codesignal-oa-in-memory-database
+===BODY===
+Meta
+Coding·90 minMembers
+CodeSignal OA — In-Memory Database
+Implement an in-memory database with record operations, filtered scans, timestamps, and TTL. A later variant adds get_when(key, field, at) to retrieve a field’s historical value instead of restoring the entire database.
+SWE
+MLE
+codesignal
+in-memory-database
+ttl
+versioning
+Frequency
+Low
+Last asked
+2026-09-08
+Stage
+oa
+Requirements
+
+Implement basic record operations. The historical-read variant explicitly includes get, set, and delete, with values addressed by key and field.
+
+Support record scans by matching key and by key prefix in the SWE assessment; its precise method signatures and return formatting are not specified.
+
+Add timestamp and time-to-live (TTL) constraints to the operations.
+
+In the historical-read variant, implement get_when(key, field, at) to return the value of that field at the earlier time at. This is a field-level lookup, not a whole-database rollback.
+
+Notes
+
+The SWE assessment lasts 90 minutes and has four levels. All tests for the current level must pass before the next level becomes visible; this timing has not been separately confirmed for the MLE historical-read variant.
+
+Design for later levels early: retrofitting historical reads at level four can exhaust the remaining time.
+
+Exact return values for absent history and timestamp-boundary behavior remain unspecified; clarify them from the assessment prompt.
+
+A SWE candidate advanced to the full loop despite leaving some level-three tests failing. Completing every level is therefore not a universal prerequisite for advancement.
+
+Solution outline
+
+Use a key-to-field map for record access and retain a version history for each key/field pair. Store each version's write timestamp, value or deletion marker, and optional expiry. Keep history separate from any current-value cache so deleting or expiring the current value does not erase earlier states.
+
+For a historical lookup, locate the latest version whose write timestamp is at or before the requested time. Return that version only if it is not a deletion marker and is valid at the requested time. If the selected version is deleted or expired, do not fall back to an older overwritten value. Use the prompt's required missing-value result.
+
+Keep versions ordered by timestamp. With nondecreasing operation timestamps, appending a version takes amortized O(1) time; predecessor lookup takes O(log h) time for h versions of one field, with O(h) history storage. Out-of-order writes need ordered insertion or a different ordered structure. Clarify equal-timestamp ordering and the exact expiry endpoint before implementing comparisons.
+
+Apply the same visibility check to reads and scans, then implement the specified scan scope and output ordering. Treat any current-value index as a cache of the versioned state, not a replacement for history.
+
+Preparation
+
+In a 20-minute drill, implement key/field set, get, and delete plus a scan using an explicitly written practice contract. Check missing keys, deleted fields, prefix matches, and empty results; keep unknown assessment formatting separate from your practice assumptions.
+
+In a 25-minute drill, add version histories and compare binary-search historical queries with a simple chronological replay oracle. Test times before the first write, at a write, around expiry, after deletion, and after an expired overwrite; verify that an older value does not reappear.
+
+In a 10-minute review, write down the unresolved timestamp ordering, expiry endpoint, scan scope, and missing-history result. Ensure your implementation can follow the contract supplied by the assessment without discarding historical data.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

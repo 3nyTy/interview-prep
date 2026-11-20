@@ -1,0 +1,53 @@
+===H1===
+Two-Value Exchange Warm-Up
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/swap-two-values-without-temp
+===BODY===
+Oracle
+CodingMembers
+Two-Value Exchange Warm-Up
+Start with a = 30 and b = 40, then swap their values without using a third variable.
+SWE
+math
+easy
+Frequency
+Single report
+Last asked
+2026-08-10
+Stage
+onsite-coding
+Requirements
+
+Start with a = 30 and b = 40.
+
+Swap the two values without declaring or using a third variable.
+
+Examples
+
+Initial state: a = 30, b = 40.
+
+Required final state: a = 40, b = 30.
+
+Notes
+
+Arithmetic form: set a = a + b, then b = a - b, then a = a - b. Substituting 30 and 40 produces the required final state.
+
+In fixed-width integer languages, the intermediate sum can overflow even when both original values fit. XOR swap avoids arithmetic overflow for integer operands but is less readable and is not applicable to arbitrary value types.
+
+Native tuple assignment may avoid an explicit user-declared temporary variable, but confirm whether the interviewer wants language syntax or the underlying arithmetic/bitwise technique.
+
+Time complexity and auxiliary space are both O(1).
+
+Preparation
+
+Write the arithmetic and XOR forms from memory, then trace each assignment with a = 30 and b = 40.
+
+Explain the overflow and type-safety trade-offs of both forms in under one minute.
+
+State how tuple assignment is evaluated in your interview language and clarify whether it satisfies the intended constraint before using it.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

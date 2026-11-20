@@ -1,0 +1,514 @@
+===H1===
+Most Frequent Call Path from Function Trace Logs
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/most-frequent-call-path-from-trace-logs
+===BODY===
+Roblox
+Coding·45 minMembers
+Most Frequent Call Path from Function Trace Logs
+Parse a stream of function entry / exit events, maintain the active call stack, and return the full call path (root → leaf) that occurs most often across the trace. Tie-breaking prefers the deeper path, then the path that first reached the top frequency. Two follow-ups extend the problem to multiple threads and to returning the longest active stack.
+SWE
+MLE
+Infra Eng
+stack
+parsing
+hashmap
+string-processing
+medium
+Frequency
+High
+Last asked
+2026-08-13
+Stage
+phone-screen · onsite-coding
+Problem Overview
+
+You are given trace logs from a program. Each log records either entering a function or returning from a function. While scanning the logs from left to right, maintain the active call stack. Every time a function is entered, the current full stack path is counted once.
+
+For example, if the active stack after an entry is:
+
+main -> handleEvents -> handleClickEvent
+
+then the counted path is:
+
+main->handleEvents->handleClickEvent
+
+Return the most frequent call path.
+
+Add tie-breaking by stack depth, then first occurrence.
+
+Add prompt IDs and return the answer for each prompt independently.
+
+One detail worth clarifying in the interview: some reports use a shallow-path tie-breaker, but the more common follow-up asks for the deeper path when frequencies tie. This write-up uses the frequency, then deeper stack, then first-to-reach rule.
+
+Trace Format
+
+Single-threaded logs look like this:
+
+"-> main"   # enter main
+"<- main"   # return from main
+
+Some examples omit the space after the arrow, such as "->main" or "<-main". A robust parser should accept both.
+
+Threaded logs prefix each event with a prompt ID:
+
+"0 -> main"
+"0 <- main"
+"12 -> worker"
+
+Assume logs are well-formed unless the interviewer says otherwise: every return matches the top of that prompt's stack, function names are alphanumeric or underscores, and call depth is bounded.
+
+Part 1: Most Frequent Path
+
+Problem Statement
+
+Given a list of single-threaded trace logs, return the call path that occurs most often. A path is counted on each enter event only.
+
+If the input is empty, return the empty string. If multiple paths have the same frequency in Part 1, return the path that first reached that frequency while scanning left to right.
+
+from typing import List
+
+def most_frequent_call_path(traces: List[str]) -> str:
+    pass
+
+Example
+
+traces = [
+    "-> main",
+    "-> handleEvents",
+    "-> handleClickEvent",
+    "<- handleClickEvent",
+    "-> handleClickEvent",
+    "<- handleClickEvent",
+    "<- handleEvents",
+    "<- main",
+]
+
+most_frequent_call_path(traces)
+# "main->handleEvents->handleClickEvent"
+
+The counted paths are:
+
+Entry eventCounted pathCount
+-> mainmain1
+-> handleEventsmain->handleEvents1
+first -> handleClickEventmain->handleEvents->handleClickEvent1
+second -> handleClickEventmain->handleEvents->handleClickEvent2
+
+The deepest path appears twice, so it is the answer.
+
+Solution
+
+Use a stack for active function names and a parallel stack of already-built path strings. On entry, build the new path from the previous path plus the new function, count it, and update the best answer if its count becomes strictly larger.
+
+from collections import defaultdict
+from typing import DefaultDict, List, Tuple
+
+def _parse_single_trace(line: str) -> Tuple[str, str]:
+    text = line.strip()
+    if text.startswith("->"):
+        return "enter", text[2:].strip()
+    if text.startswith("<-"):
+        return "exit", text[2:].strip()
+    raise ValueError(f"Invalid trace line: {line}")
+
+class CallPathTracker:
+    def __init__(self, prefer_deeper_on_tie: bool = False) -> None:
+        self.prefer_deeper_on_tie = prefer_deeper_on_tie
+        self.stack: List[str] = []
+        self.path_stack: List[str] = []
+        self.counts: DefaultDict[str, int] = defaultdict(int)
+        self.best_path = ""
+        self.best_count = 0
+        self.best_depth = 0
+
+    def enter(self, function: str) -> None:
+        parent_path = self.path_stack[-1] if self.path_stack else ""
+        path = f"{parent_path}->{function}" if parent_path else function
+
+        self.stack.append(function)
+        self.path_stack.append(path)
+
+        self.counts[path] += 1
+        count = self.counts[path]
+        depth = len(self.stack)
+
+        if self._is_better(count, depth):
+            self.best_path = path
+            self.best_count = count
+            self.best_depth = depth
+
+    def exit(self, function: str) -> None:
+        if not self.stack or self.stack[-1] != function:
+            raise ValueError(f"Mismatched return: {function}")
+        self.stack.pop()
+        self.path_stack.pop()
+
+    def result(self) -> str:
+        return self.best_path
+
+    def frequency(self) -> int:
+        return self.best_count
+
+    def _is_better(self, count: int, depth: int) -> bool:
+        return count > self.best_count
+
+def most_frequent_call_path(traces: List[str]) -> str:
+    tracker = CallPathTracker()
+
+    for line in traces:
+        event, function = _parse_single_trace(line)
+        if event == "enter":
+            tracker.enter(function)
+        else:
+            tracker.exit(function)
+
+    return tracker.result()
+
+Complexity:
+
+Time: O(total_path_characters). Every enter event creates one path string whose length is the current stack path length.
+
+Space: O(distinct_paths + depth) plus the characters stored in distinct path strings.
+
+Part 2: Tie-Break by Deeper Stack
+
+Problem Statement
+
+Now use these tie-breaking rules:
+
+Prefer the path with the highest frequency.
+
+If frequencies tie, prefer the deeper path.
+
+If frequency and depth both tie, prefer the path that first reached that frequency while scanning left to right.
+
+from typing import List
+
+def most_frequent_call_path_deepest_tie(traces: List[str]) -> str:
+    pass
+
+Example
+
+traces = [
+    "-> main",
+    "-> handleEvents",
+    "-> handleKeyEvent",
+    "<- handleKeyEvent",
+    "-> handleClickEvent",
+    "<- handleClickEvent",
+    "-> handleClickEvent",
+    "<- handleClickEvent",
+    "-> handleKeyEvent",
+    "<- handleKeyEvent",
+    "<- handleEvents",
+    "<- main",
+]
+
+most_frequent_call_path_deepest_tie(traces)
+# "main->handleEvents->handleClickEvent"
+
+Both leaf paths occur twice:
+
+main->handleEvents->handleClickEvent
+
+main->handleEvents->handleKeyEvent
+
+They have the same frequency and same depth, so we keep the one that reached count 2 first.
+
+Solution
+
+The only change from Part 1 is the best-answer comparison. When a path's updated count ties the current best count, allow it to replace the answer only if it is deeper.
+
+class DeepestTieCallPathTracker(CallPathTracker):
+    def __init__(self) -> None:
+        super().__init__(prefer_deeper_on_tie=True)
+
+    def _is_better(self, count: int, depth: int) -> bool:
+        if count > self.best_count:
+            return True
+        if count == self.best_count and depth > self.best_depth:
+            return True
+        return False
+
+def most_frequent_call_path_deepest_tie(traces: List[str]) -> str:
+    tracker = DeepestTieCallPathTracker()
+
+    for line in traces:
+        event, function = _parse_single_trace(line)
+        if event == "enter":
+            tracker.enter(function)
+        else:
+            tracker.exit(function)
+
+    return tracker.result()
+
+Do not sort all paths at the end if the interviewer cares about the "first reached the top frequency" rule. Updating the best answer online captures that rule naturally.
+
+Part 3: Multiple Threads
+
+Problem Statement
+
+Now every trace line includes a prompt ID. Logs from multiple threads can be interleaved. Maintain an independent stack and independent path counters for each prompt, then return the Part 2 answer for each prompt.
+
+from typing import Dict, List
+
+def most_frequent_call_path_by_thread(traces: List[str]) -> Dict[str, str]:
+    pass
+
+Example
+
+traces = [
+    "0 -> main",
+    "1 -> func_2",
+    "0 -> func_1",
+    "0 <- func_1",
+    "1 -> func_3",
+    "1 <- func_3",
+    "1 <- func_2",
+    "0 <- main",
+]
+
+most_frequent_call_path_by_thread(traces)
+# {
+#     "0": "main->func_1",
+#     "1": "func_2->func_3",
+# }
+
+prompt 0 has paths main and main->func_1. They both occur once, so Part 2 chooses the deeper path. prompt 1 follows the same logic.
+
+Solution
+
+Use a dictionary from thread_id to a DeepestTieCallPathTracker. Each event is applied only to its own prompt's tracker.
+
+import re
+from typing import Dict, List, Tuple
+
+_THREAD_TRACE_RE = re.compile(r"^(\d+)\s+(->|<-)\s*([A-Za-z0-9_]+)$")
+
+def _parse_thread_trace(line: str) -> Tuple[str, str, str]:
+    match = _THREAD_TRACE_RE.match(line.strip())
+    if not match:
+        raise ValueError(f"Invalid threaded trace line: {line}")
+
+    thread_id, arrow, function = match.groups()
+    event = "enter" if arrow == "->" else "exit"
+    return thread_id, event, function
+
+def most_frequent_call_path_by_thread(traces: List[str]) -> Dict[str, str]:
+    trackers: Dict[str, DeepestTieCallPathTracker] = {}
+
+    for line in traces:
+        thread_id, event, function = _parse_thread_trace(line)
+        if thread_id not in trackers:
+            trackers[thread_id] = DeepestTieCallPathTracker()
+
+        tracker = trackers[thread_id]
+        if event == "enter":
+            tracker.enter(function)
+        else:
+            tracker.exit(function)
+
+    return {
+        thread_id: tracker.result()
+        for thread_id, tracker in trackers.items()
+    }
+
+Complexity: O(total_path_characters) time across all threads. Space is O(total_distinct_paths + total_active_depth).
+
+A newer interviewer variant asks candidates to reuse the helper from the earlier part instead of writing the per-thread version as a completely separate function. Treat the helper API as part of the design: keep the single-thread tracker small enough that it can be instantiated per thread / prompt ID.
+
+observed Follow-up Variants
+
+The following variants come from the interview reports in the source data: returning the count, returning the longest call stack, and finding the most frequent function per prompt. The exact function signatures below are interview-prep scaffolding, not quoted official APIs.
+
+Return the Frequency Too
+
+Because CallPathTracker already stores best_count, returning both values is a small API change:
+
+from typing import List, Tuple
+
+def most_frequent_call_path_with_count(traces: List[str]) -> Tuple[str, int]:
+    tracker = DeepestTieCallPathTracker()
+
+    for line in traces:
+        event, function = _parse_single_trace(line)
+        if event == "enter":
+            tracker.enter(function)
+        else:
+            tracker.exit(function)
+
+    return tracker.result(), tracker.frequency()
+
+Return the Longest Call Stack
+
+Some interviewers ask for the longest stack seen in the trace instead of the most frequent stack. That version does not need path counts; update the answer whenever a new maximum depth appears.
+
+from typing import List
+
+def longest_call_stack(traces: List[str]) -> str:
+    stack: List[str] = []
+    path_stack: List[str] = []
+    best_path = ""
+    best_depth = 0
+
+    for line in traces:
+        event, function = _parse_single_trace(line)
+        if event == "enter":
+            parent_path = path_stack[-1] if path_stack else ""
+            path = f"{parent_path}->{function}" if parent_path else function
+            stack.append(function)
+            path_stack.append(path)
+
+            if len(stack) > best_depth:
+                best_path = path
+                best_depth = len(stack)
+        else:
+            if not stack or stack[-1] != function:
+                raise ValueError(f"Mismatched return: {function}")
+            stack.pop()
+            path_stack.pop()
+
+    return best_path
+
+Most Frequent Function Per prompt
+
+Another observed prompt follow-up asks for the most frequent function name in each prompt, not the full path. Count function names on entry events per prompt and ignore exits except for validation.
+
+from collections import defaultdict
+from typing import DefaultDict, Dict, List
+
+def most_frequent_function_by_thread(traces: List[str]) -> Dict[str, str]:
+    counts: Dict[str, DefaultDict[str, int]] = {}
+    best_function: Dict[str, str] = {}
+    best_count: Dict[str, int] = {}
+    stacks: Dict[str, List[str]] = {}
+
+    for line in traces:
+        thread_id, event, function = _parse_thread_trace(line)
+
+        if thread_id not in counts:
+            counts[thread_id] = defaultdict(int)
+            best_function[thread_id] = ""
+            best_count[thread_id] = 0
+            stacks[thread_id] = []
+
+        if event == "enter":
+            stacks[thread_id].append(function)
+            counts[thread_id][function] += 1
+            current_count = counts[thread_id][function]
+
+            if current_count > best_count[thread_id]:
+                best_function[thread_id] = function
+                best_count[thread_id] = current_count
+        else:
+            if not stacks[thread_id] or stacks[thread_id][-1] != function:
+                raise ValueError(f"Mismatched return: {function}")
+            stacks[thread_id].pop()
+
+    return best_function
+
+Most-Called Single Function (global count)
+
+A lighter reported variant drops the call-path entirely. The trace uses single-character arrows — each line is "> name" (enter) or "< name" (exit) — and you return the single function that was entered the most times (count one call per enter event; ignore exits). Break ties by whichever tied function's first enter appears earliest in the log, and return "" if nothing is ever entered. Assume no recursion and well-formed, matched events, so a single pass counting enter events suffices — no active stack is needed.
+
+def most_called(logs: list[str]) -> str: ...
+    # Count one call per "> name"; ignore "< name".
+    # Tie-break: earliest first-enter wins. Return "" if no function is ever entered.
+
+Test Cases
+
+assert most_frequent_call_path([
+    "-> main",
+    "-> handleEvents",
+    "-> handleClickEvent",
+    "<- handleClickEvent",
+    "-> handleClickEvent",
+    "<- handleClickEvent",
+    "<- handleEvents",
+    "<- main",
+]) == "main->handleEvents->handleClickEvent"
+
+assert most_frequent_call_path([]) == ""
+
+# Part 1 keeps the first path when every path has the same count.
+assert most_frequent_call_path([
+    "-> A",
+    "-> B",
+    "<- B",
+    "-> C",
+    "<- C",
+    "<- A",
+]) == "A"
+
+# Part 2 lets a deeper path beat a shallower path at the same frequency.
+assert most_frequent_call_path_deepest_tie([
+    "-> A",
+    "-> B",
+    "<- B",
+    "<- A",
+]) == "A->B"
+
+assert most_frequent_call_path_deepest_tie([
+    "-> main",
+    "-> handleEvents",
+    "-> handleKeyEvent",
+    "<- handleKeyEvent",
+    "-> handleClickEvent",
+    "<- handleClickEvent",
+    "-> handleClickEvent",
+    "<- handleClickEvent",
+    "-> handleKeyEvent",
+    "<- handleKeyEvent",
+    "<- handleEvents",
+    "<- main",
+]) == "main->handleEvents->handleClickEvent"
+
+# Interviewers may require the threaded follow-up to reuse the single-thread helper.
+# Keep tracker state isolated per thread / prompt ID.
+
+assert most_frequent_call_path_by_thread([
+    "0 -> main",
+    "1 -> func_2",
+    "0 -> func_1",
+    "0 <- func_1",
+    "1 -> func_3",
+    "1 <- func_3",
+    "1 <- func_2",
+    "0 <- main",
+]) == {
+    "0": "main->func_1",
+    "1": "func_2->func_3",
+}
+
+assert most_frequent_call_path_with_count([
+    "-> main",
+    "-> child",
+    "<- child",
+    "-> child",
+    "<- child",
+    "<- main",
+]) == ("main->child", 2)
+
+assert longest_call_stack([
+    "-> A",
+    "-> B",
+    "-> C",
+    "<- C",
+    "<- B",
+    "<- A",
+]) == "A->B->C"
+
+assert most_frequent_function_by_thread([
+    "0 -> A",
+    "0 -> B",
+    "0 <- B",
+    "0 -> B",
+    "0 <- B",
+    "0 <- A",
+]) == {"0": "B"}
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,62 @@
+===H1===
+Binary Tree Maximum Path Sum (with path reconstruction)
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/binary-tree-max-path-sum
+===BODY===
+ByteDance / TikTok
+Coding·60 minMembers
+Binary Tree Maximum Path Sum (with path reconstruction)
+Classic 'max path sum that may bend at any node' on a binary tree, plus the harder follow-up of reconstructing the actual node sequence — not just the score.
+SWE
+tree
+dfs
+recursion
+dp
+hard
+Frequency
+Medium
+Last asked
+2026-07-17
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Given the root of a binary tree where node values may be negative, find the maximum path sum. A path may start and end at any nodes and bend at most once at any internal node (it does not have to pass through the root).
+
+def maxPathSum(root: Optional[TreeNode]) -> int: ...
+
+Reported follow-ups:
+
+Return the path itself, not just the score — output the ordered list of node values along the best path.
+
+Path may be downward-only (single direction, parent-to-leaf), but values are all positive and you must also handle a target-sum check (does any single downward path sum to target?).
+
+Path-must-not-pass-through-root / non-leaf constraint: interviewer adds a wrinkle to make sure you understand the recursion contract rather than memorizing the LeetCode answer.
+
+Notes
+
+Canonical recursion returns gain(node) = max gain you can contribute if your parent extends through you (i.e., one downward arm only), while a side-effect variable tracks the global best as node.val + left_gain + right_gain at every node.
+
+For path reconstruction, augment the recursion to return both gain and the corresponding path, and update both best_score and best_path together.
+
+For the downward-only variant with target sum, prefer a top-down accumulator: pass the running sum down, check against target at every node.
+
+Common bug: negative gains should be clamped at 0 (max(0, left_gain)); forgetting this gives wrong answers when one subtree is all-negative.
+
+Time complexity O(n), space O(h) for the recursion stack.
+
+Preparation
+
+Code the score-only version from scratch in under 8 minutes.
+
+Add path reconstruction as a separate drill — practice both the "return tuple from recursion" and "maintain global mutable list" styles.
+
+Walk through a tree with mixed positive/negative values (e.g. [-10, 9, 20, null, null, 15, 7]) explaining how the gain values bubble up.
+
+Be ready to discuss why the global-best update happens at every recursion call, not just at the root return.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

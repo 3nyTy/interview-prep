@@ -1,0 +1,1286 @@
+{
+  "company": "citadel",
+  "display_name": "Citadel / Citadel Securities",
+  "qbank_count": 36,
+  "questions_scraped": 36,
+  "site_total_count": 139,
+  "oj_count": 103,
+  "external_count": 0,
+  "description": "Citadel and Citadel Securities run two distinct loops sharing one brand. Citsec (the market maker) hires for HFT software, quant research and quant dev; its phone screens lean on small, sharp coding prompts (merge-K, ring buffers, stock-DP ladders) and the loop is famously single-fail — any weak round and the next interview is cancelled within a day. Citadel (the hedge fund) and its sub-orgs (GQS, EQR, NXT) lean harder on probability brainteasers, deep resume drilling and a multi-week team-match stage where coding bar drops but cultural and PM-style fit dominates the offer decision.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/citadel",
+  "scraped_at": "2026-09-20",
+  "source": "1point3acres qbank (logged-in session)",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "deduplicating-file-system",
+      "title": "Deduplicating File System",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-09-08",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "filesystem",
+        "dedup",
+        "hashing",
+        "python",
+        "oop-design"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "filesystem",
+        "dedup",
+        "hashing",
+        "python",
+        "oop-design"
+      ],
+      "overview": "Implement a Python FileSystem with writefile(path, data) and readfile(path), storing identical file contents only once. Discuss avoiding unnecessary hashing and extending shared storage to support deletion.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/deduplicating-file-system"
+    },
+    {
+      "n": 2,
+      "slug": "task-dependency-ordering",
+      "title": "Task Dependency Ordering",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-15",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "graph",
+        "topological-sort",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "graph",
+        "topological-sort",
+        "medium"
+      ],
+      "overview": "Given a map from string task names to prerequisite lists, return any valid ordering of all tasks. The screen supplies a Java-style `Map<String, List<String>>` interface and follows with feasibility and time-complexity questions.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/task-dependency-ordering"
+    },
+    {
+      "n": 3,
+      "slug": "candy-lc-135",
+      "title": "Candy (LC 135)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-08",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "greedy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "greedy"
+      ],
+      "overview": "Citadel phone-screen opener using the standard LC 135 Candy problem. The candidate explained the approach without writing code, then moved to a data-stream OOD problem; the interviewer emphasized candidate-led trade-off discussion throughout the screen.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/candy-lc-135"
+    },
+    {
+      "n": 4,
+      "slug": "sre-python-fundamentals-set",
+      "title": "SRE Python Fundamentals — Five-Question Set",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-08-05",
+      "stage": "tech-screen",
+      "access": "Members",
+      "roles": [
+        "Infra Eng"
+      ],
+      "tags": [
+        "python",
+        "cs-fundamentals",
+        "easy"
+      ],
+      "roles_slug": [
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "python",
+        "cs-fundamentals",
+        "easy"
+      ],
+      "overview": "Complete five short Python tasks in CoderPad: repeated output with blank-line separation, reverse-order squaring, FizzBuzz, word-frequency counting, and the second-largest unique integer with a `None` fallback. The coding set shares a one-hour first round with a verbal system-design prompt.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/sre-python-fundamentals-set"
+    },
+    {
+      "n": 5,
+      "slug": "react-trading-event-feed-dashboard",
+      "title": "Real-Time Trading Event Feed Dashboard (React)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-07-27",
+      "stage": "tech-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "frontend",
+        "react",
+        "streaming",
+        "sliding-window",
+        "trading",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "frontend",
+        "react",
+        "streaming",
+        "sliding-window",
+        "trading",
+        "medium"
+      ],
+      "overview": "Build a React dashboard that subscribes to a supplied stream of trade and quote events. Render newest-first feeds by event type, maintain summary statistics over the most recent 30 seconds, and support pause/resume with an explicit explanation of resume behavior; styling is out of scope and AI assistance is disallowed.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/react-trading-event-feed-dashboard"
+    },
+    {
+      "n": 6,
+      "slug": "tree-sum-leaf-next-pointer",
+      "title": "N-ary Tree Sum + Leaf `next` Pointer",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-13",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "tree",
+        "dfs",
+        "tree-traversal",
+        "recursion",
+        "linked-list",
+        "complexity-analysis",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "tree",
+        "dfs",
+        "tree-traversal",
+        "recursion",
+        "linked-list",
+        "complexity-analysis",
+        "medium"
+      ],
+      "overview": "Citadel Data Storage / Infra technical phone screen: define a tree-node structure, compute the sum of all node values, then connect all leaf nodes in DFS order using a `next` pointer. The final follow-up asks for `O(1)` extra space by reusing the node's own pointer fields instead of a helper array or traversal stack.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/tree-sum-leaf-next-pointer"
+    },
+    {
+      "n": 7,
+      "slug": "thread-safe-key-call-counter",
+      "title": "Thread-Safe Key Call Counter",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-05-21",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "hashmap",
+        "metrics",
+        "concurrency",
+        "threading",
+        "distributed-systems",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "hashmap",
+        "metrics",
+        "concurrency",
+        "threading",
+        "distributed-systems",
+        "medium"
+      ],
+      "overview": "Citsec phone-screen ladder: implement a counter that returns how many times a key has been called so far, make it thread-safe, then discuss how the same counter should work when multiple applications on one host call it concurrently.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/thread-safe-key-call-counter"
+    },
+    {
+      "n": 8,
+      "slug": "citadel-hft-onsite-fundamentals",
+      "title": "HFT Onsite Round 3 — Sort Complexity + Linux Fundamentals + tail(n) Design",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-05-07",
+      "stage": "onsite-coding · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "operating-systems",
+        "cs-fundamentals",
+        "io",
+        "sorting",
+        "complexity-analysis",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "operating-systems",
+        "cs-fundamentals",
+        "io",
+        "sorting",
+        "complexity-analysis",
+        "hard"
+      ],
+      "overview": "Citsec HFT (Singapore) onsite round 3: no coding submission, but a wide-ranging interrogation on sort-algorithm complexity (especially quicksort worst case), Linux systems primitives (shared memory, interrupts), and a `tail -n` design on a very large file. Reported as the round that failed the loop and triggered same-day cancellation of round 4.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/citadel-hft-onsite-fundamentals"
+    },
+    {
+      "n": 9,
+      "slug": "qd-eqr-onsite-coding-ladder",
+      "title": "Citadel QD On-Site Coding Ladder (3 Rounds, 3-4 Problems Each)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-03-30",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RS",
+        "SWE"
+      ],
+      "tags": [
+        "dp",
+        "hashmap",
+        "heap",
+        "data-structure",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "rs",
+        "swe"
+      ],
+      "tags_slug": [
+        "dp",
+        "hashmap",
+        "heap",
+        "data-structure",
+        "medium"
+      ],
+      "overview": "Citadel QD onsite coding pattern reported by a senior bank quant: three coding rounds, each packing 3-4 LeetCode-style problems (mostly mediums plus 1-2 hards) into the slot. Partial credit on one hard does not block advance, but pace is the dominant grading axis.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/qd-eqr-onsite-coding-ladder"
+    },
+    {
+      "n": 10,
+      "slug": "game-of-life-in-place-infinite",
+      "title": "Game of Life — In-Place and Infinite Board",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-03-21",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "All"
+      ],
+      "tags": [
+        "grid",
+        "simulation",
+        "bit-manipulation",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "all-roles"
+      ],
+      "tags_slug": [
+        "grid",
+        "simulation",
+        "bit-manipulation",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Citsec phone screen 2 of 2: implement Conway's Game of Life on a 2D board, then escalate to in-place updates, sparse-board optimization, and finally the infinite-board case.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/game-of-life-in-place-infinite"
+    },
+    {
+      "n": 11,
+      "slug": "single-producer-multi-consumer-ring-buffer",
+      "title": "Single-Producer Multi-Consumer Ring Buffer",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-03-08",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-structure",
+        "concurrency",
+        "threading",
+        "oop-design",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "concurrency",
+        "threading",
+        "oop-design",
+        "hard"
+      ],
+      "overview": "Citsec C++ SWE phone screen with a senior Chinese engineer: 30 minutes of resume drilling followed by a quick OOD — design a single-producer, multi-consumer ring buffer over a fixed-capacity circular array. Reference framing is a circular-deque interface in the spirit of LC 641, generalized to concurrent consumers.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/single-producer-multi-consumer-ring-buffer"
+    },
+    {
+      "n": 12,
+      "slug": "time-keyed-kv-store",
+      "title": "Time-Keyed Key-Value Store (set / get-before-timestamp)",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-02-18",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "binary-search",
+        "hashmap",
+        "data-structure",
+        "python",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "binary-search",
+        "hashmap",
+        "data-structure",
+        "python",
+        "medium"
+      ],
+      "overview": "Citadel SWE intern phone screen single problem: design a key-value store where each value is tagged with a timestamp, and reads return the most recent value at or before a query timestamp. Classic LC-981 framing with the binary-search-on-sorted-timestamps solution as the target.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/time-keyed-kv-store"
+    },
+    {
+      "n": 13,
+      "slug": "obfuscated-code-refactor",
+      "title": "Refactor Obfuscated C++ Code (Hidden Best-Time-To-Buy-Sell)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-02-06",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "oa",
+        "code-reading",
+        "refactoring",
+        "array",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "oa",
+        "code-reading",
+        "refactoring",
+        "array",
+        "easy"
+      ],
+      "overview": "Citadel OA round: a 30+ line C++ function `root_node(std::vector<int> output)` packed with red-herring variables, `std::pow`, `std::distance`, bit-shift tricks, and constexpr noise. The task is to read past the obfuscation, recognize the underlying algorithm (max profit from a buy-low / sell-high pass), and rewrite it cleanly.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/obfuscated-code-refactor"
+    },
+    {
+      "n": 14,
+      "slug": "multi-exchange-nbbo-class",
+      "title": "Multi-Exchange BBO / NBBO Class",
+      "category": "coding",
+      "duration": "40 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-29",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-structure",
+        "trading",
+        "oop-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "trading",
+        "oop-design",
+        "medium"
+      ],
+      "overview": "Citsec SWE phone-screen prompt that walks the candidate through a stripped-down market-data class. Ingest a stream of orders tagged with exchange id, price, quantity, and order type; expose per-exchange best bid / best ask and the consolidated NBBO across all exchanges.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/multi-exchange-nbbo-class"
+    },
+    {
+      "n": 15,
+      "slug": "application-exchange-routing-alerting",
+      "title": "Application-to-Exchange Routing OOD with Sliding-Window Alerts",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-28",
+      "stage": "onsite-coding · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "sliding-window",
+        "oop-design",
+        "data-structure",
+        "rate-limiting",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "sliding-window",
+        "oop-design",
+        "data-structure",
+        "rate-limiting",
+        "medium"
+      ],
+      "overview": "Citadel SWE intern onsite round 3: simulate a routing system where applications register subscriptions to exchanges; design when to raise an alert if a single exchange takes on too many subscriptions in a time window. Follow-ups push into distributed control plane design.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/application-exchange-routing-alerting"
+    },
+    {
+      "n": 16,
+      "slug": "weighted-sampling-with-updates",
+      "title": "Weighted Random Sampling with Insert / Delete",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-28",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-structure",
+        "sampling",
+        "probability",
+        "binary-search",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "sampling",
+        "probability",
+        "binary-search",
+        "hard"
+      ],
+      "overview": "Citadel SWE intern onsite round 2: support dynamic insert and delete of weighted items, plus uniform random sampling proportional to weight. Reported solution uses a Fenwick / binary indexed tree over prefix sums of weights for `O(log n)` per operation.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/weighted-sampling-with-updates"
+    },
+    {
+      "n": 17,
+      "slug": "simulate-2048-encode-state",
+      "title": "2048 Simulation + Compress State to a `long long`",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-28",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "simulation",
+        "bit-manipulation",
+        "grid",
+        "compression",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "simulation",
+        "bit-manipulation",
+        "grid",
+        "compression",
+        "medium"
+      ],
+      "overview": "Citadel SWE US-intern onsite round 1: hand-implement the 2048 game's tile-shift mechanic, then design an encoding that packs the 4x4 board state into a single 64-bit integer for compact storage / hashing.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/simulate-2048-encode-state"
+    },
+    {
+      "n": 18,
+      "slug": "lru-lfu-custom-evict",
+      "title": "LRU + LFU + Custom Eviction Function",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-25",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-structure",
+        "hashmap",
+        "linked-list",
+        "oop-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "hashmap",
+        "linked-list",
+        "oop-design",
+        "medium"
+      ],
+      "overview": "Cache-design ladder asked in a Citsec phone screen. Implement an LRU cache, then an LFU cache, then generalize to a cache parameterized by a pluggable eviction function. The interviewer explicitly grades how cleanly each variant inherits scaffolding from the previous one.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/lru-lfu-custom-evict"
+    },
+    {
+      "n": 19,
+      "slug": "bst-from-scratch",
+      "title": "BST from Scratch (insert / search / delete) + Balancing Discussion",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-22",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "bst",
+        "tree",
+        "data-structure",
+        "complexity-analysis",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "bst",
+        "tree",
+        "data-structure",
+        "complexity-analysis",
+        "medium"
+      ],
+      "overview": "Citsec SWE Intern second phone screen: build a binary search tree class in C++ supporting insert, search, and delete; then defend the average / worst-case complexity and explain how to evolve it into an AVL or red-black tree.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/bst-from-scratch"
+    },
+    {
+      "n": 20,
+      "slug": "round-robin-task-scheduler",
+      "title": "Implement a Round-Robin Task Scheduler",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-15",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "scheduling",
+        "data-structure",
+        "queue",
+        "operating-systems",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "scheduling",
+        "data-structure",
+        "queue",
+        "operating-systems",
+        "medium"
+      ],
+      "overview": "Citadel NXT third-round live coding: implement a round-robin task scheduler. Limited detail leaked under the in-post spoiler tag, but the round shape (1-hour coding paired with a 1-hour systems design slot) is consistent with several NXT loops.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/round-robin-task-scheduler"
+    },
+    {
+      "n": 21,
+      "slug": "interval-overlap-max-team",
+      "title": "Largest Team Whose Members Share a Common Office Window",
+      "category": "coding",
+      "duration": "75 min",
+      "frequency": "Single report",
+      "last_asked": "2025-12-22",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "oa",
+        "interval-aggregation",
+        "sorting",
+        "greedy",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "oa",
+        "interval-aggregation",
+        "sorting",
+        "greedy",
+        "medium"
+      ],
+      "overview": "Citadel SWE Campus Assessment (HackerRank, 75 minutes total). Given `n` employees with `[startTime[i], endTime[i]]` office windows, return the largest team that contains at least one \"core employee\" whose window overlaps with every other member's window. Reduces to the maximum number of intervals covering a single point.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/interval-overlap-max-team"
+    },
+    {
+      "n": 22,
+      "slug": "grace-hopper-non-consecutive-processes",
+      "title": "Non-Consecutive Process Allocation Counting (Modulo 1e9 + 7)",
+      "category": "coding",
+      "duration": "75 min",
+      "frequency": "Single report",
+      "last_asked": "2025-12-22",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "oa",
+        "math",
+        "dp",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "oa",
+        "math",
+        "dp",
+        "easy"
+      ],
+      "overview": "Citadel SWE Campus Assessment (HackerRank). Count the number of ways to allocate `n_processes` to `n_intervals` consecutive time slots such that the same process never occupies two consecutive slots. Returns the count modulo `10^9 + 7`. Combinatorial closed-form is the intended fast path.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/grace-hopper-non-consecutive-processes"
+    },
+    {
+      "n": 23,
+      "slug": "wildcard-regex-matching",
+      "title": "Wildcard / Regex String Matching (`*` operator)",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2025-12-16",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RS"
+      ],
+      "tags": [
+        "string",
+        "dp",
+        "recursion",
+        "two-pointer",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "rs"
+      ],
+      "tags_slug": [
+        "string",
+        "dp",
+        "recursion",
+        "two-pointer",
+        "medium"
+      ],
+      "overview": "Citsec EQR (NG QR) live-coding round: implement string matching where `*` is the only wildcard operator. The interviewer steers the candidate from recursion-with-memo to a two-pointer iterative solution after the initial submission.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/wildcard-regex-matching"
+    },
+    {
+      "n": 24,
+      "slug": "order-book-pair-coding",
+      "title": "Order Book Pair Coding",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-07-26",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-structure",
+        "trading",
+        "oop-design",
+        "complexity-analysis",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "trading",
+        "oop-design",
+        "complexity-analysis",
+        "medium"
+      ],
+      "overview": "Open-ended order book implementation appears in Citsec phone screens (EQR Python QD) and Singapore HFT onsite round 1. The interviewer expects the candidate to enumerate the required APIs first, then implement add / cancel / view-best mechanics. Scope varies by round: a 45-minute first-round CoderPad variant requires a matching engine, while another round explicitly excludes matching.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/order-book-pair-coding"
+    },
+    {
+      "n": 25,
+      "slug": "task-scheduler-priority-lazy-delete",
+      "title": "Task Scheduler with Priority + Lazy Deletion",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-07-17",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "heap",
+        "data-structure",
+        "scheduling",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "heap",
+        "data-structure",
+        "scheduling",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Citadel SWE intern onsite round 4: design an in-memory task scheduler that supports insert, delete, and execute-highest-priority. Reported solution uses a priority queue with a lazy-deletion marker so cancellation does not require an `O(n)` heap scan. The same family anchors a 90-minute C++ round in Citadel GQS onsites, framed as a scheduler whose callers register tasks together with their arguments.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/task-scheduler-priority-lazy-delete"
+    },
+    {
+      "n": 26,
+      "slug": "reverse-file-tac-implementation",
+      "title": "Implement `tac` — Reverse-Order File Reader",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-05-07",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "io",
+        "string-processing",
+        "operating-systems",
+        "complexity-analysis",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "io",
+        "string-processing",
+        "operating-systems",
+        "complexity-analysis",
+        "medium"
+      ],
+      "overview": "Citsec C++ phone-screen prompt: implement the `tac` command (cat with line order reversed), then ladder up through `O(1)` space optimizations and large-file scaling. A separate Citsec HFT onsite round in Singapore asked the analogous `tail -n` over a very large file.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/reverse-file-tac-implementation"
+    },
+    {
+      "n": 27,
+      "slug": "stock-trading-dp-ladder",
+      "title": "Best Time to Buy and Sell Stock — Full DP Ladder",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-05-07",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Free preview",
+      "roles": [
+        "SWE",
+        "All"
+      ],
+      "tags": [
+        "dp",
+        "array",
+        "state-machine",
+        "complexity-analysis",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "all-roles"
+      ],
+      "tags_slug": [
+        "dp",
+        "array",
+        "state-machine",
+        "complexity-analysis",
+        "medium"
+      ],
+      "overview": "Phone-screen staple at Citsec: start with the single-transaction max profit, ladder up through unlimited transactions, then bounded-k transactions, and on some loops add cooldown / transaction-fee variants. Interviewers grade as much on the generalization narrative (state definition, complexity, edge cases) as on the final code.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/stock-trading-dp-ladder"
+    },
+    {
+      "n": 28,
+      "slug": "merge-k-sorted-streams-ood",
+      "title": "Merge K Sorted Streams (OOD + Algorithm)",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Low",
+      "last_asked": "2026-01-16",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "heap",
+        "merge",
+        "data-structure",
+        "code-reading",
+        "oop-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "heap",
+        "merge",
+        "data-structure",
+        "code-reading",
+        "oop-design",
+        "medium"
+      ],
+      "overview": "Two flavors of merge-K appear in Citsec phone screens: a C++ OOD variant where the candidate fills in an abstract `Stream` class given a template heavy with `shared_ptr` and type aliases, and a tighter algorithm-only variant with a timestamp tie-break that nudges the standard LC 23 solution.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/merge-k-sorted-streams-ood"
+    },
+    {
+      "n": 29,
+      "slug": "sre-configuration-deployment-control-plane",
+      "title": "Fleet Configuration and Deployment Control Plane",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-08-05",
+      "stage": "tech-screen",
+      "access": "Members",
+      "roles": [
+        "Infra Eng"
+      ],
+      "tags": [
+        "distributed-systems",
+        "cloud",
+        "sre"
+      ],
+      "roles_slug": [
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "distributed-systems",
+        "cloud",
+        "sre"
+      ],
+      "overview": "Design a system for safely changing configuration and deploying 200+ services across multiple data centers and cloud regions, with rollback support. The starting point mixes checked-in property files, hand-managed environment variables, a directly edited shared NFS mount, and SSH-driven deployment scripts.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/sre-configuration-deployment-control-plane"
+    },
+    {
+      "n": 30,
+      "slug": "metrics-alerting-system-design",
+      "title": "Metrics Collection & Alerting System",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-07-08",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "metrics",
+        "distributed-systems",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "metrics",
+        "distributed-systems",
+        "hard"
+      ],
+      "overview": "Citsec C++ SWE onsite design round: build an end-to-end metrics and alerting pipeline — instrumentation on a machine fleet, collection, time-series storage, a serving/query layer, threshold alerting, and per-worker failure detection. Storage-engine choice (time-series / SSTable vs. relational) and the failure-detection mechanism are the probed decision points; a ~2-second query-latency requirement surfaces mid-round.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/metrics-alerting-system-design"
+    },
+    {
+      "n": 31,
+      "slug": "citadel-bq-resume-loop",
+      "title": "Behavioral / Resume Drilling Across the Loop",
+      "category": "behavioral",
+      "duration": "30 min",
+      "frequency": "High",
+      "last_asked": "2026-09-08",
+      "stage": "recruiter-screen · phone-screen · onsite-bq · final-round",
+      "access": "Members",
+      "roles": [
+        "All"
+      ],
+      "tags": [
+        "behavioral",
+        "deep-dive",
+        "why-company",
+        "culture-fit",
+        "fit"
+      ],
+      "roles_slug": [
+        "all-roles"
+      ],
+      "tags_slug": [
+        "behavioral",
+        "deep-dive",
+        "why-company",
+        "culture-fit",
+        "fit"
+      ],
+      "overview": "Citadel and Citsec both front-load resume / behavioral content into nearly every round. Phone screens dedicate 10-30 minutes to resume drilling before coding; onsite has dedicated team-fit / culture rounds; the loop typically closes with a final leadership call on the Citadel side.",
+      "source_count": 14,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/citadel-bq-resume-loop"
+    },
+    {
+      "n": 32,
+      "slug": "gqs-swe-whiteboard-boundary-search-top-k",
+      "title": "GQS SWE Whiteboard: Boundary Search + Sliding-Window Top K",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-30",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "binary-search",
+        "array",
+        "sliding-window",
+        "top-k",
+        "data-structure",
+        "bst",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "binary-search",
+        "array",
+        "sliding-window",
+        "top-k",
+        "data-structure",
+        "bst",
+        "medium"
+      ],
+      "overview": "Discussion-only GQS SWE phone screen with a Quant Developer interviewer. The first problem asks for all values equal to `K` in a sorted array under progressively tighter binary-search API constraints; the second asks how to maintain the top `K` elements inside each sliding window and drives toward an ordered data structure supporting insert, erase, and traversal.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/gqs-swe-whiteboard-boundary-search-top-k"
+    },
+    {
+      "n": 33,
+      "slug": "quadratic-form-finite-min",
+      "title": "When Does `min x'Qx + c'x` Have a Finite Minimum?",
+      "category": "other",
+      "duration": "30 min",
+      "frequency": "Single report",
+      "last_asked": "2026-04-28",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RS"
+      ],
+      "tags": [
+        "math-reasoning",
+        "linear-algebra",
+        "optimization",
+        "hard"
+      ],
+      "roles_slug": [
+        "mle",
+        "rs"
+      ],
+      "tags_slug": [
+        "math-reasoning",
+        "linear-algebra",
+        "optimization",
+        "hard"
+      ],
+      "overview": "Citadel GQS Quant Researcher first round: after 30 minutes of resume discussion, a single technical question on the conditions under which an unconstrained quadratic program over `R^n` attains a finite minimum.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/quadratic-form-finite-min"
+    },
+    {
+      "n": 34,
+      "slug": "eqr-alpha-factor-deep-dive",
+      "title": "EQR Alpha-Factor Research Deep-Dive + LLM Inference Stability",
+      "category": "other",
+      "duration": "75 min",
+      "frequency": "Single report",
+      "last_asked": "2025-12-16",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RS"
+      ],
+      "tags": [
+        "deep-dive",
+        "ml-knowledge",
+        "math-reasoning",
+        "probability",
+        "llm",
+        "hard"
+      ],
+      "roles_slug": [
+        "mle",
+        "rs"
+      ],
+      "tags_slug": [
+        "deep-dive",
+        "ml-knowledge",
+        "math-reasoning",
+        "probability",
+        "llm",
+        "hard"
+      ],
+      "overview": "Citsec EQR (NG QR) round combining resume-grade alpha-research drilling with a quantitative case study on LLM inference noise. Scheduled as 45 minutes; ran 75 minutes. Six themed sub-prompts plus a single live coding closer.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/eqr-alpha-factor-deep-dive"
+    },
+    {
+      "n": 35,
+      "slug": "trading-probability-quickfire",
+      "title": "Trading OA — 15-Question Probability Quickfire (30 Minutes)",
+      "category": "other",
+      "duration": "30 min",
+      "frequency": "Single report",
+      "last_asked": "2025-11-21",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RS",
+        "All"
+      ],
+      "tags": [
+        "oa",
+        "probability",
+        "math-reasoning",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "rs",
+        "all-roles"
+      ],
+      "tags_slug": [
+        "oa",
+        "probability",
+        "math-reasoning",
+        "medium"
+      ],
+      "overview": "Citadel Trading OA format: 15 probability / expected-value questions in 30 minutes, averaging 2 minutes per question. Standard quant-interview probability staples (color-pair runs, uniform-pair differences, binary-choice population balancing) at a pace that rewards pattern recognition over derivation.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/trading-probability-quickfire"
+    },
+    {
+      "n": 36,
+      "slug": "gqs-quant-phone-brainteasers",
+      "title": "GQS Quant Phone — Correlation Range + Box-Muller-Style Sampling",
+      "category": "other",
+      "duration": "45 min",
+      "frequency": "Low",
+      "last_asked": "2026-04-28",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RS"
+      ],
+      "tags": [
+        "probability",
+        "linear-algebra",
+        "math-reasoning",
+        "sampling",
+        "hard"
+      ],
+      "roles_slug": [
+        "mle",
+        "rs"
+      ],
+      "tags_slug": [
+        "probability",
+        "linear-algebra",
+        "math-reasoning",
+        "sampling",
+        "hard"
+      ],
+      "overview": "Citadel GQS Quant Researcher phone screen: short brainteaser-style probability questions delivered after a deep resume drill. Reported questions cover the achievable range of `corr(Y, Z)` given two other pairwise correlations, and how to transform `Uniform(0, 1)` samples into `Normal(0, 1)`.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/citadel/gqs-quant-phone-brainteasers"
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+===H1===
+Progressive Banking System OA
+===URL===
+https://www.1point3acres.com/interview/problems/company/airbnb/oa-banking-system
+===BODY===
+Airbnb
+CodingMembers
+Progressive Banking System OA
+Build a four-level banking system. The progression covers account creation, deposits and transfers; ranking the highest-spending accounts; scheduling and canceling future payments; and finally merging accounts while retaining balances, transaction state, and historical queries. A workspace-credit rotation replaces scheduled payments with delayed cashback while preserving the same state-ordering challenge.
+SWE
+object-design
+data-structure
+scheduling
+top-k
+hard
+Frequency
+Medium · New
+Last asked
+2026-08-23
+Stage
+oa
+Requirements
+
+Implement a banking system whose levels unlock progressively.
+
+Level 1:
+
+create_account(timestamp, account_id).
+
+deposit(timestamp, account_id, amount).
+
+transfer(timestamp, source_account_id, target_account_id, amount).
+
+Handle missing accounts, duplicate creation, identical source and target accounts, insufficient funds, and the required return balance.
+
+Level 2:
+
+top_spenders(timestamp, n) ranks accounts by total outgoing value.
+
+A transfer increases only the source account's outgoing total.
+
+Apply the supplied deterministic tie-break rule when outgoing totals match.
+
+Level 3:
+
+Schedule a future payment.
+
+Cancel a scheduled payment.
+
+Query or otherwise track payment status.
+
+Process payments that are due before any later operation observes or mutates the current state.
+
+Successful scheduled payments also contribute to the Level 2 outgoing total.
+
+Level 4:
+
+Merge accounts while retaining both balances, transaction histories, spending histories, and pending-payment information.
+
+Query an account's historical balance at a specified time.
+
+Notes
+
+Time-dependent work must be settled before executing operations whose results depend on the current state. A single settlement routine invoked by earlier operations keeps this behavior consistent.
+
+Later levels depend directly on the state and accounting decisions made in earlier levels.
+
+Account merge semantics require a deliberate policy for references to the retired account ID; follow the supplied interface and tests.
+
+Exact return types, the ranking tie-break, payment-ID format, and ordering among payments sharing a timestamp come from the assessment contract.
+
+Alternate canonical variant — Workspace credits and delayed cashback
+
+Level 1 creates workspaces, adds credits, and transfers credits between workspaces.
+
+Level 2 ranks workspaces by cumulative outgoing or consumed credits.
+
+Level 3 spends credits and schedules a 2% cashback to arrive 24 hours later; the cashback status is queryable by transaction ID.
+
+Level 4 merges workspaces, carries over balances and transaction history, redirects pending cashback, and supports point-in-time balance queries.
+
+Preparation
+
+Implement account creation, deposits, and transfers behind one account-state map, then regression-test every operation after each extension.
+
+Add spending totals and a deterministic top-N query while keeping the tie-break rule isolated so it can follow the supplied contract.
+
+Model pending payments in time order and route all time-sensitive operations through one settle(now) transition.
+
+Practice merging two account histories without losing the timeline needed for point-in-time balance queries.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

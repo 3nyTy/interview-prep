@@ -1,0 +1,136 @@
+===H1===
+Job Scheduler with Cron / Pause / Resume
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/job-scheduler-cron-pause-resume
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Job Scheduler with Cron / Pause / Resume
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+System Design
+·
+60 min
+Members
+Job Scheduler with Cron / Pause / Resume
+
+Design a distributed job scheduler that supports cron-style recurring jobs, pause (allow in-flight jobs to complete) and resume. Workers are assumed unlimited.
+
+SWE
+distributed-systems
+scheduling
+queueing
+persistence
+idempotency
+medium
+Frequency
+Medium
+Last asked
+2026-08-10
+Stage
+onsite-system-design · phone-screen
+Requirements
+API surface:
+submit(job, cron_expression)
+pause(job_id) — already-running invocations finish; no new invocations launch.
+resume(job_id) — re-enables future scheduled launches.
+cancel(job_id)
+Worker pool is assumed effectively unlimited; the design must focus on scheduling correctness, not worker autoscaling.
+Persistence: job definitions, schedules, and current state (running / paused / canceled) must survive a scheduler restart.
+Idempotency: a launch must not be duplicated under scheduler failover.
+Observability: per-job last-run, next-run, status.
+Notes
+Core design split:
+Schedule store: durable table of (job_id, cron_expr, state, next_fire_time). The single source of truth.
+Dispatcher: a leader-elected service that scans the schedule store for jobs with next_fire_time ≤ now and state == RUNNING, then enqueues a launch message into a work queue. Updates next_fire_time to the next cron tick atomically with the enqueue.
+Workers: pull from the queue, execute the job, report status back into the schedule store.
+Cron expression parsing is a solved subproblem — frame the round around scheduling correctness rather than the parser.
+Leader election prevents duplicate dispatch under multi-instance scheduler deployments. Zookeeper / etcd / a DB row lock all work; the trade-off discussion (RTO, split-brain risk) is the signal.
+The pause-but-let-in-flight-finish requirement means the scheduler only controls future launches; workers don't need to receive a cancel signal. State transitions are: RUNNING ↔ PAUSED → CANCELED.
+Idempotency on launch: include a unique (job_id, fire_time) token in the work-queue message; the worker writes a lease row keyed on that token before executing, so a duplicated message is detected and dropped.
+Failure modes worth surfacing: dispatcher crashes between schedule-store update and queue enqueue (use a transactional outbox), worker crashes mid-execution (lease expiry triggers re-dispatch only if the job is idempotent — otherwise let the operator decide), clock skew across schedulers (use a single monotonic clock source or accept ±1 tick slop).
+A standard, template-like scheduler design was judged insufficiently differentiated. Tie each component to an explicit requirement, compare at least one credible alternative, and surface a non-obvious correctness or operability insight.
+Preparation
+Draw the schedule-store + dispatcher + queue + workers diagram in under 5 minutes. Pre-draw it on scratch paper before the round if possible.
+Be ready to defend: why leader election over sharded dispatch (correctness over throughput at this scale), why a work queue between dispatcher and workers (decoupling, retries, observability), how pause is implemented (it's a state field, not an active signal to workers).
+Drill the failure-mode discussion: dispatcher crash, worker crash, scheduler restart, time skew. Snowflake interviewers push on each of these in turn.
+Rehearse one alternative to each major component so the discussion demonstrates judgment beyond a memorized reference architecture.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Preparation
+Related discussions · 4
+🔑雪花 梯批诶斯 2轮背靠背
+Snowflake 面经
+雪花 onsite 挂经
+雪花全套
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Service Failure Forensics
+Single report
+distributed-systems
+medium
+graph
++2
+Max Credits with K Classes (Interval-Style)
+Low
+scheduling
+medium
+dp
++3
+Frontend Grid: Robot Eats Candies
+Single report
+medium
+frontend
+bfs
++2
+Grep With Context Lines
+Single report
+medium
+string-processing
+parsing
++1
+Top-K Search Terms (Per-User Deduped)
+Single report
+medium
+hashmap
+set
++2
+Code editor

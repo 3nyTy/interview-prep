@@ -1,0 +1,600 @@
+===H1===
+Distributed Tree Node Count
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/distributed-tree-node-count
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Distributed Tree Node Count
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+System Design
+·
+60 min
+Members
+Distributed Tree Node Count
+
+You are given an N-ary tree where each node is a distributed server.
+
+SWE
+distributed-systems
+tree
+parallelism
+map-reduce
+hard
+Frequency
+Single report
+Last asked
+2026-06-24
+Stage
+onsite-system-design
+Distributed Tree Node Count
+Problem Summary
+
+Imagine a tree structure where every node is a separate server.
+
+Each node can only talk to its parent and its children.
+Communication is asynchronous (it happens in the background).
+Messages might arrive late or in the wrong order.
+
+Your goal is to write code for the nodes so they can count the total number of nodes in the entire tree.
+
+The interview usually has 3 parts:
+
+Basic Counting: Counting assuming messages work perfectly.
+Duplicate Handling: Handling cases where a message arrives twice.
+Reliability: Handling cases where messages get lost (packet loss).
+Provided Code Interface
+
+You must use these classes. You cannot change the send_async function; consider it a black box that handles the network.
+
+class Message:
+    def __init__(self, kind: str, request_id: str, payload: dict):
+        self.kind = kind
+        self.request_id = request_id
+        self.payload = payload
+
+class Node:
+    def __init__(self, node_id: str, parent_id: str | None, children: list[str]):
+        self.node_id = node_id
+        self.parent_id = parent_id
+        self.children = children
+
+    def send_async(self, to_node_id: str, message: Message) -> None:
+        """Network API (already provided). usage: send_async(id, msg)"""
+        pass
+
+    def call(self, from_node_id: str | None, message: Message) -> None:
+        """You need to implement this logic."""
+        pass
+
+Part 1: Basic Counting Logic
+Task Goal
+
+Write the call function to handle:
+
+request_count: A parent asks a child to count its subtree.
+reply_count: A child sends its result back to the parent.
+
+Only the Root node should output the final total number.
+
+Rules
+Leaf Nodes: Immediately reply with 1.
+Internal Nodes:
+Send request_count to all children.
+Wait for all replies.
+Calculate 1 + sum(child_counts).
+Send the result to the parent.
+Root Node: Waits for all replies, then prints the final number.
+Concurrency: Use a Lock to protect data because messages arrive at the same time.
+Example
+        1
+      / | \
+     2  3  4
+       / \
+      5   6
+
+
+The root (1) should output 6.
+
+Part 1 Solution
+from dataclasses import dataclass
+from threading import Lock
+
+@dataclass
+class InFlight:
+    parent_id: str | None
+    pending_children: set[str]
+    total: int = 1
+
+class Message:
+    def __init__(self, kind: str, request_id: str, payload: dict):
+        self.kind = kind
+        self.request_id = request_id
+        self.payload = payload
+
+class Node:
+    def __init__(self, node_id: str, parent_id: str | None, children: list[str]):
+        self.node_id = node_id
+        self.parent_id = parent_id
+        self.children = children
+        self._lock = Lock()
+        self._inflight: dict[str, InFlight] = {}
+
+    def send_async(self, to_node_id: str, message: Message) -> None:
+        pass
+
+    def _start_count(self, parent_id: str | None, request_id: str) -> None:
+        # If this is a leaf node (no children)
+        if not self.children:
+            if parent_id is None:
+                print(1)
+            else:
+                self.send_async(
+                    parent_id,
+                    Message("reply_count", request_id, {"count": 1, "child_id": self.node_id}),
+                )
+            return
+
+        # Prepare to wait for children
+        with self._lock:
+            self._inflight[request_id] = InFlight(
+                parent_id=parent_id,
+                pending_children=set(self.children),
+                total=1,
+            )
+
+        # Ask all children to count
+        for child_id in self.children:
+            self.send_async(child_id, Message("request_count", request_id, {}))
+
+    def call(self, from_node_id: str | None, message: Message) -> None:
+        if message.kind == "request_count":
+            self._start_count(from_node_id, message.request_id)
+            return
+
+        if message.kind != "reply_count":
+            return
+
+        child_count = int(message.payload["count"])
+        child_id = message.payload["child_id"]
+
+        with self._lock:
+            state = self._inflight.get(message.request_id)
+            if state is None:
+                return
+
+            if child_id not in state.pending_children:
+                return
+
+            state.pending_children.remove(child_id)
+            state.total += child_count
+            done = len(state.pending_children) == 0
+            parent_id = state.parent_id
+            total = state.total
+            
+            # Clean up memory if done
+            if done:
+                del self._inflight[message.request_id]
+
+        if not done:
+            return
+
+        # If we are done, either print (if root) or reply to parent
+        if parent_id is None:
+            print(total)
+        else:
+            self.send_async(
+                parent_id,
+                Message(
+                    "reply_count",
+                    message.request_id,
+                    {"count": total, "child_id": self.node_id},
+                ),
+            )
+
+Complexity (Part 1)
+Metric	Details
+Time	O(n). We visit every node and send a message for each edge.
+Space	O(h) to O(n). We store data in memory while waiting for children to reply.
+Part 2: Handling Duplicate Messages
+Interview Challenge
+
+Sometimes the network is glitchy. The send_async function might try sending the same message multiple times (retries). This means a node might receive duplicate request_count or reply_count messages.
+
+How do you prevent counting the same node twice?
+
+Strategy
+
+We need to make our operations idempotent (safe to repeat).
+
+Track Requests: If we already finished a request, save the answer.
+Duplicate Request: If a parent asks again, send the saved answer immediately.
+Duplicate Reply: If a child replies again, ignore it.
+Part 2 Solution
+
+We update the code to check for duplicates before processing.
+
+from dataclasses import dataclass
+from threading import Lock
+
+@dataclass
+class InFlight:
+    parent_id: str | None
+    pending_children: set[str]
+    total: int = 1
+
+class Message:
+    def __init__(self, kind: str, request_id: str, payload: dict):
+        self.kind = kind
+        self.request_id = request_id
+        self.payload = payload
+
+class Node:
+    def __init__(self, node_id: str, parent_id: str | None, children: list[str]):
+        self.node_id = node_id
+        self.parent_id = parent_id
+        self.children = children
+
+        self._lock = Lock()
+        self._inflight: dict[str, InFlight] = {}
+        # Stores the final answer for a specific request_id
+        self._completed_total: dict[str, int] = {}
+        # Tracks if the root has already printed the result for a request_id
+        self._root_printed: set[str] = set()
+
+    def send_async(self, to_node_id: str, message: Message) -> None:
+        pass
+
+    def _maybe_reply_cached(self, parent_id: str | None, request_id: str) -> bool:
+        with self._lock:
+            if request_id not in self._completed_total:
+                return False
+            total = self._completed_total[request_id]
+
+        if parent_id is None:
+            # If root receives a duplicate trigger, print only if we haven't yet.
+            with self._lock:
+                if request_id in self._root_printed:
+                    return True
+                self._root_printed.add(request_id)
+            print(total)
+            return True
+
+        # Send the cached answer again
+        self.send_async(
+            parent_id,
+            Message(
+                "reply_count",
+                request_id,
+                {"count": total, "child_id": self.node_id},
+            ),
+        )
+        return True
+
+    def _start_count(self, parent_id: str | None, request_id: str) -> None:
+        # Check if we already finished this job
+        if self._maybe_reply_cached(parent_id, request_id):
+            return
+
+        if not self.children:
+            with self._lock:
+                self._completed_total[request_id] = 1
+                if parent_id is None:
+                    if request_id in self._root_printed:
+                        return
+                    self._root_printed.add(request_id)
+            if parent_id is None:
+                print(1)
+            else:
+                self.send_async(
+                    parent_id,
+                    Message("reply_count", request_id, {"count": 1, "child_id": self.node_id}),
+                )
+            return
+
+        with self._lock:
+            # If we are already working on this request, ignore the duplicate start
+            if request_id in self._inflight:
+                return
+            self._inflight[request_id] = InFlight(
+                parent_id=parent_id,
+                pending_children=set(self.children),
+                total=1,
+            )
+
+        for child_id in self.children:
+            self.send_async(child_id, Message("request_count", request_id, {}))
+
+    def call(self, from_node_id: str | None, message: Message) -> None:
+        if message.kind == "request_count":
+            self._start_count(from_node_id, message.request_id)
+            return
+
+        if message.kind != "reply_count":
+            return
+
+        child_count = int(message.payload["count"])
+        child_id = message.payload["child_id"]
+
+        with self._lock:
+            state = self._inflight.get(message.request_id)
+            if state is None:
+                # Request is already done or unknown, ignore duplicate reply
+                return
+            if child_id not in state.pending_children:
+                # We already counted this child, ignore duplicate
+                return
+
+            state.pending_children.remove(child_id)
+            state.total += child_count
+            done = len(state.pending_children) == 0
+            parent_id = state.parent_id
+            total = state.total
+            if done:
+                self._completed_total[message.request_id] = total
+                del self._inflight[message.request_id]
+
+        if not done:
+            return
+
+        if parent_id is None:
+            with self._lock:
+                if message.request_id in self._root_printed:
+                    return
+                self._root_printed.add(message.request_id)
+            print(total)
+        else:
+            self.send_async(
+                parent_id,
+                Message(
+                    "reply_count",
+                    message.request_id,
+                    {"count": total, "child_id": self.node_id},
+                ),
+            )
+
+Complexity (Part 2)
+Metric	Details
+Time	O(n) for unique messages. Duplicates are very fast (O(1)) checks.
+Space	O(n). We keep the history of request_ids in memory.
+Part 3: Handling Lost Messages
+Interview Challenge
+
+Now, assume send_async is unreliable. Messages might get dropped (packet loss). How do you ensure the count still finishes?
+
+Practical Design
+
+We need an "At-Least-Once" delivery system.
+
+Message IDs: Every packet gets a unique ID.
+Outbox: When sending, keep the message in a list (Outbox) until we get a confirmation.
+Retry: If we don't get a confirmation (ACK) quickly, send it again.
+Acknowledgment (ACK): The receiver must send an ACK message back to say "I got it."
+Deduplication: Because we retry, the receiver uses Part 2 logic to ignore duplicates.
+Part 3 Solution
+
+We create a "Reliable Node" that wraps the original logic with a retry system.
+
+from dataclasses import dataclass
+from threading import Lock
+from time import time
+from uuid import uuid4
+
+@dataclass
+class OutboxItem:
+    to_node_id: str
+    envelope: dict
+    next_retry_ts: float
+    attempts: int
+
+class ReliableNode(Node):
+    RETRY_BASE_SECONDS = 0.2
+    RETRY_CAP_SECONDS = 2.0
+
+    def __init__(self, node_id: str, parent_id: str | None, children: list[str]):
+        super().__init__(node_id, parent_id, children)
+        self._transport_lock = Lock()
+        self._outbox: dict[str, OutboxItem] = {}     # Waiting for ACKs
+        self._seen_message_ids: set[str] = set()     # To ignore duplicate packets
+
+    def send_async(self, to_node_id: str, message: Message) -> None:
+        # If it's already a transport message, send directly
+        if message.kind == "transport":
+            self._raw_send(to_node_id, message.payload)
+            return
+        # Otherwise, wrap it in our reliable logic
+        self.reliable_send(to_node_id, message)
+
+    def _raw_send(self, to_node_id: str, envelope: dict) -> None:
+        # Use the unreliable network
+        super().send_async(
+            to_node_id,
+            Message("transport", envelope["request_id"], envelope),
+        )
+
+    def reliable_send(self, to_node_id: str, inner_message: Message) -> None:
+        message_id = str(uuid4())
+        envelope = {
+            "type": "data",
+            "message_id": message_id,
+            "request_id": inner_message.request_id,
+            "inner_kind": inner_message.kind,
+            "inner_payload": inner_message.payload,
+        }
+        now = time()
+        with self._transport_lock:
+            self._outbox[message_id] = OutboxItem(
+                to_node_id=to_node_id,
+                envelope=envelope,
+                next_retry_ts=now + self.RETRY_BASE_SECONDS,
+                attempts=0,
+            )
+        self._raw_send(to_node_id, envelope)
+
+    def on_timer_tick(self) -> None:
+        # This function runs repeatedly (e.g., every 100ms)
+        now = time()
+        to_retry: list[tuple[str, OutboxItem]] = []
+
+        with self._transport_lock:
+            for message_id, item in self._outbox.items():
+                if item.next_retry_ts <= now:
+                    to_retry.append((message_id, item))
+
+            for message_id, item in to_retry:
+                item.attempts += 1
+                # Exponential backoff (wait longer each time)
+                backoff = min(
+                    self.RETRY_BASE_SECONDS * (2 ** item.attempts),
+                    self.RETRY_CAP_SECONDS,
+                )
+                item.next_retry_ts = now + backoff
+
+        for _, item in to_retry:
+            self._raw_send(item.to_node_id, item.envelope)
+
+    def call(self, from_node_id: str | None, message: Message) -> None:
+        if message.kind != "transport":
+            # Fallback for simple tests
+            super().call(from_node_id, message)
+            return
+
+        envelope = message.payload
+        envelope_type = envelope["type"]
+
+        # If we received an ACK, stop retrying that message
+        if envelope_type == "ack":
+            acked_message_id = envelope["acked_message_id"]
+            with self._transport_lock:
+                self._outbox.pop(acked_message_id, None)
+            return
+
+        # If we received Data
+        message_id = envelope["message_id"]
+        request_id = envelope["request_id"]
+
+        # 1. Send ACK immediately so sender stops retrying
+        if from_node_id is not None:
+            ack = {
+                "type": "ack",
+                "request_id": request_id,
+                "acked_message_id": message_id,
+            }
+            self._raw_send(from_node_id, ack)
+
+        # 2. Check for duplicates (have we seen this packet ID?)
+        with self._transport_lock:
+            if message_id in self._seen_message_ids:
+                return
+            self._seen_message_ids.add(message_id)
+
+        # 3. Process the actual data using logic from Part 2
+        inner = Message(
+            envelope["inner_kind"],
+            request_id,
+            envelope["inner_payload"],
+        )
+        super().call(from_node_id, inner)
+
+Complexity (Part 3)
+Metric	Details
+Time	O(n) normal work. If the network is bad, retries add overhead.
+Space	Increases. We must store the outbox and seen_message_ids.
+2026 interface confirmation
+Each tree node runs as an independent process on a different host. A node knows its own unique ID and the IDs of all children.
+The provided API is sendAsync(to_node_id, message). Incoming messages trigger receive(sender_id, message).
+The root prints the total count once all child subtrees have replied. The same request / reply aggregation model above matches this interface directly.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Distributed Tree Node Count
+Problem Summary
+Provided Code Interface
+Part 1: Basic Counting Logic
+Task Goal
+Rules
+Example
+Part 1 Solution
+Complexity (Part 1)
+Part 2: Handling Duplicate Messages
+Interview Challenge
+Strategy
+Part 2 Solution
+Complexity (Part 2)
+Part 3: Handling Lost Messages
+Interview Challenge
+Practical Design
+Part 3 Solution
+Complexity (Part 3)
+2026 interface confirmation
+Related discussions · 1
+🔑Snowflake Backend Engineer 面经
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Web URL Crawler at Scale
+Single report
+distributed-systems
+web-crawler
+queueing
++2
+Design an RPC Abstraction Layer
+Single report
+distributed-systems
+rpc
+idempotency
++2
+Pre-order Traversal Skipping Marked Nodes
+Single report
+tree
+dfs
+tree-traversal
++2
+Service Failure Forensics
+Single report
+distributed-systems
+graph
+dfs
++2
+Forest Parent Array Delete Node
+Single report
+tree
+array
+hashmap
++1
+Code editor

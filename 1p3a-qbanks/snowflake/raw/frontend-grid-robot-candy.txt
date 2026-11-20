@@ -1,0 +1,120 @@
+===H1===
+Frontend Grid: Robot Eats Candies
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/frontend-grid-robot-candy
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Frontend Grid: Robot Eats Candies
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+·
+60 min
+Members
+Frontend Grid: Robot Eats Candies
+
+Frontend phone screen for a Snowflake frontend role: implement a small JavaScript game where a robot navigates a grid eating candies. Grid scaffolding and helper functions are provided.
+
+SWE
+frontend
+bfs
+grid
+simulation
+medium
+Frequency
+Single report
+Last asked
+2026-03-28
+Stage
+phone-screen
+Requirements
+A grid is pre-rendered in the DOM; helper functions for cell access and rendering are provided.
+A robot starts at a known cell; candies are placed at specified cells.
+Implement the JavaScript logic that moves the robot through the grid and removes candies as it visits them.
+The exact movement rules (player-controlled vs autonomous shortest-path) are clarified during the round; both have been reported.
+Notes
+Snowflake's frontend phone screen does not always announce itself as frontend-only — confirm with the recruiter before the round whether to prepare LeetCode or DOM / JS exercises. The interviewer's background (frontend-focused vs full-stack) is a strong hint.
+For autonomous movement, the natural algorithm is BFS from the robot's current cell to the nearest candy, re-running after each candy is consumed (or to all candies in one pass with multi-source BFS variants).
+For player-controlled movement, the work is largely event-handling boilerplate: keyboard listeners, debounced re-renders, state update on cell entry, candy removal.
+Familiar JS / DOM idioms (event delegation, requestAnimationFrame for smooth re-renders, basic state object) are the assumed baseline — interviewers expect candidates to write these without referring to documentation.
+Edge cases: robot on a wall, multiple candies in the same cell (should there be?), grid boundary handling, robot collides with itself or with previously-cleared cells.
+Preparation
+Refresh vanilla-JS DOM event handling: addEventListener on document for keyboard input, cell-id-keyed lookups for rendering.
+Drill BFS on a 2-D grid in JS (no Python crutch); know the array-of-arrays vs flat-array trade-offs.
+Prepare a simple state object: { robot: {x, y}, candies: Set<"x,y">, grid: number[][] }. Re-render after each state mutation.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Preparation
+Related discussions · 1
+🔑雪花前端店面
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Throne Inheritance
+Single report
+simulation
+medium
+tree
++1
+Word Search
+Single report
+grid
+medium
+backtracking
++1
+Serialize and Deserialize Dictionary Trie
+Single report
+medium
+trie
+compression
++2
+Min Coins to Pay with Change Allowed
+Single report
+medium
+dp
+greedy
++1
+Copy List with Random Pointer
+Single report
+medium
+linked-list
+hashmap
+Code editor

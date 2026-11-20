@@ -1,0 +1,1401 @@
+{
+  "company": "linkedin",
+  "display_name": "LinkedIn",
+  "qbank_count": 37,
+  "questions_scraped": 37,
+  "site_total_count": 132,
+  "oj_count": 95,
+  "external_count": 0,
+  "description": "LinkedIn's loop pivoted heavily in 2025 — Staff candidates now sit a packed two-round phone screen (coding + project retro) before a five-round onsite that includes an AI-Coding session in CoderPad's assistant pane. Behavioural depth is the dominant downlevel axis; the same coding bar that passes at Senior frequently caps a Staff loop with a downlevel offer.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/linkedin",
+  "scraped_at": "2026-09-20",
+  "source": "1point3acres qbank (logged-in session)",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "coding-merge-nary-trees-by-key",
+      "title": "Merge N-ary Trees by Node Key",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Medium",
+      "last_asked": "2026-08-27",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "tree",
+        "dfs",
+        "recursion",
+        "concurrency",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "tree",
+        "dfs",
+        "recursion",
+        "concurrency",
+        "medium"
+      ],
+      "overview": "Merge two N-ary trees whose nodes carry stable keys, combining nodes only when their keys match. The prompt is an N-ary transformation of the familiar binary-tree merge family, with conflict-policy and concurrent-update follow-ups.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-merge-nary-trees-by-key"
+    },
+    {
+      "n": 2,
+      "slug": "coding-weighted-sampling-die",
+      "title": "Weighted Sampling from a Probability Distribution",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-03-25",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "SWE",
+        "RS"
+      ],
+      "tags": [
+        "probability",
+        "sampling",
+        "binary-search",
+        "prefix-sum",
+        "numerical-stability",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "swe",
+        "rs"
+      ],
+      "tags_slug": [
+        "probability",
+        "sampling",
+        "binary-search",
+        "prefix-sum",
+        "numerical-stability",
+        "medium"
+      ],
+      "overview": "Given a probability distribution over `N` categories (e.g. an M-faced biased die or softmax weights), draw a sample in `O(log N)`. The canonical solution is inverse-CDF sampling — build a cumulative prefix and binary-search a uniform `[0, 1)` draw. Follow-ups dig into probabilities that don't sum to 1, very large or peaked distributions, and rejection-sampling expected cost.",
+      "source_count": 6,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-weighted-sampling-die"
+    },
+    {
+      "n": 3,
+      "slug": "coding-phone-letter-combinations",
+      "title": "Phone Keypad — Letter Combinations / Word Filter",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Medium",
+      "last_asked": "2026-03-02",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "backtracking",
+        "string",
+        "hashmap",
+        "trie",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "backtracking",
+        "string",
+        "hashmap",
+        "trie",
+        "medium"
+      ],
+      "overview": "The classic phone-keypad letter-combinations problem shows up nearly every recent loop, often as the screen warm-up. A common variant: given a digit string and a dictionary of words, return which words can be typed on the keypad — the structural twist that turns it into a hash / trie problem rather than pure backtracking.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-phone-letter-combinations"
+    },
+    {
+      "n": 4,
+      "slug": "coding-min-sum-distance-line",
+      "title": "Minimum Sum-of-Distances Meeting Point on a Line",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Medium",
+      "last_asked": "2026-02-17",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "SWE",
+        "RS"
+      ],
+      "tags": [
+        "math",
+        "quickselect",
+        "sorting",
+        "math-reasoning",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "swe",
+        "rs"
+      ],
+      "tags_slug": [
+        "math",
+        "quickselect",
+        "sorting",
+        "math-reasoning",
+        "medium"
+      ],
+      "overview": "Given a 1-D array of points, find the point that minimizes the sum of absolute distances to every other point. The answer is the median; the interview signal is the proof, not the code. Follow-ups extend to L2 distance with k chosen positions (much harder) and to streaming median maintenance.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-min-sum-distance-line"
+    },
+    {
+      "n": 5,
+      "slug": "coding-lru-cache-multithread",
+      "title": "LRU Cache + Thread-Safe Follow-up",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-01-22",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "data-structure",
+        "hashmap",
+        "linked-list",
+        "concurrency",
+        "threading",
+        "ai-tools",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "hashmap",
+        "linked-list",
+        "concurrency",
+        "threading",
+        "ai-tools",
+        "medium"
+      ],
+      "overview": "Implement an LRU cache, then extend to a thread-safe version. In post-reform loops this is often delivered as the AI-coding round: candidates outline the doubly-linked-list + hashmap design, let the in-IDE assistant produce the skeleton, then dry-run unit tests and reason about lock granularity.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-lru-cache-multithread"
+    },
+    {
+      "n": 6,
+      "slug": "coding-recommender-training-pipeline",
+      "title": "Recommender Training Pipeline",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-09-06",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "recommendation",
+        "classification",
+        "feature-engineering",
+        "json",
+        "ambiguous-spec"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "recommendation",
+        "classification",
+        "feature-engineering",
+        "json",
+        "ambiguous-spec"
+      ],
+      "overview": "Complete a text-embedding recommender training pipeline using member profiles, item text, and clicked/skipped labels. Implement the RecommenderTrainer data-loading, feature-preparation, and training methods; the interviewer also requested a handwritten MLP.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-recommender-training-pipeline"
+    },
+    {
+      "n": 7,
+      "slug": "coding-nested-list-weight-sum-ii",
+      "title": "Nested List Weight Sum II (LC 364)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-09-04",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "recursion"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "recursion"
+      ],
+      "overview": "Compute the inverse-depth-weighted sum of integers in a nested list. The candidate explicitly identified this as unchanged LeetCode 364.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-nested-list-weight-sum-ii"
+    },
+    {
+      "n": 8,
+      "slug": "coding-logistic-regression-debugging",
+      "title": "Logistic Regression Debugging",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-24",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "debugging",
+        "classification",
+        "gradient-descent",
+        "ml-knowledge",
+        "hard"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "debugging",
+        "classification",
+        "gradient-descent",
+        "ml-knowledge",
+        "hard"
+      ],
+      "overview": "Debug a logistic-regression implementation with errors in the weight gradient, sigmoid-derivative contract, and binary cross-entropy loss. The interviewer expects the corrected gradient to be derived and simplified to its final matrix form.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-logistic-regression-debugging"
+    },
+    {
+      "n": 9,
+      "slug": "coding-robot-navigation-unknown-grid",
+      "title": "Robot Navigation in an Unknown Grid",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-18",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "grid",
+        "graph",
+        "bfs",
+        "simulation",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "grid",
+        "graph",
+        "bfs",
+        "simulation",
+        "medium"
+      ],
+      "overview": "Control a robot in an initially unexplored matrix using turn, forward-move, wall-detection, and return-to-explored-location operations. Discover traversable cells while finding a path from the starting position to the destination.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-robot-navigation-unknown-grid"
+    },
+    {
+      "n": 10,
+      "slug": "coding-count-distinct-sorted-array",
+      "title": "Count Distinct Values in a Massive Sorted Array",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-16",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "binary-search",
+        "divide-and-conquer",
+        "recursion",
+        "complexity-analysis",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "binary-search",
+        "divide-and-conquer",
+        "recursion",
+        "complexity-analysis",
+        "medium"
+      ],
+      "overview": "Count distinct values in a sorted array where `n` may be in the billions but the number of distinct values `k` is only in the hundreds. Skip each equal-value run with boundary searches for O(k log n), and analyze a divide-and-conquer alternative that can degrade to O(n).",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-count-distinct-sorted-array"
+    },
+    {
+      "n": 11,
+      "slug": "coding-k-closest-elements-sorted-array",
+      "title": "Find K Closest Elements in a Sorted Array (LC 658)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-16",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "binary-search",
+        "two-pointer",
+        "heap",
+        "top-k",
+        "io",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "binary-search",
+        "two-pointer",
+        "heap",
+        "top-k",
+        "io",
+        "medium"
+      ],
+      "overview": "Given a sorted array, target `x`, and integer `k`, return the `k` closest values in sorted order, preferring the smaller value on equal distance. Implement the binary-search-on-window solution and discuss unsorted-input and out-of-memory variants.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-k-closest-elements-sorted-array"
+    },
+    {
+      "n": 12,
+      "slug": "coding-pow-x-n",
+      "title": "Pow(x, n) (LC 50)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-16",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "math",
+        "recursion",
+        "complexity-analysis",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "math",
+        "recursion",
+        "complexity-analysis",
+        "medium"
+      ],
+      "overview": "Implement `pow(x, n)` for positive and negative integer exponents. The round expects an O(log n) solution in both recursive and iterative form, plus explicit handling of the minimum signed-integer exponent where ordinary negation overflows.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-pow-x-n"
+    },
+    {
+      "n": 13,
+      "slug": "coding-prefix-sum-2d-matrix-oa",
+      "title": "2-D Matrix Range Sum with Updates (OA SumTable)",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Single report",
+      "last_asked": "2026-04-08",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "prefix-sum",
+        "data-structure",
+        "io",
+        "parsing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "prefix-sum",
+        "data-structure",
+        "io",
+        "parsing",
+        "medium"
+      ],
+      "overview": "HackerRank OA for the SWE AI Trainer (LLM rater) role. Five TypeScript multiple-choice questions on code-quality judgement plus one Python implementation: process a stream of `get`/`set` queries against a 2-D matrix returning the rectangle sum for `get` and applying point updates for `set`.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-prefix-sum-2d-matrix-oa"
+    },
+    {
+      "n": 14,
+      "slug": "coding-stratified-sample",
+      "title": "Stratified Sampling from Class-Bucketed JSON",
+      "category": "coding",
+      "duration": "20 min",
+      "frequency": "Single report",
+      "last_asked": "2026-03-18",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "sampling",
+        "probability",
+        "hashmap",
+        "data-engineering",
+        "easy"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "sampling",
+        "probability",
+        "hashmap",
+        "data-engineering",
+        "easy"
+      ],
+      "overview": "ML-coding sub-round (~20 min slot inside a triple-task phone screen). Input is a JSON object keyed by class label; the values are example arrays. Implement a uniform-over-classes sampler — pick a class uniformly at random first, then sample one example from that class.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-stratified-sample"
+    },
+    {
+      "n": 15,
+      "slug": "coding-cache-rank-eviction",
+      "title": "Cache with Rank-Based Eviction Policy",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-22",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-structure",
+        "hashmap",
+        "heap",
+        "object-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "hashmap",
+        "heap",
+        "object-design",
+        "medium"
+      ],
+      "overview": "Given an interface where every cached value implements `rank()`, build a cache whose eviction policy drops the lowest-`rank()` entry on overflow. Hashmap plus a min-heap on `rank` is the baseline; the interesting follow-up is a stable last-seen-timestamp tiebreaker via doubly-linked-list bookkeeping per rank bucket.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-cache-rank-eviction"
+    },
+    {
+      "n": 16,
+      "slug": "coding-service-dependency-impact",
+      "title": "Service Dependency Impact Propagation",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-12-22",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "graph",
+        "dfs",
+        "bfs",
+        "topological-sort",
+        "tree",
+        "ai-tools",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "graph",
+        "dfs",
+        "bfs",
+        "topological-sort",
+        "tree",
+        "ai-tools",
+        "medium"
+      ],
+      "overview": "Given a JSON manifest mapping services to their `read_from` and `write_to` paths, and a list of deleted paths, identify which services are impacted. Three escalating sub-tasks layer a directory-tree projection and a service dependency chain on top of a basic intersection scan. The AI-coding round template — long prompt, IDE-context loading, assistant-driven implementation.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-service-dependency-impact"
+    },
+    {
+      "n": 17,
+      "slug": "coding-sparse-vector-matrix-product",
+      "title": "Sparse Vector / Matrix Product",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-11-16",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RS"
+      ],
+      "tags": [
+        "data-structure",
+        "object-design",
+        "math",
+        "linear-algebra",
+        "memory-bounded",
+        "hard"
+      ],
+      "roles_slug": [
+        "mle",
+        "rs"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "object-design",
+        "math",
+        "linear-algebra",
+        "memory-bounded",
+        "hard"
+      ],
+      "overview": "Design `SparseVector` and `SparseMatrix` classes from scratch, then implement vector-vector and matrix-matrix products without materializing the dense form. The bar is *both* sub-`O(M × N)` time and minimal memory — a list-of-coordinates representation is the expected baseline; CSR/CSC if pushed.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-sparse-vector-matrix-product"
+    },
+    {
+      "n": 18,
+      "slug": "coding-subarray-first-last-equal-max",
+      "title": "Count Subarrays Where First = Last = Max",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Single report",
+      "last_asked": "2025-11-13",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "stack",
+        "hashmap",
+        "monotonic-stack",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "stack",
+        "hashmap",
+        "monotonic-stack",
+        "medium"
+      ],
+      "overview": "Count subarrays where the first element equals the last element equals the maximum value in the subarray. Not a canonical LC problem; the optimal `O(N)` solution uses a monotonic-decreasing stack to find, for each index, the next strictly greater element on the right and group equal-value runs accordingly.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-subarray-first-last-equal-max"
+    },
+    {
+      "n": 19,
+      "slug": "coding-ranked-choice-voting",
+      "title": "Ranked-Choice Voting (Instant Runoff)",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Single report",
+      "last_asked": "2025-11-12",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "simulation",
+        "hashmap",
+        "algorithm",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "simulation",
+        "hashmap",
+        "algorithm",
+        "medium"
+      ],
+      "overview": "Implement instant-runoff voting: each voter submits a preference ranking; in each round, the lowest-vote candidate is eliminated and that candidate's votes redistribute to their next-preferred remaining candidate. Return the candidate that first crosses 50%. Pure simulation with care needed on tie-breaking and ballot iteration pointers.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-ranked-choice-voting"
+    },
+    {
+      "n": 20,
+      "slug": "coding-largest-number",
+      "title": "Largest Number (LC 179)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "—",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [],
+      "tags": [
+        "sorting",
+        "string"
+      ],
+      "roles_slug": [],
+      "tags_slug": [
+        "sorting",
+        "string"
+      ],
+      "overview": "Arrange non-negative integers to form the largest concatenated number. The standard formulation returns a string; any interview-specific modifications remain unspecified.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-largest-number"
+    },
+    {
+      "n": 21,
+      "slug": "coding-lfu-cache",
+      "title": "LFU Cache",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-04-17",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-structure",
+        "hashmap",
+        "linked-list",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "hashmap",
+        "linked-list",
+        "hard"
+      ],
+      "overview": "LeetCode 460 — implement an `O(1)` LFU cache. Two hashmaps (key→node, freq→doubly-linked-list) plus a `min_freq` cursor. Surfaces in both phone screens and onsite coding rounds, often as the candidate's second algorithmic problem in a tight window.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-lfu-cache"
+    },
+    {
+      "n": 22,
+      "slug": "coding-max-stack",
+      "title": "Max Stack",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Low",
+      "last_asked": "2026-03-02",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "stack",
+        "hashmap",
+        "linked-list",
+        "data-structure",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "stack",
+        "hashmap",
+        "linked-list",
+        "data-structure",
+        "medium"
+      ],
+      "overview": "LeetCode 716: implement a stack with `push`, `pop`, `top`, `peekMax`, and `popMax`. The `popMax` operation is the discriminator — the optimal answer is a doubly-linked list of nodes plus a TreeMap (or skip list) keyed on value, giving `O(log N)` for `popMax` and `O(1)` for the rest.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-max-stack"
+    },
+    {
+      "n": 23,
+      "slug": "coding-biased-coin-uniform",
+      "title": "Biased Coin to Uniform Range",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Low",
+      "last_asked": "2026-02-23",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "probability",
+        "sampling",
+        "math-reasoning",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "probability",
+        "sampling",
+        "math-reasoning",
+        "medium"
+      ],
+      "overview": "Given a biased Bernoulli (returns 0 with probability `p`, 1 with probability `1-p`), construct a uniform sampler over `[0, 6]`. The canonical recipe: combine two biased draws to get a fair coin (Von Neumann's trick), then bit-pack three fair coins and reject draws outside `[0, 6]`.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-biased-coin-uniform"
+    },
+    {
+      "n": 24,
+      "slug": "coding-meeting-scheduler-earliest-slot",
+      "title": "Meeting Scheduler — Earliest Available Slot",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-02-12",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "interval",
+        "binary-search",
+        "data-structure",
+        "concurrency",
+        "ai-tools",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "interval",
+        "binary-search",
+        "data-structure",
+        "concurrency",
+        "ai-tools",
+        "medium"
+      ],
+      "overview": "Given a list of existing meetings and a new meeting's required start-time-no-earlier-than and duration, return the earliest start that fits. Delivered as the AI-coding round in recent loops — the interviewer watches whether the candidate uses the assistant for boilerplate while keeping the data-structure decision (sorted-by-start with binary search vs segment tree) under their own control.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-meeting-scheduler-earliest-slot"
+    },
+    {
+      "n": 25,
+      "slug": "coding-alert-monitor",
+      "title": "Alert Monitor — Rolling Window + Severity Distribution + Spike Detection",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-02-04",
+      "stage": "onsite-coding",
+      "access": "Free preview",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "data-structure",
+        "queue",
+        "stack",
+        "sliding-window",
+        "streaming",
+        "interval",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "queue",
+        "stack",
+        "sliding-window",
+        "streaming",
+        "interval",
+        "medium"
+      ],
+      "overview": "Build an `AlertMonitor` class with three queries against an append-only stream: count alerts in the trailing 15 minutes, return the severity histogram for the current hour-block, and emit a next-greater-volume index per minute. The third sub-task is monotonic-stack territory; the round tests whether the candidate picks the right data structure for each query rather than retrofitting one structure for everything.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-alert-monitor"
+    },
+    {
+      "n": 26,
+      "slug": "coding-function-exclusive-inclusive-time",
+      "title": "Function Inclusive / Exclusive Time",
+      "category": "coding",
+      "duration": "55 min",
+      "frequency": "Low",
+      "last_asked": "2025-11-20",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "stack",
+        "string",
+        "parsing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "stack",
+        "string",
+        "parsing",
+        "medium"
+      ],
+      "overview": "Given a list of `(function_id, start|end, timestamp)` log lines, compute the inclusive and exclusive elapsed time for a target function. LeetCode 636 variant — stack-based bookkeeping where each `start` pushes a context and each `end` pops while attributing elapsed time to the *current top* of the stack.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/coding-function-exclusive-inclusive-time"
+    },
+    {
+      "n": 27,
+      "slug": "sd-job-scheduler",
+      "title": "Distributed Job Scheduler / Calendar Service",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-08-18",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "scheduling",
+        "distributed-systems",
+        "storage",
+        "query-optimization",
+        "data-modeling",
+        "ci-cd",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "scheduling",
+        "distributed-systems",
+        "storage",
+        "query-optimization",
+        "data-modeling",
+        "ci-cd",
+        "medium"
+      ],
+      "overview": "Design a job scheduler / calendar service that supports millions of scheduled tasks, range queries for upcoming tasks, and real-time dashboard updates. Variants include event scheduling with timezones and recurring events.",
+      "source_count": 6,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/sd-job-scheduler"
+    },
+    {
+      "n": 28,
+      "slug": "sd-personalized-inmail-ai",
+      "title": "AI-Powered Personalized Recruiter Message Generation",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-03-21",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "SWE"
+      ],
+      "tags": [
+        "mlsd",
+        "llm-agent",
+        "rag",
+        "tool-use",
+        "ranking",
+        "retrieval",
+        "prompt-engineering",
+        "evaluation",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "swe"
+      ],
+      "tags_slug": [
+        "mlsd",
+        "llm-agent",
+        "rag",
+        "tool-use",
+        "ranking",
+        "retrieval",
+        "prompt-engineering",
+        "evaluation",
+        "medium"
+      ],
+      "overview": "Design an end-to-end system that helps recruiters generate personalised outreach: pull the candidate profile, the open role, the recruiter's past outreach style, and produce a draft InMail. Recurring sub-prompts cover tool registration, RAG, LLM fine-tuning vs prompting, draft / human-in-the-loop, and offline + online evaluation.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/sd-personalized-inmail-ai"
+    },
+    {
+      "n": 29,
+      "slug": "sd-metrics-monitoring-platform",
+      "title": "Metrics & Monitoring Platform",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-03-20",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "mlsd",
+        "system-design",
+        "storage",
+        "streaming",
+        "scaling",
+        "ranking",
+        "top-k",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "mlsd",
+        "system-design",
+        "storage",
+        "streaming",
+        "scaling",
+        "ranking",
+        "top-k",
+        "medium"
+      ],
+      "overview": "Design a metrics platform that ingests production telemetry, supports arbitrary-granularity queries, and powers a visualization layer. Recurring twists: `top-k` exceptions by error class, severity histograms over time, and explicit *no-alerting* scope (the interviewer wants you to scope tight and not drift into pager design).",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/sd-metrics-monitoring-platform"
+    },
+    {
+      "n": 30,
+      "slug": "sd-news-feed",
+      "title": "News Feed / Timeline",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-16",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "feed",
+        "fan-out",
+        "ranking",
+        "caching",
+        "queueing",
+        "data-modeling",
+        "scaling",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "feed",
+        "fan-out",
+        "ranking",
+        "caching",
+        "queueing",
+        "data-modeling",
+        "scaling",
+        "medium"
+      ],
+      "overview": "Design a ranked news feed for a read-heavy social product with seconds-level freshness. Use a hybrid fan-out strategy, lightweight per-user inboxes, asynchronous celebrity delivery, bounded history, two-stage ranking, and explicit read-your-writes handling for a user's own posts.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/sd-news-feed"
+    },
+    {
+      "n": 31,
+      "slug": "sd-collab-coderpad",
+      "title": "Real-Time Collaborative Code Editor",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-11-13",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "system-design",
+        "websocket",
+        "concurrency",
+        "pubsub",
+        "scaling",
+        "frontend",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "system-design",
+        "websocket",
+        "concurrency",
+        "pubsub",
+        "scaling",
+        "frontend",
+        "medium"
+      ],
+      "overview": "Design a CoderPad-like session: one admin can edit, all viewers see real-time updates, new joiners catch up immediately, optional code execution. The interviewer explicitly forbids referring to operational-transform algorithms — derive the propagation model from scratch.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/sd-collab-coderpad"
+    },
+    {
+      "n": 32,
+      "slug": "sd-typeahead-autocomplete",
+      "title": "Type-Ahead / Autocomplete Suggestions",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-04-16",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "search",
+        "trie",
+        "ranking",
+        "caching",
+        "ann",
+        "scaling",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "search",
+        "trie",
+        "ranking",
+        "caching",
+        "ann",
+        "scaling",
+        "medium"
+      ],
+      "overview": "Design a type-ahead service that returns the top-K most relevant completions for a query prefix in `< 100 ms`. Recurring follow-ups: personalisation, multi-region freshness, and tail-latency budget when the trie spans hundreds of millions of phrases.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/sd-typeahead-autocomplete"
+    },
+    {
+      "n": 33,
+      "slug": "sd-job-recommendation-ranking",
+      "title": "LinkedIn Learning / Job Recommendation Ranking",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-03-18",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "mlsd",
+        "recommendation",
+        "ranking",
+        "two-tower",
+        "retrieval",
+        "feature-engineering",
+        "ab-testing",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "mlsd",
+        "recommendation",
+        "ranking",
+        "two-tower",
+        "retrieval",
+        "feature-engineering",
+        "ab-testing",
+        "medium"
+      ],
+      "overview": "Design a recommender that surfaces LinkedIn Learning courses (or jobs) based on the user's profile, recently applied jobs, and behavioural history. Standard candidate-generation + ranking architecture; the LinkedIn-specific twist is heavy feature engineering on the job-posting side and explicit explainability for the recommended item.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/sd-job-recommendation-ranking"
+    },
+    {
+      "n": 34,
+      "slug": "sd-linkedin-skills-extraction",
+      "title": "LinkedIn Skills — Data Mining & ML System Design",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-02-23",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "mlsd",
+        "data-engineering",
+        "data-mining",
+        "retrieval",
+        "classification",
+        "feature-engineering",
+        "evaluation",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "mlsd",
+        "data-engineering",
+        "data-mining",
+        "retrieval",
+        "classification",
+        "feature-engineering",
+        "evaluation",
+        "medium"
+      ],
+      "overview": "Design the pipeline behind LinkedIn's Skills graph: how skill phrases are extracted from resumes / job posts, normalized into a canonical taxonomy, ranked per profile, and continually updated as new skills emerge. The round is graded as much on data collection / labeling strategy as on modeling.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/sd-linkedin-skills-extraction"
+    },
+    {
+      "n": 35,
+      "slug": "sd-single-machine-kv-store",
+      "title": "Single-Machine Key-Value Store with Filesystem Spill",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2025-12-24",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "storage",
+        "in-memory-database",
+        "filesystem",
+        "memory-bounded",
+        "persistence",
+        "data-structure",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "storage",
+        "in-memory-database",
+        "filesystem",
+        "memory-bounded",
+        "persistence",
+        "data-structure",
+        "medium"
+      ],
+      "overview": "Design a single-machine KV store that holds a billion keys and MB-scale values. Memory is bounded; on-disk format is append-only files; values cannot live entirely in memory. The round straddles system design and data-structure design — many candidates over-pivot to distributed systems and lose signal.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/sd-single-machine-kv-store"
+    },
+    {
+      "n": 36,
+      "slug": "behavioral-project-deep-dive",
+      "title": "Project Deep-Dive (Four-Axis Rubric)",
+      "category": "behavioral",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-08-27",
+      "stage": "phone-screen · onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "deep-dive",
+        "project-retro",
+        "behavioral",
+        "leadership",
+        "impact",
+        "presentation",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "deep-dive",
+        "project-retro",
+        "behavioral",
+        "leadership",
+        "impact",
+        "presentation",
+        "medium"
+      ],
+      "overview": "Conversational deep-dive on one or two recent projects, graded against four axes: Leadership, Craftsmanship, Execution, Impact. Bring an architecture diagram (white-board or pre-drawn) and lead the interviewer through with two-to-three years of context. The round runs from `phone screen` through `onsite` depending on level.",
+      "source_count": 12,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/behavioral-project-deep-dive"
+    },
+    {
+      "n": 37,
+      "slug": "behavioral-bq-pack",
+      "title": "Behavioral / BQ Question Pack (Staff & Senior)",
+      "category": "behavioral",
+      "duration": "45 min",
+      "frequency": "High",
+      "last_asked": "2026-08-16",
+      "stage": "phone-screen · onsite-bq",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "behavioral",
+        "star",
+        "leadership",
+        "impact",
+        "conflict",
+        "ambiguity",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "behavioral",
+        "star",
+        "leadership",
+        "impact",
+        "conflict",
+        "ambiguity",
+        "medium"
+      ],
+      "overview": "Recurring behavioral prompts across recent loops, especially at Staff level. LinkedIn's bar is explicit about *leadership narrative depth* — interviewers flag when a Staff candidate's stories sound like Senior-IC work. Bring two-to-three multi-quarter, cross-functional stories with quantified business impact for each top theme.",
+      "source_count": 15,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/linkedin/behavioral-bq-pack"
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+===H1===
+Reverse Words in a String (Preserve Spaces, In-Place)
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/reverse-words-in-place
+===BODY===
+ByteDance / TikTok
+Coding·60 minMembers
+Reverse Words in a String (Preserve Spaces, In-Place)
+Reverse the word order in a string. Follow-ups: rewrite to preserve the original number of spaces between every position, and reduce extra space below `O(n)`.
+SWE
+string
+two-pointer
+in-memory-database
+medium
+Frequency
+Single report
+Last asked
+2026-03-10
+Stage
+onsite-coding
+Requirements
+
+Given a string s, reverse the order of words. A word is a maximal substring of non-space characters.
+
+def reverseWords(s: str) -> str: ...
+
+Follow-ups asked:
+
+Write multiple test cases for your first solution and run them.
+
+Modify the first version to preserve the exact original spacing (the number of spaces between word positions must match the input).
+
+Optimize complexity — first your solution's, then ask whether you can do it in-place (O(1) extra space).
+
+The reported round was C++-specific; the candidate's reverse(begin, end) twice approach was accepted as a passable in-place solution but the interviewer probed for whether that matched their intent.
+
+Notes
+
+The classic O(1) extra-space pattern is: (1) reverse the entire string in place, (2) reverse each word in place. Works on a mutable character array.
+
+For the "preserve spacing" variant: collect the words and the run-lengths of spaces separately, then interleave reversed-word-list with the original space-run sequence.
+
+For the C++ in-place version, std::reverse(first, last) plus a two-pointer scan to find word boundaries is the standard answer.
+
+Time O(n); space O(1) for in-place, O(n) for the split-and-join approach.
+
+Common bug: handling consecutive spaces, leading spaces, or trailing spaces — clarify the trim-or-preserve policy with the interviewer up front. The canonical formulation trims whitespace; the reported variant explicitly preserves the original space layout, which is the harder follow-up.
+
+Preparation
+
+Code the in-place reverse-then-reverse-words version in C++ (or your interview language) until it is second nature.
+
+Drill the "preserve spaces" variant separately — most candidates have not seen it.
+
+Practice on inputs with multiple spaces between words, leading/trailing spaces, and a single word.
+
+Be ready to argue the complexity of each variant and why the two-reverse trick works.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

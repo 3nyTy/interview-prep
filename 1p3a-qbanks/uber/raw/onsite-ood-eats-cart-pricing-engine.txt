@@ -1,0 +1,83 @@
+===H1===
+Onsite OOD / Coding: Uber Eats Cart & Pricing Engine
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/onsite-ood-eats-cart-pricing-engine
+===BODY===
+Uber
+Coding·60 minMembers
+Onsite OOD / Coding: Uber Eats Cart & Pricing Engine
+Recurring Senior / L5+ onsite OOD round (also appears as a system-design prompt depending on team). Design the core classes and interfaces for Uber Eats's cart + pricing engine: item customizations, surge pricing, promos / BOGO, membership benefits, and a receipt breakdown.
+SWE
+EM
+oop-design
+system-design
+scaling
+idempotency
+hard
+Frequency
+Medium
+Last asked
+2026-05-12
+Stage
+onsite-coding · onsite-system-design
+Requirements
+
+Item customization — items can have any number of customizations (extra cheese, no onions, size upgrades). Each customization may add a positive, negative, or zero delta to the item price.
+
+Pricing strategies (composable):
+
+Surge — a multiplier on the subtotal (e.g. 1.2x).
+
+Membership discount — a fixed percentage off the subtotal for Uber One subscribers (e.g. 5%) plus 0% delivery fee.
+
+Promotions — coupon codes that are either flat amounts ($5 off) or percentages (10% off), and BOGO / tiered delivery fees.
+
+Receipt breakdown — final output must itemize: base price, add-ons, fees, surge, discounts, and the final total.
+
+Concurrency — multiple devices may mutate the same cart; the design must protect against lost-update on checkout.
+
+Scale (often added as a follow-up): 10M concurrent orders, multi-region.
+
+Notes
+
+Treat the round as OOD-first, SD-second. The interviewer typically opens by asking for classes and interfaces, then pushes for data model and concurrency in the final 20 minutes.
+
+Suggested class layout:
+
+Item with a list of Customization.
+
+LineItem = Item + quantity + computed line price.
+
+Cart holds line items, a customer_id, merchant_id, status (open / locked / checked-out), and a version counter.
+
+PricingStrategy interface (apply(Cart) → PricingDelta); concrete implementations: SurgePricing, MembershipDiscount, Promotion, DeliveryFee.
+
+PricingEngine runs strategies in a defined order; emits a Receipt object.
+
+Data model: two tables — cart(cart_id, user_id, merchant_id, status, version, pricing_snapshot_ref) and cart_item(cart_id, item_id, quantity, selected_options, price_snapshot). Index (user_id, merchant_id, status) to fetch the active cart in O(1).
+
+Concurrency:
+
+Cart-level optimistic concurrency: every mutation includes expected_version; conditional write on the version column.
+
+Per-item version control if the interviewer pushes on "two devices modify different items concurrently."
+
+The interviewer cares about correctness over latency; multiple write-ups have noted edge cases (price changes mid-cart, promo expiry between view and checkout) as the deciding follow-ups.
+
+Pricing-strategy ordering matters: apply discounts → surge → fees in a documented order, because a percentage-off promo before or after surge gives different totals. Hard-code the order in a PricingPipeline rather than letting each strategy mutate the cart directly. Idempotent checkout uses a (cart_id, version) optimistic-lock token.
+
+Preparation
+
+Pre-bake the PricingStrategy interface — it is the load-bearing abstraction the round revolves around. Practice plugging in a surge strategy and a percentage-discount strategy without rewriting the cart class.
+
+Pre-script answers for: (1) what happens when two devices add items simultaneously; (2) how to snapshot price at checkout so the user sees the same total as the order; (3) how to retry a checkout idempotently.
+
+Skim the Uber Eats public engineering blog posts on cart and surge — interviewers occasionally reuse phrasing from those posts.
+
+Drill a 10-minute whiteboard run-through that ends in a printable receipt object: subtotal → customizations → promos → surge → membership → delivery fee → tax → final. The receipt structure is what the interviewer grades, not the individual strategy code.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

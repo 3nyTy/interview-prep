@@ -1,0 +1,284 @@
+===H1===
+Grid Drop and Remove Duplicates
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/grid-drop-and-remove-duplicates
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Grid Drop and Remove Duplicates
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+Members
+Grid Drop and Remove Duplicates
+
+You are implementing a Connect-4-like board utility on an m x n grid.
+
+SWE
+grid
+simulation
+deduplication
+medium
+Frequency
+Single report
+Last asked
+2026-01-22
+Stage
+phone-screen · onsite-coding
+Grid Drop and Remove Duplicates
+Problem Description
+
+You need to build a tool that acts like a Connect-4 board. You will work with a grid that has m rows and n columns.
+
+An empty spot is marked as 0.
+Spots with pieces are marked with letters like R, Y, or B.
+
+This interview has three parts:
+
+Write a function to drop a piece into a specific column.
+Write a function to remove groups of pieces of the same color that are touching.
+Make the remaining pieces fall down (gravity) after removing old ones. You must handle dropping and removing one after another.
+Part 1: Dropping Pieces
+Task Requirements
+
+You need to write this function:
+
+drop(color: str, col: int) -> list[list[str]]
+
+
+The Rules:
+
+The piece must fall to the lowest empty row in that column.
+If the column is full, you must raise an error.
+Return the grid state after the drop.
+Usage Example
+
+Imagine a 3x3 empty grid. If we call drop("Y", 1) four times, this is what happens:
+
+0 0 0      0 0 0      0 Y 0      0 Y 0
+0 0 0  ->  0 Y 0  ->  0 Y 0  ->  0 Y 0
+0 Y 0      0 Y 0      0 Y 0      0 Y 0 (4th call fails: column is full)
+
+Approach and Solution
+
+A slow way to solve this is to check the column from bottom to top every time. That takes O(m) time. A faster way is to remember the next empty row for every column. This allows us to drop a piece in O(1) time.
+
+class GridGame:
+    def __init__(self, rows: int, cols: int):
+        self.rows = rows
+        self.cols = cols
+        self.grid = [["0"] * cols for _ in range(rows)]
+        # stores the row index where the next piece falls for column c
+        self.next_free_row = [rows - 1] * cols
+
+    def drop(self, color: str, col: int) -> list[list[str]]:
+        if col < 0 or col >= self.cols:
+            raise ValueError("invalid column")
+        r = self.next_free_row[col]
+        if r < 0:
+            raise ValueError("column is full")
+
+        self.grid[r][col] = color
+        self.next_free_row[col] -= 1
+        return self.grid
+
+Time and Space Analysis
+Operation	Time	Space
+drop (optimized)	O(1)	O(n) for column pointers
+Part 2: Removing Matching Groups
+Task Requirements
+
+You need to write this function:
+
+remove_duplicate() -> list[list[str]]
+
+
+How it works:
+
+Find groups of the same color that are touching (connected up, down, left, or right).
+If a group has 2 or more pieces, remove them (change them to 0).
+Return the updated grid.
+
+Example:
+
+R Y 0       R 0 0
+B Y Y  =>   0 0 0
+B R 0       0 R 0
+
+Approach and Solution
+
+We use BFS or DFS to find the groups. Then we verify the size of the group and remove the pieces if necessary.
+
+from collections import deque
+
+class GridGame:
+    def remove_duplicate(self) -> list[list[str]]:
+        rows, cols = self.rows, self.cols
+        seen = [[False] * cols for _ in range(rows)]
+        to_clear: list[tuple[int, int]] = []
+
+        for r in range(rows):
+            for c in range(cols):
+                color = self.grid[r][c]
+                if color == "0" or seen[r][c]:
+                    continue
+
+                q = deque([(r, c)])
+                seen[r][c] = True
+                comp = [(r, c)]
+
+                while q:
+                    x, y = q.popleft()
+                    for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                        nx, ny = x + dx, y + dy
+                        if nx < 0 or nx >= rows or ny < 0 or ny >= cols:
+                            continue
+                        if seen[nx][ny] or self.grid[nx][ny] != color:
+                            continue
+                        seen[nx][ny] = True
+                        q.append((nx, ny))
+                        comp.append((nx, ny))
+
+                if len(comp) >= 2:
+                    to_clear.extend(comp)
+
+        for r, c in to_clear:
+            self.grid[r][c] = "0"
+
+        return self.grid
+
+Time and Space Analysis
+Operation	Time	Space
+remove_duplicate	O(m * n)	O(m * n)
+Part 3: Handling Gravity
+Task Requirements
+
+After removing pieces, the remaining pieces above them must fall down to fill the gaps. The drop and remove_duplicate functions must continue to work correctly in any order.
+
+Approach and Solution
+
+We add an apply_gravity() function. After gravity moves the pieces, we must update the next_free_row list based on the new grid layout.
+
+class GridGame:
+    def apply_gravity(self) -> list[list[str]]:
+        rows, cols = self.rows, self.cols
+
+        for c in range(cols):
+            write = rows - 1
+            # move non-empty cells to the bottom
+            for r in range(rows - 1, -1, -1):
+                if self.grid[r][c] != "0":
+                    self.grid[write][c] = self.grid[r][c]
+                    if write != r:
+                        self.grid[r][c] = "0"
+                    write -= 1
+
+            # fill the rest of the column with 0s
+            for r in range(write, -1, -1):
+                self.grid[r][c] = "0"
+
+            # update the tracker for the next drop
+            self.next_free_row[c] = write
+
+        return self.grid
+
+    def remove_duplicate_and_fall(self) -> list[list[str]]:
+        self.remove_duplicate()
+        self.apply_gravity()
+        return self.grid
+
+Time and Space Analysis
+Operation	Time	Space
+apply_gravity	O(m * n)	O(1) extra
+remove_duplicate_and_fall	O(m * n)	O(m * n) (from BFS seen)
+Important Takeaways
+Keep drop fast (O(1)) by maintaining the next_free_row tracker.
+If you change the grid in a big way (like applying gravity), you must update the column pointers.
+This ensures that mixing actions like drop -> remove -> gravity -> drop works consistently.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Grid Drop and Remove Duplicates
+Problem Description
+Part 1: Dropping Pieces
+Task Requirements
+Usage Example
+Approach and Solution
+Time and Space Analysis
+Part 2: Removing Matching Groups
+Task Requirements
+Approach and Solution
+Time and Space Analysis
+Part 3: Handling Gravity
+Task Requirements
+Approach and Solution
+Time and Space Analysis
+Important Takeaways
+Related discussions · 0
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Frontend Grid: Robot Eats Candies
+Single report
+grid
+simulation
+medium
++2
+Throne Inheritance
+Single report
+simulation
+medium
+tree
++1
+Filter System with Dynamic Blacklist
+Single report
+simulation
+medium
+oop-design
++3
+Serialize and Deserialize Dictionary Trie
+Single report
+medium
+trie
+compression
++2
+Copy List with Random Pointer
+Single report
+medium
+linked-list
+hashmap
+Code editor

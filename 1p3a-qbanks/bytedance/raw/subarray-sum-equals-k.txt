@@ -1,0 +1,49 @@
+===H1===
+Subarray Sum Equals K (Count)
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/subarray-sum-equals-k
+===BODY===
+ByteDance / TikTok
+CodingMembers
+Subarray Sum Equals K (Count)
+Given an integer array and a target `k`, return the number of contiguous subarrays whose sum equals `k`. The exact interview signature, constraints, and examples remain unspecified.
+SWE
+array
+prefix-sum
+hashmap
+medium
+Frequency
+Single report
+Last asked
+—
+Stage
+phone-screen
+Requirements
+
+Given an integer array nums and a target k, count the contiguous subarrays whose sum equals k.
+
+Count every matching start-and-end pair, including overlapping subarrays.
+
+The exact function signature, numeric constraints, and return type are unspecified; clarify them before coding.
+
+Notes
+
+Maintain a running prefix sum and a frequency map of prefix sums already seen. For each current prefix p, add the stored count of p - k before incrementing the count of p.
+
+Seed the map with {0: 1} so a matching prefix beginning at index 0 is counted. The lookup-before-increment order also handles k = 0 without counting an empty subarray.
+
+The canonical implementation runs in expected O(n) time and O(n) auxiliary space. A variable-size sliding window is not sufficient when values may include negatives.
+
+Preparation
+
+Implement the prefix-sum frequency-map solution from a blank editor and explain why the lookup happens before the current prefix is inserted.
+
+Dry-run an input with negative values, an all-zero input, and an input where multiple overlapping subarrays hit the same target.
+
+Compare the linear scan with an O(n^2) prefix-sum baseline and state what information the map compresses.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

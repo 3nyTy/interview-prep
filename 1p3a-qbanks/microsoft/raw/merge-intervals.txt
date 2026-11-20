@@ -1,0 +1,50 @@
+===H1===
+Merge Intervals (LC 56) + Interview Variant
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/merge-intervals
+===BODY===
+Microsoft
+CodingMembers
+Merge Intervals (LC 56) + Interview Variant
+The canonical prompt is LC 56: sort intervals by start and merge overlaps into disjoint ranges. A Hiring Event variant instead asks for the original intervals that participate in any overlap, so clarify the expected output before coding.
+SWE
+MLE
+array
+interval
+sorting
+medium
+Frequency
+Low
+Last asked
+2026-08-15
+Stage
+onsite-coding
+Requirements
+
+Given a collection of intervals, merge every overlapping group and return the resulting disjoint intervals.
+
+Sort by interval start, then scan while extending the current merged endpoint or beginning a new range.
+
+Handle empty input and a single interval cleanly.
+
+Explain the approach while coding and keep the sorting and merge logic concise and readable.
+
+Notes
+
+Alternate canonical variant — overlap reporting
+
+One Hiring Event version asks for all intervals that overlap another interval rather than the merged union. The wording is thin on whether to preserve each original interval or return consolidated ranges, so clarify the exact output contract before coding.
+
+For the canonical version, code quality and boundary behavior are explicit scoring signals. In Python, expect discussion of a clear sort key and clean handling of empty or single-element input.
+
+Preparation
+
+Implement the canonical merge in one pass after sorting, then test touching endpoints, containment, disjoint ranges, and empty input.
+
+Practice the overlap-reporting variant separately and state the output semantics before writing code.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

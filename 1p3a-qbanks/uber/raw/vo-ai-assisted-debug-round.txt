@@ -1,0 +1,61 @@
+===H1===
+VO: AI-Assisted Coding / Debug Round (HackerRank IDE + AI)
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/vo-ai-assisted-debug-round
+===BODY===
+Uber
+Coding·60 minMembers
+VO: AI-Assisted Coding / Debug Round (HackerRank IDE + AI)
+New 2026 onsite round shape. Uses a HackerRank-hosted IDE that closely resembles Cursor, with an in-browser AI coding assistant available. The interviewer hands over a small full-stack app with a bug (e.g. transaction handling) and grades your ability to debug using AI as a teammate.
+SWE
+ai-tools
+code-reading
+debugging
+medium
+Frequency
+Low
+Last asked
+2026-05-08
+Stage
+onsite-coding
+Requirements
+
+The IDE includes a built-in AI assistant. AI use is explicitly allowed — this is the differentiator from older coding rounds.
+
+A small full-stack application (frontend + backend, often with a transaction feature) is preloaded. The interviewer states the failing scenario (e.g. "transfers between accounts sometimes produce the wrong final balance") and asks you to diagnose and fix.
+
+You may also be asked to add a new small feature on top of the same codebase.
+
+Notes
+
+The IDE supports running the app live in-browser. Spend the first 5 minutes orienting to the project layout — multiple candidates have lost the round to navigation friction.
+
+Treat the AI as a junior teammate: ask it where a function is defined, ask it to summarise a file, ask it for hypotheses on the bug. Do not paste the entire problem and accept the first suggestion — interviewers have flagged candidates who copy-pasted AI output without verifying.
+
+Effective prompting strategies reported:
+
+"Which function might be responsible for handling this transaction?" → narrows the search.
+
+"What invariants does this function assume? Are any of them violated?" → drives the bug hunt.
+
+Production-tier debugging skills (reading stack traces, adding logging, isolating the failing case) matter more than algorithmic depth. This is closer to a real on-the-job debugging session than a leetcode round.
+
+The format is new and varies. The HackerRank IDE may or may not be Cursor-shaped depending on the specific team running the round.
+
+The session transcript of your AI prompts is part of the evaluation surface. Vague prompts ("fix this bug") and accepting the first suggestion are explicitly graded down; surgical prompts that name a function or assert an invariant are graded up. Treat each prompt as a small unit-test request, not a global solve.
+
+Preparation
+
+Practice using Cursor or GitHub Copilot for code navigation in an unfamiliar small repo — clone any open-source project and force yourself to find a specific function in <2 minutes using only AI prompts.
+
+Drill debugging exercises (intentionally broken Python or Node apps) with an AI assistant. Time yourself.
+
+Pre-script a 3-step debugging mental model: reproduce the bug, hypothesise where it lives, verify with a targeted change. Use the AI to accelerate steps 2–3, never to replace step 1.
+
+Run a 30-minute self-drill against an unfamiliar small Express + React repo with a planted bug, using Cursor or a HackerRank AI-IDE trial: practice the orientation pass (entry points, routes, data layer) and the prompt cadence (locate → hypothesis → verify) before the live round.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,70 @@
+===H1===
+Implement round() From String + Round-to-Precision
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/round-and-precision-string
+===BODY===
+Pinterest
+Coding·60 minMembers
+Implement round() From String + Round-to-Precision
+Two-part string-arithmetic problem: (1) reimplement Python's `round()` on a string input — no float conversion — with all the edge cases that exposes; (2) round a numeric string `s` to a precision specified by another string `p` (e.g. `p='100'` rounds to the hundreds, `p='0.1'` rounds to one decimal).
+SWE
+MLE
+string
+string-processing
+parsing
+math
+numerical-stability
+medium
+Frequency
+Low
+Last asked
+2026-05-27
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Part 1. Implement round(s: str) -> str from scratch. Input is a decimal-number string. Round to the nearest integer using banker's rounding (round-half-to-even) or standard half-up — clarify with the interviewer which.
+
+Part 2. Implement roundTo(s: str, p: str) -> str where p describes the precision as a power-of-ten string:
+
+s='12567', p='100'  → '12600'
+
+s='1234.678', p='0.1' → '1234.7'
+
+No floating-point conversion — strings only.
+
+Examples
+
+round("2.5")   → "2"  or "3"  (depending on rounding mode)
+round("-.2")   → "0"
+round("2.")    → "2"
+round("1e300") → defined? (clarify overflow behavior)
+
+roundTo("12567", "100")  → "12600"
+roundTo("1234.678", "0.1") → "1234.7"
+
+Notes
+
+The interviewer will hammer on edge cases — clarify them upfront before writing code: leading -, leading +, leading . with no whole part ('-.2'), trailing . with no fractional part ('2.'), scientific notation ('1e3'), float-overflow strings ('1e300'), and the empty string.
+
+For Part 1, parse the input into (sign, integer-part-digits, fractional-part-digits). To round to the nearest integer, inspect the first fractional digit: if < 5 truncate; if > 5 increment the integer-part-digits (with carry propagation); if == 5, look at downstream fractional digits and apply your chosen tie-break rule.
+
+Carry propagation across digit boundaries is the most-bugged part: rounding '999.5' up should yield '1000', not '9910'. Practice the carry loop on '999', '9999', and '9'.
+
+This also surfaces in the SWE onsite loop, framed as "round the last digit of a non-negative decimal/integer" with heavy case-splitting — same carry-and-edge-case core, no negative sign there.
+
+For Part 2, normalize p to a precision integer = ±exponent of 10 (e.g. '100' → +2, '0.1' → −1). Then shift the decimal point in s by that exponent, round to integer using Part 1, and shift back.
+
+Preparation
+
+Spend the first 5 minutes enumerating edge cases out loud; this is graded as part of the signal.
+
+Implement digit-string addition with carry once before this round — it is the workhorse for every increment-after-rounding operation.
+
+Practice on the example inputs above plus three of your own (negative numbers, very long fractional parts, rounding precision larger than the input).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

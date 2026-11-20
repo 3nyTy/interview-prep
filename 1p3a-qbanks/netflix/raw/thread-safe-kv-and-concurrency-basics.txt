@@ -1,0 +1,103 @@
+===H1===
+Thread Safe Kv And Concurrency Basics
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/thread-safe-kv-and-concurrency-basics
+===BODY===
+Thread Safe Kv And Concurrency Basics
+
+<https://www.1point3acres.com/interview/problems/company/netflix/thread-safe-kv-and-concurrency-basics>
+
+Netflix
+Coding
+
+60 min
+Members
+Thread-Safe KV Store / Atomic Counter / Blocking Queue
+
+Netflix Infra and Data Platform rounds include hands-on concurrency: synchronized KV store, atomic counter, blocking queue, double-checked locking, and TTL map variants.
+
+SWE
+Infra Eng
+concurrency
+threading
+in-memory-database
+ttl
+queue
+race-condition
+medium
+Frequency
+Low
+Last asked
+2026-03-31
+Stage
+phone-screen  onsite-coding
+Requirements
+KV variant: implement get, put, and optionally delete with thread safety.
+TTL variant: entries expire after a fixed duration; support lazy cleanup and capacity cleanup.
+Atomic counter variant: increment(), decrement(), get(), and optionally wait until value reaches zero.
+Atomic counter should also expose add(delta) -> int returning the updated value, with increment/decrement delegating to it. In Python the GIL is not sufficient: x += 1 is a non-atomic load-add-store, so the read-modify-write must run under the same lock or one update is lost. Common follow-ups: a compare_and_set(expected, new) CAS API, reducing contention via striped / per-thread counters, and a lock-free variant using hardware atomics.
+Blocking queue variant: offer(), poll(), peek(), size(), and wait / signal behavior.
+Explain validation and production behavior, not just code.
+Notes
+Java can use ConcurrentHashMap, AtomicInteger, ReentrantLock, and Condition. Python can use threading.Lock / RLock / Condition with careful critical sections.
+Start with correctness under a coarse lock. Then discuss fine-grained lock striping if contention is high.
+Double-checked locking is usually about avoiding repeated expensive initialization while still publishing a fully initialized object safely.
+For TTL maps, get can check expiry for the requested key while background cleanup removes old keys globally.
+Blocking queue correctness depends on condition loops, not one-time if: always re-check the predicate after waking.
+Count-down-latch variant (__init__(count), count_down(), wait(), plus a count_up() twist that makes it re-armable): back it with a Condition; count_down decrements and notify_all() exactly when the count hits zero; wait() blocks in a while count > 0: loop (the loop, not an if, is what guards against spurious wakeups). notify_all over notify because every waiter must proceed once the gate opens.
+Preparation
+Implement a coarse-lock KV store and a striped-lock KV store.
+Implement a blocking queue with not_empty and not_full conditions.
+Implement an atomic counter with waitUntilZero().
+Be ready to explain race cases: lost update, stale read, deadlock, missed signal, and cleanup racing with get.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Preparation
+Related discussions  3
+???? ??? GenAI Architecture Interview ?????? ??????
+???????
+?Netflix technical ????
+Related questions
+
+Other Netflix questions sharing tags with this one
+
+Weighted Cache / Timed Cache
+Medium
+ttl
+concurrency
+medium
++3
+Latency Tracker with Percentile Window
+Low
+concurrency
+threading
+medium
++3
+Count Disjoint String Pairs
+Low
+medium
+bitmask
+string
++1
+Movie Billboard Rotation Service
+Low
+medium
+heap
+ranking
++3
+Number Pairs That Match Target
+Single report
+medium
+hashmap
+array
++1
+Code editor
+
+---

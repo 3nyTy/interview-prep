@@ -1,0 +1,50 @@
+===H1===
+Lowest Common Ancestor (BT / BST / N-ary)
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/lowest-common-ancestor
+===BODY===
+Meta
+Coding·40 minMembers
+Lowest Common Ancestor (BT / BST / N-ary)
+LeetCode 235 (BST), 236 (binary tree), and 1644 (with optional nodes). The N-ary variant is Meta's preferred follow-up.
+SWE
+MLE
+Infra Eng
+tree
+recursion
+medium
+Frequency
+Medium
+Last asked
+2026-08-21
+Stage
+phone-screen · onsite-coding
+Requirements
+
+BST LCA: walk down comparing values.
+
+Binary-tree LCA: post-order — if both children return non-null, current is LCA.
+
+Optional-node variant: must confirm both targets exist before returning.
+
+N-ary variant: same post-order pattern; collect non-null hits across all children.
+
+Follow-up: nodes have parent pointers — two-pointer chase to common ancestor.
+
+Notes
+
+Confirm up front whether either target may be absent — changes return contract.
+
+Some interviewers ask for both recursive and parent-pointer iterative solutions.
+
+Preparation
+
+Write LCA-binary-tree, LCA-BST, LCA-with-parent-pointer from memory.
+
+Practice the N-ary post-order variant — Meta asks for it explicitly.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

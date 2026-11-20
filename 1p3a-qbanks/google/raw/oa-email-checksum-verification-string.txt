@@ -1,0 +1,60 @@
+===H1===
+OA: Email Checksum + Verification-String Lookup
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/oa-email-checksum-verification-string
+===BODY===
+Google
+Coding·30 minMembers
+OA: Email Checksum + Verification-String Lookup
+SDE II Early-Career HackerRank OA, problem 1 of 2 (90 min total). Implementation-heavy: slice an email body into k-character chunks, map each chunk to a checksum integer using a fixed letter→digit table, then index into a verification string (with modular wrap) to produce the final verification token. Framed as Gmail's anti-spam check.
+SWE
+string
+simulation
+easy
+Frequency
+Single report
+Last asked
+2026-05-17
+Stage
+oa
+Requirements
+
+Inputs: an email content string, a verification string, and an integer chunk size k.
+
+For each non-overlapping k-character window of email:
+
+Map each character to an integer using a fixed table: a–z → 1–25 (lowercase only, per the report), and :, /, . → 26, 27, 28 respectively.
+
+Sum the mapped values over the window — this is the window's checksum.
+
+Use that checksum to index into verification. If the checksum exceeds len(verification), take it modulo the length.
+
+Append the character found at that index to the output verify string.
+
+Return the assembled verify string.
+
+Time budget: candidate aimed to finish in 5–10 minutes so the second (much larger) OA problem has the bulk of the remaining time.
+
+Notes
+
+Pure implementation, no algorithmic trick — clean lookup tables and one pass.
+
+Characters outside the documented table (uppercase, digits, other punctuation) were not specified in the prompt. Decide on a sensible default (skip / treat as 0 / raise) and call it out in a comment; reviewers tend to accept any explicit choice.
+
+Handle the tail window when len(email) % k != 0: the prompt as recovered doesn't pin this down — either pad with a 0-contribution sentinel or stop early. Ask in chat; both are accepted.
+
+The mod wrap on the verification string is the only easy-to-miss spec — idx = checksum % len(verification) is intended even when checksum < len(verification) (handle the zero edge consistently).
+
+Preparation
+
+Write the lookup table once with {ch: i+1 for i, ch in enumerate(string.ascii_lowercase)} plus three special-char overrides; saves time vs hand-typing 28 entries.
+
+Practice slicing email[i:i+k] in a loop where i strides by k — common off-by-one source.
+
+Run a 2-minute sanity check end-to-end on a toy input before moving to problem 2; the OA gives only 2 visible test cases, no hidden cases run during the session.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

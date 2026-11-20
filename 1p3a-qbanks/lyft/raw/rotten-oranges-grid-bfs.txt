@@ -1,0 +1,55 @@
+===H1===
+Rotten Oranges / Grid Infection BFS
+===URL===
+https://www.1point3acres.com/interview/problems/company/lyft/rotten-oranges-grid-bfs
+===BODY===
+Lyft
+Coding·60 minFree preview
+Rotten Oranges / Grid Infection BFS
+A recurring phone-screen and OA-style coding prompt equivalent to the rotten-oranges family: run a BFS infection process on a grid and compute whether all reachable fresh cells can be converted.
+SWE
+bfs
+grid
+medium
+Frequency
+Medium
+Last asked
+2026-09-01
+Stage
+oa · phone-screen · onsite-coding
+Requirements
+
+Input is a 2-D grid representing cells with at least empty, fresh, and infected states.
+
+All initially infected cells spread simultaneously to their valid neighbors each minute or step.
+
+Return the total time needed to infect all fresh cells, or return the failure value if some fresh cell can never be reached.
+
+Be ready to explain the queue initialization, visited/state mutation, and time counting.
+
+Notes
+
+This has appeared as a technical screen and as an OA-style first round.
+
+Candidates described it as straightforward BFS; one T4 loop finished the coding portion in about 20 minutes.
+
+This is the canonical multi-source BFS grid simulation: enqueue every initially infected cell, count fresh cells up front, mutate cells as they become infected, and stop early when the fresh count reaches zero.
+
+The main failure mode is off-by-one time counting when multiple starting cells are processed level by level. A robust pattern is to increment minutes only after processing one full frontier that actually infects at least one fresh cell.
+
+Runtime is O(rows * cols) and space is O(rows * cols) in the worst case because each cell is inspected/enqueued at most once.
+
+Preparation
+
+Implement multi-source BFS from memory with both common styles: queue entries as (row, col, minute) and level-order loops that process len(queue) items per minute.
+
+Drill edge cases: no fresh cells, no infected cells, isolated fresh cells, and a one-cell grid.
+
+Practice explaining why each cell is enqueued at most once and why the runtime is O(rows * cols).
+
+Re-solve the LC-equivalent prompt three times, then rewrite the solution using generic names like healthy/infected/blocked so you are not dependent on orange-specific wording.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

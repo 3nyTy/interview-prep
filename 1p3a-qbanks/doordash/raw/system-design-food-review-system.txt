@@ -1,0 +1,96 @@
+===H1===
+System Design: Food Review System with Reward Bonus
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/system-design-food-review-system
+===BODY===
+DoorDash
+System Design·75 minMembers
+System Design: Food Review System with Reward Bonus
+Design a food-review system on top of DoorDash orders. Users submit reviews (text, rating 1–5, optional photos) tied to a delivered order. The system aggregates per-item ratings (5-point scale), shows posts with like counts, and rewards high-engagement reviews (100+ thumbs up) with DoorDash credit. Sometimes paired with a monthly driver-payout subsystem in the same prompt.
+SWE
+ranking
+feed
+caching
+idempotency
+moderation
+kafka
+medium
+Frequency
+High
+Last asked
+2026-09-01
+Stage
+onsite-system-design
+Requirements
+
+Functional
+
+A user who completed an order can submit one review per item (text + 1–5 star + optional photos / video).
+
+Per-item displayed rating is aggregated across all reviews and shown as a 5-point average plus review count.
+
+Reviews are listed per item with like counts; users can like / unlike a review.
+
+When a review reaches 100+ likes, the author receives DoorDash credit as a reward.
+
+(Variant) End of month, drivers are paid based on aggregated delivery records — a separate but adjacent subsystem.
+
+Non-functional
+
+Read-heavy: per-item rating reads dominate (every browse view triggers one). Cache aggressively.
+
+Writes are bursty: a popular item can attract thousands of reviews after a viral post.
+
+Reward credit must be idempotent — a review crossing 100 likes is rewarded exactly once even if the like counter is double-counted.
+
+Multimedia must be served via CDN; uploads must validate size / type and be moderated.
+
+Notes
+
+Core data model. reviews(id, user_id, item_id, order_id, rating, text, created_at); review_media(review_id, url, type); review_likes(review_id, user_id, created_at) (or a counter); item_rating_agg(item_id, total_rating, review_count) for the 5-point display.
+
+Rating aggregation. Keep a denormalized item_rating_agg row updated by a streaming consumer of the review_created event. The displayed average is total_rating / review_count. Recompute from raw reviews via a nightly job to repair drift.
+
+Like counters. Two layers: a Redis counter for hot reads (per-review like count) plus a review_likes table for the source of truth. Counter is updated on each like and asynchronously persisted to the DB; the DB row enables dedupe and audit.
+
+Reward trigger. Subscribe a worker to a like_threshold_crossed event emitted when the counter crosses 100. Use a rewards_granted(review_id, granted_at, idempotency_key) table to ensure exactly-one credit per crossing. Idempotency key = review_id.
+
+Multimedia. Direct-to-S3 (or equivalent) upload with pre-signed URL; CDN-fronted reads; per-upload moderation pipeline (NSFW / spam detection) before the review becomes visible.
+
+Moderation. A pending_reviews table for the moderation queue; reviews go from pending → visible after auto-moderation passes or a human approves.
+
+Anti-abuse. Rate-limit reviews per user per item (one per delivered order); like-abuse detection via reputation + IP heuristics.
+
+Driver-payout variant. Append-only delivery_events(driver_id, order_id, completed_at, payment_due) table; monthly batch job aggregates per-driver totals and emits payout intents into the payments system (same idempotency-key pattern as the 3-day donation prompt).
+
+The like-threshold reward is sometimes framed as cashback (DoorDash credit) for highly-upvoted reviews; the mechanics are identical to the 100-likes reward above.
+
+Upvote / downvote variant. Some rounds replace likes with up- and downvotes and reward authors whose reviews accumulate heavy upvotes. Keep votes in a dedicated review_votes(review_id, user_id, vote_type) table with a uniqueness constraint on (review_id, user_id) — distinguishing review authorship from voting on a review in the schema, and enforcing one vote per user per review, are both explicitly probed.
+
+Common follow-up themes
+
+What if the like counter is double-incremented due to a duplicate request? (Idempotency on (review_id, user_id); counter is a derived view, not the source of truth.)
+
+How do you display ratings while moderation is pending? (Hide from public list; show to the author only with a "pending review" banner.)
+
+How do you compute a personalized rating that down-weights spam? (Reputation-weighted average; recompute via batch.)
+
+How do you keep aggregates fresh under burst writes? (Streaming aggregation with windowed flush; downgrade to eventual consistency under load.)
+
+How do you scale photo storage and serving? (Direct-to-S3 + CDN; thumbnails generated async.)
+
+Preparation
+
+Draw the diagram in 5 minutes: client → API → reviews DB + Kafka → aggregation worker → Redis cache + display API; separately, like service → counter + threshold worker → rewards service.
+
+Have the idempotent-reward story ready: rewards_granted table keyed by review_id, threshold check happens inside the same transaction as the insert.
+
+Brush up on cache-aside read patterns for hot per-item rating reads.
+
+Be ready to talk through the moderation + multimedia pipeline as a side thread; interviewers sometimes dive there instead of the reward logic.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,66 @@
+===H1===
+Min Errors in 0/1/! Subsequence DP
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/errors-in-zero-one-bang-subsequence-dp
+===BODY===
+Amazon
+Coding·40 minMembers
+Min Errors in 0/1/! Subsequence DP
+A database string contains `0`, `1`, and unknown `!`. Each subsequence `01` costs `x`, each `10` costs `y`. Each `!` resolves to either `0` or `1`. Minimize the total cost.
+SWE
+string
+dp
+medium
+Frequency
+Single report
+Last asked
+2026-04-16
+Stage
+oa
+Requirements
+
+Input: a string s over the alphabet {0, 1, !} and two positive costs x, y.
+
+Replace each ! with either 0 or 1 (independently).
+
+Cost = x * (number of 01 subsequences in resolved string) + y * (number of 10 subsequences).
+
+Return the minimum total cost.
+
+Examples
+
+s = "101!0", x = 2, y = 3
+# !->1 gives "10110": #01 subsequences = 2, #10 subsequences = 4
+# cost = 2*2 + 3*4 = 16  (!->0 gives "10100" -> 2*1 + 3*5 = 17, so 16 is optimal)
+
+Notes
+
+Linear-DP solution: scan left-to-right, maintaining zeros_so_far and ones_so_far. At each character, decide its contribution to existing 0 and 1 counters; at each !, branch on 0 vs 1 and keep the cheaper running total.
+
+The greedy heuristic for ! is: choose 0 if y * ones_so_far + x * future_ones_estimate < x * zeros_so_far + y * future_zeros_estimate. Easier as a two-pass DP than a closed-form.
+
+Watch for x != y — symmetry-breaking is the entire point.
+
+DP state: as you scan, maintain (cost, ones_so_far) if the current resolution treats this prefix's !s a certain way; at each !, branch into the two assignments and merge by min-cost.
+
+A cleaner closed-form: track two running quantities — cost_if_zero = total cost assuming this ! becomes 0, cost_if_one = total cost if it becomes 1 — and pick the cheaper. Each 0 contributes y * (number of preceding ones) to the 10 cost; each 1 contributes x * (number of preceding zeros) to the 01 cost.
+
+Time complexity O(n), space O(1). The DP table form is only needed when the interviewer asks for the full witness assignment.
+
+Preparation
+
+Solve LC 1653 (Minimum Deletions to Make String Balanced) — same DP shape over a, b with deletion costs.
+
+Practice the two-counter sweep until you can write it without looking at notes.
+
+Discuss the brute-force O(2^k) baseline (where k is the number of !) before the DP, so the interviewer sees you understand the search space.
+
+Implement first as an O(n) two-counter sweep, then re-implement as an explicit DP with parent pointers so you can recover the chosen ! assignment — the follow-up commonly asks "which assignment achieves the min cost?".
+
+Quick sanity checks: when x == y, the answer collapses to x * (zeros * ones) regardless of ! choices; use this as a unit test.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

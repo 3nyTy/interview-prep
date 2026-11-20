@@ -1,0 +1,66 @@
+===H1===
+ML System Design: Behavior Prediction from Sensor + Camera Data
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/sd-ml-behavior-prediction-from-sensors
+===BODY===
+Waymo
+System Design·60 minMembers
+ML System Design: Behavior Prediction from Sensor + Camera Data
+Onsite ML system design: train one or more agents that predict the behavior of surrounding vehicles, pedestrians, and cyclists from the AV's sensor and camera data, including uncertainty quantification handed downstream to the planner. Reported across MLE phone screens and senior onsite loops; deep follow-ups on loss design, uncertainty calibration, and long-tail data curation.
+MLE
+mlsd
+ml-knowledge
+transformer
+attention
+calibration
+evaluation
+hard
+Frequency
+Low
+Last asked
+2026-04-18
+Stage
+onsite-system-design
+Requirements
+
+Inputs: time-aligned sensor data (LiDAR / radar) and camera streams from the ego vehicle.
+
+Outputs: per-agent trajectory predictions over a future horizon (typically 3–8 seconds), with uncertainty (per-step covariance or a categorical distribution over modes).
+
+Downstream contract: predictions feed the motion planner. The planner needs (a) deterministic outputs at a fixed cadence, (b) uncertainty in a form the planner can integrate into cost functions, (c) bounded latency budget.
+
+Common follow-up framings: predict emergent dangers / interventions; condition predictions on the ego's planned action (interactive prediction).
+
+Notes
+
+Representation. Encode each agent's history as a sequence of (x, y, vx, vy, yaw, class) tuples in a local ego-centric frame. Encode the surrounding map as a graph of lane centerlines and crosswalks. State-of-the-art systems use a graph-attention or transformer encoder that fuses agent histories + map context (VectorNet / SceneTransformer / Wayformer architectures).
+
+Output head. Two dominant choices: (a) a regression head producing (μ, Σ) per agent per future timestep; (b) a categorical head over a fixed set of trajectory modes with per-mode confidence (essential for multimodal predictions like 'turn left vs go straight at the intersection'). Mention both and pick mode-categorical for safety-critical planning — single-mode regression collapses multi-mode futures to their average and is dangerous.
+
+Loss. Multi-mode regression uses a winner-take-all loss (gradient flows only through the closest mode to the ground-truth trajectory) plus a classification cross-entropy on mode probabilities. Plain MSE produces mode-averaging.
+
+Uncertainty. Distinguish aleatoric (sensor noise, inherent unpredictability) from epistemic (model knowledge gaps). Aleatoric is captured by the per-step covariance head; epistemic requires deep ensembles or Monte-Carlo dropout — flag the latency / serving cost. The planner consumes aleatoric directly; epistemic is usually used offline for triage.
+
+Data and long-tail. Mining for rare and dangerous scenarios is the leverage point: active learning over disagreement between predictor and ground truth, hard-negative selection from simulation, scenario tagging by interaction density. Be ready to discuss how interactions are bootstrapped vs labeled.
+
+Training stages. Pretrain on imitation (behavioral cloning from log data), fine-tune with closed-loop simulation rollouts to address compounding error, then add interactive prediction (conditioned on ego plan).
+
+Evaluation. Open-loop metrics (minADE / minFDE for the closest of K modes, mode-recall) vs closed-loop metrics (intervention rate, time-to-collision, downstream planner success). Closed-loop is the truth signal; open-loop is the iteration signal.
+
+Latency. Planner cycle is typically 10 Hz. The predictor must produce a fresh batch in <100 ms with bounded P99. Quantization, batching, and trimming history horizon are standard levers.
+
+Preparation
+
+Sketch the end-to-end diagram before the round: sensor → object track ingestion → encoder → multi-mode head → planner consumer. Practice naming the data, the loss, and the latency budget at each arrow.
+
+Pre-stage answers for the deep-dive questions: winner-take-all loss derivation, multi-mode coverage metric (minFDE@K), online-vs-offline drift detection.
+
+Re-read recent Waymo behavior-prediction publications (Wayformer / MultiPath / SceneTransformer families) at the conceptual level — interviewers reliably probe whether the candidate can argue why graph-attention encoders won over rasterized CNN encoders for multi-agent prediction.
+
+Hold one practice round on the 'sim-to-real' question alone: how do you know your simulator trains a prediction model that generalizes to the road?
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

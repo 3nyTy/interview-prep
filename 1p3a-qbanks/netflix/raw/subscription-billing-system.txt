@@ -1,0 +1,158 @@
+===H1===
+Subscription Billing System
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/subscription-billing-system
+===BODY===
+Subscription Billing System
+
+<https://www.1point3acres.com/interview/problems/company/netflix/subscription-billing-system>
+
+Netflix
+System Design
+
+60 min
+Members
+Subscription Billing System (300M Subscribers)
+
+Design monthly subscription billing for 300M users: charge on the right date, never double-charge (idempotency at Redis + DB + gateway), retry failed payments with a dunning schedule, and survive scheduler / worker failures via a hybrid scheduler + catch-up cron.
+
+SWE
+Infra Eng
+payment
+idempotency
+scheduling
+scaling
+transactions
+hard
+Frequency
+Single report
+Last asked
+2026-01-19
+Stage
+onsite-system-design
+Design a Billing System for 300M Subscribers
+
+This guide explains how to design a billing system for Netflix. The system needs to handle monthly payments for 300 million users. It must charge users on the correct date, handle failed payments without crashing, and grow easily as the number of users increases.
+
+Phase 1: What We Need to Build
+Basic Features
+Users must subscribe to a plan and pay automatically every month.
+Users must be able to update their credit card or payment info.
+Users must be able to see their past bills and upcoming charges.
+The system must try again automatically if a payment fails.
+The system must send emails for upcoming charges or payment status.
+
+We will ignore complex features like discounts or changing plans for now. We want to focus on the core design.
+
+System Goals
+Goal	Target	Why it matters
+Reliability	No missed charges, no double charges	We cannot lose revenue.
+Consistency	Process payments exactly once	Handling money needs to be very safe.
+Scalability	300M users, ~10M bills per day	It must handle Netflix-sized traffic.
+Fault Tolerance	Handle outside failures	Banks and payment services often fail.
+Latency	Speed is not critical	It is okay to be late, but never wrong.
+
+Unlike normal apps, billing systems care more about correctness than speed. It is fine if a charge happens a few hours late. It is NOT fine to charge someone twice.
+
+Scale Numbers
+Metric	Value
+Total subscribers	300M
+Bills per day	300M / 30 = ~10M
+Average transactions per second (TPS)	10M / 86,400 = ~116 TPS
+Peak TPS (2-3x)	~250-350 TPS
+Subscription record size	~500 bytes
+Storage for subscriptions	300M * 500B = 150 GB
+
+Billing dates are spread out over the month, so the load is steady. The hard part is not the speed, but ensuring reliability.
+
+Phase 2: Database Design
+Main Tables
+Subscription
+??? id: UUID (PK)
+??? user_id: UUID (FK)
+??? plan_id: VARCHAR
+??? status: ENUM (trial, active, past_due, cancelled, paused)
+??? billing_day_of_month: TINYINT (1-31, original signup day)
+??? next_billing_date: DATE
+??? last_billed_at: TIMESTAMP
+??? payment_method_id: VARCHAR
+??? created_at: TIMESTAMP
+??? updated_at: TIMESTAMP
+
+BillingTransaction
+??? id: UUID (PK)
+??? subscription_id: UUID (FK)
+??? user_id: UUID (FK)
+??? amount_cents: INTEGER
+??? currency: VARCHAR(3)
+??? status: ENUM (pending, success, failed)
+??? idempotency_key: VARCHAR (UNIQUE)
+??? payment_gateway_ref: VARCHAR
+??? failure_reason: VARCHAR
+??? attempt_number: INTEGER
+??? created_at: TIMESTAMP
+??? updated_at: TIMESTAMP
+
+PaymentMethod
+??? id: UUID (PK)
+??? user_id: UUID (FK)
+??? type: ENUM (card, paypal, bank)
+??? token: VARCHAR (gateway token, not raw card)
+??? last_four: VARCHAR(4)
+??? expiry_month: TINYINT
+??? expiry_year: SMALLINT
+??? is_default: BOOLEAN
+??? created_at: TIMESTAMP
+
+Subscription Status Logic
+
+Key changes in status:
+
+trial ? active: The first payment works.
+active ? past_due: The payment fails (start trying again).
+past_due ? active: A retry works, or the user updates their card.
+past_due ? cancelled: We tried too many times and failed (usually 3 tries over 14 days).
+Phase 3: How Systems Talk
+Internal Service Commands
+
+These commands are used by our system, not by the user directly:
+
+# Trigger billing for a subscription (called by scheduler)
+POST /internal/billing/charge
+Request:
+{
+  "subscription_id": "sub_123",
+  "idempotency_key": "bill_sub123_2024_02_15"
+}
+Response:
+{
+  "transaction_id": "txn_456",
+  "status": "success" | "failed" | "pending",
+  "failure_reason": null
+}
+
+# Retry a failed payment
+POST /internal/billing/retry
+Request:
+{
+  "subscription_id": "sub_123",
+  "attempt_number": 2
+}
+
+# Get subscriptions due for billing (for cron job)
+GET /internal/subscriptions/due?before={timestamp}&limit=1000
+Response:
+{
+  "subscriptions": [...],
+  "cursor": "next_page_token"
+}
+
+User App Commands
+# Get billing history
+GET /api/users/{user_id}/billing/history
+Response:
+{
+  "transactions": [
+    {"id": "txn_456", "amount": 1599, "sta
+
+---

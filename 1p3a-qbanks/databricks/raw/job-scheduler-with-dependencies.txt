@@ -1,0 +1,60 @@
+===H1===
+Job Scheduler With Dependencies
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/job-scheduler-with-dependencies
+===BODY===
+Databricks
+System Design·60 minMembers
+Job Scheduler With Dependencies
+Design a low-level scheduler where each job contains tasks with dependencies. The interviewer expects task-state modeling, dependency execution order, retries, and worker scheduling.
+SWE
+Infra Eng
+scheduling
+topological-sort
+queueing
+medium
+Frequency
+Single report
+Last asked
+2026-04-02
+Stage
+onsite-system-design
+Requirements
+
+A job is a set of tasks with dependency relationships.
+
+Scheduler should run tasks only after prerequisites complete.
+
+Track task states such as pending, runnable, running, succeeded, failed, and retrying.
+
+Discuss worker assignment, retry policy, failure propagation, and cycle detection.
+
+Some candidates receive this as a low-level system-programming round rather than a broad distributed design.
+
+Notes
+
+Model the task graph explicitly and maintain indegree / dependent lists for topological scheduling.
+
+Define whether task failure cancels the whole job or allows downstream skipping / retries.
+
+Keep the design concrete: tables, queues, worker lease / heartbeat, and state transitions.
+
+For idempotent task execution, use (task_id, attempt_id) as the side-effect dedup key — workers stamp every external side effect (DB write, API call, blob upload) with that compound key, so a re-driven retry after a lost ack is a no-op. Pair with at-least-once delivery on the queue and an attempts table to detect runaway retries.
+
+Alternate variant — priority GPU scheduler
+
+Some loops swap the dependency-DAG framing for a priority-based GPU compute platform: users submit jobs (often long-running ML training) with high / low priority onto a shared GPU pool. The axis shifts from topological ordering to resource arbitration — a priority queue for job selection, preemption of a running low-priority job for a higher one (checkpoint first so progress is not lost), and aging so low-priority jobs do not starve. Failure handling dominates because training jobs run for days: periodic checkpointing to durable storage + resume, GPU-node-crash recovery, OOM / corrupted-checkpoint / stuck-job timeouts, exponential-backoff retries, and freeing GPUs when a job crashes. Containers (Docker) and orchestration (Kubernetes) are expected context, though it is fine to lean on queue / worker fundamentals if Kubernetes specifics are unfamiliar.
+
+Preparation
+
+Implement a small DAG executor locally using topological sort and a worker queue.
+
+Prepare schema for jobs, tasks, dependencies, attempts, and leases.
+
+Review retry backoff, idempotent task execution, and stuck-worker recovery.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

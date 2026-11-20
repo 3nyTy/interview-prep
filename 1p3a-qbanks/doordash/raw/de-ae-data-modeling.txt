@@ -1,0 +1,71 @@
+===H1===
+DE / AE Onsite: Data Modeling (Fitness App)
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/de-ae-data-modeling
+===BODY===
+DoorDash
+System Design·60 minMembers
+DE / AE Onsite: Data Modeling (Fitness App)
+Data modeling round for Analytics Engineering. Design a schema for a fitness app, define DAU, and write the DAU query against the schema. A small set of standard SQL follow-ups extend the round; window functions cover most of them.
+DS
+sql
+data-modeling
+schema-design
+etl
+data-engineering
+medium
+Frequency
+Single report
+Last asked
+2026-03-16
+Stage
+onsite-coding · onsite-system-design
+Requirements
+
+Design a schema for a fitness app: users, workouts, sessions, devices.
+
+Define DAU (daily active users): a user is "active" on day D if they logged at least one workout session on D.
+
+Write the SQL query computing DAU for an arbitrary date range.
+
+Follow-up SQL: MAU, weekly retention, top workout types per user — interviewer picks 1–2.
+
+Notes
+
+Standard schema:
+
+users(id, email, signup_date, ...)
+
+workouts(id, user_id, workout_type_id, started_at, duration_min, ...)
+
+workout_types(id, name, ...)
+
+Optional devices(id, user_id, device_type, ...) for instrumented telemetry.
+
+DAU query template:
+SELECT date_trunc('day', started_at) AS day,
+       COUNT(DISTINCT user_id)      AS dau
+FROM   workouts
+WHERE  started_at BETWEEN :start AND :end
+GROUP BY 1
+ORDER BY 1;
+
+Window-function follow-ups (retention, top-N) all build on this base — use LAG for day-over-day, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY ... DESC) for top-N.
+
+Clarify the definition of "active" with the interviewer up front: minimum session duration, completed vs started, device-side ping vs server-recorded workout.
+
+For long ranges, expect the interviewer to ask about materialized rollups (daily_active_users table populated by an ETL); this is the natural lead-in to the AE / DE platform discussion.
+
+Preparation
+
+Practice writing DAU / WAU / MAU queries cold; these are the canonical DE / AE warm-ups.
+
+Practice 2 retention patterns: cohort retention via self-join, rolling retention via LAG.
+
+Be ready to discuss the platform-level question: where does this query live? (BigQuery / Snowflake / Redshift / Trino — pick what your background supports.) The interviewer often pivots into the materialized-rollup discussion.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

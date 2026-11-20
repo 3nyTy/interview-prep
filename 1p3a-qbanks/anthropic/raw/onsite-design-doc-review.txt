@@ -1,0 +1,89 @@
+===H1===
+Onsite Design Doc Review
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/onsite-design-doc-review
+===BODY===
+Anthropic
+System Design·55 minMembers
+Onsite Design Doc Review
+A newer onsite round, particularly common for EM candidates and increasingly for senior IC loops. The interviewer hands the candidate a design doc (sometimes one straight from the team's own backlog) and asks them to critique it — surface risks, propose alternatives, identify gaps.
+EM
+SWE
+MLE
+design-review
+critique
+new-round
+medium
+Frequency
+High
+Last asked
+2026-08-31
+Stage
+onsite-system-design · phone-screen
+Requirements
+
+Format
+
+55 minutes. First ~10 minutes to read the doc, then a guided discussion.
+
+Some candidates report the doc resembling an actual ongoing internal design — closely tied to the hiring team's domain.
+
+For EM loops, this round replaces a coding round and sits alongside Execution & Leadership and Technical Presentation.
+
+Also appears in SWE loops as the system-design slot itself — the doc-review format replacing a blank-page design round.
+
+What interviewers grade on
+
+Identifying the most important risks first, not exhaustively listing minor nits.
+
+Surfacing what is missing as well as what is wrong — the doc is usually intentionally incomplete.
+
+Suggesting alternative architectures with concrete tradeoffs.
+
+Calibration: knowing when to push back vs. when the author has clearly considered an angle.
+
+Communication: how a real review comment would read in a doc-comment thread.
+
+Inference scheduling variant
+
+Review a design for an inference system, including cache-hit-rate assumptions, batching strategy, and where load balancing belongs before GPU dispatch.
+
+The follow-up provides a pool of eight GPUs serving both a large and a small model. A large-model batch occupies all eight GPUs, while a small-model batch occupies one; inference latency is the same. Design queueing and dispatch across the shared pool.
+
+Make the scheduling policy explicit: separate queues are a reasonable starting point, but the review must explain how observed QPS, batch-formation delay, starvation, and GPU utilization determine priority.
+
+A phone-screen inference review specifies 10,000 requests per second and 100 ms per batch. Identify two or three flaws, then design batching and load balancing ahead of inference, estimate the server count, explain overload handling, and schedule resources across different models.
+
+Notes
+
+The round is new enough that detailed prompts are not yet broadly leaked. Several candidates flag it as the round they had no time to prepare for.
+
+Treat it as a senior code-review at the architecture level: prioritize, justify, propose.
+
+This is the round where mocking with a peer who has reviewed many real design docs is highest-leverage.
+
+One recurring doc topic is the batched GPU inference API — the same fixed-batch family as the flagship inference-API design prompt, delivered as a flawed doc to critique. Constraints the doc pins (fixed batching, no auto-scaling, no rate limiting) are off-limits to redesign; work within them.
+
+Scope differs across interviewers: an August 2026 version explicitly included load shedding, rate limiting, caching, and idempotency among the design corrections. These are not universally forbidden; distinguish that version from the more constrained dispatch-only variant before proposing changes.
+
+For the eight-GPU scheduling variant, reserve all eight GPUs atomically before dispatching a large-model batch; small-model batches each reserve one. Once the policy selects a waiting large batch, stop admitting new small batches and let active finite-duration work drain, then launch the large batch. Use bounded turns or aging between the model queues so neither class is indefinitely postponed; explain the utilization cost of draining rather than claiming this policy is throughput-optimal.
+
+For capacity planning, let B be the achieved requests per batch and C the number of independent simultaneous batch slots per server. With 0.1 seconds per batch, ideal server throughput is B * C / 0.1 requests/sec, so 10,000 QPS requires at least ceil(1000 / (B * C)) servers. Ask for B, C, and model-specific GPU requirements before choosing a number; account for batch fill, queueing, headroom, and failures beyond this ideal floor. Do not assume the all-eight-GPU model has eight independent batch slots.
+
+Preparation
+
+Review three real design docs (your own or open-source) end-to-end and write a structured critique for each. Practice the 10-minute speed-read.
+
+Build a checklist of dimensions to scan: scope/goals, non-goals, alternatives considered, scale/cost estimates, failure modes, rollout/rollback, observability, security/privacy, migration.
+
+Have language ready: "the section on X is underspecified — specifically, I'd want to see Y and Z before I'd ship this."
+
+In 15 minutes, trace a mixed queue of one-GPU and eight-GPU batches; show every reservation, the drain before a large batch, and how a waiting small batch eventually runs.
+
+In 10 minutes, derive the server-count lower bound from batch size and independent batch concurrency, then identify which missing parameters prevent a numerical answer and where latency headroom enters.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

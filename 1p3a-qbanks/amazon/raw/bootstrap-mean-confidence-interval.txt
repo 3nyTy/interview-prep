@@ -1,0 +1,50 @@
+===H1===
+Bootstrap Mean & Confidence Interval
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/bootstrap-mean-confidence-interval
+===BODY===
+Amazon
+CodingMembers
+Bootstrap Mean & Confidence Interval
+Implement bootstrap resampling for a sample mean and confidence interval, discuss which statistics can or cannot be estimated reliably, then remove the explicit loop with NumPy vectorization.
+RS
+MLE
+numpy
+sampling
+probability
+medium
+Frequency
+Single report
+Last asked
+2026-08-14
+Stage
+phone-screen
+Requirements
+
+Given a numeric sample, repeatedly draw bootstrap samples with replacement.
+
+Compute the bootstrap distribution of the sample mean and derive a confidence interval from it.
+
+Follow-up: name statistics that bootstrap resampling can estimate well and statistics for which the estimate can be unreliable.
+
+Follow-up: remove the explicit Python for loop using NumPy vectorization.
+
+Notes
+
+The statistical-validity follow-up is intentionally probing. One answer proposed mean and variance as suitable, and median / min / max as unsuitable, but explicitly flagged that boundary as uncertain. Explain assumptions instead of memorizing that list as a rule.
+
+Separate two concerns in the implementation: drawing a matrix of resample indices and reducing each resampled row to one statistic.
+
+Clarify the number of bootstrap draws, confidence level, random seed behavior, and the required interval convention before coding.
+
+Preparation
+
+Implement the scalar-loop and vectorized versions on the same fixed seed and confirm they produce comparable bootstrap distributions.
+
+Rehearse a two-minute explanation of percentile intervals, finite-sample limitations, and why extreme statistics behave differently from smooth averages.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,60 @@
+===H1===
+Weighted Random Sampling with Insert / Delete
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/weighted-sampling-with-updates
+===BODY===
+Citadel / Citadel Securities
+Coding·60 minMembers
+Weighted Random Sampling with Insert / Delete
+Citadel SWE intern onsite round 2: support dynamic insert and delete of weighted items, plus uniform random sampling proportional to weight. Reported solution uses a Fenwick / binary indexed tree over prefix sums of weights for `O(log n)` per operation.
+SWE
+data-structure
+sampling
+probability
+binary-search
+hard
+Frequency
+Single report
+Last asked
+2026-01-28
+Stage
+onsite-coding
+Requirements
+
+Support the following operations:
+
+insert(id, weight) — add an item with the given weight.
+
+remove(id) — delete an existing item.
+
+sample() -> id — return a random item id, sampled with probability proportional to its current weight.
+
+The candidate is expected to keep all three operations efficient under continuous updates, not just a one-shot batch sample.
+
+Notes
+
+The clean answer is a Fenwick tree (binary indexed tree) over an indexed slot array of weights. insert and remove are point updates; sample draws a uniform random in [0, total_weight) and binary-searches the prefix-sum tree for the slot whose cumulative sum first exceeds the draw. All operations are O(log n).
+
+Naive alternative: maintain a std::vector<(id, weight)> and a running total. sample is O(n) via linear prefix scan; insert is O(1) append; remove requires either swap-and-pop (only works if you do not need stable indexing) or a separate index map. State the tradeoff explicitly when picking the Fenwick approach.
+
+For dynamic id space (items inserted with arbitrary external ids, not pre-known indices), pair the Fenwick tree with a hashmap id -> tree_index and a free-list of indices freed by remove. The reported solution mentions "dynamic extension" — handling growth past the initial tree capacity by doubling.
+
+Common slip: using a max-heap or sorted container — those support sample-the-max efficiently but not weighted random selection, which needs the prefix-sum structure.
+
+Sanity check: the sum of weights changes after every insert / remove. sample must read the live total each time, not cache it staler than one update.
+
+Preparation
+
+Implement a Fenwick tree once for plain prefix-sum queries; then layer the weighted-sample variant by adding the "find smallest index with prefix-sum > target" binary search. The latter is the discriminator.
+
+Drill the analogous LC families: weighted random pick with replacement, weighted reservoir sampling. Each reinforces a different facet of the same probability invariant.
+
+Be ready to argue the sampling proof out loud: drawing u ~ Uniform[0, total) and selecting slot k such that prefix[k-1] <= u < prefix[k] gives P(k) = weight[k] / total.
+
+Have the O(log n) Fenwick descent for "find by prefix" memorized; under time pressure, candidates default to O(log^2 n) upper-bound + Fenwick query, which still passes but signals weaker mastery.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

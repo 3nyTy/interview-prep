@@ -1,0 +1,199 @@
+===H1===
+OA — In-Memory Database (4-Level CodeSignal)
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/oa-in-memory-database
+===BODY===
+Anthropic
+Coding·90 minMembers
+OA — In-Memory Database (4-Level CodeSignal)
+The canonical Anthropic OA. CodeSignal, 90 minutes, gated 4-level CRUD on an in-memory key/value/field database. Each level depends on the prior. Modern variants drop compare-set/delete and replace level 4 with backup/restore or look-back time travel.
+SWE
+MLE
+Infra Eng
+oa
+codesignal
+oop
+ttl
+snapshot
+medium
+Frequency
+Medium
+Last asked
+2026-07-18
+Stage
+oa
+Requirements
+
+Input is a list of command arrays (each command is [op, arg1, arg2, …]); output is an equally-long list of result strings. Timestamps are unique and strictly increasing milliseconds. Each level must pass before the next unlocks.
+
+Level 1 — Core records
+
+The DB stores records keyed by string key; each record is a {field → value} map (both strings).
+
+SET <ts> <key> <field> <value>
+
+Action: set/overwrite field in record key; creates the record if missing.
+
+Returns: "".
+
+GET <ts> <key> <field>
+
+Returns: the value, or "" if record/field missing.
+
+DELETE <ts> <key> <field>
+
+Action: remove field from key.
+
+Returns: "true" if removed, "false" if absent.
+
+COMPARE_AND_SET <ts> <key> <field> <expected> <newValue> (older rotations only)
+
+Action: set to newValue only if the current value equals expected.
+
+Returns: "true" on update, "false" otherwise.
+
+COMPARE_AND_DELETE <ts> <key> <field> <expected> (older rotations only)
+
+Action / Returns: same pattern; deletes only on match.
+
+Level 2 — Search
+
+SCAN <ts> <key>
+
+Returns: "<f1>(<v1>), <f2>(<v2>), …" with fields sorted lexicographically by field name; "" if record empty or missing.
+
+SCAN_BY_PREFIX <ts> <key> <prefix>
+
+Returns: same format, restricted to fields starting with prefix.
+
+Level 3 — TTL expiry
+
+SET_WITH_TTL <ts> <key> <field> <value> <ttl> (also seen as SET_AT_WITH_TTL)
+
+Action: write the field with lifetime [ts, ts+ttl). Re-SET resets the TTL.
+
+Returns: "".
+
+All Level-1/2 commands now treat fields whose lifetime has elapsed as gone (boundary is inclusive of start, exclusive of expiry — at exactly ts + ttl the field is dead).
+
+Level 4 — Time travel (one of two rotations)
+
+Backup / restore variant
+
+BACKUP <ts> — deep snapshot; pauses TTL countdowns at this point.
+
+RESTORE <ts> <at_ts> — load the most recent backup with backup_ts ≤ at_ts; survivors resume TTL countdown from the new clock (store remaining-TTL deltas, not absolute expiries — the single most-failed corner case).
+
+Look-back variant
+
+GET_WHEN <ts> <key> <field> <at_ts> — value as of at_ts (at_ts == 0 falls back to Level-1 semantics; at_ts ≤ ts guaranteed).
+
+The append-only history per (key, field) is the data structure; binary-search by set_ts then re-check expiry against at_ts.
+
+Examples
+
+Level 1 (COMPARE_AND_SET / COMPARE_AND_DELETE rotation):
+
+[
+  ["SET", "0", "A", "B", "4"],
+  ["SET", "1", "A", "C", "6"],
+  ["COMPARE_AND_SET", "2", "A", "B", "4", "9"],
+  ["COMPARE_AND_SET", "3", "A", "C", "4", "9"],
+  ["COMPARE_AND_DELETE", "4", "A", "C", "6"],
+  ["GET", "5", "A", "C"],
+  ["GET", "6", "A", "B"]
+]
+// → ["", "", "true", "false", "true", "", "9"]
+
+Level 2 (SCAN ordering + SCAN_BY_PREFIX on missing record):
+
+[
+  ["SET", "1", "A", "BC", "1"],
+  ["SET", "2", "A", "BD", "2"],
+  ["SET", "3", "A", "C", "3"],
+  ["SCAN_BY_PREFIX", "4", "A", "B"],
+  ["SCAN", "5", "A"],
+  ["SCAN_BY_PREFIX", "6", "B", "B"]
+]
+// → ["", "", "", "BC(1), BD(2)", "BC(1), BD(2), C(3)", ""]
+
+Level 3 (TTL boundary: alive at ts < expiry, dead at ts == expiry):
+
+[
+  ["SET_WITH_TTL", "1", "A", "BC", "1", "9"],
+  ["SET_WITH_TTL", "5", "A", "BC", "2", "10"],
+  ["SET", "6", "A", "BD", "3"],
+  ["SCAN_BY_PREFIX", "14", "A", "B"],
+  ["SCAN_BY_PREFIX", "15", "A", "B"]
+]
+// → ["", "", "", "BC(2), BD(3)", "BD(3)"]
+
+At ts=14 field BC is alive (re-SET at 5 pushed expiry to 15); at ts=15 it's exactly expired and only BD survives.
+
+Notes
+
+90-minute hard cap. You must pass earlier levels before the harness unlocks the next.
+
+CodeSignal retains the previous level's code when the next level unlocks. Reuse and refactor the existing implementation rather than restarting; an extensible early data model prevents expensive level-three and level-four rewrites.
+
+Learn the CodeSignal debugging panel before the assessment. Fast inspection of the visible failing cases matters as much as raw implementation speed.
+
+The toughest level-4 corner cases involve TTL semantics across the snapshot boundary — write down which clock is authoritative before coding.
+
+Return-type details have drifted: some variants now return tuples instead of strings, some allow None instead of empty string. Read the harness signatures, do not assume.
+
+Some recent prompts explicitly say "no hidden test cases" — the visible cases are the full grader.
+
+Canonical command vocabulary across the 4 levels (subset varies by rotation): SET <ts> <key> <field> <value>, GET, DELETE, SCAN <key> (returns "<f1>(<v1>), <f2>(<v2>), …" sorted by field name), SCAN_BY_PREFIX <key> <prefix>, SET_WITH_TTL / SET_AT_WITH_TTL, GET_AT, DELETE_AT, SCAN_AT, and (older variants only) COMPARE_AND_SET / COMPARE_AND_DELETE. Level 4 uses either BACKUP <ts> + RESTORE <ts> <at_ts> (snapshot family) or GET_WHEN <ts> <key> <field> <at_ts> (look-back family) — never both in the same rotation.
+
+Suggested core data structure
+
+A single class with two stores covers all four levels with minimal rework between them:
+
+class DB:
+    def __init__(self):
+        # records[key][field] = list of (set_ts, value, expiry_ts_or_None)
+        # always append-only; reads filter by ts and expiry
+        self.records: dict[str, dict[str, list[tuple[int, str, int | None]]]] = {}
+        # snapshots[backup_ts] = deep snapshot of `records` with TTL deltas, not absolute expiries
+        self.snapshots: dict[int, dict] = {}
+
+Why this shape:
+
+Level 1–2 read the latest non-expired entry per (key, field); scan walks the field-map and sorts.
+
+Level 3 is a filter on the same log: expiry_ts_or_None > query_ts.
+
+Level 4 backup/restore: deep-copy the records map but rewrite expiry_ts → remaining_ttl (delta) so restore can resume countdowns against the new clock. This is the single most-failed corner case — the bug is storing absolute timestamps in the snapshot and getting wrong expiries after restore.
+
+Level 4 look-back: the append-only history is already the answer. Binary-search the per-field history list by set_ts and check expiry against at_timestamp.
+
+Common bugs candidates report
+
+TTL counted from the snapshot's backup(timestamp) rather than from the original set_at after restore — fix: store delta, not absolute.
+
+scan_by_prefix doesn't sort, or sorts by value when level says by field name.
+
+delete on an already-expired field returning True instead of False.
+
+Off-by-one on TTL boundary: t == set_ts + ttl is reported as still-alive in some prompts, gone in others — confirm with the visible sample test before coding.
+
+Preparation
+
+Reuse a single class with a dict[key][field] = list[(timestamp, value, expiry)] event log. Level 1–3 reduce to filters over this log; level 4 backup is a deep copy with paused expiries.
+
+Practice writing the OA cold under a 90-minute clock at least twice. The challenge is implementation velocity, not algorithms.
+
+Memorize Python idioms for sorting tuples by composite keys and for binary-searching a list of (timestamp, ...) records.
+
+The harness allows iteration but not state-resetting between commands — keep a clean immutable-log-with-pointer pattern in mind.
+
+Layered drill order: (1) implement L1 cold in 10 min → (2) add L2 scans without breaking L1 in another 10 → (3) refactor records to carry (ts, value, expiry) tuples for L3 in 20 → (4) add backup/restore with delta-TTL in 25, leaving 25 min for the look-back variant + bug-fix margin. Time-box ruthlessly; you don't get partial credit for an unfinished L4 if L3 still fails an edge case.
+
+Practice from a public reference implementation of the same shape (search "in-memory-db" repos that cover set/get/delete + scan + SetAtWithTtl); the goal is to internalize the data-structure shape, not memorize the answer.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

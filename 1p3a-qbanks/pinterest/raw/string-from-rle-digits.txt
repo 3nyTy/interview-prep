@@ -1,0 +1,46 @@
+===H1===
+Regenerate Strings from Run-Length Digit Encoding
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/string-from-rle-digits
+===BODY===
+Pinterest
+Coding·60 minMembers
+Regenerate Strings from Run-Length Digit Encoding
+Inverse of an RLE-style decoding: given a digits-only string like `'2345'`, enumerate strings that decode to the same multiset when interpreted as run-length-encoded segments. For `'2345'` the decoded base is two of 3 followed by four of 5 (`'335555'`); equivalent encodings include `'2 of 345555'` shape variants.
+SWE
+string
+string-processing
+compression
+backtracking
+medium
+Frequency
+Single report
+Last asked
+2025-11-18
+Stage
+phone-screen
+Requirements
+
+The forward operation reads digit pairs as (count, digit): '2345' becomes two 3s followed by four 5s, or '335555'. Given a decoded digits string, return every valid encoding, including different partitions of one repeated run such as four 5s encoded once as '45' or split as '15' + '35'.
+
+Notes
+
+Backtrack from left to right. At the start of a maximal equal-digit run of length k, choose a positive prefix length, emit (length, digit), and recurse on the unconsumed suffix.
+
+Define whether counts may contain multiple digits and whether adjacent segments with the same digit are allowed; these choices determine the result set. Disallow zero-count segments unless the contract explicitly permits them.
+
+Generate segments in a canonical order and use a set only as a defensive deduplication check.
+
+Preparation
+
+Implement the forward decoder first to make the contract executable.
+
+Enumerate '333' and '335555' by hand, then compare the backtracking output with the expected set.
+
+Test a single digit, all-distinct digits, a run longer than nine, and the chosen same-digit-adjacency rule.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

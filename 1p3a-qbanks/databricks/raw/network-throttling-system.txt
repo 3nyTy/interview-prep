@@ -1,0 +1,431 @@
+===H1===
+Design a Network Throttling System
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/network-throttling-system
+===BODY===
+Databricks
+System DesignMembers
+Design a Network Throttling System
+Design a throttling system for serving infrastructure handling both internal and external users, covering per-user and global rate limits, fairness, and overload protection.
+SWE
+Infra Eng
+rate-limiting
+throttling
+scaling
+medium
+Frequency
+Single report
+Last asked
+2025-11-20
+Stage
+onsite-system-design
+Problem Overview
+
+You need to design a throttling system (rate limiter) for a large infrastructure. This system handles traffic for both internal teams and external users.
+
+Current Setup:
+
+Client -> HTTP Server (Gateway) -> API Server -> Database / 3P Server / Another API Server
+
+Internal: API servers owned by your company's teams.
+
+External: Users connecting via the internet.
+
+The Issue:
+Recently, a huge burst of traffic caused the system to crash. The failure spread from one service to another (cascading failure), waking up engineers at night.
+
+Your Goal:
+Build a system to stop this from happening again. It must handle:
+
+Incoming traffic: Limit requests coming from users at the Gateway.
+
+Outgoing traffic: Limit requests your API servers send to databases or third-party (3P) tools.
+
+Note: Do not worry about fixing the bugs in the current code. Focus only on the throttling design.
+
+Questions to Ask the Interviewer
+
+In the interview, ask these questions to understand the scope:
+
+Traffic Behavior
+
+Is traffic steady, or does it spike at specific times?
+
+How much of the traffic is internal vs. external?
+
+How big is a "burst"? (e.g., 2x normal traffic or 10x?)
+
+Do some API endpoints get hit much more than others?
+
+User Experience
+
+What happens when we block a user? (Error message, slow response, or wait in a queue?)
+
+Should internal employees have priority over outside users?
+
+Do paid users get higher limits than free users?
+
+System Limits
+
+How many requests can our databases and servers currently handle?
+
+Do we already have tools to monitor health?
+
+How fast must the throttle check be? (Latency budget)
+
+Do we need to change limits on the fly without restarting servers?
+
+Traffic Flow
+
+Incoming: How do we stop bad traffic at the front door?
+
+Outgoing: How do we stop our servers from crushing a database?
+
+Common Follow-Up Questions
+
+How do you handle rate limiting when you have many Gateway servers (distributed rate limiting)?
+
+How do you stop one bad user from using up all the CPU/RAM?
+
+What metrics/numbers would you watch to set the right limits?
+
+How does the system fail "gracefully" (nicely) when overloaded?
+
+How do you handle different request types (e.g., simple reads vs. heavy writes)?
+
+What if the third-party service we call has its own rate limits?
+
+How do you implement "backpressure" (telling the sender to slow down)?
+
+How do you avoid the "thundering herd" problem (everyone retrying at the exact same time)?
+
+Which algorithm is best: Token Bucket, Leaky Bucket, or Sliding Window?
+
+How do you test this system to ensure it actually works during a crash?
+
+Proposed Solution
+
+Note: This is a guide. Try to solve the problem yourself before reading this.
+
+1. Defining the Requirements
+
+Functional Requirements (What the system does)
+
+Incoming Throttling: Stop traffic at the Gateway.
+
+Blocks external users from crashing the system.
+
+Sets limits per user, per tier (free/paid), or per endpoint.
+
+Outgoing Throttling: Stop traffic leaving the API servers using an "On-Host Proxy."
+
+Prevents your servers from crushing databases or 3P APIs.
+
+Stops failures from spreading (cascading) if a dependency is slow.
+
+Multi-tenant: Support different limits for different teams or API keys.
+
+Graceful Degradation: Send a clear error (HTTP 429) when limits are hit.
+
+Dynamic Config: Change limits immediately without restarting the code.
+
+Non-Functional Requirements (How the system performs)
+
+Low Latency: The check must be very fast (under 5ms).
+
+High Availability: The throttling system itself cannot crash.
+
+Accuracy: It is okay if it is 99% accurate (it doesn't need to be perfect).
+
+Observability: We need good graphs and alerts to see what is happening.
+
+Fairness: One user should not be able to block everyone else.
+
+2. Estimating Scale and Capacity
+
+Let's do some math to see how big the system needs to be.
+
+Assumptions
+
+Normal Traffic: 100,000 requests per second (RPS).
+
+Burst Traffic: 500,000 RPS (5x normal).
+
+Servers: 200 API servers, 50 Gateways.
+
+Users: 10,000 active API keys.
+
+Storage for Rate Limiting
+
+We need to store the "Token Bucket" data (how many tokens a user has left).
+
+Size per user: ~100 bytes.
+
+Total size: 10,000 users × 100 bytes = 1 MB.
+
+Conclusion: This is very small. We can easily store this in memory or Redis.
+
+Latency Budget
+
+Allowed total time: 200ms.
+
+Throttling check: Should be < 5ms.
+
+Conclusion: We need a very fast cache (like Redis or in-memory HashMap).
+
+Network
+
+Max outgoing data: 500,000 RPS × 10 KB = 5 GB/s.
+
+Conclusion: We must throttle to prevent clogging the network.
+
+3. API Design
+
+We need to define the functions our system will call.
+
+Gateway (Incoming)
+
+check_rate_limit(user_id, api_key, endpoint)
+
+Input: Who is the user and what do they want?
+
+Output: Allowed (Yes/No), Retry-After (Time to wait), Current Usage.
+
+get_throttle_config(user_id)
+
+Gets the rules for this specific user.
+
+On-Host Proxy (Outgoing)
+
+proxy_request(target_service, request)
+
+Sends the request to the dependency (like a DB).
+
+Handles retries and Circuit Breaking (stopping requests if the destination is dead).
+
+get_service_health(target_service)
+
+Checks if the downstream service is healthy.
+
+Configuration (Admin)
+
+update_throttle_limits(user_id, new_limits)
+
+Updates the rules instantly.
+
+get_throttle_metrics()
+
+Gets data for graphs/dashboards.
+
+4. Data Storage Schema
+
+Core Data Structures
+
+1. ThrottleConfig (The Rules)
+
+user_id: Who is this?
+
+tier: Free, Pro, or Internal.
+
+limits: RPS allowed (e.g., 100 per second).
+
+burst_capacity: How much sudden traffic is allowed.
+
+2. RateLimitState (The Counter)
+
+This lives in memory or Redis.
+
+tokens_remaining: How many requests can they still make?
+
+last_refill_time: When did we last give them tokens?
+
+3. CircuitBreakerState (Safety Switch)
+
+service_name: e.g., "Database-Primary".
+
+state: CLOSED (Working), OPEN (Blocked/Broken), or HALF_OPEN (Testing).
+
+failure_count: How many times did it fail recently?
+
+Database Choice
+
+Config: Store in PostgreSQL (reliable) and cache in Redis (fast).
+
+Counters: Store in Redis (very fast).
+
+Metrics: Store in Prometheus or InfluxDB (good for time-series data).
+
+5. High-Level Architecture
+
+                                    ┌─────────────────────┐
+                                    │  Config Service     │
+                                    │  (Throttle Limits)  │
+                                    └──────────┬──────────┘
+                                               │
+                                               ▼
+┌──────────┐      ┌──────────────────────────────────────────┐
+│  Client  │─────▶│         Gateway / Load Balancer          │
+└──────────┘      │                                          │
+                  │  ┌────────────────────────────────────┐  │
+                  │  │  Incoming Traffic Throttler        │  │
+                  │  │  - Token Bucket Algorithm          │  │
+                  │  │  - Redis-backed state store        │  │
+                  │  │  - Per-user/endpoint limits        │  │
+                  │  └────────────────────────────────────┘  │
+                  └──────────────┬───────────────────────────┘
+                                 │
+                                 ▼
+                  ┌──────────────────────────────────────────┐
+                  │         API Server Cluster               │
+                  │                                          │
+                  │  ┌────────────────────────────────────┐  │
+                  │  │  On-Host Proxy (Outgoing)          │  │
+                  │  │  - Circuit Breaker                 │  │
+                  │  │  - Connection Pool Management      │  │
+                  │  │  - Retry with backoff              │  │
+                  │  └──────────┬─────────────────────────┘  │
+                  └─────────────┼────────────────────────────┘
+                                │
+                    ┌───────────┼───────────┐
+                    ▼           ▼           ▼
+              ┌──────────┐ ┌─────────┐ ┌──────────┐
+              │ Database │ │ 3P APIs │ │ Internal │
+              │          │ │         │ │   APIs   │
+              └──────────┘ └─────────┘ └──────────┘
+
+How it Works
+
+Gateway: Checks Redis to see if the user has tokens. If yes, pass request. If no, return 429 Error.
+
+Config Service: Admin sets limits here. It pushes updates to Gateways.
+
+On-Host Proxy: Sits on the API server. It watches outgoing calls. If the Database fails, the proxy stops sending requests (Circuit Breaker).
+
+Redis: Keeps track of the counters (tokens).
+
+6. Deep Dive into Logic
+
+6.1 Incoming Traffic (Gateway)
+
+Algorithm: Token Bucket
+Imagine a bucket. You add tokens to it at a steady rate (e.g., 10 tokens per second). When a request comes in, it takes a token.
+
+Bucket full? You can handle a sudden burst.
+
+Bucket empty? The request is blocked (throttled).
+
+Why use it? It handles bursts well and is easy to understand.
+
+Distributed Rate Limiting
+Since we have 50 Gateways, they need to share the count.
+
+Solution: Store the bucket count in Redis.
+
+Lua Scripts: Use Redis Lua scripts to read and update the count in one step (atomic operation). This prevents counting errors.
+
+Hierarchy (Order of Checks)
+Check limits in this order:
+
+Global: Is the whole system overloaded?
+
+Tier: Is the "Free Tier" group overloaded?
+
+User: Is this specific user overloaded?
+
+Endpoint: Is the specific API (e.g., /buy) overloaded?
+
+If any of these fail, block the request.
+
+6.2 Outgoing Traffic (Proxy)
+
+Circuit Breaker Pattern
+This protects your dependencies (like the Database).
+
+CLOSED: Everything is fine. Requests go through.
+
+OPEN: Too many errors happened. Block all requests immediately. This gives the Database time to recover.
+
+HALF_OPEN: After a short wait, let one request through to test. If it works, go back to CLOSED. If it fails, go back to OPEN.
+
+Adaptive Throttling (AIMD)
+For third-party services, we might not know their limits.
+
+AIMD: Additive Increase, Multiplicative Decrease.
+
+Logic: Slowly increase traffic. If we get an error, cut traffic in half immediately. Then slowly increase again.
+
+Result: We find the maximum speed automatically.
+
+6.3 Dynamic Configuration
+
+We need to update limits without restarting servers.
+
+Push Model: When Admin updates Postgres, send a message to Redis Pub/Sub.
+
+Gateways: All gateways subscribe to Redis. They get the message instantly and update their local cache.
+
+Benefit: Updates happen in less than 1 second.
+
+7. Solving Hard Problems & Bottlenecks
+
+7.1 Single Point of Failure (Redis)
+
+Problem: If Redis goes down, we can't check limits.
+Solution:
+
+Use Redis Cluster (multiple servers).
+
+Fallback: If Redis is dead, switch to local memory. It’s less accurate but keeps the site running.
+
+7.2 Hotspots (One Heavy User)
+
+Problem: One user sends so many requests they overload a single Redis node.
+Solution:
+
+Local Caching: The Gateway caches the result for 1 second. It doesn't ask Redis for every single request.
+
+7.3 Thundering Herd
+
+Problem: You blocked 10,000 requests. The block expires at 12:00:00. At 12:00:01, all 10,000 requests retry at once and crash the system again.
+Solution:
+
+Jitter: When telling users to retry, give them a random time.
+
+Don't say: "Wait 60 seconds."
+
+Say: "Wait 60 seconds ± random few seconds."
+
+This spreads the traffic out.
+
+7.4 Latency
+
+Problem: Checking limits over the network takes too long.
+Solution:
+
+Use a local in-memory cache for the most frequent checks. Only go to Redis if necessary.
+
+Extra Topics
+
+Testing Strategy
+
+Load Testing: Use tools like Locust or k6 to flood the system and see if the throttle works.
+
+Chaos Engineering: Turn off Redis on purpose to see if the fallback works.
+
+Future Improvements
+
+Cost-Based Throttling: Charge more tokens for expensive requests (like "Search") and fewer for cheap ones (like "Get ID").
+
+ML Prediction: Use Machine Learning to predict traffic spikes before they happen.
+
+Security
+
+DDoS: Throttling helps, but you also need a firewall/DDoS protection service (like Cloudflare) in front of the Gateway.
+
+Audit Logs: Keep a record of who changed the throttle limits.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

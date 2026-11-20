@@ -1,0 +1,39 @@
+===H1===
+LRU Cache with Expiration (LC 146 + TTL)
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/lru-cache-with-expiration
+===BODY===
+Oracle
+CodingMembers
+LRU Cache with Expiration (LC 146 + TTL)
+Implement an O(1) LRU cache with a hash map plus doubly linked list, then extend it with per-entry expiration so expired keys read as absent.
+SWE
+hashmap
+linked-list
+ttl
+medium
+Frequency
+Low
+Last asked
+2026-09-03
+Stage
+onsite-coding
+Requirements
+
+Implement an LRU cache supporting get(key) and put(key, value) in O(1) average time.
+
+Standard structure: a hash map for key→node lookup plus a doubly linked list ordering nodes by recency.
+
+Follow-up: extend the cache to support per-entry expiration (TTL). An expired entry must be treated as absent on get, even if it has not yet been evicted by capacity.
+
+Notes
+
+The base is equivalent to LeetCode 146. The expiration follow-up is the discriminator and is where time tends to run out — be ready to contrast lazy expiration (check the timestamp on access) with active eviction before writing it.
+
+An additional onsite used the base LC 146 problem without specifying an expiration follow-up. That round moved to a shared Google Doc when HackerRank would not open; do not assume TTL is required in every version.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,64 @@
+===H1===
+Smallest Time-Diff Pair Per User (Orders × Ads)
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/smallest-time-diff-orders-ads
+===BODY===
+Amazon
+Coding·30 minMembers
+Smallest Time-Diff Pair Per User (Orders × Ads)
+Given two timestamp-sorted event streams per user (orders and ad events), return the minimum absolute time difference for each user. A re-skin of LC interview 16.06 (Smallest Difference).
+SWE
+array
+two-pointer
+medium
+Frequency
+Single report
+Last asked
+2026-02-12
+Stage
+phone-screen
+Requirements
+
+Two lists of events grouped by user_id: orders[i] = (user, timestamp) and ads[j] = (user, timestamp). Each list is sorted by timestamp within a user.
+
+For every user that appears in both streams, return the minimum |order_ts - ad_ts| pair.
+
+Input format is intentionally under-specified — the interviewer expects you to drive clarification.
+
+Examples
+
+orders = {"u1": [10, 50, 90]}
+ads    = {"u1": [12, 60]}
+# smallest diff for u1 = |10 - 12| = 2
+
+Notes
+
+Per-user solution is a two-pointer merge over the two sorted lists, tracking the running minimum. O(n + m) per user.
+
+The interviewer typically asks fewer than four sentences of prompt and waits for the candidate to define input format, ties, and missing-user behavior. Treat the clarification phase as half the round.
+
+Watch for users who appear in only one stream — usually you skip them, but confirm.
+
+The per-user core is the classic two-pointer scan over two sorted sequences: advance whichever pointer points to the smaller value, update the running minimum on every step. Correctness rests on the monotonicity invariant — once you advance the pointer at the smaller side, no earlier value on that side can produce a smaller diff with any future value on the other side.
+
+Total complexity is O(N + M) where N, M are the sums of per-user event counts. If either side comes in unsorted, the bound becomes O(N log N + M log M) from the sort.
+
+A common subtle bug: treating ties (order_ts == ad_ts) as a result of zero but skipping the early return that the prompt may want. Confirm whether the answer is the pair or the minimum scalar diff.
+
+Preparation
+
+Practice LC interview 16.06 (Smallest Difference) until you can implement the two-pointer scan without thinking.
+
+Rehearse a clarification checklist for under-specified prompts: input format, sortedness, duplicates, ties, missing keys, output ordering.
+
+Be ready to extend to streaming (online merge) if asked — store the most recent value from each stream and update the running minimum on every new event.
+
+Layered drill: (1) write the two-pointer scan for a single user in under 5 minutes; (2) extend to the multi-user dictionary join and decide what to do with users absent from one side; (3) add a streaming variant where new events arrive one at a time — maintain the last-seen-from-each-side and update the running min on each insertion.
+
+Pre-rehearse the clarification opener: input format, per-user sortedness guarantee, tie behavior, missing-user behavior, output shape (per-user dict vs flat list).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

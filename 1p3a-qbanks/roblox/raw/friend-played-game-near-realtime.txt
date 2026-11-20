@@ -1,0 +1,544 @@
+===H1===
+Near-Real-Time Friend-Played-Game Counter
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/friend-played-game-near-realtime
+===BODY===
+Roblox
+System Design·60 minMembers
+Near-Real-Time Friend-Played-Game Counter
+Design a service that, for a given (user, game) pair, surfaces near-real-time signals: how many of the user's friends have played the game, plus the total active-player count for the game. Targets 10M users and 100k games. The core problem is the fan-out from a play event to every friend of the player without overwhelming the storage layer at peak hours.
+SWE
+Infra Eng
+system-design
+scaling
+social-graph
+feed
+fan-out
+redis
+caching
+hard
+Frequency
+Low
+Last asked
+2026-06-19
+Stage
+phone-screen · onsite-system-design
+Problem Statement
+
+Design a backend system for a Roblox game dashboard. The dashboard shows a list of games, and each game card should display social and popularity signals such as:
+
+which friends have played the game
+
+how many friends have played the game
+
+the total number of players or play sessions
+
+like, favorite, or popularity counts
+
+Common variants of this prompt include:
+
+Near real-time game player count system
+
+Game dashboard with friend activity and like counts
+
+Favorites and social recommendation system design
+
+Show that "your friend played this game"
+
+Clarify the metric semantics. "Total player count" can mean current concurrent players, unique lifetime players, unique players in the last 24 hours, or total sessions. Pick one for the base design and name the others as extensions.
+
+Phase 1: Requirements (~5 minutes)
+
+Functional Requirements
+
+Users should be able to open a dashboard of games.
+
+Each game card should show friend activity, such as up to a few friend names/avatars and the total friend count.
+
+Each game card should show popularity counts, such as current players, total plays, likes, or favorites.
+
+The system should ingest play events when a user starts or finishes playing a game.
+
+The system should update counts near real time so dashboards do not look stale.
+
+Optional follow-ups:
+
+Rank games by friend activity or popularity.
+
+Show "friends currently playing" versus "friends have played before".
+
+Support unfavorite/unlike and count correction.
+
+Privacy controls that hide a user's activity from friends.
+
+Non-Functional Requirements
+
+RequirementTargetWhy it matters
+Dashboard latencyP95 under 150 msGame browsing should be fast
+Count freshnessWithin 1-10 seconds for active countsNear real-time display is expected
+Friend activity freshnessWithin seconds to minutes depending on metricSocial proof should feel current
+Scale10M users, 100K gamesobserved prompt scale
+Read volumeDashboard reads much higher than writesBrowse surfaces are hot
+AvailabilityDegrade by hiding social details rather than failing pageDashboard should remain usable
+ConsistencyEventual consistency acceptable for counts; privacy and permissions must be correctCounts can lag; privacy cannot
+
+Clarifying Questions
+
+What games appear on the dashboard?
+Assume a separate ranking or discovery service returns candidate game IDs. This design enriches those game cards.
+
+What friend activity do we need?
+Base design: friends who have ever played the game, with count and top 3 friend previews.
+
+Do we need currently playing?
+Treat it as an extension using presence events and short TTL counters.
+
+Can counts be approximate?
+Display counts can be eventually consistent and sometimes approximate, but must not drift permanently.
+
+What privacy rules apply?
+Assume users can hide activity; read paths must filter hidden or blocked relationships.
+
+Capacity Estimation
+
+observed scale:
+- 10M users
+- 100K games
+
+Dashboard reads:
+- 5M DAU open dashboard 5 times/day = 25M dashboard reads/day
+- Average ~= 290 reads/sec
+- Peak 50x ~= 14.5K reads/sec
+- If each dashboard has 50 games, enrichment reads can touch 725K game cards/sec at peak
+
+Play events:
+- 10M users * 5 game starts/day = 50M start events/day
+- Average ~= 580 events/sec
+- Peak 50x ~= 29K events/sec
+
+Friend activity:
+- Average friend count = 100
+- Naively checking 50 games * 100 friends = 5,000 membership checks per dashboard
+- Need batched queries and precomputed indexes
+
+The dashboard fanout is the key capacity insight. A single page can require enrichment for dozens of games, so per-card queries must be batched or served from read models.
+
+Phase 2: Data Model (~5 minutes)
+
+Core Entities
+
+User
+- user_id
+- privacy_settings
+
+FriendEdge
+- user_id
+- friend_id
+- status: active | blocked | removed
+- created_at
+
+Game
+- game_id
+- title
+- creator_id
+- status
+- metadata
+
+PlayEvent
+- event_id
+- user_id
+- game_id
+- event_type: started | ended
+- session_id
+- region
+- created_at
+
+UserGameActivity
+- user_id
+- game_id
+- first_played_at
+- last_played_at
+- play_count
+- visible_to_friends
+
+GameAggregate
+- game_id
+- total_unique_players
+- total_play_count
+- current_players
+- like_count
+- favorite_count
+- updated_at
+
+FriendGameActivityReadModel
+- user_id
+- game_id
+- friend_count
+- sample_friend_ids
+- updated_at
+
+Read Model Options
+
+There are two common ways to compute friend activity.
+
+Option A: Read-time intersection
+- Fetch viewer's friend IDs
+- Fetch users who played each candidate game
+- Intersect in memory or with set operations
+- Better freshness, more read CPU
+
+Option B: Write-time fanout/read model
+- When a user plays a game, update friend activity for that user's friends
+- Faster reads, heavier writes and privacy invalidation
+
+For a Roblox interview, present a hybrid:
+
+Use read-time batched intersection for correctness and flexibility.
+
+Cache the result per (viewer_id, game_id) or dashboard page for a short TTL.
+
+Add precomputed read models only for very hot dashboard surfaces.
+
+Storage Layout
+
+friend_edges:
+- key: user_id
+- value: friend_id list or rows
+
+user_game_activity:
+- primary key: (user_id, game_id)
+- secondary index: game_id, last_played_at desc
+
+game_aggregates:
+- primary key: game_id
+
+game_players_set:
+- key: game_id
+- value: compressed set or bitmap of users who played
+
+current_players:
+- key: game_id
+- value: count with short TTL / heartbeat updates
+
+Do not make the dashboard query scan all play events. Play events are append-only facts; dashboard reads should hit compact activity tables, counters, sets, or cached read models.
+
+Phase 3: API Design (~5 minutes)
+
+Protocol Choice
+
+Use REST for dashboard reads and play-event ingestion. Use a streaming pipeline internally for play events and counter updates. If the game client already maintains a persistent connection, current-player changes can also flow through a presence service.
+
+Dashboard API
+
+GET /api/game-dashboard?cursor=...
+
+200 OK
+{
+  "games": [
+    {
+      "game_id": "game_123",
+      "title": "Tower Challenge",
+      "current_players": 42110,
+      "total_play_count": 88219000,
+      "like_count": 540000,
+      "friend_activity": {
+        "friend_count": 7,
+        "sample_friends": [
+          { "user_id": "u1", "display_name": "Ari" },
+          { "user_id": "u2", "display_name": "Mina" }
+        ]
+      }
+    }
+  ],
+  "next_cursor": "..."
+}
+
+Enrichment API
+
+If discovery is separate:
+
+POST /api/games/enrich
+Content-Type: application/json
+
+{
+  "game_ids": ["game_123", "game_456"],
+  "fields": ["counts", "friend_activity"]
+}
+
+Play Event API
+
+POST /api/games/{game_id}/play-events
+Content-Type: application/json
+Idempotency-Key: session_789_started
+
+{
+  "event_type": "started",
+  "session_id": "session_789",
+  "region": "us-west"
+}
+
+POST /api/games/{game_id}/play-events
+Content-Type: application/json
+Idempotency-Key: session_789_ended
+
+{
+  "event_type": "ended",
+  "session_id": "session_789"
+}
+
+Batch enrichment is the API detail that keeps the design practical. Do not call one backend endpoint per game card.
+
+Phase 4: High-Level Design (~15-25 minutes)
+
+Dashboard Read Flow
+
+Client calls GET /api/game-dashboard.
+
+Dashboard API authenticates the viewer.
+
+Dashboard API asks Discovery Service for candidate game IDs.
+
+Dashboard API calls Game Enrichment Service with all game IDs in one batch.
+
+Enrichment Service fetches:
+
+game metadata
+
+aggregate counts
+
+viewer's active friend list
+
+friend activity for the candidate games
+
+Enrichment Service filters hidden or blocked users.
+
+Dashboard API returns game cards with social and count fields.
+
+Friend Activity Computation
+
+Read-time batched intersection:
+
+Input:
+- viewer_id
+- candidate_game_ids: 50
+
+Steps:
+1. Fetch viewer friend IDs from Social Graph Service.
+2. Fetch activity rows for candidate games and friend IDs.
+3. Group by game_id.
+4. Count distinct friend IDs per game.
+5. Return top 3 sample friends by recency or closeness.
+
+Efficient query shape:
+
+SELECT game_id, user_id, last_played_at
+FROM user_game_activity
+WHERE game_id IN (:candidate_game_ids)
+  AND user_id IN (:friend_ids)
+  AND visible_to_friends = true
+ORDER BY game_id, last_played_at DESC;
+
+For very large friend lists, use:
+
+a compressed friend set in memory
+
+a game_id -> recent_players set
+
+bitmap intersections if user IDs can be mapped to dense integer IDs
+
+short TTL cache for (viewer_id, dashboard_candidate_hash)
+
+Play Event Write Flow
+
+Game client or server emits a started event.
+
+Play Event API validates and deduplicates by session_id and event type.
+
+Event is appended to the play event stream.
+
+Counter workers update:
+
+UserGameActivity
+
+total play count
+
+unique player count only if the (user_id, game_id) activity row is newly inserted
+
+current player count for started/ended or presence heartbeat
+
+Updated aggregates are written to cache/read model.
+
+Make the unique-player update an upsert: insert (user_id, game_id) once, increment total_unique_players only on insert, and update last_played_at plus play_count on later plays.
+
+Counts
+
+Use different mechanisms by count type:
+
+MetricSourceFreshness
+Current playersPresence heartbeats or start/end eventsSeconds
+Total play countEvent stream aggregationSeconds to minutes
+Unique playersUserGameActivity first-play dedupeMinutes
+Like/favorite countReaction system aggregateSeconds to minutes
+Friends playedActivity store intersection or read modelSeconds to minutes
+
+Avoid one generic "counter" answer. Current concurrent players, lifetime plays, unique players, and like counts have different correctness and freshness needs.
+
+Component Responsibilities
+
+ComponentResponsibility
+Dashboard APIOrchestrates discovery and enrichment
+Discovery ServiceChooses candidate games
+Game Enrichment ServiceBatches counts, metadata, and friend activity
+Social Graph ServiceReturns active friends and privacy-filtered relationships
+Activity StoreStores user-game play history
+Aggregate CacheServes game counts quickly
+Event StreamBuffers play-event ingestion bursts
+Aggregator WorkersUpdate counts and activity read models
+Presence ServiceTracks currently playing sessions
+
+Phase 5: Scaling & Trade-offs (~15-20 minutes)
+
+Friend Activity: Read-Time Versus Write-Time
+
+ApproachProsCons
+Read-time intersectionCorrect with latest friend/privacy state; simpler writesExpensive for large dashboards and friend lists
+Write-time fanoutVery fast dashboard readsHeavy writes; hard privacy and unfriend invalidation
+HybridPractical balanceMore moving pieces
+
+Recommended interview answer:
+
+Start with read-time batched intersection and short TTL cache.
+
+Add precomputed read models for hot users, hot games, or top dashboard pages.
+
+Keep privacy filtering at read time or invalidate aggressively when privacy changes.
+
+Current Player Count
+
+Start/end events can be wrong if clients crash. Use presence heartbeats:
+
+active_session:{session_id} -> { user_id, game_id, expires_at }
+current_players:{game_id}:{shard_id} -> count
+
+Clients or game servers heartbeat every 15-30 seconds. If a heartbeat expires, the presence service decrements or recomputes current player counts from active sessions.
+
+Hot Game Scaling
+
+Popular games create hot counters.
+
+Mitigations:
+
+Shard counters by game_id and counter_shard_id.
+
+Aggregate shards periodically into game_aggregates.
+
+Cache final counts at edge or regional caches.
+
+Return slightly stale counts for dashboard cards.
+
+Use approximate counters for display if exactness is not required.
+
+Dashboard Cache Strategy
+
+Cache layers:
+
+game_metadata:{game_id} -> long TTL
+game_counts:{game_id} -> short TTL, seconds
+friend_activity:{viewer_id}:{game_id} -> short TTL, 1-5 minutes
+dashboard_page:{viewer_id}:{candidate_hash} -> very short TTL
+
+Do not cache friend activity without including viewer identity and privacy-relevant versioning.
+
+Privacy and Safety
+
+Respect block relationships and "hide my activity" settings.
+
+Filter sample friends after fetching activity.
+
+If privacy state changes, invalidate activity caches for that user or use short TTLs.
+
+Avoid exposing exact hidden-user counts if the product promises activity privacy.
+
+Failure Handling
+
+FailureBehavior
+Count cache unavailableReturn game cards without counts or with stale cached counts
+Social graph slowReturn dashboard with no friend activity and log degradation
+Event stream lagCounts become stale but writes remain durable
+Duplicate play eventsDeduplicate by session ID and event type
+Missed end eventPresence TTL expires session
+
+Observability
+
+Track:
+
+Dashboard P95/P99 latency.
+
+Enrichment batch size and fanout cost.
+
+Social graph latency and cache hit rate.
+
+Event ingestion lag.
+
+Count freshness by metric.
+
+Current player count reconciliation drift.
+
+Friend activity cache hit rate.
+
+Debugging a Missing Result
+
+Interviewers like to probe debuggability: a user opens a game and the friend line that used to appear is suddenly gone. Walk the read path top to bottom and isolate where the signal drops:
+
+Confirm whether the whole line is missing or only the friend portion (counts still render?). This separates the enrichment / social-graph path from the aggregate-count path.
+
+Check the viewer's friend list from the Social Graph Service — an unfriend, block, or privacy-setting change can legitimately empty the intersection.
+
+Check the visible_to_friends flag on the relevant UserGameActivity rows — a friend flipping their activity to private removes them from the result.
+
+Inspect the cache layer: a stale or poisoned friend_activity:{viewer_id}:{game_id} entry, or a cache key that omits a privacy-version component, can serve an empty or wrong result.
+
+Fall back to the source of truth: run the intersection query directly against the activity store for that (viewer_id, game_id) and compare against what the cache returns.
+
+Check ingestion lag — if play events stopped flowing (stream backlog, worker outage), recent activity never lands in the read model.
+
+Good answers add observability hooks per layer (per-stage latency, cache hit/miss, intersection result size) so the bisection is data-driven rather than guesswork.
+
+Common Pitfalls
+
+Doing N requests for N game cards - Batch enrichment is mandatory for a dashboard with many games.
+
+Using play events directly on the read path - The dashboard needs compact activity and aggregate read models.
+
+Ignoring privacy - Friend activity is social data. Filtering hidden activity is more important than showing a perfectly fresh count.
+
+Interview Checklist
+
+Clarify whether counts mean current players, lifetime plays, unique players, likes, or favorites.
+
+Define FriendEdge, UserGameActivity, GameAggregate, and play events.
+
+Use a dashboard/enrichment API that batches game IDs.
+
+Draw discovery, enrichment, social graph, aggregate cache, activity store, event stream, and presence.
+
+Explain friend activity via batched intersection plus cache.
+
+Discuss current player count with heartbeats and TTLs.
+
+Cover hot counters, privacy filtering, and stale-count degradation.
+
+Summary
+
+AreaRecommended Answer
+Dashboard readsBatch candidate game enrichment
+Friend activityBatched intersection of friends and game activity
+CountsPrecomputed aggregates served from cache
+Current playersPresence heartbeat with TTL
+Event ingestionAppend play events to stream, update read models async
+Key trade-offRead-time correctness versus write-time fanout speed
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,75 @@
+===H1===
+Phone Battery Discharge Scheduling
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/phone-battery-discharge-scheduling
+===BODY===
+Roblox
+CodingMembers
+Phone Battery Discharge Scheduling
+Schedule or select phone activities under battery discharge constraints to maximize usable time or completed work.
+SWE
+scheduling
+greedy
+heap
+medium
+Frequency
+Single report
+Last asked
+2026-05-09
+Stage
+phone-screen
+A dead phone needs to run for t minutes of usage time. You have n spare batteries indexed 0 to n - 1, all fully charged at the start. Battery i provides capacity[i] minutes of phone runtime; after it is fully drained, it needs recharge[i] minutes of real-time to be ready again.
+
+Batteries must be used in strict cyclic order: 0, 1, 2, ..., n - 1, 0, 1, .... You cannot skip a battery — if the next one in line is still recharging when its turn comes, the phone sits dead (off) until that battery is ready. Phone usage time does not advance while the phone is off; only real-time advances, allowing other batteries to keep recharging on their own schedules. Once a battery is inserted, the phone runs on it continuously until it is fully drained or the phone hits its t-minute target — you cannot pop a battery out partway through to put in the next one.
+
+Return the indices of the batteries that were fully discharged within the t minutes of usage, in the order they discharged. If the last battery used was only partially drained when the phone hit its t-minute target, it is not included.
+
+This was observed from a Roblox online assessment (August 2025) as the first of two coding tasks in a 50-minute round.
+
+Examples
+
+Example 1:
+
+Input: t = 10 capacity = [3,4,2] recharge = [5,6,8]
+
+Output: [0,1,2]
+
+Explanation:
+
+Battery 0 runs from real-time 0 to 3 (full discharge), battery 1 from 3 to 7 (full discharge), battery 2 from 7 to 9 (full discharge). At real-time 9, battery 0 is back (recharged at 8) and runs for 1 more minute before the phone hits 10 minutes of usage — partial use, not counted.
+
+Example 2:
+
+Input: t = 10 capacity = [5] recharge = [5]
+
+Output: [0,0]
+
+Explanation:
+
+Battery 0 runs 0..5 (full discharge, ready again at 10). Phone is off from real-time 5 to 10. At real-time 10, battery 0 runs another 5 minutes (full discharge), bringing usage to 10.
+
+Example 3:
+
+Input: t = 4 capacity = [5] recharge = [10]
+
+Output: []
+
+Explanation:
+
+Battery 0 provides 5 minutes of capacity but only 4 are used before the phone hits the runtime target — partial use, never fully discharged.
+
+Constraints
+
+1 <= t <= 10^4
+
+1 <= capacity.length == recharge.length <= 10^3
+
+1 <= capacity[i] <= 10^4
+
+0 <= recharge[i] <= 10^4
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

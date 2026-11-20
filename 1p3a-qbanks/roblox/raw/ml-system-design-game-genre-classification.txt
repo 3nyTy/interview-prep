@@ -1,0 +1,678 @@
+===H1===
+ML System Design: Game Genre Classification From Scratch
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/ml-system-design-game-genre-classification
+===BODY===
+Roblox
+System Design·60 minMembers
+ML System Design: Game Genre Classification From Scratch
+MLE phone-screen prompt: design a system to classify each game on the platform into a fixed genre taxonomy from scratch. Covers label collection, feature pipelines, model choice for a multi-modal item, training and refresh cadence, and downstream consumption.
+MLE
+mlsd
+classification
+feature-engineering
+evaluation
+active-learning
+vlm
+medium
+Frequency
+Single report
+Last asked
+2026-04-18
+Stage
+phone-screen
+Problem Statement
+
+Design a machine learning system that classifies Roblox games, also called experiences, into genres such as obby, simulator, roleplay, tycoon, shooter, horror, racing, sports, social hangout, puzzle, and adventure.
+
+Each experience can belong to multiple genres, and the genre labels should be fresh enough to power search, browse pages, recommendations, creator analytics, and internal quality review. The system should work for both brand-new experiences with sparse engagement data and popular experiences with rich play history.
+
+This was observed in a Roblox onsite round for a Machine Learning Engineer. The observed prompt was open-ended: design the game genre classification system from scratch. The interviewer is usually looking for how you structure the ML problem, build the taxonomy, collect labels, choose model inputs, evaluate quality, serve predictions, and keep the system reliable as the catalog changes.
+
+What Makes Game Genre Classification Hard
+
+Multi-label taxonomy. A game can be both horror and survival, or both roleplay and social. Forcing exactly one genre loses useful signal.
+
+Hierarchical labels. A top-level label like action may contain finer labels like shooter, fighting, and battle royale. The model should not predict inconsistent parent-child combinations.
+
+Noisy self-declared metadata. Creators may omit tags, overuse popular tags, or intentionally keyword-stuff metadata to get more traffic.
+
+Cold start and long tail. Many experiences have little play data. The first prediction must rely on title, description, creator tags, thumbnails, and other content signals.
+
+Multimodal evidence. Useful signals live in text, images, videos, game metadata, player behavior, and co-play patterns. No single signal is enough.
+
+Taxonomy drift. New Roblox genres and trends appear over time. A static label set will become stale.
+
+Downstream impact. Bad labels hurt search and discovery. High-traffic experiences need higher confidence and auditability than low-traffic catalog entries.
+
+Phase 1: Requirements and ML Framing
+
+Functional Requirements
+
+Given a Roblox experience, predict a primary genre at the most specific useful taxonomy level, its implied top-level genre, and a ranked list of secondary genres with confidence scores.
+
+Support a versioned hierarchical taxonomy so downstream systems know which genre definitions were used.
+
+Refresh labels when an experience is created, its metadata changes, its media changes, or its gameplay behavior shifts.
+
+Expose genre predictions to search, browse, recommendations, analytics, and review tools through a low-latency serving layer.
+
+Collect feedback from human reviewers, creators, users, and downstream quality metrics to improve future training data.
+
+Non-Functional Requirements
+
+Freshness. New or updated experiences should receive an initial genre label within minutes to an hour. Large backfills can run offline.
+
+Read latency. Downstream product requests should read genre labels in under ~10 ms. The classifier should not run synchronously inside search or recommendation requests.
+
+Scale. Design for millions of experiences, frequent metadata/media updates, and high-volume downstream reads from search and recommendation services.
+
+Quality. Primary genre precision should be high at both top-level and fine-grained levels. Secondary genre recall can be higher as long as confidence scores are calibrated.
+
+Auditability. Store taxonomy version, model version, confidence, top features, and review state for every prediction.
+
+Robustness. The system must handle missing metadata, unavailable media features, creator spam, class imbalance, and new genre trends.
+
+Capacity Estimation
+
+Use round numbers and adjust if the interviewer gives exact scale:
+
+MetricEstimate
+Catalog size~10M total experiences, ~1M active enough to classify carefully
+New or updated experiences~100K per day
+Genre taxonomy~20 top-level genres, ~100-300 fine-grained labels
+Prediction frequencyOn create/update + nightly reclassification for active catalog
+Downstream read trafficTens of thousands of QPS from search, browse, and recommendations
+Human review budgetSmall relative to catalog, focused on high-traffic and low-confidence cases
+
+At this scale, genre prediction should be offline or nearline, written into a genre store, and read cheaply by downstream systems. Running a large multimodal model directly in the search request path is unnecessary and risky.
+
+ML Framing
+
+This is a hierarchical multi-label classification problem:
+
+Input. Experience metadata, creator tags, title, description, thumbnails, trailers, gameplay/session statistics, user behavior aggregates, and historical labels.
+
+Output. A probability per genre, an implied ancestor path, plus selected primary and secondary labels after thresholding and hierarchy constraints.
+
+Objective. Maximize calibrated genre quality for downstream discovery while keeping high precision for labels that users browse or filter by.
+
+State early that this is not a recommendation system. Recommendation predicts which game a user should play. Genre classification predicts what a game is. The output becomes a feature for search and recommendations, but the classification model has a different objective and serving path.
+
+Phase 2: Data and Features
+
+Labels
+
+The hardest part is not the model architecture. It is building reliable labels.
+
+Label SourceSignalStrengthRisk
+Human taxonomy reviewersGold labels on sampled experiencesHighest qualityExpensive, limited coverage
+Creator-selected genre/tagsSelf-declared intentFresh, available at create timeNoisy, spam-prone
+Existing browse/category placementCurated or legacy labelsUseful bootstrapMay reflect old taxonomy
+User feedback and reports"Wrong genre" feedback, creator appealsDirect correction signalSparse and biased toward visible games
+Search/click/play logsQueries that lead to playsLarge scale weak labelsPosition bias and recommendation feedback loops
+Co-play similarityGames played by similar users in same sessions/cohortsUseful for long-tail groupingCan confuse audience overlap with genre
+
+The training set should combine a small gold set with a larger weakly labeled set. The gold set is used for evaluation and calibration. Weak labels can help pretraining or candidate selection, but should not be treated as truth.
+
+Taxonomy Record
+
+{
+  "taxonomy_version": "genre_v4",
+  "genre_id": "horror_survival",
+  "display_name": "Survival Horror",
+  "parent_id": "horror",
+  "is_active": true,
+  "definition": "Games where players survive threats in a horror-themed setting",
+  "positive_examples": ["doors-like survival horror", "escape horror maze"],
+  "negative_examples": ["light spooky roleplay with no survival loop"]
+}
+
+Versioning matters because downstream systems, evaluation dashboards, and historical labels must agree on what each label meant at the time it was predicted.
+
+Feature Families
+
+FamilyExamplesNotes
+Text metadatatitle, description, creator tags, update notes, localized descriptionsStrong cold-start signal, but easy to game
+Structured metadatamax players, genre submitted by creator, age guidelines, monetization flags, device supportCheap and stable
+Media embeddingsthumbnail embedding, trailer/video embedding, icon embedding, OCR text from imagesCaptures visual genre clues like racing cars, obstacle courses, horror scenes
+Gameplay statisticssession length distribution, party size, death/retry rate, level completion rate, match duration, retention curveAvailable after launch; useful for distinguishing similar text labels
+Player behaviorco-play graph, repeat-play cohorts, search queries that lead to plays, browse sourcePowerful but biased by exposure and current recommendation system
+Creator contextcreator history, previous games, update cadence, moderation qualityUseful prior, but should not dominate the game-level label
+Review feedbackhuman edits, creator appeals, user reports, moderator decisionsBest correction loop for ambiguous or high-impact labels
+
+For cold start, text and media features dominate. For mature experiences, gameplay and behavior features help distinguish genres that look similar in metadata but play differently.
+
+Data Pipeline
+
+Catalog events fire when an experience is created, title/description/tags change, thumbnails or trailers change, or the game receives enough new play data.
+
+Feature extraction jobs compute text embeddings, media embeddings, structured features, and aggregate behavioral features.
+
+Feature store keeps the same feature definitions available for offline training and nearline inference.
+
+Prediction logs store the exact feature snapshot, taxonomy version, model version, scores, selected labels, and downstream outcomes.
+
+Phase 3: High-Level Architecture
+
+The prediction flow:
+
+A creator publishes or updates an experience.
+
+Catalog events trigger text, structured metadata, and media feature extraction.
+
+Once enough play data exists, gameplay and behavior aggregates are added.
+
+The inference service loads the feature vector and scores all genre labels for the active taxonomy version.
+
+Calibration and thresholding choose the fine-grained primary genre, implied top-level genre, and secondary genres while enforcing parent-child consistency.
+
+Low-confidence, high-traffic, or policy-sensitive predictions are routed to human review.
+
+Approved predictions are written to the genre store and propagated to search, browse, recommendations, and analytics.
+
+The online product path should read precomputed genre labels. Do not put expensive media encoders or large classifiers on the critical path for search or recommendations.
+
+Phase 4: Taxonomy and Labeling
+
+Taxonomy Design
+
+Start with a small, stable hierarchy:
+
+Action
+  Shooter
+  Fighting
+  Battle Royale
+Adventure
+  Obby
+  Survival
+  Exploration
+Simulation
+  Tycoon
+  Life Simulation
+  Vehicle Simulation
+Social
+  Roleplay
+  Hangout
+  Party Game
+Horror
+  Survival Horror
+  Puzzle Horror
+Sports and Racing
+  Racing
+  Team Sports
+Puzzle and Strategy
+
+The taxonomy should allow:
+
+One primary fine-grained genre plus an implied top-level genre for browse placement and analytics.
+
+Multiple secondary genres for search recall, recommendations, and filtering.
+
+Parent-child consistency so survival_horror implies horror.
+
+Unknown or mixed labels for games that do not fit cleanly.
+
+Deprecation and migration when a genre is split, merged, or renamed.
+
+Human Labeling Strategy
+
+Build a gold dataset intentionally:
+
+Sample head, mid-tail, and long-tail experiences.
+
+Oversample ambiguous genres such as roleplay vs social, simulator vs tycoon, and adventure vs obby.
+
+Require at least two independent labels for ambiguous examples.
+
+Track annotator agreement and route disagreements to expert review.
+
+Store label rationale so future taxonomy changes can reuse the judgment.
+
+The initial gold set can be small relative to the full catalog, but it must be balanced enough to evaluate rare genres. A carefully sampled human-labeled set with tens of thousands of examples is often more valuable than millions of untrusted creator tags.
+
+Weak Supervision
+
+Weak labels are useful for scale:
+
+Creator tags and submitted categories.
+
+Keyword rules from title and description.
+
+Visual similarity to known genre examples.
+
+Search queries that led to plays.
+
+Co-play clusters with already-labeled games.
+
+Use these signals to pretrain or generate candidates, then calibrate against the gold set. If you merge weak labels blindly, the model will learn creator spam and existing recommendation bias.
+
+Active Learning
+
+Human review budget should focus where it matters:
+
+Low confidence predictions near the decision threshold.
+
+High-traffic experiences where a wrong label has large user impact.
+
+New or fast-growing experiences with sparse labels.
+
+Examples with disagreement between text, media, and behavior models.
+
+New clusters that do not fit the current taxonomy.
+
+Active learning is a strong interview signal here. It shows that you understand the bottleneck is label quality, not just model capacity.
+
+Taxonomy Evolution
+
+Genres evolve. The system needs a controlled taxonomy workflow:
+
+Detect emerging clusters from search logs, co-play graphs, and human reviewer notes.
+
+Add a proposed genre with definitions and examples.
+
+Label a validation set for the new genre.
+
+Backfill predictions for active catalog entries.
+
+Publish a new taxonomy version and keep old predictions queryable.
+
+Do not silently change label meaning in place. If simulator is split into vehicle_simulator and life_simulation, downstream metrics need to know when the taxonomy changed.
+
+Phase 5: Model Design
+
+Baseline
+
+Start with a simple baseline:
+
+Normalize title, description, and creator tags.
+
+Apply keyword and synonym dictionaries per genre.
+
+Trust creator labels only when they agree with text/media evidence.
+
+Use a logistic regression or gradient-boosted model over sparse text and metadata features.
+
+This baseline is easy to debug and gives a floor for precision. It also helps build reviewer tooling before investing in a large multimodal model.
+
+Text Model
+
+A text model handles cold start well:
+
+Input: title, description, creator tags, localized text.
+
+Model: multilingual transformer or text embedding model with a multi-label classification head.
+
+Output: one sigmoid probability per genre.
+
+Loss: binary cross-entropy with class weights or focal loss for rare genres.
+
+Text alone will overfit to creator wording, so treat it as one strong signal rather than the whole system.
+
+Media Model
+
+Thumbnails and trailers are often more honest than tags:
+
+Use an image/video encoder to embed thumbnails, icons, and short preview clips.
+
+Train a multi-label classifier on top of media embeddings.
+
+Use OCR from thumbnails as an additional text feature.
+
+Track missing media and low-quality media separately rather than defaulting to zero confidence.
+
+Media helps distinguish games like racing, obby, horror, and sports, but it can miss gameplay mechanics that are not visible in a thumbnail.
+
+Gameplay and Behavior Model
+
+After an experience has traffic, add behavior:
+
+Session length and retry patterns.
+
+Party size and social graph features.
+
+Match duration and lobby/waiting-room behavior.
+
+Completion or progression signals.
+
+Co-play similarity to known genre clusters.
+
+For example, an obby may have short repeated attempts and high death/retry events, while a roleplay hangout may have long sessions, stable groups, and chat-heavy behavior. These features should be aggregated with privacy in mind and should avoid using raw individual-level histories in the classifier.
+
+Multimodal Fusion
+
+A pragmatic production architecture uses late fusion:
+
+ModelInputOutput
+Text classifiertitle, description, tagsper-genre probabilities
+Media classifierthumbnails, trailers, iconper-genre probabilities
+Behavior classifiergameplay and co-play aggregatesper-genre probabilities
+Meta modelall model scores + structured featurescalibrated final probabilities
+
+Late fusion is easier to debug and can tolerate missing modalities. If media extraction fails, the meta model can still use text and structured metadata. If the game is brand new, behavior features are absent by design.
+
+Hierarchical Constraints
+
+The final selection step should enforce taxonomy consistency:
+
+if p(survival_horror) > threshold_child:
+  p(horror) = max(p(horror), p(survival_horror))
+
+primary_genre = highest_confidence_specific_label()
+top_level_genre = ancestor(primary_genre)
+secondary_genres = non-ancestor labels above per-label thresholds, capped at K
+
+Thresholds should be calibrated per label. A broad genre like adventure may use a different threshold than a narrow genre like vehicle_simulator.
+
+Explainability
+
+Store lightweight explanations for reviewers and creators:
+
+Top matched text tokens or creator tags.
+
+Nearest labeled examples by embedding similarity.
+
+Main modality contributions: text score, media score, behavior score.
+
+Confidence and threshold margin.
+
+The explanation does not need to be perfect, but reviewers need enough context to understand why the model made a questionable prediction.
+
+Phase 6: Training and Evaluation
+
+Training Cadence
+
+ComponentCadenceWhy
+Text and metadata featuresOn update + daily backfillMetadata changes are frequent
+Media embeddingsOn media update + nightly batchGPU-heavy, but important for cold start
+Behavior aggregatesHourly or dailyNeeds enough play data to be stable
+Baseline/rulesAs taxonomy changesUseful guardrails and debug baseline
+Multimodal classifierDaily or weeklyDepends on label volume and drift
+Calibration thresholdsDaily or weeklyKeeps per-label precision/recall stable
+Full active-catalog backfillWeekly or on major taxonomy/model changeEnsures consistent labels across catalog
+
+Data Splits
+
+Avoid leakage:
+
+Use a temporal split so the validation set reflects future catalog changes.
+
+Hold out creators or near-duplicate game families for some evaluations, so cloned games do not leak labels.
+
+Keep a frozen human-labeled benchmark set for model comparison.
+
+Evaluate cold-start separately using only features available at create time.
+
+Offline Evaluation
+
+Use multiple metrics because micro-averages hide rare genre failures:
+
+Primary genre accuracy at both top-level and fine-grained levels.
+
+Macro F1 across genres to protect rare labels.
+
+Micro F1 for overall catalog quality.
+
+Precision@K and Recall@K for secondary genre lists.
+
+Per-label precision/recall for important genres.
+
+Hierarchical consistency rate for parent-child constraints.
+
+Calibration error so confidence scores mean what they say.
+
+Human audit pass rate on sampled high-traffic predictions.
+
+Do not optimize only micro F1. A model can look good by performing well on huge genres while failing rare but important genres.
+
+Online Evaluation
+
+Genre labels are not the final product, so online metrics should measure downstream impact:
+
+Search filter usage, click-through/play-start rate, and abandonment.
+
+Browse page engagement by genre.
+
+Recommendation diversity and satisfaction guardrails.
+
+Query reformulation rate for genre-like queries.
+
+Creator appeal rate for "wrong genre" labels.
+
+Human reviewer override rate.
+
+User report rate for misleading genre placement.
+
+Run A/B tests carefully. A genre classifier may improve search recall while changing exposure distribution across games, so include fairness and catalog coverage guardrails.
+
+Human-in-the-Loop Evaluation
+
+Keep humans in the loop after launch:
+
+Sample predictions for every genre weekly.
+
+Oversample low-confidence and high-traffic cases.
+
+Track reviewer disagreement by genre.
+
+Feed corrected labels back into training.
+
+Maintain a dashboard for label distribution drift and confusion pairs.
+
+Handling Train/Serve Skew
+
+Log the exact feature snapshot used for each prediction:
+
+{
+  "experience_id": "exp_123",
+  "taxonomy_version": "genre_v4",
+  "model_version": "genre_mm_2026_04_12",
+  "feature_snapshot_id": "feat_987",
+  "scores": {
+    "obby": 0.82,
+    "adventure": 0.57,
+    "puzzle": 0.41,
+    "roleplay": 0.09
+  },
+  "top_level_genre": "adventure",
+  "primary_genre": "obby",
+  "secondary_genres": ["puzzle"],
+  "review_state": "auto_approved"
+}
+
+Training should use the same feature definitions and, when possible, the same stored feature values that inference used. Recomputing features months later can silently change labels.
+
+Phase 7: Serving, Scaling, and Cold Start
+
+Serving Model
+
+Use two serving paths:
+
+Nearline update path. When an experience changes, recompute affected features, run the classifier, and update the genre store.
+
+Batch backfill path. Nightly or weekly jobs reclassify the active catalog when models, thresholds, or taxonomy versions change.
+
+Downstream product systems read from the genre store:
+
+{
+  "experience_id": "exp_123",
+  "taxonomy_version": "genre_v4",
+  "top_level_genre": "adventure",
+  "primary_genre": "obby",
+  "secondary_genres": ["puzzle"],
+  "confidence": 0.82,
+  "model_version": "genre_mm_2026_04_12",
+  "updated_at": "2026-04-18T17:22:00Z"
+}
+
+Latency Budget
+
+OperationTarget
+Genre store read by search/recs<10 ms p99
+Initial text-only cold-start prediction<5 minutes after publish
+Full text + media prediction<30-60 minutes after publish or media update
+Behavior-based refinementHourly or daily after enough plays
+Active-catalog backfillHours, not user-facing
+
+The important distinction: prediction latency can be minutes for freshness, but read latency must be milliseconds because search and recommendations call it constantly.
+
+Storage and Indexing
+
+Store predictions in a low-latency key-value store keyed by (experience_id, taxonomy_version). Also write to:
+
+Search index fields for genre filtering and query matching.
+
+Recommendation feature store for candidate generation and ranking.
+
+Analytics warehouse for dashboards and audits.
+
+Review queue for low-confidence or contested predictions.
+
+Include model version and taxonomy version in every record. This makes rollback and historical analysis possible.
+
+Horizontal Scale
+
+Partition catalog events by experience_id so updates for the same game are ordered.
+
+Make inference idempotent; repeated events should write the same prediction for the same feature snapshot.
+
+Run media extraction on a separate GPU worker pool so image/video backlog does not block text-only cold-start labels.
+
+Batch inference for throughput, especially during backfills.
+
+Use dead-letter queues for failed media extraction or malformed metadata.
+
+Cold Start
+
+For a brand-new experience:
+
+Generate an initial label from title, description, creator tags, structured metadata, and thumbnail.
+
+Use creator history as a weak prior, not as the deciding signal.
+
+Mark low-confidence labels as provisional.
+
+Refresh after the game receives enough play sessions for behavior features.
+
+Route high-growth low-confidence games to human review quickly.
+
+Cold-start quality matters because the first label affects early discovery. A wrong initial label can send the game to the wrong audience and create a bad feedback loop.
+
+Monitoring and Safety
+
+Monitor several layers:
+
+Data drift. Text length, missing descriptions, media embedding distribution, creator tag distribution.
+
+Label drift. Sudden spikes or drops in genre frequency.
+
+Quality drift. Weekly human audit metrics and per-label F1 on fresh labels.
+
+Downstream drift. Search CTR, browse engagement, creator appeals, user reports.
+
+Abuse. Keyword stuffing, misleading thumbnails, fast metadata churn around popular genres.
+
+Operational health. Event lag, feature extraction failures, inference latency, genre store read latency.
+
+Rollout and Rollback
+
+Do not replace all labels at once:
+
+Shadow-score the active catalog with the new model.
+
+Compare label distributions and confusion pairs against the current model.
+
+Send disagreements on high-traffic experiences to review.
+
+Roll out by traffic slice or genre slice.
+
+Keep old model predictions for rollback until the new model is stable.
+
+Common Pitfalls
+
+Treating genre as single-label classification. Many Roblox experiences naturally span multiple genres. A single softmax label loses useful information and creates bad browse placement.
+
+Trusting creator tags as ground truth. Creator tags are useful features, but they are noisy and incentive-aligned toward traffic. Validate them with content, media, behavior, and human labels.
+
+Putting the classifier in the search request path. Genre labels should be precomputed and served from a low-latency store. Search should not wait for media encoders or large models.
+
+Ignoring taxonomy versioning. If label definitions change without versioning, evaluation dashboards and downstream models become impossible to interpret.
+
+Optimizing only aggregate accuracy. Head genres can dominate metrics. Track macro F1, rare genre performance, calibration, and human audit pass rate.
+
+Letting recommendation feedback loops become labels. Play logs reflect what the current system exposed. They are weak evidence, not unbiased truth.
+
+Forgetting cold start. A design that waits for weeks of play data fails new experiences. Use content and media first, then refine with behavior.
+
+No review or appeal path. Genre labels affect creator visibility. High-impact mistakes need human review, audit logs, and correction feedback.
+
+Interview Checklist
+
+Problem Framing
+
+  Classified the problem as hierarchical multi-label content classification
+
+  Separated genre classification from recommendation/ranking
+
+  Defined top-level genre, primary fine-grained genre, secondary genres, confidence, and taxonomy version
+
+Data and Features
+
+  Covered title, description, creator tags, structured metadata, media, gameplay, and behavior features
+
+  Distinguished gold human labels from weak labels
+
+  Discussed feature snapshots and train/serve consistency
+
+Taxonomy and Labeling
+
+  Designed a versioned genre taxonomy with parent-child relationships
+
+  Included human review, active learning, and taxonomy evolution
+
+  Addressed ambiguous and mixed-genre games
+
+Modeling
+
+  Started with a debuggable baseline
+
+  Proposed text, media, and behavior models with late fusion
+
+  Handled class imbalance, missing modalities, calibration, and hierarchy constraints
+
+Training and Evaluation
+
+  Used temporal and creator/duplicate-aware splits
+
+  observed primary accuracy, macro/micro F1, precision@K, calibration, and human audit pass rate
+
+  Connected offline quality to downstream search/browse/recommendation metrics
+
+Serving and Scaling
+
+  Used nearline and batch inference, not synchronous request-time classification
+
+  Stored predictions in a low-latency genre store
+
+  Covered cold start, backfills, monitoring, rollout, and rollback
+
+Summary
+
+ConcernDecision
+FramingHierarchical multi-label classification over Roblox experiences
+OutputTop-level genre, primary fine-grained genre, secondary genres, calibrated scores, taxonomy version, model version
+LabelsHuman gold set plus weak creator, search, behavior, and co-play signals
+FeaturesText metadata, structured metadata, media embeddings, gameplay aggregates, behavior aggregates
+ModelLate-fusion multimodal classifier with per-label sigmoid heads
+TaxonomyVersioned parent-child ontology with active evolution and backfills
+EvaluationPrimary accuracy, macro/micro F1, precision@K, calibration, human audit, downstream A/B metrics
+ServingNearline prediction on updates, batch backfills, low-latency genre store reads
+Cold startText, creator tags, structured metadata, and thumbnail first; behavior later
+SafetyHuman review, creator appeal path, drift monitoring, spam detection, rollback
+
+The defining property of this design: genre classification is a catalog understanding system, not a personalization system. The best answer builds a reliable taxonomy and labeling loop first, then layers in multimodal models, calibrated thresholds, nearline serving, and human review so downstream search and recommendation systems can trust the labels.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

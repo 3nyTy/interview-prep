@@ -1,0 +1,57 @@
+===H1===
+Code Craft: Validate Cart
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/code-craft-validate-cart
+===BODY===
+DoorDash
+Coding·60 minMembers
+Code Craft: Validate Cart
+Phone-screen Code Craft prompt. Given a cart with item entries, validate whether the cart is orderable under quantity, availability, and min/max-limit rules. The prompt is intentionally open-ended; candidates are expected to negotiate exact rule semantics before coding.
+SWE
+object-design
+medium
+Frequency
+Single report
+Last asked
+2026-06-10
+Stage
+phone-screen
+Requirements
+
+Input: a cart containing item lines. Each line should at minimum expose an item id / SKU and requested quantity; the availability and min/max limits may be supplied in the item metadata or by a mock inventory / catalog service.
+
+Validate at least three rule families:
+
+Requested quantity must be valid for the item.
+
+Item must be available / in stock.
+
+Item-specific minimum and maximum quantity limits must be respected.
+
+Output: either a boolean validity result or a structured validation result with per-item errors; clarify which shape the interviewer wants before implementing.
+
+The prompt is open-ended: the interviewer expects discussion on rule shape, data ownership, and how errors should be surfaced.
+
+Notes
+
+Keep the implementation rule-driven rather than hard-coding checks inline. A clean shape is CartValidator.validate(cart) -> ValidationResult, with small helper methods or rule objects for quantity, availability, and min/max limits.
+
+Prefer returning structured errors such as {item_id, code, message} so the caller can render actionable feedback. A plain boolean is too thin unless the interviewer explicitly requests it.
+
+Edge cases to test: empty cart, duplicate item lines, quantity zero / negative, item unavailable, requested quantity below min, requested quantity above max, and multiple validation errors in one cart.
+
+If availability comes from a service, separate fetching item metadata from applying validation rules. This keeps the validator testable and makes failure handling easier to discuss.
+
+Preparation
+
+Practice implementing a small rule-engine-style validator in 25 minutes.
+
+Prepare a table-driven test suite covering the edge cases above.
+
+Have a short answer ready for catalog / inventory-service failure: fail closed for checkout, show retryable validation error, and log the failed dependency.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

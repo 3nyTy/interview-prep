@@ -1,0 +1,60 @@
+===H1===
+Battleship Board (React, Frontend Onsite)
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/battleship-react-frontend
+===BODY===
+Waymo
+Coding·45 minMembers
+Battleship Board (React, Frontend Onsite)
+Frontend onsite: implement the Battleship board in React from a physical reference model. Cells cycle through empty / red marker / white marker on click. Compute and display ship-sunk vs ship-alive status from the marker state.
+SWE
+react
+frontend
+design-implementation
+game-engine
+medium
+Frequency
+Single report
+Last asked
+2026-04-03
+Stage
+onsite-coding
+Requirements
+
+Render a Battleship board (grid of cells) in React.
+
+Each cell click cycles through visual states: empty → red marker → white marker → empty (or similar — confirm rules).
+
+Maintain ship metadata (positions, lengths) and compute, after each click, which ships are fully hit (sunk) vs still alive; display the status.
+
+The interviewer brought a physical Lego model and verbally explained rules — clarification dominates the first 10–15 minutes.
+
+Notes
+
+Decompose into <Board />, <Row />, <Cell /> components plus a <Status /> summary panel.
+
+State shape: cellStates: CellState[][], ships: { id, cells: [r,c][], length }. Derive is_sunk(ship) = ship.cells.every(([r,c]) => cellStates[r][c] === HIT).
+
+Click handler updates only the affected cell — avoid re-rendering the whole grid by memoizing <Cell /> on (state, onClick).
+
+Track ship metadata as a separate immutable structure; recompute sunk-status on each state change with a derived selector instead of mutating the ship records.
+
+Edge cases: clicking the same cell twice (cycle through states), clicking outside ship cells (red / white markers still allowed for 'misses'), persistent vs ephemeral state (no requirement for refresh durability unless the interviewer asks).
+
+Most reported failures trace back to spending too long on the rules clarification and leaving no time to implement. Drive the rules-pinning conversation ruthlessly: 'Three states per cell, click cycles through them, ship is sunk when all its cells are red?'
+
+Preparation
+
+Pre-write a Battleship board template in React in under 20 minutes: state, click handler, sunk-status selector, basic CSS grid layout.
+
+Rehearse explaining the unidirectional data flow aloud (state owned by <Board />, dispatched by <Cell /> clicks).
+
+Bring a 4-line useReducer template for the click handler if the interviewer asks for explicit dispatch.
+
+Familiarize yourself with Battleship rules once before the loop — being unable to discuss 'what does it mean for a ship to be sunk' tanks the clarification budget.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

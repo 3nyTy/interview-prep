@@ -1,0 +1,57 @@
+===H1===
+Sort 0..32000 with Bit-Vector Storage
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/bit-vector-sort-0-to-32000
+===BODY===
+Microsoft
+Coding·30 minMembers
+Sort 0..32000 with Bit-Vector Storage
+Classic Bell Labs / Bentley problem revived for an Azure storage HM round. Sort an unsorted, duplicate-free integer file with values in [0, 32000] using only `getNum()` / `putNum()` helpers — and minimal memory.
+SWE
+bit-manipulation
+sorting
+io
+medium
+Frequency
+Single report
+Last asked
+2025-11-21
+Stage
+onsite-coding
+Requirements
+
+A file contains an unsorted sequence of distinct integers in [0, 32000]. You are given two helper functions:
+
+getNum() — reads the next integer from the input, or returns sentinel on EOF.
+
+putNum(int) — writes an integer to the output file.
+
+Sort the integers in ascending order and write them out. The HM gave the round a 30-minute slot and explicitly said "this is an old problem; the trick is the memory bound."
+
+The unstated constraint that makes this interesting: the candidate is expected to recognize that ordinary in-memory sort wastes memory because the value range is small.
+
+Notes
+
+Use a bit vector of length 32001. Read inputs one at a time with getNum(), set bit i for each integer i. Then sweep the bit vector once in order, calling putNum(i) for every set bit.
+
+Memory: 32001 bits ≈ 4 KB regardless of input size. Time: O(N + 32001).
+
+In Python: a bytearray(32001 // 8 + 1) with bit-twiddling does the trick. In C/Java: int[32001 / 32 + 1] with bitset[i >> 5] |= 1 << (i & 31).
+
+This is the canonical "Bentley column" introduction-to-bit-vectors problem. Interviewers who ask it want the "compact representation when the value range is bounded" insight; the implementation itself is five lines.
+
+Common reported failure: candidates default to sorted(list(input)) because the value range is small enough to fit in memory anyway. That is correct but misses the signal — the interviewer wants the bit vector.
+
+Preparation
+
+Pre-write the bit-vector set / test snippets in your language of choice. In Python use int.bit_length arithmetic or bytearray + bitwise ops.
+
+Know the generalizations: if duplicates were allowed, switch to a count array. If the range were [0, 2^32] and could not fit in memory, switch to external multi-pass radix sort.
+
+Be ready to articulate the memory comparison: bit_vector_bytes ≈ range / 8, vs int_array_bytes ≈ N · 4. Bit vector wins when the range is small and density is high.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

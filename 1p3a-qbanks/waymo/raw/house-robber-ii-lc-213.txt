@@ -1,0 +1,56 @@
+===H1===
+House Robber II (LC 213)
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/house-robber-ii-lc-213
+===BODY===
+Waymo
+CodingMembers
+House Robber II (LC 213)
+Canonical LeetCode 213: maximize the money collected from a circular row of houses without taking from two adjacent houses. The first and last houses are adjacent.
+SWE
+array
+dp
+medium
+Frequency
+Single report
+Last asked
+2026-07-31
+Stage
+phone-screen
+Requirements
+
+Input: an integer array nums, where nums[i] is the amount of money in house i.
+
+The houses form a circle, so the first and last houses are adjacent.
+
+Return the maximum amount that can be collected without taking from two adjacent houses.
+
+Examples
+
+nums = [2, 3, 2] returns 3.
+
+nums = [1, 2, 3, 1] returns 4.
+
+nums = [1, 2, 3] returns 3.
+
+Notes
+
+The interview identified the problem as LC 213, with no Waymo-specific modification stated.
+
+It appeared as the sole technical phone-screen problem before the virtual onsite.
+
+Handle the one-house case directly. For longer arrays, solve two linear subproblems—exclude the last house and exclude the first house—then take the larger result, since the two endpoints cannot both be selected.
+
+Solve each linear range with rolling dynamic programming: for each value, update the best total as max(previous_best, best_before_previous + value). The total complexity is O(n) time and O(1) auxiliary space.
+
+Preparation
+
+Solve the canonical problem from scratch under a 45-minute limit, including a verbal correctness argument and complexity analysis.
+
+Test one-house, two-house, and first-versus-last boundary cases explicitly before submitting.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

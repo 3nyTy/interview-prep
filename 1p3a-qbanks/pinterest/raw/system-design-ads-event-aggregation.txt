@@ -1,0 +1,65 @@
+===H1===
+System Design: Ads Event Aggregation / Reporting
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/system-design-ads-event-aggregation
+===BODY===
+Pinterest
+System Design·60 minMembers
+System Design: Ads Event Aggregation / Reporting
+Design the ads event aggregation pipeline — billions of impression / click / conversion events ingested, aggregated by advertiser / campaign / segment, served to a reporting dashboard with both real-time and historical views.
+SWE
+ads
+etl
+data-engineering
+streaming
+kafka
+storage
+scaling
+medium
+Frequency
+Low
+Last asked
+2026-08-11
+Stage
+onsite-system-design
+Requirements
+
+Design the pipeline that consumes ads event streams (impressions, clicks, conversions) and serves an advertiser-facing reporting dashboard. Address:
+
+Event ingestion (Kafka / equivalent) and schema evolution.
+
+Aggregation by (advertiser, campaign, ad-group, time bucket, audience segment).
+
+Storage: hot path for real-time-ish queries vs cold path for long-history queries.
+
+Query layer for the dashboard — pre-aggregated cubes vs ad-hoc OLAP.
+
+Late-arriving events and corrections (a conversion attributed an hour after the click).
+
+Cost: at billions of events / day, the design has to defend per-event $$ math.
+
+Notes
+
+Standard lambda / kappa architecture: Kafka → real-time stream processor (Flink / Spark Structured Streaming) writes minute-grain aggregates to a hot store (Druid / Pinot / ClickHouse); the same events also land in S3 / data lake for batch reprocessing. The hot store covers the last N days; the lake covers the long tail.
+
+Aggregation cubes should be pre-rolled along the dimensions the dashboard queries most: (advertiser × campaign × hour) and (advertiser × audience-segment × day) are typical. Ad-hoc dimensions fall through to the lake with longer latency.
+
+Late-arriving events: keep the aggregation window open for a watermark period (e.g. 1 hour for click → conversion), or write append-only event records and re-aggregate on query. The former is faster, the latter is correct under any delay.
+
+Idempotency at the ingestion layer is critical — events are at-least-once and the count must not be inflated by replays. Dedupe by (event_id, advertiser_id) at the stream-processor input.
+
+A common follow-up extension is per-user reporting / segmentation, which adds a cardinality challenge. Use HyperLogLog for unique-user counts; don't claim exact counts at this scale.
+
+Preparation
+
+Pre-draw the lambda architecture (Kafka → stream → hot store; Kafka → lake → batch → cold store; query layer reads both).
+
+Drill the late-arriving-event handling — the watermark + re-aggregate trade-off is the most likely deep-dive.
+
+Practice the cost-per-event math: events per second × bytes per event × storage replication factor × retention days × $/GB — be ready to give a directional dollar number per day.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

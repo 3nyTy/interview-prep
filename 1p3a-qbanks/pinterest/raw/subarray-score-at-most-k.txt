@@ -1,0 +1,54 @@
+===H1===
+Subarray Score ≤ K (Sliding-Window)
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/subarray-score-at-most-k
+===BODY===
+Pinterest
+Coding·60 minMembers
+Subarray Score ≤ K (Sliding-Window)
+Given an integer array and an integer K, count the number of contiguous subarrays whose `(sum × length)` score is at most K. Must be O(n).
+SWE
+array
+sliding-window
+two-pointer
+prefix-sum
+medium
+Frequency
+Single report
+Last asked
+2025-11-07
+Stage
+phone-screen
+Requirements
+
+Given a non-negative integer array arr and integer K, count contiguous subarrays whose score is sum(arr[i..j]) * (j-i+1) <= K in O(n). Clarify that non-negative values are required for the sliding-window monotonicity.
+
+Examples
+
+arr = [2, 1, 4, 3, 5]
+K = 5
+answer = 5
+
+Each single-element subarray qualifies, while every multi-element subarray has score above 5.
+
+Notes
+
+Maintain a running sum and left boundary. After adding arr[right], repeatedly remove arr[left] while sum * window_length > K.
+
+Once valid, every suffix of the current non-negative window ending at right is also valid, contributing right-left+1 subarrays.
+
+Negative values break this monotonicity and require a different problem formulation; do not silently apply the same window.
+
+Preparation
+
+Implement the window and hand-trace every right endpoint in the example.
+
+Test empty input, K=0, zeros, one oversized element, and a window requiring multiple left shifts.
+
+State the monotonicity proof and the O(n) amortized argument out loud.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

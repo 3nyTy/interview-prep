@@ -1,0 +1,49 @@
+===H1===
+Best Time to Buy and Sell Stock — Single Transaction
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/single-transaction-stock-profit
+===BODY===
+Oracle
+CodingMembers
+Best Time to Buy and Sell Stock — Single Transaction
+Given prices ordered over time, choose one buy followed by one sell to maximize profit. Only a single transaction is allowed.
+SWE
+array
+easy
+Frequency
+Low
+Last asked
+2026-08-19
+Stage
+onsite-coding
+Requirements
+
+Input: a sequence of prices ordered by time.
+
+Choose at most one buy and one later sell.
+
+Output the maximum profit obtainable from that single transaction.
+
+Notes
+
+Scan once while maintaining the lowest price seen so far and the best profit seen so far. For each price, evaluate price - min_price, update the best profit, then update the running minimum.
+
+The invariant is that min_price is the cheapest valid buy before or at the current position; therefore every candidate profit uses a sell that does not precede its buy.
+
+If prices never rise, choosing no transaction yields profit 0.
+
+Time complexity is O(n) and auxiliary space is O(1).
+
+Preparation
+
+Implement the one-pass running-minimum solution without storing prefix arrays, then explain its invariant in two sentences.
+
+Trace decreasing prices, repeated minima, and a single-price input; confirm that no profitable trade returns 0.
+
+Contrast the linear scan with the O(n^2) enumeration of every buy/sell pair and state why the scan examines the best buy for every sell.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

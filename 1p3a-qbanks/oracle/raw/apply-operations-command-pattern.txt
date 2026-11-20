@@ -1,0 +1,63 @@
+===H1===
+Apply List of Operations (Command Pattern)
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/apply-operations-command-pattern
+===BODY===
+Oracle
+Coding·45 minMembers
+Apply List of Operations (Command Pattern)
+Given a list of operations and an initial state, apply all operations to derive the final state. Recognising and using the Command pattern is the explicit signal. Follow-up: identify cases where operations can be applied out of order or merged. Oracle Health AI IC4 onsite, second technical round.
+SWE
+MLE
+oop-design
+design
+object-design
+medium
+Frequency
+Single report
+Last asked
+2026-02-03
+Stage
+onsite-coding
+Requirements
+
+Input: an initial state and a list of operations to apply.
+
+Output: the final state after all operations are applied in order.
+
+The interviewer flags that the round is intentionally not a traditional LeetCode problem — it is testing whether the candidate organises the implementation around the Command pattern (encapsulating each operation as a self-contained object with an apply(state) method).
+
+Follow-up: identify cases where operations do not need to be applied sequentially — operations that commute can be reordered or batched.
+
+Notes
+
+Core skeleton:
+interface Operation {
+    State apply(State current);
+    // Optionally: boolean commutesWith(Operation other);
+    // Optionally: Optional<Operation> mergeWith(Operation other);
+}
+
+Each concrete operation (e.g. AddItemOp, RemoveItemOp, UpdateMetadataOp) implements apply and exposes its inputs as fields. The driver is a tight loop: for (op : operations) state = op.apply(state);
+
+Optimisation follow-up: introduce a commutesWith (or domain-specific equivalent) that allows the driver to reorder pure-add operations ahead of pure-remove operations, or to merge two consecutive Updates on the same key.
+
+Real-world parallel: this is the same shape as Redux reducers, event-sourced state machines, or operational transformation. Mentioning one of these analogies signals senior understanding without name-dropping unnecessary jargon.
+
+Common over-engineering trap: pre-defining undo() / redo() before they're requested. Skip — the round is about composing forward application, not maintaining an undo stack.
+
+Common under-engineering trap: writing one giant applyAll(ops) function with a switch on operation type. The whole point of this round is moving the switch into per-operation polymorphism.
+
+Preparation
+
+Drill the Command-pattern skeleton in Java or TypeScript on a small concrete domain (calculator, todo list, key-value store). 20 minutes per drill, three times.
+
+For the optimisation follow-up, work through a list of 5-6 operations on a sample state and identify which pairs commute by hand. This builds the intuition for what commutesWith should encode.
+
+Be ready to compare against a non-Command alternative (e.g. event sourcing, reducers) and articulate why polymorphism beats the giant switch.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

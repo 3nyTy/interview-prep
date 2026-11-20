@@ -1,0 +1,104 @@
+===H1===
+In-Memory File System OA
+===URL===
+https://www.1point3acres.com/interview/problems/company/airbnb/oa-in-memory-file-system
+===BODY===
+Airbnb
+CodingMembers
+In-Memory File System OA
+Implement a progressive in-memory file or cloud-storage system. One rotation adds copy/search, user capacity, and compression; another uses add/get/delete, prefix-ranked largest-file queries, user ownership and merge, then per-user backup and restore.
+SWE
+filesystem
+object-design
+data-structure
+compression
+testing
+codesignal
+medium
+Frequency
+Medium · New
+Last asked
+2026-09-08
+Stage
+oa
+Requirements
+
+Implement the project entirely in memory; no operating-system file reads or writes are required.
+
+Maintain file records with a name, size, and creator, plus user records with a user ID, capacity, owned files, consumed capacity, and derived remaining capacity.
+
+Level 1:
+
+Add files.
+
+Copy files.
+
+Retrieve files.
+
+Level 2:
+
+Search for files by a required name prefix and suffix.
+
+Level 3:
+
+Add users with storage capacities.
+
+Add files on behalf of a user.
+
+Update a user's capacity.
+
+Count copied files against the creator's consumed capacity; reject a copy when its size exceeds the remaining capacity.
+
+Treat files created in the earlier levels as belonging to an administrator account, and revise the earlier copy behavior to respect ownership and capacity.
+
+Level 4:
+
+Compress and decompress files.
+
+A compressed file consumes half of its original size.
+
+Update the owning user's consumed capacity whenever compression changes the stored size.
+
+Notes
+
+Use one file map keyed by name, with each value carrying the stored size and owner, plus one user map keyed by ID for capacity and consumed space. Derive remaining capacity as capacity - consumed rather than maintaining a third mutable counter.
+
+Centralize storage accounting in a helper that applies a signed size delta to the owner. A successful copy adds the source file's size; compression or decompression applies new_size - old_size.
+
+Preserve the invariant that each user's consumed space equals the sum of the current sizes of that user's files. For copies, check the capacity delta before mutating either map so a rejected operation leaves no partial state.
+
+Exact method signatures, search ordering, capacity-reduction behavior, compressed-name rules, and decompression failure semantics come from the supplied interface and tests.
+
+The assessment emphasizes object modeling and basic list/dictionary operations rather than optimal asymptotic performance. Passing the supplied tests is the immediate goal.
+
+The complete data model is not visible at the start. Later levels require modifying classes and methods that already pass earlier tests, so every state-model change needs a full regression run.
+
+The CodeSignal workspace may prevent editing the test file or copying the supplied function signature, and its debugging controls can be difficult to discover under time pressure.
+
+Alternate canonical variant — Cloud storage, user merge, and backup
+
+Level 1 exposes addFile(name, size), getFileSize(name), and deleteFile(name). Duplicate adds fail; reads and deletes return an empty optional when the file does not exist.
+
+Level 2 exposes getNLargest(prefix, n). Filter by prefix, sort by size descending, and break equal-size ties by file name in lexicographic order; return all matches when fewer than n exist.
+
+Level 3 adds users with individual capacities. addFileBy(userId, name, size) returns remaining capacity on success. The administrator has unlimited capacity, and Level 1 files belong to that administrator. mergeUser(userId1, userId2) transfers ownership and combines capacity/usage before deleting the second user; administrator merges are excluded.
+
+Level 4 adds per-user backup and restore. A backup snapshots owned file names and sizes and replaces any earlier backup. Restore first reconciles the user's current files, then recreates backed-up files except names now owned by another user. With no backup, restore removes the user's current files.
+
+Merging leaves the destination user's backup unchanged and deletes the source user's backup. Administrator backup and restore follow the same contract as ordinary users.
+
+Preparation
+
+Rehearse creating a small in-memory file store and extending it one level at a time while rerunning all earlier tests after every model change.
+
+Write boundary tests for exact-capacity copies, insufficient capacity, capacity updates, and repeated compression or decompression.
+
+Separately drill deterministic top-N sorting, user merge, and restore collisions so the alternate rotation does not require a new data model.
+
+Practice basic list and dictionary transformations in CodeSignal before the assessment so editor ergonomics do not consume implementation time.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

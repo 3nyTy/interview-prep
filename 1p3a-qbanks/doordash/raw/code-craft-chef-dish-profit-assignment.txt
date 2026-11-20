@@ -1,0 +1,64 @@
+===H1===
+Code Craft: Chef Skill → Dish Profit Assignment
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/code-craft-chef-dish-profit-assignment
+===BODY===
+DoorDash
+Coding·60 minMembers
+Code Craft: Chef Skill → Dish Profit Assignment
+Assign chefs to dishes to maximize total profit. Each chef can cook at most one dish; multiple chefs can cook the same dish. Each dish has a difficulty level, and a chef can cook a dish only if their skill ≥ the dish's difficulty. Profits sorted (or queryable) by difficulty.
+SWE
+greedy
+sorting
+two-pointer
+prefix-sum
+medium
+Frequency
+Single report
+Last asked
+2026-05-11
+Stage
+phone-screen
+Requirements
+
+Input: chefs (list of skill levels), difficulties (list of dish difficulties), profits (list of dish profits indexed by difficulty).
+
+A chef cooks at most one dish; can only cook dishes with difficulty ≤ chef.skill.
+
+Multiple chefs can cook the same dish.
+
+Output: maximum total profit summed across all chef assignments.
+
+Follow-up: given a single list profits where index = difficulty, how would you generate that list from raw input? (Typically: sort dishes by difficulty, take running max profit so each dish's listed profit dominates all easier dishes — guarantees monotonicity.)
+
+Notes
+
+Greedy / two-pointer / LC 826 "Most Profit Assigning Work" equivalent.
+
+Standard approach:
+
+Pair (difficulty, profit) and sort by difficulty.
+
+Sort chefs by skill ascending.
+
+Sweep chefs in order, maintaining best_profit_so_far over all dishes whose difficulty has been passed. Add best_profit_so_far to total for each chef.
+
+Total time: O((n + m) log(n + m)).
+
+The follow-up ("how to generate profits[] where index = difficulty") is asking for a monotonic-by-difficulty profit table: sort by difficulty, take prefix-max, index into the result by difficulty. Equivalent to compressing (difficulty, profit) pairs into a non-decreasing-profit array.
+
+Common bug: failing to skip dishes the chef cannot do; the two-pointer approach side-steps this by sorting chefs ascending and only advancing the dish pointer.
+
+Preparation
+
+Drill LC 826 (Most Profit Assigning Work) until automatic.
+
+Practice the sort + sweep + prefix-max pattern in under 15 minutes.
+
+Have the follow-up answer ready: "sort by difficulty, take running max profit."
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

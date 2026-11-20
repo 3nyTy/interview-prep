@@ -1,0 +1,365 @@
+{
+  "company": "harvey",
+  "display_name": "Harvey",
+  "qbank_count": 9,
+  "questions_scraped": 9,
+  "site_total_count": 38,
+  "oj_count": 20,
+  "external_count": 9,
+  "description": "Harvey builds domain-specific generative-AI tools for law firms and legal teams, layering retrieval and document-workflow products (Vault / Data Room) on top of frontier LLMs. Its interview loop is small and stable: a single coding screen drawn from a tight rotation, system-design rounds anchored on Harvey's own document products, and a values-driven behavioral bar — with recruiters who actively prep candidates before each round.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/harvey",
+  "scraped_at": "2026-09-20",
+  "source": "1point3acres qbank (logged-in session)",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "text-highlighting-citation",
+      "title": "Text Highlighting / Citation Tagging",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Very high",
+      "last_asked": "2026-08-09",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Free preview",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "string",
+        "interval",
+        "interval-aggregation",
+        "parsing",
+        "hashmap",
+        "string-processing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "string",
+        "interval",
+        "interval-aggregation",
+        "parsing",
+        "hashmap",
+        "string-processing",
+        "medium"
+      ],
+      "overview": "Given an LLM-generated sentence and a list of source phrases, wrap every word-level matched region in <yellow></yellow> tags, merging overlapping matches into a single block. The follow-up appends every contributing source index after each block, ordered by global source frequency descending and then source index ascending.",
+      "source_count": 16,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/harvey/text-highlighting-citation"
+    },
+    {
+      "n": 2,
+      "slug": "spreadsheet-formula-engine",
+      "title": "Spreadsheet / Formula Engine",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-08-04",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe",
+        "mle"
+      ],
+      "tags": [
+        "dependency-resolution",
+        "topological-sort",
+        "cycle-detection",
+        "dfs",
+        "hashmap",
+        "parsing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "dependency-resolution",
+        "topological-sort",
+        "cycle-detection",
+        "dfs",
+        "hashmap",
+        "parsing",
+        "medium"
+      ],
+      "overview": "Build a mini spreadsheet: set_cell(label, value) / get_cell(label), where a label is letters+digits (e.g. \"A1\"). Values are integers or +-only formulas referencing other cells; reads should be O(1), w...",
+      "source_count": 12,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/harvey/spreadsheet-formula-engine"
+    },
+    {
+      "n": 3,
+      "slug": "in-memory-file-system",
+      "title": "In-Memory File System",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-08-25",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe",
+        "mle"
+      ],
+      "tags": [
+        "filesystem",
+        "hashmap",
+        "parsing",
+        "recursion",
+        "data-structure",
+        "hashing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "filesystem",
+        "hashmap",
+        "parsing",
+        "recursion",
+        "data-structure",
+        "hashing",
+        "medium"
+      ],
+      "overview": "Implement an in-memory file system with addFile(path) and getFile(path): adding stores a file at a slash-delimited path (creating folders as needed), and getFile returns either a file's contents or th...",
+      "source_count": 6,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/harvey/in-memory-file-system"
+    },
+    {
+      "n": 4,
+      "slug": "duplicate-file-discovery",
+      "title": "Duplicate File Discovery",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-29",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "filesystem",
+        "dfs",
+        "bfs",
+        "graph",
+        "hashing",
+        "io",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "filesystem",
+        "dfs",
+        "bfs",
+        "graph",
+        "hashing",
+        "io",
+        "medium"
+      ],
+      "overview": "Given directory-listing and path-type helpers, implement find_dups(root) to traverse a filesystem and group paths whose file contents are identical. Handle symlink cycles, then reason about unreadable...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/harvey/duplicate-file-discovery"
+    },
+    {
+      "n": 5,
+      "slug": "db-connection-pool",
+      "title": "Database Connection Pool",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-04-30",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "concurrency",
+        "object-design",
+        "data-structure",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "concurrency",
+        "object-design",
+        "data-structure",
+        "medium"
+      ],
+      "overview": "Onsite coding round: given a mocked db.query, implement a connection pool — acquire() to hand out a connection and release() to return it — managing a fixed set of reusable connections.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/harvey/db-connection-pool"
+    },
+    {
+      "n": 6,
+      "slug": "rag-ml-coding-notebook",
+      "title": "RAG Notebook (ML Coding)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-08-25",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "mle",
+        "swe"
+      ],
+      "tags": [
+        "rag",
+        "retrieval",
+        "pandas",
+        "colab",
+        "evaluation",
+        "python",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "swe"
+      ],
+      "tags_slug": [
+        "rag",
+        "retrieval",
+        "pandas",
+        "colab",
+        "evaluation",
+        "python",
+        "medium"
+      ],
+      "overview": "ML-coding round in a Colab notebook: fill in a simple RAG pipeline — generate text embeddings from a pandas DataFrame, retrieve the top-10 by cosine similarity to the query embedding, and run a short ...",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/harvey/rag-ml-coding-notebook"
+    },
+    {
+      "n": 7,
+      "slug": "design-google-drive-data-room",
+      "title": "Design Google Drive / Data Room",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-07-07",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "swe",
+        "mle"
+      ],
+      "tags": [
+        "system-design",
+        "storage",
+        "access-control",
+        "scaling",
+        "schema-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "system-design",
+        "storage",
+        "access-control",
+        "scaling",
+        "schema-design",
+        "medium"
+      ],
+      "overview": "Design Google Drive / Harvey's Data Room: file-and-folder storage with upload/download, large-file handling, and a heavy focus on access control (organization-level ACLs). Default content is PDFs; mul...",
+      "source_count": 9,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/harvey/design-google-drive-data-room"
+    },
+    {
+      "n": 8,
+      "slug": "harvey-values-behavioral",
+      "title": "Harvey Values / Behavioral",
+      "category": "behavioral",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-07-02",
+      "stage": "onsite-bq",
+      "access": "Members",
+      "roles": [
+        "swe",
+        "mle"
+      ],
+      "tags": [
+        "behavioral",
+        "values",
+        "culture-fit",
+        "conflict",
+        "mentorship",
+        "leadership",
+        "collaboration"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "behavioral",
+        "values",
+        "culture-fit",
+        "conflict",
+        "mentorship",
+        "leadership",
+        "collaboration"
+      ],
+      "overview": "Behavioral round (Harvey doesn't call it a BQ) anchored on the published Harvey Values: bring experiences mapped to those values. Common probes cover conflict/disagreement, feedback, mentorship style,...",
+      "source_count": 10,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/harvey/harvey-values-behavioral"
+    },
+    {
+      "n": 9,
+      "slug": "project-deep-dive",
+      "title": "Project Deep Dive",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-08-25",
+      "stage": "onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "swe",
+        "mle"
+      ],
+      "tags": [
+        "deep-dive",
+        "project-deep-dive",
+        "open-ended"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "deep-dive",
+        "project-deep-dive",
+        "open-ended"
+      ],
+      "overview": "Project deep-dive with the hiring manager / engineering lead: you present a past project while they probe its timeline, tech-stack choices, the decisions and trade-offs behind them, and how you handle...",
+      "source_count": 12,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/harvey/project-deep-dive"
+    }
+  ]
+}

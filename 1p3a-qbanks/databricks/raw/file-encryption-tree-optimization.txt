@@ -1,0 +1,270 @@
+===H1===
+File Encryption Tree Optimization
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/file-encryption-tree-optimization
+===BODY===
+Databricks
+Coding·55 minMembers
+File Encryption Tree Optimization
+Traverse a file-system tree to count encrypted vs unencrypted files, then choose the minimum-cost set of file-level or directory-level encryption calls.
+SWE
+MLE
+tree
+dp
+filesystem
+medium
+Frequency
+Medium
+Last asked
+2026-08-11
+Stage
+phone-screen · onsite-coding
+Problem Overview
+
+A file system is represented as a tree. There are two kinds of nodes:
+
+DirectoryNode: has a children list. A child can be either a DirectoryNode or a FileNode (the two types can be freely mixed).
+
+FileNode: has a boolean is_encrypted.
+
+class FileNode:
+    def __init__(self, is_encrypted: bool):
+        self.is_encrypted = is_encrypted
+
+class DirectoryNode:
+    def __init__(self, children: list):
+        self.children = children  # mix of DirectoryNode and FileNode
+
+The question has two parts.
+
+Part 1: Count Encrypted vs. Unencrypted Files
+
+Write a function that takes a DirectoryNode and recursively walks its entire subtree. Return a tuple (encrypted_count, unencrypted_count) counting every FileNode reachable from the input directory.
+
+Example
+
+root/
+├── a.txt        (encrypted)
+├── b.txt        (unencrypted)
+└── sub/
+    ├── c.txt    (unencrypted)
+    └── d.txt    (encrypted)
+
+count_files(root)  # → (2, 2)
+
+Approach
+
+A straightforward post-order traversal. Recurse into directories, and tally based on is_encrypted whenever you hit a file.
+
+def count_files(node):
+    if isinstance(node, FileNode):
+        return (1, 0) if node.is_encrypted else (0, 1)
+
+    enc = unenc = 0
+    for child in node.children:
+        e, u = count_files(child)
+        enc += e
+        unenc += u
+    return enc, unenc
+
+Complexity
+
+Time: O(N) where N is the total number of nodes in the subtree.
+
+Space: O(H) recursion depth where H is the tree's height.
+
+This part is the warm-up. The interviewer is checking that you can recurse cleanly over a heterogeneous tree.
+
+Part 2: Encrypt Everything in Minimum Total Time
+
+Now you must actually encrypt every unencrypted file in the tree. You have two APIs:
+
+API 1: encrypt_file(file)
+
+Encrypts a single file. Cost:
+
+T_req + T_file
+
+T_req is a fixed per-call request overhead.
+
+T_file is the time to encrypt one file.
+
+API 2: encrypt_directory(directory)
+
+Batch-processes every file in the directory's entire subtree (all nested subdirectories included), encrypting any unencrypted ones. Cost:
+
+T_req + N * T_file
+
+where N is the total number of files in that subtree (encrypted and unencrypted). The API still has to walk every file to check its state, so already-encrypted files are not free here. The single T_req overhead is paid once for the whole call.
+
+Clarifying assumption. The problem statement is ambiguous about whether N counts only the unencrypted files or every file in the subtree. The first interpretation makes the problem trivial: calling encrypt_directory(root) always achieves the lower bound T_req + total_unenc * T_file. The interesting and intended version (and the one the interviewer is checking for) is N = total file count in the subtree, which makes batching wasteful on subtrees that are mostly already encrypted. We use that interpretation below.
+
+Goal: given the root directory and constants T_req and T_file, return the minimum total time required to encrypt every unencrypted file in the tree.
+
+Example 1: Batch Wins
+
+root/                   T_req = 10, T_file = 1
+├── a.txt   (unenc)
+├── b.txt   (unenc)
+└── c.txt   (unenc)
+
+Three encrypt_file calls: 3 * (10 + 1) = 33
+
+One encrypt_directory(root): 10 + 3 * 1 = 13 ✅
+
+Example 2: Individual File Wins
+
+root/                   T_req = 10, T_file = 1
+├── a.txt   (encrypted)
+├── b.txt   (encrypted)
+└── c.txt   (unenc)
+
+One encrypt_file(c): 10 + 1 = 11 ✅
+
+One encrypt_directory(root): 10 + 3 * 1 = 13 (pays T_file for the two already-encrypted files too).
+
+This is exactly the tension that makes Part 2 a real problem: a high encrypted-density subtree wastes T_file per encrypted file when batched.
+
+Example 3: Mixed Strategy Wins
+
+root/                       T_req = 5, T_file = 1
+├── busy_dir/               (5 unencrypted files)
+│   ├── p.txt   (unenc)
+│   ├── q.txt   (unenc)
+│   ├── r.txt   (unenc)
+│   ├── s.txt   (unenc)
+│   └── t.txt   (unenc)
+└── clean_dir/              (10 encrypted, 1 unencrypted)
+    ├── e1..e10.txt  (encrypted x10)
+    └── x.txt   (unenc)
+
+encrypt_directory(root): 5 + 16 * 1 = 21 (drags 10 already-encrypted files into the cost).
+
+Mixed: encrypt_directory(busy_dir) + encrypt_file(x):
+
+encrypt_directory(busy_dir) = 5 + 5 * 1 = 10
+
+encrypt_file(x) = 5 + 1 = 6
+
+Total = 16 ✅
+
+The optimal solution batches the dense subtree, picks off the lone file individually, and never touches the encrypted-heavy region with a directory call.
+
+Approach: Tree DP
+
+Insight
+
+At every directory d, you have exactly two choices for handling the unencrypted files in d's subtree:
+
+Option A (batch from here): call encrypt_directory(d). Cost = T_req + total_files(d) * T_file. This single call covers everything in d's subtree, and we are done with this subtree.
+
+Option B (recurse into children): for each child, handle it independently.
+
+If the child is an unencrypted file: must call encrypt_file on it. Cost = T_req + T_file.
+
+If the child is an already-encrypted file: cost = 0.
+
+If the child is a directory: recursively apply the same DP.
+
+You want the cheaper of the two. If a subtree has zero unencrypted files, the answer is 0. Never pay T_req to "batch nothing".
+
+Recurrence
+
+Let min_cost(d) = minimum cost to encrypt every unencrypted file in d's subtree, assuming the caller has not already batched d away.
+
+total_files(d)    = number of files (encrypted + unencrypted) in d's subtree
+unenc_count(d)    = number of unencrypted files in d's subtree
+
+min_cost(d) =
+    0                                    if unenc_count(d) == 0
+    min(
+        T_req + total_files(d) * T_file,        # Option A: batch this directory
+        sum over each child c of:               # Option B: recurse
+            T_req + T_file       if c is unencrypted file
+            0                    if c is encrypted file
+            min_cost(c)          if c is directory
+    )                                          otherwise
+
+Final answer: min_cost(root).
+
+Implementation
+
+def min_encryption_time(root, T_req, T_file):
+    # First pass: precompute (total_files, unenc_count) per subtree.
+    stats = {}
+
+    def count(node):
+        if isinstance(node, FileNode):
+            total, unenc = 1, (0 if node.is_encrypted else 1)
+        else:
+            total = unenc = 0
+            for c in node.children:
+                t, u = count(c)
+                total += t
+                unenc += u
+        stats[id(node)] = (total, unenc)
+        return total, unenc
+
+    count(root)
+
+    # Second pass: DP.
+    def best(node):
+        if isinstance(node, FileNode):
+            return 0 if node.is_encrypted else (T_req + T_file)
+
+        total, unenc = stats[id(node)]
+        if unenc == 0:
+            return 0  # nothing to do in this subtree
+
+        option_a = T_req + total * T_file                  # batch this directory
+        option_b = sum(best(c) for c in node.children)     # recurse into children
+        return min(option_a, option_b)
+
+    return best(root)
+
+Why the Recurrence Is Correct
+
+The two choices at a directory cover every distinct "frontier" of encrypt_directory calls. Concretely, an optimal solution can be described by the set of highest directories on which encrypt_directory is called (no two are nested) plus a set of individual encrypt_file calls outside those subtrees. For any directory d, either d is one of those highest batched directories (Option A), or it is not, in which case the optimal solution restricted to d's subtree is the optimal independent solution for each of d's children (Option B). The DP picks the cheaper of the two at every node, which gives the global optimum by an inductive argument from the leaves up.
+
+Complexity
+
+Time: O(N). Each node is visited a constant number of times.
+
+Space: O(N) for the count table plus O(H) recursion depth.
+
+Sanity-Check the Trade-off
+
+The "batch vs. individual" decision at a directory d reduces to comparing:
+
+T_req + total_files(d) * T_file    vs    sum_of_child_costs
+
+Useful intuitions:
+
+Dense unencrypted subtree: batching at a high directory wins because a single T_req covers everything and the T_file cost is unavoidable anyway.
+
+Encrypted-heavy subtree with a few unencrypted files sprinkled in: batching is wasteful, since you'd pay T_file for every already-encrypted file. Recursing and using encrypt_file on the few unencrypted ones is cheaper.
+
+Crossover (flat directory case): for a directory whose children are all leaf files, batching wins when the saved request overhead (unenc_count - 1) * T_req exceeds the wasted encrypted-file work (total_files - unenc_count) * T_file. With deeper nesting the comparison generalizes through the DP, but the same intuition holds.
+
+Edge Cases to Mention
+
+Empty directory (children = []): both options yield 0. Return 0.
+
+All files already encrypted: unenc_count(root) = 0, so the answer is 0. The DP guard if unenc == 0: return 0 handles this without paying a stray T_req.
+
+T_req = 0: there's no batching incentive. Every encrypt_file is free overhead, and every encrypt_directory charges T_file per file in the subtree. The optimal strategy is to recurse all the way down to individual unencrypted files, yielding total_unenc * T_file. The DP returns this naturally.
+
+Single unencrypted file at the root with no siblings: answer is T_req + T_file either way.
+
+Summary
+
+PartTechniqueTimeSpace
+1. Count encrypted/unencryptedRecursive post-order traversalO(N)O(H)
+2. Minimum total encryption timeTree DP, batch vs. recurse at each directoryO(N)O(N)
+
+The key idea in Part 2 is that the T_req overhead creates a classic batching trade-off, and on a tree the optimal batching frontier is exactly what a two-option DP at each directory selects.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

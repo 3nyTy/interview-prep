@@ -1,0 +1,49 @@
+===H1===
+Merge K Sorted Lists (incl. K = 3)
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/merge-k-sorted-lists
+===BODY===
+Goldman Sachs
+Coding·60 minMembers
+Merge K Sorted Lists (incl. K = 3)
+Merge K sorted linked lists into a single sorted linked list. Goldman has asked both the general K-list form and an explicit K=3 variant ("merge three sorted lists in one go").
+SWE
+linked-list
+heap
+merge
+medium
+Frequency
+Low
+Last asked
+2025-06-09
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input: an array of k sorted linked-list heads.
+
+Return: the head of a single sorted linked list containing all nodes from the inputs.
+
+Goldman interviewers have asked both the generic K form and an explicit K=3 form. The K=3 variant rewards a hand-rolled three-way merge over a heap; the K-form rewards the heap solution.
+
+Notes
+
+Min-heap solution (O(N log k)) — push the head of each list into a min-heap; repeatedly pop the smallest, append it to the output, and push its next if non-null. This is the canonical answer for general k.
+
+Divide-and-conquer (O(N log k)) — pairwise merge adjacent lists, then pairwise merge the results, log k rounds. Slightly easier to reason about complexity-wise.
+
+K=3 manual merge — three pointers, a 3-way comparison at each step. O(N) and avoids the heap overhead; this is what the interviewer is signaling when they ask for K=3 "in one go." Don't reach for the heap reflexively when K is fixed at 3.
+
+Edge cases: empty list array → return null; all input heads null → return null; mixed-length inputs → standard.
+
+Preparation
+
+Implement both: the general heap-based form, and the K=3 manual 3-way pointer merge. Drill the K=3 form especially — it is the version Goldman has asked at Associate level and rewards clean pointer hygiene.
+
+LC 23 "Merge k Sorted Lists" is the canonical equivalent and is on Goldman's tagged LeetCode list.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

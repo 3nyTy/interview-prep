@@ -1,0 +1,108 @@
+===H1===
+Latency Tracker Percentile Window
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/latency-tracker-percentile-window
+===BODY===
+Latency Tracker Percentile Window
+
+<https://www.1point3acres.com/interview/problems/company/netflix/latency-tracker-percentile-window>
+
+Netflix
+Coding
+
+60 min
+Members
+Latency Tracker with Percentile Window
+
+Implement a thread-safe latency tracker that records `(timestamp, latency)` samples and returns P90 / P99 over a requested time window. Infra variants emphasize concurrency and cleanup.
+
+SWE
+Infra Eng
+streaming
+sliding-window
+concurrency
+threading
+sorting
+medium
+Frequency
+Low
+Last asked
+2026-04-24
+Stage
+phone-screen  onsite-coding
+Requirements
+setLatency(timestamp: long, latency: double) records a latency sample in milliseconds.
+getP99Latency(windowSize) returns the 99th percentile over samples whose timestamps fall in the latest windowSize.
+General variant: getPercentileLatency(windowSize, percentile).
+Multiple users / threads may report concurrently.
+Tests are expected.
+class LatencyTracker:
+    def add_sample(self, timestamp_ms: int, latency_ms: int) -> None: ...
+    def get_percentile(self, window_ms: int, percentile: float) -> float | None: ...
+        # percentile in (0, 100]; returns None if no sample falls in the window.
+
+Notes
+Clarify whether windowSize is relative to wall-clock now or relative to the latest recorded timestamp.
+Common canonical pin-down: the window is relative to the latest observed timestamp, with end = latest_timestamp and start = end - window_ms + 1 (inclusive), and incoming timestamps are assumed non-decreasing  so a plain append-only array plus bisect_left(timestamps, start) finds the window without scanning older samples.
+Use nearest-rank: for n samples in the window and percentile p, rank r = ceil((p/100) * n) clamped to [1, n], return the r-th smallest (1-indexed); p100 is the max. Reduce lock contention by copying the window slice under the lock, then sorting it outside the lock.
+Simple version: keep samples in a deque ordered by timestamp, copy active-window latencies, sort, and select percentile. This is easiest and acceptable when sample count is modest.
+More scalable version: maintain time buckets, each with a histogram or sorted multiset. Query merges buckets covering the window.
+Exact P99 requires ordered statistics over the active window; approximate P99 can use histograms, t-digest, or fixed latency buckets.
+Concurrency strategy: start with one lock around the deque; then discuss lock striping by time bucket if write throughput is high.
+Cleanup can be lazy during queries or handled by a background sweeper; explain how far back data must be retained.
+Preparation
+Implement the exact deque + sort version.
+Add a lock and test concurrent writers conceptually.
+Prepare a scalable version with buckets and approximate percentiles.
+Test no data, one sample, exact percentile index rounding, and stale samples outside the window.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Preparation
+Related discussions  3
+??? ?? infra?
+?? ??coding
+?Netflix technical ????
+Related questions
+
+Other Netflix questions sharing tags with this one
+
+Weighted Cache / Timed Cache
+Medium
+concurrency
+medium
+data-structure
++3
+Data Engineering Movie Success Pipeline
+Low
+streaming
+medium
+data-engineering
++3
+Merge Intervals
+Single report
+sorting
+medium
+interval
++1
+Music Playlist History
+Single report
+sorting
+medium
+data-structure
++2
+Social Media Sentiment Tracking
+Single report
+streaming
+medium
+data-engineering
++2
+Code editor
+
+---

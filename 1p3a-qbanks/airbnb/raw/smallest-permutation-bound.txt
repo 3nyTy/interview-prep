@@ -1,0 +1,77 @@
+===H1===
+Smallest Permutation ≥ Lower Bound
+===URL===
+https://www.1point3acres.com/interview/problems/company/airbnb/smallest-permutation-bound
+===BODY===
+Airbnb
+Coding·45 minMembers
+Smallest Permutation ≥ Lower Bound
+Given either an integer `n` or a list of digits `0..9`, return the smallest integer string that can be formed from the available digits. The follow-up adds a lower bound `L`: return the smallest value ≥ `L` using the same digit multiset, with zeros excluded in part 1 but usable in part 2.
+SWE
+math
+backtracking
+greedy
+medium
+Frequency
+Medium
+Last asked
+2026-08-26
+Stage
+tech-screen · phone-screen
+Requirements
+
+Input variant A: n (integer) and lowerBound (integer, optional — without it, return the smallest permutation overall).
+
+Input variant B: digits: List[int] where every element is 0..9, plus an optional lowerBound.
+
+Part 1 output: the smallest integer string formed from the available non-zero digits, using each non-zero digit exactly once.
+
+Part 2 output: the smallest integer string that uses the available digit multiset and is >= lowerBound; in this part, zeros are usable.
+
+If no permutation can satisfy the lower bound, return -1 or an empty result; clarify the exact sentinel before coding.
+
+The result should not have a leading zero unless the interviewer explicitly allows it.
+
+Examples
+
+digits = [1, 3, 3, 4, 2]
+part1 -> "12334"
+
+digits = [0, 1, 2]
+part1 -> "12"
+
+digits = [7, 1, 8], lowerBound = 719
+part2 -> "781"
+
+n = 178, lowerBound = 200
+part2 -> 718
+
+Notes
+
+Without a lower bound, sort digits ascending; for the list variant, drop zeros in part 1. For the integer variant, if zeros remain in the multiset, put the smallest non-zero digit first and then append the remaining digits in sorted order.
+
+With a lower bound, construct the answer digit-by-digit: at position i, pick the smallest unused digit that is >= L[i]. If you pick a digit > L[i], the remaining positions can be the smallest sorted suffix because the bound is already cleared. If you pick == L[i], recurse on i+1; if you cannot pick any, backtrack and try the next-larger digit at position i-1.
+
+This is the digit-DP / next-permutation hybrid pattern. Time complexity is O(D^2) for D digits with backtracking; for small D it is effectively constant.
+
+Edge cases: lowerBound has more digits than the available multiset, lowerBound has fewer digits, all digits are zero, duplicates in the multiset, and the part-1 vs part-2 zero rule.
+
+Some interviewers phrase the same follow-up as "next permutation greater than L"; the algorithm is identical.
+
+Preparation
+
+Implement the part-1 sorter in under 5 minutes, including the zero-exclusion rule for List[int] input.
+
+Implement the digit-by-digit constructor cold; verify [7, 1, 8], L=719 returns 781, and n=178, L=200 returns 718.
+
+Write the digit-count comparison guard at the start: if len(str(L)) > D, return the sentinel immediately.
+
+Drill the leading-zero corner case with n=100, L=10 and the list-input corner case [0, 0, 1].
+
+Prepare for the follow-up "what about the next permutation given the same digits with no arbitrary lower bound?" — the canonical next-permutation algorithm in O(D) is the gold-standard answer.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

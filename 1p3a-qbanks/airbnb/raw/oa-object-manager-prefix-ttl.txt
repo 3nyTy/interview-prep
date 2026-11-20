@@ -1,0 +1,75 @@
+===H1===
+In-Memory Object Manager OA
+===URL===
+https://www.1point3acres.com/interview/problems/company/airbnb/oa-object-manager-prefix-ttl
+===BODY===
+Airbnb
+Coding·90 minMembers
+In-Memory Object Manager OA
+Implement an in-memory object manager keyed by `object_id`, where every object owns unique field/value pairs. Extend basic CRUD with prefix scans, timestamped writes with finite lifetimes, expiry cleanup, and point-in-time queries over still-valid fields.
+SWE
+in-memory-database
+hashmap
+ttl
+simulation
+codesignal
+medium
+Frequency
+Single report
+Last asked
+2026-08-28
+Stage
+oa
+Requirements
+
+Store objects by a unique object_id; each object contains fields whose names are unique within that object.
+
+Implement the basic operations:
+
+set_value(object_id, field, value)
+
+get_value(object_id, field)
+
+delete_value(object_id, field)
+
+delete_object(object_id)
+
+Implement scan_by_prefix(object_id, prefix) to return all fields on the selected object whose names begin with prefix.
+
+Extend writes with start_time and duration, giving each field an activation time and expiry time.
+
+Support both of the time-aware operations introduced in the final stage:
+
+Remove all fields expired as of a supplied timestamp.
+
+Query all fields that remain valid at a supplied timestamp.
+
+Notes
+
+Prefix matching must reject field names shorter than the requested prefix rather than indexing beyond the field name.
+
+Keep one nested map from object IDs to field records. A field record can carry its value plus optional activation and expiry bounds, allowing ordinary CRUD and time-aware operations to share one representation.
+
+Route every time-aware read and cleanup through one validity predicate. The usual duration convention is the half-open interval start_time <= query_time < start_time + duration; confirm the expiry endpoint against the supplied tests before relying on it.
+
+Cleanup should remove expired field records without disturbing fields that are not yet active. If the last field disappears, follow the supplied contract on whether the empty object record remains.
+
+A direct prefix scan is O(F) for F fields on one object, plus any ordering cost required by the return contract. Basic map-backed reads, writes, and deletes are expected O(1).
+
+The assessment places more weight on faithfully simulating the state transitions than on asymptotic optimization.
+
+Keep the ordinary CRUD contract and the time-aware contract consistent; hidden tests can mix records with and without expiry metadata.
+
+Preparation
+
+Implement nested object/field maps, then add prefix filtering without changing the basic CRUD behavior.
+
+Add activation and expiry metadata to the same model and write boundary tests for the exact start and expiry timestamps.
+
+Rehearse the full extension under a 90-minute timer, rerunning earlier-level tests after every state-model change.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

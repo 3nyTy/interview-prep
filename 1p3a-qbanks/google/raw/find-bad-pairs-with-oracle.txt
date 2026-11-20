@@ -1,0 +1,68 @@
+===H1===
+Find All Bad Pairs Using runTest Oracle
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/find-bad-pairs-with-oracle
+===BODY===
+Google
+Coding·45 minMembers
+Find All Bad Pairs Using runTest Oracle
+PhD intern coding round 2: given a black-box oracle `runTest(S)` that returns `true` iff a subset `S` contains no bad pair, identify all bad pairs across N test items with as few oracle calls as possible.
+SWE
+RS
+algorithm-design
+math-reasoning
+hard
+Frequency
+Single report
+Last asked
+2025-11-27
+Stage
+onsite-coding
+Requirements
+
+Items t_1, ..., t_N are given.
+
+Oracle: runTest(S: Set[Item]) -> bool returns true iff S contains zero bad pairs; otherwise false.
+
+Output: every bad pair (t_i, t_j).
+
+Minimize total oracle calls.
+
+Examples
+
+N=4, bad pairs = {(1,2)}.
+runTest({1,2,3,4}) → false → at least one bad pair somewhere.
+runTest({1,3,4})   → true  → 2 is in every bad pair containing items from this set.
+... binary search to isolate.
+
+Notes
+
+Standard "group testing" / Dorfman testing problem. Walk through the analogy with COVID pooled tests for intuition.
+
+Algorithm sketch:
+
+Test the full set. If true, no bad pairs.
+
+Otherwise, binary-search to find one bad pair by partitioning the set and testing halves.
+
+Remove the items that participate in the located bad pair; repeat.
+
+Tighter bound: with up to K bad pairs, total queries are O(K log N) using adaptive group testing.
+
+A naive O(N²) pairwise scheme works but the interviewer expects you to beat it with adaptive splitting.
+
+Verbalize correctness: each binary-search step rules out half the candidates; you can always reduce the search space until exactly one bad pair is isolated.
+
+Preparation
+
+Read the Wikipedia article on group testing and Dorfman's two-stage scheme.
+
+Drill recursive binary partitioning on a candidate set with positive/negative oracle feedback.
+
+Have a back-of-envelope analysis ready: "Total calls O(K log N) for K bad pairs and N items."
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

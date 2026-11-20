@@ -1,0 +1,65 @@
+===H1===
+Portfolio Rebalancer
+===URL===
+https://www.1point3acres.com/interview/problems/company/akunacapital/portfolio-rebalancer
+===BODY===
+Akuna Capital
+CodingMembers
+Portfolio Rebalancer
+Implement an object model for portfolio rebalancing: given current and target percentage allocations behind an IPortfolio interface, return the per-asset percentage to buy (positive) or sell (negative).
+SWE
+oop-design
+hashmap
+trading
+easy
+Frequency
+Single report
+Last asked
+2026-05-25
+Stage
+oa
+Requirements
+
+Implement a small portfolio-rebalancing system for financial asset management. Given a portfolio's current percentage allocations and its target percentage allocations, return, for each asset, how much to buy or sell so the portfolio matches the target.
+
+Required types and methods:
+
+interface IPortfolio {
+    Map<String, Integer> getAllocations();
+}
+
+class SimplePortfolio implements IPortfolio {
+    SimplePortfolio(Map<String, Integer> allocations);
+}
+
+class PortfolioManager {
+    static Map<String, Integer> rebalancePortfolio(IPortfolio currentPortfolio, IPortfolio targetPortfolio);
+}
+
+rebalancePortfolio returns a map with the same asset keys, where each value is the percentage to buy (positive) or sell (negative) for that asset, i.e. target[asset] - current[asset].
+
+Constraints:
+
+Each portfolio holds at least 2 and at most 10 distinct asset types.
+
+Allocations in both the current and target portfolio each sum to exactly 100%.
+
+All percentages are positive integers.
+
+Notes
+
+Both portfolios share the same asset keys, so the result is a straight per-key difference of target minus current. Because each side sums to 100, the returned deltas always sum to 0 — a quick self-check. Preserve insertion order (e.g. LinkedHashMap) if the grader compares ordered output.
+
+The task is as much about the object model as the arithmetic: implement IPortfolio, back SimplePortfolio with the allocation map, and keep rebalancePortfolio static on PortfolioManager. If an asset could appear in one portfolio but not the other, clarify the contract before coding; the stated setup keeps the key sets identical.
+
+Preparation
+
+Implement the interface, the concrete class, and the manager, then verify the deltas sum to zero on a 2-asset and a 10-asset case.
+
+Decide how to treat a key present in only one portfolio and state the assumption out loud before coding.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

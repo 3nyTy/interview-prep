@@ -1,0 +1,79 @@
+===H1===
+System Design — Rate Limiter
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/system-design-rate-limiter
+===BODY===
+Oracle
+System Design·45 minMembers
+System Design — Rate Limiter
+Design a rate limiter and compare the available algorithmic approaches. Cover caching, distributed implementation, scalability, and the trade-offs that determine which design to choose.
+SWE
+Infra Eng
+system-design
+rate-limiting
+throttling
+caching
+distributed-systems
+redis
+medium
+Frequency
+Low
+Last asked
+2026-08-19
+Stage
+onsite-system-design
+Requirements
+
+Per-user / per-API-key rate limiting at the application gateway.
+
+Limits are typically expressed as N requests per window (e.g. 100 requests / minute).
+
+Must be horizontally scalable — multiple gateway nodes share the same rate-limit state.
+
+Handle bursts gracefully without permanently elevating the steady-state limit.
+
+Return appropriate HTTP semantics on rate-limit hits (429 Too Many Requests with Retry-After).
+
+Notes
+
+Five canonical algorithms; pick one and articulate trade-offs:
+
+Token bucket — refills at a constant rate; allows bursts up to bucket size. Most flexible; default for API gateways.
+
+Leaky bucket — fixed drain rate; smooths bursts. Best when downstream throughput is fixed.
+
+Fixed window counter — count per minute; reset at minute boundaries. Cheap but allows 2× spikes at the boundary.
+
+Sliding window log — store the timestamp of every request in the last window. Most accurate; highest memory cost.
+
+Sliding window counter — interpolate between current and previous fixed windows. Good accuracy / memory trade-off; this is the default for most production systems.
+
+Shared state: the simplest distributed implementation uses Redis with atomic increments (INCR + EXPIRE). For very high throughput, use Redis Lua scripts to do the read-decide-write atomically.
+
+For multi-region: prefer eventual consistency with local enforcement plus periodic reconciliation; strict global consistency adds latency that defeats the purpose.
+
+Common deep dives interviewers ask:
+
+How do you avoid hot-key pressure on a single Redis shard when one customer dominates traffic?
+
+How do you isolate noisy-neighbour customers without resharding mid-flight?
+
+What's the failure mode when Redis is unreachable? (Fail-open vs fail-closed.)
+
+The SMTS loop explicitly required discussion of algorithm choices, caching, distributed implementation, scalability, and trade-offs.
+
+Preparation
+
+Walk through the token-bucket vs sliding-window-counter trade-off in two minutes; pick one as your default.
+
+Sketch the Redis-Lua-script implementation for atomic increment + check.
+
+Be ready for the noisy-neighbour deep dive — the standard answer is per-key TTL plus per-customer sharding hints. Hot-shard handling is a common follow-up.
+
+Run through a public rate-limiter SD write-up (Hello Interview or ByteByteGo) to refresh the standard talking points.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

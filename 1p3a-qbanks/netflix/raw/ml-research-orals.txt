@@ -1,0 +1,60 @@
+===H1===
+Ml Research Orals
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/ml-research-orals
+===BODY===
+Ml Research Orals
+
+<https://www.1point3acres.com/interview/problems/company/netflix/ml-research-orals>
+
+Netflix
+Other
+Members
+ML Research Orals (Self-Attention / LoRA / Optimizers)
+
+A rapid-fire ML-knowledge round for research and ML roles. After a project deep-dive the interviewer drills fundamentals  self-attention, LoRA, optimizers, loss functions, ViT vs CNN  then closes with a short, easy coding task.
+
+RS
+MLE
+ml-knowledge
+transformer
+attention
+lora
+Frequency
+Low
+Last asked
+2026-05-09
+Stage
+phone-screen  onsite-research
+Requirements
+Expect a fast back-and-forth on ML fundamentals, usually after a 30-minute research / project deep-dive.
+Recurring topics across loops:
+Describe self-attention; why the attention score is divided by sqrt(dim).
+Describe LoRA and its benefits; why LoRA reduces GPU memory consumption.
+Difference between Adam and SGD.
+ViT vs CNN  pros and cons, and the factors influencing ViT patch size.
+Difference between MSE loss and cross-entropy loss.
+Usually closes with an easy coding task, e.g. a class that records word-occurrence counts over a streaming text input (a plain dict / counter is enough).
+Notes
+The two answers candidates most often fumble are the precise difference between MSE and cross-entropy loss, and exactly how and why LoRA cuts GPU memory (you train two low-rank matrices instead of the full weight, so optimizer state and gradients shrink to the adapter, not the base model).
+This is a knowledge oral, not a derivation round  crisp, correct one-paragraph answers score better than long tangents.
+The closing coding task is intentionally trivial; do not over-engineer it.
+Preparation
+Write out the scaled-dot-product attention formula and explain the sqrt(dim) scaling (keeps the softmax inputs in a low-variance regime so gradients do not vanish) from memory.
+Be able to state in two sentences each: Adam vs SGD, ViT vs CNN trade-offs, and MSE vs cross-entropy, plus a one-line account of LoRA's memory savings.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Preparation
+Related discussions  2
+Netflix ML research intern ??
+Netflix Research Scientist ??
+Code editor
+
+---

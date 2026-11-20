@@ -1,0 +1,62 @@
+===H1===
+Interval List Intersections
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/interval-list-intersections
+===BODY===
+Uber
+CodingMembers
+Interval List Intersections
+Given two lists of closed intervals, each sorted by start time and pairwise disjoint within a list, return every intersection between the two lists using a two-pointer sweep. A follow-up asks how to handle input lists too large to fit in memory.
+SWE
+interval
+two-pointer
+array
+streaming
+medium
+Frequency
+Single report
+Last asked
+2026-01-09
+Stage
+onsite-coding
+Interval List Intersections
+
+You are given two lists of closed intervals, firstList and secondList. Each list is sorted by start time, and the intervals within the same list are pairwise disjoint.
+
+Return all intersections between the two lists.
+
+An intersection between [a, b] and [c, d] is [max(a, c), min(b, d)] when max(a, c) <= min(b, d).
+
+Follow-up note: If the lists are too large to fit in memory, keep the same two-pointer logic but read each list as a stream or chunked iterator, buffering only the current interval from each source.
+
+Examples
+
+Example 1:
+
+Input: firstList = [[0,10],[20,30]], secondList = [[5,8],[15,22]]
+
+Output: [[5,8],[20,22]]
+
+Example 2:
+
+Input: firstList = [[0,2],[5,10],[13,23],[24,25]], secondList = [[1,5],[8,12],[15,24],[25,26]]
+
+Output: [[1,2],[5,5],[8,10],[15,23],[24,24],[25,25]]
+
+Constraints
+
+0 <= firstList.length, secondList.length <= 10^5
+
+firstList[i].length == secondList[j].length == 2
+
+0 <= start <= end <= 10^9
+
+firstList and secondList are sorted by start time
+
+Intervals inside each list are pairwise disjoint
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

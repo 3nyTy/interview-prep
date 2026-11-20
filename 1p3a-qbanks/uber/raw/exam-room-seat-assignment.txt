@@ -1,0 +1,64 @@
+===H1===
+Seat Assignment / Exam Room
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/exam-room-seat-assignment
+===BODY===
+Uber
+Coding·60 minMembers
+Seat Assignment / Exam Room
+Onsite coding round. Implement a class that seats people one at a time in a row of n seats, each time choosing the seat that maximizes the distance to the nearest occupied seat. Seats are never vacated. Confirmed expected output for n=10: 0, then 9, then 4 or 5.
+SWE
+heap
+greedy
+simulation
+medium
+Frequency
+Single report
+Last asked
+2026-05-15
+Stage
+onsite-coding
+Requirements
+
+Implement a class that seats people in a row of n seats indexed 0 .. n-1.
+
+Each call to assign() seats the next person at the seat that maximizes the distance to the nearest already-seated person, and returns that seat index.
+
+The first person takes seat 0.
+
+When two candidate seats give the same maximum distance, either is acceptable — confirm the tie-break with the interviewer.
+
+Seats are never vacated: there is no leave() in this variant, so the occupied set only grows.
+
+class AssignSeat:
+    def __init__(self, n): ...
+    def assign(self) -> int: ...
+
+Examples
+
+seats = AssignSeat(10)
+seats.assign() -> 0
+seats.assign() -> 9
+seats.assign() -> 4 or 5   # both are distance 4 from the nearest person
+
+Notes
+
+This is the Exam Room problem without the leave() operation. Because seats are never freed, keep the occupied seats in sorted order and, on each assign(), scan the gaps between consecutive occupied seats (plus the two end gaps) for the gap that yields the largest minimum distance.
+
+The two end gaps are special: a gap touching seat 0 or seat n-1 gives a distance equal to the full gap length (you can sit flush against the wall), whereas an interior gap of length g yields a best distance of g // 2 at its midpoint.
+
+A heap of gaps keyed by achievable distance gives O(log n) per assign; a sorted list of occupied seats with a linear scan is usually enough to get accepted and is easier to reason about under time pressure.
+
+The expected output 0, 9, 4 or 5 was confirmed with the interviewer — verify the tie-break and the first-seat convention before coding.
+
+Preparation
+
+Implement LC 855 Exam Room end to end, then strip out leave() to match this simpler variant.
+
+Practice the best-seat / best-distance math for a gap in both forms (interior midpoint vs wall-adjacent) so you can place each new person in a single pass.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,71 @@
+===H1===
+LRU Cache (with TTL and LFU Follow-ups)
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/lru-cache-with-ttl
+===BODY===
+ByteDance / TikTok
+Coding·60 minMembers
+LRU Cache (with TTL and LFU Follow-ups)
+Design and implement an LRU cache in O(1) per op. Follow-ups extend it with TTL expiry, LFU eviction, or fixed-time get/put semantics under contention.
+SWE
+data-structure
+hashmap
+linked-list
+ttl
+medium
+Frequency
+Medium
+Last asked
+2026-09-06
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Implement an LRUCache class with O(1) get(key) and put(key, value) operations:
+
+class LRUCache:
+    def __init__(self, capacity: int): ...
+    def get(self, key: int) -> int: ...   # -1 if not present
+    def put(self, key: int, value: int) -> None: ...
+
+Reported follow-ups:
+
+Add TTL: each entry has an expiry time. get returns -1 if expired; expired entries should not occupy capacity.
+
+Add LFU: a second eviction round where ties on usage frequency are broken by recency.
+
+List with all four ends: same O(1) constraint but design a structure supporting rpush / rpop / lpush / lpop plus indexed access — exercises the same doubly-linked-list muscle.
+
+Print path / iterate in LRU order: walk the structure from least-recent to most-recent.
+
+High cache-miss-rate follow-up (asked even in frontend screens): given a high miss rate, how do you improve hit ratio? Expected discussion: grow capacity, switch eviction policy (LFU / admission control like TinyLFU), add a second cache tier, or prefetch. Candidates who only wrote the LRU and never studied caching strategy get gated here.
+
+Notes
+
+Canonical implementation: hashmap from key to doubly-linked-list node, with a sentinel head and tail. Every access splices the node to the tail.
+
+For TTL, two practical approaches: (1) lazy expiry — check at get time and evict; (2) a min-heap or expiry-bucket scheduler for eager eviction. Lazy is simpler and what most interviewers expect first.
+
+For LFU, you need both a freq-to-list mapping and a key-to-(node, freq) mapping. collections.OrderedDict per frequency is the cleanest Python pattern.
+
+Reported failure mode: candidates use OrderedDict.move_to_end and call the solution done. Interviewers who push for "draw the linked list" want to see the manual node-splice version because that's what reveals whether you understand pointer manipulation.
+
+Concurrency follow-up sometimes appears: discuss segment / striped locks vs. a global lock vs. lock-free CAS-based alternatives.
+
+A backend-intern first round uses the unmodified LRU Cache problem after detailed project and database-indexing questions.
+
+Preparation
+
+Code the manual doubly-linked-list version from scratch — no OrderedDict. Be able to write it in under 20 minutes.
+
+Practice the TTL extension by adding a (value, expires_at) tuple and a lazy-evict path in get.
+
+For LFU, drill the two-level structure (freq buckets + key map) until you can articulate the eviction rule confidently.
+
+Have one concrete example traced through on the whiteboard (capacity 2, sequence of get/put), including an eviction.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

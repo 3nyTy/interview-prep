@@ -1,0 +1,67 @@
+===H1===
+ML Systems Codebase Deep Dive
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/ml-systems-codebase-deep-dive
+===BODY===
+Apple
+Other·30 minMembers
+ML Systems Codebase Deep Dive
+A no-coding HM technical screen for an ML Systems Engineer role that turns into a deep review of one recent project and its codebase. The interviewer probes architecture, deployment, data collection, cross-evaluation, database choices, agentic-system rationale, FastAPI / LangGraph state handling, PDF embedding, similarity search, and paper retrieval.
+MLE
+deep-dive
+agents
+agentic-workflow
+rag
+retrieval
+database
+backend
+medium
+Frequency
+Single report
+Last asked
+2026-07-01
+Stage
+phone-screen · tech-screen
+Requirements
+
+Prepare to walk through one recent ML / agentic-systems project as if the interviewer is reviewing the implementation with you. The round may stay on a single project for the full screen.
+
+Be ready to cover:
+
+Overall architecture and deployment path.
+
+How data is collected, cleaned, evaluated, and compared across alternatives.
+
+What database or storage layer the project uses, and why that choice fits the workload.
+
+Why an agentic architecture was chosen instead of a simpler pipeline.
+
+Backend framework details, including FastAPI-style API boundaries and how state is carried through a LangGraph-style workflow.
+
+Retrieval details: how PDFs are embedded, how similarity is computed, and how the system selects useful papers or documents.
+
+Failures and trade-offs: what broke, what you changed, and what you would redesign with more time.
+
+Notes
+
+This is not a generic ML trivia screen. The differentiator is whether you can defend your own implementation choices at the level of codebase structure, data flow, persistence, evaluation, and production constraints.
+
+Keep answers concise enough for a 30-minute HM screen. Start with a one-minute architecture map, then let follow-ups go deeper. For every choice, state the alternative you rejected and the constraint that made your choice reasonable.
+
+A strong answer names concrete interfaces and boundaries without dumping every file or class. For example: API endpoint -> orchestration graph -> retrieval step -> evaluator -> persistence. If the project uses agents, explain what state is stored, which transitions are deterministic, where model calls happen, and how the system recovers from bad retrieval or tool output.
+
+Preparation
+
+Pick one recent project and write a compact architecture map: request path, data path, storage, evaluation, deployment, monitoring, and failure modes.
+
+Prepare a decision table for the main technical choices: agentic workflow vs fixed pipeline, vector retrieval vs keyword search, database choice, evaluation metric, and deployment shape.
+
+Rehearse a codebase tour that can be delivered without screen sharing: core modules, key interfaces, state objects, and where the hardest bug lived.
+
+For retrieval-heavy projects, be ready to explain embedding generation, chunking, similarity scoring, candidate selection, and cross-evaluation.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

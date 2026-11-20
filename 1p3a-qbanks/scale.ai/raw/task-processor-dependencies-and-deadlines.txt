@@ -1,0 +1,109 @@
+===H1===
+Task Processor: Dependencies and Deadlines
+===URL===
+https://www.1point3acres.com/interview/problems/company/scale.ai/task-processor-dependencies-and-deadlines
+===BODY===
+Scale AI
+Coding·60 minFree preview
+Task Processor: Dependencies and Deadlines
+Implement a task processor with `AddTask` and `ConsumeTask`. Start by returning the unconsumed task with the earliest deadline, then add subtask dependencies so a parent can only be consumed after all subtasks, and finally support deadline updates for tasks that have not already been consumed.
+SWE
+MLE
+data-structure
+heap
+topological-sort
+scheduling
+medium
+Frequency
+High
+Last asked
+2026-08-14
+Stage
+phone-screen · tech-screen
+Requirements
+
+Implement a class or service with two core operations:
+
+AddTask(tasks): add one or more tasks to the processor.
+
+ConsumeTask(): return and consume the eligible task with the smallest deadline.
+
+Part 1 input is a list of tasks with task id and deadline. Recent examples use string ids and integer deadlines, roughly:
+
+[{"id": "1", "deadline": 2}]
+
+Part 1 behavior:
+
+No dependencies exist.
+
+ConsumeTask() pops the task with the smallest deadline.
+
+If no task is available, return the designated empty-task value; one version describes this as a "no task" return.
+
+Part 2 adds subtasks / prerequisite ids:
+
+[{"id": "1", "deadline": 2, "subtasks": ["2", "3"]}]
+
+A task can be consumed only after all of its subtasks have already been consumed.
+
+Among all currently eligible tasks, still choose the smallest deadline.
+
+Maintain parent and child dependency state so a newly eligible parent enters the ready set only after the last outstanding subtask is consumed.
+
+Part 3 variants:
+
+updateDeadline(task_id, new_deadline) updates a task that has not yet been consumed.
+
+If the task has already been consumed, return None or otherwise reject the update.
+
+When using a heap, handle stale heap entries by checking whether the (deadline, task_id) pair still matches the current task state when popped.
+
+Additional follow-ups:
+
+Time complexity for each operation.
+
+Task validation, DAG verification, and cycle handling.
+
+Concurrency if multiple consumers operate at the same time.
+
+Streaming arrival of tasks rather than one fixed batch.
+
+Production unit-test design.
+
+Examples
+
+Dependency order example from the prompt family:
+
+[
+  {"id": "1", "deadline": 2, "subtasks": ["2"]},
+  {"id": "2", "deadline": 4, "subtasks": []}
+]
+
+Task 1 has the earlier deadline, but task 2 must be consumed first because 1 depends on it. The consume order is therefore 2, then 1.
+
+Notes
+
+The ready queue is naturally a min-heap keyed by deadline. The non-ready tasks need reverse dependency edges from subtask to parent so parents can be unlocked when a subtask is consumed.
+
+The common mistake is pushing every task into the heap before prerequisites are satisfied. Keep blocked tasks out of the ready heap until their unmet-subtask count reaches zero.
+
+For updateDeadline, lazy deletion is usually simpler than removing arbitrary heap entries: update the canonical task map, push the new deadline, and discard stale heap entries during consume.
+
+The interview can become a mini job-scheduler design discussion if there is extra time. Be ready to speak about DAG validation and locking without overbuilding the first implementation.
+
+The deadline-update third part is a recent addition. The interviewer may advance immediately after each completed part, allow unrestricted run/debug cycles, and not require screen sharing.
+
+Plan to complete all three parts within the round; passing may depend on clearing the full sequence.
+
+Preparation
+
+Implement the three parts with a heap, task_id -> task map, remaining_prereq_count, and subtask_id -> parent_ids reverse adjacency.
+
+Drill cycle detection separately with DFS colors or Kahn's algorithm so the DAG-validation follow-up is immediate.
+
+Write tests for empty queue, duplicate deadline tie-breaks, parent-before-child blocking, update-before-consume, update-after-consume, and stale heap entries.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

@@ -1,0 +1,55 @@
+===H1===
+Largest Rectangle in Histogram
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/largest-rectangle-histogram
+===BODY===
+ByteDance / TikTok
+Coding·60 minMembers
+Largest Rectangle in Histogram
+Given a histogram represented by an array of bar heights, compute the largest rectangular area contained inside it. Reported as the second problem in an NG SWE phone screen after a sliding-window warmup.
+SWE
+stack
+array
+complexity-analysis
+hard
+Frequency
+Single report
+Last asked
+2026-01-29
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Given a vector<int> heights representing the height of each column in a histogram of unit-width bars, return the area of the largest rectangle that fits inside the histogram.
+
+def largestRectangleArea(heights: List[int]) -> int: ...
+
+The interviewer expects you to analyze the time complexity of your solution out loud and justify your choice of data structure.
+
+Notes
+
+Optimal solution is a monotonic stack in O(n): maintain a stack of indices with strictly increasing heights; when a shorter bar arrives, pop and compute the area for each popped index (height = heights[popped], width = current_index - stack[-1] - 1).
+
+Sentinel trick: append a 0 to the input (or process indices n after the loop) so the stack drains cleanly.
+
+Common naive answer is O(n²) (for each bar, expand left and right until a shorter bar) — works but interviewers will push you toward O(n).
+
+Be ready for a follow-up to "Maximal Rectangle" (binary matrix) which builds on this primitive row by row.
+
+Common bug: off-by-one on the width calculation after popping; double-check on [2, 1, 2] (expected 3, not 2).
+
+Preparation
+
+Code the monotonic-stack version from scratch, with the sentinel trick.
+
+Trace it on [2, 1, 5, 6, 2, 3] step by step until the pop-and-area logic feels natural.
+
+Be ready to write the brute-force first and then optimize — interviewers reward visible reasoning.
+
+Prepare the "Maximal Rectangle on a 0/1 grid" follow-up: per-row prefix heights plus this primitive.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

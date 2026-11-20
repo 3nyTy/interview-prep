@@ -1,0 +1,106 @@
+===H1===
+MLE Onsite: ML System Design (Recommendation / Feed Ranking / ETA)
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/mle-onsite-ml-system-design
+===BODY===
+Uber
+System Design·60 minMembers
+MLE Onsite: ML System Design (Recommendation / Feed Ranking / ETA)
+MLE / Applied Scientist onsite SD round. Design an ML-powered system end-to-end: feature pipeline, model training, online serving, evaluation, and A/B framework. Recurring prompts: Uber Eats restaurant recommendation, feed ranking, ETA prediction, driver-rider matching.
+MLE
+RS
+system-design
+rag
+retrieval
+ml-knowledge
+scaling
+hard
+Frequency
+Medium
+Last asked
+2026-03-09
+Stage
+onsite-system-design
+Requirements
+
+Functional:
+
+Define the prediction target (CTR, conversion, ETA error, matching success).
+
+Design the feature pipeline (offline batch + online realtime + entity-level joins).
+
+Choose a model family (GBM / wide-and-deep / two-tower retrieval / Transformer ranker).
+
+Serve predictions with p99 latency budget (typically <100 ms for feed ranking, <500 ms for ETA).
+
+Evaluation: offline metrics (NDCG, MAPE) + online A/B (or switchback for marketplace metrics).
+
+Scale:
+
+100M+ users; 1M+ items in the candidate set; query rate 100K+ QPS.
+
+Design decisions interviewers probe:
+
+Retrieval (recall-stage) vs ranking (precision-stage) split.
+
+Cold-start strategy for new items / new users.
+
+Feature freshness: streaming features vs daily-batch features.
+
+Train / serve skew: how do you guarantee features at training match features at serving.
+
+Notes
+
+The two-stage retrieval → ranking architecture is the expected baseline. Retrieval narrows the candidate set from millions to hundreds; ranking scores those hundreds with a heavier model.
+
+For Uber Eats specifically, expect a follow-up on location-aware retrieval: H3 cells + delivery radius constraints.
+
+Feature store is a near-mandatory talking point: offline store (Hive / Pinot) for training; online store (Cassandra / Redis) for serving; a feature-spec layer to prevent train-serve skew.
+
+Evaluation is graded specifically:
+
+Offline: AUC / NDCG / recall@k for ranking; MAPE / RMSE for ETA.
+
+Online: A/B for product surfaces; switchback for marketplace-level effects (ETA, dispatch).
+
+Confidence intervals: state that you would compute 95% CI and explain why for ratio metrics you must use the delta method or bootstrap.
+
+Drift monitoring and online model retraining cadence come up if the interviewer pushes past the baseline architecture.
+
+Recommendation-system framing
+
+A common instantiation is an open-ended recommendation system prompt for an Uber product surface — recommend the most relevant items/content from historical behavior, context, item features, and feedback signals. The prompt is often stated broadly ("design a recommendation system") and then narrowed mid-interview into a specific product variant, so structure the discussion to flex into whichever surface the interviewer steers toward.
+
+Two frequent variants: Uber Eats restaurant recommendation and feed ranking. The interviewer cares less about a fixed product UI than about whether you can lay out the end-to-end ML system cleanly.
+
+Hit this full pipeline checklist explicitly — these are the stages graders look for, in order:
+
+Objective definition — the target metric and what "relevant" means for this surface.
+
+Candidate generation — retrieval to narrow millions of items to a few hundred.
+
+Ranking — heavier scoring model over the retrieved candidates.
+
+Online serving — meet the latency budget; feature lookup from the online store.
+
+Logging — capture impressions, clicks, conversions, and the features served at request time (the basis for both training data and train-serve-skew checks).
+
+Training data — assembled from logged events + logged features; mind label delay and position/selection bias.
+
+Evaluation — offline metrics plus online A/B (or switchback).
+
+Feedback loops — closing the loop from served recommendations back into logging/training, and the bias this introduces (popularity feedback, exposure bias) plus how to dampen it.
+
+Preparation
+
+Memorise one end-to-end ML system diagram (event source → feature pipeline → training → registry → serving → monitoring). Be able to draw it in 3 minutes.
+
+Pre-load 2–3 concrete numbers per prompt (e.g. ranking p99 budget, candidate set size, daily train data volume). Interviewers reward specific numbers.
+
+For Scientist II loops, prepare a 5-minute experiment-design segment: switchback, treatment buckets, guardrails, CI interpretation.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

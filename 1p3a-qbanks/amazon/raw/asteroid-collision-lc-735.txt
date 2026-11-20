@@ -1,0 +1,61 @@
+===H1===
+Asteroid Collision (LC 735)
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/asteroid-collision-lc-735
+===BODY===
+Amazon
+CodingMembers
+Asteroid Collision (LC 735)
+Given signed asteroid sizes, simulate collisions: positive values move right, negative values move left, the smaller absolute size explodes, and equal sizes both disappear. Return the survivors.
+SWE
+stack
+simulation
+array
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-coding
+Requirements
+
+Input is an array of nonzero integers. Sign gives direction: positive moves right and negative moves left; absolute value gives size.
+
+A right-moving asteroid followed by a left-moving asteroid may collide.
+
+The smaller asteroid explodes; equal sizes both explode.
+
+Return all asteroids that remain after every collision resolves.
+
+Examples
+
+Walk through these cases before finishing:
+
+[5, 10, -5]
+
+[8, -8]
+
+[10, 2, -5]
+
+[-2, -1, 1, 2]
+
+Notes
+
+The critical control-flow distinction is whether the current asteroid survives, is destroyed, or must continue colliding after removing a smaller stack top.
+
+The all-separated-direction case [-2, -1, 1, 2] verifies that left-moving asteroids already on the left never collide with right-moving asteroids to their right.
+
+Proactively constructing edge cases and dry-running them received explicit positive feedback.
+
+Preparation
+
+Write the stack simulation without a separate collision helper, then rewrite it with one; compare which invariant is easier to explain.
+
+Drill equal-size annihilation, repeated pops, an empty result, and a sequence in which no collision is possible.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

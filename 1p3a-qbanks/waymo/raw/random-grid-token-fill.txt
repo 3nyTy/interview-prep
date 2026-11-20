@@ -1,0 +1,72 @@
+===H1===
+Randomly Populate Grid with Connected Equal-Size Token Regions
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/random-grid-token-fill
+===BODY===
+Waymo
+Coding·60 minMembers
+Randomly Populate Grid with Connected Equal-Size Token Regions
+Onsite coding: populate an `m × n` grid with four tokens such that (a) each token occupies the same number of cells, (b) each token's region is 4-connected, (c) the entire grid is covered, and (d) the placement is randomized. Multi-source BFS expansion with a retry loop is the canonical approach.
+SWE
+bfs
+grid
+sampling
+simulation
+hard
+Frequency
+Low
+Last asked
+2026-08-25
+Stage
+onsite-coding
+Requirements
+
+Inputs: integers m, n (grid dimensions), four token labels 1, 2, 3, 4.
+
+Output: an m × n grid where every cell carries exactly one token.
+
+Constraints:
+
+Each token occupies exactly (m · n) / 4 cells. Assume m · n is divisible by 4 (clarify with interviewer).
+
+Minority variant: The four token regions must each stay connected, but equal region sizes are not stated — clarify the quota requirement before coding.
+
+Each token's cells are 4-connected (up / down / left / right).
+
+The placement must be randomized — running the algorithm twice should yield different placements when feasible.
+
+Narrow, snake-like board dimensions should be handled rather than treated as ordinary square grids.
+
+Notes
+
+Canonical approach is parallel BFS expansion:
+
+Pick four random seed cells, one per token, mutually distinct.
+
+Initialize a per-token BFS queue with that token's seed.
+
+Repeat: pick a token whose region is below quota and not blocked, pop one cell from its queue, claim an unclaimed neighbor (chosen randomly among unclaimed neighbors), and push the neighbor onto the queue. Round-robin or randomize the token visit order each iteration to avoid biasing toward one token.
+
+Stop when all tokens hit quota or when no progress is possible.
+
+Termination is not guaranteed in a single pass — a token's region can get walled off. Detect 'stuck' (any non-full token has an empty frontier) and restart the whole algorithm; success probability per attempt is high for square-ish grids.
+
+Expected runtime per attempt is O(m · n); the retry loop converges in a small constant number of attempts for practical grid sizes.
+
+Common bug: greedily expanding one token to quota before moving to the next produces non-randomized, biased layouts and tends to wall off later tokens. Round-robin the BFS expansion across tokens.
+
+Follow-ups worth pre-staging: prove the algorithm terminates almost surely; estimate the retry probability for narrow grids; generalize to k tokens with possibly unequal quotas.
+
+Preparation
+
+Code multi-source BFS over a grid until it's automatic, including the claimed[][] map and the per-token queue book-keeping.
+
+Implement a pick_random_unclaimed_neighbor helper that shuffles the neighbor order to enforce real randomness.
+
+Stress-test with a small 4 × 4 grid; manually verify each retry produces a connected layout. The first failure mode is forgetting that 'random unclaimed neighbor' must reroll after claiming, not before.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

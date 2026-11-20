@@ -1,0 +1,66 @@
+===H1===
+Message Latency from Send/Receive CSV Logs
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/message-latency-from-csv-logs
+===BODY===
+Amazon
+CodingMembers
+Message Latency from Send/Receive CSV Logs
+Given send and receive CSV logs keyed by message type and id, print the latency (received minus sent timestamp) for every message that appears in both.
+SWE
+csv
+hashmap
+parsing
+easy
+Frequency
+Single report
+Last asked
+2026-05-27
+Stage
+onsite-coding
+Requirements
+
+Two CSV inputs: ComputeA-send.csv (when messages are sent) and ComputeB-receive.csv (when received).
+
+Each row holds message_type (string), id (unique incrementing int), and synchronized_timestamp (int).
+
+For every message that was both sent and received, print message_type, id, latency where latency = received_timestamp - sent_timestamp.
+
+Examples
+
+Send:
+altitude, 0, 222
+altitude, 2, 224
+altitude, 1, 223
+altitude, 3, 230
+Receive:
+altitude, 0, 223
+altitude, 1, 225
+altitude, 2, 226
+
+Output:
+altitude, 0, 1
+altitude, 1, 2
+altitude, 2, 2
+
+(id 3 was sent but never received, so it is omitted.)
+
+Notes
+
+Key both files by (message_type, id) and emit only ids present in both maps; unmatched sends or receives are dropped.
+
+Rows are not sorted by id — do not assume input order. The example output is by ascending id.
+
+Clarify whether ids are unique only within a message_type or globally; keying on the pair is safe either way.
+
+Preparation
+
+Drill CSV parsing plus a hashmap join, trimming whitespace after each comma.
+
+Talk through the edge cases: unmatched sends, duplicate ids, malformed rows.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

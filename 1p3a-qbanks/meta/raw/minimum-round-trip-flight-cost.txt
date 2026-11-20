@@ -1,0 +1,56 @@
+===H1===
+Minimum Round-Trip Flight Cost
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/minimum-round-trip-flight-cost
+===BODY===
+Meta
+CodingMembers
+Minimum Round-Trip Flight Cost
+Given parallel arrays of departure and return flight prices, choose a departure day strictly before the return day to minimize total cost. Return both indices; when several pairs have the same minimum cost, prefer the earliest departure and the latest return. The round explicitly asks for an O(n^2) baseline followed by an O(n) optimization.
+Perf Eng
+array
+optimization
+medium
+Frequency
+Low
+Last asked
+2026-07-13
+Stage
+phone-screen
+Requirements
+
+Input consists of two arrays: D, the departure price by day, and R, the return price by day.
+
+Choose indices i and j such that i < j, minimizing D[i] + R[j].
+
+Return the chosen departure and return indices.
+
+If multiple pairs have the same minimum total, choose the earliest departure index and the latest return index.
+
+Start with an O(n^2) implementation, then optimize it to O(n).
+
+Examples
+
+D = [10, 7, 8, 3, 6]
+
+R = [5, 4, 10, 7, 5]
+
+Choose D[3] = 3 and R[4] = 5; the minimum round-trip cost is 8.
+
+Notes
+
+The ordering constraint is strict: the departure index must be earlier than the return index. Clarify this before coding if the interviewer phrases the rule only as departure before return.
+
+Tie-breaking affects both selected indices, so it should be covered explicitly in tests rather than treated as an incidental detail.
+
+Preparation
+
+Implement the quadratic baseline and the linear-time version back to back, explaining the invariant used to retain the best compatible departure.
+
+Drill boundary tests for two-day inputs, equal prices, repeated minima, and ties that exercise both the earliest-departure and latest-return rules.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

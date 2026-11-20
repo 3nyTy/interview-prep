@@ -1,0 +1,68 @@
+===H1===
+Serialize Arithmetic Expression Tree with Minimum Parentheses
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/binary-expression-tree-serialize-min-parens
+===BODY===
+Waymo
+Coding·45 minMembers
+Serialize Arithmetic Expression Tree with Minimum Parentheses
+Onsite coding: given a syntax tree whose nodes are variables or one of `+ − × ÷`, serialize the tree to an infix string using the minimum number of parentheses required to preserve evaluation semantics.
+SWE
+tree
+recursion
+parsing
+string-processing
+hard
+Frequency
+Single report
+Last asked
+2026-04-27
+Stage
+onsite-coding
+Requirements
+
+Input: a binary expression tree. Each node is either a variable (leaf) or one of the operators +, -, *, / (internal node with exactly two children).
+
+Output: an infix string representation that, when re-parsed under standard precedence and left-associativity, reproduces the same tree.
+
+Use the minimum number of parentheses — emit parens only where required by precedence or associativity.
+
+Notes
+
+Operator precedence: *, / bind tighter than +, -. Both - and / are left-associative; + and * are commutative and associative.
+
+Recursive serialization passes the parent context (operator + side: left / right) down:
+
+Wrap a child in parens iff its top operator has strictly lower precedence than the parent's, OR equal precedence but the child sits on the right of a non-associative parent (- or /).
+
+Leaf nodes (variables) never need parens.
+
+Examples:
+
+(a + b) * c → must wrap (a + b) because + has lower precedence than the parent *.
+
+a - (b - c) → wrap because - is left-associative and the right child has the same precedence.
+
+a - b - c (left-leaning tree of -) → emit as a - b - c with no parens.
+
+a / (b * c) and a / (b / c) → both wrap because / is left-associative and the right operand re-runs at the same precedence.
+
+Implementation: write serialize(node, parent_op, side) that decides paren-wrapping by comparing precedence(child_op) with precedence(parent_op) plus the associativity-on-right check.
+
+Edge cases: unary minus (the prompt doesn't include it, but flag the question), commutative grouping ((a + b) + c vs a + (b + c) — the parens differ from the operand order but evaluate the same, so the answer depends on tree shape).
+
+Preparation
+
+Pre-write a precedence table and an associativity table for the four operators.
+
+Implement the serialize(node, parent_op, side) recursion and dry-run it on 5 expressions with mixed + - * / plus brackets.
+
+Stretch: extend to ^ (right-associative) and unary - — both appear as senior-loop follow-ups.
+
+Verify by round-tripping: parse the serialized string back to a tree and assert structural equality with the original.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

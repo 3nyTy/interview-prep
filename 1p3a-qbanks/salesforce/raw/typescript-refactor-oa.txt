@@ -1,0 +1,74 @@
+===H1===
+TypeScript Refactor OA (HackerRank — fullstack)
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/typescript-refactor-oa
+===BODY===
+Salesforce
+Coding·90 minMembers
+TypeScript Refactor OA (HackerRank — fullstack)
+Salesforce uses an existing-codebase exercise in full-stack loops: the detailed TypeScript form asks candidates to fix snapshot tests, add coverage, and refactor duplicated conditional logic while keeping tests green. A newer 90-minute OA includes a thinner Java Spring variant in which candidates modify the supplied project until its test cases pass.
+SWE
+refactoring
+code-reading
+typescript
+frontend
+fullstack
+oop-design
+medium
+Frequency
+Low
+Last asked
+2026-07-25
+Stage
+oa · onsite-coding · onsite-system-design
+Requirements
+
+Input: a small TypeScript project with snapshot-style unit tests, some passing, some failing.
+
+Step 1: read the existing tests, identify and fix any broken ones.
+
+Step 2: add additional test coverage for un-tested branches.
+
+Step 3: refactor the production code. Typical refactor — replace nested if / else chains with a lookup table or rule-evaluator structure, eliminate duplicated logic, extract a clear extension point for new rules.
+
+All steps must keep tests green; the harness runs the suite continuously.
+
+Some interviewers also probe object-oriented / design-pattern justification ("which pattern did you apply?") during the closing chat.
+
+Notes
+
+This is labelled as a "system design" round on the loop schedule but the interview is a code-refactor exercise. If the interviewer agrees, you may push back early — but in practice opting out can be treated as a withdrawal. Plan to complete the refactor.
+
+Snapshot tests in Jest / Vitest: a fix usually means deleting the stale snapshot file and re-running with -u once the production behaviour is correct, not patching the snapshot string by hand.
+
+Common refactor targets: strategy pattern (one class per rule, dispatched by a map), table-driven evaluation (array of { matcher, action } rows), or extract-method + early-return.
+
+Hidden grader signals: clean commit-equivalent diffs (small, named, reversible), naming hygiene, and removing dead code as you go. Interviewers comment positively on candidates who narrate the refactor ("first I'll make this safe with a test, then change the structure").
+
+Outcome feedback can be sparse: "told everything completed well, then rejected for not reaching senior bar with no specific gap explained" is the recurring complaint. Anchor expectations on the title (senior / staff / LMTS) — assume the bar is higher than the cosmetic difficulty of the task.
+
+Alternate canonical variant — Java Spring
+
+In a 90-minute full-stack OA, the second task is a small existing-code project selected from available language or framework choices. The candidate selected Java Spring and changed the code until the supplied tests passed.
+
+AI assistance is explicitly permitted for this project task, while the algorithm task in the same OA explicitly prohibits it.
+
+The exact Java interfaces and failing tests are not available yet.
+
+Preparation
+
+Practise a TypeScript refactor end-to-end: clone a small open-source TypeScript library, add an if-else chain, then refactor it into strategy / table-driven form under 45 minutes.
+
+Refresh Jest / Vitest snapshot semantics — how to add, update, and read snapshot files. Know expect(x).toMatchInlineSnapshot() vs toMatchSnapshot().
+
+Be able to name and apply at least three classical design patterns (strategy, chain-of-responsibility, observer) and articulate which one matches the prompt.
+
+Walk through the GoF / Grokking-OOD strategy-pattern chapter — interviewers explicitly ask which pattern you chose and why.
+
+Practise entering a small Spring project cold, running its test suite, tracing one failure to production code, and making the smallest change that turns the suite green.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

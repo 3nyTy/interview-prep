@@ -1,0 +1,546 @@
+===H1===
+Revenue Tracking System with Referrals
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/revenue-tracking-with-referrals
+===BODY===
+Databricks
+CodingMembers
+Revenue Tracking System with Referrals
+Design and implement an in-memory revenue-tracking system that records transactions and supports customer referrals, attributing referred revenue.
+SWE
+object-design
+design-implementation
+hashmap
+medium
+Frequency
+Low
+Last asked
+2026-08-24
+Stage
+phone-screen · onsite-coding
+Problem Statement
+
+We need to build a system that tracks how much money customers make. This system must also handle referrals. If one customer invites another, the inviter gets credit based on the new customer's revenue.
+
+System Requirements:
+
+Create a class called RevenueSystem with these three methods:
+
+insert(revenue: int) -> int: Add a new customer with a specific revenue amount. Return a new, unique customer ID (starting at 0).
+
+insert(revenue: int, referrer_id: int) -> int: Add a new customer who was invited by an existing customer (referrer_id). The referrer's total revenue goes up by the amount of the new customer's revenue. Return the new customer's ID.
+
+get_lowest_k_by_total_revenue(k: int, min_total_revenue: int) -> Set[int]: Find the customers with the lowest total revenue who still meet a minimum requirement (min_total_revenue).
+
+Return a maximum of k customer IDs.
+
+Sort the results by total revenue (lowest to highest).
+
+If two customers have the same revenue, sort them by their ID (lowest to highest).
+
+How to Calculate Revenue:
+
+The formula for a customer's total revenue is:
+
+total_revenue(customer_id) = (My Personal Revenue) + (Sum of Direct Referrals' Revenue)
+
+Important: In this version, only direct referrals count. If Customer A refers B, and B refers C, Customer A only gets credit for B.
+
+Usage Examples
+
+Example 1: Basic Operations
+
+system = RevenueSystem()
+
+# Add customers with no referrals
+id0 = system.insert(300)  # Returns: 0. Customer 0 total: 300
+id1 = system.insert(200)  # Returns: 1. Customer 1 total: 200
+
+# Customer 0 refers a new person with 100 revenue
+id2 = system.insert(100, 0)  # Returns: 2
+# Update:
+#   - Customer 2 has 100 total.
+#   - Customer 0 now has 300 + 100 = 400 total.
+
+# Customer 0 refers another person
+id3 = system.insert(150, 0)  # Returns: 3
+# Update:
+#   - Customer 3 has 150 total.
+#   - Customer 0 now has 300 + 100 + 150 = 550 total.
+
+# Customer 2 refers a new person
+id4 = system.insert(50, 2)  # Returns: 4
+# Update:
+#   - Customer 4 has 50 total.
+#   - Customer 2 now has 100 + 50 = 150 total.
+#   - Customer 0 does NOT change (we only count direct referrals).
+
+# Query: Find the lowest 3 earners who have at least 100 total revenue
+result = system.get_lowest_k_by_total_revenue(k=3, min_total_revenue=100)
+# Returns: {2, 3, 1}
+# Why?
+#   Customer 4: 50 (Too low, ignored)
+#   Customer 2: 150
+#   Customer 3: 150
+#   Customer 1: 200
+#   Customer 0: 550
+#
+# Sorted List: [150 (id 2), 150 (id 3), 200 (id 1), 550 (id 0)]
+# We take the first 3: {2, 3, 1}
+
+Example 2: Edge Cases
+
+system = RevenueSystem()
+
+id0 = system.insert(100)     # Customer 0 total: 100
+id1 = system.insert(200, 0)  # Customer 1 total: 200. Customer 0 total: 300
+
+# Query asking for 10 people, but only 2 qualify
+result = system.get_lowest_k_by_total_revenue(k=10, min_total_revenue=150)
+# Returns: {1, 0}
+
+# Query with a threshold that is too high
+result = system.get_lowest_k_by_total_revenue(k=5, min_total_revenue=500)
+# Returns: set() (Empty set)
+
+Example 3: Tie-Breaking by ID
+
+system = RevenueSystem()
+
+id0 = system.insert(100)  # Total: 100
+id1 = system.insert(100)  # Total: 100
+id2 = system.insert(100)  # Total: 100
+
+result = system.get_lowest_k_by_total_revenue(k=2, min_total_revenue=50)
+# Returns: {0, 1}
+# All have the same revenue. We pick the smallest IDs: 0 and 1.
+
+Solution 1: Fast Inserts (HashMap)
+
+Best for: Systems where you add data often but rarely ask for results.
+
+Data Structures
+
+We use a class to hold customer data and a dictionary (HashMap) to store them.
+
+class Customer:
+    def __init__(self, id: int, revenue: int):
+        self.id = id
+        self.revenue = revenue
+        self.total_revenue = revenue
+        self.referrals = []  # List of people this customer referred
+
+class RevenueSystem:
+    def __init__(self):
+        self.customers = {}  # Map ID to Customer object
+        self.next_id = 0
+
+Implementation
+
+class Customer:
+    def __init__(self, id: int, revenue: int):
+        self.id = id
+        self.revenue = revenue
+        self.total_revenue = revenue
+        self.referrals = []
+
+class RevenueSystem:
+    def __init__(self):
+        self.customers = {}
+        self.next_id = 0
+
+    def insert(self, revenue: int, referrer_id: int = None) -> int:
+        """
+        Add a new customer.
+        Time Complexity: O(1)
+        """
+        customer_id = self.next_id
+        self.next_id += 1
+
+        customer = Customer(customer_id, revenue)
+        self.customers[customer_id] = customer
+
+        if referrer_id is not None:
+            # Update the person who referred them
+            referrer = self.customers[referrer_id]
+            referrer.total_revenue += revenue
+            referrer.referrals.append(customer_id)
+
+        return customer_id
+
+    def get_lowest_k_by_total_revenue(self, k: int, min_total_revenue: int) -> set:
+        """
+        Sort and find the top K customers on demand.
+        Time Complexity: O(n log n)
+        Space Complexity: O(n)
+        """
+        # 1. Find everyone who meets the minimum money requirement
+        eligible = [
+            customer for customer in self.customers.values()
+            if customer.total_revenue >= min_total_revenue
+        ]
+
+        # 2. Sort them by revenue, then by ID
+        eligible.sort(key=lambda c: (c.total_revenue, c.id))
+
+        # 3. Return the first k IDs
+        return set(c.id for c in eligible[:k])
+
+Complexity Analysis
+
+Time Complexity:
+
+insert(): O(1). Adding to a HashMap is instant.
+
+get_lowest_k_by_total_revenue(): O(n log n). We have to sort the list every time we run this query.
+
+Space Complexity:
+
+O(n) to store the customers.
+
+When to use: Use this if you have thousands of inserts for every one query.
+
+Solution 2: Fast Queries (Sorted Set)
+
+Best for: Systems where you need to read data frequently.
+
+Data Structures
+
+We use a self-balancing tree (like SortedList in Python or TreeSet in Java). This keeps customers sorted automatically.
+
+from sortedcontainers import SortedList
+
+class Customer:
+    def __init__(self, id: int, revenue: int):
+        self.id = id
+        self.revenue = revenue
+        self.total_revenue = revenue
+        self.referrals = []
+
+    def __lt__(self, other):
+        # Logic to sort by revenue first, then ID
+        if self.total_revenue != other.total_revenue:
+            return self.total_revenue < other.total_revenue
+        return self.id < other.id
+
+class RevenueSystem:
+    def __init__(self):
+        self.customers = {}  # Map ID -> Customer
+        self.sorted_customers = SortedList()  # Always keeps order
+        self.next_id = 0
+
+Implementation
+
+from sortedcontainers import SortedList
+
+class Customer:
+    def __init__(self, id: int, revenue: int):
+        self.id = id
+        self.revenue = revenue
+        self.total_revenue = revenue
+        self.referrals = []
+
+    def __lt__(self, other):
+        if self.total_revenue != other.total_revenue:
+            return self.total_revenue < other.total_revenue
+        return self.id < other.id
+
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __hash__(self):
+        return hash(self.id)
+
+class RevenueSystem:
+    def __init__(self):
+        self.customers = {}
+        self.sorted_customers = SortedList()
+        self.next_id = 0
+
+    def insert(self, revenue: int, referrer_id: int = None) -> int:
+        """
+        Add a customer and update the sorted list.
+        Time Complexity: O(log n)
+        """
+        customer_id = self.next_id
+        self.next_id += 1
+
+        customer = Customer(customer_id, revenue)
+        self.customers[customer_id] = customer
+        self.sorted_customers.add(customer)
+
+        if referrer_id is not None:
+            referrer = self.customers[referrer_id]
+
+            # We must remove the referrer before updating their value
+            # so the SortedList doesn't get confused
+            self.sorted_customers.remove(referrer)
+
+            # Update revenue
+            referrer.total_revenue += revenue
+            referrer.referrals.append(customer_id)
+
+            # Put them back in the list in the new correct position
+            self.sorted_customers.add(referrer)
+
+        return customer_id
+
+    def get_lowest_k_by_total_revenue(self, k: int, min_total_revenue: int) -> set:
+        """
+        Get results quickly from the pre-sorted list.
+        Time Complexity: O(n) worst case, O(k) best case
+        """
+        result = set()
+
+        # Just walk through the already sorted list
+        for customer in self.sorted_customers:
+            if customer.total_revenue < min_total_revenue:
+                continue
+
+            result.add(customer.id)
+            if len(result) == k:
+                break
+
+        return result
+
+Complexity Analysis
+
+Time Complexity:
+
+insert(): O(log n). It takes logarithmic time to add or remove items from a Sorted Set.
+
+get_lowest_k_by_total_revenue(): O(n) in the worst case (if everyone is below the threshold). O(k) in the best case.
+
+Space Complexity:
+
+O(n) to store customers in both the HashMap and the SortedList.
+
+Optimization: Binary Search
+
+We can make queries even faster. Instead of checking every customer from the start, we use Binary Search to jump straight to the first person who has enough revenue.
+
+def get_lowest_k_by_total_revenue(self, k: int, min_total_revenue: int) -> set:
+    # Create a fake customer to find the search position
+    dummy = Customer(-1, min_total_revenue)
+
+    # Find the index where revenue >= min_total_revenue
+    start_idx = self.sorted_customers.bisect_left(dummy)
+
+    # Grab the next k items starting from that index
+    result = set()
+    for i in range(start_idx, len(self.sorted_customers)):
+        if len(result) == k:
+            break
+        result.add(self.sorted_customers[i].id)
+
+    return result
+
+Solution 3: Lazy Updates
+
+For very large systems, we can mix the two approaches. We delay the sorting work until someone actually asks for the data.
+
+class RevenueSystem:
+    def __init__(self):
+        self.customers = {}
+        self.next_id = 0
+        self.dirty = set()  # Tracks if data has changed
+        self.sorted_cache = None  # Saves the last sorted result
+
+    def insert(self, revenue: int, referrer_id: int = None) -> int:
+        customer_id = self.next_id
+        self.next_id += 1
+
+        customer = Customer(customer_id, revenue)
+        self.customers[customer_id] = customer
+
+        if referrer_id is not None:
+            referrer = self.customers[referrer_id]
+            referrer.total_revenue += revenue
+            referrer.referrals.append(customer_id)
+            self.dirty.add(referrer_id)
+
+        # Mark cache as invalid (it is now old/wrong)
+        self.sorted_cache = None
+        return customer_id
+
+    def get_lowest_k_by_total_revenue(self, k: int, min_total_revenue: int) -> set:
+        # Only re-sort if the cache was invalidated
+        if self.sorted_cache is None:
+            self.sorted_cache = sorted(
+                self.customers.values(),
+                key=lambda c: (c.total_revenue, c.id)
+            )
+
+        result = set()
+        for customer in self.sorted_cache:
+            if customer.total_revenue >= min_total_revenue:
+                result.add(customer.id)
+                if len(result) == k:
+                    break
+
+        return result
+
+Interview Follow-Up Questions
+
+Follow-Up 1: Real-Time Top-K Maintenance
+
+Question: How would you keep a list of the "Top K" customers updated instantly after every insert?
+
+Ideas:
+
+Use a Max-Heap: Keep a heap of size K. When a new customer comes in, check if they earn less than the "biggest" person in the heap. If so, swap them.
+
+Trade-offs: This is tricky because when a referrer gets more money, their position in the heap might change. Updating items inside a heap is complex.
+
+Follow-Up 2: Multi-Level Referrals
+
+Question: What if referrals work like a family tree? If A refers B, and B refers C, Customer A should get credit for C as well.
+
+Approach 1: Calculate on Demand (Recursive)
+When asked for revenue, use a recursive function (DFS) to add up revenue from all children, grandchildren, etc.
+
+Pros: Easy to write.
+
+Cons: Very slow (O(n)) every time you check revenue.
+
+Approach 2: Update Upwards (Bubble Up)
+When a new customer joins, add their revenue to their referrer, then their referrer's referrer, all the way to the top.
+
+Pros: Checking revenue is fast (O(1)).
+
+Cons: Inserting is slower because you have to walk up the tree.
+
+def insert(self, revenue: int, referrer_id: int = None) -> int:
+    customer_id = self.next_id
+    self.next_id += 1
+
+    customer = Customer(customer_id, revenue)
+    self.customers[customer_id] = customer
+
+    if referrer_id is not None:
+        # Move up the chain and add revenue to all ancestors
+        current_id = referrer_id
+        while current_id is not None:
+            self.customers[current_id].total_revenue += revenue
+            # You need a parent pointer to do this
+            current_id = self.customers[current_id].parent
+
+    return customer_id
+
+Follow-Up 3: Get Referral Tree Levels
+
+Question: Given a customer ID, return a list of all their referrals grouped by generation (level).
+
+Solution: Use Breadth-First Search (BFS). Use a queue to visit all direct children, then all grandchildren, etc.
+
+def get_referral_levels(self, customer_id: int) -> List[List[int]]:
+    """
+    Return customers grouped by level using BFS.
+    """
+    if customer_id not in self.customers:
+        return []
+
+    result = []
+    queue = [customer_id]
+
+    while queue:
+        level_size = len(queue)
+        current_level = []
+
+        for _ in range(level_size):
+            current_id = queue.pop(0)
+            customer = self.customers[current_id]
+
+            # Don't add the starting customer to the result list
+            if current_id != customer_id:
+                current_level.append(current_id)
+
+            # Add children to queue
+            queue.extend(customer.referrals)
+
+        if current_level:
+            result.append(current_level)
+
+    return result
+
+Follow-Up 4: Get Revenue for N Levels Deep
+
+Question: Calculate total revenue, but only count referrals up to N levels deep.
+
+Solution: Use BFS or DFS, but stop when you reach depth N.
+
+def get_revenue_n_levels(self, customer_id: int, n: int) -> int:
+    """
+    Get revenue including referrals up to N levels deep.
+    """
+    if customer_id not in self.customers:
+        return 0
+
+    total_revenue = 0
+    # Store (customer_id, current_level) in queue
+    queue = [(customer_id, 0)]
+
+    while queue:
+        current_id, level = queue.pop(0)
+        customer = self.customers[current_id]
+
+        # Add this person's revenue
+        total_revenue += customer.revenue
+
+        # If we haven't hit the limit, add their referrals to the queue
+        if level < n:
+            for referral_id in customer.referrals:
+                queue.append((referral_id, level + 1))
+
+    return total_revenue
+
+Testing the Code
+
+def test_revenue_system():
+    # Test basic insert
+    system = RevenueSystem()
+    assert system.insert(100) == 0
+    assert system.insert(200) == 1
+
+    # Test referral logic
+    system2 = RevenueSystem()
+    id0 = system2.insert(300)
+    id1 = system2.insert(200, 0)
+    # Check if referrer got the credit
+    assert system2.customers[0].total_revenue == 500
+    assert system2.customers[1].total_revenue == 200
+
+    # Test sorting logic
+    system3 = RevenueSystem()
+    system3.insert(300)  # ID 0
+    system3.insert(100, 0)  # ID 1
+    system3.insert(150, 0)  # ID 2
+    system3.insert(50, 1)  # ID 3
+
+    result = system3.get_lowest_k_by_total_revenue(k=3, min_total_revenue=100)
+    # Correct set: {0, 1, 2}. ID 3 is excluded (too poor).
+    assert result == {0, 1, 2}
+
+    # Test empty result
+    result = system3.get_lowest_k_by_total_revenue(k=5, min_total_revenue=1000)
+    assert result == set()
+
+    print("All tests passed!")
+
+test_revenue_system()
+
+Quick Comparison
+
+ApproachInsert TimeQuery TimeSpaceBest For
+HashMap + SortO(1)O(n log n)O(n)Lots of writes, very few reads
+SortedSetO(log n)O(k) or O(n)O(n)Frequent reads, or balanced usage
+Lazy UpdateO(1)O(n log n) (first time), O(k) (cached)O(n)Bursts of writes, occasional reads
+
+Phone-Screen Pacing Variant
+
+The prompt also runs as a phone screen with a heavy discussion phase: interviewers can spend the first ~30 minutes on trade-offs between the top-K retrieval options (heap vs. sorted set vs. sort-on-query) before allowing any code. Write the optimal version directly rather than iterating up from a naive one. The nested-revenue follow-up (multi-level referral attribution) can arrive as late as the 45-minute mark — expect to clarify its semantics and walk through an example verbally even if no time remains to code it.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

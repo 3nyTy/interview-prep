@@ -1,0 +1,54 @@
+===H1===
+Sliding-Window Stream Session Bucketing
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/sliding-window-stream-bucketing
+===BODY===
+Microsoft
+Coding·45 minMembers
+Sliding-Window Stream Session Bucketing
+Azure phone screen. Given a stream of timestamped events, return the (min, max) of each fixed-width time bucket in a single O(N) pass.
+SWE
+sliding-window
+hashmap
+streaming
+medium
+Frequency
+Single report
+Last asked
+2026-04-16
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Streaming events arrive as floats representing timestamps. Group them into fixed-width buckets (e.g. 2 seconds each starting at bucket_start = floor(first_ts / W) * W); within each bucket, output (min_ts, max_ts). Return the list of tuples in time order.
+
+Example with W = 2:
+
+events = [0.5, 1.0, 1.5, 2.0, 4.0]
+buckets = [(0.5, 1.5), (2.0, 2.0), (4.0, 4.0)]
+
+Buckets are half-open [k*W, (k+1)*W), so 2.0 lands in bucket index 1 (int(2.0 / 2) = 1), not in the [0, 2) bucket — watch this boundary value.
+
+Time complexity must be O(N). Memory O(B) where B is number of populated buckets.
+
+Notes
+
+Single linear pass; for each event compute bucket_idx = int(ts / W) and update a dict bucket_idx → (min, max). At the end, sort by bucket index (or emit in order if the stream is monotonically increasing — interviewer should clarify whether the stream is ordered).
+
+If the stream is guaranteed monotonic, you can stream out the result without holding more than one bucket in memory: keep the current (idx, min, max) and emit + reset whenever the next event falls into a higher bucket.
+
+Edge cases the interviewer pushes: empty stream (return []), all events in one bucket, sparse buckets with gaps (do not emit empty buckets), unsorted stream (state explicitly whether you assume sorted).
+
+Preparation
+
+Write both the sorted-stream constant-memory version and the unsorted-stream dict version; mention both before coding.
+
+Pre-rehearse the bucket-index calculation including the bucket_start alignment — interviewers ask "what if the stream starts mid-bucket".
+
+Pair with the rate-limiter problem — both share the time-window bookkeeping pattern.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

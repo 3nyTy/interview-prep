@@ -1,0 +1,65 @@
+===H1===
+Code Review — Multi-PR Walkthrough
+===URL===
+https://www.1point3acres.com/interview/problems/company/airbnb/code-review-multi-pr
+===BODY===
+Airbnb
+Coding·60 minMembers
+Code Review — Multi-PR Walkthrough
+A 60-minute round in which the candidate reviews 2–3 pull requests of increasing complexity (Python or Java). The interviewer is mostly silent; the candidate is expected to drive: read top-down, leave inline comments, and surface bugs, design issues, missing tests, and operational concerns.
+SWE
+code-reading
+refactoring
+python
+concurrency
+testing
+medium
+Frequency
+High
+Last asked
+2026-08-19
+Stage
+onsite-coding
+Requirements
+
+Language choice is offered at scheduling time — Python or Java. Most candidates choose Python because the publicly circulating practice material is denser in Python.
+
+The round presents 2–3 PRs (sometimes a single larger diff) of escalating difficulty. The first usually has the most obvious bugs; the last requires the candidate to question the architecture.
+
+The interviewer typically introduces the scenario, then turns the floor over and observes. Expect minimal back-and-forth — silence is intentional.
+
+Leave comments inline (in the doc or shared IDE) rather than only narrating; both the content and the structure of the review are graded.
+
+Cover at least: correctness bugs, concurrency / race-condition risk, error handling (swallowed exceptions, silent None returns), input validation, observability (logging / metrics), test coverage gaps, naming / API ergonomics, backwards compatibility.
+
+Notes
+
+The signal split is roughly: (a) do you find the obvious bugs, (b) do you raise architectural concerns from a high level before diving into nits, (c) do you ask about the deployment / runtime context before assuming the bug.
+
+Common landmines candidates miss: shared mutable state across threads, missing idempotency on retry, off-by-one in pagination, try/except Exception: pass that hides real failures, returning None where the caller expects a value, time-zone-naive datetimes, integer overflow in cost calculations, missing tests for the failure path.
+
+The interviewer values explicit prioritization — flag a comment as blocker, non-blocking, nit, or question. This mirrors Airbnb's internal review conventions and reads as senior behavior.
+
+Strong reviews start with a one-paragraph architectural summary ("the change does X; here is the failure mode I am most worried about"), then walk top-down through the diff. Weak reviews start at line 1 and grind through nits.
+
+The round may present up to four PRs; you are explicitly told you do not need to finish all of them, and the score depends on the quality and quantity of each comment rather than how many PRs you close. Java works as well as Python — the diffs and review expectations are nearly identical across the two.
+
+A widely circulated public writeup of this round's structure (a senior-onsite recap) and the example PR style is referenced enough that interviewers assume candidates have read it — preparing without it is a disadvantage.
+
+Preparation
+
+Build a personal review checklist (correctness → concurrency → errors → tests → observability → API → docs) and run it as muscle memory.
+
+Practice on 4–5 medium-sized open-source PRs: read the diff cold, write a review, then compare against the merged comments.
+
+For Python specifically: master with / context manager bugs, mutable default arguments, == vs is, generator-exhaustion, asyncio task leaks, missing await, missing timeout= on requests.
+
+Have Claude or another assistant generate a synthetic 200-line PR with intentional bugs (race, swallowed exception, off-by-one, missing test); review it under a 30-minute timer.
+
+Read the publicly circulating Airbnb code-review walkthrough at least twice — the structure (top-down, prioritized comments) is what interviewers grade against.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

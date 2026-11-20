@@ -1,0 +1,54 @@
+===H1===
+Delete and Earn (LC 740)
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/delete-and-earn
+===BODY===
+Microsoft
+Coding·75 minMembers
+Delete and Earn (LC 740)
+Maximize points by choosing values from an integer array: taking a value earns its points and removes values one smaller or one larger. The OA prompt “Maximize Score” is unchanged LC 740.
+SWE
+array
+dp
+medium
+Frequency
+Single report
+Last asked
+2026-09-09
+Stage
+oa
+Requirements
+
+Given an integer array, repeatedly choose a value v, earn v points, and delete that chosen element.
+
+Choosing v also deletes every remaining element equal to v - 1 or v + 1.
+
+Return the maximum total points obtainable through these choices.
+
+Notes
+
+The canonical problem rules match the Requirements above; the preparation below follows those same rules.
+
+The candidate explicitly identifies “Maximize Score” as unchanged LC 740, with only the name changed.
+
+This is the second question in a 75-minute intern OA.
+
+The size of the value range matters; avoid assuming that all intermediate values occur in the input.
+
+Aggregate each positive value into points[v] = v * count(v). Once a value is chosen, taking its remaining copies adds points without excluding any further values. Sort the distinct values and keep take and skip for the best totals including or excluding the last processed value.
+
+Initialize both totals to zero. For a value adjacent to the previous key, set new_take = old_skip + points[v]; across a gap, set new_take = max(old_take, old_skip) + points[v]. In both cases set new_skip = max(old_take, old_skip). Update both states together and return their maximum.
+
+With n elements and k distinct values, aggregation and sorting take O(n + k log k) time and O(k) space. The gap case lets both nonconflicting values contribute without iterating through absent values.
+
+Preparation
+
+In 20 minutes, implement frequency aggregation and the sorted-key take/skip recurrence; write down why adjacent values conflict while gaps do not.
+
+In 10 minutes, compare the result with exhaustive deletion choices on small arrays, covering repeated values, consecutive values, separated values, and a single distinct value.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

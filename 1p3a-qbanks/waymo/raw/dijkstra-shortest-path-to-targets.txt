@@ -1,0 +1,55 @@
+===H1===
+Shortest Path from Source to Target Nodes (Dijkstra)
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/dijkstra-shortest-path-to-targets
+===BODY===
+Waymo
+Coding·45 minMembers
+Shortest Path from Source to Target Nodes (Dijkstra)
+Classic Dijkstra phone screen: given a source node, a set of target nodes, and weighted edges between nodes, return the shortest distance from source to all targets (or the minimum over targets, depending on the asked variant). Aligned with LeetCode 743 (Network Delay Time).
+SWE
+dijkstra
+graph
+heap
+medium
+Frequency
+Single report
+Last asked
+2026-05-01
+Stage
+phone-screen
+Requirements
+
+Input: a starting node, a list of target nodes, and a collection of weighted edges between nodes.
+
+Output: the shortest distance from the source to each target (or the minimum across all targets, depending on the asked variant).
+
+Edge weights are non-negative.
+
+Notes
+
+The standard single-source shortest-path implementation is Dijkstra with a min-heap: O((V + E) log V) with a binary heap, O(E + V log V) with a Fibonacci heap (almost never needed in interviews).
+
+Maintain a dist map seeded with 0 for the source and +inf elsewhere; pop the lowest-tentative-distance node, relax its outgoing edges, and skip stale heap entries by comparing against the current best distance on pop.
+
+For the 'minimum distance over a target set' framing, terminate early when the first target is popped — the popped distance is final for that node.
+
+If the interviewer adds negative weights as a follow-up, switch to Bellman-Ford (O(VE)) and call out the cycle-check requirement.
+
+Visualize the relaxation step on a small whiteboard before coding — most rejections on this question trace back to off-by-one bugs in the heap-pop / skip-stale logic.
+
+Preparation
+
+Write Dijkstra from scratch in under 12 minutes with a heap; rehearse without referring to a reference until it's automatic.
+
+Practice the LC 743 (Network Delay Time) interface explicitly — input format, edge representation, return value.
+
+Implement the all-targets variant by tracking visited counts and bailing early; this is a common interviewer follow-up.
+
+Be ready to discuss when to prefer BFS (unit weights), Dijkstra (non-negative weights), Bellman-Ford (negative weights), and Floyd-Warshall (all-pairs).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

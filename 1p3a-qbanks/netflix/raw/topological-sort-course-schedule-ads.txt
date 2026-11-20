@@ -1,0 +1,117 @@
+===H1===
+Topological Sort Course Schedule Ads
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/topological-sort-course-schedule-ads
+===BODY===
+Topological Sort Course Schedule Ads
+
+<https://www.1point3acres.com/interview/problems/company/netflix/topological-sort-course-schedule-ads>
+
+Netflix
+Coding
+
+60 min
+Free preview
+Topological Sort / Course Schedule for Ads
+
+The Ads coding staple is a Course Schedule / dependency-ordering problem. The base task is to produce or validate a topological order; follow-ups ask for runtime, multiple valid orders, all possible orders, or parallel-course scheduling.
+
+SWE
+topological-sort
+graph
+bfs
+backtracking
+dependency-resolution
+medium
+Frequency
+High
+Last asked
+2026-06-04
+Stage
+phone-screen  onsite-coding
+Requirements
+Input: a set of tasks / courses / ads-processing jobs and prerequisite pairs before -> after.
+Return either whether all tasks can be completed, one valid execution order, or all valid execution orders depending on the variant.
+Detect cycles and explain what should be returned when a cycle exists.
+Follow-up: sort multiple valid results deterministically, usually lexicographically or by original input order.
+Follow-up: print all valid topological orders and state the exponential worst-case runtime.
+Follow-up: parallel courses / batched execution, where all currently unblocked nodes can run together.
+Examples
+numTasks = 4
+edges = [[0, 1], [0, 2], [1, 3], [2, 3]]
+valid order = [0, 1, 2, 3] or [0, 2, 1, 3]
+parallel batches = [[0], [1, 2], [3]]
+
+Notes
+Kahn's algorithm is the cleanest default: build adjacency and in-degree, queue all in-degree-zero nodes, pop, decrement neighbors, and fail if visited count is smaller than n.
+DFS topo also works, but cycle-state bugs are easier under pressure. Use three colors: unvisited, visiting, visited.
+Deterministic ordering requires a min-heap or sorted queue instead of a plain FIFO queue.
+All-orders printing is backtracking over the current zero-in-degree set. The complexity is O(V + E) per emitted order, with up to factorially many outputs.
+Parallel-course follow-up returns BFS waves over zero-in-degree frontiers. If durations are introduced, the level duration is either the max duration in the current wave or a DAG longest-path calculation, depending on whether courses can start as soon as each prerequisite completes.
+A common L4 phone-screen framing gives each task an individual completion time and asks for the minimum time to finish every task. Solve it as a Kahn/BFS wave that propagates the longest finish-time along prerequisite chains (a DAG longest-path); detect cycles first, run your own tests, and be ready to describe the DFS-with-memo equivalent as the follow-up.
+The minimum-semesters framing (relations[i] = [prev, next], take any number of unblocked courses per semester, return the minimum semester count, -1 if a cycle exists) is just the wave count: run Kahn level by level and count levels; if the processed-node count is less than n, return -1.
+Preparation### Alternate canonical variant  bounded courses per semester ( k)
+
+A harder variant caps each semester at at most k courses (constraints are small, n  15). Greedy by in-degree is not optimal here  choosing which k of the currently-unblocked courses to take changes future semesters. Solve with bitmask DP over completed-course sets: dp[mask] = minimum semesters to reach mask; for each reachable mask, compute the set of courses whose prerequisites are all inside mask, then enumerate every size-k subset of that available set as the next semester. State space 2^n, transitions enumerate subsets of the available frontier.
+
+Implement Kahn's algorithm in 10 minutes with cycle detection and tests.
+Add a deterministic min-heap variant.
+Add allOrders() with backtracking and restore in-degree after each recursive branch.
+Practice explaining why all-orders is not polynomial in the output size.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Examples
+Notes
+Preparation### Alternate canonical variant  bounded courses per semester ( k)
+Related discussions  8
+???L5 onsite??
+?? ???? 6 ->5 ->0
+??Ads L4 ????
+??ads???? - ???
+?Netflix technical ????
+?Netflix Ads L4 ??
+???ghost???
+netflix ads PS ??fullstack ???
+Related questions
+
+Other Netflix questions sharing tags with this one
+
+Reconstruct Itinerary
+Single report
+graph
+backtracking
+dfs
++1
+Count Disjoint String Pairs
+Low
+medium
+bitmask
+string
++1
+Movie Billboard Rotation Service
+Low
+medium
+heap
+ranking
++3
+Number Pairs That Match Target
+Single report
+medium
+hashmap
+array
++1
+Resilient / Versioned In-Memory File System
+Medium
+medium
+filesystem
+object-design
++4
+Code editor
+
+---

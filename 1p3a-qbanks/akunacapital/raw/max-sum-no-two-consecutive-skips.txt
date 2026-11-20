@@ -1,0 +1,45 @@
+===H1===
+Max Subsequence Sum Without Skipping Two in a Row
+===URL===
+https://www.1point3acres.com/interview/problems/company/akunacapital/max-sum-no-two-consecutive-skips
+===BODY===
+Akuna Capital
+CodingMembers
+Max Subsequence Sum Without Skipping Two in a Row
+Choose a subsequence to maximize the sum where you may skip elements but never two consecutive ones. Two-state DP: take[i] = val[i] + max(take[i-1], skip[i-1]); skip[i] = take[i-1]; answer = max(take[-1], skip[-1]).
+SWE
+RS
+dp
+array
+medium
+Frequency
+Low
+Last asked
+2025-10-29
+Stage
+oa
+Requirements
+
+Given an array of values, choose a subsequence to maximize the total sum. You may skip elements, but you cannot skip two elements in a row.
+
+Notes
+
+Model two states per index: take[i] is the best sum ending with val[i] taken, and skip[i] is the best sum where val[i] is skipped. Because two consecutive skips are forbidden, a skip must follow a taken element:
+
+take[i] = val[i] + max(take[i-1], skip[i-1])
+skip[i] = take[i-1]
+answer  = max(take[n-1], skip[n-1])
+
+The community threads describe the recurrence and constraint but do not include a concrete input/output example, so verify the base cases (take[0] = val[0], skip[0] = 0 or -inf depending on whether an empty prefix counts) against your own small tests.
+
+Preparation
+
+Implement the two-state DP and reduce it to O(1) extra space.
+
+Hand-test arrays with negative values to confirm the skip rule still maximizes correctly.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

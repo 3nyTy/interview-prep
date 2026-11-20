@@ -1,0 +1,129 @@
+===H1===
+Recipe as Contiguous Ingredient Subsequence
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/recipe-ingredient-subsequence
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Recipe as Contiguous Ingredient Subsequence
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+·
+45 min
+Members
+Recipe as Contiguous Ingredient Subsequence
+
+Given an ordered ingredient list and a set of recipes (each itself an ordered sub-list of ingredients), decide whether each recipe occurs as a contiguous subsequence of the ingredient list. Follow-ups: O(1) extra space; ingredient list arrives as a stream.
+
+SWE
+string
+hashing
+two-pointer
+sliding-window
+state-machine
+streaming
+medium
+Frequency
+Single report
+Last asked
+2026-01-17
+Stage
+phone-screen
+Requirements
+An ordered list ingredients of length N.
+A set of recipes, each an ordered list of ingredients.
+For each recipe, return whether it appears as a contiguous, in-order subsequence within ingredients.
+Follow-up 1: O(1) extra space.
+Follow-up 2: ingredients is a streaming input; process recipes online as ingredients arrive.
+Notes
+Base: this is multi-pattern substring matching on the ingredient list. Three reasonable approaches:
+Hash every length-L contiguous window in ingredients and look up each recipe by its hash. O(N + total recipe length) with prefix-hash + rolling-hash.
+For a small recipe set, scan the ingredient list once per recipe with KMP-style matching. O(R × (N + L_R)).
+Build a generalized suffix automaton over the ingredient list and walk each recipe through it. Overkill for an interview but worth naming.
+O(1) extra space follow-up: per-recipe two-pointer sliding window. Maintain a start pointer into ingredients and a pointer into the current recipe; advance both on match, reset the recipe pointer on mismatch. O(R × N) time, O(1) extra space.
+Streaming follow-up: maintain a small per-recipe state machine that tracks how far through the recipe the current streaming position matches. On each new ingredient, advance every active state by one; emit a match when any state reaches the recipe length. This is the Aho-Corasick pattern reduced to a flat dictionary.
+Edge cases: empty recipe (vacuously true), recipe longer than the ingredient list, repeated ingredients in the list, recipe that overlaps with its own prefix (the KMP failure-function nuance).
+Preparation
+Implement the rolling-hash base version; verify against a brute-force scan on small inputs.
+Add the O(1)-space sliding-window variant.
+For the streaming follow-up, write a per-recipe state machine: an array of "current match length so far" indices.
+Exact matcher framing
+The richer version asks whether each recipe appears as a contiguous in-order slice of the ingredient stream, then adds O(1)-extra-space and streaming follow-ups.
+For the streaming follow-up, maintain per-recipe match state and emit a match when a recipe state reaches its length. This is the Aho-Corasick idea reduced to a small recipe set.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Preparation
+Exact matcher framing
+Related discussions · 1
+🔑snowflake timeline + code 面经
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Document Target Coverage and Minimum Window
+Single report
+sliding-window
+string
+medium
++1
+RecordCollection Sort Colors
+Single report
+two-pointer
+medium
+array
++1
+Serialize and Deserialize Dictionary Trie
+Single report
+medium
+trie
+compression
++2
+Frontend Grid: Robot Eats Candies
+Single report
+medium
+frontend
+bfs
++2
+Copy List with Random Pointer
+Single report
+medium
+linked-list
+hashmap
+Code editor

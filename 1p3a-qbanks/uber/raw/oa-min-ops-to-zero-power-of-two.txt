@@ -1,0 +1,76 @@
+===H1===
+OA: Minimum Operations to Reduce N to 0 (±2^i)
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/oa-min-ops-to-zero-power-of-two
+===BODY===
+Uber
+Coding·90 minMembers
+OA: Minimum Operations to Reduce N to 0 (±2^i)
+Hack2Hire OA problem, equivalent to LeetCode 2571. Given a positive integer `n`, on each operation set `n = n ± 2^i` for some non-negative integer `i`. Return the minimum number of operations needed to reach 0.
+SWE
+bit-manipulation
+greedy
+medium
+Frequency
+Low
+Last asked
+2026-04-01
+Stage
+oa
+Requirements
+
+Input: a positive integer n with 1 <= n < 2^60. In the OA harness n is passed as a base-10 string (the value can exceed 32-bit range, so parse it into a wide integer; in Python int(n) is exact, in other languages use 64-bit or big-int).
+
+One operation: choose any i ≥ 0, then either add or subtract 2^i from n.
+
+Output: minimum number of operations to make n == 0.
+
+def min_operations(n: str) -> int: ...
+    # n is a base-10 string, 1 <= int(n) < 2^60 — parse to a wide/big integer first.
+    # Returns the minimum count of (±2^i) operations to drive the value to 0.
+
+Examples
+
+n = 39  (binary 100111)
+Option A: 39 → 40 (+1) → 32 (−8) → 0 (−32)   = 3 ops
+Option B: 39 → 32 (−7?) — not a power of two — invalid
+Option A wins: answer = 3.
+
+n = "5"   → 2   (5 → 4 [−1] → 0 [−4])
+n = "21"  → 3   (21 → 20 [−1] → 16 [−4] → 0 [−16])
+
+Notes
+
+Equivalent to finding a non-adjacent-form (NAF) signed-binary representation of n with the fewest non-zero digits.
+
+Greedy procedure:
+
+If n is even: n >>= 1, do not count an op (this is just shifting position).
+
+If n is odd: must spend one op. Look at the low two bits:
+
+n % 4 == 1: subtract 1 (creates more trailing zeros to shift through).
+
+n % 4 == 3: add 1 (same reason — produces a longer run of zeros).
+
+Increment the op counter, then continue.
+
+Edge case n == 3: greedy says n + 1 = 4 → 2 → 1 → ? but the optimal is 3 = 2 + 1, i.e. 2 ops. The branch n % 4 == 3 with n != 3 is the version of the rule that holds.
+
+The LC 2571 solution generalises directly; cite it explicitly in interview if relevant.
+
+String input / wide range: because the value can reach just under 2^60, the input arrives as a base-10 string. Parse it once into an exact integer (big-int safe) before the bit loop; do not assume it fits in a signed 32-bit int.
+
+Preparation
+
+Drill LC 2571 until the n % 4 split is automatic.
+
+Practice manually computing NAF for n = 7, 11, 15, 31 so you can trace the algorithm under pressure.
+
+Watch for the n == 1, n == 2, n == 3 micro-edges; many candidates miss n == 3.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

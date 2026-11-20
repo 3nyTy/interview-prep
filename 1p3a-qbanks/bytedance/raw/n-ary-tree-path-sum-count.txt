@@ -1,0 +1,56 @@
+===H1===
+N-ary Tree Path Sum Count
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/n-ary-tree-path-sum-count
+===BODY===
+ByteDance / TikTok
+Coding·60 minMembers
+N-ary Tree Path Sum Count
+Count target-sum paths in a tree, with the binary-tree version generalized to an N-ary tree. The expected optimal solution uses DFS plus a prefix-sum counter rather than checking every ancestor path.
+SWE
+tree
+dfs
+prefix-sum
+hashmap
+medium
+Frequency
+Single report
+Last asked
+2026-05-29
+Stage
+phone-screen
+Requirements
+
+Given an N-ary tree and a target sum, count the number of downward paths whose node values sum to the target. The path can start and end at any nodes as long as it follows parent-to-child direction.
+
+def path_sum(root: Node, target: int) -> int: ...
+
+Expected constraints:
+
+The binary-tree shape is generalized to N children per node.
+
+Return the count of valid paths, not the paths themselves.
+
+Optimize to O(n) using a running prefix sum and a hashmap of previously seen prefix sums.
+
+Notes
+
+The brute-force approach starts a DFS from every node and can degrade to O(nh) or worse. The interviewer pushed for the O(n) prefix-sum solution.
+
+Keep the prefix counter scoped to the current root-to-node path: increment before descending, decrement after returning.
+
+A sliding-window mental model is tempting but wrong when values can be negative or when branching creates multiple independent root-to-leaf paths.
+
+Preparation
+
+Re-implement the prefix-sum path-count template on both binary trees and N-ary trees.
+
+Practice explaining why backtracking the hashmap is required after each child subtree.
+
+Test with a target reached by a middle segment, not only from the root.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

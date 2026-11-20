@@ -1,0 +1,81 @@
+===H1===
+Single-Machine Key-Value Store with Filesystem Spill
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/sd-single-machine-kv-store
+===BODY===
+LinkedIn
+System Design·60 minMembers
+Single-Machine Key-Value Store with Filesystem Spill
+Design a single-machine KV store that holds a billion keys and MB-scale values. Memory is bounded; on-disk format is append-only files; values cannot live entirely in memory. The round straddles system design and data-structure design — many candidates over-pivot to distributed systems and lose signal.
+SWE
+Infra Eng
+storage
+in-memory-database
+filesystem
+memory-bounded
+persistence
+data-structure
+medium
+Frequency
+Low
+Last asked
+2025-12-24
+Stage
+onsite-system-design
+Requirements
+
+Functional:
+
+get(key) -> value / put(key, value) / delete(key).
+
+Up to 1B keys live; each value is MB-scale.
+
+Persistent across restarts.
+
+Constraints:
+
+Filesystem allows creating, deleting, and append-only writes to files. Each file caps at some maximum size (say 1 GB).
+
+Total file count < 100k.
+
+Memory budget cannot hold all values; key index can fit in memory.
+
+Non-functional:
+
+Reads dominate; writes are bursty.
+
+Crash-safe within last few seconds of writes acceptable.
+
+Notes
+
+The expected design: LSM-tree-lite.
+
+In-memory memtable (sorted map) for recent writes.
+
+On overflow, flush to a sorted on-disk segment file.
+
+Background compaction merges segment files into larger ones, dropping deleted/overwritten keys.
+
+In-memory index of (key -> file_id, offset, length) keyed by hash or sorted by key for range support.
+
+Values stored inline in segments (avoid value-log split unless asked); use BlockCache for recently-read value blocks.
+
+Tombstone records for deletes; compaction drops them after enough segments have been merged past them.
+
+The interviewer specifically pushed back on "this is distributed" — keep it single-node and discuss compaction strategy, not Raft.
+
+Preparation
+
+Read the LevelDB / RocksDB architecture overview; you should be able to draw the memtable + segment-file + compaction loop without reference.
+
+Prepare the math: 1B keys × (key length + 16 bytes pointer) = the in-memory index footprint. Be ready to justify whether that fits.
+
+Drill the compaction strategy choices — size-tiered vs level-tiered — with a concrete trade-off (write amplification vs read amplification).
+
+For the variant that adds range queries, propose a sorted-segment layout with sparse index per segment.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

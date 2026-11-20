@@ -1,0 +1,244 @@
+===H1===
+Bag-of-Words Similarity Search from Scratch
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/bag-of-words-similarity-search-from-scratch
+===BODY===
+Apple
+CodingMembers
+Bag-of-Words Similarity Search from Scratch
+This Apple Machine Learning Engineer phone screen asks you to build a tiny similarity search engine using the bag-of-words (BoW) representation, from scratch, without scikit-learn or any vectorizer library.
+MLE
+medium
+hashmap
+retrieval
+string-processing
+Frequency
+Single report
+Last asked
+2026-05-05
+Stage
+phone-screen
+Problem Overview
+
+This Apple Machine Learning Engineer phone screen asks you to build a tiny similarity search engine using the bag-of-words (BoW) representation, from scratch, without scikit-learn or any vectorizer library. In the reported variant, the interviewer provides the function signatures and what each function should do. Your job is to fill them in.
+
+The round tests whether you can:
+
+Tokenize text yourself
+
+Convert documents into BoW vectors (with a vocabulary you build)
+
+Compute cosine similarity between two vectors
+
+Wire those pieces together to rank a corpus against a query
+
+The algorithmic content is modest. The interviewer is watching your fluency with the core NLP primitives and whether the code you produce is clean, correct on edge cases, and numerically sensible.
+
+Clarify Before Coding
+
+A few questions worth asking up front:
+
+Tokenization rules. Lowercase? Strip punctuation? Keep numbers? Split on whitespace only, or use a regex for word boundaries? Drop stopwords?
+
+Vocabulary handling. Is the vocabulary built from the full corpus ahead of time, or rebuilt every query? How are out-of-vocabulary query tokens handled: skipped, or added?
+
+Weighting. Plain counts, binary presence, or TF-IDF? The reported prompt is plain BoW, but TF-IDF is the natural follow-up.
+
+Similarity metric. Cosine is the default for BoW. Euclidean and Jaccard are reasonable alternatives worth naming.
+
+Scale. Are we ranking 100 documents or 10 million? Dense vectors vs. sparse dicts matters at scale.
+
+Settle these and the coding becomes mechanical.
+
+Problem Statement
+
+Implement the following functions:
+
+from typing import List, Dict
+
+def tokenize(text: str) -> List[str]:
+    """Split a document into a list of normalized tokens."""
+    ...
+
+def build_vocab(corpus: List[str]) -> Dict[str, int]:
+    """Return a mapping from token -> column index."""
+    ...
+
+def vectorize(text: str, vocab: Dict[str, int]) -> List[float]:
+    """Return the BoW count vector for a document under the given vocab."""
+    ...
+
+def cosine_similarity(a: List[float], b: List[float]) -> float:
+    """Cosine similarity between two equal-length vectors."""
+    ...
+
+def similarity_search(query: str, corpus: List[str], top_k: int = 5) -> List[tuple]:
+    """Return the top_k (doc_index, score) pairs ranked by cosine similarity."""
+    ...
+
+Keep dependencies to the standard library only.
+
+Example
+
+corpus = [
+    "the cat sat on the mat",
+    "a dog chased the cat",
+    "dogs and cats are pets",
+    "the weather is nice today",
+]
+
+similarity_search("cat and dog", corpus, top_k=3)
+# -> [(1, 0.516...), (2, 0.258...), (0, 0.204...)]
+
+Document 1 ("a dog chased the cat") ranks first because it shares both "cat" and "dog" with the query. Document 2 ("dogs and cats are pets") only overlaps on "and" under this tokenizer, since "dog" and "dogs" are distinct tokens without stemming. That is a good concrete example of a BoW limitation to mention out loud.
+
+Recommended Solution
+
+1. Tokenize
+
+A minimal tokenizer lowercases and keeps only word characters. Splitting on whitespace after stripping punctuation is enough for this round:
+
+import re
+
+_TOKEN_RE = re.compile(r"[a-z0-9]+")
+
+def tokenize(text: str) -> List[str]:
+    return _TOKEN_RE.findall(text.lower())
+
+Using a regex instead of str.split() handles punctuation attached to words ("cat,", "dog.") without extra stripping code. Mention that you could add stemming (Porter) or stopword removal, but keep it out of the baseline unless asked.
+
+2. Build the Vocabulary
+
+Assign a stable column index to every distinct token in the corpus. Sorting makes the result deterministic, which helps testing:
+
+def build_vocab(corpus: List[str]) -> Dict[str, int]:
+    tokens = set()
+    for doc in corpus:
+        tokens.update(tokenize(doc))
+    return {tok: i for i, tok in enumerate(sorted(tokens))}
+
+Complexity: O(N) tokens across the corpus, O(V log V) to sort the vocabulary of size V.
+
+3. Vectorize
+
+Turn a document into a count vector of length |V|. Out-of-vocabulary tokens are silently dropped, which is the standard behavior when the vocab was frozen at training time:
+
+def vectorize(text: str, vocab: Dict[str, int]) -> List[float]:
+    vec = [0.0] * len(vocab)
+    for tok in tokenize(text):
+        idx = vocab.get(tok)
+        if idx is not None:
+            vec[idx] += 1.0
+    return vec
+
+4. Cosine Similarity
+
+Plain dot product divided by the product of L2 norms, with a guard against zero vectors:
+
+import math
+
+def cosine_similarity(a: List[float], b: List[float]) -> float:
+    if len(a) != len(b):
+        raise ValueError("vectors must be the same length")
+    dot = 0.0
+    na = 0.0
+    nb = 0.0
+    for x, y in zip(a, b):
+        dot += x * y
+        na += x * x
+        nb += y * y
+    if na == 0.0 or nb == 0.0:
+        return 0.0
+    return dot / (math.sqrt(na) * math.sqrt(nb))
+
+Returning 0 for an empty vector is a pragmatic choice. The mathematical cosine is undefined there, but zero matches what a ranking function would want: a document with no overlap ranks last.
+
+5. Wire It Together
+
+def similarity_search(query: str, corpus: List[str], top_k: int = 5):
+    vocab = build_vocab(corpus)
+    query_vec = vectorize(query, vocab)
+    doc_vecs = [vectorize(doc, vocab) for doc in corpus]
+
+    scored = [
+        (i, cosine_similarity(query_vec, v))
+        for i, v in enumerate(doc_vecs)
+    ]
+    scored.sort(key=lambda pair: pair[1], reverse=True)
+    return scored[:top_k]
+
+Complexity.
+
+Build vocab: O(N), where N is total tokens across the corpus.
+
+Vectorize all documents: O(N) time, O(D * V) space with dense vectors for D documents and vocabulary size V.
+
+Query-time scoring: O(D * V) for dense cosine, O(D * |query|) with sparse dicts (see below).
+
+Dense vectors are wasteful for real text because BoW vectors are extremely sparse. Mention this out loud.
+
+Sparse Variant
+
+A more realistic implementation uses dictionaries instead of dense lists. It also skips the explicit vocab step, since a dict already maps tokens to counts:
+
+from collections import Counter
+
+def vectorize_sparse(text: str) -> Dict[str, float]:
+    return dict(Counter(tokenize(text)))
+
+def cosine_sparse(a: Dict[str, float], b: Dict[str, float]) -> float:
+    if not a or not b:
+        return 0.0
+    # Iterate over the smaller dict for the dot product.
+    small, large = (a, b) if len(a) <= len(b) else (b, a)
+    dot = sum(v * large.get(k, 0.0) for k, v in small.items())
+    na = math.sqrt(sum(v * v for v in a.values()))
+    nb = math.sqrt(sum(v * v for v in b.values()))
+    return dot / (na * nb)
+
+Two wins:
+
+Memory is O(unique tokens per doc), not O(V).
+
+The dot product iterates over the query's tokens, which is usually tiny, so scoring scales with query length and not vocabulary size.
+
+TF-IDF Upgrade
+
+If the interviewer asks how to make the ranking better, move to TF-IDF. The intuition: common words ("the", "a") dominate raw BoW cosine because they appear in almost every document. IDF downweights them.
+
+import math
+from collections import Counter
+
+def compute_idf(corpus_tokens: List[List[str]]) -> Dict[str, float]:
+    n_docs = len(corpus_tokens)
+    df = Counter()
+    for tokens in corpus_tokens:
+        for tok in set(tokens):
+            df[tok] += 1
+    # Add-one smoothing keeps IDF finite and non-negative.
+    return {tok: math.log((1 + n_docs) / (1 + d)) + 1.0 for tok, d in df.items()}
+
+def tfidf_vector(tokens: List[str], idf: Dict[str, float]) -> Dict[str, float]:
+    tf = Counter(tokens)
+    return {tok: count * idf.get(tok, 0.0) for tok, count in tf.items()}
+
+Slot tfidf_vector in wherever vectorize was used and keep the same cosine function. L2-normalizing each vector once up front also lets you drop the denominator at query time.
+
+What to Say Out Loud
+
+A compact verbal summary that lands well:
+
+"BoW throws away order but keeps term frequency." That is the contract and also the main limitation. For anything that needs word order (negation, phrases), you want n-grams or embeddings.
+
+"Cosine normalizes for document length." Without it, long documents dominate the ranking because their raw dot products are larger.
+
+"The vectors are sparse. I'd use dicts, not arrays, in production." Dense vectors are fine for an interview answer if the corpus is small, but flag the scaling issue.
+
+"Next steps: TF-IDF for weighting, then inverted index for query speed, then dense embeddings if semantic similarity matters." This is the ladder the interviewer is watching for.
+
+The main thing Apple is checking is whether you can build the whole pipeline yourself, without reaching for CountVectorizer, and whether you understand why each step exists.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

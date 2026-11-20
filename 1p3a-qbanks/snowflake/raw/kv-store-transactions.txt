@@ -1,0 +1,158 @@
+===H1===
+Transactional KV Store
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/kv-store-transactions
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Transactional KV Store
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+·
+60 min
+Members
+Transactional KV Store
+
+Implement an in-memory key-value store with `get`, `set`, `delete`, and nested `begin` / `commit` / `rollback`. Required to support O(1) amortized operations and a multi-threading follow-up. A senior-loop variant moves values to disk and reframes the round around lock contention.
+
+SWE
+data-structure
+hashmap
+transactions
+concurrency
+in-memory-database
+hard
+Frequency
+Low
+Last asked
+2026-02-26
+Stage
+phone-screen · onsite-coding · onsite-system-design
+Requirements
+Core API:
+set(key, value)
+get(key) -> value | None
+delete(key)
+begin() — start a new (possibly nested) transaction.
+commit() — atomically merge the current transaction into its parent (or into the base store if no parent).
+rollback() — discard the current transaction.
+All operations must be O(1) amortized.
+Reads inside a transaction must see the in-progress writes of all currently open ancestor transactions, falling back to the base store on miss.
+Follow-up 1 (multi-thread): make the store safe for concurrent callers. The interviewer typically expects per-transaction-stack-per-thread isolation, not a single global lock.
+Follow-up 2 (senior variant, IC4+): values are large blobs stored on disk. The round shifts to contention handling — pseudo-code for acquiring / releasing a per-key lock around the disk write, and a discussion of read amplification.
+Examples
+set("a", 1)
+begin()
+set("a", 2)
+get("a")        # → 2
+begin()
+set("a", 3)
+rollback()
+get("a")        # → 2
+commit()
+get("a")        # → 2
+
+Notes
+The canonical implementation is a stack of dicts. set writes to the top of the stack; get walks the stack from top to bottom; delete writes a tombstone sentinel into the top dict so that lookups in active transactions return None even if the base store has the key.
+commit merges the top dict into the dict below (or into the base store if the stack has only one frame after popping). rollback simply pops.
+Tombstones are easy to forget. Without them, delete inside a transaction can be "undone" by rollback only if the base store value is rediscovered on lookup — most candidates get this wrong on the first pass.
+For multi-threading, the simplest correct answer is one transaction stack per thread plus a global lock on the base store mutation. Interviewers reward candidates who articulate why per-key locks would be tricky (commit touches many keys atomically) and accept the global-base-lock answer.
+For the on-disk variant, the per-key lock has to be acquired around (read-from-disk, modify, write-to-disk) rather than around individual operations, otherwise concurrent writers can interleave dirty reads. A read-write lock is the natural extension.
+Edge cases: commit / rollback with no open transaction (error), nested rollback after a sibling commit, get on a deleted key inside a nested transaction, very deep nesting.
+Preparation
+Implement the stack-of-dicts version from scratch in under 15 minutes, including tombstones for delete.
+Add per-thread transaction stacks plus a base-store lock; write a small test that runs two threads doing interleaved transactions and verifies isolation.
+For senior loops, prepare to discuss: per-key vs global locking, the cost of acquiring locks during commit, durability concerns if the on-disk write fails mid-commit, and how WAL-based recovery would help.
+Canonical API details
+class KeyValueStore:
+    def get(self, key: str): ...
+    def set(self, key: str, value): ...
+    def delete(self, key: str): ...
+    def begin(self): ...
+    def commit(self): ...
+    def rollback(self): ...
+
+get returns None for missing keys and for keys deleted in the active transaction. commit() and rollback() with no active transaction should raise an error.
+A common first implementation supports one active transaction with a delta map plus a tombstone sentinel; nested transactions generalize that into the stack-of-dicts model already described above.
+In the single-transaction shape, begin, get, set, delete, and rollback are O(1) average; commit is O(k), where k is the number of changed keys.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Examples
+Notes
+Preparation
+Canonical API details
+Related discussions · 3
+⭐雪花 电面 新题
+🔑雪花IC2 phone screen + VO 一套挂经
+雪花mid level滇缅
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Filter System with Dynamic Blacklist
+Single report
+hashmap
+data-structure
+oop-design
++3
+Find Median from Data Stream
+Single report
+data-structure
+hard
+heap
++1
+Event Stream Count in Time Range
+Low
+data-structure
+hashmap
+binary-search
++2
+Top-K Search Terms (Per-User Deduped)
+Single report
+hashmap
+set
+heap
++2
+Happy Number
+Single report
+hashmap
+math
+cycle-detection
++2
+Code editor

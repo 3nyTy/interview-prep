@@ -1,0 +1,316 @@
+===H1===
+Design a HashMap
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/design-a-hashmap
+===BODY===
+Apple
+CodingMembers
+Design a HashMap
+Design and implement a HashMap<K, V> from scratch, without using the language's built-in hash map. Support the standard API:.
+SWE
+hashmap
+medium
+Frequency
+Low
+Last asked
+2026-08-21
+Stage
+phone-screen · onsite-system-design
+Problem Overview
+
+Design and implement a HashMap<K, V> from scratch, without using the language's built-in hash map. Support the standard API:
+
+class MyHashMap<K, V> {
+    void put(K key, V value);    // insert or overwrite
+    V    get(K key);             // return value or null/sentinel if absent
+    void remove(K key);          // delete if present, no-op otherwise
+    boolean containsKey(K key);
+    int size();
+}
+
+The interviewer is looking for two things: a correct, working implementation, and a conversation about collision handling. The two canonical approaches are separate chaining and open addressing. A strong candidate implements one, explains the other, and names the trade-offs.
+
+Clarify Before Coding
+
+Key and value types? Generic, or fixed (e.g., int -> int as in LeetCode 706)? Generic keys require hashCode() + equals(); primitive keys simplify things.
+
+Expected load? Drives initial capacity and whether you need resizing on day one.
+
+Thread safety? Assume single-threaded unless asked. Mentioning that concurrent access needs external synchronization or a different design (striped locks, CAS) is a bonus.
+
+Null keys or values allowed? Languages differ (Java allows one null key, Rust has no null at all). State the assumption.
+
+Do you need ordered iteration? If yes, that is a LinkedHashMap, a different design. Confirm this is a plain hash map.
+
+Core Ingredients
+
+Every hash map has four moving parts:
+
+A hash function that maps an arbitrary key to an integer.
+
+A bucket array indexed by hash(key) mod capacity.
+
+A collision resolution strategy for when two keys land in the same bucket.
+
+A resize policy that keeps the load factor bounded so operations stay amortized O(1).
+
+The collision strategy is the meat of the question.
+
+Approach 1: Separate Chaining
+
+Each bucket holds a small collection (linked list, or a short array) of entries that hash to that index. Lookups walk the collection and compare keys.
+
+class MyHashMap<K, V> {
+    static class Entry<K, V> {
+        final K key;
+        V value;
+        Entry<K, V> next;
+        Entry(K k, V v) { key = k; value = v; }
+    }
+
+    private Entry<K, V>[] buckets;
+    private int size = 0;
+    private static final double LOAD_FACTOR = 0.75;
+
+    @SuppressWarnings("unchecked")
+    MyHashMap() {
+        buckets = (Entry<K, V>[]) new Entry[16];
+    }
+
+    private int indexFor(K key) {
+        // Mix and mask. Math.floorMod handles negative hashCodes safely.
+        int h = key == null ? 0 : key.hashCode();
+        h ^= (h >>> 16);                 // spread high bits into low bits
+        return Math.floorMod(h, buckets.length);
+    }
+
+    V get(K key) {
+        for (Entry<K, V> e = buckets[indexFor(key)]; e != null; e = e.next) {
+            if (Objects.equals(e.key, key)) return e.value;
+        }
+        return null;
+    }
+
+    void put(K key, V value) {
+        int i = indexFor(key);
+        for (Entry<K, V> e = buckets[i]; e != null; e = e.next) {
+            if (Objects.equals(e.key, key)) { e.value = value; return; }
+        }
+        Entry<K, V> head = new Entry<>(key, value);
+        head.next = buckets[i];
+        buckets[i] = head;
+        size++;
+        if ((double) size / buckets.length > LOAD_FACTOR) resize();
+    }
+
+    void remove(K key) {
+        int i = indexFor(key);
+        Entry<K, V> prev = null, cur = buckets[i];
+        while (cur != null) {
+            if (Objects.equals(cur.key, key)) {
+                if (prev == null) buckets[i] = cur.next;
+                else prev.next = cur.next;
+                size--;
+                return;
+            }
+            prev = cur; cur = cur.next;
+        }
+    }
+
+    boolean containsKey(K key) { return get(key) != null; }  // tighten if null values allowed
+    int size() { return size; }
+
+    @SuppressWarnings("unchecked")
+    private void resize() {
+        Entry<K, V>[] old = buckets;
+        buckets = (Entry<K, V>[]) new Entry[old.length * 2];
+        size = 0;
+        for (Entry<K, V> head : old) {
+            for (Entry<K, V> e = head; e != null; e = e.next) put(e.key, e.value);
+        }
+    }
+}
+
+Complexity:
+
+Average: O(1) per operation.
+
+Worst case: O(n) if every key hashes to the same bucket (adversarial keys, or a bad hash function). Java 8+ mitigates this by promoting long chains to a balanced tree, giving O(log n) worst case.
+
+Pros:
+
+Simple to implement and reason about.
+
+Load factor above 1 still works, just slower. No hard capacity limit.
+
+Deletion is trivial: unlink the node.
+
+Cons:
+
+Cache-unfriendly: each probe chases a pointer to a heap-allocated entry.
+
+Extra memory per entry (the next pointer and object header).
+
+Approach 2: Open Addressing (Linear Probing)
+
+All entries live in the bucket array itself. On collision, probe forward (linear probing), by a second hash (double hashing), or by triangular offsets (quadratic probing) until an empty slot is found.
+
+class MyHashMap<K, V> {
+    private K[] keys;
+    private V[] values;
+    private byte[] state;   // 0 = EMPTY, 1 = OCCUPIED, 2 = TOMBSTONE
+    private int size = 0;
+    private static final double LOAD_FACTOR = 0.5;  // open addressing needs headroom
+
+    @SuppressWarnings("unchecked")
+    MyHashMap() {
+        int cap = 16;
+        keys   = (K[]) new Object[cap];
+        values = (V[]) new Object[cap];
+        state  = new byte[cap];
+    }
+
+    private int indexFor(K key, int cap) {
+        int h = key == null ? 0 : key.hashCode();
+        h ^= (h >>> 16);
+        return Math.floorMod(h, cap);
+    }
+
+    V get(K key) {
+        int i = indexFor(key, keys.length);
+        while (state[i] != 0) {                             // stop at EMPTY, not TOMBSTONE
+            if (state[i] == 1 && Objects.equals(keys[i], key)) return values[i];
+            i = (i + 1) % keys.length;
+        }
+        return null;
+    }
+
+    void put(K key, V value) {
+        if ((double) (size + 1) / keys.length > LOAD_FACTOR) resize();
+        int i = indexFor(key, keys.length);
+        int firstTombstone = -1;
+        while (state[i] != 0) {
+            if (state[i] == 2 && firstTombstone == -1) firstTombstone = i;
+            if (state[i] == 1 && Objects.equals(keys[i], key)) {
+                values[i] = value;
+                return;
+            }
+            i = (i + 1) % keys.length;
+        }
+        int slot = firstTombstone != -1 ? firstTombstone : i;
+        keys[slot] = key;
+        values[slot] = value;
+        state[slot] = 1;
+        size++;
+    }
+
+    void remove(K key) {
+        int i = indexFor(key, keys.length);
+        while (state[i] != 0) {
+            if (state[i] == 1 && Objects.equals(keys[i], key)) {
+                keys[i] = null;
+                values[i] = null;
+                state[i] = 2;   // TOMBSTONE: keep the probe chain intact
+                size--;
+                return;
+            }
+            i = (i + 1) % keys.length;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void resize() {
+        K[] oldKeys = keys;
+        V[] oldVals = values;
+        byte[] oldState = state;
+        int newCap = oldKeys.length * 2;
+        keys   = (K[]) new Object[newCap];
+        values = (V[]) new Object[newCap];
+        state  = new byte[newCap];
+        size = 0;
+        for (int i = 0; i < oldKeys.length; i++) {
+            if (oldState[i] == 1) put(oldKeys[i], oldVals[i]);   // skip EMPTY and TOMBSTONE
+        }
+    }
+}
+
+Complexity:
+
+Average: O(1) per operation when the load factor stays below ~0.7.
+
+Worst case: O(n) if the table fills up or clustering degenerates.
+
+Pros:
+
+Cache-friendly: entries are contiguous in memory, so probes stay on a few cache lines.
+
+No per-entry allocation.
+
+Lower memory overhead at low load factors.
+
+Cons:
+
+Deletion is tricky. A naive clear-and-forget breaks probe chains; you need tombstones and must rebuild occasionally to avoid tombstone buildup. The code above only resizes when size grows, so a heavy put/remove churn over a small key set can fill every slot with OCCUPIED+TOMBSTONE and livelock. Production implementations track used = occupied + tombstones and resize (or rehash in place) when used / capacity exceeds the threshold.
+
+Performance collapses as the table fills. Requires a strict load factor (typically 0.5 to 0.7) and aggressive resizing.
+
+Primary clustering in linear probing degrades lookup time. Double hashing or Robin Hood hashing helps.
+
+Key Design Decisions to Discuss
+
+The Hash Function
+
+key.hashCode() mod capacity is not enough. When capacity is a power of two, mod 2^k keeps only the low k bits of the hash and throws the high bits away. Many real hashCode() implementations put their entropy in the high bits, so any two keys whose hashes differ only above bit k collide. Classic example: keys with hashes 0x00010000, 0x00020000, 0x00030000 all land in bucket 0 under mod 16. The fix is to mix high bits into low bits before masking:
+
+int spread(int h) { return h ^ (h >>> 16); }   // Java HashMap's trick
+
+Also: if capacity is a power of two, use h & (capacity - 1) instead of % for speed. If not, Math.floorMod is safer than % because % can return negative values in Java.
+
+Capacity Choice: Power of Two vs Prime
+
+Power of two. Lets you replace % with a bitmask. Requires a good spread function so low-bit bias does not kill you. Java's HashMap uses this.
+
+Prime. Naturally spreads poorly distributed hashes. Slightly slower modulus. Common in older implementations.
+
+Load Factor
+
+Chaining: 0.75 is the classic default. Higher is acceptable, just slower.
+
+Open addressing: 0.5 to 0.7 max. Above that, probe sequences explode.
+
+Resize
+
+Double the capacity and re-insert every live entry with the new index. Amortized O(1) per insert. A single resize is O(n), but it happens rarely enough that the average stays flat.
+
+Equals vs Reference Equality
+
+Always compare keys with equals() (or the language equivalent), never ==. Two objects with the same hashCode() are not necessarily the same key.
+
+Nulls
+
+Decide up front: allow null keys, ban them, or treat them as a special sentinel. Java's HashMap allows one null key and hashes it to 0. Other languages vary (Python's dict allows None; Go allows nil only for nilable key types; Rust has no null concept at all). Stating the policy out loud is part of a good answer.
+
+When to Pick Which
+
+SituationBetter choiceWhy
+General-purpose, unknown workloadChainingRobust under high load, simpler deletion
+Small fixed keys, performance-critical, known upper boundOpen addressingCache locality wins; you can size the table once
+Keys with adversarial or poor-quality hashesChaining (or randomized seed)Probing degenerates under bad hashes faster than chains do
+Delete-heavy workloadChainingTombstones make open addressing bleed performance
+Read-heavy with stable keysOpen addressingProbes stay in cache; chaining chases pointers
+
+Capping Resize Lag (follow-up)
+
+A recurring Apple follow-up: a single resize copies every entry into the larger bucket array, an O(n) stall that surfaces as a latency spike. To cap that lag, spread the rehash across many operations instead of doing it in one shot — keep both the old and new tables live, and on each put / get migrate a few buckets from old to new (incremental rehashing, as Redis does). Lookups consult both tables until the migration finishes. This trades a one-time O(n) pause for a bounded amount of extra O(1) work per operation.
+
+Notes
+
+The Wallet phone screen used CoderPad and the canonical LC hash-map implementation prompt.
+
+Preserve a compile-ready scaffold when interviewer edits affect framework code, and reserve time to run and debug corner cases; the coding window may close strictly even when only a few minutes remain.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

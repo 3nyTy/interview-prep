@@ -1,0 +1,106 @@
+===H1===
+Coding Q3 — Stack Trace Reconstruction
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/coding-q3-stack-trace
+===BODY===
+Anthropic
+Coding·55 minMembers
+Coding Q3 — Stack Trace Reconstruction
+Given a stream of `enter <func>` / `exit <func>` lines representing a program's execution, reconstruct the active call stack at every point and compress consecutive identical traces. Bonus follow-ups include denoising and handling traces where only the last m frames are visible. The inverse rotation starts from timestamped stack samples and emits ordered start/end events, with recursion, debounce, and streaming constraints.
+SWE
+MLE
+two-pointer
+string-processing
+stack
+python
+medium
+Frequency
+High
+Last asked
+2026-08-16
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Base problem
+
+Process a list of trace events of the form enter X and exit X, where each exit matches the most recent unmatched enter. At every step, output the current call stack as a tuple. Compress runs of identical adjacent stacks into a single entry tagged with a duration / count.
+
+Follow-up 1 — Prefix dedup → postfix dedup
+
+The natural representation compares stacks by prefix (root first). The interviewer flips it: compare by postfix (leaf first) so that frames added/removed near the leaf still group correctly even when callers differ. Walk through how the comparison logic changes.
+
+Follow-up 2 — Last-m visible frames
+
+The sampler only captures the last m frames of each stack — the prefix is hidden, and m itself is unknown. With only the suffix visible, dedupe consecutive samples that could correspond to the same logical stack. Reported solutions use a two-pointer / sliding-window scan over the suffix string. Be ready to enumerate the corner cases recursive calls introduce.
+
+Bonus (occasionally asked)
+
+Denoise traces by collapsing N consecutive identical frames into one — track timestamps so the dedup is bounded by elapsed time, not just sample count.
+
+Handle the case where the captured suffix is itself incomplete (the final frame is mid-execution).
+
+Streaming input. Treat samples as an iterator and keep memory independent of total history; the interviewer expects the state needed for transitions and N-sample confirmation without retaining every prior sample.
+
+Notes
+
+The base problem is the canonical call-stack-from-event-log simulation: parse events of the form id:start|end:ts, push on start and pop on end, and at every transition you can read the current active stack off the data structure. Time accounting (when you need per-frame totals rather than the raw stack) follows by keeping the previous timestamp and crediting the elapsed delta to the current top of stack before mutating it.
+
+This is a discussion-heavy round. Candidates routinely spend more time defending corner cases than writing code.
+
+Some onsite rotations open with a quick bug-fix warm-up (e.g., an event that never gets appended to the trace list, caught by print-debugging) before the reconstruction proper; both parts together fit in roughly 50 minutes.
+
+The interviewer specifically watches whether you confirm assumptions about the event stream — well-formedness, balanced enter/exit, the alphabet — before coding.
+
+Multiple candidates report being asked to verbally reason through recursion edge cases (same function appearing twice in the stack) rather than encode them.
+
+Inverse variant: the round can be flipped so the input is stack samples taken at fixed intervals — Sample{ts: double, stack: vector<string>} (outermost → innermost) — and the output is the start/end event list Event{kind: "start"|"end", ts, name}. Algorithm: diff each adjacent pair of stacks, emit end events for frames present in the older sample but missing in the newer (innermost → outermost), then start events for newly-appearing frames (outermost → innermost). The diff is along the suffix; track the longest common prefix.
+
+The suffix-only follow-up sometimes runs as a discussion-only replacement for the third coding part: reason through how you would dedupe when the earlier frames are unknown and only the trailing frames are visible — no code expected, but the approach needs to be crisp.
+
+Canonical struct signatures (inverse variant)
+
+struct Sample {
+    double ts;                       // timestamp (sorted ascending in the input)
+    std::vector<std::string> stack;  // outermost (e.g. "main") -> innermost
+};
+
+struct Event {
+    std::string kind;   // "start" or "end"
+    double ts;
+    std::string name;
+};
+
+// Base: diff consecutive samples and emit start/end transitions.
+std::vector<Event> convertSamplesToEvents(const std::vector<Sample>& samples);
+  // - DO NOT emit closing "end" events for frames still live in the final sample.
+  // - Recursion-safe: the SAME function name at different depths is a distinct frame;
+  //   compare by (depth, name) along the longest common prefix.
+
+// Debounced follow-up: only emit start/end if a frame appears at the SAME stack
+// position (same parents, same depth) in N consecutive samples. Any break resets
+// the streak — two separated runs do NOT add up.
+std::vector<Event> convertSamplesToDebouncedEvents(
+    const std::vector<Sample>& samples,
+    int N
+);
+  // The reset rule is the corner that fails most candidates:
+  //   t=1 ["a","b"], t=2 ["a","b","c"]  -> a,b are still streaking (prefix preserved).
+  //   t=1 ["a","b"], t=2 ["c","b","a"]  -> a,b streaks RESET; the entire t=1 stack must
+  //                                          close before the new stack opens.
+  // Either the 1st or the Nth sample is acceptable as the emitted start_ts so long
+  // as the choice is consistent across all frames.
+
+Preparation
+
+Implement the base problem (stack reconstruction + run-length compression of identical traces) in <15 minutes.
+
+Practice the prefix → postfix re-orientation on paper. Be able to articulate why postfix comparison is harder when the prefix is missing.
+
+Draft a two-pointer denoise routine that operates on the visible suffix and skip-merges runs that match modulo length differences.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,54 @@
+===H1===
+Number of Visible People in a Queue (LC 1944)
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/number-of-visible-people-in-a-queue-lc-1944
+===BODY===
+Waymo
+CodingMembers
+Number of Visible People in a Queue (LC 1944)
+Canonical LeetCode 1944: for each person in a queue of distinct heights, count how many people to their right are visible under the rule that everyone between the pair must be shorter than both endpoints.
+SWE
+array
+monotonic-stack
+hard
+Frequency
+Single report
+Last asked
+2026-07-31
+Stage
+onsite-coding
+Requirements
+
+Input: an array heights of distinct positive integers, ordered from the front of the queue to the back.
+
+Person i can see person j > i when every person between them is shorter than both endpoint people.
+
+Return an array answer where answer[i] is the number of people to the right visible to person i.
+
+Examples
+
+heights = [10, 6, 8, 5, 11, 9] returns [3, 1, 2, 1, 1, 0].
+
+heights = [5, 1, 2, 3, 10] returns [4, 1, 1, 1, 0].
+
+Notes
+
+The interview identified the problem as LC 1944, with no Waymo-specific modification stated.
+
+It was one of two hard coding rounds in the virtual onsite.
+
+Scan from right to left with a decreasing monotonic stack. Every shorter height popped by the current person is visible; if the stack is still nonempty afterward, the nearest remaining taller person is also visible. Push the current height after recording the count.
+
+Each height is pushed and popped at most once, giving O(n) time and O(n) auxiliary space. Distinct heights avoid equality handling; if duplicates were allowed, the visibility rule would need an explicit tie policy.
+
+Preparation
+
+Derive the visibility condition aloud before implementing the canonical problem, then give a correctness and complexity argument.
+
+Hand-check strictly increasing, strictly decreasing, and alternating-height queues to catch incorrect blocking logic.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

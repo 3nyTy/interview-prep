@@ -1,0 +1,48 @@
+===H1===
+Fill Dashes with Nearest Letter
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/matrix-fill-nearest-letter
+===BODY===
+Uber
+Coding·60 minMembers
+Fill Dashes with Nearest Letter
+L4 backend phone screen. In a matrix of dashes and letters, replace every '-' with an orthogonally adjacent letter at distance 1; the follow-up requires breaking ties by the alphabetically smallest letter. A Walls-and-Gates multi-source BFS.
+SWE
+bfs
+grid
+medium
+Frequency
+Single report
+Last asked
+2026-05-29
+Stage
+phone-screen
+Requirements
+
+You are given a matrix containing only - (dash) characters and letters.
+
+Replace every - with the nearest letter at Manhattan distance 1 (an orthogonally adjacent letter cell).
+
+If a - has multiple adjacent letters at distance 1, replacing with any one of them is acceptable.
+
+Follow-up: when a - has multiple equidistant adjacent letters, replace it with the alphabetically smallest one.
+
+Notes
+
+This is the Walls and Gates pattern: run a multi-source BFS seeded from all letter cells simultaneously, so the first letter to reach a - is a nearest one.
+
+For the alphabetical-tie follow-up, plain "first to arrive wins" is not enough — among letters that reach a cell on the same BFS layer you must keep the smallest. Either seed the BFS in alphabetical order of letters, or when multiple sources land on the same cell in the same layer keep the minimum character.
+
+Watch for dashes not adjacent to any letter; clarify whether the input guarantees every dash has a neighboring letter.
+
+Preparation
+
+Implement multi-source BFS (LC 286 Walls and Gates), then adapt the relaxation step to carry the propagating letter and break ties by smallest character.
+
+Test a cell equidistant from two different letters to confirm the alphabetical tie-break.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

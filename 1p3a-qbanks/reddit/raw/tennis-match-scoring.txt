@@ -1,0 +1,132 @@
+===H1===
+Tennis Match Scoring
+===URL===
+https://www.1point3acres.com/interview/problems/company/reddit/tennis-match-scoring
+===BODY===
+Reddit
+Coding·60 minFree preview
+Tennis Match Scoring
+Multi-part object-oriented design problem modeling a tennis match. Implement point / game / set / match scoring rules, then extend to best-of-three / best-of-five formats and run-time queries. The most common Reddit phone-screen prompt.
+SWE
+MLE
+object-design
+oop-design
+simulation
+state-machine
+medium
+Frequency
+High
+Last asked
+2026-07-16
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Design and implement a tennis-match scoring system. The prompt is structured as a sequence of parts, each unlocking more rules. Most loops cover parts 1–3; finishing parts 4–5 is the explicit staff-level signal.
+
+Part 1 — Game scoring. Model a single game. Two players accumulate points using the canonical tennis sequence (0 / 15 / 30 / 40 / game). At 40-40 the game enters deuce; a player wins the game by leading by two points (advantage → game). The class exposes a method to record a point for a given player and a method to read the current displayed score.
+
+Part 2 — Set scoring. Layer set tracking on top of games. A player wins a set by being the first to win 6 games and leading by ≥ 2 games. If the score reaches 6-6, play a tiebreak (first to 7, win by 2).
+
+Part 3 — Best-of-N matches. Generalize the match to best-of-three or best-of-five sets. Track set wins, expose the live match state, and signal match completion when a player wins ⌈N/2⌉ sets.
+
+Part 4 — Test harness. Drive the implementation from a list of point events and assert the final match state. Some interviewers ask for an in-class runTests method that consumes a string of point winners (e.g. "AABBA…") and prints the score after each point.
+
+Part 5 — Extension (often skipped due to time). Variants include serving rotation, history queries ("what was the score after the 17th point?"), or supporting both BO3 and BO5 polymorphically without re-implementing the game / set logic.
+
+A typical interviewer pushes hard on clarifying questions up front — clarification on tiebreak rules, deuce semantics, and whether scoring methods return formatted strings ("15-30") or raw counts ((1, 2)) is part of the signal. Most candidates spend 15–20 minutes on clarification + OOD before writing any code.
+
+Notes
+
+The natural decomposition is Match owns Set[], Set owns Game[], Game owns the deuce / advantage state machine. Resisting the temptation to inline all state into Match is the OOD signal interviewers look for.
+
+The deuce / advantage logic is the bug magnet. The cleanest formulation is to track raw point counts per player inside Game, and derive the displayed score on read (0 / 15 / 30 / 40 / deuce / adv-A / adv-B). Avoid storing the displayed score as state.
+
+Tiebreak is structurally a separate scoring mode inside Set — easier to model as a polymorphic Game subtype (TiebreakGame) than as a conditional inside the normal game logic.
+
+Best-of-three vs best-of-five differ only in the set-win threshold. Parameterize once at Match construction; do not branch on the format inside lower layers.
+
+Common failure mode: candidate finishes parts 1–2 cleanly but runs out of time on part 3 because the set / game state was tangled into a single class. The interviewer will not pause the clock to refactor.
+
+Multiple interviewers explicitly ask candidates to write their own tests rather than relying on hidden cases. Plan for the last 5–10 minutes to be test-writing, not coding.
+
+A recurring Part-3 extension asks how to handle players switching sides between games (standard rule: switch after odd games 1, 3, 5…). The clean answer is that side is presentational metadata about the players, not game state — track it in the Set (which already owns the between-games lifecycle) and swap with a small helper, leaving the scoring logic untouched.
+
+Reported time budget for the multi-part version: ~20 minutes for Part 1 plus its tests, ~15 minutes for Part 2 plus tests. Get Part 1 fully working and tested before moving on.
+
+Alternate canonical variant — two-part numeric Game + rendering Match
+
+A commonly-seen shorter shape stops at a single game and splits the work into (1) a numeric point-counting API and (2) a human-readable renderer, replacing an explicit advantage counter with a deuce-collapse normalization. Assume exactly two players.
+
+Part 1 — numeric Game API. Store raw point counts; expose:
+
+class Game:
+    def __init__(self, player1: str, player2: str): ...
+    def add_score(self, player: str) -> None: ...
+        # Increment the given player's count; raise if the game already has a result.
+    def get_score(self) -> tuple[int, int]: ...
+        # Current raw counts as (player1_count, player2_count).
+    def get_result(self) -> str | None: ...
+        # Winner's name once max(count) >= 4 AND lead >= 2; else None.
+
+The trick that keeps this branch-free: normalize a tie back to 3-3 the instant it forms above deuce. On each add_score, if both counts are ≥ 4 and equal, reset both to 3. So 4-4 → 3-3, and tied states such as 5-5 never persist as observable scores — deuce naturally reappears after an advantage is surrendered, and get_result only ever fires from a 4-3/3-4 → +1 step. Both get_score and get_result stay O(1) with no advantage bookkeeping; space is O(1).
+
+Part 2 — rendering Match. Wrap a Game and translate raw counts to tennis terms:
+
+class Match:
+    def __init__(self, player1: str, player2: str): ...
+    def point_won_by(self, player: str) -> None: ...   # delegates to Game.add_score
+    def score(self) -> str: ...
+    def result(self) -> str | None: ...                 # "winner <player>" or None
+
+Rendering rules for score():
+
+Per-side label map 0→"love" / 1→"15" / 2→"30" / 3→"40"; below 3-3 render as "{a}-{b}" (e.g. "15-love", "30-30").
+
+Both counts ≥ 3 and equal → "deuce" (raw 3-3 is tennis 40-40).
+
+Both ≥ 3 and unequal (raw 4-3/3-4) → "advantage <leader>".
+
+A decided game → "winner <player>".
+
+Common bugs candidates report
+
+Firing get_result on lead-≥-2 alone without also requiring max(count) >= 4, which wrongly ends the game at an early 2-0.
+
+Skipping the deuce-collapse, so advantage → deuce → advantage cycling instead accumulates unbounded counts and the render logic misclassifies later tied states.
+
+Flip-flopping between returning formatted strings and raw tuples across methods; keep the numeric layer (get_score → tuple) and the render layer (score() → string) cleanly separated.
+
+Examples
+
+Numeric layer (raw counts, deuce-collapse in action):
+
+p1, p2, p1, p1  -> get_score() == (3, 1); get_result() is None
+p2, p2          -> (3, 3)      # deuce
+p1              -> (4, 3)      # advantage p1
+p2              -> (4, 4) collapses -> (3, 3)   # back to deuce
+
+Render layer:
+
+point alice     -> score() == "15-love"
+... reaching 3-3 -> score() == "deuce"
+point alice     -> score() == "advantage alice"
+point bob       -> score() == "deuce"
+point bob, bob  -> result() == "winner bob"
+
+Preparation
+
+Drill the deuce → advantage → game state machine on paper until you can write it in under 3 minutes without bugs. This is the densest correctness check in part 1.
+
+Practice the layered OOD: write Game first end-to-end (with tests), then wrap it in Set, then in Match. Resist the urge to design all three classes upfront — interviewers reward incremental, testable layering.
+
+Time-box yourself: 15 minutes clarification + design, 10 minutes per part. If part 1 takes longer than 15 minutes of coding, the loop is in trouble.
+
+Pre-write a runTests("AABB…") driver in your scratch space — having it ready saves the last 10 minutes for the multi-part variants.
+
+Decide ahead of time whether to expose the score as a formatted string or a structured object; interviewers accept either but punish flip-flopping mid-round.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

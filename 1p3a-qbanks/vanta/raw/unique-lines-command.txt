@@ -1,0 +1,46 @@
+===H1===
+Implement `uniq` — Unique Lines in a File
+===URL===
+https://www.1point3acres.com/interview/problems/company/vanta/unique-lines-command
+===BODY===
+Vanta
+Coding·90 minFree preview
+Implement `uniq` — Unique Lines in a File
+Build a CLI command that prints each distinct line of a file once while preserving first-seen order. The graded follow-ups push you toward handling a file too large to fit in memory and preserving global output order when partitioning or spilling data to disk.
+SWE
+io
+hashing
+streaming
+memory-bounded
+set
+medium
+Frequency
+High
+Last asked
+2026-07-16
+Stage
+onsite-coding
+Requirements
+
+Implement a command-line tool that reads a file and outputs each distinct line once (a global de-duplication utility, not merely adjacent-line collapsing). Preserve the order in which unique lines first appear. It must run end-to-end in your own IDE / on your own machine.
+
+A working in-memory solution typically combines a set/hashmap to track seen lines with a queue or simple pass to preserve output order — but getting there is mostly about decomposing the steps and discussing each with the interviewer, not about a hard algorithmic trick.
+
+Follow-up 1 — file too large for memory: the input file no longer fits in RAM. Discuss an external approach: stream the file, hash lines and partition/spill to disk (e.g. bucket by hash into multiple temp files), then de-duplicate per bucket.
+
+Follow-up 2 — preserve global order: explain how the external-memory design still emits unique lines in their original first-seen order even though records are partitioned. Continue reasoning about how your chosen language handles file-system access and memory loading of large inputs.
+
+Notes
+
+There is no provided online coding environment. You write, build, and run locally; the round leans on real file-system I/O, so make sure you can run code on your machine before the interview.
+
+At the end you package and upload your code (a Google Form has been used for submission). Budget time accordingly.
+
+Pace yourself for the two follow-ups — several candidates ran out of time on the second one. When preparing, focus on your chosen language's file-system and large-input/memory-loading APIs; that is the direction the follow-ups push.
+
+Talk through each step with the interviewer and converge on one solution together — the round rewards clear incremental problem-solving over a clever one-liner.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

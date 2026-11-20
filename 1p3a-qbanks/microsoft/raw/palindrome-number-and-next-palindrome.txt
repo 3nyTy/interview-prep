@@ -1,0 +1,56 @@
+===H1===
+Palindrome Number + Next-Greater Palindrome
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/palindrome-number-and-next-palindrome
+===BODY===
+Microsoft
+Coding·45 minMembers
+Palindrome Number + Next-Greater Palindrome
+Two-part HE coding round. First: detect whether an integer is a palindrome without converting to a string. Second: find the smallest palindrome strictly greater than the input.
+SWE
+math
+string-processing
+medium
+Frequency
+Low
+Last asked
+2026-01-20
+Stage
+onsite-coding
+Requirements
+
+Part 1. isPalindrome(n: int) -> bool. Return True when the decimal representation of n reads the same forwards and backwards. Solve without converting to string. Negative numbers are not palindromes by convention.
+
+Part 2. nextPalindrome(n: int) -> int. Return the smallest palindrome strictly greater than n. Examples:
+
+132 -> 141
+99  -> 101
+1221 -> 1331
+
+Notes
+
+Part 1. Reverse the lower half of the integer and compare to the upper half. Pop the last digit (n % 10), build the reversed value, divide n by 10, stop when the reversed value is ≥ the remaining n. For odd-length numbers the middle digit lives on one side and you drop it before comparing. O(log₁₀ n) time, O(1) space.
+
+Part 2. Operate on the digit array:
+
+Mirror the left half onto the right (e.g. 12_3_45 → 12_3_21). If this mirrored value is already > n, return it.
+
+Otherwise, increment the center digit (or the middle pair, for even length), propagating carry into the left half, then mirror again.
+
+Edge case: the increment carries past the most significant digit (999 → 1001). Detect by length change and emit 10…01 with the right number of zeros.
+
+The full algorithm is O(L) in the number of digits and pure array manipulation. The two-step "mirror, then increment-if-needed" framing avoids special-casing each digit length.
+
+Preparation
+
+Pre-write Part 1 in five lines using the half-reverse trick. Drill on 1221, 121, 1, 0, -1, and 1000021.
+
+Practice Part 2 on paper for odd and even lengths and for the 999 → 1001 carry-over case.
+
+Watch the interviewer hint — some are willing to accept the string conversion for Part 1 and only push integer-math on Part 2; surface the integer-math approach unprompted to signal awareness.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

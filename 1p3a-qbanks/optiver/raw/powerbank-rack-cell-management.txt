@@ -1,0 +1,76 @@
+===H1===
+PowerBank Rack & Cell Management
+===URL===
+https://www.1point3acres.com/interview/problems/company/optiver/powerbank-rack-cell-management
+===BODY===
+Optiver
+Coding·90 minMembers
+PowerBank Rack & Cell Management
+A 90-minute OOD simulation: implement a PowerBank with ordered capacity-constrained racks, time-dependent charged/depleted/spent cells, insertion, an equalization pass that swaps cells between adjacent racks, and a dispatch pass that drains charged cells while refilling vacancies.
+SWE
+oop-design
+simulation
+state-machine
+data-structure
+hard
+Frequency
+Single report
+Last asked
+2026-08-11
+Stage
+oa
+Requirements
+
+Implement a PowerBank containing ordered racks 1..k, from front to back. Each rack has its own capacity and holds cells identified by cellId.
+
+Each cell is loaded at a timestamp with a duration and moves through three time-derived states at dispatch time:
+
+charged: dispatchTimestamp < loadTimestamp + duration
+
+depleted: loadTimestamp + duration <= dispatchTimestamp < loadTimestamp + 2 * duration
+
+spent: loadTimestamp + 2 * duration < dispatchTimestamp; remove spent cells and treat them as nonexistent.
+
+The exact state at loadTimestamp + 2 * duration is not specified; clarify this boundary before coding. A cell's charge score is loadTimestamp + duration - dispatchTimestamp. Higher charge ranks first, with lexicographically smaller cellId as the tie-breaker.
+
+Implement three operations:
+
+Initialize the rack structure and per-rack capacities.
+
+loadCell(String cellId, double timestamp, double duration) -> boolean
+
+Insert the cell into the first rack, from front to back, with available capacity.
+
+Return true on insertion; return false if no rack can accept it.
+
+dispatchCell(double timestamp, int maxDispatchCells) -> List<String>
+
+Run an equalize phase, then a dispatch phase.
+
+Equalize from front to back. When a nonempty rack has a charged-cell ratio below 50% and the next rack contains a charged cell, swap the current rack's least-charged cell with the next rack's most-charged cell.
+
+Dispatch at most maxDispatchCells charged cells. Repeatedly take the most-charged cell from the earliest rack containing any charged cell.
+
+Fill a vacancy using the most-charged cell from a later rack, propagating refills from front to back one rack at a time.
+
+Emit each selected cell as {cellId}:{charged/depleted}. If fewer than maxDispatchCells charged cells are available, return all eligible results.
+
+Notes
+
+The prompt is reading-heavy: roughly 30 minutes can go into parsing the rules and another 10+ minutes into design.
+
+The difficulty is state management and selecting data structures that preserve the ordering and movement rules; there is no separate algorithmic trick, and the constraints are sufficient for a direct simulation.
+
+The boundary at exactly twice a cell's duration and the precise refill behavior across more than two racks should be confirmed before implementation.
+
+Preparation
+
+Translate the three time states, both tie-breakers, the 50% trigger, and the front-to-back movement rules into explicit invariants before writing code.
+
+Implement and test state transitions, per-rack ranked selection, equalization, and refill propagation independently before combining them into dispatchCell.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

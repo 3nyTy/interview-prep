@@ -1,0 +1,78 @@
+===H1===
+Code Craft: Cart with Promotions (OOD)
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/code-craft-cart-promotions-ood
+===BODY===
+DoorDash
+Coding·60 minMembers
+Code Craft: Cart with Promotions (OOD)
+OOD Code Craft round. A shopping cart contains items with prices and a shipping fee. A list of promotions applies — either a percentage discount (does not apply to shipping) or a fixed-dollar discount. Find the promotion that yields the lowest payment and return the final amount. Multiple parts, each adding edge cases.
+SWE
+oop-design
+object-design
+medium
+Frequency
+Single report
+Last asked
+2025-12-07
+Stage
+phone-screen
+Requirements
+
+Input:
+
+items: list of (name, price).
+
+shipping: a fixed shipping fee added to the subtotal.
+
+promotions: list of promotion objects. Two types:
+
+PercentDiscount(percent) — multiplies the items subtotal by (1 - percent / 100). Does not apply to shipping.
+
+FixedDiscount(amount) — subtracts amount from the total (items + shipping). Cannot reduce the total below 0.
+
+Output: the minimum final payment achievable by applying exactly one promotion (or zero, if no promotion is better than no promotion at all — clarify).
+
+Each part adds an edge case: empty cart, negative subtotal after fixed discount, promotion that does not apply to the cart (e.g. minimum-purchase requirement), tie-breaking when two promotions yield equal totals.
+
+Notes
+
+Clean OOP structure:
+
+class Item { String name; double price; }
+
+abstract class Promotion { double apply(double subtotal, double shipping); }
+
+Concrete PercentDiscount and FixedDiscount subclasses implementing apply.
+
+class Cart holds items, shipping, and a method bestTotal(promotions) that iterates promotions and returns the minimum.
+
+The reason interviewers ask this in OOP form: they want to see that you separate the Promotion type from the cart's pricing logic. Inlining if isinstance(p, PercentDiscount) everywhere is a fail signal.
+
+Floating-point care: compute everything in integer cents internally if available, or use decimal.Decimal in Python. Naively using double can cause off-by-one-cent failures on test cases.
+
+Round to 2 decimals only at the output step.
+
+Edge cases the interviewer hits in successive parts:
+
+Empty cart → return shipping (no discount applies to shipping for percentage; fixed can still apply).
+
+Fixed discount > total → final = 0, not negative.
+
+Multiple promotions tied for minimum → return any; interviewer may probe whether you want deterministic tie-breaking.
+
+Promotion with a minimum-purchase floor → check eligibility before applying.
+
+Preparation
+
+Pre-write the Promotion class hierarchy with apply(subtotal, shipping) -> total and one concrete subclass each.
+
+Drill the integer-cents arithmetic pattern; this is the easiest way to dodge floating-point bugs in a 60-minute round.
+
+Practice growing the design incrementally: implement one promotion type, run tests, add the second, add eligibility, add tie-breaking. Each part adds 5–10 minutes.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

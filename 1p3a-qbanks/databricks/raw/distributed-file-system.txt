@@ -1,0 +1,195 @@
+===H1===
+Distributed File System
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/distributed-file-system
+===BODY===
+Databricks
+System DesignMembers
+Distributed File System
+Design the metadata layer of a distributed file system supporting create-directory, list, put / get file, delete, and a recursive hierarchy. The defining requirement is strong consistency: a list must immediately reflect prior puts (unlike eventually-consistent S3). Blob storage is assumed to exist.
+SWE
+Infra Eng
+distributed-systems
+filesystem
+storage
+data-modeling
+medium
+Frequency
+Single report
+Last asked
+2026-05-15
+Stage
+phone-screen · onsite-system-design
+The Challenge
+
+Design a distributed file system (a file system that works across multiple computers). It needs to handle these common actions:
+
+Create a directory (folder)
+
+List what is inside a directory
+
+Put a file (upload)
+
+Get a file (download)
+
+Delete files and directories
+
+What You Need to Build
+
+System Capabilities:
+
+Perform standard actions: create, read, update, and delete.
+
+Handle folders inside other folders (recursive hierarchy).
+
+Allow file uploads and downloads.
+
+Allow users to see a list of files in a directory.
+
+Performance & Quality Goals:
+
+Strong consistency: This is the most important part. Unlike S3, when you add or change a file, the "list" command must show the change immediately. "Last-writer-wins" is not allowed.
+
+Scalability: The system must handle very large files efficiently.
+
+Availability: The system must stay online even if some servers fail.
+
+Questions You Might Be Asked
+
+During the interview, expect the interviewer to ask deep questions about:
+
+Database Design & Data Modeling
+
+How will you organize the metadata (data about the files)?
+
+Which database will you pick and why?
+
+How will you split the data (partitioning) and create indexes?
+
+Consistency & CAP Theorem
+
+How do you ensure the file list is always up-to-date immediately (Strong Consistency)?
+
+What did you sacrifice based on the CAP theorem?
+
+How is this design different from systems like S3 that are eventually consistent?
+
+Delete Operations
+
+How do you delete a directory that contains many other directories inside it?
+
+What happens if you delete a folder with thousands of sub-folders?
+
+How do you mark files that need to be deleted later (dirty files)?
+
+Large File Handling
+
+What do you do if a file is too big?
+
+How do you split the file into pieces (chunking)?
+
+How do you track the details of each chunk?
+
+File Immutability
+
+Why can't files be changed directly (why are they immutable)?
+
+How do you handle different versions of the same file?
+
+How can a user download a file while someone else is updating it?
+
+High Availability
+
+How do you handle it if the main control node fails (like the namenode in HDFS)?
+
+What is your backup plan (active/standby strategy)?
+
+Do you need tools for coordination like Zookeeper or etcd?
+
+Notes
+
+Handling Strong Consistency
+
+This problem is totally different from designing S3: listing files must be strongly consistent with upload/change operations, so eventual-consistency table schemas are not sufficient.
+
+Make the directory the DynamoDB partition key. For the sort key, use either the subdirectory name or the file name; a fileId sort key also works. This supports multiple file versions and helps when someone downloads a file while it is being updated.
+
+Key insight: Making the directory the partition key lets you use a Local Secondary Index (LSI). This gives you strong consistency and makes it easy to find all sub-folders or files by checking a fileType field.
+
+Deleting Nested Folders
+
+The hard part in deletion is how to remove directories correctly when they contain many sub-directories.
+
+One approach that works:
+
+Put all sub-directories into a queue (specifically a deque).
+
+Use multiple threads to take items from the queue.
+
+Each thread marks a field in the database table to show that the sub-directory is deleted.
+
+This makes sure the deletion happens correctly across the distributed system without losing track of any folders.
+
+Defining the Scope
+
+Assume that blob storage like S3 already exists and can be used directly. Do not spend the round designing the file storage layer itself.
+
+Critical clarification: You can assume a blob storage service (like S3) already exists to hold the actual file data. The interview is about:
+
+Designing the database schema
+
+Handling transactions
+
+Managing metadata
+
+Ensuring strong consistency
+
+Do not spend time designing the hard drive storage infrastructure.
+
+Managing Huge Files
+
+For very large files, use a chunk table. A separate fileId is useful here:
+
+It helps manage multiple versions of a file.
+
+It makes managing pieces of the file easy (you just need fileId and chunkNum).
+
+It allows different chunks to be uploaded or downloaded at the same time.
+
+Mistakes to Avoid
+
+Don't focus on small files: optimizing for small files is usually not important here. You don't need to worry about running out of inodes; you can just add more storage machines.
+
+Keep High Availability simple: Avoid over-indexing on Zookeeper/etcd for namenode failure. A simple active/standby setup is usually enough. Don't discuss complex topics unless the interviewer asks.
+
+Stay on topic: spending too much time on topics outside the target metadata-design problem leaves no time for the real questions.
+
+Expected Answer Shape
+
+The round tends to reward a specific metadata-first design. Even when the prompt sounds open-ended, be ready to justify why the design choices support strong consistency, efficient listing, recursive deletion, and large-file chunk management. Also:
+
+You must explain why you made your design choices.
+
+Don't assume the interviewer knows what you are thinking.
+
+They are looking for specific signals.
+
+Summary & Tips
+
+Consistency is key: This is NOT S3. The list of files must match the actual files immediately (Strong Consistency).
+
+Focus on Metadata: Assume the file storage exists. Spend your time on the database design, schema, and how to keep data consistent.
+
+Study hard: Read the GFS, HDFS, and Bigtable papers. Be ready for deep questions on any part you mention.
+
+Explain "Why": Always tell the interviewer why you chose a specific design, even if it seems simple.
+
+Watch the clock: Don't talk about topics the interviewer is not interested in. Focus on their specific questions.
+
+Database design matters: Think carefully about partition keys, sorting keys, and indexes to make sure you get strong consistency.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

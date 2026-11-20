@@ -1,0 +1,58 @@
+===H1===
+Time-Keyed Key-Value Store (set / get-before-timestamp)
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/time-keyed-kv-store
+===BODY===
+Citadel / Citadel Securities
+Coding·45 minMembers
+Time-Keyed Key-Value Store (set / get-before-timestamp)
+Citadel SWE intern phone screen single problem: design a key-value store where each value is tagged with a timestamp, and reads return the most recent value at or before a query timestamp. Classic LC-981 framing with the binary-search-on-sorted-timestamps solution as the target.
+SWE
+binary-search
+hashmap
+data-structure
+python
+medium
+Frequency
+Single report
+Last asked
+2026-02-18
+Stage
+phone-screen
+Requirements
+
+Implement a class with two methods:
+
+set(key, val, timestamp) — record that key had value val at the given timestamp. Timestamps for the same key are inserted in strictly increasing order.
+
+get(key, timestamp) — return the value associated with key at the most recent timestamp less than or equal to timestamp. If no such timestamp exists for that key, return the closest available value per the interviewer's clarification (originally stated as "return the most recent if no value at current time").
+
+The candidate's prompt explicitly imports typing from the start, signalling that type hints are expected on the public API.
+
+Notes
+
+Canonical structure: per-key list of (timestamp, value) entries appended on set (already sorted because the spec guarantees monotonic timestamps). On get, binary-search the list for the largest timestamp <= query and return the corresponding value.
+
+Time complexity: set is O(1) amortized; get is O(log m) where m is the number of writes for that key.
+
+Edge cases the interviewer probes: empty history for that key (interviewer's wording leaves ambiguity — clarify before coding), multiple entries at the same timestamp (problem statement rules this out, but state the assumption), and the get query before the first set for that key.
+
+Common slip: writing a linear scan instead of binary search, then trying to retrofit. Open with bisect_right from the start.
+
+The typing hint nudge implies the interviewer wants Dict[str, List[Tuple[int, Any]]] style annotations; this is style points, not correctness, but worth doing.
+
+Preparation
+
+Implement the binary-search version from scratch in Python using bisect_right. Memorize the off-by-one: bisect_right(times, t) - 1 is the index of the largest timestamp <= t.
+
+Practice the LC 981 problem in 10 minutes end-to-end so the boilerplate (defaultdict of list, bisect, edge-case guards) is automatic.
+
+Be ready to extend the design verbally: how would you support backdated writes (insert into sorted list with bisect.insort, O(m) insert), how would you persist this across restarts, how would you shard by key.
+
+Brush up on type hint syntax — Dict, List, Tuple, Any — so the typed signature is not the time sink.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

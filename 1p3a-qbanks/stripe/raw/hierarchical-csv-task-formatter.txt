@@ -1,0 +1,80 @@
+===H1===
+Hierarchical CSV Task / Subtask Formatter
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/hierarchical-csv-task-formatter
+===BODY===
+Stripe
+CodingMembers
+Hierarchical CSV Task / Subtask Formatter
+Parse task and subtask CSV rows and render parent-child output even when rows arrive out of hierarchy order. Later parts change the final-child format and add recursively nested subtasks; exact formatting details require clarification.
+SWE
+csv
+parsing
+tree
+Frequency
+Low · New
+Last asked
+2026-09-11
+Stage
+phone-screen
+Requirements
+
+Parse CSV records describing tasks and subtasks, then render their hierarchy.
+
+Part 1: distinguish task rows from subtask rows and output each task's ID and name.
+
+Part 2: attach subtasks to their parent and print them beneath the parent task. Input rows are not already in hierarchy order.
+
+The input includes a date, row type, identifiers, and a name. One layout is date,task,task-id,name,... for tasks and date,subtask,subtask-id,parent-id,name,... for subtasks.
+
+Minority variant: Another layout places the parent ID before the subtask ID; clarify column positions before coding.
+
+Part 3: change the formatting of the final subtask in a list. The exact final-child marker is unspecified.
+
+Part 4: support any number of children and recursively nested subtasks.
+
+Examples
+
+Input rows illustrating the parent-ID-first layout:
+
+01/01/2025,task,T1,cook dinner
+01/01/2025,subtask,T1,T2,buy groceries
+
+Part 2 output shape (a separate formatting illustration, not the output of the two rows above):
+
+parent task 1:
+  subtask 1 - name
+  subtask 2 - name
+parent task 2:
+  subtask 1 - name
+  subtask 2 - name
+
+Notes
+
+Clarify sibling ordering, exact punctuation, and the last-child format before implementing the renderer.
+
+The prompt is long; a delayed start and lengthy process introduction can reduce coding time substantially.
+
+Completing three parts and explaining the fourth does not guarantee advancement.
+
+Solution skeleton
+
+Parse rows with a CSV parser using the agreed column layout. First build an ID-to-node map; then attach each subtask to its parent so a child can appear before its parent in the input.
+
+Keep hierarchy construction separate from rendering. Traverse each root depth-first, passing the depth and whether a child is last to the renderer; make punctuation and the final-child marker parameters until the output contract is clarified.
+
+Preserve input order unless the prompt specifies another sibling order. Clarify duplicate IDs, missing parents, and cycles rather than silently choosing behavior for malformed hierarchies; an iterative traversal avoids recursion-depth limits on deep inputs.
+
+With hash-map lookups and no sibling sorting, construction takes expected linear time in input size. Rendering takes time proportional to the traversal plus the number of characters emitted, including indentation; hierarchy storage is linear in the number of nodes.
+
+Preparation
+
+In 20 minutes, implement two-pass linkage and exercise a child before its parent, multiple roots, and several nesting levels; inspect the resulting parent-child relationships independently of formatting.
+
+In 15 minutes, implement a renderer with configurable indentation and final-child markers. Test zero, one, and several children and verify sibling order under an explicitly chosen practice convention.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

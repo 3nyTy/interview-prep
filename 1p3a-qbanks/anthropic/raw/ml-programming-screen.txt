@@ -1,0 +1,95 @@
+===H1===
+ML Programming Screen — QKV Attention & einsum
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/ml-programming-screen
+===BODY===
+Anthropic
+Coding·55 minMembers
+ML Programming Screen — QKV Attention & einsum
+One of the research-track 1-of-N phone screens. ~40 minutes of programming with sequence models / scaled dot-product attention, plus short ML knowledge questions. Comfort with einsum and reading mathematical equations is explicitly called out by the recruiter.
+MLE
+RE
+RS
+transformer
+attention
+einsum
+numpy
+pytorch
+ml-knowledge
+hard
+Frequency
+Low
+Last asked
+2026-02-18
+Stage
+phone-screen · tech-screen
+Requirements
+
+Reported components of the round:
+
+Implement a small piece of a transformer block from scratch in NumPy or PyTorch — typically scaled dot-product attention (QKV multiplication, softmax, output projection) or a multi-head wrapper around it.
+
+Use einsum correctly for the QKV products and the attention-weight × value reduction.
+
+Short ML questions about masking (causal / padding), why softmax is applied to the last axis, the role of sqrt(d_k), and numerical-stability tricks.
+
+Some rounds substitute or augment with a small NumPy bug-hunt ("this transformer block runs but the loss doesn't go down — find the bugs").
+
+Notes
+
+The recruiter blurb names the round; do not confuse it with the standard SWE Coding & Design slot.
+
+Open-book on documentation, no AI assistants. Expect Colab.
+
+The full prompt has not been publicly documented; the structure above is the consensus of candidates who took the option and described it afterwards.
+
+Canonical formulas to have at your fingertips
+
+The screen tests fluency with the standard scaled-dot-product attention formulation. You should be able to derive and implement these from memory:
+
+Attention(Q, K, V) = softmax(Q · Kᵀ / √d_k) · V
+
+Multi-head decomposition (h heads):
+
+head_i = Attention(Q · W_Q^i, K · W_K^i, V · W_V^i)
+MultiHead(Q, K, V) = Concat(head_1, …, head_h) · W_O
+
+Standard reference shapes the canonical formulation uses (d_model = 512, h = 8, d_k = d_v = d_model / h = 64) — be ready to plug arbitrary values and trace the shapes end-to-end.
+
+The 1 / √d_k scaling
+
+Without scaling, for large d_k the dot-product q · k has variance proportional to d_k, which pushes softmax into saturation and kills gradients. Dividing by √d_k normalizes the variance back to 1. Expect this as an oral question — having the variance argument ready is the signal of having implemented it, not just read about it.
+
+Einsum patterns
+
+Two patterns interviewers watch for:
+
+# QK^T over batch + heads: (B, H, T, D) × (B, H, T, D) -> (B, H, T, T)
+scores = torch.einsum('bhid,bhjd->bhij', Q, K) / math.sqrt(D)
+
+# attention-weighted values: (B, H, T, T) × (B, H, T, D) -> (B, H, T, D)
+out = torch.einsum('bhij,bhjd->bhid', weights, V)
+
+Numerical stability
+
+Subtract the row max before exp in softmax — standard log-sum-exp trick.
+
+For causal masking, add -inf (or a large negative number like -1e9) to masked positions before softmax, never multiply by 0 after.
+
+Float16 / bfloat16 attention typically casts the softmax to float32 to avoid overflow on long sequences.
+
+Preparation
+
+Hand-derive the shapes for multi-head attention end-to-end, then implement it from scratch in NumPy without copy-pasting.
+
+Practice writing the same forward pass twice: once with explicit matmul + reshape, once with einsum. The interview tests both fluency and speed.
+
+Refresh causal masking, KV-cache mechanics, and the standard numerical-stability tricks (subtract max before softmax, log-sum-exp).
+
+Drill the 1 / √d_k variance derivation out loud — it's the most reliable oral follow-up.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

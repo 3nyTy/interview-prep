@@ -1,0 +1,104 @@
+===H1===
+AI Code Craft Challenge: Delayed-Delivery Workflow Engine
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/ai-code-craft-workflow-engine
+===BODY===
+DoorDash
+Coding·75 minMembers
+AI Code Craft Challenge: Delayed-Delivery Workflow Engine
+A 2026 round that explicitly encourages AI coding assistants in the candidate's own IDE. Delivery varies between a starter-code workflow engine and a from-scratch refund-service variant; the latter requires real HTTP services running on separate local ports. The graded signal is rapid, validated AI collaboration plus early clarification of the expected runtime shape.
+SWE
+MLE
+EM
+ai-coding
+ai-tools
+ai-allowed
+ai-collaboration
+parsing
+new-round
+medium
+Frequency
+High
+Last asked
+2026-09-01
+Stage
+onsite-coding
+Requirements
+
+Input: starter code (provided); a text format for workflow definitions; a way to issue refunds (mocked).
+
+Build a workflow engine that:
+
+Parses a text-based workflow definition into executable steps / nodes (the format is open — clarify with the interviewer).
+
+Executes the workflow against a delayed-delivery scenario.
+
+Issues a full or partial refund per the workflow output.
+
+Use an AI coding assistant (Cursor / Copilot / Claude) throughout — encouraged, not just allowed.
+
+Generate AI-authored test cases for the implementation and for the refund follow-up logic. Run them.
+
+Bring your own IDE; you'll screen-share the editor + AI panel.
+
+Notes
+
+Read the starter code first before prompting the AI — many candidates fail by piping the prompt straight into the assistant without understanding the existing scaffolding.
+
+Recommended workflow:
+
+Skim starter code. Identify the entry point, the type definitions, and the mock interfaces.
+
+Ask the assistant to summarize the codebase. Verify the summary is correct.
+
+Implement one workflow step end-to-end with the AI's help; run tests.
+
+Generalize to the parser + executor; iterate.
+
+Ask the AI for test cases; review each before running.
+
+The interviewer is grading velocity, prompt quality, ability to validate AI-generated code, and your reasoning when you accept or reject a suggestion. Don't go silent — narrate why you're accepting a suggestion or asking for a different approach.
+
+Common pitfall: blindly accepting AI-generated tests that pass trivially (e.g. only test the happy path). Always read the AI's test list and call out missing coverage.
+
+The interviewer may interrupt to ask you to switch approaches; this is a stress test of how quickly you can recover with AI help.
+
+Workflow engine design (for the implementation core):
+
+Parser: tokenize the text definition into a sequence of Step objects with type + parameters.
+
+Executor: dispatch each step type to a handler; carry forward a Context object holding accumulated state.
+
+Refund logic: terminal step computes refund fraction; call the mock refund API with an idempotency key.
+
+The workflow definition may be handed to you as a DAG of steps rather than flat text; the engine still reduces to parsing the definition, traversing nodes in dependency order, and dispatching each step to a handler.
+
+Delivery mechanics in recent onsites: the prompt lives in HackerRank, but you copy the scaffold into your local IDE and drive the AI there, confirming each proposed change with the interviewer before letting it run.
+
+Recent production follow-ups: what repeated calls to the refund API would do (idempotency keys make the refund safe to retry) and how to cut user-facing latency (async execution with immediate acknowledgment).
+
+Alternate thin variant — decision-tree refund
+
+A newer MLE VO used the same AI Code Craft framing but described the implementation as a "decision tree refund" task. The exact input contract isn't consistently specified and varies by candidate; treat it as the same refund-workflow family and clarify whether the interviewer expects a tree evaluator, a rule engine, or a text-workflow parser before coding.
+
+Alternate canonical variant — from-scratch refund services
+
+A Q3 2026 onsite variant starts with no scaffold and expects actual HTTP services rather than in-memory classes calling one another. Build a DAG-backed workflow service, an order-fetching service, and a refund-accepting service; run them on separate local ports and demonstrate real endpoint-to-endpoint communication. The exact split has also appeared as two cooperating endpoints, so confirm the required process and port topology before prompting the assistant.
+
+Getting the services running is weighted more heavily than sophisticated DAG logic or an elaborate test suite in this variant. Keep the first pass thin, use the AI assistant for fast plan-and-execute iterations, and inspect enough output to catch integration mistakes without stalling progress. After the basic version works, a product-flavored follow-up may ask what to add next; partial refunds is the recurring extension.
+
+Preparation
+
+Spend a few hours coding in Cursor / Copilot / Windsurf with screen recording enabled. Practice narrating decisions while accepting / rejecting suggestions.
+
+Pre-build a workflow-engine reference project (parser + executor + handler dispatch) so the structure is muscle memory; this round rewards starting fast, not designing from scratch under pressure.
+
+Pre-write prompts you can paste verbatim: "summarize this codebase," "write 5 edge-case tests for the parser," "refactor the executor to handle errors uniformly."
+
+Practice reading AI-generated code in 30 seconds and calling out 1–2 things you would change. The interviewer wants to see this skill.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

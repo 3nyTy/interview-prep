@@ -1,0 +1,53 @@
+===H1===
+Car Maze with Incrementally Revealed Neighbors (DFS)
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/car-maze-incremental-discovery-dfs
+===BODY===
+Waymo
+Coding·45 minMembers
+Car Maze with Incrementally Revealed Neighbors (DFS)
+Phone screen: a car explores a maze toward a goal; at each cell it learns which neighbors are reachable but has no global view. Implement DFS with a visited set to find a path while preventing cycles.
+SWE
+dfs
+graph
+simulation
+easy
+Frequency
+Single report
+Last asked
+2026-03-25
+Stage
+phone-screen
+Requirements
+
+Input: an API exposing current_position(), neighbors(position) (the set of reachable neighbor positions, revealed only at visit time), and is_goal(position).
+
+The map is not given up front — the car only learns connectivity by physically visiting cells.
+
+Output: a path from the start to the goal, or null if no path exists.
+
+Notes
+
+Iterative DFS with a visited set is the canonical solution. Push the start onto a stack; on each pop, check the goal predicate, then push unvisited neighbors. Track the chosen path via a parent map.
+
+Cycle prevention is the only invariant — never revisit a cell. This is the most common Waymo coding-round failure mode (candidates write infinite-loop DFS when neighbors form a back-edge).
+
+Use BFS instead if the interviewer adds 'shortest path' to the requirements; DFS finds a path, not the shortest.
+
+For an unknown / unbounded map, set a step cap (e.g. max_steps = 4 × known_cells_so_far) and treat the API as a black box — surface this as a clarification before coding.
+
+'Backtracking' here means physically retracing steps when the car hits a dead end; if the API requires explicit move(direction) calls, every backtrack costs one API call and shows up in time budget.
+
+Preparation
+
+Drill iterative DFS with explicit stack + parent-map path reconstruction.
+
+Pre-write the API wrapper class (MazeAPI) so you can read the interviewer's prompt and immediately know how to call into it.
+
+Practice the 'when do I use BFS vs DFS' answer: BFS for shortest path on unit-cost edges, DFS for path existence and lower memory footprint.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

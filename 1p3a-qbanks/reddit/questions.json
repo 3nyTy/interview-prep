@@ -1,0 +1,1042 @@
+{
+  "company": "reddit",
+  "display_name": "Reddit",
+  "qbank_count": 28,
+  "questions_scraped": 27,
+  "site_total_count": 74,
+  "oj_count": 26,
+  "external_count": 20,
+  "description": "Reddit's loop runs on a small, slowly-rotating bank of company-specific coding prompts (Tennis Scoring, Report Chain, Chat Message Merge) paired with product-flavored system-design rounds (Game Leaderboard, Live Chat, Notification System). The bar is high on clean OOD and crisp clarification — multi-part prompts are routinely under-scoped on purpose, and rounds end without finishing all parts. Ads and ML Platform orgs add a hiring-manager domain round on top of the standard loop; recent cohorts also report aggressive down-leveling and long team-match limbo after a passing loop.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/reddit",
+  "scraped_at": "2026-09-20",
+  "content_source": "metadata scraped 2026-09-20; statements paywalled",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "tennis-match-scoring",
+      "title": "Tennis Match Scoring",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-07-16",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Free preview",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "object-design",
+        "oop-design",
+        "simulation",
+        "state-machine",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "object-design",
+        "oop-design",
+        "simulation",
+        "state-machine",
+        "medium"
+      ],
+      "overview": "Multi-part object-oriented design problem modeling a tennis match. Implement point / game / set / match scoring rules, then extend to best-of-three / best-of-five formats and run-time queries. The most common Reddit phone-screen prompt.",
+      "overview_teaser": null,
+      "statement_available": true,
+      "source_count": 8,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/tennis-match-scoring"
+    },
+    {
+      "n": 2,
+      "slug": "billing-status-replay",
+      "title": "Billing Status Replay (OOD)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-09-02",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "SWE"
+      ],
+      "tags": [
+        "medium",
+        "oop-design",
+        "object-design",
+        "simulation",
+        "stack",
+        "transactions",
+        "python"
+      ],
+      "roles_slug": [
+        "mle",
+        "swe"
+      ],
+      "tags_slug": [
+        "medium",
+        "oop-design",
+        "object-design",
+        "simulation",
+        "stack",
+        "transactions",
+        "python"
+      ],
+      "overview": null,
+      "overview_teaser": "Rebuild one billing-state object per advertiser by replaying a transaction log in increasing timestamp order, breaking ties by transaction id. Model a BillingStatus class that ingests transactions and...",
+      "statement_available": false,
+      "source_count": 3,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/billing-status-replay"
+    },
+    {
+      "n": 3,
+      "slug": "rate-limiter-open-ended",
+      "title": "Rate Limiter (Open-Ended Coding)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-03-13",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "rate-limiting",
+        "sliding-window",
+        "object-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "rate-limiting",
+        "sliding-window",
+        "object-design",
+        "medium"
+      ],
+      "overview": null,
+      "overview_teaser": "Implement a per-user rate limiter and walk through the design trade-offs interactively. The interviewer leaves the exact algorithm open — sliding window log, sliding window counter, token bucket, leak...",
+      "statement_available": false,
+      "source_count": 2,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/rate-limiter-open-ended"
+    },
+    {
+      "n": 4,
+      "slug": "moderator-list-hierarchy",
+      "title": "Moderator List Hierarchy",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-01-01",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "medium",
+        "parsing",
+        "csv",
+        "hashmap",
+        "simulation",
+        "sorting",
+        "access-control",
+        "moderation",
+        "design-implementation"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "medium",
+        "parsing",
+        "csv",
+        "hashmap",
+        "simulation",
+        "sorting",
+        "access-control",
+        "moderation",
+        "design-implementation"
+      ],
+      "overview": null,
+      "overview_teaser": "Parse newline-delimited, comma-separated action logs to model a Reddit-style moderator hierarchy, where each moderator's effective access timestamp determines their rank and a moderator may remove onl...",
+      "statement_available": false,
+      "source_count": 2,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/moderator-list-hierarchy"
+    },
+    {
+      "n": 5,
+      "slug": "report-chain-org-tree",
+      "title": "Report Chain / Org Tree",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-20",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "tree",
+        "parsing",
+        "tree-traversal",
+        "object-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "tree",
+        "parsing",
+        "tree-traversal",
+        "object-design",
+        "medium"
+      ],
+      "overview": null,
+      "overview_teaser": "Build an organizational reporting hierarchy from a list of (employee, manager) pairs, then answer multi-part queries against it: pretty-print the indented tree, find skip-level pairs, locate an indivi...",
+      "statement_available": false,
+      "source_count": 6,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/report-chain-org-tree"
+    },
+    {
+      "n": 6,
+      "slug": "chat-message-merge",
+      "title": "Chat Message Merge with Windowed API",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-29",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "merge",
+        "sliding-window",
+        "dedup",
+        "two-pointer",
+        "complexity-analysis",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "merge",
+        "sliding-window",
+        "dedup",
+        "two-pointer",
+        "complexity-analysis",
+        "medium"
+      ],
+      "overview": null,
+      "overview_teaser": "Given a provided chat API that returns a window of messages centered on a target message id, implement a class that merges the context windows of an input list of message ids into a single sorted, de-...",
+      "statement_available": false,
+      "source_count": 5,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/chat-message-merge"
+    },
+    {
+      "n": 7,
+      "slug": "product-sense-improve-onboarding",
+      "title": "Product Sense: Improve Reddit Onboarding",
+      "category": "other",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-03-23",
+      "stage": "onsite-bq · onsite-research",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "product-design",
+        "ux",
+        "ambiguity",
+        "open-ended",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "product-design",
+        "ux",
+        "ambiguity",
+        "open-ended",
+        "medium"
+      ],
+      "overview": null,
+      "overview_teaser": "Open-ended product round: pick a part of Reddit's onboarding flow and propose improvements. The interviewer cares about the framework — user segmentation, goal definition, hypothesis generation, measu...",
+      "statement_available": false,
+      "source_count": 1,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/product-sense-improve-onboarding"
+    },
+    {
+      "n": 8,
+      "slug": "admin-action-log-ordering",
+      "title": "Admin Action Log: Order & Permission",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-06-23",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "parsing",
+        "hashmap",
+        "sorting",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "parsing",
+        "hashmap",
+        "sorting",
+        "medium"
+      ],
+      "overview": null,
+      "overview_teaser": "Parse chronological moderator action logs, track active moderators by most-recent promotion time, answer whether one moderator can remove another by seniority, and return the current ranking. The newe...",
+      "statement_available": false,
+      "source_count": 2,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/admin-action-log-ordering"
+    },
+    {
+      "n": 9,
+      "slug": "pseudo-memcached-protocol",
+      "title": "Pseudo-Memcached Protocol Server",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-06-12",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "SWE"
+      ],
+      "tags": [
+        "backend",
+        "networking",
+        "parsing",
+        "in-memory-database",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "swe"
+      ],
+      "tags_slug": [
+        "backend",
+        "networking",
+        "parsing",
+        "in-memory-database",
+        "medium"
+      ],
+      "overview": null,
+      "overview_teaser": "Implement a simplified memcached-style TCP key-value server supporting line-based `get` / `set` commands with byte-count-framed values and a multi-key `get` bonus. Reddit's \"Backend Coding\" round, whi...",
+      "statement_available": false,
+      "source_count": 1,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/pseudo-memcached-protocol"
+    },
+    {
+      "n": 10,
+      "slug": "odd-even-linked-list",
+      "title": "Odd Even Linked List",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-02-14",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "linked-list",
+        "two-pointer",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "linked-list",
+        "two-pointer",
+        "medium"
+      ],
+      "overview": null,
+      "overview_teaser": "Given the head of a singly linked list, group all odd-indexed nodes together followed by the even-indexed nodes (1-based, first node is odd), preserving relative order within each group, and return th...",
+      "statement_available": false,
+      "source_count": 1,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/odd-even-linked-list"
+    },
+    {
+      "n": 11,
+      "slug": "shortest-palindrome",
+      "title": "Shortest Palindrome",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-01-02",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "palindromes",
+        "two-pointer",
+        "hard"
+      ],
+      "roles_slug": [
+        "mle",
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "palindromes",
+        "two-pointer",
+        "hard"
+      ],
+      "overview": null,
+      "overview_teaser": "Given a string, prepend the fewest characters to the front to make it a palindrome and return the result. This is LeetCode 214: the linear-time approach finds the longest palindromic prefix via a KMP ...",
+      "statement_available": false,
+      "source_count": 1,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/shortest-palindrome"
+    },
+    {
+      "n": 12,
+      "slug": "post-comment-ranking-sd",
+      "title": "Post / Comment Ranking System",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-03-23",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "mlsd",
+        "ranking",
+        "recommendation",
+        "feed",
+        "feature-engineering",
+        "inference",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "mlsd",
+        "ranking",
+        "recommendation",
+        "feed",
+        "feature-engineering",
+        "inference",
+        "medium"
+      ],
+      "overview": null,
+      "overview_teaser": "Design a ranking system for posts (subreddit / home feed) or comments (within a post). Covers candidate generation, feature retrieval, online inference, A/B testing, and the cold-start path. The inter...",
+      "statement_available": false,
+      "source_count": 2,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/post-comment-ranking-sd"
+    },
+    {
+      "n": 13,
+      "slug": "word-search",
+      "title": "Word Search",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-03-18",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "medium",
+        "backtracking",
+        "grid",
+        "dfs"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "medium",
+        "backtracking",
+        "grid",
+        "dfs"
+      ],
+      "overview": null,
+      "overview_teaser": "Determine whether a target string can be formed by a path through a 2-D character grid, moving only to horizontally or vertically adjacent cells and reusing no cell. Solved with grid DFS plus backtrac...",
+      "statement_available": false,
+      "source_count": 0,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/word-search"
+    },
+    {
+      "n": 14,
+      "slug": "load-balancer-debugging-and-extension",
+      "title": "Load Balancer Debugging & Extension",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-07-16",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "backend",
+        "code-reading",
+        "debugging",
+        "circuit-breaker",
+        "troubleshooting",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "backend",
+        "code-reading",
+        "debugging",
+        "circuit-breaker",
+        "troubleshooting",
+        "medium"
+      ],
+      "overview": null,
+      "overview_teaser": "Debug and extend a provided load-balancer codebase across four parts: repair failed health checks, diagnose excess latency, add a circuit breaker for unhealthy servers, and replace round-robin routing...",
+      "statement_available": false,
+      "source_count": 1,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/load-balancer-debugging-and-extension"
+    },
+    {
+      "n": 15,
+      "slug": "word-search-ii",
+      "title": "Word Search II",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-03-23",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "trie",
+        "grid",
+        "dfs",
+        "backtracking",
+        "string",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "trie",
+        "grid",
+        "dfs",
+        "backtracking",
+        "string",
+        "hard"
+      ],
+      "overview": null,
+      "overview_teaser": "Given a 2-D character grid and a list of up to 30,000 words, return every word that can be traced along a path of horizontally or vertically adjacent cells, with no cell reused within a single word. T...",
+      "statement_available": false,
+      "source_count": 0,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/word-search-ii"
+    },
+    {
+      "n": 16,
+      "slug": "word-sequence-validation",
+      "title": "Word Sequence Validation",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-09-11",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "codesignal"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "codesignal"
+      ],
+      "overview": null,
+      "overview_teaser": "Validate a supplied word sequence. The examples distinguish a valid single-character transition from a two-character jump and an unchanged adjacent word.",
+      "statement_available": false,
+      "source_count": 1,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/word-sequence-validation"
+    },
+    {
+      "n": 17,
+      "slug": "comment-prediction-mlsd",
+      "title": "Comment-Prediction ML System (will_user_comment_on_posts)",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-06-12",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "mlsd",
+        "ranking",
+        "recommendation",
+        "inference",
+        "feature-engineering",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "mlsd",
+        "ranking",
+        "recommendation",
+        "inference",
+        "feature-engineering",
+        "medium"
+      ],
+      "overview": null,
+      "overview_teaser": "Staff-level MLE system design: build an end-to-end ML system exposing `will_user_comment_on_posts(user_id, [post_ids])` that scores each post by the probability the user would comment, used as a signa...",
+      "statement_available": false,
+      "source_count": 1,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/comment-prediction-mlsd"
+    },
+    {
+      "n": 18,
+      "slug": "feature-store-sd",
+      "title": "ML Feature Store",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-03-23",
+      "stage": "onsite-system-design · onsite-research",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "mlsd",
+        "ml-infra",
+        "feature-engineering",
+        "ranking",
+        "caching",
+        "ci-cd",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "mlsd",
+        "ml-infra",
+        "feature-engineering",
+        "ranking",
+        "caching",
+        "ci-cd",
+        "medium"
+      ],
+      "overview": null,
+      "overview_teaser": "Design a feature store that serves both training pipelines (batch reads, point-in-time correctness) and online inference (low-latency lookups by entity id). Discuss deployment, CI/CD, caching, online/...",
+      "statement_available": false,
+      "source_count": 3,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/feature-store-sd"
+    },
+    {
+      "n": 19,
+      "slug": "video-recommendation-sd",
+      "title": "Video Recommendation",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-03-22",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "SWE"
+      ],
+      "tags": [
+        "system-design",
+        "mlsd",
+        "recommendation",
+        "ranking",
+        "retrieval",
+        "ml-infra",
+        "metrics",
+        "data-engineering",
+        "personalization"
+      ],
+      "roles_slug": [
+        "mle",
+        "swe"
+      ],
+      "tags_slug": [
+        "system-design",
+        "mlsd",
+        "recommendation",
+        "ranking",
+        "retrieval",
+        "ml-infra",
+        "metrics",
+        "data-engineering",
+        "personalization"
+      ],
+      "overview": null,
+      "overview_teaser": "ML system-design round: architect a video recommendation system covering candidate generation, ranking models, and serving. The interviewer pushes hard on the infrastructure side — how services are sp...",
+      "statement_available": false,
+      "source_count": 1,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/video-recommendation-sd"
+    },
+    {
+      "n": 20,
+      "slug": "mle-eda-ctr-notebook",
+      "title": "MLE Live Coding: EDA + Post-Category CTR",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-09-10",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "pandas",
+        "scikit-learn",
+        "feature-engineering",
+        "classification",
+        "ai-allowed",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "pandas",
+        "scikit-learn",
+        "feature-engineering",
+        "classification",
+        "ai-allowed",
+        "medium"
+      ],
+      "overview": null,
+      "overview_teaser": "Live Jupyter notebook session. Load a small post-engagement dataset (per-row reading time across post categories plus a click label), do quick EDA, build a CTR classifier, and discuss model choice and...",
+      "statement_available": false,
+      "source_count": 4,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/mle-eda-ctr-notebook"
+    },
+    {
+      "n": 21,
+      "slug": "game-leaderboard-sd",
+      "title": "Game Leaderboard System Design",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-04-02",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "leaderboard",
+        "ranking",
+        "redis",
+        "sharding",
+        "caching",
+        "scaling",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "leaderboard",
+        "ranking",
+        "redis",
+        "sharding",
+        "caching",
+        "scaling",
+        "medium"
+      ],
+      "overview": null,
+      "overview_teaser": "Design a real-time global game leaderboard that supports score updates and top-K queries for millions of players. The interviewer starts from a single-server skeleton (10 reads / 1 write per second, n...",
+      "statement_available": false,
+      "source_count": 3,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/game-leaderboard-sd"
+    },
+    {
+      "n": 22,
+      "slug": "word-ladder",
+      "title": "Word Ladder (LC 127)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-09-11",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "graph",
+        "codesignal"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "graph",
+        "codesignal"
+      ],
+      "overview": null,
+      "overview_teaser": "Find the length of the shortest single-character transformation sequence from a start word to an end word using a supplied dictionary. The candidate explicitly identified the second phone-screen quest...",
+      "statement_available": false,
+      "source_count": 1,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/word-ladder"
+    },
+    {
+      "n": 23,
+      "slug": "word-ladder-two-char-moves",
+      "title": "Word Ladder with One- or Two-Character Moves",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-07-21",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "bfs",
+        "graph",
+        "string",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "bfs",
+        "graph",
+        "string",
+        "medium"
+      ],
+      "overview": null,
+      "overview_teaser": "Given a dictionary of words and a start and end word, decide whether a transformation path exists where each step changes one or two characters. Variant of classic word ladder with two-character moves...",
+      "statement_available": false,
+      "source_count": 1,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/word-ladder-two-char-moves"
+    },
+    {
+      "n": 24,
+      "slug": "hiring-manager-domain-round",
+      "title": "Hiring-Manager Domain Round",
+      "category": "behavioral",
+      "duration": "45 min",
+      "frequency": "Medium",
+      "last_asked": "2026-01-29",
+      "stage": "onsite-bq · final-round",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "behavioral",
+        "deep-dive",
+        "leadership",
+        "fit",
+        "ads",
+        "ml-infra",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "behavioral",
+        "deep-dive",
+        "leadership",
+        "fit",
+        "ads",
+        "ml-infra",
+        "medium"
+      ],
+      "overview": null,
+      "overview_teaser": "Conversation with the hiring manager that mixes standard behavioral prompts with deep, role-specific domain interrogation. For Ads roles the pivot lands on ad-tech mechanics; for ML Platform it lands ...",
+      "statement_available": false,
+      "source_count": 4,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/hiring-manager-domain-round"
+    },
+    {
+      "n": 25,
+      "slug": "ml-fundamentals-oral",
+      "title": "ML Fundamentals",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-09-10",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "ml-knowledge",
+        "classification",
+        "feature-engineering",
+        "evaluation",
+        "calibration",
+        "verbal",
+        "open-ended"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "ml-knowledge",
+        "classification",
+        "feature-engineering",
+        "evaluation",
+        "calibration",
+        "verbal",
+        "open-ended"
+      ],
+      "overview": null,
+      "overview_teaser": "A fundamentals-heavy ML discussion built around modeling a feature x against a target y, then interpreting a plot of two overlapping class-conditional distributions to reason about separability, Bayes...",
+      "statement_available": false,
+      "source_count": 3,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/ml-fundamentals-oral"
+    },
+    {
+      "n": 26,
+      "slug": "live-chat-system-sd",
+      "title": "Subreddit Live Chat System",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-04-12",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "chat",
+        "websocket",
+        "fan-out",
+        "messaging",
+        "presence",
+        "scaling",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "chat",
+        "websocket",
+        "fan-out",
+        "messaging",
+        "presence",
+        "scaling",
+        "medium"
+      ],
+      "overview": null,
+      "overview_teaser": "Design Reddit's subreddit live-chat product (real-time chat anchored to a subreddit, room sizes ranging from tens to millions during live events). The Super Bowl scenario — fan-out to ~5M concurrent u...",
+      "statement_available": false,
+      "source_count": 3,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/live-chat-system-sd"
+    },
+    {
+      "n": 27,
+      "slug": "notification-system-sd",
+      "title": "Notification System",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-04-12",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "notification",
+        "push-notification",
+        "fan-out",
+        "messaging",
+        "scaling",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "notification",
+        "push-notification",
+        "fan-out",
+        "messaging",
+        "scaling",
+        "medium"
+      ],
+      "overview": null,
+      "overview_teaser": "Design Reddit's notification system: deliver in-app, push, and email notifications for events like replies, mentions, mod actions, and trending posts. Supports per-user preferences, bundling/digesting...",
+      "statement_available": false,
+      "source_count": 3,
+      "url": "https://www.1point3acres.com/interview/problems/company/reddit/notification-system-sd"
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+===H1===
+Maximum Difference Across Connected Components
+===URL===
+https://www.1point3acres.com/interview/problems/company/akunacapital/maximum-difference-connected-components
+===BODY===
+Akuna Capital
+CodingMembers
+Maximum Difference Across Connected Components
+Given an undirected graph by node count and edge list, find each connected component, and return the maximum over components of (largest node id - smallest node id).
+SWE
+graph
+bfs
+union-find
+easy
+Frequency
+Single report
+Last asked
+2026-05-25
+Stage
+oa
+Requirements
+
+Given a graph defined by a node count and an edge list, identify the connected components, and for each component compute the difference between its largest and smallest node value. Return the maximum of these differences across all components.
+
+Signature observed on the HackerRank-style task:
+
+public static int maximumDifference(int gNodes, List<Integer> gFrom, List<Integer> gTo)
+
+Nodes are numbered 1 to gNodes.
+
+Edges are undirected; gFrom[i] connects to gTo[i].
+
+A connected component is a maximal group of nodes linked directly or transitively.
+
+An isolated node forms a component of size 1, whose max-minus-min difference is 0.
+
+Constraints:
+
+1 <= gNodes <= 10^5
+
+1 <= gEdges <= min(10^5, gNodes * (gNodes - 1) / 2)
+
+Examples
+
+For gNodes = 4, gFrom = [1, 2], gTo = [2, 3]:
+
+Nodes 1, 2, 3 form one component; node 4 is isolated.
+
+Component {1, 2, 3} has difference 3 - 1 = 2; component {4} has difference 0.
+
+Answer: 2.
+
+Notes
+
+The node values are the node ids themselves, so each component's difference is simply maxId - minId over its members. Either BFS/DFS over an adjacency list or a union-find keyed by node id works; with up to 10^5 nodes and edges, both are linear. Track min and max id per component as you traverse, or carry (minId, maxId) on each disjoint-set root as you union.
+
+Watch the indexing: nodes are 1-based, so size the adjacency list / parent array to gNodes + 1. Isolated nodes still count as components contributing a difference of 0, so initializing the answer to 0 is safe.
+
+Preparation
+
+Implement both a BFS-component version and a union-find version; for union-find, store (minId, maxId) on each set root.
+
+Test a single fully connected graph, all-isolated nodes, and several disjoint components of different spans.
+
+Drill the 1-based-indexing setup so an off-by-one on the adjacency array does not cost time under the timer.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

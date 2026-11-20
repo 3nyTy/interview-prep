@@ -1,0 +1,60 @@
+===H1===
+MLSD — Image Copyright Violation Detection
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/mlsd-image-copyright-detection
+===BODY===
+Meta
+System Design·45 minMembers
+MLSD — Image Copyright Violation Detection
+Detect whether a user-uploaded image violates copyright. VLM embedding + ANN lookup is the consensus retrieval approach; the interesting depth lives in adversarial robustness and partial-violation follow-ups.
+MLE
+RS
+mlsd
+vlm
+contrastive-learning
+ann
+adversarial
+hard
+Frequency
+Low
+Last asked
+2026-04-24
+Stage
+onsite-system-design
+Requirements
+
+Functional: given a user-uploaded image, decide whether it infringes any image in a copyrighted-image registry.
+
+Pipeline: pretrained VLM (CLIP-style) → image embedding → ANN index over the registry → similarity threshold → ownership check (uploader vs registry owner).
+
+Reported follow-ups (must be ready to answer):
+
+How would you fine-tune the VLM? (Contrastive learning on copyright-positive pairs, hard-negative mining.)
+
+What if the user uploads a 3×3 collage where only one cell infringes? (Image segmentation / region proposals → per-region embedding; or upstream object/region detector before similarity check.)
+
+What about adversarial text overlaid on the image? (Contrastive training with adversarial augmentations; OCR-aware preprocessing.)
+
+Original is copyrighted, but the user took a phone photo of it — still infringing? (Define legal scope with PM/legal; if yes, training data must include re-photographed pairs as positives.)
+
+Operational: registry update pipeline, model-confidence-based human review, per-region thresholds.
+
+Notes
+
+The candidate who reported this prompt is from search/ads MLE background; the interviewer kept pushing for a single-model solution after the candidate proposed a segmentation + similarity two-model design. Be ready to defend a single-model approach (e.g., a VLM that outputs region-aware embeddings).
+
+Adversarial robustness is the second-half emphasis — don't spend all the budget on the base similarity pipeline.
+
+Preparation
+
+Memorize a CLIP-fine-tuning + ANN retrieval template.
+
+Prep a 60-second pitch on contrastive learning with adversarial augmentations.
+
+Practice scoping with the interviewer: which infringement types count (exact, transformed, partial, re-captured)?
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,46 @@
+===H1===
+Flatten a Multilevel Doubly Linked List (Skip Empty Nodes)
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/flatten-multilevel-list-skip-empty-nodes
+===BODY===
+ByteDance / TikTok
+CodingMembers
+Flatten a Multilevel Doubly Linked List (Skip Empty Nodes)
+LC 430 (Flatten a Multilevel Doubly Linked List) with one delta: nested nodes carry empty values and must be excluded from the flattened output. Asked alongside a binary-tree max-path-sum question in the same IC round.
+SWE
+linked-list
+dfs
+medium
+Frequency
+Single report
+Last asked
+2026-07-17
+Stage
+onsite-coding
+Requirements
+
+Flatten a multilevel doubly linked list — nodes carry prev / next pointers plus a child pointer to a nested sub-list — into a single-level doubly linked list. Per the candidate, the base problem is the canonical LC 430 unchanged.
+
+Variant twist: the nested nodes carry an empty value, and empty-valued nodes must be excluded from the flattened result while the structure reachable through them is preserved.
+
+Notes
+
+The empty-node exclusion is the only delta from the canonical LC 430 problem.
+
+The exclusion breaks the memorized splice template: skipping a node mid-splice is where dangling prev / next pointers creep in, so decide up front whether you filter during the flatten or in a second pass.
+
+Clarify at the start exactly which nodes can be empty — in this variant, emptiness co-occurs with nesting, and that assumption changes how you stitch the sub-list back in.
+
+The same IC-led round pairs this with the binary-tree maximum-path-sum problem (DFS plus DP), so budget time for two problems.
+
+Preparation
+
+Re-implement the canonical multilevel flatten from scratch (iterative with a stack, then recursive), verifying prev / next symmetry with a list printer.
+
+Add a value filter to your template and re-test around the edge cases: excluded head, excluded tail, and consecutive excluded nodes.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,44 @@
+===H1===
+Basic Calculator with Postfix Notation
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/postfix-basic-calculator
+===BODY===
+Amazon
+Coding·45 minMembers
+Basic Calculator with Postfix Notation
+Implement a basic calculator for postfix notation. Details on operators, integer division, unary negatives, and invalid-token handling are thin, so clarify the grammar before coding.
+SWE
+stack
+parsing
+medium
+Frequency
+Single report
+Last asked
+2026-07-02
+Stage
+onsite-coding
+Requirements
+
+Input: an arithmetic expression in postfix / reverse Polish notation.
+
+Use a stack: push operands; when an operator arrives, pop the required operands, compute, and push the result.
+
+Clarify the operator set (+, -, *, /), integer vs floating division, negative numbers, whitespace / tokenization, and invalid expression handling.
+
+Notes
+
+This is the classic stack-evaluator shape, but the available prompt detail does not include a full grammar or sample expression. Do not assume LeetCode-style truncating division unless the interviewer confirms it.
+
+For binary operators, operand order matters: if the stack pops right then left, compute left op right.
+
+Preparation
+
+Write a reverse-Polish evaluator from scratch, including explicit invalid-token and too-few-operands checks.
+
+Practice explaining the tokenization contract before implementation: space-delimited tokens, signed integers, and division semantics.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

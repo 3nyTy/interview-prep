@@ -1,0 +1,56 @@
+===H1===
+Chairs / Restaurant Order Simulation
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/chairs-restaurant-simulation
+===BODY===
+Goldman Sachs
+Coding·60 minMembers
+Chairs / Restaurant Order Simulation
+Given a sequence of customer / chair events (`C`, `R`, `U`, `L`), simulate the chairs required to seat every customer. The OA-bank version of an order-simulation problem Goldman has recycled across cycles.
+SWE
+simulation
+string
+medium
+Frequency
+Single report
+Last asked
+2024-10-26
+Stage
+oa
+Requirements
+
+For each input string, walk through the characters and track two counters: total chairs ever owned, and chairs currently available for reuse. The character semantics are:
+
+C (customer arrives): if a chair is available, reuse it (available--); otherwise buy a new one (total++).
+
+R (customer leaves): if any chairs exist, return one to the available pool (available++).
+
+U: behaves like C — seat a customer.
+
+L: behaves like R — release a chair back to the pool.
+
+Return the final total chairs for each string in the input array.
+
+public static List<Integer> calculateChairs(String[] arr)
+
+Notes
+
+Pure single-pass simulation; O(total length) time, O(1) extra space per string.
+
+The C / U and R / L symmetry suggests the original problem framed C/R and U/L as two different event types (e.g. two seating zones) — be ready for a follow-up that introduces a third zone.
+
+The common solution treats C and U identically; if an interviewer expects per-zone accounting, ask before writing.
+
+Edge cases: empty string returns 0; an R or L when there is nothing to release is a no-op, not an error.
+
+Preparation
+
+Implement once treating all four characters as one combined zone; then refactor with Map<Char, Counter> so a third zone is one line away. Interviewers often ask for the more general form as a follow-up.
+
+This is a state-simulation pattern; warm up with LC "Robot Bounded In Circle" (LC 1041) or "Asteroid Collision" (LC 735) for the same mental model.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

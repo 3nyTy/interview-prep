@@ -1,0 +1,201 @@
+===H1===
+Implement an Image Filter
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/implement-an-image-filter
+===BODY===
+Apple
+Coding·20 minMembers
+Implement an Image Filter
+This is a recent Apple onsite ML Coding round (Round 3, 20 minutes of coding after 20 minutes of project plus ML fundamentals).
+MLE
+medium
+numpy
+pillow
+grid
+Frequency
+Single report
+Last asked
+2025-12-02
+Stage
+phone-screen
+Problem Overview
+
+implement an image filter from scratch. What the interviewer means in practice is 2D convolution, the primitive behind blur, sharpen, edge detection, and every conv layer in a CNN.
+
+They want to see:
+
+You understand that filtering an image is a sliding weighted sum between the image and a small kernel.
+
+You can handle the mechanics correctly: kernel flipping (convolution vs. cross-correlation), padding, stride, and boundaries.
+
+You can write a clean NumPy implementation in 20 minutes, and then explain how to make it fast (vectorized, im2col, or FFT).
+
+You know a few standard kernels by heart (box blur, Gaussian, Sobel).
+
+It is a shared-editor round. You do not need to import scipy.signal.convolve2d or cv2.filter2D. The point is to write the inner loop.
+
+Clarify Before Coding
+
+Convolution or cross-correlation? Mathematically, convolution flips the kernel; cross-correlation does not. Most ML / CV libraries (PyTorch, TensorFlow, OpenCV filter2D) actually compute cross-correlation and call it convolution. Ask which one is wanted. For symmetric kernels (Gaussian, box) the distinction does not matter.
+
+Grayscale or multi-channel? (H, W) vs. (H, W, C). Handle both, or at minimum handle grayscale cleanly and say how to extend.
+
+Padding. valid (no padding, output shrinks), same (zero-pad so output matches input), or reflect / replicate? Default to same with zero padding; mention alternatives.
+
+Stride. Usually 1 for a filter. Non-trivial strides turn this into a downsampling op.
+
+Kernel shape. Square and odd (3x3, 5x5) is the common case. Odd sizes give a well-defined center.
+
+Data type and range. uint8 images need to be cast to float for the multiply-accumulate, and clipped back to [0, 255] after. Do not convolve on uint8 directly.
+
+Settle these in under a minute and start coding.
+
+Baseline: Nested-Loop Cross-Correlation
+
+The most direct implementation. Slow, but obviously correct, and small enough to type from memory:
+
+import numpy as np
+
+def filter2d(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
+    """
+    Apply a 2D filter (cross-correlation) to a grayscale image with zero padding
+    so the output matches the input shape.
+
+    image:  (H, W) float array
+    kernel: (kH, kW) float array, odd dimensions
+    """
+    h, w = image.shape
+    kh, kw = kernel.shape
+    assert kh % 2 == 1 and kw % 2 == 1, "kernel must have odd dimensions"
+
+    pad_h, pad_w = kh // 2, kw // 2
+    padded = np.pad(image, ((pad_h, pad_h), (pad_w, pad_w)), mode="constant")
+    out = np.zeros_like(image, dtype=float)
+
+    for i in range(h):
+        for j in range(w):
+            region = padded[i : i + kh, j : j + kw]
+            out[i, j] = (region * kernel).sum()
+
+    return out
+
+Things to call out while writing this:
+
+np.pad with mode="constant" is zero padding. mode="reflect" or "edge" avoids darkening the borders and is what most photo tools use.
+
+This is cross-correlation. For true convolution, flip the kernel first: kernel = kernel[::-1, ::-1].
+
+For multi-channel images, apply the same kernel independently per channel: loop over the last axis, or use np.stack([filter2d(img[..., c], kernel) for c in range(img.shape[-1])], axis=-1).
+
+Complexity: O(H * W * kH * kW) time, O(H * W) memory. For a 1024x1024 image and a 5x5 kernel, that is ~26M multiplies. Pure Python loops over pixels will be too slow; NumPy helps some because the inner (region * kernel).sum() is vectorized, but the outer H * W Python loop is still the bottleneck.
+
+Faster: Vectorized via sliding_window_view
+
+numpy.lib.stride_tricks.sliding_window_view gives you all kH x kW patches as a single (H, W, kH, kW) view without copying. Multiply by the kernel and sum over the last two axes:
+
+from numpy.lib.stride_tricks import sliding_window_view
+
+def filter2d_vectorized(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
+    kh, kw = kernel.shape
+    pad_h, pad_w = kh // 2, kw // 2
+    padded = np.pad(image, ((pad_h, pad_h), (pad_w, pad_w)), mode="constant")
+    patches = sliding_window_view(padded, (kh, kw))      # (H, W, kH, kW)
+    return (patches * kernel).sum(axis=(-2, -1))
+
+Same math, no Python-level loops, typically 50-100x faster on a single image. The (patches * kernel) broadcast materializes a (H, W, kH, kW) array, so memory goes up by a factor of kH * kW. For small kernels this is fine.
+
+The im2col Trick (for the Follow-Up)
+
+Deep learning frameworks implement convolution as im2col + matrix multiply. Unroll every kH x kW patch into a row, stack into (H*W, kH*kW), flatten the kernel to (kH*kW,), and the filtered image is the matrix-vector product reshaped back to (H, W):
+
+def filter2d_im2col(image, kernel):
+    kh, kw = kernel.shape
+    pad_h, pad_w = kh // 2, kw // 2
+    padded = np.pad(image, ((pad_h, pad_h), (pad_w, pad_w)), mode="constant")
+    patches = sliding_window_view(padded, (kh, kw))      # (H, W, kH, kW)
+    cols = patches.reshape(-1, kh * kw)                  # (H*W, kH*kW)
+    return (cols @ kernel.ravel()).reshape(image.shape)
+
+For multi-channel images and multiple output channels this generalizes to a full GEMM, which is why GPUs are so fast at it. Worth mentioning even if you do not write it out, because it shows you know why conv layers hit peak FLOPs on hardware.
+
+Standard Kernels to Know
+
+Have at least these memorized:
+
+# 3x3 box blur (normalized)
+box = np.ones((3, 3)) / 9.0
+
+# 3x3 Gaussian approximation (sigma ~= 1)
+gauss = np.array([
+    [1, 2, 1],
+    [2, 4, 2],
+    [1, 2, 1],
+], dtype=float) / 16.0
+
+# Sobel edge detection (horizontal gradient)
+sobel_x = np.array([
+    [-1, 0, 1],
+    [-2, 0, 2],
+    [-1, 0, 1],
+], dtype=float)
+
+# Sobel vertical
+sobel_y = sobel_x.T
+
+# Sharpen (identity + high-pass)
+sharpen = np.array([
+    [ 0, -1,  0],
+    [-1,  5, -1],
+    [ 0, -1,  0],
+], dtype=float)
+
+Edge magnitude is sqrt(filter2d(img, sobel_x)**2 + filter2d(img, sobel_y)**2). If they give you a specific filter to implement (Sobel is the most common), write the kernel and call your filter2d.
+
+Separable Kernels
+
+A Gaussian (and a box blur) is separable: the 2D kernel factors into an outer product of two 1D kernels. Convolving with the row kernel then the column kernel gives the same result at O(H * W * k) instead of O(H * W * k^2):
+
+# 1D Gaussian
+g1d = np.array([1, 2, 1], dtype=float) / 4.0
+
+def separable_filter(image, g1d):
+    # horizontal pass
+    tmp = filter2d_vectorized(image, g1d[np.newaxis, :])
+    # vertical pass
+    return filter2d_vectorized(tmp, g1d[:, np.newaxis])
+
+For a 5x5 Gaussian this is ~2.5x faster; for 15x15 it is ~7.5x. Good thing to mention as an optimization even if you do not implement it.
+
+Putting It Together
+
+A minimal end-to-end example you can talk through at the end:
+
+def apply_filter(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
+    img_f = image.astype(float)
+    if img_f.ndim == 2:
+        out = filter2d_vectorized(img_f, kernel)
+    else:
+        # (H, W, C): filter each channel independently
+        out = np.stack(
+            [filter2d_vectorized(img_f[..., c], kernel) for c in range(img_f.shape[-1])],
+            axis=-1,
+        )
+    return np.clip(out, 0, 255).astype(image.dtype)
+
+Cast up to float, filter, clip, cast back. Without the clip you get overflow wrap-around on uint8, which produces the classic "neon" artifacts. Mentioning the cast and clip out loud is a free signal that you have done this before.
+
+Complexity Summary
+
+ApproachTimeMemoryNotes
+Nested Python loopsO(H_W_kH*kW)O(H*W)Baseline, correct, slow
+sliding_window_view + multiplyO(H_W_kH*kW)O(H_W_kH*kW)Same ops, vectorized
+im2col + matmulO(H_W_kH*kW)O(H_W_kH*kW)Same ops, hits BLAS
+Separable 1D passesO(H_W_k)O(H*W)Works when kernel factors
+FFTO(H_W_log(H*W))O(H*W)Wins for very large kernels
+
+For a 20-minute round, write the baseline first, then replace the double loop with sliding_window_view if time allows. If the interviewer pushes on performance, talk through im2col and separability before they ask.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

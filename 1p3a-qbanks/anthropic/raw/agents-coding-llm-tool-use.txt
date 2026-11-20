@@ -1,0 +1,104 @@
+===H1===
+Agents / Coding with LLMs
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/agents-coding-llm-tool-use
+===BODY===
+Anthropic
+Coding·55 minMembers
+Agents / Coding with LLMs
+Research-track 1-of-N option: write code in Colab that uses an LLM (via the Anthropic API) as a building block — designing prompts and a tool-use loop to solve a multi-step problem. Open-book on documentation; starter API code is supplied so you don't memorize syntax.
+SWE
+RE
+RS
+MLE
+llm
+agents
+tool-use
+prompt-engineering
+colab
+medium
+Frequency
+High
+Last asked
+2026-09-04
+Stage
+phone-screen · tech-screen
+Requirements
+
+The recruiter blurb is explicit:
+
+"This interview will test writing code with LLMs as a building block, and prompting to create an agent. You should be conceptually familiar with Tool Use and Agents and how they are handled in our API. The interview is open-book and we provide starter code for using the API, so there's no need to memorize exact API syntax."
+
+Reported shape:
+
+Colab notebook, 55 minutes on Google Meet, share-screen.
+
+Starter cell wraps the Messages API and the tool-use schema.
+
+The task itself is open-ended — design prompts for an agent that plans a small workflow, defines its own tools, and demonstrates progress on a concrete input. Specific tasks have not been described in detail publicly.
+
+Reported task — stock-price agent
+
+One concrete instance: the starter code answers stock-price questions that need only a single tool call, and you extend it into an agent loop that handles questions requiring multi-step reasoning / multiple tool calls. A second part asks you to reduce the number of turns the agent needs to reach an answer — partly a prompt-engineering exercise, partly a test of how you structure the loop.
+
+A closely related three-part variant scores the progression explicitly: repair the supplied bugs until the agent works, make it answer the full question set within two turns, then compress the workflow to one turn. This round now also appears in standard SWE phone screens, not just the research-track menu: the portal may list only "coding interview" with no Q-number, and the recruiter blurb names Tool Use and Agent Loops as the prep target.
+
+AI-assisted pull-request review variant
+
+Use the supplied browser-based VS Code-like editor, GitHub-like site, and Claude Code to inspect four pull requests.
+
+First explain the problem each pull request solves and comment on each change.
+
+Then choose one pull request, improve its implementation, and update the pull request.
+
+The supplied repository is TypeScript in this variant; the interviewer does not allow changing the language.
+
+Notes
+
+Open-book on docs, no AI assistants beyond the supplied API. Screen-share lets the interviewer watch how you iterate on prompts.
+
+Publicly available detail is thin because the round only goes to research-adjacent candidates who self-select it. Treat this card as a structural overview, and re-check forum closer to the interview date for fresh task-specific writeups.
+
+AI-assisted coding variant (Claude Code CLI)
+
+A distinct rotation reframes this round from building an agent to coding with one. The recruiter blurb:
+
+"This interview will evaluate your ability to write and review code using AI tools. You'll have access to the Claude Code CLI, and are allowed [to] search things up on Google, Stack Overflow, etc. You'll work on some practical engineering tasks in a browser-based environment that is similar to Visual Studio Code + GitHub. No account setup is required in advance."
+
+Here AI assistance is the point, not a banned tool — you drive the Claude Code CLI to complete and review practical engineering tasks in a hosted VS Code-like environment, and you are graded on how effectively you delegate, verify, and review AI-written code. This contrasts sharply with the standard live-coding rounds where assistants are forbidden. Task specifics are not public yet; treat it as a code-review plus agentic-workflow exercise rather than a from-scratch algorithm round, and practice reading and correcting AI-generated diffs quickly.
+
+The 55-minute preparation scope is unusually explicit:
+
+LLM API mechanics: chat/messages roles, system and user prompts, images, token limits, reasoning effort, prompt caching, and latency metrics such as time-to-first-token and time-to-last-token.
+
+Agent execution: agents and subagents, permission prompts, background tasks, and common control-loop failure modes.
+
+Tools: tool use, parallel and strict tool use, web search, memory, bash, computer use, tool search, programmatic tool calling, and MCP.
+
+Safety and reliability: hallucinations, jailbreaks, refusals, and unintended actions. Deep ML internals such as PyTorch, linear algebra, and KV-cache implementation are explicitly out of scope.
+
+AI-assisted repository execution
+
+The hosted environment can start from a completely unfamiliar repository and present roughly four pull-request-sized tasks. The point is not to recognize the language instantly; it is to inspect each change, direct Claude Code toward concrete fixes, and verify the result before moving on.
+
+Time pressure is severe: finishing two changes and reviewing a third can consume the full session. Triage the understandable changes first, but reserve time to run tests and close the loop on every change you claim as complete.
+
+September 2026 clarification for the AI-assisted variant: the task is explicitly split into reviewing all four pull requests, then improving one. The broad repository-execution description above should not be read as requiring implementation work on every pull request. TypeScript may be fixed even when it is not your preferred language.
+
+Preparation
+
+Run through Anthropic's public tool-use cookbook end-to-end at least once: define a tool, route the assistant's tool_use turns back to your code, return tool_result blocks, iterate.
+
+Practice writing an agent loop from a blank Colab in under 20 minutes: parse the response, dispatch tool calls, stop on end_turn.
+
+Have a mental template for prompt structure: role description, tool catalog summary, output contract, exit condition. Be ready to refactor mid-round when the interviewer pushes on robustness or eval criteria.
+
+In a 20-minute drill, inspect four small TypeScript pull requests and write a short problem statement plus one concrete review comment for each before choosing an implementation change.
+
+In a separate 20-minute drill, improve one selected pull request with the supplied assistant, inspect the resulting diff, and run a focused check of the behavior you changed; summarize the fix and any unresolved issue.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,82 @@
+===H1===
+Todo List Full-Stack System Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/todo-list-full-stack-system-design
+===BODY===
+Microsoft
+System DesignMembers
+Todo List Full-Stack System Design
+Design a todo-list application with create-list, task CRUD, viewing, ordering, authentication / authorization, cache behavior, API versioning, service-to-service auth, and a 500 requests-per-second user-load follow-up.
+SWE
+fullstack
+backend
+access-control
+rate-limiting
+caching
+versioning
+medium
+Frequency
+Single report
+Last asked
+2026-06-21
+Stage
+onsite-system-design
+Requirements
+
+Design a todo-list service with these functional requirements:
+
+Create a list.
+
+Add tasks to a list.
+
+View tasks.
+
+Update tasks.
+
+Delete tasks.
+
+Non-functional and follow-up constraints surfaced during the round:
+
+A single user can generate about 500 requests per second; decide whether to absorb this with rate limiting, caching, request coalescing, or a mix.
+
+Lists need a stable ordering model so the client can render tasks predictably and update positions without corrupting concurrent edits.
+
+APIs are REST-shaped and include a path version such as /v1/...; explain what versioning protects and how backward compatibility is handled.
+
+The design must distinguish user authentication from authorization and also handle authentication between internal services.
+
+Cache design must account for stale data and invalidation after task updates / deletes.
+
+Notes
+
+A compact design that covers the expected axes:
+
+API shape: POST /v1/lists, POST /v1/lists/{list_id}/tasks, GET /v1/lists/{list_id}/tasks, PATCH /v1/tasks/{task_id}, DELETE /v1/tasks/{task_id}.
+
+Data model: lists(id, owner_id, name, created_at) and tasks(id, list_id, title, status, position, updated_at). Add an ACL or sharing table if collaboration is in scope.
+
+AuthN vs AuthZ: authentication proves who the caller is (session token / OAuth / JWT); authorization decides whether that caller can read or mutate a particular list. Keep the resource ownership check server-side, not in the client.
+
+Ordering: use a persisted position field. For simple rounds, integer positions plus periodic reindexing are enough; for collaborative reorder-heavy lists, use fractional ranks so moving an item only rewrites that task.
+
+High request rate: put per-user rate limits at the API gateway, use idempotency keys for mutating endpoints, and cache read-heavy GET responses. If a single user sends 500 RPS of writes, throttle rather than trying to scale writes indefinitely.
+
+Caching: cache task-list reads by (user_id, list_id, version), invalidate or bump the list version after any write, and set a short TTL as a fallback against missed invalidations. The core bug to call out is stale task order after an update.
+
+Service-to-service auth: use mTLS or signed service tokens with scoped claims; do not forward end-user bearer tokens blindly across every internal hop.
+
+Preparation
+
+Be ready to draw the API + schema first; the prompt is small enough that missing resource ownership checks stands out.
+
+Practice explaining authentication vs authorization in one minute, then apply it to list ownership and shared-list permissions.
+
+Have a cache invalidation story tied to list versioning; "just use Redis" is not enough.
+
+For the 500-RPS follow-up, separate read bursts from write bursts and explicitly choose rate limiting for abusive per-user write traffic.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

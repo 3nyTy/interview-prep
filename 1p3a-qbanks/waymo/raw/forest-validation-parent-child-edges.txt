@@ -1,0 +1,44 @@
+===H1===
+Validate a Forest from (parent, child) Edges
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/forest-validation-parent-child-edges
+===BODY===
+Waymo
+Coding·45 minMembers
+Validate a Forest from (parent, child) Edges
+Phone screen: given a graph described as a list of (parent, child) edges, decide whether it forms a valid forest (a disjoint set of trees). The candidate must design their own test cases. The whole round is conducted under screen-share as an anti-cheat measure.
+SWE
+graph
+union-find
+cycle-detection
+testing
+medium
+Frequency
+Single report
+Last asked
+2026-06-04
+Stage
+phone-screen
+Requirements
+
+Input: a graph given as a list of (parent, child) directed edges.
+
+Output: whether the graph is a valid forest — i.e. a collection of one or more disjoint trees.
+
+The candidate is expected to design their own test cases as part of the round.
+
+Notes
+
+What makes a forest. Every node has at most one parent, there are no cycles, and the structure splits into one or more disjoint trees (no shared subtrees / no node reachable via two parents). A single tree is a valid forest; an empty graph is an edge case to clarify.
+
+Two checks. (1) In-degree: any node appearing as a child more than once means it has multiple parents → reject. (2) Acyclicity / single-component-per-root: a back edge among the (parent, child) relations means a cycle → reject. Union-find (reject when two endpoints already share a root) or a DFS/coloring cycle check both work; union-find also naturally counts the disjoint trees.
+
+Test cases to design. Single tree; two disjoint trees; a node with two parents; a self-loop (a, a); a longer cycle a→b→c→a; a duplicate edge; and the empty input. Volunteering these without prompting is part of the grade.
+
+Logistics. The session runs entirely under screen-share for anti-cheat, so think aloud and keep the code on screen — no off-screen scratch work.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

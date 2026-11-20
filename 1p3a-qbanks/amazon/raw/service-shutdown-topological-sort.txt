@@ -1,0 +1,82 @@
+===H1===
+Service Shutdown / Topological Sort
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/service-shutdown-topological-sort
+===BODY===
+Amazon
+Coding·45 minMembers
+Service Shutdown / Topological Sort
+Amazon has many services with dependencies; some are shut down. Return the full set of services that become unavailable, including transitive consumers. Equivalent to Course Schedule II / Kahn topological propagation.
+SWE
+MLE
+graph
+bfs
+topological-sort
+medium
+Frequency
+High
+Last asked
+2026-08-16
+Stage
+onsite-coding · phone-screen
+Requirements
+
+Input: a dependency graph (interviewer expects you to choose the representation — hashmap<service, list<dependents>> is the common pick).
+
+Input is guaranteed acyclic; confirm this explicitly with the interviewer before coding.
+
+A seed set of services is shut down. Return every service that depends, directly or transitively, on a shut-down service.
+
+Course Schedule follow-ups: return one valid course order; if a cycle exists, return the courses on that cycle.
+
+Examples
+
+With edges (consumer → dependency):
+
+A -> B
+C -> B
+D -> C
+
+Shutting down B should return {A, C, D} (D depends on C, which depends on B).
+
+Notes
+
+Two acceptable approaches: reverse-direction BFS/DFS from the shutdown set, or full Kahn's algorithm propagating an "affected" flag. Both are O(V + E); pick whichever you explain more cleanly.
+
+Interviewers grade clarification: ask about input format, cycle possibility, duplicates, and whether the seed services themselves should be in the output.
+
+Even though A -> B notation is common, the prompt may give you reversed adjacency. Re-derive the representation from the example before writing the loop.
+
+Both Kahn's BFS (repeatedly pop zero-indegree nodes) and DFS post-order reverse give O(V+E) time and O(V+E) space. Kahn doubles as the cycle detector — if the emitted order is shorter than V, the graph has a cycle. Volunteer this even when the prompt says the graph is acyclic; it shows you understand the algorithm's structural property.
+
+To return actual cycle membership, use tri-color DFS with parent pointers and reconstruct from the first back edge, or use strongly connected components if every cyclic course is required. Kahn's un-emitted residual is only proof of a cycle; it can also contain acyclic nodes blocked downstream of that cycle.
+
+The reverse-BFS-from-the-shutdown-set variant only touches the affected subgraph, so it is O(affected + edges from affected). When the shutdown set is small relative to the full graph, this is meaningfully faster than running full Kahn and filtering.
+
+Common bug: building the adjacency list in the wrong direction. If the input is (consumer, dependency) pairs and the question asks "who breaks when X goes down," you need edges dependency -> consumer. Re-derive the direction from the worked example before writing the loop.
+
+Preparation
+
+Solve LeetCode 207 (Course Schedule) and 210 (Course Schedule II) until both Kahn and DFS variants are second nature.
+
+Practice a 60-second clarification script: representation, direction, cycles, duplicates, output format, edge cases (empty seed, all-shutdown).
+
+Prepare an OOD-style restatement: define a Service class with name and depends_on, plus a shutdown(services) method that returns the affected set.
+
+Layered drill: (1) write Kahn from scratch on a 4-node adjacency list in 5 minutes; (2) write the recursive DFS post-order variant with a visiting / visited tri-color marker for cycle detection; (3) implement the reverse-BFS-from-seed variant and benchmark how much smaller the touched set is.
+
+Practice the 60-second clarification opener as a script: "Edge direction? Cycles guaranteed absent? Are seed services themselves in the output? Duplicates in input? Empty seed?"
+
+Canonical "Course Schedule" framing
+
+The same skill surfaces in the textbook Course Schedule phrasing: given n courses and prerequisites[i] = [a, b] (take a only after b), decide whether all courses can be finished — i.e. whether the directed prerequisite graph is acyclic. Kahn's indegree-queue (emit fewer than n nodes ⇒ a cycle exists) is the expected answer.
+
+In VO shorthand this may be introduced simply as "topological sort" rather than a full service-shutdown story. Ask for the graph direction, output target, and whether the interviewer wants ordering, reachability, or cycle detection before choosing BFS / DFS / Kahn.
+
+A recurring interviewer behavior in this framing: after you code it, you are asked "is there another approach?" and then pressed repeatedly on whether your traversal is BFS or DFS — a queue processed level-by-level is BFS; do not let "Are you sure?" prompts talk you into mislabeling it DFS. Finish by stating O(V + E) time and walking a small example by hand.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

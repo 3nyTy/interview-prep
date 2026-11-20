@@ -1,0 +1,61 @@
+===H1===
+Piano Keys: Vanilla UI Interaction
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/piano-keys-vanilla-ui
+===BODY===
+Roblox
+CodingMembers
+Piano Keys: Vanilla UI Interaction
+Build six on-screen piano keys in vanilla HTML, CSS, and JavaScript. Mouse and keyboard presses must independently control held-state styling, multiple keys must work simultaneously, and unrelated keyboard input must have no effect.
+SWE
+frontend
+javascript
+dom
+medium
+Frequency
+Single report
+Last asked
+2026-08-17
+Stage
+phone-screen
+Requirements
+
+Render six piano keys labeled C, D, E, F, G, and A using only vanilla HTML, CSS, and JavaScript; frameworks and third-party libraries are not allowed.
+
+A piano key must receive the provided .key.active style while the left mouse button is held down over it, then lose that state immediately on release.
+
+Holding the physical keyboard keys c, d, e, f, g, or a must activate the matching on-screen key; releasing each physical key must deactivate its match.
+
+Support multiple simultaneous key presses. Each key's state must remain independent until that specific input is released.
+
+Ignore keyboard input outside the six supported letters.
+
+Examples
+
+Holding c and e together activates both the C and E elements. Releasing either input removes only that key's active state.
+
+Pressing k, Enter, or an arrow key causes no visible change.
+
+Notes
+
+The exercise explicitly forbids frameworks and third-party libraries.
+
+Held-state behavior matters: activation begins on press and ends on release, rather than toggling permanently on click.
+
+Treat simultaneous keyboard events as independent state changes; a single global active key cannot satisfy the contract.
+
+Keep keyboard-held and mouse-held notes in separate sets, then render a key as active when either set contains it. This prevents one input method's release from clearing a hold that is still active through the other method.
+
+Make repeated keydown events idempotent, and handle mouse release outside the original element so a key cannot remain visually stuck.
+
+Preparation
+
+Implement the widget once in 20 minutes with two held-note sets and one renderKey(note) function; do not use a framework or third-party event helper.
+
+Run a four-case event checklist: an unrelated key, a two-key chord, mouse and keyboard holding the same note, and a mouse release outside the pressed element.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

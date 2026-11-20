@@ -1,0 +1,41 @@
+===H1===
+Insert Interval (LC 57)
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/insert-interval
+===BODY===
+Apple
+CodingMembers
+Insert Interval (LC 57)
+Given a sorted list of pairwise non-overlapping intervals and one new interval, insert the new interval, merge any overlaps, and return the sorted non-overlapping result. The Apple round used the canonical LC 57 problem; an Apple-specific modification or follow-up was not disclosed.
+SWE
+medium
+interval
+Frequency
+Single report
+Last asked
+2026-07-28
+Stage
+phone-screen
+Requirements
+
+You are given a list of pairwise non-overlapping closed intervals sorted by start value and one new closed interval. Insert the new interval, merge every overlap, and return the intervals sorted by start value with no overlaps remaining.
+
+Treat intervals that share an endpoint as overlapping. The Apple-specific follow-up was not disclosed.
+
+Notes
+
+Use one linear pass over the already-sorted input: append intervals that end before the new interval starts, expand the new interval across every overlap, append the merged interval, then append the untouched suffix. Each original interval is examined once, so the time complexity is O(n) with O(1) auxiliary space apart from the output.
+
+Preparation
+
+Implement the one-pass solution without re-sorting the combined input.
+
+Dry-run empty input, insertion before or after every interval, endpoint-touching intervals, and a new interval that contains several existing intervals.
+
+Explain the loop invariant for the untouched prefix, the active merged interval, and the untouched suffix.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

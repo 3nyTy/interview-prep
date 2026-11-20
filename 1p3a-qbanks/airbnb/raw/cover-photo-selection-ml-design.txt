@@ -1,0 +1,67 @@
+===H1===
+Improve Booking via Cover Photo Selection (ML Design)
+===URL===
+https://www.1point3acres.com/interview/problems/company/airbnb/cover-photo-selection-ml-design
+===BODY===
+Airbnb
+System Design·60 minMembers
+Improve Booking via Cover Photo Selection (ML Design)
+Pick the cover photo for each listing to maximize click-through and booking. Open-ended ML design — the candidate drives the framing.
+MLE
+mlsd
+ranking
+ab-testing
+evaluation
+vlm
+medium
+Frequency
+Single report
+Last asked
+2026-04-17
+Stage
+onsite-system-design
+Requirements
+
+Functional
+
+For each listing with >= 5 photos, choose the cover photo shown on the search results page.
+
+Optimize for click-through to the listing page; secondary for booking conversion.
+
+Non-functional
+
+Batch inference acceptable; daily or weekly recompute.
+
+Latency at serve time is negligible (cover photo is materialized in the listing record).
+
+Notes
+
+Problem framing. Cast as either (a) supervised ranking over a listing's own photo set, labeled by per-photo click-through rate from a historical experiment that randomized photo order, or (b) absolute photo-quality scoring trained on a labeled photogenicity dataset.
+
+Training data. Hardest part. Either run a position-randomized experiment to collect unbiased per-photo CTR, or bootstrap from an external image-quality model (CLIP-style scoring) and refine with a small labeled set.
+
+Features. Image embedding (CLIP / vision tower), room-type classifier output, photo composition score (rule-of-thirds, color harmony), text from listing title / description for relevance check.
+
+Model. Two stages: (1) an image-quality model producing a per-photo score, (2) a per-listing ranker that re-orders the photo set using listing context. Both are typically GBDT / MLP on top of the embedding.
+
+Eval. Offline: AUC against the next click on a held-out cohort. Online: A/B test with click-through and booking as primary, time-to-first-click as guard.
+
+Failure modes. Over-fitting to seasonality (winter cabins vs summer beaches), bias toward stock-photo aesthetics, missing photos for new listings.
+
+Cold start. New listings get the default first-photo-uploaded behavior until the model has confidence.
+
+Preparation
+
+Pre-script the position-randomized-experiment framing — the senior signal is recognizing CTR is biased by current photo order.
+
+Drill the two-stage model (per-photo quality → per-listing rank) on paper.
+
+Pre-write the A/B test plan with primary + guard metrics.
+
+Be ready for the "what if we have no clickstream data" fallback (CLIP-style external scoring).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

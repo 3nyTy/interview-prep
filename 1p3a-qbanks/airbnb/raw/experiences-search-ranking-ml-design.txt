@@ -1,0 +1,72 @@
+===H1===
+Airbnb Experiences — Search Ranking (ML Design)
+===URL===
+https://www.1point3acres.com/interview/problems/company/airbnb/experiences-search-ranking-ml-design
+===BODY===
+Airbnb
+System Design·60 minMembers
+Airbnb Experiences — Search Ranking (ML Design)
+Design the ranking model for Airbnb Experiences (or for the main listings search). Standard MLSD scope: problem framing, training data, features, model architecture, eval, online serving, A/B test plan.
+MLE
+mlsd
+ranking
+recommendation
+two-tower
+feature-engineering
+ab-testing
+medium
+Frequency
+Single report
+Last asked
+2026-05-03
+Stage
+onsite-system-design
+Requirements
+
+Functional
+
+Rank Experience candidates returned by retrieval for a given (user, query, context).
+
+Optimize for booking conversion as the primary metric; engagement (clicks, dwell) as guard metrics.
+
+Non-functional
+
+Online p99 ranking latency under ~100ms for a top-K list of 100.
+
+Model retraining cadence: daily or weekly batch.
+
+A/B test infrastructure: production-grade with multi-arm support.
+
+Notes
+
+Problem framing. Cast as listwise learning-to-rank (LambdaRank / GBDT pairwise) on (query, listing) pairs with labels from clicks / books / cancellations. Acknowledge cancellation-as-negative explicitly.
+
+Training data. Joined log table of impressions + interactions; positional bias correction (IPS or position dropout) is the first deep-dive.
+
+Features. Three categories: user (recent search history, price band, travel intent), listing (host quality, price percentile, photo embedding), context (time-to-trip, day-of-week, geo).
+
+Model. Two-tower for retrieval + GBDT or deep cross network for ranking. The two-tower is the standard answer; defend by latency.
+
+Eval. Offline: NDCG@10, MAP, AUC, plus a per-segment slice (new vs returning users, low vs high price band). Online: A/B test with booking-conversion as primary, cancellation rate as guard.
+
+Online serving. Feature store keyed by user_id + listing_id; warm cache for hot listings; fallback to popularity ranking on model error.
+
+Cold start. New listings get a synthetic prior from cluster average; new users get popularity ranking until first interaction.
+
+The interviewer pushes on the eval and the A/B test design — most candidates over-invest in the model architecture and under-invest in the metric strategy.
+
+Preparation
+
+Pre-write a 6-section MLSD outline (problem → data → features → model → eval → serving) and time yourself to 8 minutes.
+
+Drill the positional bias correction (IPS) explanation in one paragraph.
+
+Prepare a 30-second pitch on the A/B test guard metrics — this is the most common follow-up.
+
+Practice articulating the listing-LTV problem (next card) as a related but distinct prompt — they sometimes overlap.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,48 @@
+===H1===
+Valid Palindrome II
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/valid-palindrome-ii
+===BODY===
+Meta
+Coding·40 minMembers
+Valid Palindrome II
+LeetCode 680 / 1216. Two-pointer with a single allowed deletion (or K deletions in the harder follow-up). Meta-canon phone-screen problem.
+SWE
+MLE
+Infra Eng
+string
+two-pointer
+easy
+Frequency
+Medium
+Last asked
+2026-08-24
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Return whether the string is a palindrome after deleting at most 1 character.
+
+Follow-up: at most K deletions (LeetCode 1216, hard); recursive two-pointer with memo or interval DP.
+
+Examples
+
+'abca' → true (drop b or c); 'abcdef' → false.
+
+Notes
+
+Two-pointer skip-once is the clean solution: on mismatch, try skipping left or right and recheck.
+
+The K-delete extension is the differentiator. Recurse on the next mismatch with k-1, memoize on (l, r, k).
+
+Preparation
+
+Write the K=1 version in <5 min, then immediately extend to K with memoization on a whiteboard.
+
+Drill LeetCode 5 (Longest Palindromic Substring) as a related warm-up — different algorithm, but conditions you to think in palindrome invariants.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

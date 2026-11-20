@@ -1,0 +1,63 @@
+===H1===
+Phone Screen OOD: Filesystem Navigation
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/phone-screen-ood-filesystem-navigation
+===BODY===
+Uber
+CodingMembers
+Phone Screen OOD: Filesystem Navigation
+Implement `mkdir(String name)`, `pwd()`, and `cd(String path)` over an in-memory directory tree. `cd` must resolve absolute and relative paths containing `.`, `..`, and a wildcard that may span multiple directory levels, changing the current directory on success and returning an error otherwise.
+SWE
+filesystem
+oop-design
+dfs
+hard
+Frequency
+Single report
+Last asked
+2026-08-11
+Stage
+phone-screen
+Requirements
+
+Maintain an in-memory directory hierarchy and a current working directory.
+
+mkdir(String name) creates a directory under the current location.
+
+pwd() returns the current path.
+
+cd(String path) resolves the supplied path and moves the current directory when a match exists; otherwise it returns an error.
+
+path may be absolute or relative and may contain /, ., .., and *.
+
+The wildcard may match across multiple directory levels, not only one segment.
+
+Clarify the tie-break behavior when a wildcard resolves to multiple destinations; multiplicity is part of the prompt, but the selection/error rule is not fixed.
+
+Examples
+
+A path such as a/*/c may match c beneath more than one intervening directory level.
+
+Notes
+
+Treat path parsing and path resolution as separate responsibilities. The resolver must carry multiple candidate directories after a wildcard instead of assuming a unique next segment.
+
+Define root behavior for .., repeated separators, missing components, and ambiguous wildcard matches before implementation.
+
+Represent each directory as a stable node with a parent pointer and a child-name map; update the current directory only after resolution selects one destination.
+
+Model wildcard resolution as memoized DFS or BFS over (node, component_index). After clarifying whether the wildcard consumes zero or at least one level, use transitions that either advance the pattern or descend while retaining the wildcard; ordinary components advance both. This avoids greedy matching and bounds the search to reachable node-pattern states.
+
+Collect every terminal candidate before applying the agreed ambiguity rule so a failed or ambiguous cd leaves the current directory unchanged.
+
+Preparation
+
+Implement the directory node model plus mkdir, pwd, and ordinary absolute/relative cd first; then add wildcard traversal without changing the public API.
+
+Build tests for root navigation, ., .., nonexistent paths, wildcard matches at different depths, and multiple valid wildcard destinations.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

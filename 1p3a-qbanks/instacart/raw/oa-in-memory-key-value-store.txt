@@ -1,0 +1,99 @@
+===H1===
+OA: In-Memory Key-Value Store
+===URL===
+https://www.1point3acres.com/interview/problems/company/instacart/oa-in-memory-key-value-store
+===BODY===
+Instacart
+Coding·90 minFree preview
+OA: In-Memory Key-Value Store
+The dominant Instacart OA prompt. Implement an in-memory database where records are keyed by `key`, each record stores `field -> value` strings, and later levels add scans, prefix scans, timestamped reads, TTL, backup, and restore.
+SWE
+hashmap
+in-memory-database
+ttl
+snapshot
+codesignal
+hard
+Frequency
+Medium
+Last asked
+2026-04-23
+Stage
+oa
+Requirements
+
+Level 1:
+
+void set(String key, String field, String value)
+Optional<String> get(String key, String field)
+boolean delete(String key, String field)
+
+Each record is uniquely identified by key.
+
+Each record contains multiple fields, and each field maps to a string value.
+
+delete returns whether the field existed and was deleted.
+
+Level 2:
+
+List<String> scan(String key)
+List<String> scanByPrefix(String key, String prefix)
+
+Return fields for one record, usually sorted lexicographically by field name.
+
+Prefix scan filters only fields beginning with prefix.
+
+Output formatting is normally field(value) or an equivalent string shape; read tests before finalizing.
+
+Level 3:
+
+void setAt(String key, String field, String value, int timestamp)
+void setAtWithTTL(String key, String field, String value, int timestamp, int ttl)
+Optional<String> getAt(String key, String field, int timestamp)
+boolean deleteAt(String key, String field, int timestamp)
+List<String> scanAt(String key, int timestamp)
+List<String> scanByPrefixAt(String key, String prefix, int timestamp)
+
+A TTL value makes the field valid over [timestamp, timestamp + ttl).
+
+Reads at exactly timestamp + ttl should treat the field as expired.
+
+Non-TTL writes are valid indefinitely until overwritten or deleted.
+
+Level 4:
+
+int backup(int timestamp)
+void restore(int timestamp, int timestampToRestore)
+
+backup stores the current visible database state and returns the number of non-empty records.
+
+restore restores the latest backup at or before timestampToRestore.
+
+After restore, remaining TTL must be recalculated relative to the restore time.
+
+Notes
+
+Use Map<String, Map<String, VersionedValue>> as the core shape. A VersionedValue can store value, start, expire, and a tombstone flag.
+
+If the prompt only asks point-in-time operations, a single current value per field may pass early levels. For Level 4, a version list per field is more robust because restore needs historical snapshots.
+
+The clean Level 4 model is: backup stores visible values plus remaining TTL at backup time; restore applies that snapshot at the new current timestamp and recomputes expire = restore_timestamp + remaining_ttl.
+
+Common bugs: treating TTL as inclusive, deleting expired fields before backup count, failing to remove empty records from the backup count, and sorting scan output by value instead of field.
+
+CodeSignal multi-level tasks reward shipping Level 1/2 quickly. Keep helpers tiny: isAlive(field, t), visibleFields(key, t), and format(field, value).
+
+Preparation
+
+Implement Levels 1 and 2 in under 20 minutes.
+
+Add TTL with tests for t = start, t = expire - 1, and t = expire.
+
+Practice backup/restore separately on two fields: one non-TTL field and one TTL field with partial lifetime remaining.
+
+Read every visible test. Several candidates only understood the expected output format by inspecting tests.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

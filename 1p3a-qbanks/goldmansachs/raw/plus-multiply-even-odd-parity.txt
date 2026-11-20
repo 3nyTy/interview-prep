@@ -1,0 +1,52 @@
+===H1===
+Plus-Multiply Even / Odd Parity
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/plus-multiply-even-odd-parity
+===BODY===
+Goldman Sachs
+Coding·60 minMembers
+Plus-Multiply Even / Odd Parity
+Walk the input array splitting it into even-index and odd-index streams; alternate `+` and `*` operations within each stream; compare the final parity of the two sums and return EVEN / ODD / NEUTRAL.
+SWE
+array
+simulation
+medium
+Frequency
+Single report
+Last asked
+2024-10-26
+Stage
+oa
+Requirements
+
+Given an integer array, split elements by index parity into two streams (even-index stream and odd-index stream). Within each stream, alternate between addition and multiplication starting with addition. After consuming all elements:
+
+Compare the parity (mod 2) of the two final values.
+
+Return "EVEN" if the even-stream final value has higher parity (i.e. evenSum % 2 > oddSum % 2).
+
+Return "ODD" if the odd-stream final value has higher parity.
+
+Return "NEUTRAL" if they tie.
+
+public static String plusMultipleArray(int[] arr)
+
+Notes
+
+The common solution accumulates each stream with alternating + and * using a per-stream counter (x++, y++). The first operation in each stream is an addition.
+
+Use long for the running totals — alternating multiplication grows the value fast and int overflow is realistic for the larger test inputs.
+
+The problem name ("plus multiply") and the parity-of-mod-2 comparison make the semantics unusual; restate the rules to the interviewer before coding so the assumption about which stream goes first is locked in.
+
+Preparation
+
+Walk through 6-8 element examples by hand to verify your understanding of the alternation pattern.
+
+Be explicit about long vs int when discussing complexity — interviewers respect candidates who flag overflow risk before writing the loop.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

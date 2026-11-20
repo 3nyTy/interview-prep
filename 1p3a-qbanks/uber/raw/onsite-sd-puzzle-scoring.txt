@@ -1,0 +1,71 @@
+===H1===
+Onsite System Design: Daily Puzzle / Submission Scoring
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/onsite-sd-puzzle-scoring
+===BODY===
+Uber
+System Design·60 minMembers
+Onsite System Design: Daily Puzzle / Submission Scoring
+Onsite system design variant. Design a daily-puzzle product where users submit one answer per day, see their score and a leaderboard, and the system handles puzzle scheduling. Effectively a smaller-scale LeetCode-clone design.
+SWE
+system-design
+storage
+idempotency
+medium
+Frequency
+Single report
+Last asked
+2026-04-30
+Stage
+onsite-system-design
+Requirements
+
+Functional:
+
+Schedule one puzzle per day per locale.
+
+Accept a single submission per user per puzzle; score it server-side; return the score and current rank.
+
+Serve a leaderboard (per locale, per day, and all-time).
+
+Scale:
+
+10M+ users globally, ~1M daily active.
+
+Heavy read on the leaderboard; submission burst at midnight local time.
+
+Single-region or active-active region setup.
+
+Design decisions:
+
+Where to score (client vs server vs on-the-fly Lambda).
+
+Idempotent submission (a user must not be able to submit twice).
+
+Leaderboard storage: sorted-set (Redis) vs columnar batch.
+
+Notes
+
+The reported version of this round was "easy mode" — the interviewer's bar was visibly lower than the heatmap or cart rounds. Treat it as a baseline product-design round.
+
+Standard layout: API gateway → submission service → puzzle service → score service → leaderboard service. Use Redis sorted-set per (locale, date) for the daily leaderboard; daily snapshot to a columnar warehouse for the all-time view.
+
+Idempotency: hash (user_id, puzzle_id) as the submission natural key; reject duplicates at the DB layer.
+
+The interviewer's follow-ups have been milder than other Uber SD rounds; the headline trade-off is around leaderboard freshness vs cost.
+
+For the all-time view, do not keep a global Redis sorted set; it becomes a hot key. Snapshot the daily sorted set into a columnar warehouse (ClickHouse / BigQuery) overnight and answer all-time queries from a materialised view refreshed every few minutes.
+
+Preparation
+
+Have one "social leaderboard" design ready (Redis sorted-set is canonical) — it transfers across this and similar low-bar rounds.
+
+Don't over-engineer. Several candidates have reported the interviewer cutting the discussion short when the design went past 4 services; keep the diagram tight.
+
+Have a 60-second (locale, date) Redis sorted-set sketch ready: ZADD leaderboard:{locale}:{date} score user_id, ZREVRANGE for top-K, ZRANK for the requesting user's position. Same pattern handles the daily and rolling-7-day variants.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

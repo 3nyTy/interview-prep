@@ -1,0 +1,57 @@
+===H1===
+Code Craft: Generate 5-Minute Day-Time Codes
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/code-craft-day-time-interval-codes
+===BODY===
+DoorDash
+Coding·60 minMembers
+Code Craft: Generate 5-Minute Day-Time Codes
+Given a start and end day-time (e.g. `Mon 10:00 AM` to `Tue 11:00 PM`), generate an integer list representing every 5-minute interval in the range, encoded as `DHHMM` where D is the day index (Mon=1..Sun=7) and HHMM is 24-hour time.
+SWE
+string-processing
+simulation
+parsing
+easy
+Frequency
+Single report
+Last asked
+2025-12-08
+Stage
+phone-screen
+Requirements
+
+Input: two timestamps as strings, formatted like "Mon 10:00 AM" and "Tue 11:00 PM".
+
+Output: a list of integers, one per 5-minute interval in the range inclusive (or per the interviewer's convention).
+
+Encoding: 5-digit integer where the first digit is the day index (Mon=1, ..., Sun=7) and the remaining four digits are the time in 24-hour HHMM. Example: 11000 = Monday 10:00, 11005 = Monday 10:05, etc.
+
+Notes
+
+Two-stage approach:
+
+Parse each string into a (day_idx, hour_24, minute) triple.
+
+Walk by 5-minute increments from start to end, encoding each step as day_idx * 10000 + hour_24 * 100 + minute.
+
+Handle AM/PM correctly: 12:00 AM is 00:00, 12:30 PM is 12:30, 1:00 PM is 13:00.
+
+Handle day rollover when walking past 7:55 PM Sun: if the end is before the start in the week cycle, clarify with the interviewer whether to wrap to next Monday or stop.
+
+Watch the encoding edge case: at 10:00 the code is 11000, not 110000 — pad correctly when serializing to string for display.
+
+Convert internally to "minutes since Monday 00:00" for easier arithmetic, then convert back to the encoded form on output. This avoids manual carry handling.
+
+Preparation
+
+Pre-write the (day, hour, minute) ↔ minutes-since-week-start conversion helpers.
+
+Drill the AM/PM parser; this is the most common bug source.
+
+Have an example range walked out by hand before coding.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

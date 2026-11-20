@@ -1,0 +1,136 @@
+===H1===
+Throne Inheritance
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/throne-inheritance
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Throne Inheritance
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+Members
+Throne Inheritance
+
+A kingdom consists of a king and his children in a family tree.
+
+SWE
+tree
+hashmap
+simulation
+medium
+Frequency
+Single report
+Last asked
+2026-01-18
+Stage
+phone-screen · onsite-coding
+Problem Overview: Throne Inheritance
+
+We need to create a system to manage a family tree for a kingdom. This kingdom starts with a king, and the tree grows as children are born. Every person in this kingdom has a unique name.
+
+The system is initialized with a king named kingName. You must build a class that supports the following actions:
+
+ThroneInheritance(string kingName)
+Starts the system and sets the king as the root of the family tree.
+void birth(string parentName, string childName)
+Records that a parent named parentName had a new child named childName.
+void death(string name)
+Marks the person named name as dead.
+string[] getInheritanceOrder()
+Returns a list of names showing who is next in line for the throne.
+
+The order of inheritance is determined by a standard Preorder Traversal of the family tree. The rules are:
+
+The parent comes before their children.
+Older children come before younger children.
+If a person has died, they are skipped and do not appear in the final list.
+Sample Usage
+
+Example 1:
+
+Input: ["ThroneInheritance","birth","birth","birth","birth","birth","birth","getInheritanceOrder","death","getInheritanceOrder"] [["king"],["king","andy"],["king","bob"],["king","catherine"],["andy","matthew"],["bob","alex"],["bob","asha"],[],["bob"],[]]
+
+Output: [null,null,null,null,null,null,null,["king","andy","matthew","bob","alex","asha","catherine"],null,["king","andy","matthew","alex","asha","catherine"]]
+
+Technical Limits
+Name Length: kingName, parentName, childName, and name are between 1 and 15 characters long.
+Characters: Names use only lowercase English letters.
+Uniqueness: Every childName is unique.
+Valid Parents: When birth is called, the parentName is guaranteed to exist in the tree.
+Valid Deaths: The death function is only called for people who are currently alive.
+Operation Count: There will be at most 10^5 total calls to birth, death, and getInheritanceOrder.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Problem Overview: Throne Inheritance
+Sample Usage
+Technical Limits
+Related discussions · 0
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Forest Parent Array Delete Node
+Single report
+tree
+hashmap
+medium
++1
+Filter System with Dynamic Blacklist
+Single report
+simulation
+hashmap
+medium
++3
+Frontend Grid: Robot Eats Candies
+Single report
+simulation
+medium
+frontend
++2
+Copy List with Random Pointer
+Single report
+hashmap
+medium
+linked-list
+Boundary of Binary Tree
+Single report
+tree
+medium
+dfs
++1
+Code editor

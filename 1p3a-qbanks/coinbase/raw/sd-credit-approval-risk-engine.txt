@@ -1,0 +1,375 @@
+===H1===
+System Design — Credit Approval Risk Engine
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/sd-credit-approval-risk-engine
+===BODY===
+Coinbase
+System DesignMembers
+System Design — Credit Approval Risk Engine
+Design a credit-approval risk engine that accepts an application, returns a decision id instantly, fans out to several slow external providers (credit bureau, KYC, fraud, income) asynchronously, and combines their signals into approve / deny / manual-review. Discussion centers on returning fast while deciding in the background, three-layer idempotency, a single-writer decision state machine, circuit-breakers on flaky vendors, and an append-only audit trail for compliance.
+SWE
+idempotency
+state-machine
+kafka
+messaging
+async
+circuit-breaker
+scaling
+medium
+Frequency
+Single report
+Last asked
+2026-02-15
+Stage
+onsite-system-design
+Design a Credit Approval Risk Engine
+
+This guide covers how to design a system that approves or denies credit card applications. The system needs to talk to many slow, external services (like credit bureaus or fraud checkers). The main challenge is managing these slow connections without blocking the user or losing data.
+
+This is a common "open-ended" interview question. Interviewers want to see how you break down the system, handle failures, and manage data safely.
+
+1. Problem Requirements
+
+Functional Requirements
+
+Submission: Users must be able to send an application and get an ID back instantly.
+
+Data Collection: The system must check risk data from outside providers (credit bureau, fraud, income) in the background (asynchronously).
+
+Decision Making: The system uses rules and scores to decide: approved, denied, or manual_review.
+
+Status Checks: Users and support agents need to check the current status and final result.
+
+Reliability: The system must handle retries and provider failures safely. It must never charge a user twice or run a check twice by accident.
+
+Note: Do not make the user wait for all checks to finish. Return a "processing" status quickly, then finish the work in the background.
+
+Non-Functional Requirements
+
+RequirementGoalWhy it matters
+AccuracyZero duplicate apps or checksMoney and laws are involved.
+Speed (Latency)Fast response to user (<10s). Full decision < 5 mins.Users hate waiting.
+Uptime99.95% availabilityIf users can't apply, the company loses money.
+TrackingKeep a history of every changeRequired by banking laws.
+ScalabilityHandle big spikes in trafficMarketing campaigns can cause sudden traffic surges.
+
+Capacity Estimation
+
+MetricValue
+Applications/day2,000,000
+Average Submit Speed~23 requests/sec
+Peak Submit Speed500+ requests/sec
+External checks per app4-8 calls
+External traffic peak2,000-4,000 calls/sec
+Storage Needs~12 TB/year
+
+Key Insight: Even if user traffic is low, the backend traffic is high because one user application triggers many external checks.
+
+2. Database Schema
+
+Main Tables
+
+We need a clear structure to store applications, applicant details, and the results from external providers.
+
+Application
+├── id: UUID (PK)
+├── applicant_id: UUID (FK)
+├── product_type: VARCHAR
+├── channel: ENUM (web, mobile, partner_api)
+├── status: ENUM (received, processing, awaiting_external, ready_for_decision, approved, denied, manual_review, expired)
+├── decision_id: UUID (FK nullable)
+├── idempotency_key: VARCHAR (UNIQUE with applicant_id)
+├── created_at: TIMESTAMP
+├── updated_at: TIMESTAMP
+└── expires_at: TIMESTAMP
+
+Applicant
+├── id: UUID (PK)
+├── legal_name: VARCHAR
+├── dob: DATE
+├── ssn_last4: VARCHAR
+├── address_hash: VARCHAR
+├── annual_income: DECIMAL
+├── employment_status: VARCHAR
+└── created_at: TIMESTAMP
+
+RiskSignal
+├── id: UUID (PK)
+├── application_id: UUID (FK)
+├── provider: ENUM (bureau, kyc, fraud, income)
+├── provider_request_id: VARCHAR
+├── signal_type: VARCHAR
+├── signal_payload: JSONB
+├── status: ENUM (pending, success, failed, timed_out)
+├── received_at: TIMESTAMP
+└── expires_at: TIMESTAMP
+
+Decision
+├── id: UUID (PK)
+├── application_id: UUID (FK)
+├── outcome: ENUM (approved, denied, manual_review)
+├── risk_score: DECIMAL
+├── reason_codes: JSONB
+├── ruleset_version: VARCHAR
+├── model_version: VARCHAR
+├── decided_at: TIMESTAMP
+└── decided_by: ENUM (system, human_reviewer)
+
+WorkflowExecution
+├── id: UUID (PK)
+├── application_id: UUID (FK)
+├── workflow_name: VARCHAR
+├── workflow_run_id: VARCHAR (UNIQUE)
+├── current_step: VARCHAR
+├── status: ENUM (running, waiting, completed, failed)
+├── retry_count: INTEGER
+└── updated_at: TIMESTAMP
+
+ApplicationEvent (append-only audit log)
+├── id: UUID (PK)
+├── application_id: UUID (FK)
+├── event_type: VARCHAR
+├── payload: JSONB
+└── created_at: TIMESTAMP
+
+State Machine Rules
+
+Never let an external callback (like a fraud check returning) write approved or denied directly to the database. External callbacks should only update the RiskSignal table. A separate, central service should look at all signals and make the final move to approved or denied.
+
+3. API Structure
+
+Protocol Strategy
+
+REST: Use this for public APIs (submitting apps, checking status).
+
+Events: Use this internally (Kafka) to trigger background tasks.
+
+Workflow API: Use a system like Temporal or AWS Step Functions to manage long processes.
+
+Public API Endpoints
+
+POST /api/credit-applications
+Headers:
+  Idempotency-Key: 01J3R2J7F1TQ0K6W6N8A4X9V7R
+Request:
+{
+  "product_type": "cashback_card",
+  "applicant": {
+    "legal_name": "Jane Doe",
+    "dob": "1994-04-08",
+    "ssn_last4": "1234",
+    "annual_income": 180000
+  }
+}
+Response:
+{
+  "application_id": "app_123",
+  "status": "processing",
+  "next_poll_after_seconds": 3
+}
+
+GET /api/credit-applications/{application_id}
+Response:
+{
+  "application_id": "app_123",
+  "status": "manual_review",
+  "latest_step": "fraud_check_timeout",
+  "updated_at": "2026-02-10T19:40:01Z"
+}
+
+GET /api/credit-applications/{application_id}/decision
+Response:
+{
+  "application_id": "app_456",
+  "outcome": "approved",
+  "risk_score": 0.18,
+  "reason_codes": ["BUREAU_OK", "FRAUD_LOW", "INCOME_VERIFIED"]
+}
+
+Internal Event Messages
+
+Topic: credit.application.submitted
+Message: { application_id, applicant_id, idempotency_key, submitted_at }
+
+Topic: credit.external.requested
+Message: { application_id, provider, provider_request_id, attempt, timeout_ms }
+
+Topic: credit.external.completed
+Message: { application_id, provider, provider_request_id, status, signal_payload, received_at }
+
+Topic: credit.decision.ready
+Message: { application_id, required_signals_complete, missing_providers[] }
+
+Topic: credit.decision.finalized
+Message: { application_id, outcome, risk_score, reason_codes, ruleset_version }
+
+Provider Callback (Internal)
+
+POST /internal/providers/{provider}/callbacks
+Request:
+{
+  "provider_request_id": "bureau_req_789",
+  "status": "success",
+  "payload": { ...provider_specific_fields... },
+  "signature": "hmac..."
+}
+
+4. System Architecture
+
+Component Roles
+
+Application API: Checks user permission, creates the initial record, and replies "processing" immediately.
+
+Outbox Relay: Reads saved events from the database and sends them to Kafka. This ensures no events are lost if the system crashes.
+
+Workflow Orchestrator: Manages the steps. It says, "First check fraud, then check income." It handles timeouts and retries.
+
+Worker Pools: These do the actual work. They pick up tasks and call the external providers.
+
+External Adapter Gateway: A translator layer. It converts our internal requests into the specific format required by each vendor. It also handles rate limits (slowing down if we send too many requests).
+
+Signal Processor: Listens for finished checks. When enough data is gathered, it tells the Decision Service to run.
+
+Rule Engine: Holds the logic (e.g., "If income < $10k, deny"). It uses versions so we can track which rules applied to which user.
+
+Decision Service: The final judge. It reads the rules and signals, then writes the final approved or denied status.
+
+Status Cache: Stores the current status in Redis so users can check it quickly without overloading the main database.
+
+Preventing Duplicates (Idempotency)
+
+We need three layers of protection to ensure we don't process things twice:
+
+API Layer: UNIQUE(applicant_id, idempotency_key). This stops a user from clicking "Submit" twice.
+
+Workflow Layer: Only one workflow runs per Application ID.
+
+Provider Layer: We generate a unique ID for every external request (e.g., appID_provider_attempt). This ensures we don't pay the vendor twice for the same check.
+
+CREATE UNIQUE INDEX uq_applicant_idempotency
+ON credit_applications (applicant_id, idempotency_key);
+
+INSERT INTO credit_applications (
+  id, applicant_id, idempotency_key, status, created_at
+)
+VALUES (
+  '6f8b30ce-b3c2-4709-aab6-8927bde5f6ef',
+  '1f4d66c2-0be0-4d3d-9f09-a0e7ca8eb6b9',
+  '01J3R2J7F1TQ0K6W6N8A4X9V7R',
+  'processing',
+  NOW()
+)
+ON CONFLICT (applicant_id, idempotency_key) DO NOTHING
+RETURNING id;
+
+Rate Limiting (Traffic Control)
+
+LocationMethodPurpose
+APILimit per userStop hackers or bugs from spamming us.
+WorkflowLimit total active workflowsKeep our servers from crashing.
+ProviderToken bucket per vendorRespect the vendor's limits so they don't block us.
+RetriesRetry budgetOnly retry a certain % of failures to prevent a "retry storm."
+
+5. Scaling and Challenges
+
+Solving Non-Functional Requirements
+
+Accuracy: We use a single service to write the final decision. This prevents race conditions where two services try to update the status at the same time.
+
+Latency (Speed): We reply "processing" immediately so the user isn't blocked. We run external checks in parallel (all at once) rather than one by one.
+
+Auditability: We never delete data. We use an "append-only" log (like a diary) to record every event.
+
+Common Bottlenecks
+
+Slow External Providers: If a vendor is slow, use a "Circuit Breaker." If they fail too often, stop calling them for a while or default to manual_review.
+
+Traffic Spikes: If too many events pile up, auto-scale the worker servers. Separate high-priority messages from low-priority ones.
+
+Database load: Write events to Kafka first, then save to the database in batches. This reduces the load on the database.
+
+Key Trade-offs
+
+1. Buying a Workflow Engine vs. Building Custom Code
+
+Custom Code: Flexible, but hard to manage retries and timeouts correctly.
+
+Managed Engine (Recommended): Tools like Step Functions handle state and retries automatically. It costs more but saves engineering time.
+
+2. Kafka (Events) vs. Direct Calls (RPC)
+
+Direct Calls: Easier to debug, but if one service fails, the whole chain fails.
+
+Kafka (Recommended): Keeps services separate. If one part breaks, the messages wait in the queue until it's fixed.
+
+Failure Scenarios
+
+FailureWhat happens?How to fix?
+Client TimeoutUser submits but doesn't get a reply.The Idempotency-Key lets them retry safely without creating a duplicate.
+Worker CrashA server dies while waiting for a vendor.The Workflow Engine detects the timeout and restarts the task.
+Kafka OutageMessages can't be sent.The system pauses. When Kafka is back, we replay events from the log.
+Bad Rule PushWe deploy a rule that denies everyone.Use rule versioning. Roll back to the old version and re-run the decisions.
+
+6. Interview Checklist
+
+Use this list to ensure you cover all important topics during the interview.
+
+  External Services: Did you explain that external vendors are slow and unreliable?
+
+  Latency: Did you distinguish between the fast "received" response and the slower final decision?
+
+  Data Model: Did you include Application, RiskSignal, and Decision tables?
+
+  State Machine: Did you clearly show the flow (Received -> Processing -> Decision)?
+
+  API: Did you use idempotency keys?
+
+  Orchestration: Did you use a workflow engine/queue instead of direct calls?
+
+  Failures: Did you mention circuit breakers and retry limits?
+
+  Single Writer: Did you explain that only one service should finalize the decision?
+
+7. Core Concepts to Remember
+
+Async is mandatory: You cannot wait for slow external checks while the user waits on the phone. Return "processing" and finish later.
+
+Idempotency is key: Everything (API, workflows, vendor calls) must handle duplicates safely.
+
+One Decision Maker: Centralize the final logic. Don't let scattered services update the final status.
+
+Protect the System: Use rate limits and retry budgets to prevent one failure from taking down the whole platform.
+
+Audit Everything: In finance, you must be able to prove why a decision was made. Store versioned rules and history logs.
+
+Candidate-Report Notes
+
+Acknowledge fast, decide async. Persist the application, return processing, and drive the external calls off a queue / workflow engine. Blocking the request on provider latency is the primary thing this prompt is testing against.
+
+Single writer for the decision. External provider callbacks must only write to a RiskSignal store — never flip the application to approved / denied directly. One Decision Service reads the gathered signals plus the active rule version and is the only component that writes a terminal state. This removes the race that otherwise corrupts the outcome.
+
+Idempotency in three layers: API (UNIQUE(applicant_id, idempotency_key) so a double-click is a no-op), workflow (one run per application id), and provider (a per-attempt request id like appId_provider_attempt so a redelivered callback or a retry never double-charges the vendor).
+
+Transactional outbox: write domain events in the same transaction as the state change, then relay them to the message bus, so a crash between "save" and "publish" can't lose an event.
+
+Resilience on slow vendors: a circuit-breaker per provider (trip → default that provider's signal to manual_review), a token-bucket rate-limit per vendor to respect their quotas, and a retry budget so a provider outage doesn't trigger a retry storm.
+
+State machine: received → processing → awaiting_external → ready_for_decision → approved | denied | manual_review, each transition the result of an idempotent event so replays land in the same terminal state.
+
+Versioned rules: store ruleset_version / model_version on every decision so a bad rule push can be rolled back and the affected applications re-decided — and so you can answer "why was this application denied," which is itself a compliance requirement.
+
+Preparation
+
+Be able to draw the async core from memory: API → outbox → bus → workflow orchestrator → provider workers → signal store → single Decision Service → status cache. This spine carries the whole answer.
+
+Rehearse the three-layer idempotency story end-to-end (API unique key, single workflow per id, per-attempt provider request id) — it is the most common follow-up.
+
+Have a 60-second answer on slow / failing providers: circuit-breaker → default-to-manual-review, retry budget, and why only one service may finalize the decision.
+
+Practice the "prove why a decision was made" angle (append-only event log + versioned rules); the financial / audit framing is what separates this from a generic async-fanout design.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

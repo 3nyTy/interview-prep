@@ -1,0 +1,55 @@
+===H1===
+OA: Maximize Pipeline Throughput
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/oa-pipeline-throughput
+===BODY===
+Uber
+Coding·90 minMembers
+OA: Maximize Pipeline Throughput
+Hack2Hire OA problem. A pipeline runs services in series, so the end-to-end throughput equals the minimum throughput across all services. Each service `i` starts at throughput `t[i]` and can be scaled `x` times to reach `t[i] * (1 + x)` at total spend `x * cost[i]`. Given a global `budget`, maximize the achievable pipeline throughput.
+SWE
+algorithm
+medium
+Frequency
+Medium
+Last asked
+2026-06-04
+Stage
+oa
+Requirements
+
+Input: arrays t[] (initial throughputs) and cost[] (per-scale-up cost) of length n, and a single integer budget.
+
+For each service i, you may apply any non-negative integer scale factor x_i. After scaling, that service's throughput is t[i] * (1 + x_i) and it costs x_i * cost[i].
+
+Total spend across all services must satisfy Σ x_i * cost[i] ≤ budget.
+
+Pipeline throughput = min_i (t[i] * (1 + x_i)). Maximize this minimum.
+
+Output: the maximum achievable pipeline throughput as an integer.
+
+Notes
+
+Standard "binary-search the answer" pattern. The predicate canAchieve(target) is monotone: if you can hit a throughput T, you can hit any T' < T.
+
+For a candidate target and service i, the minimum scale factor needed is x_i = ceil(target / t[i]) − 1. Sum x_i * cost[i] and compare against the budget.
+
+Binary-search range: lo = min(t), hi = max(t) + budget (or any safe upper bound).
+
+Common slip: forgetting to floor-divide / ceil-divide correctly when target exactly matches a multiple of t[i] — the formula ceil(target / t[i]) − 1 is exact only when target ≥ t[i].
+
+A pure greedy on the bottleneck service does not work because spending on the bottleneck shifts the bottleneck.
+
+Preparation
+
+Drill the binary-search-the-answer pattern (LC 410, LC 875, LC 1011) until the predicate function is muscle memory.
+
+Practice writing the predicate with explicit early-exit when partial cost exceeds the budget — this is what makes the solution pass the large hidden tests.
+
+Implement once with (lo + hi) // 2 and once with the float-friendly lo + (hi - lo) // 2 to avoid overflow in languages with bounded ints.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

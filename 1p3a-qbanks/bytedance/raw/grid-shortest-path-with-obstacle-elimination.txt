@@ -1,0 +1,57 @@
+===H1===
+Grid Shortest Path with K Obstacle Eliminations
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/grid-shortest-path-with-obstacle-elimination
+===BODY===
+ByteDance / TikTok
+Coding·45 minMembers
+Grid Shortest Path with K Obstacle Eliminations
+First-round Growth coding prompt: find the shortest path in a grid, then handle the follow-up where up to `k` obstacles can be eliminated. Full I/O was thin, but the required state is `(row, col, remaining_eliminations)` for the follow-up.
+SWE
+grid
+bfs
+shortest-path
+medium
+Frequency
+Single report
+Last asked
+2026-06-29
+Stage
+phone-screen
+Requirements
+
+Given a grid, find the shortest path through it. The follow-up adds obstacles and allows eliminating at most k obstacles while still returning the shortest valid path length.
+
+Clarify before coding:
+
+Start and target coordinates, commonly top-left to bottom-right.
+
+Whether movement is 4-directional only.
+
+How obstacles are encoded and whether eliminating an obstacle consumes budget before entering the cell.
+
+What to return when the target is unreachable.
+
+Notes
+
+The base problem is plain BFS on grid coordinates.
+
+The follow-up is BFS over (row, col, remaining_k) states; visiting (r, c) with more remaining eliminations dominates visiting the same cell with fewer.
+
+Do not collapse visited to only (row, col) after adding the obstacle budget, or you will prune paths that arrive later with more remaining budget and can still win.
+
+The round opened with about 15 minutes of resume discussion, so aim for a compact BFS skeleton before optimizing.
+
+Preparation
+
+Write a BFS template that stores distance by level rather than recomputing path length inside each state.
+
+Drill the resource-state visited structure: either a 3-D boolean array or a best_remaining[(r, c)] dominance map.
+
+Hand-trace a small grid where the shortest-looking route spends the obstacle budget too early.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

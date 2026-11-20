@@ -1,0 +1,154 @@
+===H1===
+Calculate Amount Paid in Taxes
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/calculate-amount-paid-in-taxes
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Calculate Amount Paid in Taxes
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+Members
+Calculate Amount Paid in Taxes
+
+You are given a 0-indexed 2D integer array brackets where brackets[i] = [upperi, percenti] means that the ith tax bracket has an upper bound of upperi and is taxed at a rate of percenti.
+
+SWE
+array
+math
+simulation
+easy
+Frequency
+Low
+Last asked
+2026-06-17
+Stage
+phone-screen · onsite-coding
+Problem Overview
+
+You are provided with a 0-indexed 2D integer array called brackets. Each item in this list is a pair [upper_bound, tax_rate]. This represents a tax bracket where:
+
+upper_bound is the highest income amount included in this bracket.
+tax_rate is the percentage of tax charged for this bracket.
+
+The list brackets is sorted by upper_bound from smallest to largest. All upper bounds are distinct.
+
+You are also given an integer income. You need to calculate the total tax based on a progressive tax system.
+
+How Progressive Tax Works: Tax is calculated in steps or "chunks":
+
+Money up to the first bracket's limit is taxed at the first rate.
+Any money above the first limit—but below the second limit—is taxed at the second rate.
+This pattern continues for each subsequent bracket until all your income is accounted for.
+
+Your goal is to return the total amount of tax paid.
+
+Sample Cases
+
+Case 1:
+
+Input: brackets = [[3,50],[7,10],[12,25]], income = 10
+
+Output: 2.65
+
+Case 2:
+
+Input: brackets = [[1,0],[4,25],[5,50]], income = 2
+
+Output: 0.25
+
+Input Limits
+1 <= brackets.length <= 100
+1 <= upper_bound <= 1000
+0 <= tax_rate <= 100
+0 <= income <= 1000
+upper_bound increases strictly (the list is sorted and values are unique).
+Notes
+Also appears as an object-design round: implement a Tax/calculator class with the bracket logic plus your own test cases, rather than a single free function. The progressive-bracket math is identical.
+Was this article helpful?
+Comments
+1
+Post
+Anonymous
+Posting as coolanimesh14
+Willzy
+1 month ago
+
+这题有follow up，是给定bracket，在很多请求的情况下，怎么优化。我答的是prefixsum + binary search。可惜写完有bug没时间了
+
+3
+Rate
+1
+Reply
+Table of Contents
+Problem Overview
+Sample Cases
+Input Limits
+Notes
+Related discussions · 2
+🔑vo 面经
+雪花非主流挂经
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Happy Number
+Single report
+math
+simulation
+easy
++2
+Valid Tic-Tac-Toe State (Extended)
+Single report
+array
+simulation
+math
++1
+Single Query Type, Max Revenue in K Minutes
+Single report
+math
+easy
+greedy
+Frontend Grid: Robot Eats Candies
+Single report
+simulation
+frontend
+bfs
++2
+Pre-order Traversal Skipping Marked Nodes
+Single report
+easy
+tree
+dfs
++2
+Code editor

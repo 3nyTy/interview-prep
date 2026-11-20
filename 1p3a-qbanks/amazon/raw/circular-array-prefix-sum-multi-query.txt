@@ -1,0 +1,50 @@
+===H1===
+Circular Array — Multi-Query Distance Accumulation
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/circular-array-prefix-sum-multi-query
+===BODY===
+Amazon
+Coding·40 minMembers
+Circular Array — Multi-Query Distance Accumulation
+Bus-stops-on-a-ring variant of LC 1184: prefix-sum the ring once, then answer a stream of (a, b) queries by accumulating the shorter of the two arc distances.
+SWE
+array
+prefix-sum
+easy
+Frequency
+Single report
+Last asked
+2026-05-15
+Stage
+oa
+Requirements
+
+Given n stops arranged on a ring with edge weights distance[i] between stop i and stop (i+1) % n.
+
+A query stream of pairs (start, end) arrives; for each pair return the shorter of the two arc distances between start and end.
+
+Total answer is the sum of all per-query distances. Optimize for many queries against the same ring.
+
+Notes
+
+Equivalent in shape to the LC 1184 "Distance Between Bus Stops" problem, but the interview variant runs many queries so an O(1) per query path is expected, not a per-query traversal.
+
+Standard recipe: build a prefix-sum P[i] = sum of distance[0..i-1] and let total = P[n]. For a query (a, b) with a < b, the forward arc is P[b] - P[a] and the answer is min(forward, total - forward).
+
+Watch for the common off-by-one when start > end — normalize by swapping or by using modular subtraction.
+
+The OA framing usually wraps this in a domain (deliveries / sightseeing route), so the under-specified part is mostly extracting the ring + edge weights from the input format.
+
+Preparation
+
+Solve LC 1184 cold, then re-solve with a query stream and measure that the prefix-sum path is O(1) per query.
+
+Hand-trace a 5-stop ring with two queries that straddle the wrap-around index to lock in the total - forward branch.
+
+Write the prefix-sum build in 90 seconds without looking — this is the kind of warm-up that buys time for the AI-debug second half of the OA.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,64 @@
+===H1===
+Product Quality Values into Contiguous Blocks
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/product-quality-contiguous-blocks
+===BODY===
+Amazon
+CodingMembers
+Product Quality Values into Contiguous Blocks
+Given an integer array `quality`, repeatedly choose values `x` and `y` and replace every occurrence of `x` with `y`, paying the number of replaced elements. Minimize the total cost until every surviving quality value occupies one contiguous block.
+SWE
+array
+interval
+greedy
+medium
+Frequency
+Low · New
+Last asked
+2026-08-25
+Stage
+oa
+Requirements
+
+Input: an integer array quality, where quality[i] is the checked quality of the ith product.
+
+An optimal inventory requires all occurrences of each surviving quality value to be contiguous.
+
+One operation chooses two quality values x and y, replaces every occurrence of x with y, and costs the number of products whose value changed.
+
+Return the minimum total cost through getMinAmount(int[] quality).
+
+Constraints: 1 <= n <= 2 * 10^5 and -10^9 <= quality[i] <= 10^9.
+
+Examples
+
+quality = [7, 7, 5, 7, 3, 5, 3]
+
+Replace every 5 with 7: cost 2
+Replace every 3 with 7: cost 2
+
+Output: 4
+
+Notes
+
+x and y are values, not positions; a single operation changes every matching element across the array.
+
+Negative quality values are valid.
+
+Contiguous means one block for each distinct value that remains after all replacements; the array itself does not need to be sorted.
+
+Record each distinct value's first index, last index, and total frequency. Sort these intervals by first index, then sweep them into connected overlap components. Every component must collapse to one surviving value; otherwise two interleaving value spans would leave at least one survivor split across multiple blocks.
+
+Within each overlap component, keep the value with the largest frequency and replace every other value directly with it. The component cost is sum(frequency) - max(frequency), so summing this quantity over all components gives the minimum. The implementation uses O(n + k log k) time and O(k) space for k distinct values.
+
+Preparation
+
+Implement the first/last/frequency map and interval sweep in 20 minutes, including all-equal, all-distinct, nested-span, and chained-overlap tests.
+
+Dry-run the provided array as one overlap component with frequencies 7:3, 5:2, and 3:2; verify that preserving 7 costs 2 + 2 = 4, then explain why preserving either other value costs more.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

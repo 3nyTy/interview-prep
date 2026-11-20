@@ -1,0 +1,55 @@
+===H1===
+First Missing Positive
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/first-missing-positive
+===BODY===
+Goldman Sachs
+Coding·60 minMembers
+First Missing Positive
+Find the smallest positive integer missing from an unsorted array, in O(n) time and O(1) extra space. The cyclic-sort trick is the expected solution.
+SWE
+array
+hard
+Frequency
+Single report
+Last asked
+2025-06-09
+Stage
+onsite-coding
+Requirements
+
+Input: an unsorted integer array nums (may contain negatives, zeros, duplicates, and values larger than n).
+
+Return: the smallest positive integer (≥ 1) that does not appear in nums.
+
+Target complexity: O(n) time, O(1) extra space.
+
+public int firstMissingPositive(int[] nums)
+
+Examples
+
+[1,2,0]            → 3
+[3,4,-1,1]         → 2
+[7,8,9,11,12]      → 1
+
+Notes
+
+Cyclic-sort solution: for each index i, while 1 ≤ nums[i] ≤ n and nums[nums[i] - 1] != nums[i], swap nums[i] with nums[nums[i] - 1]. After the pass, the answer is the first index i with nums[i] != i + 1, or n + 1 if no mismatch.
+
+The naïve sort-then-scan approach is O(n log n) and breaks the space target — only useful as the brute-force baseline you state aloud before coding.
+
+A common interviewer probe: "why is the loop body amortized O(n)?" Answer: each successful swap places a value into its final slot, so the total number of swaps across all i is at most n.
+
+Preparation
+
+Implement cyclic sort once for this problem, then once for LC 41's sibling LC 268 "Missing Number" — different algorithm (XOR / arithmetic), same conceptual category.
+
+The amortized-complexity argument is the most common follow-up; rehearse it out loud.
+
+LC 41 "First Missing Positive" is the canonical equivalent.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

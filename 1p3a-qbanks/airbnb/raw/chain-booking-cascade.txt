@@ -1,0 +1,51 @@
+===H1===
+Chain Booking — Max Cascading Reservations
+===URL===
+https://www.1point3acres.com/interview/problems/company/airbnb/chain-booking-cascade
+===BODY===
+Airbnb
+Coding·45 minMembers
+Chain Booking — Max Cascading Reservations
+Given a list of listings, each described as `[x, y, r]` (coordinates plus a chain-effect radius), booking one listing auto-books every listing within its radius, which then recursively cascades. Choosing exactly one starting listing, return the maximum number of listings that can end up booked. Reduces to a max-reachable-set over a directed graph built from radius containment; candidates solve it with DFS/BFS from each node (SCC-condensation + DAG DP is the optimization).
+SWE
+graph
+dfs
+simulation
+medium
+Frequency
+Low
+Last asked
+2026-08-03
+Stage
+onsite-coding · tech-screen
+Requirements
+
+Input: a list of listings, each [x, y, r] — (x, y) is the coordinate and r is the chain-effect radius. Example input: [[1, 2, 3], [5, 2, 2], [3, 4, 1]].
+
+Booking a listing automatically books every other listing whose coordinate lies within radius r of it. Each newly booked listing then fires its own radius, cascading recursively.
+
+You may book exactly one listing. Return the maximum number of listings that end up booked across all single starting choices.
+
+You write your own test cases — the round provides no test harness.
+
+Notes
+
+Model as a directed graph: add edge A → B when B lies within A's radius (Euclidean distance from A to B ≤ r_A). Edges are directional and not symmetric — each node has its own radius, so A → B does not imply B → A.
+
+The answer is the size of the largest reachable set over all starting nodes: run a DFS/BFS from each node with a visited set and take the max. The optimization is to condense strongly-connected components and DP the reachable count over the resulting DAG.
+
+Track visited per traversal so a cascade cannot loop forever or double-count on cycles — this is the most common bug.
+
+A straightforward per-node DFS is O(V·(V+E)), which is fine for the small inputs given; a working non-optimal solution that passes self-written tests is accepted, with the SCC/DAG speed-up reserved as a follow-up.
+
+Preparation
+
+Build the radius-containment adjacency list, then write a reusable reachable_count(start) DFS with a visited set; drill the whole thing under 25 minutes including your own test cases.
+
+Practice articulating the SCC-condensation + DAG-DP optimization out loud as the "make it faster" answer, even if you code only the brute-force version.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

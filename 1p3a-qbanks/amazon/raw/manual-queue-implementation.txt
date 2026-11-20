@@ -1,0 +1,48 @@
+===H1===
+Manual Queue Implementation
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/manual-queue-implementation
+===BODY===
+Amazon
+CodingMembers
+Manual Queue Implementation
+Implement constant-time enqueue and dequeue without native data structures, then extend the queue with deletion operations.
+SWE
+queue
+linked-list
+oop-design
+Frequency
+Single report
+Last asked
+2026-09-01
+Stage
+onsite-coding
+Requirements
+
+Implement a queue with enqueue and dequeue, both running in O(1).
+
+Do not use native data structures; build the implementation using linked nodes and loops.
+
+Follow-ups: add delete(x) and removeAllDuplicates().
+
+Notes
+
+Asked in a Vancouver NG LLD round paired with GenAI literacy.
+
+The deletion follow-ups do not specify which matching occurrences to remove or their complexity requirements. Clarify these semantics before implementing them.
+
+Maintain head and tail pointers. Enqueue links a new node after the tail; dequeue removes the head. When the final node is removed, reset both pointers. Each operation touches a constant number of pointers and takes O(1) time; n queued nodes use O(n) space.
+
+For deletion, a traversal can unlink matching nodes while repairing head and tail. A duplicate-removal traversal can retain a seen-value set only if auxiliary containers are allowed; otherwise compare nodes with nested scans. Choose first-match versus all-match deletion, and keep-one versus remove-all duplicate semantics, only after clarification.
+
+Preparation
+
+Implement the node-based queue in 15 minutes and trace empty, singleton, and enqueue-after-drain states.
+
+Define both possible deletion contracts, then trace head, middle, tail, and duplicate removals against each contract.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

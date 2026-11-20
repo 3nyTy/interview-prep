@@ -1,0 +1,169 @@
+===H1===
+Webhook Delivery System
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/webhook-delivery-system
+===BODY===
+OpenAI
+System DesignMembers
+Webhook Delivery System
+Design a highly scalable webhook delivery system that allows users to register callback URLs for specific events. The system must handle 1 billion events per day with reliable at-least-once delivery, including retry logic, caching, and failure isolation.
+SWE
+Infra Eng
+messaging
+retry
+caching
+scaling
+schema-design
+idempotency
+http
+backend
+distributed-systems
+queueing
+webhook
+Frequency
+Low
+Last asked
+2025-11-19
+Stage
+onsite-system-design
+Project Requirements
+
+You need to design a Webhook delivery system that can handle a massive amount of traffic. This system allows users to register a "callback URL." When a specific event happens, the system must send an HTTP POST request to that URL.
+
+Key constraints:
+
+Scale: The system must handle 1 billion events every day (roughly 11,500 events/second).
+
+Reliability: It must deliver messages successfully and retry if the delivery fails.
+
+Features: It needs security, monitoring (observability), and a way to handle errors.
+
+Core rule: One eventId maps to exactly one callback URL per user.
+
+REST API Design
+
+Define the endpoints to register webhooks and inspect delivery status:
+
+POST /webhooks
+Body: { "event_id": "user.created", "callback_url": "https://...", "headers": {...} }
+
+GET /webhooks/:webhook_id
+Response: Webhook configuration
+
+GET /webhooks/:webhook_id/deliveries?status=failed&limit=50
+Response: Paginated delivery history
+
+Discuss: how to define JSON request/response formats, use of query parameters for filtering, and what constitutes a complete vs. minimal API surface.
+
+Database Schema
+
+CREATE TABLE webhooks (
+  webhook_id UUID PRIMARY KEY,
+  user_id UUID NOT NULL,
+  event_id VARCHAR NOT NULL,
+  callback_url TEXT NOT NULL,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP,
+  UNIQUE(user_id, event_id)
+);
+
+CREATE INDEX idx_event_active ON webhooks(event_id, is_active);
+
+CREATE TABLE webhook_deliveries (
+  delivery_id UUID PRIMARY KEY,
+  webhook_id UUID REFERENCES webhooks,
+  status VARCHAR, -- pending, success, failed, retrying
+  attempt_count INT,
+  next_retry_at TIMESTAMP,
+  response_code INT,
+  error_message TEXT,
+  created_at TIMESTAMP
+);
+
+Discuss: indexing strategy, enforcement of the one-eventId-per-user constraint, and how to shard these tables at scale.
+
+Caching Strategy
+
+Cache active webhook configurations keyed by event_id in Redis with a TTL (e.g., 5 minutes).
+
+Invalidate the cache entry when a webhook is updated or deleted.
+
+Trade-off: accepting slightly stale data (few seconds) for reduced database load.
+
+The interviewer focuses on what to cache (configs, not delivery logs), when to invalidate, and the consistency vs. latency trade-off.
+
+Failure and Retry Logic
+
+This is the primary deep-dive area.
+
+Use SQS visibility timeout or Kafka retry topics to implement delayed retries without polling the database.
+
+Apply Exponential Backoff: wait 1 min → 2 min → 4 min between attempts.
+
+Distinguish retryable errors (5xx) from non-retryable errors (4xx — fail immediately).
+
+Move messages to a Dead Letter Queue (DLQ) after a fixed number of failed attempts (e.g., 5).
+
+Store the retry count in message metadata to avoid an extra DB read per attempt.
+
+Isolate retries per webhook so one failing subscriber cannot block others (retry storms).
+
+Scale Considerations
+
+1 billion events/day requires:
+
+Database sharding (e.g., shard webhooks by user_id or event_id).
+
+Horizontal scaling of delivery workers.
+
+Queue throughput: confirm the message queue can sustain the peak event rate.
+
+Idempotency: ensure duplicate deliveries (e.g., after a worker crash) do not cause double processing on the subscriber side.
+
+Security
+
+Prevent SSRF attacks when making outbound HTTP calls to user-supplied callback URLs.
+
+Consider request signing (HMAC) so subscribers can verify the payload origin.
+
+Notes
+
+What the interviewer weights
+
+This is a coding-flavored system design round: the interviewer cares about concrete implementation details, not high-level box-drawing. Expect to be pushed for the exact REST endpoints, the literal column list and indexes, and the specific message-queue primitives used (visibility timeout, DLQ, Kafka offsets) — vague answers like "we have an API" or "we store it in a table" do not land.
+
+Topic priority, roughly in the order it gets probed:
+
+Must cover: REST API design, DB schema, retry logic.
+
+Very likely: caching, message-queue choice.
+
+Likely: idempotency (preventing duplicate processing), monitoring/observability.
+
+Possible: security (SSRF, request signing).
+
+Failure/retry handling draws the most follow-up depth — be ready to answer "what if the subscriber's server is down," how to implement exponential backoff, exactly when a message moves to the DLQ, and how to stop one bad subscriber from cascading into a retry storm.
+
+Clarifying questions to open with
+
+Confirm the core rule: one eventId maps to exactly one callback URL.
+
+Confirm scale: 1B events/day ≈ 11,500 events/second.
+
+Ask the retry policy: how many attempts before giving up / moving to DLQ.
+
+Pin down the required API surface (which endpoints are in scope).
+
+End-to-end flow to sketch
+
+Registration flow: client POSTs to the API → config persisted to DB (and cache populated/invalidated).
+
+Event flow: event fires → look up the webhook config (cache, then DB) → enqueue a delivery message → worker pops it and issues the HTTP POST → record the outcome in webhook_deliveries.
+
+Delivery is asynchronous: the API/event path enqueues, and a pool of horizontally-scaled workers performs the actual outbound calls in the background.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

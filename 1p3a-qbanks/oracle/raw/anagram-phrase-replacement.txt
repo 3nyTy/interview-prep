@@ -1,0 +1,71 @@
+===H1===
+Anagram Word Replacement in Phrases
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/anagram-phrase-replacement
+===BODY===
+Oracle
+Coding·45 minMembers
+Anagram Word Replacement in Phrases
+Given a list of phrases and a list of allowed replacement words, find for each phrase a starting position where some contiguous substring (or a word within the phrase) is an anagram of any allowed word. Return all such positions. Asked on HackerRank in an Oracle Health phone screen; hidden test case timed out.
+SWE
+string
+hashmap
+hashing
+sliding-window
+medium
+Frequency
+Single report
+Last asked
+2025-11-21
+Stage
+phone-screen
+Requirements
+
+Input: phrases: List[str] and words: List[str].
+
+For each phrase, determine whether any word inside the phrase can be replaced by some entry in words such that the original phrase word and the replacement word are anagrams of one another.
+
+Output: List[int] — one entry per phrase indicating the index / position at which such a replacement is possible (the exact return shape was the index, with 0 meaning the replacement starts at position 0 in the corresponding phrase).
+
+All test cases must run within the platform's time limit.
+
+Examples
+
+phrases = ["hello world", "below elbow"]
+words   = ["below", "elbow"]
+
+return   = [0, 4]
+
+Interpretation reported by the candidate: position 0 of phrase 0 / position 4 of phrase 1 marks a word inside the phrase that is an anagram of some entry in words (e.g. "elbow" at index 4 of "below elbow" matches "below" — character-frequency-equal).
+
+Notes
+
+The naïve approach (for each phrase word, for each candidate word, sort and compare) is O(P × W × L log L). Hidden test cases at scale will time out — this is what tripped the reporting candidate.
+
+The right structure: hash every words entry by its character-frequency fingerprint (e.g. a 26-entry tuple or a canonicalised sorted string), then walk each phrase word once and look up its fingerprint in O(L).
+
+If the prompt allows arbitrary contiguous substrings (not just whole words) as the anagram match site, the problem becomes the "find all anagram start indices" sliding-window variant of LeetCode 438. Clarify which form the interviewer wants — both forms have shown up in adjacent reports of the same family.
+
+Two performance traps observed in this round:
+
+Recomputing the character-frequency fingerprint by re-sorting on every comparison instead of caching per-word.
+
+Iterating through words linearly inside the inner loop instead of using a set keyed by fingerprint.
+
+The reporting candidate noted that the prompt was hard to parse on first read; expect to spend several minutes confirming the I/O shape against the example before coding.
+
+Preparation
+
+Practise both forms: "whole-word anagram match" (hash by fingerprint) and "contiguous substring anagram match" (sliding-window of length |word|, frequency-count compare). Be able to switch quickly.
+
+Drill LeetCode 438 ("Find All Anagrams in a String") as the sliding-window prep.
+
+For the fingerprint form: pre-compute Set<Tuple26> over the words list at the start; per-phrase, tokenise on whitespace and check each token's fingerprint against the set in O(L).
+
+Confirm the return shape with the interviewer on the first example before writing any code — the candidate explicitly flagged how long the I/O parsing took here.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

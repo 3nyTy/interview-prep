@@ -1,0 +1,58 @@
+===H1===
+Minimum Sum After K Halvings (Max-Heap)
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/min-sum-after-k-halvings
+===BODY===
+Oracle
+Coding·45 minMembers
+Minimum Sum After K Halvings (Max-Heap)
+Given a non-negative integer array and an integer `k`, repeatedly pick one element and replace it with `ceil(element / 2)`. After at most `k` operations, minimise the remaining sum. Asked as the third VO round in an Oracle Health AI loop; the reporting candidate hit hidden-test-case timeouts and suspected the zero-handling edge case.
+MLE
+SWE
+heap
+greedy
+array
+medium
+Frequency
+Single report
+Last asked
+2025-08-06
+Stage
+onsite-coding
+Requirements
+
+Input: an integer array nums (non-negative) and an integer k.
+
+In each operation, pick one element of nums and replace it with ceil(nums[i] / 2). Each operation counts even if the element is already 0 (but see notes — skipping zeros is the practical optimisation).
+
+At most k operations may be performed.
+
+Output: the minimum possible sum of nums after applying up to k operations.
+
+Notes
+
+The canonical greedy: at each step, halve the current largest element. Maintain a max-heap; pop the top, push ceil(top / 2), repeat k times. Time O((n + k) log n).
+
+Correctness intuition: halving the largest current element always removes more from the sum than halving any other element (a halving operation removes x - ceil(x/2) ≈ x/2).
+
+Zero-handling: if the heap top is 0, halving it does not change the sum. Skipping (no-op) preserves the operation budget for non-zero elements. The reporting candidate suspected this was the missed edge case behind the hidden-test-case timeouts.
+
+A subtle alternative: if all elements become zero before k operations are exhausted, the remaining operations are vacuous and the answer is 0. Do not loop forever.
+
+The original prompt phrased this as a hard-limited-k problem; the LeetCode equivalent is LC 1962 ("Remove Stones to Minimize the Total"). The Python solution there uses a max-heap (negative values in heapq) and a tight loop.
+
+Common bugs: (a) integer division (//) instead of ceiling division; (b) using a min-heap by accident; (c) forgetting to push the halved value back after each pop.
+
+Preparation
+
+Implement LeetCode 1962 using a max-heap. In Python, push negatives into heapq; in Java, use PriorityQueue with reverse-ordering comparator.
+
+Stress-test with an input containing zeros and a k larger than the number of non-zero elements — this is where the reporting candidate's solution silently failed.
+
+Have math.ceil(x / 2) / -(-x // 2) (Python) and (x + 1) >> 1 (Java) ready as integer-safe ceiling-halve expressions — the reporting candidate lost time on math.ceil import path under language pressure.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

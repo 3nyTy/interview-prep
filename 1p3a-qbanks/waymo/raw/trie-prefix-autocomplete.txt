@@ -1,0 +1,54 @@
+===H1===
+Prefix Autocomplete via Trie
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/trie-prefix-autocomplete
+===BODY===
+Waymo
+Coding·45 minMembers
+Prefix Autocomplete via Trie
+Phone screen: given a word list, build a data structure that returns all words sharing a given prefix. Interviewer explicitly expects a trie; hashmap is the brute-force baseline. Common follow-up is DFS extraction of all completions below a prefix node.
+SWE
+trie
+dfs
+string
+data-structure
+medium
+Frequency
+Single report
+Last asked
+2026-03-27
+Stage
+phone-screen
+Requirements
+
+Build a data structure indexed by a word list.
+
+Implement find_all_by_prefix(prefix) -> List[str] that returns every word in the list that starts with prefix.
+
+Interviewer expects a trie solution; hashmap of full strings is accepted as the baseline only.
+
+Notes
+
+Trie shape: each node holds a children: Map<char, Node> plus a terminal flag. Lookup walks the prefix one character at a time; if any character is missing, return []. Otherwise, DFS from the prefix node, accumulating characters into a buffer and emitting at every terminal flag.
+
+Lookup complexity: O(|prefix|) to find the subtree, then O(K · L) to enumerate K completions of average length L.
+
+Hashmap baseline is O(N · |prefix|) per query; only sufficient when interviewer accepts brute force as the starting point.
+
+Common micro-bugs in the DFS extraction: forgetting to emit when the prefix itself is a complete word, and mutating a shared buffer without backtracking.
+
+Memory follow-up: a 26-slot array per node is faster but wastes space; switching to a hashmap per node trades constant factors for memory.
+
+Preparation
+
+Implement insertion + prefix lookup + DFS extraction in a single 30-minute sit-down a few times until the recursion shape is automatic.
+
+Practice talking through the trie-vs-hashmap trade-off before writing code — the interviewer in this round wanted the trade-off discussion before implementation.
+
+Stretch goal: extend the trie to weighted entries (top-K completions by score) using a heap at each node; common follow-up for senior loops.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

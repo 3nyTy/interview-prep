@@ -1,0 +1,68 @@
+===H1===
+ML Coding: Top-P (Nucleus) Sampling
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/ml-coding-top-p-sampling
+===BODY===
+Capital One
+Coding·60 minMembers
+ML Coding: Top-P (Nucleus) Sampling
+Applied Researcher Tech Interview 1, second problem. Given a probability distribution over a vocabulary and a threshold `p`, sample from the smallest set of top tokens whose cumulative probability is at least `p`. Tests both algorithmic clarity and ML fluency.
+RS
+MLE
+ml-knowledge
+sampling
+llm
+numpy
+numerical-stability
+medium
+Frequency
+Single report
+Last asked
+2026-01-19
+Stage
+onsite-coding · onsite-research
+Requirements
+
+Input: a 1-D NumPy / PyTorch tensor of logits or probabilities over a vocabulary of size V, and a threshold p ∈ (0, 1].
+
+If given logits, convert to probabilities via softmax (with numerical stability — log-sum-exp).
+
+Sort probabilities descending, accumulate, find the smallest prefix length k such that the cumulative probability ≥ p.
+
+Re-normalise that top-k subset to sum to 1, then sample a single index from it.
+
+Return the sampled token index in the original vocabulary indexing.
+
+Notes
+
+Standard implementation skeleton:
+
+probs = softmax(logits) with logits -= logits.max() for stability.
+
+sorted_idx = argsort(probs)[::-1] and sorted_probs = probs[sorted_idx].
+
+cumsum = sorted_probs.cumsum(); k = int(searchsorted(cumsum, p)) + 1.
+
+top_probs = sorted_probs[:k] / sorted_probs[:k].sum() — re-normalise.
+
+chosen = np.random.choice(k, p=top_probs); return sorted_idx[chosen].
+
+Common variant: also support temperature, applied as logits /= temperature before softmax. The interviewer often extends to this after the base implementation.
+
+For LLM decoding, the practical concern is correctness at the boundary: if a single token has probability ≥ p, the top-p set is just that one token (greedy). Make sure k = 1 in that case rather than 0.
+
+Top-p is adaptive (the cutoff depends on entropy), unlike top-k (fixed). Be ready to compare them: top-p performs better on diverse outputs because it expands the candidate pool on flat distributions and contracts on peaked ones.
+
+Preparation
+
+Implement once in pure NumPy, once in PyTorch — interviewers ask which framework you prefer and watch closely if the conversion is shaky.
+
+Practise the temperature extension and the top-k variant; the interviewer often picks one as the follow-up.
+
+Be ready to explain why softmax needs the max-subtraction trick for numerical stability — this is the second-most-common deepening question.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

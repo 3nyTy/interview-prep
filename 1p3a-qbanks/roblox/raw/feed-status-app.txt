@@ -1,0 +1,498 @@
+===H1===
+Feed Status App
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/feed-status-app
+===BODY===
+Roblox
+System DesignMembers
+Feed Status App
+Design a status/feed app that stores user updates, serves timelines, and handles real-time or near-real-time freshness.
+SWE
+feed
+presence
+social-graph
+backend
+Frequency
+Single report
+Last asked
+2026-02-11
+Stage
+onsite-system-design
+Problem Statement
+
+Design a frontend app that pulls feeds and shows their status. Users should be able to open a dashboard, see multiple feed sources, understand whether each feed is fresh, loading, stale, failed, or paused, and inspect recent feed items or sync errors.
+
+Assume this is a Roblox frontend system design interview. The backend can expose APIs for feed metadata, feed items, and refresh actions, but the interview should focus on the client architecture: UI structure, API contracts, polling strategy, state management, loading and error states, caching, and how the app behaves on slow or flaky networks.
+
+Common aliases include:
+
+Design a frontend app to pull feeds and show status
+
+Design feed status dashboard
+
+Design a client app for feed health and recent updates
+
+Clarify what "feed" and "status" mean before designing. In the base answer below, a feed is a source that returns recent items, and status means sync freshness plus operational state: loading, fresh, stale, failed, paused, or unauthorized.
+
+Phase 1: Requirements (~5-7 minutes)
+
+Functional Requirements
+
+Users should be able to view a dashboard of feed sources.
+
+Users should be able to see each feed's current status, including last successful pull, current sync state, and error summary.
+
+Users should be able to inspect recent items for a feed with pagination or infinite scroll.
+
+Users should be able to manually refresh a feed and see progress without duplicating refreshes.
+
+Users should be able to filter or sort feeds by failed, stale, active, source type, or owner.
+
+Optional follow-ups:
+
+Search feed items across all sources.
+
+Subscribe to real-time status changes.
+
+Configure feed polling intervals.
+
+Show incident history or status trend charts.
+
+Support admin-only actions such as pausing or reauthorizing a feed.
+
+Product Scope
+
+Assume a web app first, implemented with React or a similar component model. The backend owns the actual feed ingestion and stores feed status. The frontend triggers refresh requests and subscribes or polls for updates; it does not scrape third-party feeds directly from the browser.
+
+Out of scope unless the interviewer asks:
+
+Full feed crawler or ingestion worker design.
+
+Third-party OAuth implementation details.
+
+Ranking or recommendation of feed items.
+
+Long-term analytics warehouse.
+
+Non-Functional Requirements
+
+RequirementTargetWhy it matters
+Dashboard first renderP95 under 1 second after app shell loadsStatus dashboards should be scannable quickly
+Status freshnessFresh within 5-30 seconds for active feedsUsers need to trust operational state
+Manual refresh feedbackUI updates immediately to refreshingAvoid repeated clicks and user confusion
+List scalability100-1,000 feeds per workspaceLarge teams may monitor many sources
+Client resilienceWorks with retries, cancellation, stale cache, and offline bannersFrontend system design heavily probes failure handling
+AccessibilityKeyboard navigation, readable status labels, non-color-only statusStatus apps must be usable under pressure
+
+Clarifying Questions
+
+Are feeds content feeds or service/job feeds?
+Assume content-like sources with sync health. The same frontend pattern also works for job feeds or service status feeds.
+
+Does the browser pull each external feed directly?
+No. The browser calls Roblox backend APIs. Direct browser polling of third-party sources creates CORS, auth, rate-limit, and secret-handling problems.
+
+Do we need real-time status?
+Start with polling plus manual refresh. Add server-sent events or WebSocket as an optimization for high-change workspaces.
+
+How many feeds and items should one page handle?
+Assume hundreds of feeds and thousands of visible items over time, so use pagination, virtualization, and normalized client state.
+
+What does "failed" mean?
+A feed may fail due to auth expiration, source unavailable, parser error, rate limit, or backend ingestion error. Show user-actionable error codes.
+
+Quick Capacity Sanity Check
+
+Client-facing assumptions:
+- 1 workspace can have 100-1,000 feeds
+- Dashboard initially shows 25-50 feeds
+- Each feed row needs compact status metadata
+- Detail view shows 20-50 recent feed items per page
+- Status refresh every 15-30 seconds while the dashboard is visible
+
+Client implication:
+- Use one batched dashboard endpoint instead of one request per feed row
+- Poll only visible or active workspaces
+- Cancel inflight requests when the workspace or filters change
+- Virtualize long feed lists
+
+In frontend system design, capacity estimates should translate into UI and data-fetching decisions: batching, pagination, virtualization, request cancellation, cache keys, and retry behavior.
+
+Phase 2: Data Model (~8-10 minutes)
+
+Core Client Entities
+
+FeedSource
+- feed_id
+- name
+- source_type: rss | webhook | internal_event | third_party_api
+- owner_team
+- status: fresh | refreshing | stale | failed | paused | unauthorized
+- health_severity: none | info | warning | critical
+- last_success_at
+- last_attempt_at
+- next_scheduled_pull_at
+- unread_item_count
+- latest_item_preview
+- error_code
+- error_message
+- can_refresh
+- can_pause
+
+FeedItem
+- item_id
+- feed_id
+- title
+- summary
+- source_url
+- author
+- published_at
+- received_at
+- read_state: unread | read
+- item_status: normal | hidden | malformed
+
+RefreshJob
+- job_id
+- feed_id
+- status: queued | running | succeeded | failed | canceled
+- requested_by
+- started_at
+- completed_at
+- error_code
+
+DashboardFilter
+- status_filter
+- source_type_filter
+- owner_filter
+- sort_key
+- search_query
+
+ClientRequestState
+- cache_key
+- status: idle | loading | success | error | refreshing
+- data_updated_at
+- error
+- abort_controller
+
+Screen Data Needs
+
+ScreenData Needed
+Dashboardfeed ID, name, source type, status, severity, last success, last attempt, unread count, latest preview
+Feed Detailfeed metadata, recent items, item pagination cursor, active refresh job
+Error Drawererror code, user-readable message, last attempts, suggested action
+Refresh Toast/Status Barjob ID, feed name, progress state, completion or failure
+Filter Sidebarstatus counts, source type counts, owner/team options
+
+Normalized Client Store
+
+entities:
+  feeds_by_id: feed_id -> FeedSource
+  items_by_id: item_id -> FeedItem
+  refresh_jobs_by_id: job_id -> RefreshJob
+
+queries:
+  dashboard:{workspace,filters,sort,cursor} -> feed_ids[], next_cursor
+  feed_items:{feed_id,cursor} -> item_ids[], next_cursor
+  status_counts:{workspace} -> counts
+
+ui:
+  selected_feed_id
+  active_filters
+  visible_rows
+  optimistic_refresh_by_feed_id
+
+Normalize by ID so a feed row, detail panel, toast, and status count can update from the same source of truth.
+
+Do not model every row as isolated component-local state. If a manual refresh changes a feed's status, the dashboard row, detail panel, and status counts should all observe the same update.
+
+Phase 3: API Design (~15-20 minutes)
+
+Dashboard API
+
+Use a client-first batched endpoint. The dashboard should not fetch each feed row independently.
+
+GET /api/v1/workspaces/{workspace_id}/feeds?status=failed,stale&source_type=rss&sort=severity_desc&limit=50&cursor=opaque_cursor
+
+{
+  "feeds": [
+    {
+      "feed_id": "feed_123",
+      "name": "Creator Marketplace Events",
+      "source_type": "internal_event",
+      "status": "failed",
+      "health_severity": "critical",
+      "last_success_at": "2025-08-30T18:20:00Z",
+      "last_attempt_at": "2025-08-30T18:34:00Z",
+      "next_scheduled_pull_at": "2025-08-30T18:40:00Z",
+      "unread_item_count": 17,
+      "latest_item_preview": {
+        "title": "New marketplace item published",
+        "published_at": "2025-08-30T18:18:00Z"
+      },
+      "error": {
+        "code": "SOURCE_RATE_LIMITED",
+        "message": "The upstream source is rate limited."
+      },
+      "permissions": {
+        "can_refresh": true,
+        "can_pause": false
+      }
+    }
+  ],
+  "status_counts": {
+    "fresh": 82,
+    "refreshing": 3,
+    "stale": 9,
+    "failed": 6,
+    "paused": 2,
+    "unauthorized": 1
+  },
+  "next_cursor": "cursor_2",
+  "generated_at": "2025-08-30T18:35:00Z"
+}
+
+Feed Detail API
+
+GET /api/v1/feeds/{feed_id}?include=active_refresh_job
+GET /api/v1/feeds/{feed_id}/items?limit=30&cursor=opaque_cursor
+
+{
+  "items": [
+    {
+      "item_id": "item_456",
+      "feed_id": "feed_123",
+      "title": "Experience status changed",
+      "summary": "A tracked experience moved from private to public.",
+      "source_url": "https://example.com/item/456",
+      "author": "system",
+      "published_at": "2025-08-30T18:21:00Z",
+      "received_at": "2025-08-30T18:22:00Z",
+      "read_state": "unread"
+    }
+  ],
+  "next_cursor": "items_cursor_2"
+}
+
+Manual Refresh API
+
+Manual refresh is a mutation, so make it idempotent.
+
+POST /api/v1/feeds/{feed_id}/refresh
+Idempotency-Key: client_generated_uuid
+Content-Type: application/json
+
+{
+  "reason": "manual_user_refresh"
+}
+
+{
+  "job_id": "refresh_789",
+  "feed_id": "feed_123",
+  "status": "queued",
+  "estimated_started_at": "2025-08-30T18:36:00Z"
+}
+
+If a refresh is already running:
+
+{
+  "job_id": "refresh_777",
+  "feed_id": "feed_123",
+  "status": "running",
+  "message": "A refresh is already in progress."
+}
+
+Status Update API
+
+Start with polling:
+
+GET /api/v1/workspaces/{workspace_id}/feed-status-updates?since=sync_token
+
+{
+  "updates": [
+    {
+      "feed_id": "feed_123",
+      "status": "fresh",
+      "last_success_at": "2025-08-30T18:36:30Z",
+      "unread_item_count": 19,
+      "active_refresh_job": null
+    }
+  ],
+  "sync_token": "sync_abc_2"
+}
+
+Offer real-time as a follow-up:
+
+Server-Sent Events:
+- feed.status_changed
+- feed.refresh_job_changed
+- feed.item_added
+
+Error Shape
+
+{
+  "error": {
+    "code": "FEED_UNAUTHORIZED",
+    "message": "This feed needs to be reauthorized.",
+    "retryable": false,
+    "action": {
+      "type": "reauthorize",
+      "url": "/feeds/feed_123/authorize"
+    }
+  }
+}
+
+Walk through the user flow, not just endpoints: dashboard load calls the batched feed API, the user clicks refresh, the client optimistically marks the feed refreshing, then polling or SSE reconciles the final job result.
+
+Phase 4: High-Level Frontend Design (~10-15 minutes)
+
+Component Responsibilities
+
+ComponentResponsibilityState Owned
+AppShellAuth, workspace selection, layoutcurrent workspace
+FeedDashboardCoordinates filters, list, detail panelselected feed ID, visible mode
+FilterBarStatus/source/search filterscontrolled filter inputs
+VirtualizedFeedListRenders large lists without DOM blowupvisible row window
+FeedStatusRowShows name, status badge, timestamps, refresh buttonno durable data; reads feed entity
+FeedDetailPanelShows feed metadata, item list, errors, actionsselected tab and item pagination
+RefreshToastsShows manual refresh progressjob IDs from store
+Data LayerFetches, caches, dedupes, retries, cancelsrequest state and cache keys
+
+Client State Machine
+
+Dashboard request:
+idle -> loading -> success
+idle -> loading -> error
+success -> background_refreshing -> success
+success -> background_refreshing -> stale_with_error
+
+Manual feed refresh:
+fresh/stale/failed -> refreshing_optimistic
+refreshing_optimistic -> refreshing_confirmed
+refreshing_confirmed -> fresh
+refreshing_confirmed -> failed
+refreshing_optimistic -> stale_with_error if POST fails
+
+Data Fetching Strategy
+
+Load the first dashboard page with status counts.
+
+Cache by workspace, filters, sort key, and cursor.
+
+Poll status deltas every 15-30 seconds while the dashboard tab is visible.
+
+Pause polling when the page is hidden; refresh immediately when visible again.
+
+Cancel stale requests when filters change.
+
+Dedupe overlapping dashboard and detail requests through the query cache.
+
+Keep previous data visible during background refresh.
+
+Manual Refresh Flow
+
+User clicks Refresh on feed_123
+-> UI disables refresh button and marks row refreshing
+-> POST /feeds/feed_123/refresh with Idempotency-Key
+-> API returns existing or new refresh job
+-> Store records refresh job
+-> Poll/SSE updates job status
+-> On success, merge new feed status and item count
+-> On failure, show row error and actionable message
+
+For frontend system design, call out the subtle UI states: initial loading, background refresh, stale data with an error banner, per-row refresh, empty filters, unauthorized feed, and partial failure where the dashboard loads but some feed details fail.
+
+Phase 5: Deep Dive & Trade-offs (~8-10 minutes)
+
+Polling vs. Server-Sent Events
+
+ApproachProsConsUse When
+PollingSimple, cache-friendly, easy to retryCan be stale, wastes requests if nothing changesLow to moderate update frequency
+Long pollingLower latency than polling, simpler than WebSocketMore server complexity than pollingNeed near real-time without full duplex
+SSEOne-way status updates fit this app wellConnection lifecycle and auth handlingMany status changes while dashboard is open
+WebSocketFull duplex, low latencyMore complex and usually unnecessaryUsers need interactive bidirectional updates
+
+Base answer: polling with a delta endpoint. Upgrade to SSE if the interviewer pushes on freshness.
+
+Client Caching and Staleness
+
+Use stale-while-revalidate behavior:
+
+Show cached dashboard data immediately after navigation.
+
+Mark it stale if generated_at is older than the freshness target.
+
+Refresh in the background.
+
+If refresh fails, keep cached data with a visible stale/error indicator.
+
+Do not cache unauthorized or permission-sensitive results across users.
+
+Request Failure Handling
+
+Failure cases:
+- Dashboard API fails: show retry affordance and cached data if present
+- Feed detail fails: keep dashboard usable and show detail-panel error
+- Refresh POST times out: retry with same idempotency key or fetch active job
+- Polling fails: back off and show "status updates delayed"
+- 401/403: stop polling and route to login or permission error
+- 429: respect Retry-After and reduce polling frequency
+
+Virtualization and Rendering Performance
+
+For hundreds or thousands of feeds:
+
+Use a virtualized list with fixed or measured row heights.
+
+Keep status badges and timestamps lightweight.
+
+Memoize rows by feed_id and entity version.
+
+Avoid re-rendering the whole list when one feed status changes.
+
+Use stable sort keys so rows do not jump unexpectedly during background updates.
+
+Frontend Testing Strategy
+
+Cover:
+
+Component tests for status badge variants and action availability.
+
+Data-layer tests for cache keys, dedupe, request cancellation, and retry behavior.
+
+Integration tests for dashboard load, filter changes, manual refresh, and failure states.
+
+Accessibility tests for keyboard refresh actions and non-color-only status.
+
+Contract tests or mocked API fixtures for response shape changes.
+
+Common Pitfalls
+
+Making one network request per feed row will break down quickly and create flickering partial states. Use a batched dashboard API.
+
+Only showing spinner/error/success is too shallow. Status dashboards need stale data, background refresh, partial failure, unauthorized, paused, and refreshing states.
+
+Do not put every feed row's status in component-local state. Normalize by feed ID so updates from polling, manual refresh, and the detail panel reconcile cleanly.
+
+Interview Checklist
+
+  Clarify feed source and status semantics.
+
+  Define 3-5 user flows around dashboard, detail, refresh, and filtering.
+
+  Use a client-first batched dashboard API.
+
+  Include request/response examples and error shape.
+
+  Discuss polling versus SSE.
+
+  Explain normalized state, query cache keys, and request cancellation.
+
+  Cover loading, stale, partial error, unauthorized, and refresh-in-progress states.
+
+  Mention virtualization and testing.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

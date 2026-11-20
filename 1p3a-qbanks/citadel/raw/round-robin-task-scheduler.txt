@@ -1,0 +1,60 @@
+===H1===
+Implement a Round-Robin Task Scheduler
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/round-robin-task-scheduler
+===BODY===
+Citadel / Citadel Securities
+Coding·60 minMembers
+Implement a Round-Robin Task Scheduler
+Citadel NXT third-round live coding: implement a round-robin task scheduler. Limited detail leaked under the in-post spoiler tag, but the round shape (1-hour coding paired with a 1-hour systems design slot) is consistent with several NXT loops.
+SWE
+scheduling
+data-structure
+queue
+operating-systems
+medium
+Frequency
+Single report
+Last asked
+2026-01-15
+Stage
+onsite-coding
+Requirements
+
+Implement a round-robin scheduler that:
+
+Accepts new tasks (e.g. add(task) or enqueue(task)).
+
+Cycles through tasks in arrival / queue order, granting each one a fixed time slice before moving to the next.
+
+Removes a task when it signals completion; preserves the round-robin position for the remaining tasks.
+
+Exact prompt specifics (slice length, preemption model, blocking behavior) are gated behind a [hide] tag in the source thread, so clarify with the interviewer before coding.
+
+Notes
+
+Canonical structure: a queue of task descriptors. Each "tick" pops the front, executes one slice, and re-pushes to the back if the task is not complete. O(1) per tick.
+
+For pause / resume semantics, augment the task descriptor with a state field (runnable / waiting / done). Skip non-runnable entries on each tick, or move them to a parking lot until an external event re-enables them.
+
+For variable slice sizes (weighted round robin), associate a credit counter with each task; deduct from the credit on each tick and only re-enqueue when credit is exhausted, then refill. This is the same pattern used by Linux's deficit round-robin packet scheduler.
+
+Memory layout: queue of pointers / handles, not full task objects, so cancellation is cheap. Keep a hashmap task_id -> handle if cancellation by id is required.
+
+The NXT round paired this with a systems-design slot — the interviewer may probe how the scheduler integrates with a thread pool, message bus, or distributed orchestrator. Be prepared to evolve the design.
+
+Preparation
+
+Write the basic round-robin loop using a std::deque or Python collections.deque; budget the implementation at 15 minutes so the rest of the slot is available for follow-ups.
+
+Read the Linux DRR (Deficit Round Robin) and CFS (Completely Fair Scheduler) one-pager descriptions; they are the standard real-world generalizations and frequent follow-up references.
+
+Refresh the cooperative-vs-preemptive scheduling distinction: round-robin is cooperative if tasks yield voluntarily, preemptive if the scheduler can interrupt. State which model the prompt assumes before coding.
+
+Have a 60-second scale-out pitch ready: shard tasks across worker pools, use a central coordinator only for cross-shard scheduling decisions, fall back to local round-robin within each worker.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

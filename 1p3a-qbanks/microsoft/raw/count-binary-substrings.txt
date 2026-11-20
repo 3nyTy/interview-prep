@@ -1,0 +1,49 @@
+===H1===
+Count Binary Substrings (LC 696)
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/count-binary-substrings
+===BODY===
+Microsoft
+Coding·75 minMembers
+Count Binary Substrings (LC 696)
+Count contiguous binary substrings with equal numbers of zeros and ones, with each digit grouped consecutively. The intern OA uses the unchanged LC 696 problem under a renamed prompt.
+SWE
+binary-string
+easy
+Frequency
+Single report
+Last asked
+2026-09-09
+Stage
+oa
+Requirements
+
+Given a binary string, return the number of contiguous substrings containing equal numbers of 0 and 1, with all zeros together and all ones together within each substring.
+
+Count repeated occurrences separately.
+
+Notes
+
+The canonical problem rules match the Requirements above; the preparation below follows those same rules.
+
+The candidate explicitly identifies the question as unchanged LC 696, with only the assessment name changed.
+
+This is one of two questions in a 75-minute intern OA.
+
+Pay attention to accounting for the final consecutive group when scanning the string.
+
+Track the previous and current consecutive-run lengths. At each character change, add min(previous, current) for the completed adjacent pair, then shift the current length into previous and start the new run. Add the last pair after the scan. Each valid substring crosses exactly one run boundary; a pair of lengths a and b contributes min(a, b) choices.
+
+A single pass uses O(n) time and O(1) auxiliary space. A single run contributes zero; an empty input, if accepted by the caller, also returns zero.
+
+Preparation
+
+In 15 minutes, implement the two-run-counter scan without storing all run lengths; explain when the last contribution is added.
+
+In 10 minutes, compare the result against substring enumeration on short binary strings, covering one character, identical characters, alternating characters, and unequal adjacent runs.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

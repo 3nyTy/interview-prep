@@ -1,0 +1,60 @@
+===H1===
+Longest Zigzag Path in a Grid
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/longest-zigzag-path-grid
+===BODY===
+ByteDance / TikTok
+Coding·60 minMembers
+Longest Zigzag Path in a Grid
+TT Ads phone screen. Given an integer grid, return the length of the longest path (4-directional moves) whose consecutive value comparisons strictly alternate — grid[a] < grid[b] > grid[c] < ... or the inverse. DFS over a (cell, last-direction) state, best memoized like a longest-increasing-path-in-matrix DP; solved with DFS + backtracking.
+SWE
+grid
+dfs
+backtracking
+dp
+medium
+Frequency
+Single report
+Last asked
+2026-06-17
+Stage
+phone-screen
+Requirements
+
+Given a 2-D grid of integers, find the length of the longest zigzag path.
+
+Start from any cell; each step moves to a 4-directionally adjacent cell (up / down / left / right).
+
+The value comparisons between consecutive steps must strictly alternate in direction:
+
+grid[a] < grid[b] > grid[c] < grid[d] ..., or
+
+grid[a] > grid[b] < grid[c] > grid[d] ...
+
+In other words, every adjacent pair along the path flips between strictly-increasing and strictly-decreasing. Equal neighbors break the path.
+
+Return the length (number of cells) of the longest such path.
+
+Notes
+
+A straight DFS + backtracking from every cell works and is what was used under time pressure; the state you carry is the current cell plus the direction of the last comparison (up or down).
+
+Strict inequality matters: equal adjacent values cannot extend a zigzag, so guard the < / > checks explicitly.
+
+The clean optimization is DFS with memoization keyed on (r, c, last_direction) — at most 2·m·n states, turning the search into an O(m·n) longest-path-style DP rather than exponential backtracking.
+
+Pacing note: the ads-track phone screen opens with a long resume chat (longer if you have an ads background), so coding time can be tight — one candidate ran out of time mid-debug on a loop even after the approach was correct. Get to a working skeleton early.
+
+Preparation
+
+Drill the memoized "longest path in a matrix" pattern, then add the alternating-direction twist by splitting each cell's memo into an up-state and a down-state.
+
+Hand-trace a 3x3 grid with both starting directions to convince yourself the alternation invariant holds at every step.
+
+Practice writing the (r, c, last_dir) memo from scratch in under 20 minutes so the resume chat does not eat your coding budget.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

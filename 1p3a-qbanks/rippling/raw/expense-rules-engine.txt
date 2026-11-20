@@ -1,0 +1,176 @@
+===H1===
+Expense Rules Engine
+===URL===
+https://www.1point3acres.com/interview/problems/company/rippling/expense-rules-engine
+===BODY===
+Rippling
+Coding·60 minFree preview
+Expense Rules Engine
+Design an extensible corporate-card rules engine. Evaluate per-expense and per-trip policies, choose a useful return type, then support composite AND / OR / NOT rules and scale the design to millions of expenses and tens of thousands of rules.
+SWE
+MLE
+oop-design
+hashmap
+data-modeling
+streaming
+ai-allowed
+hard
+Frequency
+High
+Last asked
+2026-09-01
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input expenses are dictionaries with string keys and values. Typical fields include expense_id, trip_id, amount_usd, expense_type, vendor_type, and vendor_name. Note amount_usd arrives as a string ("49.99") and must be coerced to float before any numeric comparison.
+
+Implement evaluate_rules(rules: list<rule>, expenses: list<expense>) -> ...; the return type is part of the design discussion, but it should preserve which expense or trip violated which rule.
+
+Base individual-expense rules include:
+
+no restaurant expense over $75 where vendor_type == "restaurant";
+
+no airfare expenses;
+
+no entertainment expenses;
+
+no single expense over $250.
+
+Base group / trip rules include:
+
+no trip over $2000 total;
+
+no meal expenses over $200 total per trip.
+
+Design for future rule types and API-created rules. The core requirement is that rules are treated as data, not code — a single generic engine reads rule settings and checks expenses, so new rules arrive via API without touching the evaluator (Open/Closed). Hardcoding one function per policy (check_restaurant_75, check_no_airfare) is the explicit anti-pattern the interviewer is watching for.
+
+Reuse the same predicate / condition layer across individual and group rules. For example, the expense_type == "meals" condition can filter expenses before summing a trip-level amount.
+
+Follow-up: handle millions of expenses per day and tens of thousands of rules; discuss storage, rule indexing, streaming evaluation, and notification of violations.
+
+Follow-up: support composite rules such as (restaurant AND meals AND amount > 50), (entertainment AND amount > 100) OR client_hosting, and (amount > 100) AND NOT vendor_name == Staples.
+
+The two entry-point signatures the canonical shape exposes:
+
+def evaluate_rules(rules: list[Rule], expenses: list[dict]) -> list[Violation]:
+    # Per-transaction pass: for each expense, each rule that is_violated_by(expense)
+    # emits a Violation(expense_id, rule_id, rule_description).
+
+def evaluate_group_rules(group_rules: list[GroupRule], expenses: list[dict]) -> list[GroupViolation]:
+    # Per-trip pass: group expenses by rule.group_by, optionally filter each group,
+    # sum rule.aggregate_field, emit GroupViolation when total > rule.threshold.
+    # GroupViolation carries actual_value, threshold, and the contributing expense_ids.
+
+Follow-up: prohibit two specified expense types from appearing in the same trip. The rule must inspect the trip as a whole, and an individual violation must not prevent the remaining trip-level checks from running.
+
+Examples
+
+{
+  "expense_id": "001",
+  "trip_id": "001",
+  "amount_usd": "49.99",
+  "expense_type": "client_hosting",
+  "vendor_type": "restaurant",
+  "vendor_name": "Outback Roadhouse"
+}
+
+A useful violation payload is explicit enough for API clients and notifications:
+
+{
+  "rule_id": "single-expense-limit",
+  "expense_id": "004",
+  "trip_id": "002",
+  "message": "Expense 004 exceeds $250"
+}
+
+Against the base rules, a representative expense set flags: a $153 restaurant meal (over the $75 restaurant limit), a $1996 airfare row (airfare disallowed AND over $250 — two violations for one expense), and a $59.50 entertainment row (entertainment disallowed). At the trip level, a trip whose rows sum to $2206.08 breaks the $2000 trip cap, and whose meal rows sum to $210.08 breaks the $200-per-trip meal cap. The same expense can be individually valid yet belong to a flagged trip.
+
+Notes
+
+A good return type separates individual-expense violations from trip-level violations and preserves which rule was violated. The concrete contract is two separate lists wrapped in a result object — e.g. EvaluationResult(individual_violations, group_violations) with a to_response() that serializes flagged_expenses (expense_id, rule_id, reason) and flagged_groups (group_id, rule_id, reason, actual, threshold, expense_ids). Keeping them separate is deliberate: a $20 meal can be individually valid while its $3000 trip is flagged, and the caller needs to see both statuses independently.
+
+The OOD signal is the core of the round: use a predicate / rule interface, then compose rules into an expression tree for AND / OR / NOT. The canonical shape is the Rules / Specification pattern: a Rule interface with a single evaluate(context) -> bool or evaluate(context) -> Violation? method, plus composite rules AndRule, OrRule, and NotRule that hold child rules and combine their results.
+
+Split the type hierarchy into two layers: per-transaction rules that read one expense, and per-trip aggregate rules that read a grouped list. Aggregate rules need an explicit grouping step in the evaluator; running them per expense would either double-count or miss trip totals.
+
+When both individual and group rules run, combine results into one response rather than short-circuiting after the first violation; interviewers usually expect all violated policies to be visible.
+
+For scale, pre-index rules by the fields they read so each expense only triggers the rules whose predicates touch its keys; aggregate per-trip metrics incrementally instead of re-scanning; stream evaluation per trip-window; and emit violation events to an async notification path rather than blocking ingestion.
+
+Complexity: per-transaction evaluation is O(E × R × C) time (expenses × rules × conditions-per-rule) with O(V) space for violations; adding a rule is O(1). Group evaluation is O(E) to group plus O(G × R × E_g) to evaluate (groups × group-rules × expenses-per-group).
+
+Edge cases: parse amount_usd as numeric before comparing (a comparison operator, not lexicographic); handle missing fields consistently (no key → treat the condition as non-matching rather than crashing); guard non-numeric garbage ("ABC" → catch ValueError/TypeError); handle empty groups (a trip with no expenses, or a filter that removes all rows, sums to 0 and should not flag); decide whether negative or zero amounts are invalid input or simply fail no threshold rule; clarify whether multiple rules can produce duplicate-looking messages for the same expense.
+
+In AI-assisted rounds, interviewers expect the candidate to own the rule interface and the per-trip aggregation contract before prompting the tool. Some phone screens assume the candidate will use AI for the evaluator implementation; first narrate the rule design, walk through the examples, and decide how to prompt for a small evaluate function rather than asking for a full end-to-end solution. Generating composite-rule boilerplate is fine, but the interface design has to come from you.
+
+Suggested core data structure — data-driven Condition + Rule
+
+Model each atomic check as a Condition(field, operator, value) with a matches(expense) -> bool, where operator is an enum (==, !=, >, <, >=, <=) and numeric operators float-coerce both sides. A Rule is then just rule_id + description + list[Condition], violated when all conditions match (AND semantics); the evaluator stays generic.
+
+@dataclass
+class Condition:
+    field: str            # e.g. "vendor_type"
+    operator: Operator    # enum: ==, !=, >, <, >=, <=
+    value: Any            # numeric ops float()-coerce both sides; missing field -> False
+
+@dataclass
+class Rule:
+    rule_id: str
+    description: str
+    conditions: list[Condition]   # all() must match -> violation (AND)
+
+@dataclass
+class GroupRule:
+    rule_id: str
+    description: str
+    group_by: str                 # e.g. "trip_id"
+    aggregate_field: str          # e.g. "amount_usd"
+    threshold: float              # violated when summed aggregate_field > threshold
+    filter_condition: Condition | None = None   # reuse Condition to select rows in the group
+
+GroupRule deliberately reuses the per-transaction Condition as its optional in-group filter, so the meal-per-trip cap is "group by trip_id, filter expense_type == meals, sum amount_usd, compare to 200" with no new predicate machinery.
+
+Alternate canonical variant — SQL-style filter + validator
+
+Some interviewers frame rules as SQL: separate "which rows does this rule apply to" (the WHERE clause) from "what makes an applicable row a violation." A single rule then holds filter_conditions (all must match for the rule to apply) and a distinct violation_condition:
+
+@dataclass
+class SQLLikeRule:
+    rule_id: str
+    description: str
+    filter_conditions: list[Condition]   # WHERE: rows this rule applies to
+    violation_condition: Condition       # what makes an applicable row a violation
+
+    def applies_to(self, e: dict) -> bool:
+        return all(c.matches(e) for c in self.filter_conditions)
+
+    def is_violated_by(self, e: dict) -> bool:
+        return self.applies_to(e) and self.violation_condition.matches(e)
+
+This cleanly splits applicability from the violation test; it is a structural alternative to the all-conditions-AND Rule, not a value conflict — clarify which framing the interviewer wants before coding.
+
+Composite / API follow-ups
+
+OR and nesting: the flat all-AND Rule only expresses AND; for OR / NOT and nested groups, escalate to the composite AndRule / OrRule / NotRule tree or add a LogicalOperator that combines condition groups.
+
+API-defined rules: rules serialize to JSON; validate the rule definition (known fields, valid operator, well-typed value) before persisting to the DB.
+
+Priorities / short-circuit: attach a priority to rules and optionally stop evaluating once a high-priority rule fires.
+
+Scale levers: DB indexes on filtered fields, batched/paginated processing, parallel evaluation, and grouping rules by the field they read (evaluate all amount rules together) or a decision tree over predicates.
+
+Preparation
+
+Implement the base rule engine twice: once with simple per-expense functions, once with Rule objects + AndRule / OrRule / NotRule composites so the same evaluator handles both flat and nested rules.
+
+Also implement the data-driven Condition(field, operator, value) + generic evaluate_rules path end to end, including the Operator enum with float-coercing numeric comparisons and the missing-field / non-numeric guards.
+
+Group expenses by trip_id once per evaluation pass; precompute trip totals and per-expense_type sums and feed them to aggregate rules so the same totals are not recomputed per rule. Return individual and group violations as two separate lists behind a single result object with a to_response() serializer.
+
+Prepare a layered scale answer: rule storage, rule compilation into composite trees on load, field-based indexing of leaf predicates, streaming per-trip evaluation, and violation events emitted to a queue for notifications.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

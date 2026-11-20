@@ -1,0 +1,154 @@
+===H1===
+Payment Reconciliation
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/payment-reconciliation-integration
+===BODY===
+Stripe
+Coding·60 minMembers
+Payment Reconciliation
+A hands-on integration assessment where you build a payment reconciliation system that processes payment data and communicates with a clearing service API. It is structured in four escalating parts: parsing payment data, submitting a clearing file, comparing transactions, and handling disputes.
+SWE
+api-integration
+http
+parsing
+json
+payment
+medium
+Frequency
+Single report
+Last asked
+2025-10-15
+Stage
+onsite-coding
+Task Summary
+
+A practical coding exercise: build a system that checks payment records. You read data files and communicate with a clearing service API, using starter code, sample files, and API instructions provided for the round.
+
+The exercise has four parts that start easy and get progressively harder. You will parse data, make HTTP requests, handle authentication, and produce reports. The emphasis is on writing clean, professional-quality code.
+
+Interview Details
+
+Time Limit: About 45 to 60 minutes.
+
+Setup: Clone the code to your machine, work locally, and share your screen.
+
+Languages: Python, JavaScript, Java, Go, C++, Ruby, Rust, Kotlin, or C#.
+
+Style: The interviewer watches you work and offers little help — you must lead the solution.
+
+Step 1: Reading Payment Data
+
+Read JSON files holding payment data. Each file contains a list of payments with the merchant name, the amount, and the currency type.
+
+Requirements:
+
+Open and load the provided JSON files.
+
+Read the payment records and print them in a readable form.
+
+Compute aggregates over the data (total amount and transaction count).
+
+Sample Data Structure:
+
+[
+  {
+    "merchant": "acct_707",
+    "amt": 91088,
+    "currency": "usd"
+  },
+  {
+    "merchant": "acct_707",
+    "amt": 77855,
+    "currency": "usd"
+  }
+]
+
+Things to Keep in Mind:
+
+The amounts are in the smallest currency unit (e.g. cents for USD).
+
+You may need to process more than one file.
+
+Write the code so it is easy to extend for the next steps.
+
+Step 2: Sending Data to the API
+
+Convert the payment data into a specific "clearing file" format, then submit it to the API.
+
+Requirements:
+
+Convert the data into a fixed-width format.
+
+Log in to the service to obtain an API key.
+
+Send the file using the /submit_clearing_file endpoint.
+
+Verify that the upload succeeded.
+
+Clearing File Format: Each line uses commas to separate fields, and each field must have a specific width:
+
+Transaction ID
+
+Timestamp
+
+Amount (zero-padded on the left to fill the field width)
+
+Currency code
+
+Things to Keep in Mind:
+
+The server is strict about the file's exact shape — study the examples carefully.
+
+Authentication uses a Bearer token.
+
+Consider how to handle network failures.
+
+Step 3: Comparing Transactions
+
+Download the bank records from the service and compare them against the data you submitted.
+
+Requirements:
+
+Fetch the bank data from the /get_bank_account_transactions endpoint.
+
+Match these transactions against your clearing file data.
+
+Produce a report showing which items match and which do not.
+
+Submit the report to /validate_reconciliation_report to check your work.
+
+Things to Keep in Mind:
+
+Timestamps on the records might not match exactly.
+
+Some items may exist in one list but not the other.
+
+The API tells you whether your report is correct.
+
+Step 4: Managing Disputes
+
+Handle "disputes" — payments that were contested or charged back.
+
+Requirements:
+
+Fetch the list of disputes from the /get_disputes endpoint.
+
+Incorporate this data into your reconciliation logic.
+
+Update your report to show the disputed amounts.
+
+Handle the modified submission process when disputes exist.
+
+Things to Keep in Mind:
+
+Disputes change the final settled total.
+
+You may need to send extra information to the API.
+
+The report format may need to change.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

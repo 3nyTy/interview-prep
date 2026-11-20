@@ -1,0 +1,75 @@
+===H1===
+Decode String
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/decode-string
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Decode String
+Decode a string encoded with the `k[encoded_string]` repetition rule, supporting arbitrary nesting and multi-digit counts. A staple Bloomberg phone-screen problem where the interviewer pushes for the clean stack-based solution and explicit complexity reasoning.
+SWE
+stack
+string-processing
+parsing
+recursion
+medium
+Frequency
+Single report
+Last asked
+2026-01-08
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Given an encoded string with the grammar:
+
+encoded := chars
+         | encoded encoded
+         | int '[' encoded ']'
+
+Return the decoded string. int may be multi-digit. Bracket nesting is arbitrary. Inputs are well-formed.
+
+Function signature:
+
+String decodeString(String s)
+
+Follow-ups:
+
+Compare a recursive solution to an explicit-stack solution. Why does the stack version avoid the recursion-depth issue on adversarial inputs?
+
+What is the time complexity in terms of input length vs output length? Be ready to argue O(|output|).
+
+Handle malformed input gracefully (extra ']', unmatched '[') as a clarifying discussion.
+
+Examples
+
+'3[a]2[bc]'        -> 'aaabcbc'
+'3[a2[c]]'         -> 'accaccacc'
+'2[abc]3[cd]ef'    -> 'abcabccdcdcdef'
+'10[a]'            -> 'aaaaaaaaaa'   // multi-digit count
+
+Notes
+
+The canonical solution maintains two parallel stacks: one of integers (the pending repeat count) and one of strings (the partial result before the current bracket). On [, push the current count and the current partial result, then reset both. On ], pop them, then set current = popped_partial + popped_count * current.
+
+Multi-digit counts require accumulating into the count while the character is a digit, not assuming single-digit.
+
+Time complexity is O(|output|) because building the final string is the dominant cost; space is O(depth + |output|).
+
+A recursive variant parses the same grammar via mutual recursion, but the stack-based form is preferred because it makes the bracket bookkeeping explicit and survives deeply nested inputs.
+
+A common Bloomberg follow-up changes the syntax to (group){k} (multiplier suffix) instead of k[group] (prefix). The algorithm is structurally the same; only the parser shifts.
+
+Preparation
+
+Implement the two-stack solution once from scratch without looking and walk through 3[a2[c]] step by step.
+
+Be ready to convert between the iterative and recursive forms; the interviewer often asks for the one you did not write first.
+
+Practice articulating the complexity argument in terms of the output length, not the input length — this is a common follow-up trap.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,64 @@
+===H1===
+Coding — Bootloader Instruction Simulator (Fix the Loop)
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/coding-bootloader
+===BODY===
+Anthropic
+Coding·55 minMembers
+Coding — Bootloader Instruction Simulator (Fix the Loop)
+SWE coding prompt seen in both phone and virtual-onsite loops. A list of `plus` / `next` / `jump` instructions mutates an accumulator and program counter; first detect the loop, then identify or repair the single bad instruction that makes execution cycle.
+SWE
+simulation
+cycle-detection
+parsing
+python
+medium
+Frequency
+Low
+Last asked
+2026-07-18
+Stage
+phone-screen · onsite-coding
+Requirements
+
+You are given a file where each line is an instruction with an operand:
+
+plus <n> — add <n> to a global accumulated value, then advance to the next line.
+
+next <n> — skip directly to the next line (the operand is ignored for control flow).
+
+jump <n> — jump to line current_index + n.
+
+The program halts when it either runs past the last line or revisits a line it has already executed (an infinite loop). One line has its jump and next instruction swapped, which is what forces the program into a loop. The task:
+
+Run the program and detect the loop — the offending line is the first line that would be visited twice.
+
+Repair the run by flipping the behavior on a revisited line: a jump that lands on an already-visited line is treated as a next, and a next that would revisit is treated as a jump.
+
+Return the accumulated value reached once the program halts without looping.
+
+A reported clarification: the expected return is the accumulated value at the point the (repaired) program terminates — not the sum of every plus operand in the file. Partial progress is acceptable; the interviewer wanted whatever value is reached without looping.
+
+Notes
+
+The hard part is reading comprehension, not algorithms: the base mechanic is a visited-set loop detector over a program counter, but the prompt's framing (which instruction is "wrong", what exactly to return) is reported as confusing and worth clarifying explicitly before coding.
+
+The wording around "an instruction is reversed" trips candidates into thinking every jump/next is mislabeled; in practice exactly one line revisits, and that revisit point is the line to fix.
+
+A virtual-onsite variant phrases the first part as "find the loop" and the second part as "one instruction is wrong; find that instruction." Treat the prompt wording as part of the problem and restate your interpretation before coding.
+
+The full follow-up set has not surfaced — candidates ran out of time on the base problem.
+
+Preparation
+
+Implement a program-counter simulator with a visited set that halts on the first repeat — the same skeleton as the classic "find where the boot sequence loops" puzzle.
+
+Practice parsing <op> <signed-int> lines and dispatching on the op.
+
+Be ready to clarify the return contract up front (terminal accumulator vs. total) and to handle the repair rule (treat a revisiting jump as next and vice versa) as a small state tweak inside the loop.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

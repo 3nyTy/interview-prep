@@ -1,0 +1,53 @@
+===H1===
+Tic-Tac-Toe System with K Players and 3-in-a-Row Win
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/tic-tac-toe-k-players-three-in-a-row
+===BODY===
+Google
+Coding·45 minMembers
+Tic-Tac-Toe System with K Players and 3-in-a-Row Win
+Design a Tic-Tac-Toe system for `k` players on an `n x n` board. After each move, return the game status; any player wins immediately after forming 3 consecutive marks in a straight line.
+SWE
+object-design
+grid
+simulation
+medium
+Frequency
+Single report
+Last asked
+2026-05-18
+Stage
+phone-screen · tech-screen
+Requirements
+
+Input parameters: k players and an n x n board.
+
+Players take turns placing their marks on empty cells.
+
+A player wins as soon as they form 3 consecutive marks in a straight line, regardless of how large n is.
+
+After each move, return the correct game status, such as Game Over or <player> won.
+
+Discuss implementation details and time complexity before coding.
+
+Notes
+
+Check four directions through the new mark: horizontal, vertical, main diagonal, anti-diagonal. Count contiguous marks on both sides; win if total reaches 3.
+
+Avoid scanning the whole board after every move unless n is tiny. The local directional check is O(1) for the fixed 3-in-a-row target, or O(target) if generalized.
+
+Clarify invalid moves, turn order, draw state, and whether 3-in-a-row must be exactly 3 or at least 3.
+
+Preparation
+
+Implement the classic Tic-Tac-Toe design problem, then generalize from 2 players / 3x3 to k players / n x n.
+
+Practice local directional win checks with boundary guards.
+
+Write tests for corners, edges, duplicate moves, and simultaneous longer lines.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

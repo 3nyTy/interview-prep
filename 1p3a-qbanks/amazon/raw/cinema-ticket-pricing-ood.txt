@@ -1,0 +1,54 @@
+===H1===
+Extensible Cinema Ticket Pricing
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/cinema-ticket-pricing-ood
+===BODY===
+Amazon
+CodingMembers
+Extensible Cinema Ticket Pricing
+Design and implement an extensible cinema price calculator. Price combines a movie-format base price, optional add-on prices, a showtime multiplier, and a seat-tier multiplier.
+SWE
+oop-design
+object-design
+medium
+Frequency
+Single report
+Last asked
+2026-08-21
+Stage
+onsite-coding
+Requirements
+
+Movie format (standard, 3D, IMAX, and future formats) determines the base price.
+
+Showtime (morning, afternoon, night, and future slots) supplies a multiplier.
+
+Seat tier (standard, premium, VIP, and future tiers) supplies another multiplier.
+
+A ticket may include zero or more fixed-price add-ons such as seat selection, extra legroom, or a blanket.
+
+Compute price = (base price + sum(add-on prices)) × showtime multiplier × seat-tier multiplier.
+
+New formats, showtimes, seat tiers, and add-ons should be introduced without rewriting existing pricing logic.
+
+Notes
+
+Keep configurable prices and multipliers outside conditional-heavy orchestration code.
+
+Clarify currency precision, rounding, and whether promotions or taxes are inside the requested scope.
+
+Model the base-price rule, showtime multiplier, seat-tier multiplier, and each add-on behind small pricing interfaces or configuration-backed strategies. The calculator composes their outputs and owns only rounding and final currency conversion.
+
+Register new rule implementations through factories or dependency injection so extension adds a class/config entry rather than another branch in the calculator.
+
+Preparation
+
+Implement the object model and add one new movie format and add-on without modifying the calculator.
+
+Write tests for no add-ons, multiple add-ons, each multiplier boundary, and currency rounding.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

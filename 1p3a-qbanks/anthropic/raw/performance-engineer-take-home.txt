@@ -1,0 +1,53 @@
+===H1===
+Performance Engineer Take-Home — Kernel Optimization
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/performance-engineer-take-home
+===BODY===
+Anthropic
+Coding·120 minMembers
+Performance Engineer Take-Home — Kernel Optimization
+Performance Engineer track replaces the standard coding phone screen with a 2-hour AI-allowed take-home: optimize a mocked GPU-kernel-style core function. Scoring is by measured speedup; passing scores reported in the 600/1000 range with ~8× speedup.
+Perf Eng
+gpu
+kernel
+optimization
+memory-coalescing
+loop-unrolling
+hard
+Frequency
+Low
+Last asked
+2025-12-11
+Stage
+take-home
+Requirements
+
+2-hour take-home. AI tools (Claude, ChatGPT, Copilot) are explicitly allowed — this is the rare Anthropic round that encourages them.
+
+The target is a mocked kernel function that resembles a real GPU kernel: nested loops over tiles, arithmetic on a buffer, output reduction.
+
+Optimizations expected: loop unrolling, memory coalescing / better stride access, operator fusion, vectorization, eliminating redundant work.
+
+Scoring is based on a benchmark harness (speedup × baseline = score). Reported pass bar: roughly 600/1000 corresponding to ~8× speedup over the baseline.
+
+Notes
+
+The take-home is the gate into the Performance Engineer onsite — clearing it skips both the standard recruiter phone-screen technical chat and any live coding screen.
+
+Don't optimize blindly: read the kernel structure, identify the bottleneck (memory access vs. arithmetic), then iterate. The score is monotonic in measured speedup, so iteration time matters more than elegance.
+
+AI tools are useful for generating candidate rewrites; the candidate's value-add is recognizing which rewrites are actually faster on the harness.
+
+Preparation
+
+Read the standard GPU-kernel optimization references (Nvidia's CUDA C++ Best Practices, PMPP chapter on coalescing). Memorize the ladder: coalescing → tiling → unrolling → fusion → occupancy.
+
+Practice profiling a CPU baseline with perf or cProfile so you can identify the hot inner loop quickly.
+
+Have a saved scaffolding for benchmarking + correctness-checking so you don't burn time on infrastructure inside the 2-hour window.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,51 @@
+===H1===
+Catalog Top-K / Kth-Largest Selection
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/catalog-top-k-selection
+===BODY===
+Amazon
+Coding·30 minMembers
+Catalog Top-K / Kth-Largest Selection
+Solve a catalog Top-K / kth-largest task. Confirmed variants map directly to LC 215, LC 703, and LC 347, with follow-ups on heap-based improvement, streaming updates, and memory optimization.
+SWE
+heap
+top-k
+streaming
+medium
+Frequency
+Low
+Last asked
+2026-08-27
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Main variant: select the kth-largest item from a catalog-like collection; this is explicitly identified as LC 215.
+
+Streaming variant: maintain the kth-largest value as new items arrive; this is explicitly identified as LC 703.
+
+Frequency variant: return the top-k most frequent values; this is explicitly identified as LC 347.
+
+Follow-ups ask for a heap-based improvement and lower memory usage.
+
+Notes
+
+Clarify which canonical variant is in scope before coding: kth-largest by value, streaming kth-largest, or top-k by frequency.
+
+State both time and retained-state costs; the memory follow-up is an explicit part of the evaluation.
+
+For offline or streaming kth-largest, retain a min-heap of at most k values: discard the root whenever the heap grows beyond k. This gives O(n log k) offline time, O(log k) per stream update, and O(k) heap space.
+
+For top-k frequency, first count the u distinct values, then keep a size-k min-heap keyed by frequency. The exact method costs O(n + u log k) time and must retain O(u) counts unless the follow-up permits approximation.
+
+Preparation
+
+Implement all three named variants with a bounded heap and explain why the heap never needs to hold the full input.
+
+Drill the transition from an offline array API to an online add API, including duplicate values and k larger than the number of values seen so far.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

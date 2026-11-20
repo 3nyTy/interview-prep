@@ -1,0 +1,72 @@
+===H1===
+GQS SWE Whiteboard: Boundary Search + Sliding-Window Top K
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/gqs-swe-whiteboard-boundary-search-top-k
+===BODY===
+Citadel / Citadel Securities
+Other·60 minMembers
+GQS SWE Whiteboard: Boundary Search + Sliding-Window Top K
+Discussion-only GQS SWE phone screen with a Quant Developer interviewer. The first problem asks for all values equal to `K` in a sorted array under progressively tighter binary-search API constraints; the second asks how to maintain the top `K` elements inside each sliding window and drives toward an ordered data structure supporting insert, erase, and traversal.
+SWE
+binary-search
+array
+sliding-window
+top-k
+data-structure
+bst
+medium
+Frequency
+Single report
+Last asked
+2026-06-30
+Stage
+phone-screen
+Requirements
+
+A discussion-only GQS SWE phone screen with a Quant Developer interviewer. No code is written; the round is a whiteboard-style progression through two algorithmic problems.
+
+Problem 1 - Boundary search with constrained APIs
+
+Find all elements equal to K in a sorted array.
+
+Baseline answer: binary-search the left boundary and the right boundary, then return the interval.
+
+Constraint 1: only one binary-search primitive is allowed. For integer arrays, using only lower_bound can still recover the range as left = lower_bound(K) and right = lower_bound(K + 1).
+
+Constraint 2: the array element type may not have a successor operation. For floats, strings, or custom comparable objects, K + 1 is not meaningful. The discussion shifts from implementation to whether the provided API is expressive enough to recover the right boundary in O(log n).
+
+The key clarification is whether the type supports a well-defined next value or whether the API must expose both lower-bound and upper-bound behavior.
+
+Problem 2 - Sliding-window top K
+
+Given an array and a sliding window, return the largest K elements inside each window, not just the maximum.
+
+Baseline brute force: for each window, copy the window, sort it, and take the top K, for O(n * W log W) when W is the window size.
+
+A monotonic queue is not sufficient because it only preserves the maximum; values discarded while maintaining monotonicity may be needed later for the top-K set.
+
+A heap is awkward because extracting the largest K values destroys the structure unless those values are pushed back, and stale-window deletion adds extra bookkeeping.
+
+The intended direction is a sorted structure that supports insert, erase, and ordered traversal. Balanced BST, ordered set, or ordered map are the natural abstractions, with O(log W) updates and top-K traversal from the high end.
+
+Notes
+
+This is not a standard pair-programming screen. The interviewer can keep the conversation at the level of API design, complexity limits, and data-structure trade-offs for the full round.
+
+For Problem 1, the trap is assuming every ordered type has an easy successor. The stronger answer explicitly separates index-space binary search from value-space assumptions and asks whether an upper_bound operation is available.
+
+For Problem 2, the interviewer nudges away from one-off tricks and toward an abstract data structure contract. Be ready to compare monotonic queue, heap with lazy deletion, sorted list, and balanced BST without overcommitting to an implementation too early.
+
+Preparation
+
+Practice explaining lower_bound and upper_bound as API contracts, not just templates: define the returned index, duplicate handling, empty-range behavior, and what breaks when only one primitive exists.
+
+Drill sliding-window data-structure comparisons: monotonic queue for top-1, heap plus lazy deletion, sorted list, balanced BST / ordered multiset, and two-heap splits.
+
+Rehearse whiteboard reasoning out loud. State the invariant, identify the missing operation, and ask whether the interviewer wants an implementable data structure or an impossibility / API-expressiveness argument.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

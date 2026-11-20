@@ -1,0 +1,54 @@
+===H1===
+Logistic Regression Debugging
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-logistic-regression-debugging
+===BODY===
+LinkedIn
+CodingMembers
+Logistic Regression Debugging
+Debug a logistic-regression implementation with errors in the weight gradient, sigmoid-derivative contract, and binary cross-entropy loss. The interviewer expects the corrected gradient to be derived and simplified to its final matrix form.
+MLE
+debugging
+classification
+gradient-descent
+ml-knowledge
+hard
+Frequency
+Single report
+Last asked
+2026-08-24
+Stage
+phone-screen
+Requirements
+
+Inspect a logistic-regression training implementation and identify the mathematical and implementation defects.
+
+Correct the weight gradient: the residual must include the labels, giving ∇w L = Xᵀ(h - y) / m rather than Xᵀh / m.
+
+Resolve the sigmoid-derivative contract. If the helper receives a pre-activation z, compute sigmoid(z) * (1 - sigmoid(z)); h * (1 - h) is valid only when the input is already the activation h.
+
+Correct binary cross-entropy so it includes both the positive term -y log(h) and the negative term -(1 - y) log(1 - h).
+
+Derive and fully simplify the final gradient rather than stopping at an intermediate chain-rule expression.
+
+Notes
+
+The final algebraic simplification is part of the evaluation. Reaching the right direction without producing the closed matrix expression is insufficient.
+
+Write z = Xw + b, h = sigmoid(z), and the mean binary cross-entropy before differentiating. The sigmoid and cross-entropy factors simplify to ∂L/∂z = (h - y) / m, then the chain rule gives ∇w L = Xᵀ(h - y) / m.
+
+Keep the helper contract explicit in code: a derivative that accepts z must evaluate the sigmoid first, while a derivative that accepts h must not apply sigmoid a second time. Clip probabilities or use a logits-based loss when evaluating the objective numerically so log(0) does not obscure the gradient bug.
+
+Preparation
+
+In 15 minutes, derive the mean binary-cross-entropy gradient from z = Xw + b to ∇w L = Xᵀ(h - y) / m, writing every tensor shape beside the corresponding term.
+
+Implement both valid sigmoid-derivative helper contracts, name their parameters z and h, and test that the two implementations agree on three pre-activation values.
+
+Build a finite-difference gradient check for a three-row dataset and verify every analytic weight-gradient component within 1e-5.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

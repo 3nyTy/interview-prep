@@ -1,0 +1,55 @@
+===H1===
+Nested List Weight Sum (LC 339) with Follow-Ups
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/nested-list-weighted-sum-parsing
+===BODY===
+Google
+Coding·45 minMembers
+Nested List Weight Sum (LC 339) with Follow-Ups
+LC 339 Nested List Weight Sum, followed by a raw-string parsing variant. Track depth through brackets, accumulate multi-digit integers, and flush each number at a comma, closing bracket, or end of input.
+SWE
+tree
+recursion
+parsing
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-coding
+Requirements
+
+Given a nested list of integers, return the sum of each integer multiplied by its depth; outermost values have weight 1 and each nested level increments the weight.
+
+Be able to express both DFS (pass depth recursively) and BFS (process one level at a time) versions, and compare their stack behavior for very deep nesting.
+
+Follow-up: accept the nested structure as a string rather than a parsed list. Increment depth on [, decrement it on ], accumulate multi-digit numbers, and add a completed number times its depth.
+
+A number must be flushed when the parser reaches a comma, a closing bracket, or the end of the string.
+
+Examples
+
+"[3, 8, [2, 14], [2, [91]]]" → 3×1 + 8×1 + 2×2 + 14×2 + 2×2 + 91×3 = 320.
+
+Use [2, [91]] as a manual trace for bracket depth and the final-number flush.
+
+Notes
+
+The easy-to-miss bug is leaving the last buffered number uncommitted when the string ends. Manually tracing the small nested case exposed this during the interview, and fixing it proactively was part of the signal.
+
+DFS visits each nested value once in O(n) time and uses O(d) call-stack space at maximum depth d; BFS is also O(n) time with a frontier proportional to the widest level. In the string parser, track the sign and whether a number is currently buffered, flush only when that flag is set, and flush before decrementing depth on ].
+
+Preparation
+
+Write DFS and BFS versions over a parsed nested-list interface and explain when recursion depth becomes unsafe.
+
+Build the string parser as a tiny state machine, including multi-digit values and the end-of-input flush.
+
+Dry-run [2, [91]] aloud while tracking depth, buffered number, and accumulated sum.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

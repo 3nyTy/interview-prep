@@ -1,0 +1,90 @@
+===H1===
+REST API: Medical Records by Age
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/rest-api-medical-records-by-age
+===BODY===
+Oracle
+CodingMembers
+REST API: Medical Records by Age
+Implement `getRecordsByAgeGroup` to retrieve every page from a JSON mock medical-records API, calculate each patient's age when a record was created, filter by an inclusive age range and a blood-pressure-difference threshold, and return matching record IDs in sorted order. The prompt conflicts on both the subtraction order and comparison direction for the pressure predicate, so clarify that condition before coding.
+SWE
+api-integration
+http
+json
+ambiguous-spec
+medium
+Frequency
+Single report
+Last asked
+2026-07-31
+Stage
+phone-screen
+Requirements
+
+Implement getRecordsByAgeGroup(int ageStart, int ageEnd, int bpDiff) -> int[].
+
+Use HTTP GET against the supplied JSON mock endpoint. Results are paginated by appending ?page=<pageNumber>; fetch all pages before producing the result.
+
+Each response includes page, per_page, total, total_pages, and a data array.
+
+Each medical record includes an ID, UTC-millisecond creation timestamp, user ID and name, date of birth in DD-MM-YYYY format, vitals, diagnosis, doctor, height, and weight. Vitals include diastolic and systolic blood pressure, pulse, breathing rate, and body temperature.
+
+Keep records whose patient's age at the record-creation timestamp is within [ageStart, ageEnd], inclusive.
+
+The blood-pressure condition is internally inconsistent and must be clarified before implementation:
+
+The filter description says bloodPressureDiastole - bloodPressureSystole > bpDiff.
+
+The function description says the difference between systolic and diastolic pressures must be less than bpDiff.
+
+Return matching record IDs in sorted order. Return [-1] when no records match.
+
+The stated constraint is 0 <= ageStart, ageEnd, bpDiff <= 102. The function description types bpDiff as an integer, although the custom-testing input copy labels its line as a string; follow the provided code stub's actual type.
+
+Examples
+
+Custom-testing input:
+
+28
+30
+63
+
+Expected output:
+
+31
+
+The attached response excerpt shows page 1 of 10, with 10 records per page and 99 records total.
+
+Notes
+
+Compute age at each record's creation time, not at the current date.
+
+Do not silently normalize the blood-pressure expression from medical convention; the two prompt sentences specify different arithmetic and comparison directions. Resolve the intended predicate with the interviewer first.
+
+AI assistance was explicitly disallowed for this phone screen.
+
+Implementation skeleton
+
+Fetch page 1, read total_pages, and then fetch pages 2..total_pages. Process every element of each data array; do not infer completion from a short page.
+
+Parse the birth date strictly as DD-MM-YYYY and convert the millisecond timestamp to a UTC calendar date. Compute age as the year difference minus one when the creation month/day precedes the birthday; test the birthday boundary and leap-day births explicitly.
+
+After the interviewer resolves the pressure rule, encode that exact subtraction order and comparison in one predicate helper. Apply it together with the inclusive age check so the ambiguous rule cannot drift across branches.
+
+Collect matching IDs, sort them numerically, and return [-1] only when the collection is empty. With R records and K matches, local work is O(R + K log K) plus the page requests; streaming one decoded page at a time uses O(K) result space beyond the current page.
+
+Preparation
+
+Implement a three-page fake HTTP client and verify that every page is consumed when matching and non-matching records are interleaved.
+
+Write table-driven age tests for the day before, on, and after a birthday, plus a leap-day birth evaluated in a non-leap year.
+
+Put each candidate blood-pressure interpretation behind the same predicate interface and test equality at bpDiff; choose only the version confirmed by the interviewer.
+
+Test unsorted matching IDs, empty pages, and the no-match case to verify numeric sorting and the [-1] sentinel.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

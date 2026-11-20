@@ -1,0 +1,74 @@
+===H1===
+Hand-Code Self-Attention and Cross-Entropy
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/self-attention-cross-entropy-pseudocode
+===BODY===
+ByteDance / TikTok
+Coding·60 minMembers
+Hand-Code Self-Attention and Cross-Entropy
+Write self-attention pseudocode and the cross-entropy loss derivation on the spot, interleaved with attention-mechanism oral questions (FFN role, attention scaling).
+MLE
+RS
+transformer
+attention
+numpy
+pytorch
+ml-knowledge
+hard
+Frequency
+Low
+Last asked
+2026-05-01
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Two parallel sub-tasks during the coding portion of an MLE intern phone screen:
+
+Implement scaled dot-product self-attention in pseudocode or NumPy / PyTorch. Single-head is acceptable; multi-head if time permits.
+
+Derive and write the cross-entropy loss for a binary classification problem from first principles — including the sigmoid output, the per-sample loss formula, and the mean over a batch.
+
+Interviewer interleaves oral questions while you write:
+
+What is the role of the FFN sub-layer inside each attention block?
+
+Why is the attention score scaled by sqrt(d_k)?
+
+def self_attention(Q, K, V, mask=None):
+    # Q, K, V: [batch, seq_len, d_k]
+    ...
+
+def binary_cross_entropy(logits, labels):
+    # logits: [batch], labels: [batch] of {0, 1}
+    ...
+
+Notes
+
+The canonical formulation: softmax(Q @ K.T / sqrt(d_k)) @ V. Be explicit about the mask handling (-inf before softmax for masked positions) and the numerical stability concern (subtract row-max before exponentiation).
+
+Multi-head extends the same primitive by reshaping [batch, seq, d_model] to [batch, n_heads, seq, d_head] (with d_head = d_model / n_heads), running attention per head, concatenating, and applying an output projection.
+
+Cross-entropy from first principles: model P(y=1) = sigmoid(logit); per-sample loss is -y * log(p) - (1-y) * log(1-p). For numerical stability use the logsumexp trick or F.binary_cross_entropy_with_logits semantics: max(z, 0) - z*y + log(1 + exp(-|z|)).
+
+FFN role: position-wise non-linearity that lets each token mix its own features after attention has globally mixed across tokens; typical expansion ratio is 4x.
+
+sqrt(d_k) scaling: keeps the dot-product variance roughly unit when entries of Q, K are unit-variance, preventing softmax saturation as d_k grows.
+
+Common failure mode: candidates write attention but forget the scaling or the mask handling; interviewers always ask about both.
+
+Preparation
+
+Practice writing scaled dot-product attention from a blank file in NumPy. Then add a causal mask. Then extend to multi-head.
+
+Drill the binary cross-entropy derivation on paper until you can write the sigmoid-then-loss chain and explain why the negative-log form falls out of the Bernoulli likelihood.
+
+Memorize the numerical-stability rewrite of BCE-with-logits — interviewers ask about overflow on large |z|.
+
+Have a 60-second oral answer ready for FFN role and attention scaling — these come up every single MLE round at ByteDance.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,71 @@
+===H1===
+Ads Demand Data Modeling
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/ads-demand-data-modeling
+===BODY===
+Ads Demand Data Modeling
+
+<https://www.1point3acres.com/interview/problems/company/netflix/ads-demand-data-modeling>
+
+Netflix
+System Design
+
+60 min
+Members
+Ads Demand Intake Data Modeling
+
+Model the demand side of Netflix Ads: advertiser accounts, campaigns, ad groups, creative, targeting, orders, budgets, impressions, and measurement. Candidates are expected to proactively cover bidding and targeting instead of waiting for the interviewer to ask.
+
+SWE
+PM
+ads
+data-modeling
+schema-design
+database
+versioning
+hard
+Frequency
+High
+Last asked
+2026-08-05
+Stage
+onsite-system-design  onsite-deep-dive
+Requirements
+Model advertiser / business account ownership and permissions.
+Model campaigns, ad groups / line items, creative assets, targeting rules, budgets, pacing, and order type.
+Track serving events: eligible request, impression, click, conversion, and measurement attribution.
+Support direct-sold demand as a special case where open auction concepts may not apply.
+Explain how configuration changes propagate to serving systems.
+Discuss reporting tables and key metrics for campaign health.
+Core Entities
+AdvertiserAccount(id, name, billing_profile, status)
+Campaign(id, account_id, objective, start_time, end_time, budget, pacing_mode, status)
+AdGroup(id, campaign_id, targeting_rule_id, bid_or_priority, freq_cap, status)
+Creative(id, ad_group_id, asset_uri, format, approval_status)
+TargetingRule(id, geo, device, audience_segments, content_constraints)
+Order(id, account_id, type, contract_terms, budget_commitment)
+Impression(id, user_id, ad_id, campaign_id, timestamp, placement, request_id)
+Click(id, impression_id, timestamp)
+Conversion(id, impression_id, event_type, timestamp)
+
+Notes
+Breadth matters. A minimal account ? campaign ? ad table is usually not enough.
+The highest-risk missing areas are bidding / priority, targeting, pacing, creative approval, measurement, and impression tracking.
+Direct-sold demand changes the model: order and contract terms become first-class, and open-auction bid fields may be absent or replaced by priority / guaranteed delivery.
+Keep serving and reporting separate. Serving wants denormalized hot config; reporting wants immutable event facts and warehouse-friendly dimensions.
+Version targeting and campaign configuration. Serving logs should include config version so later analysis can explain why an ad was eligible.
+Schema precision
+Canonical hierarchy is Advertiser ? Campaign ? AdGroup ? Ad, with Creative a separately-reviewed entity shared across many Ads (review once, reuse in 50 ads) and Ad carrying a rotation_weight. AdGroup is where bid_strategy / bid_amount_cents and frequency_cap_count + frequency_cap_window_hours (NULL = no cap) live.
+Model targeting as a TargetingRule(ad_group_id, dimension, operator, values JSONB) table, one row per dimension. Within one dimension the values list is OR'd (genre IN [action, comedy]); across dimensions the rules are AND'd (genre AND geo AND NOT device). Operators include include / exclude / between. A row-per-rule table beats one JSONB blob because it stays queryable ("find all ad groups targeting US") and indexable; keep JSONB only for the values leaf.
+Money is always BIGINT cents, never a float (0.1 + 0.2 rounding). Prefer VARCHAR + application-side validation over a DB ENUM for status, since ad-tech statuses change often and an enum migration is painful.
+Status cascades are checked in application code, not DB triggers: an Ad serves only if Campaign=active AND AdGroup=active AND Ad=active AND Creative=approved; pausing a campaign stops its ads without rewriting child rows.
+Denormalize advertiser_id onto AdGroup to skip a join on the hottest dashboard query, and use partial indexes for hot paths  (campaign_id) WHERE status='active', (review_status) WHERE review_status='pending', (advertiser_id, status)  so the index stays small.
+Preparation
+Draw the entity graph from account to impression without looking at notes.
+Prepare a 5-minute deep dive on targeting rules and another on budget pacing.
+Practice answering "what is the key component you might be missing?" by listing lifecycle gaps: creative review, billing, measurement, targeting, and audit logs.
+Supply-side variant
+The same round is sometimes flipped to the supply side: model how a publisher's inventory and publisher-specific configuration rules are stored and applied, rather than the advertiser/demand hierarchy. Candidates who only prepared the demand side report needing extra clarification time here.
+Core supply entities to cover: Publisher, InventorySource / placement (the slots availa
+
+---

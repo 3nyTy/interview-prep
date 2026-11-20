@@ -1,0 +1,86 @@
+===H1===
+Coding & Design — Weighted Data Batcher with Checkpointing
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/coding-design-data-batcher
+===BODY===
+Anthropic
+Coding·55 minMembers
+Coding & Design — Weighted Data Batcher with Checkpointing
+A research-track 1-of-N coding-and-design problem. Build a `DataBatcher` that samples weighted batches from a `DataRegistry`, supports deterministic save/resume via an `offset` argument, and handles the case where `batch_size` is not divisible by the sum of weights.
+MLE
+RE
+RS
+sampling
+checkpointing
+iterator
+python
+hard
+Frequency
+Medium
+Last asked
+2026-05-14
+Stage
+phone-screen · tech-screen · onsite-coding
+Requirements
+
+The DataRegistry (provided in Colab) exposes something like:
+
+registry.get_iterator(name: str, offset: int = 0) -> Iterator[Example]
+
+Implement DataBatcher(registry, weights: dict[str, int], batch_size: int) with:
+
+Part 1 — Weighted sampling
+
+next_batch() returns a list of batch_size examples drawn from the registry's datasets in proportion to weights.
+
+Assume batch_size is divisible by sum(weights) for now.
+
+The order within a batch matters for deterministic reproducibility — define and commit to a convention.
+
+Part 2 — Deterministic save/resume
+
+Implement state_dict() / load_state_dict() so a training run can be paused and resumed with byte-identical batches.
+
+The supplied iterator interface accepts offset — use it; don't try to fast-forward by re-iterating.
+
+Resume must be O(1) in offset lookups, not O(n) replay.
+
+Part 3 — Non-divisible batch size
+
+Drop the divisibility assumption. Two reasonable approaches:
+
+Round-robin: maintain remainder counters; allocate the leftover slots in a defined order each batch.
+
+Stochastic: sample dataset names per slot with probabilities proportional to weights; expected ratio is correct, exact ratio is not.
+
+The interviewer expects you to discuss tradeoffs (variance, determinism, exposure bias) rather than pick blindly.
+
+Follow-ups
+
+Corner cases the interviewer fishes for: dataset shorter than its weighted quota, weights changing mid-training, multi-GPU sharding of the iterator.
+
+Test plan you'd write before deploying this in real training.
+
+Notes
+
+The canonical weighted-pick primitive — prefix-sum array of weights + binary-search a uniform draw in [0, total) — is the right building block for the stochastic non-divisible variant. Build it once, call it batch_size times per next_batch(), and the expected per-dataset count matches weights in O(log K) per slot.
+
+This round runs in Google Colab with the registry and helper imports pre-supplied. Read the cell carefully — the registry interface is the spec.
+
+An older variant of the prompt ("data batcher with sampling API offset") has been corrected: it is the offset on get_iterator, not a top-level sampling API offset.
+
+Several candidates report needing to write and re-write Part 2 — practice it ahead of time.
+
+Preparation
+
+Implement a divisible-batch weighted sampler in pure Python in under 15 minutes.
+
+Layer in state_dict / load_state_dict so a paused-then-resumed batcher emits the same next batch as an uninterrupted batcher would. Test it.
+
+Practice the non-divisible variant both ways (deterministic round-robin and stochastic) and be able to argue when you'd pick which.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

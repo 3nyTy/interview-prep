@@ -1,0 +1,67 @@
+===H1===
+System Design: Comment Notification Service
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/system-design-comment-notifications-viral-pins
+===BODY===
+Pinterest
+System DesignMembers
+System Design: Comment Notification Service
+Design a push-notification system that alerts a Pin owner whenever another user comments. Extend it for a viral Pin receiving too many comments: aggregate activity and enforce a limited notification rate per recipient instead of sending one push for every event.
+SWE
+notification
+push-notification
+fan-out
+rate-limiting
+scaling
+medium
+Frequency
+Low
+Last asked
+2026-08-06
+Stage
+onsite-system-design
+Requirements
+
+Design a notification system for comments on Pins.
+
+When a user comments on a Pin, identify the Pin owner and send that owner a push notification.
+
+Under ordinary activity, each comment can produce its own notification.
+
+A viral Pin can receive enough comments that one push per comment is no longer acceptable.
+
+Aggregate comment activity for viral Pins and limit how many notifications any recipient receives.
+
+Define the product semantics of the limit: what makes a Pin viral, the aggregation boundary, the per-user cap, and whether the cap applies per Pin or across all of a recipient's Pins.
+
+Explain what happens when activity falls below the aggregation threshold and individual delivery can resume.
+
+Notes
+
+The central stressor is concentrated fan-out: many comment events target the same Pin owner, so the normal one-event/one-push rule conflicts with the recipient-level notification limit.
+
+Separate durable event processing from notification policy. A comment event carries a stable event id and Pin id; a worker resolves the owner, applies recipient preferences and policy, then writes a notification or aggregate record before delivery. Dedupe on the stable event id so queue retries cannot create duplicate user-visible notifications.
+
+Keep the ordinary and viral paths behind one policy state machine. Ordinary events can create individual notification records; the overloaded path atomically updates state keyed by (recipient_id, pin_id, window) and schedules at most one aggregate flush. Apply the recipient-level cap after this choice so individual and summary notifications share the same budget.
+
+Treat transitions as correctness cases, not only threshold checks. Use a windowed signal with hysteresis to avoid rapid mode flapping, define whether pending individual events merge into the first summary, and make each scheduled flush idempotent. Expire inactive aggregate state only after its final flush is durable.
+
+A broader form asks for an in-app notification service without the viral-Pin details. Keep the base generation and delivery path separate from the aggregation policy so both forms remain easy to explain.
+
+Notification design and standalone rate limiting can appear in the same onsite loop; keep the user-facing notification policy distinct from general infrastructure throttling.
+
+Preparation
+
+Practice a 45-minute design that first traces comment → Pin → owner → push, then introduces the viral-Pin path without replacing the normal path.
+
+Write down the aggregation threshold, time boundary, and recipient cap before drawing components; test the policy against one quiet Pin and one extremely active Pin.
+
+Rehearse the transition in both directions between individual and aggregated delivery, including what happens to comment activity already waiting in an aggregate.
+
+Trace one duplicate event, one delivery retry, and both threshold crossings through the state machine; verify that each produces the intended number of user-visible notifications.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

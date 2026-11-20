@@ -1,0 +1,69 @@
+===H1===
+Agent Tool-Use System Design (AML Volcano Engine)
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/agent-tool-use-system-design
+===BODY===
+ByteDance / TikTok
+System Design·60 minMembers
+Agent Tool-Use System Design (AML Volcano Engine)
+Senior research-scientist intern round at ByteDance AML (Volcano Engine): open-ended design of an agent tool-use system, drilling on state management, evaluation, and failure modes of multi-step tool-invoking agents.
+RS
+MLE
+mlsd
+agents
+tool-use
+llm-agent
+evaluation
+open-ended
+hard
+Frequency
+Single report
+Last asked
+2026-03-20
+Stage
+onsite-system-design · onsite-research
+Requirements
+
+Open prompt: "What problems arise in an agent tool-use system in production, and how do you design around them?" The interviewer drives the conversation into specific sub-questions:
+
+State management: how do you maintain complex state across long tool-invocation chains? What goes in the context window vs. an external memory store?
+
+Evaluation: how do you evaluate a system this complex? What is the unit of evaluation — single tool call, single trajectory, end-to-end task outcome?
+
+Tool catalog & dispatch: how do you scale to hundreds of tools without overwhelming the model's context? Retrieval over tools, hierarchical menus, learned tool routing.
+
+Failure modes: tool calls returning malformed output, tool timeouts, infinite tool-call loops, the model hallucinating arguments. How do you detect and recover from each.
+
+Latency vs. quality: parallel tool dispatch vs. serial; speculative tool execution; caching tool outputs.
+
+Notes
+
+State management decomposes into (a) short-term scratchpad inside the LLM context (typically truncated reasoning + recent tool I/O), and (b) long-term structured store (vector store for retrieved memory, key-value store for task state, audit log for tool calls). The model never sees raw long-term storage — a retrieval layer summarizes into context.
+
+Evaluation is the hardest design point. The canonical stack is: (1) trajectory-level success rate on a curated benchmark, (2) per-step regression tests for high-leverage tool calls, (3) human-in-the-loop spot-checks for trajectories the heuristics flag, (4) online A/B on production traffic.
+
+For tool catalog at scale, the standard pattern is retrieval-augmented tool selection: embed each tool description, retrieve top-K candidates per step, present only those to the model. Hierarchical organization (categories → tools) helps further when the catalog grows past a few hundred.
+
+Loop detection: bound max steps, detect repeated identical tool calls, surface to a human-fallback path.
+
+Hallucinated arguments: validate against tool schemas before dispatch; if invalid, return a structured error to the model for self-correction rather than crashing the trajectory.
+
+This is a research-flavored design round. The interviewer rewards naming open problems (eval is hard, long-context degrades, tool dependencies are brittle) and proposing reasonable mitigations, not finding a "right answer."
+
+Preparation
+
+Read recent agent-system writeups (LangChain, AutoGPT-style architectures, ReAct paper-style trajectories) and form opinions on each design axis.
+
+Have a 2-minute spoken sketch of an agent runtime: planner → tool selector → executor → state updater → terminator.
+
+Drill the evaluation question specifically — be ready to propose a four-level eval stack from trajectory benchmarks down to online A/B.
+
+For state management, practice articulating the short-term-context / long-term-store split and what triggers a memory write vs. a memory read.
+
+Prepare to discuss canonical failure modes (timeout, hallucinated args, loops) with concrete mitigations for each.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

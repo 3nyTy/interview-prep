@@ -1,0 +1,76 @@
+===H1===
+SRE Linux / Networking Troubleshooting Round
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/sre-linux-networking-troubleshoot
+===BODY===
+ByteDance / TikTok
+Other·60 minMembers
+SRE Linux / Networking Troubleshooting Round
+Verbal round for SRE and network-focused SDE candidates drilling Linux internals, networking, and structured production triage. Recurring topics include disk-full RCA, slow-backend triage, browser-to-backend connectivity, HTTP / DNS / TCP fundamentals, and packet sizing.
+Infra Eng
+SWE
+sre
+networking
+operating-systems
+troubleshooting
+verbal
+medium
+Frequency
+High
+Last asked
+2026-09-03
+Stage
+phone-screen · onsite-coding · final-round
+Requirements
+
+60-minute oral round. Almost every question expects a structured triage outline followed by 5-6 follow-up depth probes. Recurring topics:
+
+Disk full troubleshooting: which Linux commands to start with (df, du, lsof +L1), how to find the actual large files, what to do when disk is full but no large files are visible (deleted-but-open files), how to identify the process responsible.
+
+Backend responding slowly: monitoring layer (where you look first), depth-of-stack triage (network → app server → downstream service → DB), common bottleneck classes (CPU, memory pressure, GC, lock contention, downstream latency, DNS).
+
+Browser cannot reach backend: enumerate every possible cause from DNS to TLS to load balancer to the service itself. If the answer is "DNS", how do you confirm and remediate.
+
+Networking primitives: IPv4 vs IPv6 differences; how to attach a network device to a node; port forwarding vs. tunneling; HTTP response codes and their semantics; what CDN does; libvirt overview.
+
+TCP packet / segment sizing: explain what determines the size of a TCP segment or network packet and use the terminology precisely.
+
+Hosting an application on Linux: enumerate options (apt install, Docker, VM), then for each, walk through the concrete steps.
+
+PXE / IP route / MAC layer: basic understanding of network boot, routing tables, and L2 addressing.
+
+Shell scripting under time pressure: write a small operational script without relying on generated code; the same round can still end with a short LeetCode-style coding problem.
+
+Notes
+
+Interviewers expect a structured answer, not a list of commands. Lead with the triage methodology: monitoring → reproduce → narrow → bisect → fix. Then commands are evidence inside that frame.
+
+For disk full, the deleted-but-open-file case is the highest-leverage answer: a process holding a deleted file inflates disk usage invisibly until restart; lsof +L1 surfaces it.
+
+For slow backend, segment by layer with USE (utilization / saturation / errors) for resources and RED (rate / errors / duration) for services.
+
+Some interviewers drive 5-6 follow-ups per topic. Resist the temptation to brain-dump; answer the asked question and let them drive the follow-up.
+
+Common failure mode: jumping straight to commands without naming the hypothesis. Frame each command as "I would run X to confirm hypothesis Y."
+
+The same breadth-first oral format can appear in a network-monitoring SDE third round, not only in roles explicitly labeled SRE.
+
+A USDS SRE phone-screen variant allocates about thirty minutes to common Linux commands and slow-service triage before a short coding task.
+
+Preparation
+
+Practice the disk-full triage out loud: start with df -h, then du -sh /*, then lsof +L1, then fuser, then process-by-process narrowing. Time yourself; aim for under 90 seconds end-to-end.
+
+Drill the slow-backend layered triage: monitoring → app metrics → downstream timing → DB / cache stats → infra (network, GC). Have one canonical example per layer.
+
+Memorize HTTP status code groups (1xx informational, 2xx success, 3xx redirect, 4xx client error, 5xx server error) and the canonical members (200, 301, 302, 304, 400, 401, 403, 404, 429, 500, 502, 503, 504).
+
+Refresh DNS resolution flow (recursive resolver → root → TLD → authoritative), TLS handshake basics, and the difference between port forwarding and SSH tunneling.
+
+For application-hosting, prepare concrete step lists for at least three deployment styles (systemd unit + apt, Docker container, full VM).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

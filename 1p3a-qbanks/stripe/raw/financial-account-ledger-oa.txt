@@ -1,0 +1,172 @@
+===H1===
+Financial Account Ledger (OA)
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/financial-account-ledger-oa
+===BODY===
+Stripe
+Coding·60 minMembers
+Financial Account Ledger (OA)
+Implement process_ledger(commands) with cumulative funding settlement, business-day and cutoff rules, and per-account ACH limits. Return comma-separated settled-balance query results while preserving chronological command semantics.
+SWE
+payment
+simulation
+parsing
+Frequency
+Single report
+Last asked
+2026-09-11
+Stage
+oa
+Requirements
+
+Implement process_ledger(commands) to process financial-account funding requests and return BALANCE results as one comma-separated string in query order. Four cumulative parts add settlement rules, business-day handling, cutoff times, and funding limits.
+
+Input guarantees
+
+There are 1–1000 well-formed commands. Account IDs are nonempty and contain no spaces.
+
+All INIT commands precede timestamped commands. Only the first initialization of an account has an effect.
+
+Starting balances are nonnegative; funding amounts are positive. Amounts and intermediate balances fit a signed 64-bit integer.
+
+Parts 1–2 use whole-day timestamps. Parts 3–4 use day,hour; the final implementation must accept both forms, treating a day without an hour as hour 0.
+
+Part 1 — Funding with settlement
+
+INIT <account_id> <starting_balance> creates an account whose starting balance, in minor units, is immediately settled.
+
+FUND <day> <account_id> <method> <amount> adds a funding request. Ignore it if the account does not exist.
+
+WIRE settles on the submission day; ACH settles one day later.
+
+BALANCE <day> <account_id> returns the starting balance plus earlier accepted funds that have settled by that day. Return FAILURE for an unknown account.
+
+Commands are chronological; same-day commands retain input order. A balance query sees only earlier commands.
+
+In this part every command day is a weekday, and no ACH settlement crosses a weekend. Day 1 is Monday.
+
+Part 2 — Business-day settlement
+
+Days 6 and 7 of each seven-day cycle are Saturday and Sunday: a weekend day satisfies d % 7 == 6 or d % 7 == 0.
+
+WIRE settles on its submission day, except weekend submissions settle the following Monday.
+
+ACH settles one business day after submission. Treat a weekend submission as submitted the following Monday, then apply the one-business-day delay.
+
+Add STABLECOIN, which settles on its submission day including weekends.
+
+Command formats and chronological processing remain unchanged.
+
+Part 3 — Cutoff times
+
+Use FUND <day>,<hour> <account_id> <method> <amount> and BALANCE <day>,<hour> <account_id>; hours are 0–23. INIT is unchanged.
+
+Commands are strictly chronological with no shared timestamps.
+
+WIRE's cutoff hour is 17; ACH's is 20. A weekday submission before cutoff uses that day; at or after cutoff, use the next business day.
+
+Weekend WIRE and ACH submissions use the following Monday regardless of hour. STABLECOIN ignores cutoffs and weekends.
+
+Apply Part 2 settlement rules to the effective submission day.
+
+Settlement is by calendar day, not hour. Funds settling on day d are visible to later BALANCE commands on day d regardless of query hour, but never affect a command preceding the FUND itself.
+
+Part 4 — Funding limits
+
+ACH requests have per-account limits of 5,000,000 minor units per effective business day and 10,000,000 per week.
+
+Days 1–7 are week 1, days 8–14 week 2, and so forth. Use the effective submission day after cutoff and weekend adjustment for limit accounting.
+
+Reject the entire request if either limit would be exceeded. Rejected requests never settle and consume neither limit.
+
+WIRE and STABLECOIN have no funding limits. Strict chronological processing and unique timestamps still apply.
+
+Examples
+
+Part 1
+
+Input:
+[
+  "INIT acct_1 10000",
+  "FUND 1 acct_1 WIRE 5000",
+  "FUND 1 acct_1 ACH 3000",
+  "BALANCE 1 acct_1",
+  "BALANCE 2 acct_1"
+]
+Output: "15000,18000"
+
+Part 2
+
+Input:
+[
+  "INIT acct_1 0",
+  "FUND 5 acct_1 WIRE 5000",
+  "BALANCE 5 acct_1",
+  "FUND 6 acct_1 STABLECOIN 1000",
+  "BALANCE 6 acct_1",
+  "FUND 6 acct_1 ACH 2000",
+  "BALANCE 8 acct_1",
+  "BALANCE 9 acct_1"
+]
+Output: "5000,6000,6000,8000"
+
+Part 3
+
+Input:
+[
+  "INIT acct_1 0",
+  "FUND 1,16 acct_1 WIRE 5000",
+  "FUND 1,17 acct_1 WIRE 3000",
+  "BALANCE 1,18 acct_1",
+  "BALANCE 2,0 acct_1"
+]
+Output: "5000,8000"
+
+Part 4
+
+Input:
+[
+  "INIT acct_1 0",
+  "FUND 1,10 acct_1 ACH 5000000",
+  "FUND 1,11 acct_1 ACH 1000",
+  "FUND 1,21 acct_1 ACH 4000000",
+  "BALANCE 2,0 acct_1",
+  "BALANCE 3,0 acct_1",
+  "FUND 3,10 acct_1 ACH 2000000",
+  "BALANCE 4,0 acct_1"
+]
+Output: "5000000,9000000,9000000"
+
+Notes
+
+The introductory custom-input example includes INIT acct_1 USD 100, while the detailed command definition and all four part examples omit the currency token. Clarify which INIT shape the actual tests accept before coding.
+
+Earlier constraints and tests carry forward. Keep support for whole-day timestamps after adding hours.
+
+The 2027 intern OA presents a long prompt with four parts and a roughly one-hour timer; reading and implementation pace matter.
+
+Solution skeleton
+
+Process commands in input order. Keep one settled balance per initialized account and ignore later INIT commands for that account. Parse either timestamp shape into a day and hour, defaulting the missing hour to zero.
+
+Isolate business-day adjustment, cutoff handling, and settlement-day calculation. STABLECOIN uses the original day; WIRE and ACH use the effective business day, with ACH settling one business day later. Apply only the rules introduced by the current part.
+
+For ACH limits, index counters by account and effective submission day, and by account and (effective_day - 1) // 7. Check both limits before changing either counter; reject the entire request without scheduling funds or consuming quota.
+
+Store accepted unsettled funds in a min-heap keyed by settlement day with a sequence-number tie breaker. Before each timestamped command, credit all previously accepted entries due by its day. Credit a newly accepted same-day settlement immediately so only subsequent commands observe it; never pre-load future FUND commands.
+
+Return BALANCE results in query order, including FAILURE for an unknown account. With n commands, heap processing takes O(n log n) time and O(n) space, including pending funds, limit counters, and output.
+
+Preparation
+
+In 25 minutes, implement the sequential ledger and replay all four supplied examples, checking settled balances and pending funds after every command.
+
+In 15 minutes, test WIRE and ACH immediately before and at cutoff on a Friday, weekend submissions, and STABLECOIN on a weekend; calculate effective and settlement days separately.
+
+In 15 minutes, test exact daily and weekly limits, a rejected request followed by an accepted one, separate accounts, and a week rollover. Confirm that rejection consumes neither limit.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

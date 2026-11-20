@@ -1,0 +1,58 @@
+===H1===
+Find K Closest Elements in a Sorted Array (LC 658)
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-k-closest-elements-sorted-array
+===BODY===
+LinkedIn
+CodingMembers
+Find K Closest Elements in a Sorted Array (LC 658)
+Given a sorted array, target `x`, and integer `k`, return the `k` closest values in sorted order, preferring the smaller value on equal distance. Implement the binary-search-on-window solution and discuss unsorted-input and out-of-memory variants.
+SWE
+array
+binary-search
+two-pointer
+heap
+top-k
+io
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-coding
+Requirements
+
+Given a sorted array, a target x, and integer k, return the k closest values while keeping the result sorted. On equal distance, prefer the smaller value.
+
+Compare two approaches:
+
+Binary-search for the insertion point of x, then expand two pointers k times for O(log n + k).
+
+Binary-search the window's left boundary by comparing the distances from x to A[mid] and A[mid + k], then return that contiguous window in O(log(n - k) + k).
+
+Implement the window-boundary approach and explain why the predicate moves the candidate window in the correct direction. State why ties move left.
+
+Follow-up: if the input is unsorted, maintain the best k candidates with a size-k heap for O(n log k).
+
+Follow-up: if the array does not fit in memory, use an index or block-level lookup to locate the relevant region and load only that portion.
+
+Notes
+
+The main grading point is the correctness argument for the window predicate, especially the equal-distance branch.
+
+Do not lose the sorted-output requirement when switching from the two-pointer formulation to the heap follow-up.
+
+Preparation
+
+Derive the binary-search predicate on paper and prove the direction chosen for both strict and equal comparisons.
+
+Implement both in-memory approaches, then benchmark their work when k is small and when k approaches n.
+
+Sketch an external-memory version with block metadata and identify which reads are random versus sequential.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

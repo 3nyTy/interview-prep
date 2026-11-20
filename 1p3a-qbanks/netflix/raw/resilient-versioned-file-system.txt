@@ -1,0 +1,109 @@
+===H1===
+Resilient Versioned File System
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/resilient-versioned-file-system
+===BODY===
+Resilient Versioned File System
+
+<https://www.1point3acres.com/interview/problems/company/netflix/resilient-versioned-file-system>
+
+Netflix
+Coding
+
+60 min
+Members
+Resilient / Versioned In-Memory File System
+
+Implement or design an in-memory file system that supports CRUD and versions / crash recovery. Follow-ups pivot into persistence, bottlenecks, and production readiness.
+
+SWE
+Infra Eng
+filesystem
+object-design
+snapshot
+versioning
+persistence
+binary-search
+medium
+Frequency
+Medium
+Last asked
+2026-05-21
+Stage
+oa  phone-screen
+Requirements
+Support basic file operations: create, read, update, delete, and list.
+Support versions or snapshots so prior file content can be recovered.
+Resilient variant: if the system crashes, recover file contents to the latest committed state.
+Discuss bottlenecks and production changes.
+Design
+Represent directories as trie nodes or path-map entries.
+Store each file as a list of (version_id, content) records, similar to snapshot-array semantics.
+write(path, content) appends a new version instead of overwriting in place.
+read(path, version_id=None) returns the latest version or binary-searches the version list.
+A common API shape exposes snapshot() -> int returning a monotonically increasing snapshot id and read_at_version(path, snap_id) that bisect_right-searches the file's (snap_id, content) list for the latest entry <= snap_id (content None = deleted at that snapshot). Be ready to articulate the version vs snapshot distinction: a version is one change to a single file, a snapshot is a point-in-time id many files can share.
+For crash recovery, write an append-only log before applying an in-memory update, then replay committed records on restart.
+Notes
+Snapshot-style storage is simple and interview-friendly. It trades write amplification for easy rollback.
+If content is large, store chunks and content hashes rather than duplicating entire file bodies per version.
+Production follow-ups: compaction, log truncation, directory metadata locking, permissions, quota, and replication.
+Disk-write latency is the WAL trade-off: fsync on every op is correct but slow, so offer group commit (flush every sync_interval ops) or async background flush (which risks losing the last few ops on crash); pair WAL replay with periodic checkpointing so recovery does not replay the entire log.
+Clarify whether delete creates a tombstone version or removes all history.
+Ads loops sometimes pose this as a take-home / OA-style versioned KV store, and the interviewer may invite you to frame it as an ads data store  design the API around typical ads read/write operations while keeping the versioning core intact.
+Preparation
+Implement mkdir, write, read, delete, and readVersion with a path trie.
+Add binary search over file versions.
+Prepare a crash-recovery explanation using write-ahead log, checkpoint, and replay.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Design
+Notes
+Preparation
+Related discussions  4
+????, ?????
+?netflix??
+?Netflix technical ????
+???ghost???
+Related questions
+
+Other Netflix questions sharing tags with this one
+
+Music Playlist History
+Single report
+object-design
+medium
+data-structure
++2
+Count Disjoint String Pairs
+Low
+medium
+bitmask
+string
++1
+Movie Billboard Rotation Service
+Low
+medium
+heap
+ranking
++3
+Number Pairs That Match Target
+Single report
+medium
+hashmap
+array
++1
+Promotion Posting System Data Model
+Single report
+versioning
+data-modeling
+schema-design
++2
+Code editor
+
+---

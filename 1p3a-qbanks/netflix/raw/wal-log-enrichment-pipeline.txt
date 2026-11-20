@@ -1,0 +1,151 @@
+===H1===
+Wal Log Enrichment Pipeline
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/wal-log-enrichment-pipeline
+===BODY===
+Wal Log Enrichment Pipeline
+
+<https://www.1point3acres.com/interview/problems/company/netflix/wal-log-enrichment-pipeline>
+
+Netflix
+System Design
+
+60 min
+Members
+WAL Log Enrichment Pipeline
+
+Design a CDC pipeline that captures WAL entries at 1M writes/sec, enriches them (IDs ? names/regions via a Redis-fronted lookup), and delivers them in per-key order with exactly-once semantics (Kafka transactions + LSN dedupe), DLQ, and replay.
+
+SWE
+Infra Eng
+DS
+data-engineering
+kafka
+streaming
+idempotency
+caching
+distributed-systems
+hard
+Frequency
+Single report
+Last asked
+2026-01-09
+Stage
+onsite-system-design
+Design a WAL Log Enrichment Pipeline
+
+This system needs to read Write-Ahead Log (WAL) entries from a main database, add extra details (enrichment) to them, and send them to a final database. The system must handle 1 million writes per second. It must be fast and accurate. We assume the source database uses Sharding or has multiple primary nodes.
+
+Phase 1: What We Need to Build
+System Requirements
+Capture logs: The system must read all WAL entries from the source database immediately.
+Add context: The system must add extra info to the logs (like table details or user names).
+Deliver data: The system must send the finished data to the target database in the correct order.
+Handle changes: The system must not break if the database structure (schema) changes.
+Replay ability: The system must be able to re-read old data to fix errors.
+
+"Enrichment" means turning a raw log (which usually only has IDs) into a full record. For example, it turns a user_id into a record with the user's name and location.
+
+Performance Goals
+Requirement	Target	Reason
+Throughput	1M writes/sec	Very high volume (like Netflix).
+Latency	< 5 seconds	Data needs to be ready almost instantly.
+Ordering	Per-key ordering	Updates for the same ID must stay in order.
+Durability	No data loss	We cannot lose any updates.
+Availability	99.99% uptime	The system must always be running.
+
+Unlike a website where speed is measured in milliseconds, data pipelines usually aim for seconds. A 5-second delay is okay, but losing data is not.
+
+Size Estimations
+Metric	Value
+Write speed	1M events/sec
+Event size (Raw)	~1 KB
+Event size (Enriched)	~2 KB (after adding info)
+Input speed	1M * 1 KB = 1 GB/sec
+Output speed	1M * 2 KB = 2 GB/sec
+Daily storage	~86 TB/day
+Retention (7 days)	~600 TB
+
+At 1 million writes per second, the hard parts are:
+
+Reading fast enough from the source.
+Finding extra info (enrichment) without slowing down.
+Writing to the target without crashing it.
+Phase 2: How We Store Data
+Log Entry Structure
+WALEntry (from source)
+??? lsn: BIGINT (Log Sequence Number - unique ID for the log)
+??? timestamp: TIMESTAMP
+??? transaction_id: BIGINT
+??? table: VARCHAR
+??? operation: ENUM (INSERT, UPDATE, DELETE)
+??? key: JSONB (primary key fields)
+??? before: JSONB (values before the change)
+??? after: JSONB (values after the change)
+
+EnrichedEntry (to target)
+??? lsn: BIGINT
+??? timestamp: TIMESTAMP
+??? transaction_id: BIGINT
+??? table: VARCHAR
+??? operation: ENUM
+??? key: JSONB
+??? before: JSONB
+??? after: JSONB
+??? enrichment: JSONB (added details like names/regions)
+??? enriched_at: TIMESTAMP
+??? schema_version: INTEGER
+
+Saving Our Place (Checkpoints)
+
+We track our progress in two places to ensure we don't lose data:
+
+CDC Connector: Saves the last read LSN.
+Kafka Consumers: Save the last processed message offset.
+# CDC checkpoint (Saved by the connector)
+{
+  "connector": "postgres-cdc",
+  "database": "netflix_prod",
+  "lsn": 847293847,
+  "txId": 12345
+}
+
+# Consumer offset (Managed by Kafka)
+{
+  "topic": "enriched-changes.orders",
+  "partition": 42,
+  "offset": 1000000,
+  "consumer_group": "sink-clickhouse"
+}
+
+Important Design Choices
+
+LSN (Log Sequence Number): This is a unique ID for every change in PostgreSQL.
+
+We use it to remove duplicates.
+We use it to restart processing from the exact right spot.
+
+Separate topics per table: Each table gets its own Kafka topic. This helps us scale. Big tables get more partitions.
+
+Schema versioning: We save the schema_version. This helps the consumer understand the data even if the format changes later.
+
+Phase 3: Interface Design
+
+We do not use standard web APIs (REST) for the data flow. We use database protocols and Kafka messages.
+
+Data Contracts
+
+CDC Connector ? Kafka (raw-changes topic)
+
+The connector sends events that look like this:
+
+{
+  "lsn": 847293847,
+  "timestamp": "2024-02-15T10:30:00Z",
+  "table": "orders",
+  "operation": "INSERT",
+  "key": {"order_id": "ord_123"},
+  "before": null,
+  "after": {"order_id": "ord_123", "user_id": "
+
+---

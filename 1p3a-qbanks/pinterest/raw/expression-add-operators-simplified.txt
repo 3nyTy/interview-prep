@@ -1,0 +1,63 @@
+===H1===
+Expression Add Operators (LC 282)
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/expression-add-operators-simplified
+===BODY===
+Pinterest
+Coding·60 minMembers
+Expression Add Operators (LC 282)
+Expression Add Operators appears in both the canonical LeetCode 282 form, which uses normal arithmetic precedence, and a simplified Pinterest form that evaluates operators strictly left-to-right. Insert `+`, `-`, or `*` between digit groups so the expression reaches a target under the specified evaluation rule.
+MLE
+SWE
+string
+backtracking
+recursion
+math
+medium
+Frequency
+Low
+Last asked
+2026-09-01
+Stage
+phone-screen
+Requirements
+
+Given a digit string num and a target integer target, return every expression formed by inserting +, -, or * between adjacent digit groups that evaluates to the target.
+
+Two evaluation contracts appear in phone screens:
+
+Canonical LC 282 variant: use normal arithmetic precedence, so multiplication binds more tightly than addition or subtraction.
+
+Left-to-right variant: apply operators strictly in encounter order with no precedence, so 2+3*2 means (2+3)*2 = 10.
+
+Clarify which contract applies before coding.
+
+Examples
+
+For the left-to-right variant:
+
+num = "123", target = 6
+valid = ["1+2+3", "1*2*3"]
+invalid example: "1*2+3" evaluates left-to-right to 5
+
+Notes
+
+Backtrack over the next digit group and operator. For the left-to-right form, state is (position, accumulated_value, expression) and each new operand folds directly into the accumulated value.
+
+Reject multi-digit operands with a leading zero. With n digits, the search has O(4^n) branches before pruning: each boundary can concatenate or choose one of three operators.
+
+The canonical precedence-aware form also tracks the previous multiplicative term; the left-to-right form does not need that bookkeeping.
+
+Preparation
+
+Implement the left-to-right recurrence in 20 minutes, including the leading-zero check.
+
+Implement the precedence-aware recurrence separately and explain the extra previous-term state.
+
+Enumerate every expression for num="123" and verify each result under both evaluation contracts.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

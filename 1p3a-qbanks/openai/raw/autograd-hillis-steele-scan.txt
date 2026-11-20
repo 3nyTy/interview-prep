@@ -1,0 +1,282 @@
+===H1===
+Autograd / Manual Backprop + Hillis-Steele Scan
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/autograd-hillis-steele-scan
+===BODY===
+OpenAI
+Coding·75 minMembers
+Autograd / Manual Backprop + Hillis-Steele Scan
+Given a sequence of square matrices: first write an in-place matmul, then explain why it can't backprop. Write an out-of-place version that works with autograd. Then hand-write the backward. Finally, implement forward + backward using a Hillis-Steele scan.
+RS
+RE
+MLE
+ml-knowledge
+autograd
+pytorch
+parallel-algorithm
+math-reasoning
+hard
+Frequency
+High
+Last asked
+2026-08-28
+Stage
+tech-screen · onsite-coding
+Requirements
+
+Given a stack of square matrices W of shape (N, D, D), compute the inclusive prefix products
+
+P[i] = W[0] @ W[1] @ ... @ W[i]
+
+where @ is matrix multiplication. The prefix product emits every intermediate product P[0..N-1], not only the final P[N-1]. Treat this as a small custom-autograd operator and implement four pieces:
+
+Part 1: in-place forward — write the result into a caller-provided output tensor P, plus explain why a naive in-place matmul breaks autograd (computation-graph history is lost / the view is overwritten before backward can read it).
+
+Part 2: out-of-place forward — allocate and return P so autograd works.
+
+Part 3: hand-written backward (not using PyTorch's autograd) — given upstream gradients dP, compute dW.
+
+Part 4: Hillis-Steele scan (parallel inclusive prefix scan, O(log N) depth) for forward + backward.
+
+Key: the operator is associative (but not commutative) — get the associativity and the multiply order right and the code falls out.
+
+Tensor shapes (floating-point, row-major):
+
+W[i]:  (D, D)
+P[i]:  (D, D)
+dP[i]: (D, D)   # dP[i] = dL / dP[i]
+dW[i]: (D, D)
+
+Part 1 — in-place forward (caller-provided output)
+
+The sequential recurrence is P[0] = W[0], P[i] = P[i-1] @ W[i].
+
+def prefix_products_out(W: np.ndarray, P: np.ndarray) -> np.ndarray:
+    """Fill P where P[i] = W[0] @ ... @ W[i].
+
+    W: (N, D, D);  P: (N, D, D), caller-provided output. Returns P for convenience.
+    Raises if W is not (N, D, D) or P.shape != W.shape.
+    """
+    if W.ndim != 3 or W.shape[1] != W.shape[2]:
+        raise ValueError("W must have shape (N, D, D)")
+    if P.shape != W.shape:
+        raise ValueError("P must have the same shape as W")
+
+    n = W.shape[0]
+    if n == 0:
+        return P
+
+    P[0] = W[0]
+    for i in range(1, n):
+        P[i] = P[i - 1] @ W[i]
+    return P
+    # P is W is allowed: W[i] is read before slot i is overwritten, so aliasing is safe
+    # for THIS recurrence. What is NOT safe is computing one matmul element-by-element
+    # into one of its own operands without a scratch matrix.
+    # O(N * D^3) time, O(1) extra memory beyond P.
+
+"In-place" is ambiguous — clarify which the interviewer wants:
+
+Usually: write into a caller-provided output array P.
+
+Sometimes: let P alias W so the input buffer is transformed into prefix products.
+
+The naive-autograd failure mode (Part 1's "explain the error"): mutating a tensor in place without flagging it bumps the version counter, and the saved tensor no longer matches at backward time — producing the cryptic version-counter error the interviewer probes for.
+
+Part 2 — out-of-place forward
+
+Just a wrapper that allocates P = np.empty_like(W) and calls Part 1.
+
+def prefix_products(W: np.ndarray) -> np.ndarray:
+    """Return P where P[i] = W[0] @ ... @ W[i]."""
+    P = np.empty_like(W)
+    return prefix_products_out(W, P)
+
+Part 3 — backward
+
+Let H[-1] = I, H[i] = H[i-1] @ W[i], so P[i] = H[i] and every H[i] is a forward output. For one step H[i] = H[i-1] @ W[i] with G = dL/dH[i]:
+
+dL/dW[i]   = H[i-1]^T @ G        (with H[-1] = I, i.e. left = I when i == 0)
+dL/dH[i-1] = G @ W[i]^T
+
+Scan backward from N-1 to 0, accumulating an adjoint adj:
+
+def prefix_products_backward(W: np.ndarray, dP: np.ndarray) -> np.ndarray:
+    """Given upstream dP for all prefix products, return dW. All (N, D, D)."""
+    if W.shape != dP.shape:
+        raise ValueError("W and dP must have the same shape")
+    if W.ndim != 3 or W.shape[1] != W.shape[2]:
+        raise ValueError("W must have shape (N, D, D)")
+
+    n, d, _ = W.shape
+    P = prefix_products(W)
+    dW = np.zeros_like(W)
+
+    # adj = total gradient dL/dH[i] at the current reverse step.
+    adj = np.zeros((d, d), dtype=W.dtype)
+    I = np.eye(d, dtype=W.dtype)
+
+    for i in range(n - 1, -1, -1):
+        adj = adj + dP[i]
+        left = I if i == 0 else P[i - 1]
+        dW[i] = left.T @ adj
+        adj = adj @ W[i].T
+
+    return dW
+
+Gradient-accumulation invariant: each W[j] feeds every later output P[j], P[j+1], ..., P[N-1], so backprop must accumulate the gradient from every future prefix that uses W[j]. The reverse variable adj is exactly that accumulated future contribution: when the loop reaches index j, adj already holds all gradient paths through P[k] for k >= j. The closed form is
+
+dW[j] = sum_{i >= j} (W[0] @ ... @ W[j-1])^T @ dP[i] @ (W[j+1] @ ... @ W[i])^T
+
+and the recurrence computes it without ever materializing every suffix product.
+
+Part 4 — Hillis-Steele scan (forward + backward)
+
+Because matmul is associative, the prefix products can be computed with an inclusive parallel scan using offsets 1, 2, 4, .... Because it is not commutative, the update order matters — at each level:
+
+new[i] = old[i - step] @ old[i]      # left factor is the lower index
+
+and not old[i] @ old[i - step]. Every level must read from the previous level's snapshot (old), never from a partially updated new in the same level. Indices i < step pass through unchanged.
+
+def hillis_steele_scan_forward(W: np.ndarray):
+    """Inclusive prefix scan for matmul.
+    Returns (P, levels) where levels caches each (step, old) snapshot for backward.
+    step = 1, 2, 4, ... while step < N; new[step:] = old[:-step] @ old[step:].
+    """
+    if W.ndim != 3 or W.shape[1] != W.shape[2]:
+        raise ValueError("W must have shape (N, D, D)")
+
+    n = W.shape[0]
+    cur = W.copy()
+    levels = []
+
+    step = 1
+    while step < n:
+        old = cur.copy()
+        new = old.copy()
+        new[step:] = old[:-step] @ old[step:]
+        levels.append((step, old))
+        cur = new
+        step *= 2
+
+    return cur, levels
+
+Work is O(N * D^3 * log N) (more total arithmetic than sequential), but span/depth is O(D^3 * log N) if the independent matmuls per level run in parallel. Backward reverses the cached levels; for each updated new[i] = old[i-step] @ old[i] with G = dL/dnew[i], A = old[i-step], B = old[i]:
+
+dL/dA += G @ B^T
+dL/dB += A^T @ G
+
+and pass-through indices (i < step) copy their gradient directly. A batched form replaces the per-i loop with slice ops over old[:-step] / old[step:] and np.swapaxes(..., -1, -2).
+
+def hillis_steele_scan_backward(levels, dP: np.ndarray) -> np.ndarray:
+    """Backward pass for hillis_steele_scan_forward."""
+    grad = dP.copy()
+    n = dP.shape[0]
+
+    for step, old in reversed(levels):
+        grad_old = np.zeros_like(grad)
+
+        # Unchanged outputs: new[i] = old[i] for i < step.
+        grad_old[:step] += grad[:step]
+
+        # Updated outputs: new[i] = old[i - step] @ old[i].
+        for i in range(step, n):
+            G = grad[i]
+            A = old[i - step]
+            B = old[i]
+            grad_old[i - step] += G @ B.T
+            grad_old[i] += A.T @ G
+
+        grad = grad_old
+
+    return grad
+
+def hillis_steele_scan_backward_batched(levels, dP: np.ndarray) -> np.ndarray:
+    """Same backward pass, written with batched level updates."""
+    grad = dP.copy()
+
+    for step, old in reversed(levels):
+        grad_old = np.zeros_like(grad)
+        grad_old[:step] += grad[:step]
+
+        G = grad[step:]
+        A = old[:-step]
+        B = old[step:]
+
+        grad_old[:-step] += G @ np.swapaxes(B, -1, -2)
+        grad_old[step:] += np.swapaxes(A, -1, -2) @ G
+        grad = grad_old
+
+    return grad
+
+Complexity
+
+MethodForward timeForward extra memBackward time
+Sequential, output-fillO(N * D^3)O(1) beyond PO(N * D^3)
+Sequential, allocatingO(N * D^3)O(N * D^2)O(N * D^3)
+Hillis-Steele scanO(N * D^3 * log N) workO(N * D^2 * log N) if all levels cachedO(N * D^3 * log N) work, depth O(log N)
+
+Examples
+
+W = np.array([[[1., 2.], [0., 1.]],
+              [[2., 0.], [1., 3.]],
+              [[1., 1.], [0., 1.]]])
+P = prefix_products(W)
+assert np.allclose(P[1], W[0] @ W[1])
+assert np.allclose(P[2], W[0] @ W[1] @ W[2])
+
+End-to-end check: compare sequential forward vs. scan forward, sequential backward vs. scan backward, and the analytic backward vs. central finite differences (eps = 1e-6) on a small random W of shape (5, 3, 3).
+
+def loss_from_W(W, upstream):
+    P = prefix_products(W)
+    return float(np.sum(P * upstream))
+
+def check_solution():
+    rng = np.random.default_rng(0)
+    W = rng.normal(size=(5, 3, 3))
+    dP = rng.normal(size=(5, 3, 3))
+
+    P_seq = prefix_products(W)
+    P_scan, levels = hillis_steele_scan_forward(W)
+    assert np.allclose(P_seq, P_scan)
+
+    dW_seq = prefix_products_backward(W, dP)
+    dW_scan = hillis_steele_scan_backward(levels, dP)
+    assert np.allclose(dW_seq, dW_scan)
+
+    eps = 1e-6
+    idx = (2, 1, 0)
+    W_pos = W.copy()
+    W_neg = W.copy()
+    W_pos[idx] += eps
+    W_neg[idx] -= eps
+
+    numeric = (loss_from_W(W_pos, dP) - loss_from_W(W_neg, dP)) / (2 * eps)
+    analytic = dW_seq[idx]
+    assert np.allclose(numeric, analytic, rtol=1e-5, atol=1e-5)
+
+check_solution()
+
+Notes
+
+A related but distinct sibling round is a 60-min 'numpy puzzle'.
+
+For the 75-min autograd version, a recurring stuck point is the interviewer running the candidate's original implementation, hitting a weird error message, and asking the candidate to explain it on the fly.
+
+The canonical custom-autograd API splits into forward (pure computation) and setup_context (which calls ctx.save_for_backward(...) on the tensors the backward needs), with backward returning one gradient per forward input. mark_dirty flags any tensor mutated in place — Part 1's in-place matmul without mark_dirty is exactly the failure mode that produces the cryptic version-counter error message the interviewer probes. Always sanity-check a custom backward against torch.autograd.gradcheck on a tiny double-precision tensor before claiming it's correct.
+
+Preparation
+
+Read PyTorch's autograd docs (custom Function.apply / forward / setup_context / backward) and the in-place / mark_dirty rules
+
+Derive Y = A @ B's backward: dA = dY @ B.T, dB = A.T @ dY
+
+Validate any hand-written backward with torch.autograd.gradcheck on a small float64 tensor — gets you used to the gradient-norm error message before you see it under interview pressure
+
+Learn Hillis-Steele prefix scan; hand-write forward and derive backward via associativity
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

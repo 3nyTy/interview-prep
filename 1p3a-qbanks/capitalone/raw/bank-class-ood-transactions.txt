@@ -1,0 +1,102 @@
+===H1===
+Bank Class OOD: Deposit / Withdraw / Transfer
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/bank-class-ood-transactions
+===BODY===
+Capital One
+Coding·60 minMembers
+Bank Class OOD: Deposit / Withdraw / Transfer
+The default Power Day coding round. Design a small banking class that supports account creation, deposit, withdraw, and transfer-between-accounts. The interviewer adds requirements in stages — validation, multiple account types, transaction history, fraud flags, top-N activity ranking — and watches how cleanly the design extends.
+SWE
+oop-design
+object-design
+payment
+transactions
+medium
+Frequency
+Medium
+Last asked
+2026-07-13
+Stage
+onsite-coding
+Requirements
+
+Implement a Bank (or equivalent) class supporting:
+
+Create / open an account (with an account id and an initial balance).
+
+deposit(account_id, amount) — add to balance after validating the account exists and the amount is positive.
+
+withdraw(account_id, amount) — subtract from balance after validating sufficient funds; reject otherwise.
+
+transfer(src_id, dst_id, amount) — atomic move of funds between two existing accounts; reject if either does not exist or src lacks funds.
+
+The prompt is delivered in segments. Initial pass only requires deposit / withdraw; the interviewer adds transfer after the first version compiles, then layers extensions:
+
+Multiple account types (Checking, Savings, Mortgage, Auto Loan) with type-specific rules.
+
+Transaction history (return a list of transactions per account, with timestamps).
+
+Fraud flags: deny / queue suspicious transactions (large amount, rapid sequence, unknown merchant).
+
+Concurrent access from multiple callers (correct return value when two transfers race).
+
+Top-N activity ranking (TOP_ACTIVITY n): return the identifiers of the n most active accounts in descending order of financial activity, formatted <accountId>(<activity>). The activity indicator is the absolute sum of all completed transaction amounts touching the account — deposits, withdrawals, and both sides of a successful transfer; failed operations do not count. Ties break alphabetically by account id ascending; if fewer than n accounts exist, return all of them.
+
+Validation rules to bake in early:
+
+Account-not-found returns a clear error type / exception rather than silently failing.
+
+Negative or zero amounts are rejected at the boundary, not deep inside the transfer logic.
+
+Insufficient-funds returns a distinct error from account-not-found.
+
+Examples
+
+Operation sequence exercising the TOP_ACTIVITY extension (each operation returns a value; -1 marks a rejected operation):
+
+["CREATE_ACCOUNT", "account1"]               -> true
+["CREATE_ACCOUNT", "account1"]               -> false
+["CREATE_ACCOUNT", "account2"]               -> true
+["DEPOSIT", "non-existing", "2700"]          -> -1
+["DEPOSIT", "account1", "2700"]              -> 2700
+["TRANSFER", "account1", "account2", "2701"] -> -1
+["TRANSFER", "account1", "account2", "200"]  -> 2500
+["TRANSFER", "account1", "account2", "2500"] -> 0
+["DEPOSIT", "account2", "300"]               -> 3000
+["CREATE_ACCOUNT", "account3"]               -> true
+["DEPOSIT", "account3", "4000"]              -> 4000
+["TOP_ACTIVITY", "3"] -> ["account1(5400)", "account3(4000)", "account2(3000)"]
+["DEPOSIT", "account2", "1000"]              -> 4000
+["TOP_ACTIVITY", "2"] -> ["account1(5400)", "account2(4000)"]
+["TOP_ACTIVITY", "5"] -> ["account1(5400)", "account2(4000)", "account3(4000)"]
+
+The last two queries show the tie rule: once account2 reaches activity 4000 it ties account3, and the alphabetical tiebreak ranks account2 first.
+
+Notes
+
+The graded signal is staged extension, not first-pass perfection. Write the minimum class that handles deposit / withdraw cleanly, then extend per the interviewer's prompts. Over-engineering the first pass (introducing strategy patterns, account-type hierarchies, transaction logs before being asked) wastes 10+ minutes and tends to confuse the interviewer about what the candidate is solving.
+
+Have a transaction-history extension ready: a simple list[Transaction] per account, where Transaction carries {type, amount, counterparty?, timestamp, status}. This is the most common follow-up.
+
+For the account-type follow-up, the cleanest factoring is composition rather than inheritance: a single Account class with a type field and a small ruleset table, rather than four subclasses with overrides. The four account types across prompt variants (Checking, Saving, Mortgage, Auto Loan) only differ on minor rules (e.g. mortgages reject deposit from a non-payment source); inheritance over-fits.
+
+The concurrency follow-up is rarely pushed deep; mention a per-account lock or a single bank-level lock and discuss the trade-off briefly. The interviewer is checking that the candidate knows the concept, not implementing a lock-free design.
+
+Test harness hygiene matters here because the interviewer adds requirements in chunks. Set up a run_tests() block at the bottom that exercises every code path and re-run after each extension. Candidates who lose this discipline waste time hand-tracing.
+
+In the operations-array variant, calls return values instead of raising: CREATE_ACCOUNT returns true/false, DEPOSIT returns the new balance or -1 for an unknown account, and TRANSFER returns the source account's post-transfer balance or -1 on any invalid transfer (unknown account, self-transfer, insufficient funds).
+
+Preparation
+
+Implement the base class three times until it is muscle memory: account creation, deposit, withdraw, transfer, with one error type per failure mode.
+
+Build a layered extension drill: after the base passes, add transaction history (5 min budget), then account types (10 min), then a fraud flag (15 min). Practise the staging order so the live attempt feels familiar.
+
+Read the interviewer's segment cues carefully — pauses and "now add" prompts are the explicit invitation to extend; charging ahead is the second-most-common failure mode after over-designing the first pass.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

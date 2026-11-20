@@ -1,0 +1,75 @@
+===H1===
+Design a Feature Flag System
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/feature-flag-system-design
+===BODY===
+Stripe
+System Design·60 minMembers
+Design a Feature Flag System
+Onsite system design. Build a feature-flag platform that lets engineers roll out flags by percentage / user attributes, evaluated cheaply at scale on the server-side request path.
+SWE
+system-design
+scaling
+messaging
+medium
+Frequency
+Low
+Last asked
+2026-04-30
+Stage
+onsite-system-design
+Requirements
+
+Provide an API for defining and updating flag rules (boolean, percentage rollout, attribute-based targeting).
+
+Provide a flag-evaluation API on the hot request path that must be sub-millisecond at high QPS — flag evaluation cannot become a request-path bottleneck.
+
+Support consistent percentage rollouts (same user → same answer across requests).
+
+Support runtime rule updates that propagate quickly without rebooting client services.
+
+Functional requirements should also cover audit logs and a kill-switch for emergencies.
+
+Scale targets reported
+
+High QPS (tens of thousands of evaluations per second per cluster).
+
+Updates fan out to many services; eventual consistency on the order of seconds is acceptable.
+
+Key decisions to surface
+
+Push (server pushes new rules) vs pull (clients poll) vs hybrid.
+
+Where evaluation runs — in a centralized service vs an in-process SDK with cached rules.
+
+How percentage rollouts stay stable (hashing strategy and salt).
+
+How to bound the blast radius of a bad rule (staging, canary, kill-switch).
+
+Notes
+
+Both reports tag this as a standard system-design round with the interviewer drilling on hot-path performance.
+
+Expect questions on cache invalidation, on-by-default vs off-by-default semantics, and how to handle flag deletion safely.
+
+The canonical toggle taxonomy is release / experiment / ops / permission — different toggle classes drive different consistency targets (release toggles tolerate seconds of lag, ops kill-switches need sub-second propagation, experiment toggles need consistent per-request bucketing). Naming the four classes up front is a cheap signal of literacy in this round.
+
+Production-grade platforms (LaunchDarkly / Statsig / OpenFeature) converge on the same shape: in-process SDK that holds a cached ruleset, evaluates locally for sub-millisecond hot-path latency, and refreshes the ruleset via either long-poll or a streaming connection (SSE / gRPC) with sub-second propagation. Centralized eval RPC is the anti-pattern that turns flag lookup into a hard request-path dependency.
+
+The standard sticky-bucket trick is a deterministic hash: hash(salt + user_id + flag_key) mod 10000 < rollout_pct * 100. Salt isolates flags from each other (so a user landing in the treatment of flag A does not bias them into the treatment of flag B), and the mod 10000 (not mod 100) gives enough granularity for sub-percent rollouts.
+
+Preparation
+
+Read public write-ups on LaunchDarkly / Statsig / Stripe's own feature-flag tooling.
+
+Practice the eval-path latency budget conversation: in-process SDK + periodic snapshot pull vs centralized eval RPC.
+
+Be ready to defend a hashing scheme (e.g. MurmurHash3(user_id + flag_key + salt) mod 100 < rollout_pct) and walk through what happens when rollout_pct increases.
+
+Sketch the end-to-end on a whiteboard once: control plane (CRUD + audit log + canary tooling) → CDN-distributed snapshot bundle → SDK fetcher (long-poll or SSE) → in-process evaluator with local cache → emitting per-evaluation metrics back to the control plane. Time yourself: in 35 minutes you should be able to walk every box plus the consistency/propagation story.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

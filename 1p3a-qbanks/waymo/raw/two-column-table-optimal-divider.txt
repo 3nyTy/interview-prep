@@ -1,0 +1,55 @@
+===H1===
+Two-Column Table: Place Divider to Minimize Total Height
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/two-column-table-optimal-divider
+===BODY===
+Waymo
+Coding·45 minMembers
+Two-Column Table: Place Divider to Minimize Total Height
+Phone screen: a known total width must be split between two text columns. Given the words and the joint width budget, decide the divider position that minimizes the table's total height. Binary search on divider position.
+SWE
+binary-search
+greedy
+string-processing
+medium
+Frequency
+Single report
+Last asked
+2025-11-14
+Stage
+phone-screen
+Requirements
+
+Inputs: total table width W, two columns of text (list of words for each).
+
+The divider between columns can be placed at any width w ∈ [w_min, W - w_min], where w_min accommodates the widest single word in each column.
+
+Each column wraps its text greedily inside the assigned width and reports its height (number of rendered lines).
+
+Return the divider position that minimizes the maximum of the two column heights (or the sum — confirm with the interviewer).
+
+Notes
+
+Compute height_left(w) and height_right(W - w) as greedy wrap functions: both are monotonically non-increasing in their argument (more width never adds lines). So max(height_left(w), height_right(W - w)) is unimodal — binary-search on w and find the crossover.
+
+For the 'sum of heights' objective, the same monotonicity argument applies, but the optimum lives at one of the kink points where one of the columns drops a line; ternary search over w works.
+
+Edge case to enumerate explicitly: a single word longer than the proposed column width forces w_min per column. Validate up front and surface as a clarification.
+
+Greedy text-wrap implementation runs in O(K) per call for K words; the outer binary search is O(log W), so total O(K · log W).
+
+Common micro-bug: off-by-one when measuring word widths (include trailing spaces or not?). Confirm with the interviewer.
+
+Preparation
+
+Implement greedy text-wrap as a self-contained wrap(words, width) -> num_lines function.
+
+Drill binary search on monotone functions (bisect_left / bisect_right semantics) so the crossover detection is automatic.
+
+Pre-stage the edge cases as test inputs: single-word column, equal-width words, one column dominating the height.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

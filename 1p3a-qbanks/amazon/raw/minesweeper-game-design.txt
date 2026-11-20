@@ -1,0 +1,70 @@
+===H1===
+Minesweeper Game Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/minesweeper-game-design
+===BODY===
+Amazon
+System Design·60 minMembers
+Minesweeper Game Design
+A candidate-chosen game design round ("design the game you enjoy") — one candidate picked Minesweeper. Doubles as OOD plus a touch of system design for multi-user / persistence.
+SWE
+oop-design
+system-design
+medium
+Frequency
+Single report
+Last asked
+2026-04-13
+Stage
+onsite-system-design
+Requirements
+
+Core game: variable board size and mine count, flood-fill reveal, flag mode, win/lose detection.
+
+Discuss persistence (resume in-progress game), high-score leaderboard, multi-device sync.
+
+Define the API: newGame(rows, cols, mines), reveal(r, c), flag(r, c), getState().
+
+Examples
+
+Flood-fill reveal: BFS/DFS from the clicked cell, stop at cells with adjacent-mine count > 0.
+
+Win condition: every non-mine cell is revealed; lose: a mine is revealed.
+
+Notes
+
+Game-design prompts are usually a creative-thinking proxy for OOD scoring. Pick the game whose state machine you can articulate in 30 seconds.
+
+Mention separation of concerns (game-engine vs renderer vs persistence) early; Amazon Staff/L6 rounds want clean layering.
+
+Extend with a fairness check: if first click hits a mine, regenerate the board so the first click is always safe.
+
+Two-class core is enough: Cell { isMine, isRevealed, isFlagged, adjacentMines } and Board { cells[][], state, minesRemaining, reveal(r,c), flag(r,c) }. Resist adding GameEngine / GameController unless asked — over-layering on a small OOD reads as cargo-culting.
+
+Flood-fill on reveal is the canonical multi-source BFS / DFS pattern: iterative BFS is preferred for large boards because recursive DFS blows the stack at ~10k+ cells. Stop expansion at cells with adjacentMines > 0 (these get revealed but do not propagate).
+
+Mine placement should happen after the first click, not at construction, so the first click is guaranteed safe. The cheap implementation is Fisher-Yates over the non-clicked cells; mention it explicitly because interviewers test whether you noticed the first-click-is-mine UX bug.
+
+Win check is revealedCount == totalCells - mineCount, not "all mines flagged" — flagging is a UI affordance, not a win condition. Multiple candidates conflate these.
+
+For persistence / multi-device sync, the natural decomposition is an immutable GameState snapshot plus an event log of (reveal | flag | unflag) actions; replaying the log gives you both undo and cross-device replication.
+
+Preparation
+
+Implement a small Minesweeper engine in 100-150 lines as a warmup; it nails both the flood-fill algorithm and the OOD layering.
+
+Prepare 2 backup games (Tic-Tac-Toe, Snake) in case the interviewer asks you to switch.
+
+Practice articulating game state as Cell (mine, revealed, flagged, neighbor_count) and Board (cells, status).
+
+Layered drill: (1) implement single-player Minesweeper in ~120 lines (Cell, Board, BFS reveal, flag, win/lose) and time yourself to 25 minutes; (2) add safe-first-click; (3) add a persistence layer (snapshot + event log); (4) sketch the multi-device sync extension.
+
+Have 2 backup games memorized (Tic-Tac-Toe with minimax, Snake with a circular buffer body) in case the interviewer pivots — pivoting cleanly signals comfort with the OOD frame rather than rote memorization of one prompt.
+
+Practice articulating separation of concerns in one sentence: "Board owns rules and state, Renderer is a pure function of state, GameSession owns persistence and replay" — Amazon L6/Staff rounds reward this layering explicitly.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

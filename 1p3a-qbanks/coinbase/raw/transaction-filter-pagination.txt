@@ -1,0 +1,447 @@
+===H1===
+Transaction Filter + Pagination Endpoint
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/transaction-filter-pagination
+===BODY===
+Coinbase
+Coding·60 minMembers
+Transaction Filter + Pagination Endpoint
+Build a typed endpoint over an in-memory list of transactions that filters by user / currency / time range and paginates the results. The unstated trap is offset vs cursor pagination — many interviewers will dock candidates who default to numeric offsets without raising the trade-off, and some explicitly ask for the cursor variant in the follow-up.
+SWE
+api-integration
+object-design
+ambiguous-spec
+iterator
+medium
+Frequency
+High
+Last asked
+2026-07-11
+Stage
+onsite-coding
+Query Pagination
+
+Problem Requirements
+
+Design a transaction query system. You need to build a tool that filters a list of financial transactions and shows the results in pages.
+
+The interviewer will not tell you exactly what methods to write. You must decide how the API should look to make it clean and easy to use.
+
+We will use a dataset stored in memory (a list) for this problem. However, you should also think about how this would work if the data were in a real database.
+
+Sample Dataset
+
+transactions = [
+    {"time": 1,  "id": 11, "user_id": 1, "currency": 1, "amount": 10},
+    {"time": 2,  "id": 12, "user_id": 1, "currency": 3, "amount": 11},
+    {"time": 3,  "id": 13, "user_id": 2, "currency": 2, "amount": -10},
+    {"time": 4,  "id": 14, "user_id": 2, "currency": 2, "amount": 12},
+    {"time": 5,  "id": 15, "user_id": 1, "currency": 1, "amount": 10},
+    {"time": 6,  "id": 16, "user_id": 1, "currency": 2, "amount": 13},
+    {"time": 7,  "id": 17, "user_id": 1, "currency": 2, "amount": 13},
+    {"time": 8,  "id": 18, "user_id": 1, "currency": 2, "amount": 10},
+    {"time": 9,  "id": 19, "user_id": 1, "currency": 1, "amount": 15},
+    {"time": 10, "id": 20, "user_id": 1, "currency": 1, "amount": 15},
+    {"time": 10, "id": 21, "user_id": 1, "currency": 1, "amount": 16},
+    {"time": 11, "id": 22, "user_id": 1, "currency": 1, "amount": 5},
+    {"time": 11, "id": 23, "user_id": 1, "currency": 2, "amount": 5},
+    {"time": 12, "id": 24, "user_id": 1, "currency": 2, "amount": 6},
+    {"time": 13, "id": 25, "user_id": 1, "currency": 1, "amount": 10},
+]
+
+Part 1: Filtering Results
+
+What You Need to Do
+
+Build a system that allows users to filter transactions by these fields:
+
+Time range: Find transactions between a start time and end time.
+
+User ID: Find transactions for a specific user.
+
+Currency: Find transactions with a specific currency.
+
+Amount range: Find transactions between a minimum and maximum amount.
+
+The user should be able to set one filter or mix several filters together. After setting the filters, the user runs the query to get the results.
+
+Things to Think About
+
+Configuration: How do you set the filters? Should you use individual methods or pass them all at once?
+
+Execution: When do you actually search the list? Do you search immediately when a filter is set, or wait for an execute() command?
+
+Flexibility: Can you change the filters later, or are they fixed once created?
+
+How to Use It
+
+query = TransactionQuery(transactions)
+
+# Filter by user
+query.set_user_id(1)
+results = query.execute()
+# Returns all transactions where user_id == 1
+
+# Filter by time range and currency
+query = TransactionQuery(transactions)
+query.set_time_range(5, 10)
+query.set_currency(1)
+results = query.execute()
+# Returns transactions where 5 <= time <= 10 AND currency == 1
+# -> [{"time": 5, "id": 15, ...}, {"time": 9, "id": 19, ...},
+#     {"time": 10, "id": 20, ...}, {"time": 10, "id": 21, ...}]
+
+Solution Code for Part 1
+
+class TransactionQuery:
+    def __init__(self, transactions: list):
+        self.transactions = transactions
+        self.filters = {}
+
+    def set_user_id(self, user_id: int) -> 'TransactionQuery':
+        """Filter by user ID."""
+        self.filters['user_id'] = user_id
+        return self
+
+    def set_currency(self, currency: int) -> 'TransactionQuery':
+        """Filter by currency."""
+        self.filters['currency'] = currency
+        return self
+
+    def set_time_range(self, start: int, end: int) -> 'TransactionQuery':
+        """Filter by time range [start, end] inclusive."""
+        self.filters['time_start'] = start
+        self.filters['time_end'] = end
+        return self
+
+    def set_amount_range(self, min_amt: float, max_amt: float) -> 'TransactionQuery':
+        """Filter by amount range [min, max] inclusive."""
+        self.filters['amount_min'] = min_amt
+        self.filters['amount_max'] = max_amt
+        return self
+
+    def _matches(self, txn: dict) -> bool:
+        """Check if a transaction passes all active filters."""
+        if 'user_id' in self.filters and txn['user_id'] != self.filters['user_id']:
+            return False
+        if 'currency' in self.filters and txn['currency'] != self.filters['currency']:
+            return False
+        if 'time_start' in self.filters and txn['time'] < self.filters['time_start']:
+            return False
+        if 'time_end' in self.filters and txn['time'] > self.filters['time_end']:
+            return False
+        if 'amount_min' in self.filters and txn['amount'] < self.filters['amount_min']:
+            return False
+        if 'amount_max' in self.filters and txn['amount'] > self.filters['amount_max']:
+            return False
+        return True
+
+    def execute(self) -> list:
+        """Execute the query and return matching transactions."""
+        return [txn for txn in self.transactions if self._matches(txn)]
+
+Explanation of the Design:
+
+Method Chaining: Each setup method returns self. This lets you chain commands like query.set_user_id(1).set_currency(2).execute().
+
+Dictionary for Filters: We store filters in a simple dictionary. This makes it easy to add new features. If you need a new filter, you just add a method and update the _matches function.
+
+Real Databases: In this code, we loop through a list. In a real system, each filter would become a SQL WHERE clause. A database would use indexes to make this fast.
+
+Performance:
+
+OperationTimeSpace
+set_*O(1)O(1)
+executeO(N)O(R)
+
+N = total transactions, R = number of matching results.
+
+Part 2: Adding Pagination
+
+The New Requirement
+
+Interviewer: "Now add pagination. Given a page size, the user should be able to see the results one page at a time."
+
+You need to update the system. After setting filters and a page size, the user should be able to:
+
+Get the first page of results.
+
+Get the next page using a "cursor" (a marker) from the previous result.
+
+Know when the results are finished.
+
+The user does not need to understand how the cursor works. They just pass the cursor back to the system to get the next page.
+
+Things to Think About
+
+Cursor Style: What is the cursor? Is it a number (offset) or an ID?
+
+Consistency: If the data does not change, reading from start to finish should show every item exactly once.
+
+Direction: Can the user go backward to the previous page?
+
+How to Use It
+
+query = TransactionQuery(transactions)
+query.set_user_id(1)
+query.set_page_size(3)
+
+# First page
+page1 = query.fetch_page()
+# page1.data -> first 3 matching transactions
+# page1.next_cursor -> cursor to fetch the next page
+
+# Second page
+page2 = query.fetch_page(cursor=page1.next_cursor)
+# page2.data -> next 3 matching transactions
+# page2.next_cursor -> cursor for page 3 (or None if no more results)
+
+# Iterate through all pages
+cursor = 0
+while cursor is not None:
+    page = query.fetch_page(cursor=cursor)
+    print(page.data)
+    cursor = page.next_cursor
+
+Solution Code for Part 2
+
+class Page:
+    def __init__(self, data: list, next_cursor: int = None, prev_cursor: int = None):
+        self.data = data
+        self.next_cursor = next_cursor
+        self.prev_cursor = prev_cursor
+
+class TransactionQuery:
+    def __init__(self, transactions: list):
+        self.transactions = transactions
+        self.filters = {}
+        self.page_size = None
+
+    def set_user_id(self, user_id: int) -> 'TransactionQuery':
+        self.filters['user_id'] = user_id
+        return self
+
+    def set_currency(self, currency: int) -> 'TransactionQuery':
+        self.filters['currency'] = currency
+        return self
+
+    def set_time_range(self, start: int, end: int) -> 'TransactionQuery':
+        self.filters['time_start'] = start
+        self.filters['time_end'] = end
+        return self
+
+    def set_amount_range(self, min_amt: float, max_amt: float) -> 'TransactionQuery':
+        self.filters['amount_min'] = min_amt
+        self.filters['amount_max'] = max_amt
+        return self
+
+    def set_page_size(self, size: int) -> 'TransactionQuery':
+        self.page_size = size
+        return self
+
+    def _matches(self, txn: dict) -> bool:
+        if 'user_id' in self.filters and txn['user_id'] != self.filters['user_id']:
+            return False
+        if 'currency' in self.filters and txn['currency'] != self.filters['currency']:
+            return False
+        if 'time_start' in self.filters and txn['time'] < self.filters['time_start']:
+            return False
+        if 'time_end' in self.filters and txn['time'] > self.filters['time_end']:
+            return False
+        if 'amount_min' in self.filters and txn['amount'] < self.filters['amount_min']:
+            return False
+        if 'amount_max' in self.filters and txn['amount'] > self.filters['amount_max']:
+            return False
+        return True
+
+    def execute(self) -> list:
+        """Execute the query and return all matching transactions (no pagination)."""
+        return [txn for txn in self.transactions if self._matches(txn)]
+
+    def fetch_page(self, cursor: int = 0) -> Page:
+        """
+        Fetch a single page of filtered results.
+
+        Args:
+            cursor: The starting offset into filtered results (default 0).
+
+        Returns:
+            A Page object with:
+              - data: list of transactions for this page
+              - next_cursor: cursor for the next page, or None if this is the last page
+              - prev_cursor: cursor for the previous page, or None if this is the first page
+        """
+        if self.page_size is None:
+            raise ValueError("Page size must be set before fetching pages")
+
+        # Collect matching transactions starting from the cursor offset
+        matched = []
+        skipped = 0
+        remaining_after = False
+
+        for txn in self.transactions:
+            if not self._matches(txn):
+                continue
+            if skipped < cursor:
+                skipped += 1
+                continue
+            if len(matched) < self.page_size:
+                matched.append(txn)
+            else:
+                remaining_after = True
+                break
+
+        next_cursor = cursor + len(matched) if remaining_after else None
+        prev_cursor = cursor - self.page_size if cursor > 0 else None
+        if prev_cursor is not None and prev_cursor < 0:
+            prev_cursor = 0
+
+        return Page(data=matched, next_cursor=next_cursor, prev_cursor=prev_cursor)
+
+Step-by-Step Example
+
+transactions = [
+    {"time": 1,  "id": 11, "user_id": 1, "currency": 1, "amount": 10},
+    {"time": 2,  "id": 12, "user_id": 1, "currency": 3, "amount": 11},
+    {"time": 3,  "id": 13, "user_id": 2, "currency": 2, "amount": -10},
+    {"time": 4,  "id": 14, "user_id": 2, "currency": 2, "amount": 12},
+    {"time": 5,  "id": 15, "user_id": 1, "currency": 1, "amount": 10},
+    {"time": 6,  "id": 16, "user_id": 1, "currency": 2, "amount": 13},
+    {"time": 7,  "id": 17, "user_id": 1, "currency": 2, "amount": 13},
+    {"time": 8,  "id": 18, "user_id": 1, "currency": 2, "amount": 10},
+    {"time": 9,  "id": 19, "user_id": 1, "currency": 1, "amount": 15},
+    {"time": 10, "id": 20, "user_id": 1, "currency": 1, "amount": 15},
+    {"time": 10, "id": 21, "user_id": 1, "currency": 1, "amount": 16},
+    {"time": 11, "id": 22, "user_id": 1, "currency": 1, "amount": 5},
+    {"time": 11, "id": 23, "user_id": 1, "currency": 2, "amount": 5},
+    {"time": 12, "id": 24, "user_id": 1, "currency": 2, "amount": 6},
+    {"time": 13, "id": 25, "user_id": 1, "currency": 1, "amount": 10},
+]
+
+query = TransactionQuery(transactions)
+query.set_user_id(1).set_currency(1).set_page_size(3)
+
+# Page 1 (cursor=0)
+page = query.fetch_page()
+# data: [id=11 (time=1), id=15 (time=5), id=19 (time=9)]
+# next_cursor: 3, prev_cursor: None
+
+# Page 2 (cursor=3)
+page = query.fetch_page(cursor=3)
+# data: [id=20 (time=10), id=21 (time=10), id=22 (time=11)]
+# next_cursor: 6, prev_cursor: 0
+
+# Page 3 (cursor=6)
+page = query.fetch_page(cursor=6)
+# data: [id=25 (time=13)]
+# next_cursor: None, prev_cursor: 3
+
+# Iterate all pages from the beginning
+cursor = 0
+while cursor is not None:
+    page = query.fetch_page(cursor=cursor)
+    for txn in page.data:
+        print(f"  id={txn['id']}, time={txn['time']}, amount={txn['amount']}")
+    cursor = page.next_cursor
+
+Explanation of the Design:
+
+Offset Cursor: The cursor is simply a number. It tells the system how many matching items to skip. This is easy to understand and lets you go forward and backward.
+
+Hidden Logic: The user treats the cursor like a token. In a real system, the cursor might store the last id seen (Keyset pagination), which is faster for databases.
+
+Fast Reading: The fetch_page method stops working as soon as it finds enough items for one page. It does not load all the results into memory.
+
+Backward Pagination: We calculate prev_cursor using the current position. This allows the user to go back to previous pages.
+
+Comparing Pagination Styles:
+
+ApproachGood PointsBad Points
+Offset (used here)Simple. You can jump to any page easily.Slow for deep pages (must skip many rows). Unstable if data is added or deleted.
+Keyset (WHERE id > last_id)Very fast (O(1)). Stable even if new data comes in.Harder to jump to a specific page number. Requires a unique, sorted column.
+
+In a real database, Keyset pagination is usually better because the database can jump directly to the right spot using an index.
+
+Performance:
+
+OperationTimeSpace
+fetch_pageO(cursor + P)O(P)
+
+P = page size. The cost O(cursor) happens because we have to skip rows we have already seen. If we used Keyset pagination and a database index, this would be O(P).
+
+Common Interview Questions
+
+Offset vs. Keyset Pagination: "Which one is better?"
+
+Offset is easier to build but gets slow if you have a lot of data.
+
+Keyset is faster and more reliable, but you cannot jump straight to "Page 10."
+
+Cursor Stability: "What if someone adds a new transaction while you are reading?"
+
+With Offset, you might see the same item twice or skip an item.
+
+With Keyset, it is stable. You always see the rows that come after the last one you saw.
+
+Bidirectional Pagination: "How do you go to the previous page?"
+
+Offset: Subtract the page size from the current cursor.
+
+Keyset: You must reverse the search order (e.g., WHERE id < :cursor ORDER BY id DESC).
+
+Database Optimization: "How does this map to SQL?"
+
+Every filter is a WHERE condition.
+
+You should use composite indexes (e.g., on user_id and time) so the database can find rows quickly.
+
+Scalability: "What if you have billions of rows?"
+
+Sharding: Split data onto different servers based on user_id.
+
+Partitioning: Split data by time (e.g., one table per month).
+
+Caching: Save the results of popular searches so you don't have to look them up every time.
+
+Final Performance Check
+
+OperationTime (In-Memory)Time (DB + Index)Space
+set_*O(1)O(1)O(1)
+executeO(N)O(log N + R)O(R)
+fetch_pageO(cursor + P)O(log N + P)O(P)
+
+N = total transactions, R = matching results, P = page size.
+
+Candidate-Report Notes
+
+Offset vs cursor is the entire round. Volunteer both within the first 5 minutes:
+
+Offset / limit: simple, supports random page jumps, but pages skew when records are inserted/deleted and the query degrades to O(offset + limit) on a real DB.
+
+Cursor (e.g. (time, id)): stable under inserts, O(limit) on indexed columns, but only supports forward / backward sequential traversal.
+
+For a transaction history endpoint, cursor is the production answer (data is append-mostly; users scroll, they don't jump to page 47).
+
+A clean shape: listTransactions(filter, pageRequest) -> PageResponse where PageRequest = {cursor?, limit} and PageResponse = {items, nextCursor, hasMore}. Tie-break the cursor on (time, id) so duplicate timestamps don't drop rows.
+
+The Coinbase Domain follow-up sometimes pivots into asking for backward pagination — make sure your cursor encoding supports both directions (typically by reversing the comparator and exposing prevCursor).
+
+Several candidates have failed this round for racing into the loop body without negotiating the API shape with the interviewer. Talk before typing.
+
+The same system is the substrate of the AI-assisted (AI Enhanced Pilot) round, in debug-and-extend form rather than build-from-scratch: fix an existing sort-by-timestamp implementation (invalid cursor format, duplicate timestamps resolved with an id tie-break, backward-compatible cursor evolution), design sort-by-amount support with an explicit trade-off analysis (offset vs cursor; cursor with or without the sort-key field; hashed vs plain cursor), and diagnose from logs why an unindexed amount sort times out. Preparation for this question transfers directly to that round.
+
+Preparation
+
+Write the cursor-based version once end-to-end in your interview language: filter → sort by (time, id) → drop everything <= cursor → take limit + 1 (the extra item tells you hasMore).
+
+Practice the verbal pros/cons of cursor vs offset in under 60 seconds — this is the half of the round most directly graded.
+
+Sketch the database-backed equivalent: index on (time, id), range query with WHERE (time, id) > (?, ?) ORDER BY (time, id) LIMIT ?. The interviewer often wants to hear you connect the in-memory implementation to a WHERE clause on indexed columns. Tuple comparison (time, id) > (?, ?) is the form that lets the optimizer use a composite index; the equivalent time > ? OR (time = ? AND id > ?) rewrite often does not hit the same index plan.
+
+Have a concrete benchmark anchor ready: a 1M-row table at offset 900,000 takes ~700 ms on Postgres; the same query with cursor + tuple comparison on a composite index lands sub-millisecond. The point isn't the exact numbers — it's that offset's cost grows linearly with page depth while cursor's cost is constant.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

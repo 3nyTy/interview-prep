@@ -1,0 +1,118 @@
+===H1===
+Ads Frequency Cap System Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/ads-frequency-cap-system-design
+===BODY===
+Ads Frequency Cap System Design
+
+<https://www.1point3acres.com/interview/problems/company/netflix/ads-frequency-cap-system-design>
+
+Netflix
+System Design
+
+60 min
+Members
+Ads Frequency Cap / Limiter
+
+Design a system that enforces per-user / per-campaign ad frequency caps, often with special handling for strict one-ad caps and budget smoothing. The round expects a deep dive into Redis atomicity, queue keying, read/write path separation, and offline aggregation.
+
+SWE
+Infra Eng
+ads
+rate-limiting
+redis
+kafka
+scaling
+idempotency
+distributed-systems
+hard
+Frequency
+High
+Last asked
+2026-08-05
+Stage
+onsite-system-design
+Requirements
+Support caps such as no more than N impressions per user per campaign per window.
+Read path must answer an ad-serving eligibility check with low latency.
+Write path records impressions / clicks and updates counters reliably.
+Handle at least one strict cap variant, such as a campaign where a user must see at most one ad.
+Support offline reconciliation for delayed events and counter correction.
+Ads candidates should also discuss budget pacing / smooth delivery when asked.
+Design Sketch
+Key counters by (user_id, campaign_id, window_bucket) or (user_id, advertiser_id, window_bucket) depending on business scope.
+Use Redis for hot eligibility counters. Use atomic INCR / Lua / transaction patterns so concurrent ad-serving workers cannot overserve the same cap.
+Separate the online read path from the event ingestion path. The ad server reads a hot cap state; the event pipeline writes impressions to Kafka and eventually the warehouse.
+Make the queue key explicit. Partition Kafka by user or user-campaign key when order matters for reconciliation.
+Persist raw impression events to durable storage so Redis can be rebuilt after failure.
+For strict one-cap, reserve before serving or use compare-and-set style atomic claim; decrement / expire the reservation if serving fails.
+Notes
+The hard part is not drawing Redis. It is explaining where exactness is required and where eventual consistency is acceptable.
+This is not a plain rate limiter: the read and write paths fire at different times. The eligibility read happens during bidding, but winning the bid does not guarantee the ad is shown, so the counter write is deferred and applied asynchronously only on a confirmed impression beacon. State that decoupling explicitly  the same shape appears in coupon / promo-redemption systems.
+Atomicity is the most common deep-dive. Be ready to compare Lua scripts, Redis transactions, and database row-level locks.
+Windows can be fixed, sliding, or calendar-aligned. Sliding windows are more accurate but more expensive; bucketed windows are simpler and usually good enough.
+Budget smoothing is a pacing problem: divide remaining budget over remaining time, throttle by predicted supply, and use feedback from delivery lag. Pacing is sometimes the entire prompt rather than a follow-up  the round then deep-dives how the rate limiter is actually implemented, so be ready to go below the high-level answer.
+Offline reconciliation should be idempotent. Impression IDs prevent double-counting when events are replayed.
+Preparation
+Draw online read, online write, Kafka, Redis, warehouse, and reconciliation jobs on one diagram.
+Prepare one strict one-cap algorithm with reservation semantics.
+Practice a 30-minute end-to-end narration from requirements through Redis atomicity, Kafka ingestion, reconciliation, and failure modes.
+Practice explaining the failure modes: Redis outage, Kafka lag, duplicate impression events, hot campaigns, and delayed client beacons.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Design Sketch
+Notes
+Preparation
+Related discussions  9
+???L5 onsite??
+?? Ads L5 ?? + ?????
+?? ???? 6 ->5 ->0
+??Ads L4 ????
+??Ads????+??team match??
+??ads???? - ???
+???ghost???
+??????????
+?? ads onsite
+Related questions
+
+Other Netflix questions sharing tags with this one
+
+Ads Audience Targeting / Custom Audience System
+Single report
+ads
+redis
+scaling
++5
+WAL Log Enrichment Pipeline
+Single report
+kafka
+idempotency
+distributed-systems
++4
+File Backup System
+Single report
+distributed-systems
+idempotency
+scaling
++4
+Compute Resource Scheduling for ML Jobs
+Low
+distributed-systems
+scaling
+hard
++4
+Global Config Deployment System
+Single report
+distributed-systems
+scaling
+hard
++4
+Code editor
+
+---

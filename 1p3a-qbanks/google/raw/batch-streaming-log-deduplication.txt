@@ -1,0 +1,61 @@
+===H1===
+Batch and Streaming Log Deduplication
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/batch-streaming-log-deduplication
+===BODY===
+Google
+CodingMembers
+Batch and Streaming Log Deduplication
+Process `(timestamp, message)` logs by deduplicating on message and sorting retained entries by timestamp, first keeping the first-seen entry and then the latest timestamp. The streaming extension adds `add(timestamp, message)` and `get_next()`, requiring a map plus min-heap, lazy deletion, and a discussion of watermarks and bounded state.
+SWE
+dedup
+streaming
+heap
+sorting
+medium
+Frequency
+Single report
+Last asked
+2026-07-23
+Stage
+onsite-coding
+Requirements
+
+Each log is (timestamp, message), where timestamps are integers and arrival order may differ from timestamp order.
+
+Batch, keep first: retain the first occurrence of each message by input order, ignore later duplicates, then sort retained entries by ascending timestamp.
+
+Batch, keep latest: retain the entry with the greatest timestamp for each message, then sort the retained entries.
+
+Define deterministic behavior for equal timestamps and confirm whether message comparison is exact or normalized.
+
+Extend the processor to a live stream with:
+
+add(timestamp, message)
+get_next()
+
+get_next() returns the currently retained entry with the smallest timestamp.
+
+Discuss expiry windows, partitioning, exactly-once consumers, heap compaction, and what lateness or watermark guarantee is required before emitted order can be final.
+
+Notes
+
+Empty input, identical entries, equal timestamps, out-of-order arrivals, updates, and removals all need explicit semantics.
+
+For keep-latest streaming behavior, stale heap entries must be detected against the current timestamp stored for that message.
+
+Arbitrarily late arrivals make globally final timestamp ordering impossible without a watermark or maximum-lateness guarantee.
+
+Preparation
+
+Implement both batch retention policies and write deterministic tie tests.
+
+Build the streaming interface with a membership map, min-heap, and lazy deletion, then state the amortized operation costs.
+
+Rehearse a bounded-memory design using expiry and heap rebuilding, plus a partitioning strategy that keeps each message on one shard.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

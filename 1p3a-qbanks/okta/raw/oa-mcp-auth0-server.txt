@@ -1,0 +1,68 @@
+===H1===
+Build an Auth0-based MCP Server (Hands-on OA)
+===URL===
+https://www.1point3acres.com/interview/problems/company/okta/oa-mcp-auth0-server
+===BODY===
+Okta
+CodingFree preview
+Build an Auth0-based MCP Server (Hands-on OA)
+A hands-on CodeSignal OA: build an Auth0-based MCP (Model Context Protocol) server with JWT authentication middleware and a single whoami tool, wired against Okta/Auth0's real identity APIs. AI tools are explicitly allowed.
+SWE
+oa
+codesignal
+ai-allowed
+api-integration
+access-control
+tool-use
+llm-agent
+http
+security
+medium
+Frequency
+Single report
+Last asked
+2025-11-22
+Stage
+oa
+Requirements
+
+Build a working MCP (Model Context Protocol) server backed by Auth0, exposing a single whoami tool. The assessment runs on CodeSignal, but the difficulty is the hands-on integration: you create API credentials on the Okta/Auth0 developer site, use an access token to call a local API, and the task only counts as passing once the full flow runs end-to-end.
+
+Three core pieces:
+
+JWT authentication middleware — validate the incoming bearer token:
+
+Verify the RS256 signature.
+
+Validate audience and issuer.
+
+Validate iat / exp (issued-at / expiry).
+
+Require azp or client_id to be present.
+
+Tool-level authorization — the whoami tool requires the tool:whoami scope; reject calls that lack it.
+
+Error handling — return standard HTTP errors: 401 for authentication failures, 403 for authorization (scope) failures.
+
+Notes
+
+AI tools are explicitly allowed for this OA — the recruiter calls this out up front. The bar is practical engineering (reading docs, wiring auth, debugging the integration), not algorithmic recall.
+
+It is genuinely hands-on: you must register real API credentials on Okta's developer site and exercise a live access-token flow, so a working local dev environment and familiarity with JWT/OAuth concepts matter more than puzzle-solving.
+
+Budget time to get the full request path working (token issuance → middleware validation → scoped tool call → response); partial implementations that never complete the round-trip do not count as a successful start.
+
+Preparation
+
+Build a minimal MCP server once before the OA so the protocol scaffolding (tool registration, request handling) is muscle memory.
+
+Practice verifying an RS256 JWT by hand against a JWKS endpoint: signature, aud, iss, iat/exp, and presence of azp/client_id.
+
+Wire a scope check (tool:whoami) and confirm you return 401 vs 403 correctly for the auth-vs-authorization distinction.
+
+Create a free Auth0/Okta developer tenant and run a client-credentials token flow against a local API so credential setup is not new under time pressure.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

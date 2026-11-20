@@ -1,0 +1,86 @@
+===H1===
+Cross-Device Wallpaper Synchronization
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/cross-device-wallpaper-synchronization
+===BODY===
+Apple
+System DesignMembers
+Cross-Device Wallpaper Synchronization
+Design wallpaper exchange and synchronization across a user's devices. Cover opportunistic prefetching, resumable downloads, version detection, cache priority, concurrent updates, retry behavior, and the split between background work and main-thread UI commits.
+SWE
+caching
+retry
+versioning
+async
+concurrency
+bandwidth
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-system-design
+Requirements
+
+Functional requirements
+
+When a user changes wallpaper on one device, synchronize that choice to the user's other devices.
+
+Make the local change visible immediately on the device where it was initiated; a remote synchronization failure must not roll back the local display.
+
+Prefetch wallpaper assets before the user switches to them.
+
+Resume interrupted downloads by transferring the file in chunks and recording completed chunks.
+
+Detect when the server-side asset changes through a version identifier or ETag.
+
+Distinguish system-prefetched assets from wallpapers the user explicitly selected; selected assets receive the highest retention priority.
+
+Resolve concurrent changes from multiple devices with last-writer-wins timestamps.
+
+Keep download and decode work off the main thread; use the main thread only for the final display commit.
+
+Resource and failure constraints
+
+Wallpaper files are large enough that downloading only at selection time creates visible latency.
+
+Schedule prefetching while the device is idle, on Wi-Fi, and charging to respect bandwidth, battery, and foreground performance.
+
+Apply exponential backoff to repeated failures rather than retrying continuously.
+
+Design decisions
+
+Define cache capacity, eviction order, and pinning behavior for user-selected assets.
+
+Explain why eventual synchronization with last-writer-wins is sufficient instead of strong consistency.
+
+Separate network transfer, decode, rendering preparation, and final UI commit across the correct execution contexts.
+
+Define progress metadata for resumable chunks and invalidation behavior when the resource version changes.
+
+Notes
+
+This is a client- and operating-system-focused design round. Generic distributed-system components are secondary to background-task policy, battery and network conditions, cache eviction, retry semantics, and main-thread responsiveness.
+
+Separate the small synchronization record from the large asset bytes. Upload or resume the asset first, then atomically publish metadata such as {asset_id, content_hash, version, revision}. A device observes a newer revision, downloads into a temporary location, verifies the version and content hash, decodes off the main thread, and atomically swaps the prepared asset into the local display. Key resumable progress by asset version so an ETag change invalidates stale chunks.
+
+Do not order concurrent writes with unsynchronized device wall clocks alone. Assign a server-side monotonic revision, or combine a logical timestamp with a deterministic request tie-breaker, and attach an idempotency key so retries cannot create extra versions. This preserves convergence when devices reconnect after being offline.
+
+On Apple platforms, long nonurgent transfers can use a background transfer session that continues while the app is suspended. Discretionary scheduling lets the system choose favorable power and network conditions; recreate the same session identity after relaunch and batch related transfers so repeated wakeups do not trigger escalating scheduling delays.
+
+Preparation
+
+Design the state machine for local selection, prefetch, partial download, decode, commit, failure, and retry.
+
+Write a cache policy that protects user-selected assets while allowing prefetched assets to be evicted.
+
+Trace simultaneous changes on two devices and an interrupted download followed by a server-side version change.
+
+Explain which work runs in the background and which minimal operation remains on the main thread.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

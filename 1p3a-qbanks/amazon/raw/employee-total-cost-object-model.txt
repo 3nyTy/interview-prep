@@ -1,0 +1,58 @@
+===H1===
+Employee Total-Cost Object Model
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/employee-total-cost-object-model
+===BODY===
+Amazon
+CodingMembers
+Employee Total-Cost Object Model
+Define the employee and lookup-table abstractions needed to calculate total employer cost from base salary, percentage tax, level-and-title benefits, and a location adjustment, then implement the calculation.
+SWE
+oop-design
+hashmap
+medium
+Frequency
+Single report
+Last asked
+2026-07-22
+Stage
+onsite-coding
+Requirements
+
+Model an Employee with at least baseSalary, location, title, and level.
+
+Total cost has four parts:
+
+Base salary from the employee record.
+
+Tax calculated as a fixed percentage of base salary.
+
+Benefits looked up by the composite key (level, title).
+
+A location adjustment looked up by the employee's location string; it may add to or deduct from the total.
+
+Define the necessary classes and data structures for the employee, benefits lookup, and location lookup.
+
+Implement a function or method that accepts an employee and returns the total cost.
+
+Notes
+
+The lookup boundaries are the design signal: keep tax, benefits, and location adjustments behind separate table abstractions that the cost calculator consults, so adding a new cost component means adding a table, not editing the employee class.
+
+For the (level, title) composite key, a tuple/record key in a single map or a two-level nested map both work — pick one and state the miss behavior (unknown level, title, or location) explicitly instead of letting a lookup failure propagate.
+
+The location adjustment is signed — it may add or deduct — so model it as a plain signed amount rather than a special case.
+
+Sum money in integer cents or a decimal type; a percentage tax applied to a floating-point base salary is an easy place to drop precision.
+
+Preparation
+
+Sketch the class layout in ten minutes — Employee, a benefits table keyed by (level, title), a location table, and a totalCost(employee) entry point — then implement it with a few hard-coded table rows and one test per cost component.
+
+Rehearse stating assumptions for the unspecified rules out loud: where the tax rate lives, what happens on a missing lookup key, and how negative adjustments are represented.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

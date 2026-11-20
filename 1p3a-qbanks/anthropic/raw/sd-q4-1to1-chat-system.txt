@@ -1,0 +1,149 @@
+===H1===
+System Design Q4 — 1-on-1 Chat System
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/sd-q4-1to1-chat-system
+===BODY===
+Anthropic
+System Design·55 minMembers
+System Design Q4 — 1-on-1 Chat System
+Design a 1-on-1 chat system (no groups, no channels). Single device per user, focused on message delivery, presence detection, offline-recipient queueing, session storage, and the tradeoff between Kafka and Redis for the message bus.
+SWE
+MLE
+chat
+websocket
+kafka
+redis
+presence
+medium
+Frequency
+High
+Last asked
+2026-08-21
+Stage
+phone-screen · onsite-system-design
+Requirements
+
+Scope
+
+1-on-1 only — group chats and channels are explicitly out of scope.
+
+Single device per user (web).
+
+Messages must be delivered exactly once with reasonable ordering guarantees.
+
+Canonical scale anchors
+
+The reference prompt pins these numbers; back-of-envelope work should land on them within a small constant factor:
+
+DimensionValueDerivation
+DAU100 MStated in the prompt.
+Messages / user / day10Stated.
+Total messages / day1 B100M × 10.
+Average QPS~11,5001B / 86,400 s.
+Peak QPS~35,000~3× average for busy hours.
+Concurrent WebSocket connections10 M10% of DAU online at once.
+Avg message payload200 BStated.
+Storage / day200 GB1B × 200 B.
+Storage / year~73 TB365 × 200 GB.
+End-to-end delivery target< 500 msStated.
+Availability target99.9 %+Stated.
+
+Landing these numbers early sets up the rest of the round: 10 M concurrent sockets ÷ ~1 M / gateway ≈ 10 gateway hosts as the floor; 200 GB / day × 30 days ≈ 6 TB hot storage drives the partitioning decision for messages.
+
+Areas the interviewer drives into
+
+Connection layer. WebSocket vs. long-polling; how the server tracks active connections per user.
+
+Presence / online detection. How does the server know when a user comes online? Heartbeats, gateway-managed presence tables in Redis.
+
+Offline delivery. If the recipient is offline when a message arrives, where does it queue? How is it delivered on reconnect? At-least-once vs. exactly-once.
+
+Session storage. Per-conversation history, pagination, retention policy.
+
+Kafka vs. Redis. Why pick one over the other for the message bus? Reported deep-dive on Kafka internals — partitions, consumer groups, replication, log compaction.
+
+Scaling. Sharding strategy (by conversation_id or user_id); cross-shard delivery.
+
+Notes
+
+Expect sustained pressure on component interfaces, end-to-end data flow, and failure cases. The interviewer may introduce a weaker alternative as a discussion prompt; respond by tracing its consequences and defending the trade-off rather than accepting it silently.
+
+The Kafka deep-dive is the single most cited failure mode. Multiple candidates report being asked "what is the Kafka commit log" / "how do consumer groups coordinate" / "what happens on partition leader failure" and stalling because they had only used Kafka as a black box.
+
+The interviewer fishes for explicit tradeoffs: Kafka's persistence + replay vs. Redis Streams' lower latency and simpler ops.
+
+Type the schema and tradeoffs into the doc as you go — the round leaves visible artifacts that the interviewer scores against.
+
+Connection / gateway design
+
+Pick WebSocket over TLS, not long-poll — bidirectional message flow makes long-poll wasteful. An L4 load balancer is sufficient; you don't need path-based routing.
+
+Each chat gateway holds an in-memory userId → connection map. Beyond a single server, route by consistent hash on userId so the sender's gateway can deterministically locate the recipient's owning gateway. A coordination service (etcd / ZooKeeper) tracks hash-ring ownership.
+
+Cap connections at ~1–2M per gateway host; scale horizontally past that. Mention this number explicitly when justifying server count.
+
+Presence / heartbeat — concrete cadence
+
+Application-level ping every 10–30s with a 5s pong deadline; close + force reconnect on timeout. Detection bound = interval + timeout ≈ 15s. Don't rely on TCP keepalive (kernel-level, multi-minute).
+
+Do not write last_seen on every heartbeat — at ~200M connected users / 10s interval that's 20M writes/sec. Update last_seen only on disconnect; use a conditional write to avoid races between gateways.
+
+For online state, keep a TTL-keyed presence record in Redis (presence:{userId} with TTL = 2× heartbeat) refreshed by the gateway. "Online → offline" is implicit via TTL expiry — no explicit signal needed.
+
+Offline delivery — Inbox table pattern
+
+The durability backstop is a per-recipient Inbox table, not the message bus. Partition key userId, sort key clientId / messageId, TTL 30 days. Write path: persist message + insert Inbox row first, then publish to the bus best-effort.
+
+On reconnect, the client queries its Inbox, fetches missing message bodies from the Messages table, and ACKs receipt → server deletes the Inbox row. This makes the bus delivery guarantee "at-most-once" sufficient because the Inbox provides exactly-once-from-client-perspective.
+
+Multi-device extension: scope Inbox by (userId, clientId) so each device ACKs independently. Cap devices/account (e.g., 3) to bound fanout.
+
+Kafka vs. Redis Pub/Sub — defensible answer
+
+For 1-on-1 chat, Redis Pub/Sub usually wins for the realtime fanout bus; Kafka becomes the choice only if persistence/replay across hours is a hard requirement. Be prepared to defend either, but lead with the per-user-channel cost arithmetic:
+
+Kafka topic overhead ~50 KB/topic in cluster metadata → topic-per-user at 1B users ≈ 50 TB of metadata. Topic-per-conversation is even worse. → Kafka forces conversation/user sharding onto a small number of topics, where partition assignment + consumer group rebalances on every gateway redeploy become the operational pain.
+
+Redis Pub/Sub channels are essentially pointers to subscriber sockets — no persistence, no per-channel metadata cost. Single Redis instance has been benchmarked at ~100K msg/sec at ~27% CPU; cluster the Redis fleet by hashing channels across instances.
+
+Latency: Redis Pub/Sub is single-digit ms; Kafka with acks=all is tens of ms.
+
+Durability: Redis Pub/Sub is at-most-once → that's why the Inbox table exists. Kafka is at-least-once with replay → but you're paying for durability twice if you also keep Inbox.
+
+The Kafka deep-dive that has stalled candidates: be ready to explain (a) partition = ordered log file; (b) consumer groups coordinated by a group coordinator broker, rebalance on member join/leave; (c) replication factor + ISR (in-sync replicas); leader election picks a new leader from ISR if the current leader dies; (d) log compaction keeps only the latest value per key, used for compactable topics like presence state.
+
+Sharding — by user vs. by conversation
+
+Decision rule based on fan-out direction:
+
+Mostly 1:1, many conversations per user (this question) → shard by userId. One subscription per user; sender publishes to recipient's user-channel.
+
+Few conversations, many participants each → shard by conversationId. One publish to a fat channel beats N publishes to user channels.
+
+Hybrid for mixed workloads: small conversations use user-channels; once a conversation crosses a threshold (e.g., 25 participants), publish to a conversation-channel and have members subscribe; transition by briefly double-publishing during migration.
+
+Common failure modes
+
+Load-balancing connections across gateways without consistent hashing → sender can't locate recipient's gateway directly, falls back to broadcast-to-all-gateways.
+
+Treating message ordering as a global guarantee. The interviewer accepts per-conversation ordering with server-issued monotonic message IDs (or NTP-stamped server time); arguing for globally-ordered delivery is a trap.
+
+Forgetting multi-device even though scope says "single device" — interviewers often follow up with "now add a 2nd device." Have the per-client Inbox extension ready.
+
+Preparation
+
+Read Kafka's design doc end-to-end at least once. Be able to explain partitions, replication factor, ISR, leader election, consumer offsets, and log compaction — all 5 have been asked.
+
+Pre-write the chat schema on paper: users(id, last_seen), conversations(id, user_a, user_b, last_message_id), messages(id, conversation_id, sender_id, body, server_ts), inbox(user_id, client_id, message_id, ttl). Memorize the secondary index for "latest N messages in conversation".
+
+Drill the presence story end-to-end: WebSocket connect → write presence:{userId} Redis key with TTL → heartbeat refreshes TTL → expiry == offline → gateway emits transition event on observed expiry.
+
+Layered drill order: (1) single-gateway in-memory map → (2) horizontal scale with consistent hash + coordination store → (3) add Redis Pub/Sub fanout across gateways → (4) add Inbox table for offline durability → (5) discuss Kafka swap conditions.
+
+Have a 30-second elevator answer for "why not Kafka?" framed around topic-metadata cost and at-most-once acceptability given the Inbox table. The interviewer is testing whether you can defend a choice, not whether you picked their preferred bus.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

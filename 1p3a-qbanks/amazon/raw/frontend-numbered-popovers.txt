@@ -1,0 +1,56 @@
+===H1===
+Numbered Buttons with Data Popovers
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/frontend-numbered-popovers
+===BODY===
+Amazon
+Coding·45 minMembers
+Numbered Buttons with Data Popovers
+Recreate a UI with three numbered buttons. Clicking a button opens its matching floating panel, fetches and renders the associated data, supports closing the panel, and matches the supplied image's layout and styling.
+SWE
+frontend
+javascript
+dom
+api-integration
+medium
+Frequency
+Single report
+Last asked
+2026-08-22
+Stage
+phone-screen
+Requirements
+
+Reproduce the supplied reference image's layout and styling.
+
+Render three numbered buttons.
+
+Clicking a button opens the corresponding floating panel.
+
+Fetch and render the data associated with that panel.
+
+Each panel must be closable.
+
+Implement in the Live Code editor without keyword completion or reference lookup; clarifying questions are allowed.
+
+Notes
+
+Cover the major interaction and layout requirements first; exact pixel-level completion is less important than demonstrating command of the underlying browser concepts.
+
+Clarify whether multiple panels may remain open and how loading or failed requests should render before committing to state structure.
+
+Model the interaction with one active-panel identifier plus loading, data, and error state keyed by panel. A button click selects the identifier, starts its request, and renders only the result associated with the latest active request.
+
+Keep popover positioning and close behavior deterministic, and cancel or ignore stale requests when the user switches panels so late responses cannot overwrite the visible state.
+
+Preparation
+
+Build the interaction once with plain HTML, CSS, and JavaScript in a no-autocomplete editor.
+
+Rehearse the complete state path: idle, loading, loaded, request failure, close, and switching between numbered buttons.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

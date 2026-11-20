@@ -1,0 +1,63 @@
+===H1===
+Frontend System Design — Signup Form
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/fe-sd-signup-form
+===BODY===
+Coinbase
+System Design·60 minMembers
+Frontend System Design — Signup Form
+Conversational frontend SD round: design a signup form. Not whiteboard-heavy — the interviewer asks a sequence of open questions about field-by-field architecture, validation, and A/B testing strategy. Despite the 'no right answer' framing, feedback indicates the interviewer has specific expected answers; A/B testing fluency is the recurring signal.
+SWE
+frontend
+react
+design
+ab-testing
+ux
+medium
+Frequency
+Single report
+Last asked
+2025-12-01
+Stage
+onsite-system-design
+Requirements
+
+Conversational format — no diagram required. The interviewer walks through the signup flow asking how you'd handle each decision:
+
+Field set (email / password / region / referral code).
+
+Client-side validation (per-field rules, debounced async checks for username availability).
+
+Server-side validation feedback (error surfacing, retry behavior).
+
+Multi-step vs single-page form.
+
+Tracking and analytics (how to instrument funnel drop-off without leaking PII).
+
+A/B testing variations (copy changes, field reordering, multi-step vs single-step) — what you measure and how you split.
+
+Accessibility, error recovery, browser back-button behavior.
+
+Notes
+
+A/B testing is the heaviest-weighted signal. Lead with: hypothesis → variants → primary success metric (completed signups) → guardrail (drop-off, time-to-complete) → required sample size → exposure timing (assignment on page load vs on first interaction).
+
+Validation strategy: client-side for instant feedback, server-side for trust. Spell out the difference verbally.
+
+PII discipline: do not log the email or password into analytics — log a hashed user-id or anonymous session id only.
+
+The conversational format means you can be ambushed by sub-questions every 60 seconds. Have a mental skeleton ready so you don't lose your place.
+
+Preparation
+
+Pre-rehearse the 5-step A/B testing template (hypothesis / variants / primary metric / guardrails / sample size) until you can recite it in 30 seconds.
+
+Build a one-page mental checklist of "signup form decisions" (fields, validation, multi-step, tracking, A/B, a11y) and walk through each in 5 minutes.
+
+Have one rehearsed answer on funnel-analytics instrumentation that avoids PII pitfalls.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

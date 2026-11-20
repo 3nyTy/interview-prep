@@ -1,0 +1,35 @@
+===H1===
+Monotone Increasing Digits (LC 738)
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/monotone-increasing-digits
+===BODY===
+Oracle
+CodingMembers
+Monotone Increasing Digits (LC 738)
+Return the largest number not exceeding n whose digits are monotonically non-decreasing. The greedy fix is to find the first descending pair, drop that digit by one, and fill the rest with nines.
+SWE
+greedy
+medium
+Frequency
+Single report
+Last asked
+2026-04-14
+Stage
+onsite-coding
+Requirements
+
+Given a non-negative integer n, return the largest number ≤ n whose digits are monotonically increasing (each digit ≤ the next).
+
+Greedy approach: scan digits left to right, and at the first position where a digit exceeds its successor, decrement it and set every digit after it to 9.
+
+Notes
+
+Equivalent to LeetCode 738. Reported as the second problem in an onsite coding round, immediately after the parity-swap problem.
+
+The greedy insight (find the breaking pair, drop by one, fill nines) is the part candidates stall on; deriving it on a small example such as 332 first makes it click.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,73 @@
+===H1===
+Gas Tank Grid Reachability
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/gas-tank-grid-bfs
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Gas Tank Grid Reachability
+Walk a 2-D grid from a start to a goal cell with a finite gas budget. Some cells are obstacles, some refuel you to a fixed capacity. Decide whether the goal is reachable. The trap is that gas adds a state dimension — a revisit at higher gas may unlock paths a first visit couldn't.
+SWE
+bfs
+grid
+state-machine
+hard
+Frequency
+Single report
+Last asked
+2026-01-31
+Stage
+onsite-coding
+Requirements
+
+Given a 2-D grid where each cell is:
+
+. — empty (passable)
+
+# — obstacle (impassable)
+
+G — gas station (entering refills the tank to capacity C)
+
+S — start (the player begins here with g units of gas)
+
+E — end (the goal)
+
+Each move to an adjacent cell costs 1 unit of gas. The player cannot move when the tank is empty. Return whether E is reachable from S.
+
+Function signature:
+
+boolean canReach(char[][] grid, int startGas, int capacity)
+
+Follow-ups:
+
+Why is plain BFS over (row, col) wrong? Because a cell can be re-entered with more gas than before, opening new options.
+
+Walk through BFS over the augmented state (row, col, gas). What is the state space bound? O(m * n * (C + 1)).
+
+Add a wrinkle: refueling is optional (the player chooses whether to pay the action of stopping). What changes?
+
+Notes
+
+The state space is (row, col, gas); a visited set keyed on this triple is mandatory.
+
+BFS is the natural fit because the question is reachability (existence of a path), not the shortest path under multiple objectives. Each transition decrements gas by 1; entering a G cell sets gas = capacity.
+
+A more memory-efficient invariant is to track the maximum gas observed at each cell and skip transitions that don't improve it: if (row, col) has been reached with g >= newGas, skip. This is correct because more gas is always at least as good.
+
+Time O(m * n * C), space O(m * n) with the max-gas optimization, O(m * n * C) without.
+
+If the answer is the shortest path, switch to a Dijkstra-style priority queue keyed on path length, still with the augmented state.
+
+Preparation
+
+Derive the state-space argument on paper before writing code: it explains why a visited[row][col] boolean is broken and visited[row][col][gas] (or the max-gas heuristic) is required.
+
+Implement once with the full 3-D visited set, then refactor to the max-gas-per-cell optimization. Verify equivalence on random small inputs.
+
+Practice clarifying questions: confirm whether G cells refuel on entry every time or only once, and whether the player can stand still.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

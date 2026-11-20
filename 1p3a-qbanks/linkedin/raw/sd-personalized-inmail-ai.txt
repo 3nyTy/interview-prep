@@ -1,0 +1,85 @@
+===H1===
+AI-Powered Personalized Recruiter Message Generation
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/sd-personalized-inmail-ai
+===BODY===
+LinkedIn
+System Design·60 minMembers
+AI-Powered Personalized Recruiter Message Generation
+Design an end-to-end system that helps recruiters generate personalised outreach: pull the candidate profile, the open role, the recruiter's past outreach style, and produce a draft InMail. Recurring sub-prompts cover tool registration, RAG, LLM fine-tuning vs prompting, draft / human-in-the-loop, and offline + online evaluation.
+MLE
+SWE
+mlsd
+llm-agent
+rag
+tool-use
+ranking
+retrieval
+prompt-engineering
+evaluation
+medium
+Frequency
+Medium
+Last asked
+2026-03-21
+Stage
+onsite-system-design
+Requirements
+
+Functional:
+
+Recruiter logs in, browses a list of candidates, picks one, hits "generate message".
+
+The system fetches: candidate profile, candidate's recent activity, the open job, the recruiter's past outreach (style + response rate).
+
+An LLM-backed pipeline produces a draft message. Recruiter edits and sends.
+
+Telemetry feeds back response/no-response signals.
+
+Non-functional:
+
+Latency budget: under a few seconds end-to-end for the draft.
+
+Quality bar: draft must be specific, factually grounded in profile + job, and stylistically aligned with the recruiter.
+
+Guardrails: no fabricated experience claims; respect candidate privacy controls.
+
+Reported framings as agentic systems:
+
+Tool registry — get_candidate_profile, search_past_outreach, pull_job_posting, score_candidate_fit. The model picks tools; the runtime dispatches.
+
+RAG layer — retrieve top-K snippets from the candidate's profile / activity and the recruiter's past messages, inject into prompt.
+
+Ranker — rerank candidate snippets for relevance to the open role.
+
+Drafting — LLM call with instruction template + retrieved context.
+
+Human-in-the-loop — explicit edit step before send.
+
+Notes
+
+Articulate the business goal first: response rate, recruiter time saved, candidate experience. Metric definitions before architecture.
+
+Tool calling vs end-to-end fine-tuning is a legitimate trade-off discussion — the interviewer wants to see both options weighed, not a default to "fine-tune everything".
+
+Evaluation is graded heavily — offline (response rate proxy, BLEU vs gold message, recruiter-edit distance) plus online (A/B test of response rate, candidate-flag-as-spam rate) plus guardrail eval (hallucinated-fact rate from an LLM judge).
+
+Calibration matters when downstream auctions / quotas use the score — discuss isotonic / Platt scaling if asked.
+
+For the leveling-attribute variant (the candidate → category + attribute classification), the same pipeline reused for inference but with retrieval over a skills taxonomy.
+
+Preparation
+
+Build a mental seven-step framework for any LLM system: business goal → metrics → data → retrieval → model → guardrails → eval. Use it as the round's structural backbone.
+
+Practice the tool-calling sequence diagram — registry, model selection, dispatch, result-into-context.
+
+Drill the offline-vs-online evaluation split; interviewers explicitly grade whether the candidate proposes both.
+
+Be ready with three guardrails (hallucination detector, PII filter, recruiter-style adherence) — generic safety hand-waves do not earn signal.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,36 @@
+===H1===
+Shortest Path in a Grid with Obstacle Removal
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/shortest-path-in-grid-with-obstacle-removal
+===BODY===
+Apple
+CodingMembers
+Shortest Path in a Grid with Obstacle Removal
+BFS shortest path from a start cell to an end cell in a grid with blocked cells, with a follow-up that lets you convert blocked cells to open ones.
+SWE
+bfs
+grid
+shortest-path
+medium
+Frequency
+Single report
+Last asked
+2026-05-27
+Stage
+onsite-coding
+Requirements
+
+Find the shortest path from a start cell to an end cell in a grid where some cells are blocked. Movement is between adjacent cells; return the length of the shortest path, or report that none exists.
+
+Base version: a standard breadth-first search over open cells.
+
+Follow-up: you may convert blocked cells into open cells. Recompute the shortest path under that relaxation — still BFS, now over an expanded state space.
+
+Notes
+
+The base problem is plain grid BFS from source to target. The follow-up adds the ability to clear obstacles; the canonical handling is to make the BFS state (row, col, obstacles_cleared_so_far) so the same cell can be revisited with a different remaining budget. Both parts were left deliberately open-ended — clarify the exact rules (4- vs 8-directional movement, how many cells may be converted, whether conversions are free or budgeted) before coding.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

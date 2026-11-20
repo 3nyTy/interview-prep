@@ -1,0 +1,77 @@
+===H1===
+House Segments After Deletions
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/house-segments-after-deletions
+===BODY===
+Capital One
+Coding·70 minMembers
+House Segments After Deletions
+Given distinct house locations on a number line and a deletion order, return the number of remaining contiguous house segments after each deletion. Adjacent integer locations belong to the same segment.
+SWE
+set
+interval-aggregation
+simulation
+medium
+oa
+codesignal
+Frequency
+Single report
+Last asked
+2026-05-31
+Stage
+oa
+Requirements
+
+Input: houses, an array of distinct integer locations, and queries, an array of locations to destroy in order.
+
+Every location in queries is present in houses, and query locations are distinct.
+
+A house segment is one or more adjacent remaining houses with no neighboring remaining house immediately outside the segment.
+
+After each query deletes one house, append the current number of remaining segments to the answer.
+
+Return the answer array.
+
+Examples
+
+houses  = [1, 2, 3, 6, 7, 9]
+queries = [6, 3, 7, 2, 9, 1]
+
+Return [3, 3, 2, 2, 1, 0]
+
+Initially the segments are [1, 2, 3], [6, 7], and [9]. Deleting 6 leaves [1, 2, 3], [7], and [9]. Deleting 3 leaves [1, 2], [7], and [9]. Deleting 7 leaves [1, 2] and [9], and the later deletions reduce the segment count to 0.
+
+houses  = [2, 4, 5, 6, 7]
+queries = [5, 6, 2]
+
+Return [3, 3, 2]
+
+Notes
+
+Maintain a set of alive house locations and an integer segments. Initialise segments by sorting houses and counting starts of runs: a location x starts a segment if x - 1 is not alive.
+
+For each deletion x, inspect left_alive = x - 1 in alive and right_alive = x + 1 in alive before removing x:
+
+both alive: deleting x splits one segment into two, so segments += 1;
+
+neither alive: deleting x removes a length-1 segment, so segments -= 1;
+
+exactly one alive: the segment shrinks but count is unchanged.
+
+Remove x after computing the delta, then append segments.
+
+This is the deletion mirror of the common interval-union-after-insertions problem; thinking in segment-count deltas is cleaner than rebuilding intervals after every query.
+
+Preparation
+
+Implement the delta table and test all four neighborhood cases: isolated deletion, left-edge deletion, right-edge deletion, and middle split.
+
+Hand-trace the first example until the [3, 3, 2, 2, 1, 0] sequence is automatic.
+
+Practise the insertion version too; interview variants often flip between add and delete while preserving the same invariant.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

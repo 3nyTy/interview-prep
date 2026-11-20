@@ -1,0 +1,54 @@
+===H1===
+File Chunk Range Tracking
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/file-chunks-consecutive-byte-ranges
+===BODY===
+Roblox
+CodingMembers
+File Chunk Range Tracking
+Process a stream of file chunks represented by inclusive byte ranges [start, end]. After each arrival, return the merged continuous ranges, joining both overlaps and directly adjacent byte ranges.
+SWE
+interval
+array
+codesignal
+Frequency
+Single report
+Last asked
+2026-09-09
+Stage
+oa
+Requirements
+
+Each incoming file chunk is an inclusive byte range [start, end].
+
+After every chunk arrives, return the merged continuous byte ranges received so far.
+
+Overlapping ranges and directly adjacent ranges belong to the same continuous segment: merge when start <= previous_end + 1.
+
+Examples
+
+[1, 3] and [4, 6] merge into one continuous range, [1, 6].
+
+Notes
+
+This is one of two coding tasks in a 50-minute CodeSignal assessment.
+
+Unlike overlap-only interval merging, consecutive byte positions must also merge.
+
+The exact function signature and input-size limits are unspecified.
+
+Maintain the received ranges sorted by start, with no overlaps or adjacency between consecutive stored ranges. For a new range, scan the stored ranges: copy ranges strictly before it, merge every overlapping or adjacent range by expanding its endpoints, then insert the merged range before copying the remaining ranges. Use old_end + 1 < new_start and new_end + 1 < old_start to distinguish separated ranges; otherwise merge. Use a widened integer type for endpoint-plus-one comparisons if endpoints can reach the integer limit.
+
+With k stored ranges, rebuilding the list takes O(k + 1) time and O(k + 1) space for the new list. Across n arrivals, the worst-case total is O(n²); returning a full range list after every arrival can itself require quadratic output. Copy each returned snapshot so later updates do not change earlier results.
+
+Preparation
+
+Implement the sorted-range insertion routine in 20 minutes, preserving the non-overlap and non-adjacency invariant after every arrival.
+
+In 15 minutes, compare every output against a small byte-set oracle; cover duplicate chunks, contained chunks, reversed arrival order, adjacency, one-byte gaps, and a chunk that bridges several stored ranges.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

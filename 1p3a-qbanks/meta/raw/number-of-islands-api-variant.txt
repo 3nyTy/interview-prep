@@ -1,0 +1,50 @@
+===H1===
+Number of Islands API Variant
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/number-of-islands-api-variant
+===BODY===
+Meta
+CodingMembers
+Number of Islands API Variant
+Given a binary grid, implement `isSizeExist(int size)` to answer whether any island has exactly the requested area. Precompute complete component sizes once, then answer each query from the resulting set.
+SWE
+dfs
+grid
+set
+api-design
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-coding
+Requirements
+
+Start from a binary grid containing multiple connected islands.
+
+Implement isSizeExist(int size), returning whether at least one island has exactly that many cells.
+
+Support repeated size queries against the same grid.
+
+Notes
+
+Traverse each connected component to completion, then add its final size to a set; each API call becomes a membership lookup.
+
+Do not insert the running component size from inside the traversal. That records partial sizes and produces false positives.
+
+The canonical LC 200 family uses four-directional adjacency. This API variant leaves connectivity open, so clarify whether diagonals count before coding.
+
+Preprocessing visits every grid cell once, for O(rows × columns) time and space; each subsequent set-membership query is expected O(1).
+
+Preparation
+
+Write the component traversal and size aggregation separately, then wrap them behind the query API.
+
+Test repeated island sizes, a one-cell island, no islands, and a requested size absent from the grid.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

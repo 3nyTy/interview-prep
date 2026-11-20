@@ -1,0 +1,71 @@
+===H1===
+Build a Nested Comment Tree from Flat Records
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/build-nested-comment-tree
+===BODY===
+ByteDance / TikTok
+Coding·30 minMembers
+Build a Nested Comment Tree from Flat Records
+Transform a flat list of comment objects with id, parent_id, and text into a nested root array by attaching children recursively. The supplied example contains two roots and a grandchild, plus a parent_id typo in the displayed expected payload that should be clarified.
+SWE
+tree
+hashmap
+data-modeling
+medium
+Frequency
+Single report
+Last asked
+2026-08-13
+Stage
+phone-screen
+Requirements
+
+Input is a list of comment objects containing id, parent_id, and text.
+
+A parent_id of null marks a root comment.
+
+Add a children collection to comments that have replies and return the roots as a nested array.
+
+Preserve arbitrary nesting depth; the sample includes a grandchild.
+
+Examples
+
+Input, normalized to valid JSON:
+
+[
+  {"id": 1, "parent_id": null, "text": "This is the first root comment."},
+  {"id": 2, "parent_id": null, "text": "This is the second root comment."},
+  {"id": 3, "parent_id": 1, "text": "Reply to the first root comment."},
+  {"id": 4, "parent_id": 2, "text": "Another reply to the first root comment."},
+  {"id": 5, "parent_id": 3, "text": "Reply to the first reply on the first root comment."}
+]
+
+Expected hierarchy:
+
+Root 1 contains child 3, which contains child 5.
+
+Root 2 contains child 4.
+
+Notes
+
+The displayed expected payload nests comment 4 under root 2 but writes its parent_id as 1, while the input uses 2. Treat the nesting and input relationship as the intended result, and explicitly clarify this mismatch before coding.
+
+The coding portion occupied roughly 30 minutes after a short resume discussion and React concept check.
+
+Use a two-pass build: first map each id to a cloned node with an empty children list, then attach every node to its parent or to the root list. This is O(n) time and O(n) space and does not depend on input order.
+
+Clarify policies for missing parents, duplicate IDs, self-links, and cycles before coding; untrusted records need explicit validation rather than recursive attachment alone.
+
+Preparation
+
+Implement the two-pass builder and test shuffled input, multiple roots, a deep chain, and a missing parent.
+
+Add duplicate-ID and cycle detection, then state whether invalid records are rejected, skipped, or returned separately.
+
+Compare recursive and iterative serialization on a pathologically deep tree to expose stack-depth risk.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

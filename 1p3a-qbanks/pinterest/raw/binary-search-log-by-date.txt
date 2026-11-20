@@ -1,0 +1,50 @@
+===H1===
+Binary Search Log Entries by Date String
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/binary-search-log-by-date
+===BODY===
+Pinterest
+Coding·60 minMembers
+Binary Search Log Entries by Date String
+Given a list of log entries timestamped as date strings, find the entry corresponding to a target date via binary search. Recent variants extend to violation-log counting where the first part is a hashmap pass and the second part needs binary search on a sorted timestamp array.
+SWE
+binary-search
+string
+array
+parsing
+easy
+Frequency
+Low
+Last asked
+2026-03-28
+Stage
+onsite-coding
+Requirements
+
+Logs are a sorted list of entries, each carrying a date string (ISO-8601 or a similar lexicographically-comparable format). Given a target date, return the index of the matching log entry, or the index where it would be inserted (define the exact semantics with the interviewer).
+
+Follow-up — violation log counting: given a stream of (user, timestamp) violations and a query interval [start, end], return the count of violations in the interval. The first sub-question is a per-user hashmap aggregate; the second uses binary search on a sorted timestamp array to bound the interval.
+
+Notes
+
+Validate that the date strings are lexicographically comparable — ISO-8601 ('2026-03-28T14:00:00Z') sorts correctly as raw strings; locale formats ('03/28/2026') do not. Convert if needed.
+
+The standard binary-search-bounds pattern: lower_bound returns the smallest index whose value is ≥ target; upper_bound returns the smallest index whose value is > target. The count in [start, end] is upper_bound(end) - lower_bound(start).
+
+For the violation-log follow-up, store per-user sorted list of timestamps; binary-search both ends; the count is the difference. Beware that inserts into a sorted list are O(n) — if the stream is high-rate, mention a balanced BST or skip list as the production answer.
+
+Off-by-one is the standard trap. Pre-rehearse the lower_bound / upper_bound template in your language of choice; Python's bisect module is the cleanest.
+
+Preparation
+
+Drill the bisect_left / bisect_right (or lower_bound / upper_bound) idiom until you can produce it from muscle memory.
+
+Practice the interval-count pattern on a sorted array of three to five elements with a half-open interval, then a closed interval — choosing the right pair of bounds is the entire problem.
+
+For the violation-log version, sketch the data structure once: Map<user, SortedList<timestamp>>. Discuss the trade-off of sorted-list insert (O(n)) vs balanced-BST insert (O(log n)) before the interviewer asks.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

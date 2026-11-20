@@ -1,0 +1,86 @@
+===H1===
+Remove Prefix Strings
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/remove-prefix-strings
+===BODY===
+Roblox
+CodingMembers
+Remove Prefix Strings
+Remove strings that are prefixes of another string, returning only the non-prefix survivors.
+SWE
+string
+sorting
+trie
+medium
+Frequency
+Single report
+Last asked
+2025-12-11
+Stage
+phone-screen
+Given an array of strings words, remove every string for which another, strictly shorter string in words is its prefix. Return the remaining strings in their original input order.
+
+Formally, drop words[i] if there exists some words[j] such that words[j].length < words[i].length and words[i].startsWith(words[j]).
+
+removePrefixStrings(["ab", "abc", "abcd", "bc", "bcd", "bd"]) -> ["ab", "bc", "bd"]
+
+  - "ab"    kept  (no shorter string in the array is its prefix)
+  - "abc"   removed  ("ab" is a prefix)
+  - "abcd"  removed  ("ab" and "abc" are prefixes)
+  - "bc"    kept
+  - "bcd"   removed  ("bc" is a prefix)
+  - "bd"    kept
+
+The standard "optimal" answer for this question is the Trie approach (it's structurally LeetCode 1233 Remove Sub-Folders from the Filesystem without the / delimiter). A sort + linear scan also works and is shorter to write. Both are shown in the reference solution.
+
+This was observed from a Roblox phone screen (September 2025).
+
+Examples
+
+Example 1:
+
+Input: words = ["ab", "abc", "abcd", "bc", "bcd", "bd"]
+
+Output: ["ab", "bc", "bd"]
+
+Explanation:
+
+"abc", "abcd", "bcd" are removed because shorter strings in the array ("ab", "ab", "bc") are prefixes of them. "ab", "bc", "bd" are kept because no shorter string is a prefix.
+
+Example 2:
+
+Input: words = ["a", "ab", "abc"]
+
+Output: ["a"]
+
+Explanation:
+
+"a" is a prefix of "ab" and "abc"; "ab" is a prefix of "abc". Only "a" survives.
+
+Example 3:
+
+Input: words = ["apple", "banana", "cherry"]
+
+Output: ["apple", "banana", "cherry"]
+
+Explanation:
+
+None of the strings is a prefix of any other, so the array is returned unchanged.
+
+Constraints
+
+1 <= words.length <= 10^4
+
+1 <= words[i].length <= 100
+
+words[i] consists of lowercase English letters.
+
+Original input order must be preserved in the output.
+
+A string is not considered its own prefix — duplicates of a kept root are all kept.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

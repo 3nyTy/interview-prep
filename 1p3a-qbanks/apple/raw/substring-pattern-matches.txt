@@ -1,0 +1,70 @@
+===H1===
+Substring Pattern Matches
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/substring-pattern-matches
+===BODY===
+Apple
+CodingMembers
+Substring Pattern Matches
+Given a string s and a non-empty pattern pattern, return every starting index i in s where the substring s[i..i + pattern.length - 1] equals pattern.
+SWE
+medium
+string
+string-processing
+Frequency
+Single report
+Last asked
+2026-05-03
+Stage
+phone-screen
+Given a string s and a non-empty pattern pattern, return every starting index i in s where the substring s[i..i + pattern.length - 1] equals pattern.
+
+Return the indices in ascending order. Overlapping matches are allowed — a match at index i does not prevent another match at index i + 1.
+
+In the original interview framing, the candidate was asked to write a generator that yields a signal each time a substring of s matches the pattern. Returning the list of start indices is the equivalent non-streaming form.
+
+Examples
+
+Example 1:
+
+Input: s = "abcabc", pattern = "abc"
+
+Output: [0, 3]
+
+Explanation:
+
+The pattern appears at positions 0 and 3.
+
+Example 2:
+
+Input: s = "aaaa", pattern = "aa"
+
+Output: [0, 1, 2]
+
+Explanation:
+
+Overlapping matches count — aa starts at indices 0, 1, and 2.
+
+Example 3:
+
+Input: s = "hello", pattern = "xyz"
+
+Output: []
+
+Explanation:
+
+No substring of s equals pattern.
+
+Constraints
+
+0 <= s.length <= 10^4
+
+1 <= pattern.length <= 10^3
+
+s and pattern consist of printable ASCII characters
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

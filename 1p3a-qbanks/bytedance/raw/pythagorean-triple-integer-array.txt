@@ -1,0 +1,63 @@
+===H1===
+Pythagorean Triple in an Integer Array
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/pythagorean-triple-integer-array
+===BODY===
+ByteDance / TikTok
+CodingMembers
+Pythagorean Triple in an Integer Array
+Given an integer array, decide whether three available elements can be chosen as a, b, and c such that a² + b² = c². Negative values, zero, and duplicate counts all matter; the expected general bound discussed in the round was quadratic time.
+SWE
+array
+math
+hashmap
+medium
+Frequency
+Single report
+Last asked
+2026-08-17
+Stage
+onsite-coding
+Requirements
+
+Given an integer array, determine whether it contains three elements a, b, and c satisfying a² + b² = c².
+
+Negative inputs are allowed because the relation uses squares.
+
+Respect element multiplicity: repeated use of the same numeric value is valid only when the array contains enough copies.
+
+Discuss whether the general solution can improve below O(n²) without an additional bound on the value domain.
+
+Examples
+
+[0, 1, -2, 3, 4, 5] returns true because 3² + 4² = 5².
+
+[0, 0, 0] returns true.
+
+[0, 1, -1] returns true.
+
+[0] returns false because one array element cannot supply all three positions.
+
+Notes
+
+Converting values to absolute values or squares simplifies sign handling, but a set alone loses the multiplicity needed for zero and repeated values.
+
+The interviewer used the single-zero case to test whether the implementation had preserved counts.
+
+The interviewer agreed that the unrestricted problem generally remains quadratic; value-range constraints would be needed to justify a different bound.
+
+The standard O(n^2) approach squares every element, sorts those squared values, and for each candidate hypotenuse runs two pointers over earlier positions. Because positions remain distinct, duplicate and zero multiplicities are preserved.
+
+Preparation
+
+Implement the sorted-squares two-pointer solution and prove why a valid hypotenuse can be treated as a maximum squared value.
+
+Test three zeros, one zero, negative pairs with equal squares, duplicates, and arrays shorter than three elements.
+
+State the time and space cost both when sorting a copied squared array and when mutation of the input is allowed.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

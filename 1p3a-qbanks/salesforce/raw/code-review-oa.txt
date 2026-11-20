@@ -1,0 +1,75 @@
+===H1===
+Code Review OA — Python Files (Salesforce / Slack)
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/code-review-oa
+===BODY===
+Salesforce
+Coding·120 minMembers
+Code Review OA — Python Files (Salesforce / Slack)
+Salesforce / Slack joint OA in a code-review format: candidate is given several Python files (SQL inserts, queries, etc.) and asked to leave at least 10 comments identifying bugs and design issues across different areas. Take-home format with a 24-hour window despite the recruiter's stated 1-2 hour estimate.
+SWE
+code-review
+code-reading
+sql
+security
+race-condition
+python
+take-home
+medium
+Frequency
+Single report
+Last asked
+2026-03-05
+Stage
+oa · take-home
+Requirements
+
+Format: take-home code review. Candidate plays the reviewer; the system collects line-level comments.
+
+Inputs: a small repository of Python files exercising SQL insert / query operations, configuration, and request handling.
+
+Bugs are seeded across multiple categories — at minimum the prompt names:
+
+Hard-coded secrets (API keys / passwords in source).
+
+SQL schema problems (incorrect column types, missing constraints, inconsistent naming).
+
+Race conditions (concurrent writes without locking / transactions; check-then-act sequences).
+
+Plus the usual: input validation, error handling, magic numbers, naming, dead code, missing tests, logging hygiene.
+
+Minimum 10 comments, each targeting a different area. Strong submissions land in the 25-30+ comment range.
+
+Recruiter advertises 1-2 hours; observed time-to-complete is closer to 4 hours.
+
+Notes
+
+Treat the comment count as a floor, not a ceiling — the rubric weights breadth of categories at least as much as depth on any single bug.
+
+Categorise comments yourself as you go: security, correctness, concurrency, performance, maintainability, observability. A submission with 30 comments concentrated in two categories scores worse than 20 spread across six.
+
+Hard-coded secrets / SQL-injection / unsanitised input are the most-common security gotchas. Always grep the codebase for password =, api_key =, and string-formatted SQL (f"INSERT INTO ... {var}").
+
+Race conditions are the most-missed correctness bug. Look for read-modify-write sequences against the DB without a transaction or SELECT ... FOR UPDATE, and for shared mutable state in any handler function.
+
+SQL schema issues to scan for: missing primary key / unique constraints, columns that should be NOT NULL, integer types too narrow for production scale, missing indexes on foreign keys, snake_case vs camelCase inconsistency.
+
+Phrase comments as actionable suggestions, not assertions of fault. Reviewer voice scores better than QA voice ("consider wrapping in a transaction so partial writes can't leak" beats "this is broken").
+
+Plan the 24-hour window with a sleep break — bug density grows after the first hour as familiarity builds. A single late-night push is a poor plan; reserve a second pass after a break for category coverage and false positives.
+
+Preparation
+
+Drill OWASP Top 10 fluently — security comments are the highest-leverage category and are easy to spot if the categories are top-of-mind.
+
+Practise reading 200-300 lines of unfamiliar Python in 15 minutes and listing every issue you spot — speed is the binding constraint.
+
+Write out your own checklist (security / SQL / concurrency / validation / errors / performance / observability / maintainability / testing) and run the codebase through each lane explicitly.
+
+For SQL specifically: be able to spot N+1 patterns, missing indexes on join columns, and DDL that allows NULL where it shouldn't.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

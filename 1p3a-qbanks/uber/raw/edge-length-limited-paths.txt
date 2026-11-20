@@ -1,0 +1,75 @@
+===H1===
+Checking Existence of Edge Length Limited Paths
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/edge-length-limited-paths
+===BODY===
+Uber
+CodingMembers
+Checking Existence of Edge Length Limited Paths
+Given an undirected weighted graph defined by edgeList, answer for each query whether a path exists between two nodes using only edges strictly shorter than a given limit. Efficient solutions sort edges and queries by weight and process them offline with union-find.
+SWE
+graph
+union-find
+sorting
+medium
+Frequency
+Single report
+Last asked
+2026-03-22
+Stage
+phone-screen
+Checking Existence of Edge Length Limited Paths
+
+An undirected graph of n nodes is defined by edgeList, where edgeList[i] = [u_i, v_i, dis_i] denotes an edge between nodes u_i and v_i with distance dis_i. Note that there may be multiple edges between two nodes.
+
+Given an array queries, where queries[j] = [p_j, q_j, limit_j], your task is to determine for each query whether there is a path between p_j and q_j such that each edge on the path has a distance strictly less than limit_j.
+
+Return a boolean array answer, where answer.length == queries.length and the jth value is true if there is such a path for the jth query, and false otherwise.
+
+Examples
+
+Example 1:
+
+Input: n = 3, edgeList = [[0,1,2],[1,2,4],[2,0,8],[1,0,16]], queries = [[0,1,2],[0,2,5]]
+
+Output: [false,true]
+
+Explanation:
+
+The query [0,1,2] is false because the only relevant edge has length 2, which is not strictly less than 2. The query [0,2,5] is true because 0 -> 1 -> 2 uses edges with lengths 2 and 4, both strictly less than 5.
+
+Example 2:
+
+Input: n = 5, edgeList = [[0,1,10],[1,2,5],[2,3,9],[3,4,13]], queries = [[0,4,14],[1,4,13]]
+
+Output: [true,false]
+
+Explanation:
+
+For [0,4,14], the path 0 -> 1 -> 2 -> 3 -> 4 uses edge lengths 10, 5, 9, 13, all strictly less than 14. For [1,4,13], the edge with length 13 is not allowed because the limit is strict.
+
+Constraints
+
+2 <= n <= 10^5
+
+1 <= edgeList.length, queries.length <= 10^5
+
+edgeList[i].length == 3
+
+queries[j].length == 3
+
+0 <= u_i, v_i, p_j, q_j <= n - 1
+
+u_i != v_i
+
+p_j != q_j
+
+1 <= dis_i, limit_j <= 10^9
+
+There may be multiple edges between two nodes.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

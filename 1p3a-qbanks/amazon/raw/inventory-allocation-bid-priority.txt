@@ -1,0 +1,68 @@
+===H1===
+Inventory Allocation by Bid Priority
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/inventory-allocation-bid-priority
+===BODY===
+Amazon
+CodingMembers
+Inventory Allocation by Bid Priority
+OA coding problem. Each request is `[customerId, quantity, bidAmount, timestamp]`; allocate a fixed `totalInventory` so higher bidAmount wins, ties break by round-robin on increasing timestamp, each customer takes at most one item per round until their quantity is met or stock runs out, and lower bids are only served after all higher bids. Return the IDs of customers who receive nothing.
+SWE
+greedy
+sorting
+simulation
+medium
+Frequency
+Medium
+Last asked
+2026-08-21
+Stage
+oa
+Requirements
+
+Each request is [customerId, quantity, bidAmount, timestamp]. You are also given totalInventory.
+
+Allocation rules, applied in order:
+
+Higher bidAmount has higher priority.
+
+Among customers with the same bidAmount, allocate in round-robin order by increasing timestamp.
+
+In each round a customer receives at most one item, repeating rounds until either their requested quantity is fulfilled or the inventory is exhausted.
+
+A lower bid tier is considered only after every higher-bid customer has been fully processed.
+
+Return the IDs of customers who receive no items.
+
+Examples
+
+requests = [
+    [1, 5, 5, 0],
+    [2, 7, 8, 1],
+    [3, 7, 5, 1],
+    [4, 10, 3, 3],
+]
+totalInventory = 18
+Output: [4]
+
+Notes
+
+Group requests by bidAmount descending; within a group, order by timestamp ascending and cycle through customers one unit at a time. This round-robin (not "fill the first customer completely, then the next") is the part people miss.
+
+Track each customer's remaining quantity and a received-count; a customer drops out of the rotation once their quantity hits zero.
+
+The output is the complement — customers who got zero — so a customer whose entire higher tier exhausted the stock before their tier was reached belongs in the answer.
+
+Edge cases to clarify: inventory larger than total demand (answer empty), a customer requesting zero, and identical (bidAmount, timestamp) pairs.
+
+Preparation
+
+Implement the layered loop: sort tiers by bid desc, then within a tier run rounds until the tier is satisfied or inventory is empty; stop entirely when inventory hits zero.
+
+Dry-run the provided example by hand to confirm customer 4 (lowest bid) is starved while the three higher requests consume all 18 units.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

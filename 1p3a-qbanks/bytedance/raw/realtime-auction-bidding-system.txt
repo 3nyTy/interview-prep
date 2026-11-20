@@ -1,0 +1,72 @@
+===H1===
+Realtime Auction Bidding System
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/realtime-auction-bidding-system
+===BODY===
+ByteDance / TikTok
+System Design·60 minMembers
+Realtime Auction Bidding System
+Design a high-read, high-write auction service with REST bids, ordered bid processing, durable bid history, current-price state, and realtime client updates through SSE or WebSocket.
+SWE
+messaging
+kafka
+redis
+websocket
+sse
+state-machine
+scaling
+transactions
+medium
+Frequency
+Single report
+Last asked
+2026-05-20
+Stage
+onsite-system-design
+Requirements
+
+Design an auction service for hot auctions with high read and write pressure. Core requirements:
+
+Users submit bids through a REST entrypoint.
+
+The system validates bids, preserves per-auction ordering, and updates the current highest bid.
+
+Clients receive realtime updates for highest price and bid history. SSE is sufficient for normal update streaming; WebSocket can be reserved for very high-frequency final windows such as the last 30 seconds.
+
+Store all bids and the auction state machine durably, not just the final成交 record.
+
+Handle hot auctions where many users bid concurrently on the same auction_id.
+
+A concrete architecture:
+
+Auction Service accepts REST bids, authenticates, validates basic shape, and publishes to Kafka partitioned by auction_id.
+
+Bid Worker consumes each auction's ordered stream, checks auction state and bid validity, updates MySQL transactionally, and publishes current state to Redis.
+
+Redis holds current highest bid / current auction state and powers pub/sub to the realtime update layer.
+
+SSE Server pushes Redis pub/sub updates to clients; switch selected hot final windows to WebSocket if bid frequency exceeds SSE's practical envelope.
+
+Notes
+
+Partition Kafka by auction_id so bids for one auction are processed in order while different auctions scale horizontally.
+
+Be explicit about consistency: the bid worker should be the serialization point for an auction, or MySQL conditional updates must enforce monotonic highest bid.
+
+Redis is a serving/cache layer for current state; MySQL remains the durable source for all bids and the auction state machine.
+
+Clarify how to reject stale bids, handle duplicate client retries, and close an auction exactly once.
+
+Preparation
+
+Practice the write path as an ordered state-machine update rather than a generic chat-style pub/sub system.
+
+Prepare trade-offs between REST + SSE and full WebSocket bidding.
+
+Drill hot-key mitigation: partition by auction, shard workers, and isolate extremely hot auctions with dedicated workers or finer-grained queues.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,127 @@
+===H1===
+Valid Tic-Tac-Toe State (Extended)
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/tic-tac-toe-valid-state-extended
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Valid Tic-Tac-Toe State (Extended)
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+·
+45 min
+Members
+Valid Tic-Tac-Toe State (Extended)
+
+Extended variant of LC 794: given a board state (3×3 or larger N×N), decide whether it is reachable from a legal sequence of moves under standard tic-tac-toe rules.
+
+SWE
+array
+simulation
+math
+medium
+Frequency
+Single report
+Last asked
+2025-11-23
+Stage
+phone-screen
+Requirements
+Input: an N×N grid of X, O, or empty cells. The base case is N = 3 (standard LC 794).
+Output: boolean — is this board state reachable through a legal sequence of alternating X then O moves, with neither player making a move after the other has won?
+The extension generalizes the board size; the rules (win = K-in-a-row for some K, alternation, X moves first) carry over.
+Notes
+The standard LC 794 invariants for a 3×3 board:
+count_X == count_O or count_X == count_O + 1 (X moves first).
+If X has won, count_X == count_O + 1 (the winning move was the last move).
+If O has won, count_X == count_O (the winning move was the last move).
+X and O cannot both have a winning line simultaneously.
+For the N×N extension, the same invariants hold; the only change is the win-line detection scans all rows, columns, and both diagonals for K consecutive same-symbol cells. K is typically equal to the board side for the smallest grids and a fixed constant (e.g. K = 5 for Gomoku) for larger boards. Clarify with the interviewer.
+Time: O(N²) for counting and O(N² × K) for win detection if implemented naively; reducible to O(N²) with a one-pass scan over each line.
+Edge cases: empty board (valid), single move (X only at one cell, valid), simultaneous wins (invalid), all cells filled (clarify whether a draw still requires the no-move-after-win invariant).
+The round may also flip the question: given a final state, count the number of distinct legal move sequences that lead to it. That's a much harder enumeration / DP problem and is rarely the actual ask in screens.
+Preparation
+Implement LC 794 first; verify all four invariants on the canonical test set.
+Generalize the win-line scanner to N×N with a configurable K-in-a-row.
+Drill the simultaneous-win invariant on a hand-built example.
+3x3 base constraints
+The standard base input is exactly a 3-row board where each row has length 3 and every cell is 'X', 'O', or ' '.
+Return false immediately when O has moved first, when move counts violate count_X == count_O or count_X == count_O + 1, or when the board contains moves after a winning line should have ended the game.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Preparation
+3x3 base constraints
+Related discussions · 1
+🔑Snowflake Screening
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Calculate Amount Paid in Taxes
+Low
+array
+math
+simulation
++1
+Frontend Grid: Robot Eats Candies
+Single report
+simulation
+medium
+frontend
++2
+Happy Number
+Single report
+math
+simulation
+hashmap
++2
+RecordCollection Sort Colors
+Single report
+array
+medium
+two-pointer
++1
+Forest Parent Array Delete Node
+Single report
+array
+medium
+tree
++1
+Code editor

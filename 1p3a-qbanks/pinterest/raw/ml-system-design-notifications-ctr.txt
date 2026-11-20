@@ -1,0 +1,56 @@
+===H1===
+ML System Design: Notification Ranking & Ads CTR
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/ml-system-design-notifications-ctr
+===BODY===
+Pinterest
+System Design·60 minMembers
+ML System Design: Notification Ranking & Ads CTR
+Two adjacent prompts that share an architecture: design the ML system for Pinterest notifications (which pin to push, when, with what frequency cap) or for ads CTR prediction (rank ad candidates for an impression slot). Both want explicit feature, loss, calibration, and online-experimentation design.
+MLE
+mlsd
+ml-infra
+notification
+push-notification
+ads
+calibration
+ranking
+feature-engineering
+hard
+Frequency
+Medium
+Last asked
+2026-04-09
+Stage
+onsite-system-design
+Requirements
+
+Design either notification ranking—choose a pin or suppress the send under a frequency budget—or ads CTR prediction—rank candidates for expected auction value. Cover features, candidate generation, model and loss, calibration, serving, and online evaluation.
+
+Notes
+
+Notification ranking needs a calibrated send/no-send threshold and per-user/channel frequency caps after ranking. Define cold-start behavior and the cost of fatigue.
+
+Ads ranking commonly optimizes a value such as bid × pCTR, so calibration directly affects auction ordering. Fit and monitor calibration on held-out slices rather than relying only on AUC.
+
+Both forms can use light retrieval followed by a heavier ranker; spend the design time on their distinct decision policy and labels.
+
+Offline/online divergence can come from position bias, novelty, or experiment contamination. Name a mitigation and guardrail for each selected risk.
+
+Serving follow-ups include sharding, batching, cache scope, and GPU-versus-CPU cost. Tie each choice to latency and throughput numbers.
+
+Preparation
+
+Write a one-page feature/model/loss/calibration/experiment outline for each form.
+
+Walk a notification ranking result through the frequency cap and send threshold.
+
+Compute two ads' bid × pCTR before and after a calibration correction.
+
+Define a primary metric, guardrails, and a power-analysis sketch for one A/B test.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

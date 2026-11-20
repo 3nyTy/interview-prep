@@ -1,0 +1,49 @@
+===H1===
+Minimum One-Character Word Transformations
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/minimum-word-transformation-steps
+===BODY===
+Salesforce
+CodingMembers
+Minimum One-Character Word Transformations
+Find the minimum number of steps required to transform `startWord` into `endWord`. Each step may change one character, and intermediate words are constrained by `wordsList`.
+SWE
+graph
+string
+bfs
+medium
+Frequency
+Single report
+Last asked
+2026-08-24
+Stage
+onsite-coding
+Requirements
+
+Inputs: startWord, endWord, and wordsList.
+
+In one step, change exactly one character of the current word.
+
+Use words from wordsList as the allowed intermediate states.
+
+Return the minimum number of steps needed to reach endWord from startWord.
+
+Notes
+
+Model each allowed word as a node and each valid one-character change as an unweighted edge. Breadth-first search returns the shortest transformation distance; mark a word visited when it is enqueued so it is not added repeatedly from the same or later layers.
+
+Generate neighbors either by substituting each character and checking a hash set, or by indexing wildcard patterns such as h*t. For N words of length L, the index contains O(N * L) pattern entries; materializing length-L pattern strings takes O(N * L^2) time and character storage. Clear each bucket after its first BFS scan so every bucket entry is processed once; including ordinary string construction, traversal remains O(N * L^2), with O(N) additional queue and visited entries.
+
+Clarify the output convention before coding: “steps” may mean changed edges, while some canonical versions count words in the sequence. Also confirm the unreachable sentinel and whether endWord must itself appear in wordsList. These choices affect initialization and the final return value, but not the BFS structure.
+
+Preparation
+
+Implement both direct character-substitution BFS and wildcard-bucket BFS, then compare their work on a dense dictionary of same-length words.
+
+Table-test a direct one-change path, a disconnected dictionary, cycles, an absent end word, and competing paths of different lengths; state the chosen step-count convention before evaluating expected results.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

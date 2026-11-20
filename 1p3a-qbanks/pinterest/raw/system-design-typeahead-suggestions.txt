@@ -1,0 +1,67 @@
+===H1===
+System Design: Search Typeahead / Input Suggestions
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/system-design-typeahead-suggestions
+===BODY===
+Pinterest
+System Design·60 minMembers
+System Design: Search Typeahead / Input Suggestions
+Design Pinterest's search typeahead — autocomplete suggestions for partially-typed queries. Asked at SDE L4 system-design and as the search-team SD round in MLE loops. Standard architecture: trie + frequency + personalization layer, with edge caches.
+SWE
+search
+trie
+caching
+ranking
+scaling
+medium
+Frequency
+Medium
+Last asked
+2026-09-10
+Stage
+onsite-system-design
+Requirements
+
+User types into the search bar. After each keystroke, return the top-K suggested completions. Latency budget is in the tens of milliseconds end-to-end.
+
+Cover:
+
+Suggestion ranking — frequency, recency, personalization signal.
+
+Storage — trie / FST / inverted index trade-offs.
+
+Distribution — sharding strategy for the suggestion index.
+
+Caching — edge cache for popular prefixes vs per-user cache.
+
+Update — how do new queries enter the suggestion pool, and on what cadence?
+
+Personalization — when does the user-personalized layer kick in, and what is the fallback?
+
+Notes
+
+Standard top-level architecture: a global trie (or FST for memory compactness) keyed by query prefix, with each node storing the top-K continuations precomputed at index-build time. Per-prefix top-K is O(1) at serve time.
+
+Personalization typically wraps the global layer rather than replacing it — fetch global top-K, fetch user's recent / frequent matches for the prefix, blend with a small linear scorer or a learned reranker.
+
+Edge caching of the most-common prefix → suggestions response is critical for the latency budget. The 80/20 rule applies; the top 1000 prefixes typically cover a large share of traffic.
+
+Update cadence: hourly or daily for the global trie rebuild; near-real-time for new trending queries via a hot-merge index that is merged into the cold trie on the next rebuild.
+
+A frequent push: "what about typos and prefix expansion?" — extend the trie with bounded-edit-distance traversal at serve time, or precompute typo-fold variants at index time. Either is acceptable; defend the trade-off.
+
+Scaling math: a trie covering 100M unique queries with average length 20 chars and top-K=10 stored per node is in the multi-GB range — fits in memory per shard with horizontal sharding by prefix bucket.
+
+Preparation
+
+Sketch the trie + per-node top-K + edge cache architecture once before the interview.
+
+Pre-rehearse the personalization-blend section — interviewers ask for specifics on how to mix global and per-user signal.
+
+Practice the typo-handling follow-up — bounded edit-distance traversal of a trie is a 5-minute whiteboard explanation but easy to fumble cold.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

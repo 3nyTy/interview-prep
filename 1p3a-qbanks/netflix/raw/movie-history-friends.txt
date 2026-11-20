@@ -1,0 +1,136 @@
+===H1===
+Movie History Friends
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/movie-history-friends
+===BODY===
+Movie History Friends
+
+<https://www.1point3acres.com/interview/problems/company/netflix/movie-history-friends>
+
+Netflix
+Coding
+
+60 min
+Members
+Movie History Friends I / II
+
+Two related prompts over per-customer watch histories: Part I pairs customers whose last k movies match exactly (same order); Part II pairs customers sharing at least m of their last k watches in any order. Return pairs with the smaller ID first, no duplicates.
+
+SWE
+hashmap
+set
+string
+medium
+Frequency
+Single report
+Last asked
+2026-01-28
+Stage
+phone-screen  onsite-coding
+Part I  Exact Last-k Match
+Problem Challenge: Movie History Friends
+
+Every customer has a list of movies they have watched. The list keeps the specific order in which they viewed them.
+
+We define two customers as "friends" if their last k movies are an exact match. This means the movies and their order must be identical.
+
+You are given a map that links customer IDs to their movie history, and a number k. Your task is to find and return all pairs of customers who are friends.
+
+Important Rules
+
+Not enough movies: If a customer has watched fewer than k movies, they cannot be friends with anyone.
+ID Order: You can return the list of pairs in any order. However, inside each pair, the smaller ID must come first (for example, use [1, 2], not [2, 1]).
+No Duplicates: Each pair of friends should appear only once in your output.
+Sample Cases
+
+Case 1:
+
+Input: history = {1: ["M1", "M2", "M3", "M4", "M5"], 2: ["X", "Y", "M3", "M4", "M5"], 3: ["A", "B", "M3", "M4", "M5"]}, k = 3
+
+Output: [[1, 2], [1, 3], [2, 3]]
+
+Why? All three customers watched the same last 3 movies: ["M3", "M4", "M5"]. The order is the same for everyone, so every customer is friends with every other customer.
+
+Case 2:
+
+Input: history = {1: ["A", "B", "C"], 2: ["X", "B", "C"], 3: ["A", "B", "C"]}, k = 3
+
+Output: [[1, 3]]
+
+Why? Only customers 1 and 3 have the exact same last 3 movies (["A", "B", "C"]). Customer 2 is different because their first movie does not match the others.
+
+Case 3:
+
+Input: history = {1: ["A", "B"], 2: ["C", "D", "E"]}, k = 3
+
+Output: []
+
+Why? Customer 1 has only watched 2 movies. Since k is 3, they do not have enough history to match anyone. No pairs are possible.
+
+Input Limits
+1 <= number of customers <= 1000
+1 <= k <= 100
+0 <= history[i].length <= 1000
+Movie IDs are strings
+Part II  At Least m of Last k (Unordered)
+The Challenge
+
+We have a record of movies watched by different customers. The list for each customer shows the movies in the exact order they watched them.
+
+In this problem, two customers are called "friends" if they have watched at least m of the same movies within their most recent k watches. These common movies do not need to be in the same order or the same spot in the list.
+
+You are given a map connecting Customer IDs to their movie history, along with the numbers k and m (where m is less than or equal to k). Your task is to return all pairs of Customer IDs that qualify as friends.
+
+Important Rules
+Length Check: If a customer has watched fewer than k movies total, they cannot be friends with anyone.
+Order Does Not Matter: The matching movies can be in any position within the last k entries.
+Output Format: You can list the friend pairs in any order. However, inside each pair, you must place the smaller ID first (e.g., [1, 2], not [2, 1]).
+No Duplicates: Each pair of friends should be listed only once.
+Walkthrough Examples
+
+Case 1:
+
+Input: history = {1: ["A", "B", "C", "D"], 2: ["X", "D", "B", "A"], 3: ["P", "Q", "R", "S"]}, k = 3, m = 2
+
+Output: [[1, 2]]
+
+Breakdown:
+
+Customer 1: The last 3 movies are ["B", "C", "D"].
+Customer 2: The last 3 movies are ["D", "B", "A"].
+Result: They both watched "B" and "D". That is 2 common movies. Since m is 2, this is enough to be friends.
+Customer 3: Their movies are completely different, so they have no friends here.
+
+Case 2:
+
+Input: history = {1: ["A", "B", "C"], 2: ["C", "B", "A"], 3: ["A", "B", "C"]}, k = 3, m = 3
+
+Output: [[1, 2], [1, 3], [2, 3]]
+
+Breakdown:
+
+All customers watched "A", "B", and "C" in their last 3 slots, just in different orders. Because they all share 3 movies, every possible pair is a friend pair.
+
+Case 3:
+
+Input: history = {1: ["A", "B", "C"], 2: ["D", "E", "F"]}, k = 3, m = 1
+
+Output: []
+
+Breakdown:
+
+There are no common movies between the two customers. Therefore, the result is an empty list.
+
+Data Constraints
+1 <= number of customers <= 1000
+1 <= m <= k <= 100
+0 <= history[i].length <= 1000
+Movie IDs are strings
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the fi
+
+---

@@ -1,0 +1,62 @@
+===H1===
+Valid 5-Card Poker Straight
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/valid-poker-straight
+===BODY===
+Oracle
+Coding·60 minMembers
+Valid 5-Card Poker Straight
+Given five cards drawn from a standard deck, determine whether they form a straight (five consecutive ranks). J/Q/K must be mapped to 11/12/13; Ace can play as either 1 or 14. Asked as a single 40-minute coding problem inside an Oracle Health phone screen heavy on behavioural questions.
+SWE
+array
+set
+easy
+Frequency
+Single report
+Last asked
+2025-10-22
+Stage
+phone-screen
+Requirements
+
+Input: five cards from a standard deck. Each card has a rank in {A, 2, 3, ..., 10, J, Q, K} (suits are irrelevant for the straight check).
+
+Output: boolean — are the five cards a straight (five consecutive ranks)?
+
+Special handling:
+
+J = 11, Q = 12, K = 13 in the natural ordering.
+
+Ace plays as either 1 (low straight: A-2-3-4-5) or 14 (high straight: 10-J-Q-K-A). Both forms count as valid straights.
+
+No duplicates within the five cards (if duplicates are present, return false).
+
+Notes
+
+The canonical solution: convert ranks to integers; produce two candidate sequences if an Ace is present (Ace-as-1 and Ace-as-14); for each candidate, sort and check that the values are consecutive.
+
+Alternatively, sort once with Ace = 14, then check the straight property. If false and an Ace is present, re-check with Ace = 1.
+
+A set-based check works equally well: consecutive iff max(s) - min(s) == 4 and len(s) == 5. Apply once per Ace assignment.
+
+Edge cases:
+
+Duplicate ranks → not a straight.
+
+Two Aces → still test both candidate sequences, but two of the same value is a duplicate, so return false.
+
+The round emphasised behavioural questions (5 BQs + 1 coding problem in 60 minutes), with the coding portion intentionally light. Don't overthink the algorithm — the interviewer was scoring clean code and clear reasoning more than algorithmic depth.
+
+Preparation
+
+Implement the straight checker in under 10 minutes. Cover both Ace-as-1 and Ace-as-14 in a single pass via the "if any Ace, try both" check.
+
+Walk through the two trick test cases: [A, 2, 3, 4, 5] (low) and [10, J, Q, K, A] (high). Both must return true.
+
+Have a clean function signature and small helper for rank → int conversion. Interviewer-friendly code on a behavioural-heavy round is worth more than a brittle one-liner.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,70 @@
+===H1===
+Morse Code Encoder / Decoder with Word-Break
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/morse-code-encoder-decoder
+===BODY===
+Amazon
+Coding·60 minMembers
+Morse Code Encoder / Decoder with Word-Break
+A four-part Morse code problem combining LC 804 with LC 139/140. Encode characters, decode delimited Morse, then handle delimiter-free Morse with a dictionary, ending in backtracking to enumerate every legal word combination.
+MLE
+RS
+RE
+string
+hashmap
+recursion
+dp
+hard
+Frequency
+Low
+Last asked
+2026-03-21
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Part 1 — Encode: given a string of letters, output the Morse representation.
+
+Part 2 — Decode (with delimiter): given delimited Morse, recover the original string.
+
+Part 3 — Decode without delimiter (single word): given a vocabulary and a continuous Morse string, recover the source word.
+
+Part 4 — Decode without delimiter (multiple words): enumerate every legal split into vocabulary words using backtracking.
+
+Examples
+
+Part 1: "cab" → "-.-..--..." (-.-. + .- + -...).
+
+Part 4: vocabulary {"hi", "ish"}, Morse ....--..... Output every word sequence whose concatenated Morse equals the input.
+
+Notes
+
+Part 3/4 hinge on pre-indexing the vocabulary as morse_pattern -> set(words) so the recursive split is O(n) per branch instead of O(|vocab|).
+
+This was the first round on at least one Amazon FAR loop; the interviewer remarked at the end that "most candidates don't finish Part 4," so pacing matters. Aim to clear Parts 1-2 in 15 minutes.
+
+Backtracking depth can blow up; memoize at the suffix level (solve(start_index)) the same way LC 140 expects.
+
+The Part 4 backtracking has a worst-case exponential blow-up in the number of legal splits. Memoizing at the suffix index — solve(i) -> list of sentence suffixes starting at i — caps the recursion at O(n) distinct subproblems with the total output bounded by the number of legal sentences. This is the same shape as the canonical word-break enumeration.
+
+Build the inverted index morse_pattern -> set(words) once at construction time. Then solve(i) only iterates over keys of the index whose length fits in len(input) - i — concretely you can group keys by length for an extra constant-factor win when the dictionary is large.
+
+Pacing budget: Parts 1-2 are about 10-15 minutes (table lookup plus delimited split); Part 3 adds ~10 minutes for the recursive split; Part 4 needs the remaining time for the multi-split enumeration. If you have not started Part 4 by minute 40 of a 60-minute slot, simplify Part 3 to a memoized boolean and move on.
+
+Preparation
+
+Solve LC 804 (Unique Morse Code Words) and LC 140 (Word Break II) back-to-back as warmup.
+
+Pre-build the standard Morse table once and reuse — interviewers usually let you assume it's given.
+
+Practice writing the inverted-index lookup (pattern -> words) and the memoized backtracking in one sitting; this is the time sink in Part 4.
+
+Layered drill: (1) write the encoder + delimited decoder in one sitting from a hard-coded Morse table; (2) write the single-word decoder with the inverted index; (3) extend to multi-word with memoized backtracking returning a list of sentences; (4) add the dedup follow-up by storing results in a set keyed by the joined sentence.
+
+Pre-rehearse the inverted-index construction so it falls out of your fingers — this is the line most candidates re-derive on the spot and lose 5 minutes to.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

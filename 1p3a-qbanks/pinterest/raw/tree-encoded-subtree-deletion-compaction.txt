@@ -1,0 +1,68 @@
+===H1===
+Tree-Encoded Subtree Deletion and Stable Compaction
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/tree-encoded-subtree-deletion-compaction
+===BODY===
+Pinterest
+CodingMembers
+Tree-Encoded Subtree Deletion and Stable Compaction
+A forest is stored as a parent-index array where node `i` is a root when `parent[i] == i`. First mark a target node and every descendant with `-1`; then compact the survivors to the front in stable order and rewrite every surviving parent index to the new positions.
+SWE
+array
+tree
+dfs
+hashmap
+medium
+Frequency
+Low
+Last asked
+2026-08-26
+Stage
+phone-screen
+Requirements
+
+Input is a forest represented by an array of nodes. For node index i, parent[i] is the index of its parent; a root points to itself (parent[i] == i). The node's value is its current array index.
+
+Given a target index, mark the target and every descendant as deleted by setting their parent fields to -1.
+
+Follow-up: compact the array so every surviving node appears first in its original relative order and deleted slots form a -1 suffix.
+
+Rewrite every surviving parent index so it points to the parent's new position after compaction.
+
+Examples
+
+parent = [0, 0, 0, 2, 4, 4]
+
+This encodes two trees: root 0 has children 1 and 2, node 2 has child 3, and root 4 has child 5. For target = 2, the first part produces:
+
+[0, 0, -1, -1, 4, 4]
+
+After stable compaction, the surviving nodes are old indices 0, 1, 4, 5, so the rewritten representation is:
+
+[0, 0, 2, 2]
+
+Notes
+
+Build child adjacency lists from the parent array, then run DFS or BFS from the target to mark exactly its descendant closure. This takes O(n) time and O(n) auxiliary space.
+
+Collect surviving old indices in their original order and build old_to_new[old_index] = new_index. Emit each survivor's rewritten parent as old_to_new[parent[old_index]]; a surviving root maps to its own new index. The compaction and rewrite pass is O(n).
+
+The follow-up changes node identities because each node's value is its array index. Parent pointers must therefore be rewritten rather than merely shifting non-deleted entries left.
+
+Important test cases include deleting a leaf, deleting a root with descendants, deleting one whole tree from a multi-root forest, and deleting every node.
+
+Preparation
+
+Draw the parent-index representation for a two-root forest and trace both phases by hand.
+
+Implement descendant marking once with DFS and once iteratively, then test a deep chain.
+
+Practice building and applying an old-index-to-new-index table while preserving survivor order.
+
+Write assertions that every surviving parent pointer is in range and every surviving root still points to itself.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

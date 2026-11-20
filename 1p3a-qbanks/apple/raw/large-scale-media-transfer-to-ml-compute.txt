@@ -1,0 +1,72 @@
+===H1===
+Large-Scale Media Transfer to ML Compute
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/large-scale-media-transfer-to-ml-compute
+===BODY===
+Apple
+System DesignMembers
+Large-Scale Media Transfer to ML Compute
+Design a one-time transfer of 200 TB of images and video from an on-premises source to a cloud GPU training cluster within a few days. Compare physical and network migration, use an object-store landing zone, preserve integrity and security, and extend the design into a recurring ingestion and GPU input pipeline.
+SWE
+MLE
+Infra Eng
+storage
+data-engineering
+bandwidth
+ml-infra
+scaling
+hard
+Frequency
+Single report
+Last asked
+2026-08-08
+Stage
+tech-screen
+Requirements
+
+Begin by clarifying whether the transfer is one-time or recurring, where the source currently lives, whether the destination is one host or a GPU cluster, the available network path, and the completion deadline.
+
+Use the canonical constraints: 200 TB of images and video, an on-premises source, a cloud GPU training cluster, and a few days of acceptable transfer time.
+
+Account for both a few very large videos and millions of small image files; explain how the file shape changes metadata and I/O overhead.
+
+Quantify whether 1 Gbps, 10 Gbps, or 100 Gbps networking can satisfy the deadline, including a realistic efficiency factor rather than ideal line rate alone.
+
+Choose between network transfer and a physical data-transfer appliance. Address cost, elapsed time, production-network impact, encryption, checksums, restartability, and idempotent chunk transfer.
+
+Do not make one compute host the durable destination. Design an object-storage landing zone that decouples transfer from preprocessing, inference, and training consumers.
+
+For a recurring variant, add event notification or a queue between object storage and workers so processing can retry and scale independently.
+
+Follow-up: feed the landed corpus to GPUs efficiently. Cover offline preprocessing, sharded training formats, streaming reads, prefetch, parallel decoding, shuffle strategy, and how to identify network, CPU, or GPU bottlenecks.
+
+Examples
+
+For 200 TB = 1.6 × 10^15 bits, the interview used these order-of-magnitude transfer estimates:
+
+LinkIdeal timeAt roughly 70% effective throughput
+1 Gbps18.5 days26 days
+10 Gbps1.85 days2.6 days
+100 Gbps4.4 hours6.3 hours
+
+Notes
+
+The strongest differentiators are clarification and arithmetic before architecture. When the network path takes longer than shipping encrypted appliances, physical transfer is the practical answer; with sufficient dedicated bandwidth, parallel multipart upload into object storage is the cleaner path.
+
+The architectural hinge is decoupling. Landing the corpus in durable shared storage allows failed chunks to resume and lets an entire compute fleet consume the data without coupling ingestion to one machine. Checksums, encryption in transit and at rest, and a private network boundary are expected parts of the design.
+
+For ML workloads, millions of independent small reads can starve expensive GPUs. Preprocessing into larger shards and overlapping data loading with compute turns the storage design into an end-to-end training-input design.
+
+Preparation
+
+Rehearse byte-to-bit and transfer-time calculations for 1, 10, and 100 Gbps links until they are automatic.
+
+Draw both a physical-appliance migration path and a dedicated-link multipart-upload path, including integrity and retry controls.
+
+Sketch a GPU input pipeline from object storage through preprocessing, sharding, streaming, prefetch, and parallel decoding.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

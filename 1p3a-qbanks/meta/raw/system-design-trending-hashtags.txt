@@ -1,0 +1,57 @@
+===H1===
+System Design — Trending Hashtags
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/system-design-trending-hashtags
+===BODY===
+Meta
+System Design·45 minMembers
+System Design — Trending Hashtags
+Design a backend system that detects and serves trending hashtags from Facebook posts. The system must surface trends while the real-world event is happening, target about 1-minute latency, consider the last 24 hours of posts with recency weighting, reward popularity across the community, and distinguish genuinely novel spikes from long-running background chatter.
+SWE
+feed
+ranking
+streaming
+metrics
+scaling
+medium
+Frequency
+Single report
+Last asked
+2026-06-28
+Stage
+onsite-system-design
+Requirements
+
+Ingest Facebook posts and extract hashtags continuously.
+
+Surface a hashtag as trending while the real-world event is still active; target end-to-end freshness around 1 minute.
+
+Score posts from the last 24 hours, with more recent posts carrying more weight.
+
+Popularity must reflect broad community interest, not only a small cluster posting repeatedly.
+
+Novelty is required: a trend should be about something new, or at least a sharp intensity increase versus its prior baseline.
+
+Serve the ranked trend list to product surfaces with low read latency.
+
+Notes
+
+The hard part is not counting hashtags; it is combining recency, popularity, and novelty without letting stale evergreen tags dominate.
+
+Be ready to define a baseline window for each hashtag, a decay function for recent posts, and an anti-spam / dedup layer so one coordinated group cannot manufacture a trend.
+
+The 1-minute freshness target pushes toward streaming aggregation plus approximate top-K structures, with batch recomputation used for correction rather than the primary path.
+
+Preparation
+
+Practice a streaming counter design with sliding 1-minute, 1-hour, and 24-hour windows.
+
+Prepare a trend score formula that includes current rate, baseline rate, recency decay, and unique-user / unique-community normalization.
+
+Drill the operational deep dive: late events, hashtag extraction quality, bot filtering, regional trends, and serving-cache invalidation.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

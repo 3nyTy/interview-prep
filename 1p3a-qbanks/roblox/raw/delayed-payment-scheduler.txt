@@ -1,0 +1,565 @@
+===H1===
+Delayed Payment Scheduler (Robux Transfer)
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/delayed-payment-scheduler
+===BODY===
+Roblox
+System Design·60 minMembers
+Delayed Payment Scheduler (Robux Transfer)
+Design a system that lets a user schedule a virtual-currency transfer (Robux) from one account to another, to be executed automatically at a specified future time. The core deep-dive is on durable scheduling under failure, exactly-once execution despite retries, and how to keep the scheduler accurate when millions of payments are queued for the same wall-clock minute.
+SWE
+Infra Eng
+system-design
+payment
+scheduling
+idempotency
+transactions
+distributed-lock
+hard
+Frequency
+Medium
+Last asked
+2026-04-12
+Stage
+onsite-system-design
+Problem Statement
+
+Design a delayed or scheduled payment system. A user or internal service can create a payment that should execute at a future time, cancel it before execution, and later inspect its status. The system must prevent duplicate execution, handle retries safely, and keep account balances correct.
+
+Common variants of this prompt include:
+
+design delayed payment
+
+design delayed payment system
+
+scheduled payment system
+
+payment scheduling system
+
+delayed payment with hold/reserve semantics
+
+Disclaimer: This is an interview-prep design, not financial or compliance advice. In a real payment system, legal, risk, fraud, sanctions, reconciliation, and audit requirements can dominate the architecture.
+
+Phase 1: Requirements (~5 minutes)
+
+Functional Requirements
+
+Schedule a payment: A user can create a payment to execute at a specified future time.
+
+Reserve funds with a hold: The system can place a hold at schedule time so the payment has funds available later.
+
+Cancel a scheduled payment: A user can cancel a payment before execution and release the hold.
+
+Execute due payments: The system triggers due payments and records final success, failure, or retry state.
+
+Fetch payment status: Users and internal systems can inspect scheduled, canceled, processing, succeeded, failed, and retrying payments.
+
+Keep the first version narrow: one-time scheduled payments, authenticated users, one source account, one destination, and a single currency. Recurring payments, multi-currency FX, partial captures, and batch payouts are natural follow-ups.
+
+Non-Functional Requirements
+
+RequirementTargetWhy it matters
+CorrectnessNo double charges, no lost holds, no negative balancesThis is the highest-priority requirement
+Schedule accuracyExecute within 1-5 seconds of execute_at for normal trafficUsers expect scheduled payments to fire near the requested time
+ThroughputThousands of schedule/cancel/execute operations per second at peakobserved interviews mention QPS in the thousands
+Availability99.9%+ for schedule and cancel APIsUsers must be able to stop pending payments
+DurabilityEvery scheduled payment and state transition is persistedScheduler memory loss must not lose money movement
+IdempotencySafe client retries and worker retriesNetwork retries are normal in payment systems
+AuditabilityAppend-only ledger and attempt historyRequired for debugging, reconciliation, and support
+
+Clarifying Questions
+
+Do we hold funds at schedule time or at execution time?
+For this prompt, assume we hold funds at schedule time because variants mention delayed payment with hold.
+
+Can users cancel after execution starts?
+No. A payment can be canceled while it is scheduled. Once it is processing, cancellation becomes best-effort or unavailable.
+
+How accurate does the delay need to be?
+Assume second-level accuracy is enough. This is not a hard real-time timer.
+
+Are payments independent or account-ordered?
+Default: independent payments with ledger-enforced balance correctness. If the interviewer requires dependency ordering, process dependent payments through an account-scoped sequencer.
+
+Is the external payment rail synchronous?
+Assume it is unreliable and may time out. We must use idempotency keys and reconcile unknown outcomes.
+
+Capacity Estimation
+
+Assumptions:
+- 10M users with scheduled-payment access
+- 1M scheduled payments/day
+- 20% are canceled before execution
+- Peak traffic is 20x average during bursts
+
+Schedule writes:
+- 1M/day ~= 12 writes/second average
+- 20x peak ~= 240 writes/second
+
+Execution traffic:
+- 800K payments/day actually execute
+- Average ~= 9 executions/second
+- Hot scheduled times and batch jobs can create thousands/second peak
+
+Read traffic:
+- Assume 10 status reads per payment lifecycle
+- 10M reads/day ~= 116 reads/second average
+- Peak could be several thousand/second
+
+Storage:
+- PaymentSchedule record ~= 1 KB
+- Ledger entries: 2-4 entries per payment
+- 1M payments/day ~= 1 GB/day schedule storage plus ledger/audit
+- Retain hot schedule rows in OLTP; archive old attempts and audit logs to object storage/warehouse
+
+The average throughput is not scary. The hard part is the burst around common execution times, such as top of hour, payday, campaign payouts, or retry waves after an outage.
+
+Phase 2: Data Model (~5 minutes)
+
+Core Entities
+
+PaymentSchedule {
+  payment_id: UUID
+  user_id: UUID
+  source_account_id: UUID
+  destination_account_id: UUID
+  amount: Decimal
+  currency: String
+  execute_at: Timestamp
+  next_attempt_at: Timestamp
+  shard_id: Integer
+  status: Enum(scheduled, canceling, canceled, due, processing, retry_scheduled, succeeded, failed)
+  hold_id: UUID | null
+  idempotency_key: String
+  version: Long
+  created_at: Timestamp
+  updated_at: Timestamp
+}
+
+PaymentHold {
+  hold_id: UUID
+  account_id: UUID
+  payment_id: UUID
+  amount: Decimal
+  currency: String
+  status: Enum(active, captured, released, expired)
+  created_at: Timestamp
+  updated_at: Timestamp
+}
+
+LedgerEntry {
+  ledger_entry_id: UUID
+  account_id: UUID
+  payment_id: UUID
+  entry_type: Enum(hold, release_hold, capture_hold, debit, credit)
+  amount: Decimal
+  currency: String
+  balance_after: Decimal
+  created_at: Timestamp
+}
+
+ExecutionAttempt {
+  attempt_id: UUID
+  payment_id: UUID
+  idempotency_key: String
+  status: Enum(started, gateway_accepted, gateway_timeout, succeeded, failed)
+  gateway_reference: String | null
+  error_code: String | null
+  started_at: Timestamp
+  finished_at: Timestamp | null
+}
+
+OutboxEvent {
+  event_id: UUID
+  aggregate_id: UUID
+  event_type: String
+  payload_json: JSON
+  published_at: Timestamp | null
+  created_at: Timestamp
+}
+
+State Machine
+
+Key Modeling Decisions
+
+PaymentSchedule is the source of truth
+The scheduler and queue are derived mechanisms. If they lose state, due payments can be reconstructed from the database.
+
+Ledger entries are append-only
+Never mutate balances without an auditable ledger entry. Use transactions or compare-and-set updates to prevent negative balances.
+
+Holds are explicit entities
+A scheduled payment reserves funds with a hold. Cancel releases it. Execution captures it.
+
+Idempotency is stored at every boundary
+Client schedule requests, cancel requests, execution attempts, and payment gateway calls all need dedupe keys.
+
+Version enables safe state transitions
+Every transition is conditional on the current state and version. For example, the scheduler claims scheduled/retry_scheduled -> due, and an execution worker claims due -> processing.
+
+Important Indexes
+
+CREATE UNIQUE INDEX ux_payment_user_idempotency
+  ON payment_schedules (user_id, idempotency_key);
+
+CREATE INDEX ix_payment_due
+  ON payment_schedules (status, next_attempt_at, shard_id, payment_id)
+  WHERE status IN ('scheduled', 'retry_scheduled');
+
+CREATE INDEX ix_payment_user_created
+  ON payment_schedules (user_id, created_at DESC);
+
+CREATE UNIQUE INDEX ux_hold_payment
+  ON payment_holds (payment_id);
+
+CREATE UNIQUE INDEX ux_attempt_payment_idempotency
+  ON execution_attempts (payment_id, idempotency_key);
+
+The ix_payment_due index is the foundation of the delay mechanism. For a first attempt, next_attempt_at = execute_at. For retries, next_attempt_at moves forward by the backoff interval while the original execute_at remains the user-requested schedule time.
+
+Phase 3: API Design (~5 minutes)
+
+Protocol Choice
+
+Use REST for user-facing scheduling and status APIs because these are resource-oriented operations. Use Kafka/PubSub/SQS-style queues internally to distribute due-payment execution.
+
+Schedule Payment
+
+POST /api/payments/scheduled
+Idempotency-Key: 01J9K5...
+
+Request:
+{
+  "source_account_id": "acct_src",
+  "destination_account_id": "acct_dst",
+  "amount": "25.00",
+  "currency": "USD",
+  "execute_at": "2026-04-30T17:00:00Z"
+}
+
+Response:
+{
+  "payment_id": "pay_123",
+  "status": "scheduled",
+  "hold_id": "hold_456",
+  "execute_at": "2026-04-30T17:00:00Z"
+}
+
+Cancel Scheduled Payment
+
+DELETE /api/payments/scheduled/{payment_id}
+Idempotency-Key: 01J9K6...
+
+Response:
+{
+  "payment_id": "pay_123",
+  "status": "canceled",
+  "hold_released": true
+}
+
+Get Payment Status
+
+GET /api/payments/{payment_id}
+
+Response:
+{
+  "payment_id": "pay_123",
+  "status": "processing",
+  "amount": "25.00",
+  "currency": "USD",
+  "execute_at": "2026-04-30T17:00:00Z",
+  "last_attempt_status": "gateway_timeout",
+  "next_attempt_at": "2026-04-30T17:00:15Z"
+}
+
+Internal Execution Message
+
+{
+  "payment_id": "pay_123",
+  "execute_at": "2026-04-30T17:00:00Z",
+  "attempt": 1,
+  "partition_key": "acct_src"
+}
+
+The public APIs should be boring. Most interview signal comes from explaining how the internal scheduler, ledger, queue, and worker state transitions stay correct under retries.
+
+Phase 4: High-Level Design (~15-25 minutes)
+
+Architecture
+
+Schedule Flow
+
+Client sends POST /api/payments/scheduled with an idempotency key.
+
+API validates auth, account ownership, amount, currency, and future execute_at.
+
+API calls Ledger Service to place a hold on the source account.
+
+In one transaction or saga step, persist PaymentSchedule(status='scheduled', execute_at, next_attempt_at=execute_at, shard_id), PaymentHold(status='active'), and an outbox event.
+
+Return the scheduled payment ID and hold ID.
+
+Cancel Flow
+
+Client sends DELETE /api/payments/scheduled/{payment_id} with an idempotency key.
+
+API loads the payment and checks ownership.
+
+If status is scheduled, transition to canceling using a conditional update.
+
+Release the hold through Ledger Service.
+
+Persist cancellation ledger entries and outbox events.
+
+Transition canceling -> canceled after the hold release commits. If the scheduler has already moved the payment to due, processing, or retry_scheduled, return a conflict or "too late to cancel."
+
+Execution Flow
+
+Scheduler workers scan for rows where status IN ('scheduled', 'retry_scheduled') AND next_attempt_at <= now().
+
+A worker claims a batch with a short lease or conditional state transition to due.
+
+Scheduler enqueues payment_id to the due-payment queue.
+
+Execution worker consumes the message and conditionally transitions due -> processing.
+
+Worker calls the payment gateway or internal transfer rail with a deterministic idempotency key.
+
+On confirmed success, atomically capture the hold, mark the payment succeeded, record ledger entries, and emit notifications.
+
+On retryable failure with a known no-success outcome, set status to retry_scheduled with next_attempt_at = now() + backoff. For unknown gateway timeouts, keep the payment in processing until reconciliation resolves the outcome.
+
+On permanent failure or max retries, mark failed and release or reverse the hold depending on business rules.
+
+Delay Mechanism Options
+
+OptionHow it worksProsCons
+DB due-time scanPoll payment_schedules by (status, next_attempt_at)Simple, durable, easy to recoverNeeds careful sharding and batching at high scale
+Redis sorted setStore payment IDs scored by due timestampVery fast due-time lookupRedis loss cannot be source of truth; needs DB reconciliation
+Queue delay featureUse SQS delay, delayed exchange, or timer queueOperationally simple for short delaysMany queues have max delay limits or weak cancellation
+Bucketed schedulerPartition future payments into time buckets and scan active bucketsScales better for large future schedulesMore moving parts and bucket management
+
+Recommended interview answer:
+
+Use Payment DB as the durable source of truth.
+
+Use a sharded due-time scheduler that scans by time bucket and shard key.
+
+Enqueue due payments to a durable queue for workers.
+
+Optionally maintain a Redis sorted set or timing wheel as a performance optimization, but rebuild it from DB if needed.
+
+Do not rely on in-memory timers per payment. If a scheduler process restarts, those timers disappear. Scheduled payments must be recoverable from durable storage.
+
+Scheduler Sharding
+
+Shard key: hash(payment_id) or hash(source_account_id)
+
+Every scheduler instance owns one or more shards:
+- scan current and near-future buckets
+- fetch a bounded batch ordered by next_attempt_at
+- claim rows with status/version checks
+- enqueue due payment IDs
+- renew or release leases if the scheduler crashes
+
+For example:
+
+UPDATE payment_schedules
+SET status = 'due',
+    version = version + 1,
+    updated_at = now()
+WHERE payment_id IN (
+  SELECT payment_id
+  FROM payment_schedules
+  WHERE status IN ('scheduled', 'retry_scheduled')
+    AND next_attempt_at <= now()
+    AND shard_id = $1
+  ORDER BY next_attempt_at
+  LIMIT 500
+  FOR UPDATE SKIP LOCKED
+)
+RETURNING payment_id, source_account_id, execute_at, next_attempt_at;
+
+This avoids multiple scheduler instances claiming the same payment.
+
+Hold and Ledger Correctness
+
+The ledger must make balance changes atomic. A simple model is:
+
+available_balance = posted_balance - active_holds
+
+Schedule:
+- check available_balance >= amount
+- create hold entry
+- increase active_holds
+
+Cancel:
+- release hold
+- decrease active_holds
+
+Execute:
+- capture hold
+- decrease active_holds
+- debit source posted balance
+- credit destination posted balance
+
+Use row-level locking, serializable transactions, or account-partitioned command processing so two concurrent holds cannot overspend the same account.
+
+Phase 5: Scaling & Trade-offs (~15-20 minutes)
+
+Prevent Duplicate Operations
+
+Duplicates can happen at four layers:
+
+Client retries schedule/cancel: enforce (user_id, idempotency_key) uniqueness.
+
+Scheduler reclaims the same due row: use state transitions and leases.
+
+Queue redelivery: make workers idempotent by checking payment state before executing.
+
+Payment gateway timeout: call the gateway with a stable idempotency key and reconcile unknown outcomes.
+
+Exactly-once execution across DB, queue, and external payment processor is not realistic. The practical goal is at-least-once delivery with idempotent state transitions that make the business effect happen once.
+
+Cancel vs Execute Race
+
+The race looks like this:
+
+T1: user clicks cancel
+T2: scheduler claims payment as due
+T3: worker starts execution
+
+Use a state machine with compare-and-set transitions:
+
+cancel can only change scheduled -> canceling -> canceled
+
+scheduler can only change scheduled/retry_scheduled -> due
+
+worker can only change due -> processing
+
+Whichever transition commits first wins. If cancel loses because the payment is already due, processing, or retry_scheduled, return a clear status to the user.
+
+Retry Strategy
+
+FailureRetry?Handling
+Worker crash before gateway callYesQueue redelivery; state is still due or stale processing is repaired after the claim lease expires
+Worker crash after gateway callReconcileGateway idempotency key plus status query
+Gateway timeoutReconcile before retryUnknown outcome may have succeeded
+Insufficient held fundsNoShould be prevented by hold; fail and alert if invariant breaks
+Destination account closedNo or manual reviewMark failed, release hold, notify user
+Queue outageYes after recoveryDB scan can re-enqueue due payments
+
+Preserving Payment Ordering
+
+If payments are independent, do not overcomplicate ordering. Ledger constraints prevent overspending.
+
+If the interviewer requires dependent payments to execute in order, use one of these strategies:
+
+Account-partitioned queue: partition execution messages by source_account_id. A single consumer processes each account's stream in order.
+
+Dependency graph: store depends_on_payment_id and only release a payment when dependencies succeed.
+
+Fail-fast dependent payments: if payment B depends on payment A and A fails, fail B instead of retrying out of order.
+
+Trade-off:
+
+account-level ordering is simpler and safer, but reduces parallelism for hot accounts
+
+dependency graph is flexible, but more complex to reason about and debug
+
+fail-fast behavior is operationally simple, but pushes retry decisions back to users or upstream systems
+
+Peak Traffic Bottlenecks
+
+BottleneckSymptomMitigation
+Due-time DB scanScheduler lag grows near top of hourTime buckets, shard key, bounded batches, covering index
+Hot source accountMany holds/executions contend on one balance rowAccount command queue, per-account locks, batching for internal accounts
+Queue partition skewOne partition falls behindPartition by account when ordering matters; otherwise by payment ID
+Gateway rate limitsExecution workers get throttledToken bucket per gateway, backpressure, retry with jitter
+Retry stormOutage recovery creates huge retry waveExponential backoff, jitter, retry budgets, circuit breakers
+Status readsUsers poll repeatedly after due timeCache status, push notifications, SSE/WebSocket for active sessions
+
+Reliability and Recovery
+
+Run a reconciliation job that compares processing payments against gateway status.
+
+Run a scheduler repair job that finds due scheduled/retry_scheduled rows plus stale due or processing rows whose claim lease expired.
+
+Keep a dead letter queue for payments that exceed retry limits or violate invariants.
+
+Emit outbox events for notifications and downstream analytics.
+
+Archive old attempts but keep ledger entries immutable.
+
+Observability
+
+Track these metrics:
+
+schedule API latency and error rate
+
+cancel success rate and cancel-too-late rate
+
+scheduler lag: now - oldest_due_unclaimed_next_attempt_at
+
+due queue depth by shard
+
+execution success/failure/timeout rate
+
+hold capture and release mismatches
+
+reconciliation corrections
+
+duplicate request dedupe count
+
+Scheduler lag is the key operational metric. If the oldest due payment is 10 minutes late, users do not care that the API is healthy.
+
+Common Pitfalls
+
+Using only in-memory timers loses scheduled payments when processes restart. Always keep a durable source of truth.
+
+Charging directly from a queue message without checking payment state can double-charge users after redelivery.
+
+Ignoring cancellation races leads to users seeing "canceled" while the worker is still executing the payment.
+
+Skipping hold semantics leaves the system unable to guarantee funds are available at execution time.
+
+Retrying gateway timeouts blindly can duplicate external payments. Reconcile unknown outcomes first.
+
+Interview Checklist
+
+  Clarify hold-at-schedule-time vs hold-at-execution-time
+
+  Define the payment state machine
+
+  Use DB as durable source of truth for schedules
+
+  Explain the due-time scheduler and shard strategy
+
+  Show schedule, cancel, and execute flows
+
+  Cover idempotency at client, queue, worker, and gateway boundaries
+
+  Address cancel/execute races with conditional state transitions
+
+  Discuss ledger holds and balance correctness
+
+  Handle retries, unknown gateway outcomes, and reconciliation
+
+  Discuss account-level ordering only when the interviewer requires it
+
+Summary
+
+AreaRecommended answer
+Source of truthDurable payment_schedules table plus append-only ledger
+Delay mechanismSharded due-time scheduler scanning indexed time buckets
+QueueDurable queue for due payment execution
+Balance correctnessExplicit holds, ledger entries, and account-level atomicity
+IdempotencyUnique keys for schedule/cancel/attempt/gateway operations
+CancellationConditional scheduled -> canceling -> canceled transition only
+RetriesBackoff with jitter, gateway idempotency, reconciliation for unknowns
+OrderingAccount-partitioned execution or dependency graph only when required
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

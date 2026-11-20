@@ -1,0 +1,50 @@
+===H1===
+Put Boxes Into the Warehouse (LC 1564)
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/put-boxes-into-warehouse
+===BODY===
+Pinterest
+Coding·60 minMembers
+Put Boxes Into the Warehouse (LC 1564)
+One-hour technical screen built on the "put boxes into the warehouse" problem — fit boxes (each with a height) into a row of warehouse rooms whose usable height is capped by the lowest room to their left. The follow-up flips the objective to maximizing total box height placed rather than box count.
+SWE
+greedy
+two-pointer
+medium
+Frequency
+Single report
+Last asked
+2026-06-05
+Stage
+phone-screen
+Requirements
+
+A row of warehouse rooms and a set of boxes each have integer heights.
+
+Boxes enter from the left, so room capacity is limited by the minimum doorway height encountered from the entrance. Maximize the number of placed boxes.
+
+Follow-up: maximize the total height of placed boxes instead of the count.
+
+Notes
+
+Convert room heights to prefix minima, then fill rooms from right to left. For the count objective, sort boxes ascending and greedily place the smallest box that fits each constrained room.
+
+For the total-height objective, process effective room capacities from largest to smallest and boxes from largest to smallest. Skip a box when it exceeds the current largest remaining capacity; otherwise place it and advance both pointers. This selects the largest feasible box before considering a smaller capacity. Sorting dominates at O((m+n) log(m+n)); the scan is linear.
+
+Equivalent formulation: process capacities from smallest to largest with an ordered multiset and remove the largest box not exceeding each capacity. This is useful when capacities arrive dynamically.
+
+Preparation
+
+Implement prefix-minimum normalization and the count objective.
+
+Run the total-height greedy on capacities [2, 3] with boxes [1, 2, 3], and on a case containing boxes too tall for every room.
+
+Write an exchange argument showing why replacing a chosen box with a smaller feasible box cannot improve total height.
+
+Compare the sorted two-pointer and ordered-multiset variants.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

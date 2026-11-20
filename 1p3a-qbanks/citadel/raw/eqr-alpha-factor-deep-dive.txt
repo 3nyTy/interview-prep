@@ -1,0 +1,68 @@
+===H1===
+EQR Alpha-Factor Research Deep-Dive + LLM Inference Stability
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/eqr-alpha-factor-deep-dive
+===BODY===
+Citadel / Citadel Securities
+Other·75 minMembers
+EQR Alpha-Factor Research Deep-Dive + LLM Inference Stability
+Citsec EQR (NG QR) round combining resume-grade alpha-research drilling with a quantitative case study on LLM inference noise. Scheduled as 45 minutes; ran 75 minutes. Six themed sub-prompts plus a single live coding closer.
+MLE
+RS
+deep-dive
+ml-knowledge
+math-reasoning
+probability
+llm
+hard
+Frequency
+Single report
+Last asked
+2025-12-16
+Stage
+phone-screen
+Requirements
+
+Resume / case-study round, mostly verbal. Reported sub-prompts:
+
+How do you detect whether a factor uses future / look-ahead data?
+
+How do you set IC (Information Coefficient) / ICIR thresholds for factor selection?
+
+How do you train your model, and what is the training objective?
+
+How do you prevent overfitting?
+
+Walk through prior strategies and alpha-research workflow on your resume.
+
+Case study — LLM inference stability: an LLM is run for sentiment classification on a batch of inputs with temperature > 0 (so outputs are non-deterministic). Day 1 produces a label vector y1; Day 2 produces y2. The empirical correlation corr(y1, y2) = 0.95. To raise the cross-day correlation to >= 0.99, how many independent days of inference do you need to aggregate? Reported answer: about 16 days. (The interviewer confirmed 15.93 ≈ 16 as correct.)
+
+Live coding closer: implement string matching with the * wildcard operator (see Wildcard / Regex String Matching — same family as LC 10 / 44, recursion + two-pointer iterative).
+
+Notes
+
+Look-ahead detection: the canonical guards are point-in-time data snapshots, lagged feature joins keyed on as_of_timestamp <= signal_timestamp, and adversarial reproducibility checks (re-running the strategy on the same as-of date should produce identical signals regardless of when the run executes). Verbalize at least one structural guard, not just "I check carefully."
+
+IC / ICIR thresholds: IC is the cross-sectional rank correlation between the factor and forward returns; ICIR is mean(IC) / std(IC) annualized. Standard practical thresholds: |IC| > 0.02-0.05 per period for daily horizons; ICIR > 0.5 for retention. Document your normalization (rank vs raw, period vs cumulative) explicitly.
+
+LLM stability question: model the labels as noisy estimators of an underlying ground-truth signal. If Var(noise_per_day) = σ^2 and the ground truth has variance τ^2, then corr(y_day, ground_truth) = τ / sqrt(τ^2 + σ^2). Day-to-day correlation of two independent draws is τ^2 / (τ^2 + σ^2) = 0.95. Averaging N independent days reduces noise variance by 1/N, so corr(y_avg, ground_truth)^2 = τ^2 / (τ^2 + σ^2 / N). Solve for N such that (τ^2 + σ^2/N) / τ^2 = 1 / 0.99^2; with the 0.95 starting point this resolves to N ≈ 15.93, hence about 16 days.
+
+The 75-minute over-run on a scheduled 45-minute slot is a red flag in the reported outcome — the candidate was rejected despite answering most questions. This round graded the depth of derivation, not just final numbers; verbalize the model assumptions throughout.
+
+The coding closer drops the verbal-only pace abruptly. Plan to leave 15 minutes for it even if the case-study sub-prompts are running long.
+
+Preparation
+
+Build out a 5-7 minute alpha-research deep-dive narrative covering one strategy end-to-end: hypothesis, data, factor construction, look-ahead guards, IC / ICIR diagnostics, hyperparameter tuning, overfitting controls (cross-validation across time, regularization, ensemble averaging), and live PnL attribution.
+
+Drill the noisy-estimator / signal-to-noise framework on toy problems until you can compute "how many independent samples reduce noise by factor X" in your head. The LLM stability question is one instance of this pattern; many other quant case studies use the same template.
+
+Refresh the standard overfitting controls in quant research: walk-forward cross-validation, time-series train / test splitting, deflated Sharpe ratio (Bailey & López de Prado), purged k-fold CV. Name at least two specifically.
+
+Pre-write the wildcard-matching coding closer (recursion + memo first, then two-pointer iterative as the follow-up) so the closer does not eat the case-study time.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

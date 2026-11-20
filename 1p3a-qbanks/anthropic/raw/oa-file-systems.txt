@@ -1,0 +1,110 @@
+===H1===
+OA — File Systems
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/oa-file-systems
+===BODY===
+Anthropic
+Coding·90 minMembers
+OA — File Systems
+Recently observed CodeSignal OA in the file-system family — implement a simplified file system with paths, directory traversal, and (in the final level) an LLM-related extension. Public details are thin; the third level in particular is reported as bug-prone in the supplied helpers.
+SWE
+MLE
+oa
+codesignal
+oop
+filesystem
+medium
+Frequency
+Low
+Last asked
+2026-05-28
+Stage
+oa
+Requirements
+
+CodeSignal, 90 minutes, 4 progressively-unlocking levels.
+
+Build a path-based file system: create, read, write, list, delete. Hierarchical traversal of /a/b/c style paths.
+
+Level 3 introduces an LLM-flavored extension in one rotation (candidates flag bugs in a supplied helper) and a multi-user-quota model in another — see the canonical variant below.
+
+I/O contract is harness-string-based: commands arrive as [verb, arg1, arg2, …] lists; every operation returns a string, with "true" / "false" standing in for booleans and "" for null/failure.
+
+Notes
+
+Candidates report this OA being noticeably more typing-intensive than the in-memory DB variant; the bar appears to be implementation speed.
+
+As of mid-2026 the OA increasingly ships a single generic prompt — "a toy simulation of an app that won't require anything except the standard library of your chosen language" — with the actual problem randomized at runtime; one such prompt resolved to the cloud-storage variant below. Prep all the OA families rather than betting on the title.
+
+The single most common stumble across rotations is forgetting that COPY_FILE (or its rename) preserves the original owner — not the caller. The hidden tests around mixed-owner copies and post-update-capacity eviction routinely trip candidates who reach Level 3 with shaky bookkeeping.
+
+Canonical 4-level shape — Cloud Storage rotation
+
+The most-leaked rotation models an in-memory cloud-storage service. All commands are dispatched as string-array queries and return strings; size fields are decimal integers serialised as strings.
+
+# Level 1 — basic file management
+ADD_FILE       <name> <size>             -> "true" | "false"
+  # "false" if a file already exists at <name>.
+COPY_FILE      <nameFrom> <nameTo>       -> "true" | "false"
+  # "false" if source is missing, source is a directory, OR destination exists.
+GET_FILE_SIZE  <name>                    -> "<size>" | ""
+  # "" if the file is missing.
+
+# Level 2 — search
+FIND_FILE      <prefix> <suffix>         -> "<n1>(<s1>), <n2>(<s2>), …" | ""
+  # Files whose path starts with <prefix> AND ends with <suffix>.
+  # Sort: size desc, then name asc (alphabetical). Format literally
+  # "<name>(<size>)" with no space inside the parens, comma-space between entries.
+  # "" when no file matches.
+
+# Level 3 — users and storage limits
+ADD_USER         <userId> <capacity>             -> "true" | "false"
+  # "false" if userId already exists.
+ADD_FILE_BY      <userId> <name> <size>          -> "<remaining>" | ""
+  # Like ADD_FILE but owned by <userId>. "" if user is missing, file path
+  # already taken, OR adding <size> would push the user's usage > capacity.
+  # On success returns the user's remaining capacity (string).
+  # Bare ADD_FILE calls are owned by "admin" with unlimited capacity.
+  # COPY_FILE preserves the source file's owner — not the caller.
+UPDATE_CAPACITY  <userId> <capacity>             -> "<deleted_count>" | ""
+  # Sets a new capacity. If current usage > new capacity, evict the user's files
+  # largest-first; ties broken by name asc, until usage <= capacity.
+  # Returns the number of files deleted. "" if userId is unknown.
+
+# Level 4 — compression
+COMPRESS_FILE    <userId> <name>                 -> "<remaining>" | ""
+  # Renames <name> -> <name>.COMPRESSED and halves its size (integer division).
+  # "" if file is missing, not owned by <userId>, or already ends in .COMPRESSED.
+  # COPY_FILE preserves the .COMPRESSED suffix on copies.
+DECOMPRESS_FILE  <userId> <name>                 -> "<remaining>" | ""
+  # Strips the .COMPRESSED suffix and doubles the size back.
+  # "" if the resulting (full-size) file would exceed the user's capacity,
+  # if a file at the un-suffixed name already exists, or if owner does not match.
+
+Implementation notes for this variant:
+
+Compressed size = original_size // 2 (the half is exact for evens; the OA's test inputs are constructed so all sizes are even). On decompression, restore to 2 × compressed_size.
+
+UPDATE_CAPACITY is the eviction trigger most candidates botch: it's NOT "reject future adds" — it actively deletes the largest files until the user fits under the new cap. Compressed and non-compressed files are evicted by their current size.
+
+For FIND_FILE, the result string is literal — hidden tests compare it as a string, so any extra space or trailing comma fails.
+
+A dict[path] -> FileEntry(size, owner, compressed: bool) + dict[user] -> {capacity, used} is enough; no tree of dicts needed because all paths are flat keys and directories are implicit.
+
+Preparation
+
+Build a tree-of-dicts file system from scratch in under 45 minutes, supporting mkdir, touch, read, write, ls, rm (recursive), and mv.
+
+For the Cloud Storage rotation specifically, drill the dispatch loop pattern: for cmd, *args in queries: results.append(getattr(self, handlers[cmd])(*args)). Spend muscle-memory on parsing string args back to ints rather than reinventing the harness each round.
+
+Have a clean helper for parsing and validating paths ("/", trailing slash, dot-segments).
+
+Pre-write the FIND_FILE formatter exactly: ", ".join(f"{n}({s})" for n, s in sorted_matches). Hidden tests compare the literal string.
+
+Reserve the last 20 minutes for level 4 — keep code modular enough that the extension lands cleanly.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

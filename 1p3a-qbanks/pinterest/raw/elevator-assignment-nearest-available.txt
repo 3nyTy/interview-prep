@@ -1,0 +1,77 @@
+===H1===
+Elevator Assignment / Nearest Available Elevator
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/elevator-assignment-nearest-available
+===BODY===
+Pinterest
+Coding·45 minMembers
+Elevator Assignment / Nearest Available Elevator
+Given elevators described by current floor and state (up, down, or idle), plus a passenger's floor and desired direction, return the nearest eligible elevator's index or -1. The follow-up starts every elevator idle at a given floor and processes timestamped passenger requests, asking which elevator serves the final passenger while cars move one floor per second. Its state-transition contract is incomplete and must be clarified before implementation.
+SWE
+simulation
+scheduling
+data-structure
+medium
+Frequency
+Low
+Last asked
+2026-07-22
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Base assignment
+
+Input a collection of elevators. Each elevator has a current floor and one of three states: up, down, or idle.
+
+Input one passenger request containing the passenger's floor and desired travel direction.
+
+Return the index of the nearest elevator that can accept the request. Return -1 if no elevator is eligible.
+
+An idle elevator can accept a request in either direction.
+
+A moving elevator can accept the passenger only when the passenger is on its current route and wants to travel in the same direction.
+
+An elevator already at the passenger's floor is still ineligible when it is moving in the opposite direction.
+
+Timestamped-request follow-up
+
+Start with all elevators idle and provide each elevator's initial floor.
+
+Process n passenger requests in arrival order. Each request includes a start floor, desired direction, and timestamp.
+
+Elevators move at one floor per second, so their positions must reflect the elapsed time between requests.
+
+Determine which elevator serves the final passenger.
+
+A further extension asks for a dynamically maintained data structure that supports nearest-eligible-elevator lookup as requests arrive.
+
+Notes
+
+The base selector is a single scan over the elevators. Treat an idle car as eligible; otherwise require both a matching direction and a passenger floor ahead of the car in that direction. Among eligible cars, minimize absolute floor distance. This baseline is O(E) time for E elevators and O(1) auxiliary space.
+
+Tie-breaking between equally near eligible elevators is not specified; clarify it before coding.
+
+The timestamped follow-up also leaves essential transitions open: whether a request contains a destination or only a direction, what state a car has while traveling to a pickup, when it stops or becomes idle, and how floor bounds or queued stops affect motion. Do not invent these rules; state a contract before simulating.
+
+After that contract is fixed, use an event-driven baseline: store each car's last-update time, floor, direction, and active target or stop queue; before each request, advance cars only to the next defined transition and clamp at reached targets rather than moving blindly through them; then run the base selector. A full scan per request is O(nE) before any ordered-index optimization.
+
+The phone-screen follow-up arrived with about twenty minutes remaining, and pseudocode was accepted instead of a complete implementation.
+
+Advancing a global clock, updating elevator positions by elapsed time, and then reusing the base selector was described by the interviewer as being on the right track; it becomes a complete approach only after the missing transition rules are clarified.
+
+Preparation
+
+Implement the O(E) base selector with eligibility and distance comparison in separate helpers; unit-test idle cars, both moving directions, opposite-direction requests, a passenger at the current floor, no eligible car, and an equal-distance tie.
+
+Before writing dynamic pseudocode, spend five minutes defining the missing transition contract: destination data, travel-to-pickup state, stop completion, reversal or idle behavior, floor bounds, and tie-breaking.
+
+Dry-run a timestamped sequence under that explicit contract, recording each car's last-update time, floor, direction, and active target or queue after every event; include a request that arrives after a car reaches its target to catch overshoot bugs.
+
+Explain the O(nE) event-driven baseline first, then identify which eligibility groups would need ordered floor indexes for faster nearest-car lookup.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

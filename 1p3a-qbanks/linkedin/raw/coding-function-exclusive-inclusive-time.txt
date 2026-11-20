@@ -1,0 +1,69 @@
+===H1===
+Function Inclusive / Exclusive Time
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-function-exclusive-inclusive-time
+===BODY===
+LinkedIn
+Coding·55 minMembers
+Function Inclusive / Exclusive Time
+Given a list of `(function_id, start|end, timestamp)` log lines, compute the inclusive and exclusive elapsed time for a target function. LeetCode 636 variant — stack-based bookkeeping where each `start` pushes a context and each `end` pops while attributing elapsed time to the *current top* of the stack.
+SWE
+stack
+string
+parsing
+medium
+Frequency
+Low
+Last asked
+2025-11-20
+Stage
+onsite-coding
+Requirements
+
+def function_times(logs: list[str], target: str) -> tuple[int, int]:
+    # logs: ["AB:start:0", "CD:start:3", "EF:start:5", "EF:end:6",
+    #        "CD:end:8",   "AB:end:9"]
+    # returns (inclusive, exclusive)
+
+Definitions:
+
+Inclusive time of target: the wall-clock span between its outermost start and the matching end.
+
+Exclusive time of target: inclusive time minus the time charged to any function that started while target was on the stack (its direct children's inclusive time at the first-generation level).
+
+The canonical solution maintains a stack of (function_id, last_resume_ts, accumulated_exclusive). On a start event, charge (now - prev_top.last_resume_ts) to whatever is currently on top, then push the new function. On end, pop and accumulate.
+
+The reported variant also asks for only-first-generation children to be excluded — i.e. nested grandchildren are still counted toward target's exclusive time. Clarify with the interviewer; the standard LC 636 definition excludes all nested time.
+
+Examples
+
+logs   = ["AB:start:0", "CD:start:3", "EF:start:5",
+          "EF:end:6", "CD:end:8", "AB:end:9"]
+target = "AB"
+
+inclusive(AB) = 9 - 0 + 1 = 10  (typical LC semantics; check inclusive/exclusive of end ts)
+exclusive(AB) = 10 - inclusive(CD) = 10 - 6 = 4
+
+Verify with the interviewer whether timestamps are point-in-time or unit-duration ticks — both conventions appear.
+
+Notes
+
+The trap is forgetting to charge time to the previous top before pushing — many candidates only update on end, which double-counts.
+
+LC 636 uses unit-tick semantics (end - start + 1); the LinkedIn variant uses point-in-time (end - start). Confirm before coding.
+
+The first-generation exclusion subtlety is what differentiates this from straight LC 636 — be ready to redefine.
+
+Preparation
+
+Memorize the LC 636 stack pattern; this question is the same skeleton with renamed semantics.
+
+Practice asking the inclusive/exclusive boundary question first — it saves rework.
+
+Sketch a recursion-tree diagram for the example before coding; the visual makes the per-frame accounting obvious.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

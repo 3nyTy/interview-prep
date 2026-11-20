@@ -1,0 +1,48 @@
+===H1===
+Event Filter & Queue Routing Service
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/event-filter-routing-service
+===BODY===
+Amazon
+Coding·25 minMembers
+Event Filter & Queue Routing Service
+AWS phone-screen implementation round: an events pipeline emits JSON events; build a service that holds filter expressions and routes each event to the matching output queue. Only a JSON parser helper is provided.
+SWE
+object-design
+json
+parsing
+backend
+medium
+Frequency
+Single report
+Last asked
+2026-06-11
+Stage
+phone-screen
+Requirements
+
+An events pipeline continuously emits events in JSON format.
+
+Build a service that holds a set of filter expressions; each incoming event is matched against the filters and dispatched to the corresponding output queue.
+
+Only a JSON-parser helper (Java / Jackson) is provided — you design the service structure, the filter-expression representation, and the routing logic.
+
+Notes
+
+Treat it as an OOD / implementation round, not an algorithm round: model Filter (a predicate over event fields), a Router / Service (holds filter -> queue bindings), and the dispatch loop.
+
+Time pressure is the real challenge — a compilable skeleton with clear interfaces scores better than a half-finished perfect design; state extension points (composite filters, default / dead-letter queue) aloud.
+
+No execution is required, but write compilable Java; the helper only parses JSON into a node tree whose fields you then read.
+
+Preparation
+
+Pre-write a small "predicate -> handler routing" skeleton in Java so the structure is muscle memory.
+
+Rehearse representing filter expressions (field op value, AND / OR composition) as composable predicate objects.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

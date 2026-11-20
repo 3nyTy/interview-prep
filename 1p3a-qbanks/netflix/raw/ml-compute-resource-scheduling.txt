@@ -1,0 +1,112 @@
+===H1===
+Ml Compute Resource Scheduling
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/ml-compute-resource-scheduling
+===BODY===
+Ml Compute Resource Scheduling
+
+<https://www.1point3acres.com/interview/problems/company/netflix/ml-compute-resource-scheduling>
+
+Netflix
+System Design
+
+60 min
+Members
+Compute Resource Scheduling for ML Jobs
+
+Design a scheduler that allocates CPU / GPU resources across multiple clusters for user-submitted ML jobs while keeping utilization high.
+
+MLE
+Infra Eng
+ml-infra
+scheduling
+gpu
+queueing
+distributed-systems
+scaling
+hard
+Frequency
+Low
+Last asked
+2026-07-28
+Stage
+onsite-system-design
+Requirements
+Users submit ML jobs with CPU, GPU, memory, runtime, image, and priority requirements.
+Classify workloads as training, batch inference, or smaller evaluation jobs; expect the deepest discussion on training and batch inference.
+Explain how scheduling requirements and resource-allocation policies differ across job families.
+The system has multiple clusters, each with different CPU / GPU inventory.
+Start jobs when resources are available and keep utilization high.
+Track job status: queued, running, succeeded, failed, canceled.
+Handle retries, preemption, quota, and noisy-neighbor isolation.
+Show how the scheduler monitors compute resources and handles component crashes.
+Support multi-tenancy and explain the isolation boundary.
+Provide APIs for submission, status, cancellation, and logs.
+Design Sketch
+Submission API writes Job records to durable storage and publishes scheduling events.
+Scheduler watches queued jobs and cluster resource snapshots, then places jobs using priority + fit scoring.
+Cluster agents report node inventory and job heartbeats.
+Resource allocator maintains reservations so two schedulers do not assign the same GPU.
+Execution layer starts containers / pods and streams status back.
+Quota and priority policies prevent one team from monopolizing GPUs.
+Notes
+Design decisions: centralized scheduler vs per-cluster scheduler; strict priority vs fair-share; preemptible vs non-preemptible jobs; gang scheduling for distributed training.
+GPU fragmentation matters. A cluster with eight 1-GPU gaps may not run one 8-GPU job.
+Failure handling: retry transient infra failures, preserve user-visible failure for code errors, and checkpoint long jobs.
+Metrics: GPU utilization, queue wait time, job success rate, preemption rate, and wasted reserved time.
+Preparation
+Draw API, metadata DB, scheduler, cluster agents, queue, and log store.
+Prepare a placement algorithm and discuss starvation.
+Practice a deep dive on distributed training jobs that need all workers allocated together.
+Rehearse resource monitoring and crash handling for every major component.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Design Sketch
+Notes
+Preparation
+Related discussions  2
+???VO1
+??? ML Infra VO 1
+Related questions
+
+Other Netflix questions sharing tags with this one
+
+Ads Frequency Cap / Limiter
+High
+scaling
+distributed-systems
+hard
++5
+Global Config Deployment System
+Single report
+distributed-systems
+scaling
+hard
++4
+Ads Audience Targeting / Custom Audience System
+Single report
+scaling
+distributed-systems
+hard
++5
+File Backup System
+Single report
+distributed-systems
+scaling
+hard
++4
+Subscription Billing System (300M Subscribers)
+Single report
+scheduling
+scaling
+hard
++3
+Code editor
+
+---

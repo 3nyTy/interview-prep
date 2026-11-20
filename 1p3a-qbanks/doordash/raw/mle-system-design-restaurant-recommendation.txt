@@ -1,0 +1,93 @@
+===H1===
+ML System Design: Restaurant / Store Recommendation
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/mle-system-design-restaurant-recommendation
+===BODY===
+DoorDash
+System Design·60 minMembers
+ML System Design: Restaurant / Store Recommendation
+The dominant MLE / Applied Scientist system-design prompt. Design a recommendation system that surfaces restaurants or store items to a DoorDash user given query + context. Interviewers tend to push the discussion toward infrastructure (feature store, two-tower retrieval, online serving) rather than model architecture; multi-objective optimization (CVR vs delivery time) is a recurring follow-up.
+MLE
+RS
+recommendation
+mlsd
+two-tower
+ranking
+ml-infra
+ann
+medium
+Frequency
+Medium
+Last asked
+2026-07-02
+Stage
+onsite-system-design
+Requirements
+
+Functional
+
+Given a user (with context: location, time, history) and an optional query, return a ranked list of restaurants / store items.
+
+Personalized per user.
+
+Surfaces both query-relevance (when a query is present) and discovery-style recommendations (when no query).
+
+Multi-objective: maximize conversion (CVR) while keeping expected delivery time low and respecting business constraints (e.g. ad slots, freshness).
+
+Non-functional
+
+Online inference latency budget: 100–200ms p99 end-to-end.
+
+Catalog: millions of items; per-user candidate pool: hundreds to low-thousands after retrieval.
+
+Retraining cadence: daily for ranker, less frequent for retrieval embeddings.
+
+Notes
+
+Standard two-stage architecture. Retrieval narrows millions of candidates to a few hundred; ranker scores those candidates with a richer model.
+
+Retrieval. Two-tower (user tower + item tower) trained on click / order labels; serve via ANN index (FAISS / ScaNN / Vespa) keyed on user embedding. Also keep a geo / availability filter to drop items outside delivery range — applied before ANN retrieval to reduce candidate pool.
+
+Ranker. Gradient-boosted decision tree (LightGBM) for tabular features at low latency, or a neural ranker (DLRM / Wide-and-Deep) if you need embeddings + interaction features. Output a single score per item.
+
+Multi-objective handling. Interviewers commonly push on "maximize CVR while minimizing delivery time." Two canonical answers:
+
+Two heads on a shared ranker — separate heads for p(convert) and expected_delivery_time, combined into a single objective via a tunable lambda (p_convert - λ * etd). Lambda is set offline to optimize a downstream business metric and re-tuned per A/B.
+
+Joint loss — single head trained on a composite label or pairwise loss that encodes the trade-off; harder to interpret but sometimes wins on combined metric. Two-head is the safer default answer; mention joint loss as an alternative.
+
+Feature store. Online feature store (Feast / in-house equivalent) serves features at inference time with a per-key fetch budget of a few ms. Long-term features (user embedding, item embedding, historical CVR) pre-computed offline; short-term features (session click count in last 5 min, weather, current ETA) computed online or via a streaming aggregator.
+
+Serving infra. Inference cluster behind a load balancer; per-request feature fetch is the main latency component — batch fetch across keys, parallelize tower computation, pre-quantize embeddings.
+
+Evaluation. Offline: NDCG, AUC, calibration, per-segment recall. Online: A/B test on conversion, delivery-time delta, revenue / order. Switchback design for marketplace-level treatments; classic AB for user-level.
+
+Cold start. New user → content-based fallback (popular per region); new restaurant → bootstrap embedding from catalog metadata + first-week interactions.
+
+Recent MLE loops still use store / restaurant recommendation as the canonical ML system-design prompt; the surrounding onsite mix may pair it with a separate ML domain-knowledge discussion and an AI Code Craft round.
+
+Common follow-up themes
+
+How do you handle the long tail of new restaurants? (Bootstrap embedding; explicit exploration budget in ranker.)
+
+How do you keep delivery time current? (Streaming ETA feature; per-store rolling window aggregator; refresh every minute.)
+
+How do you A/B test a new ranker without ruining marketplace economics? (Switchback at market/time grain; guard rails on order volume and dasher utilization.)
+
+How do you debug a regression? (Per-feature SHAP-style attribution; per-segment metric diff; replay traffic against a shadow model.)
+
+Preparation
+
+Memorize the two-tower → ANN → ranker pipeline and be able to draw it in under 5 minutes.
+
+Drill the multi-objective answer (two heads + lambda) and have a follow-up ready for "why not joint loss."
+
+Brush up on switchback experiment design — the marketplace framing is asked specifically.
+
+Be ready to lead the infra discussion rather than the model discussion; DoorDash interviewers explicitly steer toward infra.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

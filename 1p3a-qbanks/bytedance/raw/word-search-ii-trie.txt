@@ -1,0 +1,62 @@
+===H1===
+Word Search II with Trie
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/word-search-ii-trie
+===BODY===
+ByteDance / TikTok
+Coding·60 minMembers
+Word Search II with Trie
+Find words from a dictionary inside a 2D character board. The expected solution builds a trie over the word list, then runs backtracking DFS from each board cell with in-place visited marking.
+SWE
+trie
+grid
+dfs
+backtracking
+hard
+Frequency
+Single report
+Last asked
+2026-05-20
+Stage
+onsite-coding
+Requirements
+
+Given a 2D board of characters and a list of words, return the words that can be formed by walking adjacent cells on the board. A cell may be used at most once in one word path.
+
+def findWords(board: List[List[str]], words: List[str]) -> List[str]: ...
+
+Expected approach:
+
+Build a trie from words.
+
+Start DFS from every board cell whose character exists at the trie root.
+
+Move in four directions while following trie edges.
+
+Deduplicate found words and avoid revisiting a board cell in the same path.
+
+Run at least one self-built test case in the coding pad.
+
+Notes
+
+Trie pruning is the main signal; a per-word board search is usually too slow.
+
+Mark visited cells in-place or with a set, but restore state on backtrack.
+
+Avoid returning duplicates when the same word can be found through multiple paths.
+
+The prompt was paired with a senior-level loop, so expect follow-ups on advanced data structures and runtime trade-offs.
+
+Preparation
+
+Write the trie node structure from scratch without importing a specialized library.
+
+Drill board DFS with backtracking and state restoration.
+
+Prepare a small handmade test board and word list so you can prove the code in the interview editor.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

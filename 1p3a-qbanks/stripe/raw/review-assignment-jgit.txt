@@ -1,0 +1,47 @@
+===H1===
+Review Assignment (JGit)
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/review-assignment-jgit
+===BODY===
+Stripe
+CodingMembers
+Review Assignment (JGit)
+Integration round (Java). Use JGit to diff two branches of a git repo, take the list of changed files, and from a CSV owner mapping return the owner who owns the most changed files — i.e. auto-assign a PR reviewer.
+SWE
+api-integration
+java
+csv
+medium
+Frequency
+Single report
+Last asked
+2026-05-23
+Stage
+onsite-coding
+Requirements
+
+Java integration round built on JGit (the Java git library).
+
+Diff two branches of a given git repository and obtain the list of changed file names.
+
+A CSV file maps each file to an owner. Using that mapping, return the owner who owns the most changed files (the auto-selected reviewer).
+
+Notes
+
+This is the "find the reviewer after a PR" shape: branch diff → changed files → owner lookup → argmax by count.
+
+JGit's official site and getting-started docs have been intermittently down; set up and validate the JGit dependency before the round. One candidate's code was correct but a small JGit setup mistake stopped Part 1 from running — pre-verify your environment.
+
+Preparation
+
+Build a tiny JGit project beforehand: open a repo, resolve two branch refs, and diff them to a list of changed paths.
+
+Practice CSV parsing and a group-by-owner count in Java (Map<String, Integer>), returning the max.
+
+Verify your JGit dependency and a minimal "diff two branches" snippet compile and run cold.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

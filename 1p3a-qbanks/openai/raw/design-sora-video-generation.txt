@@ -1,0 +1,339 @@
+===H1===
+Design Sora / Video Generation Pipeline
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/design-sora-video-generation
+===BODY===
+OpenAI
+System Design·60 minMembers
+Design Sora / Video Generation Pipeline
+A client sends a video-generation request; design the full scheduling + worker flow with limited / fluctuating GPU pool. Focus on failure-scenario handling.
+SWE
+Infra Eng
+EM
+gpu
+scheduling
+messaging
+medium
+Frequency
+Very high
+Last asked
+2026-08-20
+Stage
+phone-screen · onsite-system-design
+Requirements
+
+Functional Requirements
+
+Users should be able to submit a video generation request with prompt, model version, duration, and output settings
+
+Users should be able to get asynchronous job status, progress, and the final downloadable video
+
+Users should be able to cancel a queued or running generation job
+
+The system should be able to assign each queued job to an available GPU worker, with at most one active video per worker
+
+The system should be able to recover from worker termination, provider failure, or transient network issues without losing accepted jobs
+
+Prompt safety checks, billing, and content moderation are out of scope — handled upstream or in a separate service. The focus is scheduling, worker lifecycle, and failure handling for video generation.
+
+Do not block the client request until generation finishes. Video creation takes minutes, so the public API must be asynchronous and return a durable job_id.
+
+Non-Functional Requirements
+
+RequirementTargetRationale
+Request acknowledgement (P95)< 500msFast control-plane response for job creation
+Scheduling latency (P95)< 30 secondsJobs should start quickly when capacity exists
+Progress freshness< 5 secondsUsers expect visible status updates
+Accepted-job durabilityNo lost jobsOnce accepted, a job must survive service failures
+Availability99.9%Generation service should remain usable
+Work lost on preemption< 30 secondsCheckpointing should bound wasted GPU work
+
+In an interview, call out that queue wait may exceed the target during GPU shortages. The system should expose ETA and enforce admission control rather than pretending infinite capacity.
+
+Capacity Estimation
+
+100K video generations per day; peak submission rate: 20 jobs/sec
+
+Average generation time: 3 minutes on one GPU worker; average final video size: 25 MB
+
+Workers send progress updates every 5 seconds; heartbeat every 10 seconds for lease renewal
+
+Compute: 20 jobs/sec × 180 sec = 3,600 concurrent running jobs at peak; ~4,000 ready/busy workers with a 10% warm buffer
+
+Control-plane: ~20 job writes/sec, 360 heartbeats/sec, 720 progress events/sec
+
+Storage: 100K × 25 MB = 2.5 TB/day for final artifacts; checkpoint volume can exceed this, so keep only the latest few with aggressive TTL
+
+GPU capacity, cold starts, and lost work from preemption dominate the design — not the metadata/control plane.
+
+Data Model
+
+Core Entities
+
+GenerationJob
+├── id: UUID
+├── user_id: UUID
+├── idempotency_key: string
+├── prompt_ref: string (encrypted prompt/input blob)
+├── model_version: string
+├── duration_sec: int
+├── resolution: string
+├── priority_tier: enum (free, pro, enterprise)
+├── status: enum (queued, assigned, running, completing, completed, failed, cancelled)
+├── progress_pct: int
+├── latest_checkpoint_ref: string
+├── final_artifact_id: UUID
+├── failure_reason: string
+├── created_at: timestamp
+├── started_at: timestamp
+└── completed_at: timestamp
+
+JobAttempt
+├── id: UUID
+├── job_id: UUID (FK)
+├── attempt_no: int
+├── worker_id: UUID (FK)
+├── provider_instance_id: string
+├── fencing_token: UUID
+├── status: enum (leased, running, lost, failed, succeeded)
+├── last_heartbeat_at: timestamp
+├── lease_expires_at: timestamp
+├── checkpoint_ref: string
+├── failure_reason: string
+├── started_at: timestamp
+└── ended_at: timestamp
+
+Worker
+├── id: UUID
+├── provider: string
+├── provider_instance_id: string
+├── gpu_type: string
+├── region: string
+├── status: enum (booting, idle, busy, draining, lost, terminated)
+├── current_job_id: UUID
+├── registered_at: timestamp
+├── last_heartbeat_at: timestamp
+└── drain_deadline: timestamp
+
+Artifact
+├── id: UUID
+├── job_id: UUID (FK)
+├── type: enum (input, checkpoint, final_video)
+├── object_key: string
+├── size_bytes: bigint
+├── checksum: string
+├── created_at: timestamp
+└── expires_at: timestamp
+
+JobEvent
+├── id: UUID
+├── job_id: UUID (FK)
+├── attempt_id: UUID (FK)
+├── type: enum (queued, leased, progress, checkpointed, completed, failed, cancelled)
+├── payload: jsonb
+└── created_at: timestamp
+
+Separate the logical job from execution attempts. The job represents one requested video; each attempt represents one run on one worker. This separation makes retries and preemption recovery much cleaner.
+
+Entity relationships: User 1:N GenerationJob; GenerationJob 1:N JobAttempt; Worker 1:N JobAttempt; GenerationJob 1:N Artifact; GenerationJob 1:N JobEvent.
+
+API Design
+
+Protocol Choices
+
+OperationProtocolReason
+Public job lifecycleRESTSimple async request-response API
+Progress/result notificationsWebhook / SSEEfficient async delivery to clients
+Worker control planegRPC / RPCTyped, efficient heartbeats and leasing
+
+Public REST Endpoints
+
+POST   /api/video-generations                  Create generation job (returns 202 + job_id)
+GET    /api/video-generations/{job_id}         Get job status, progress, result
+DELETE /api/video-generations/{job_id}         Cancel queued/running job
+GET    /api/video-generations/{job_id}/events  Get progress/event history
+
+Create job returns 202 Accepted with { job_id, status: "queued", estimated_wait_seconds }. Get job response includes status, progress_pct, attempt_no, result_url, and failure_reason. Supports webhook or SSE for async progress delivery.
+
+Internal Worker APIs
+
+POST /internal/workers/register                 Worker registers after boot
+POST /internal/workers/{worker_id}/lease        Worker requests one job
+POST /internal/attempts/{attempt_id}/heartbeat  Extend lease / report liveness
+POST /internal/attempts/{attempt_id}/progress   Update progress / ETA
+POST /internal/attempts/{attempt_id}/checkpoint Persist resume point
+POST /internal/attempts/{attempt_id}/complete   Mark job success with artifact ref
+POST /internal/attempts/{attempt_id}/fail       Mark job failure and classify retryability
+
+Every heartbeat, progress, checkpoint, complete, and fail request must include the fencing_token from assignment. Writes from stale workers without the latest fencing token must be rejected.
+
+Examples
+
+A submission supplies prompt + settings + an idempotency key and gets back an immediate ack with an ETA; a status read reflects the live attempt:
+
+// POST /api/video-generations
+{ "prompt": "drone shot over a snowy mountain at sunrise", "model_version": "sora-v1",
+  "duration_sec": 10, "resolution": "720p", "callback_url": "https://...", "idempotency_key": "req_7cfa9c1a" }
+// 202 Accepted
+{ "job_id": "job_123", "status": "queued", "estimated_wait_seconds": 45 }
+
+// GET /api/video-generations/job_123  → 200
+{ "job_id": "job_123", "status": "running", "progress_pct": 62, "attempt_no": 2,
+  "result_url": null, "failure_reason": null }
+
+attempt_no advancing to 2 while the job stays a single job_id is the visible signature of a preemption + resume.
+
+High-Level Design
+
+Component Responsibilities
+
+API Service — validates request + idempotency key, persists GenerationJob durably before acknowledging, emits a durable ready signal so Redis queues can be rebuilt after crashes, enqueues by priority/model/GPU requirements.
+
+Scheduler — owns queue selection and worker-job matching; assigns at most one active job per worker; creates fenced JobAttempt records transactionally; uses Redis as a readiness index but claims jobs authoritatively in PostgreSQL; prefers resume-from-checkpoint over restart-from-zero.
+
+Capacity Manager — watches queue depth, wait time, and idle worker buffer; calls external provider API to scale pools up/down; marks workers as draining when the provider warns of shutdown.
+
+Lease Monitor — detects missed heartbeats and expired leases; marks attempts as lost; requeues jobs using the latest durable checkpoint.
+
+GPU Worker — pulls one job at a time; loads model/runtime, generates frames/video, emits progress; writes checkpoints and final artifact to object storage; stops accepting new work when draining.
+
+Treat Redis ready queues as an optimization, not the source of truth. The authoritative state transition from queued to assigned must happen in PostgreSQL so stale Redis entries cannot create double assignment or lost jobs. In production the API writes the job row and an outbox/ready event in the same PostgreSQL transaction, and a dispatcher populates Redis asynchronously — a Redis miss must never lose an accepted job.
+
+Notes
+
+Lease-based scheduling with fencing
+
+The key invariant: one logical video job can have only one valid active attempt at a time.
+
+Workers register as idle and pull work when ready (pull beats push for volatile workers)
+
+Scheduler uses Redis to find candidate jobs, then atomically claims one in PostgreSQL and creates a JobAttempt
+
+Attempt gets lease_expires_at = now + 30s and a unique fencing_token
+
+Worker heartbeats every 10s to extend the lease; progress can be reported more frequently
+
+If the lease expires, the attempt is treated as dead even if the old worker later reconnects
+
+function assignJobToWorker(workerId: string, capabilities: WorkerCapabilities): Assignment | null {
+  const candidateIds = peekReadyJobIds(capabilities); // Redis hint/index only
+
+  beginTransaction();
+  const job = claimQueuedJob(candidateIds); // DB row lock / compare-and-swap
+  if (!job) { rollback(); return null; }
+
+  const attempt = createJobAttempt({
+    jobId: job.id,
+    workerId,
+    fencingToken: randomUUID(),
+    leaseExpiresAt: nowPlusSeconds(30),
+  });
+
+  markJobAssigned(job.id, attempt.id);
+  markWorkerBusy(workerId, job.id);
+  commit();
+  removeReadyHint(job.id); // best-effort cleanup
+  return attempt;
+}
+
+If Redis and PostgreSQL ever disagree, PostgreSQL wins. Stale ready hints are acceptable because the final claim is protected by the job row state.
+
+Why pull beats push here, concretely:
+
+Workers can disappear without warning, so assigning only to currently-alive workers reduces wasted dispatches
+
+Provider cold starts are slow, so a freshly-booted worker should immediately pull from the queue rather than wait to be targeted
+
+Pulling naturally respects the "one worker, one video" rule
+
+Checkpointing strategy
+
+Without checkpointing, a terminated worker wastes minutes of GPU time. Key parameters:
+
+Worker uploads resume state every 20–30 seconds or at major generation milestones
+
+Keep only the latest 1–2 checkpoints per active job; delete after success or terminal failure
+
+Replacement workers resume from the newest checkpoint; if none exists, retry from the start
+
+Checkpoint too often → IO bandwidth overhead; too rarely → wasted GPU work on preemption. Start with a 30-second fixed interval and discuss adapting by job duration, queue pressure, and provider reliability.
+
+Utilization-aware preemption is the modern pattern: schedulers track per-pod GPU utilization over a rolling 30–60 min window and preempt only low-utilization holders to make room for new high-priority jobs; pair with a cooldown to avoid thrashing.
+
+Provider volatility and cancellation
+
+If provider emits draining or preemption warnings, mark worker draining and stop assigning new jobs; if the worker vanishes without notice, rely on heartbeat timeout
+
+Use multiple providers or regions for failover at higher scale
+
+Keep the system-of-record for jobs in your own database, never only inside the provider queue — do not "hand off" the job to the provider and assume it is now safe; if the provider loses the task or the instance dies, you need your own durable job state and retry history
+
+Cancellation: if queued, remove from queue and mark cancelled; if running, mark cancel-requested in DB and notify worker on next heartbeat; worker checkpoints if useful then stops; late success from a cancelled stale attempt is rejected via fencing token + terminal job state check
+
+Burst handling and queue partitioning
+
+Separate the admission queue (cheap, can hold millions) from the running set (capped by GPU pool size)
+
+Partition queues by priority_tier + model_version + gpu_type — a single giant FIFO hurts latency when mismatched jobs block compatible workers
+
+Priority/fair-share applied at admission; running jobs run to checkpoint or preemption
+
+Idempotency: job_id / idempotency_key is the dedupe key end-to-end; retries on the same key return the existing result
+
+Split-brain execution
+
+A network partition can make the scheduler think a worker died while the worker keeps running. Guard against conflicting outcomes:
+
+Reject all writes that lack the latest fencing token
+
+Mark only one attempt as current in the DB at a time
+
+Make complete and fail APIs idempotent, so a redelivered finalization on the surviving attempt is safe
+
+Common pitfalls
+
+Returning success to the client before the job is durably stored — a crash between accept and enqueue silently loses the request
+
+Assuming the GPU provider will always send a preemption warning — heartbeat loss is the only reliable failure signal for many pools
+
+Allowing stale workers to finalize a video after the job was already retried elsewhere — without fencing you can get conflicting outcomes
+
+Using a single giant FIFO for all models and GPU types — mismatched jobs sit behind incompatible workers and hurt scheduling latency
+
+Trade-offs at a glance
+
+Push vs pull scheduling: Pull is preferred here — workers are ephemeral, one worker handles one video, and pull simplifies liveness and assignment correctness. Push has lower round-trip latency but is more fragile when workers disappear. A hybrid can optimize hot pools at the cost of operational complexity.
+
+Checkpoint frequency: Frequent = less lost work but more storage and generation overhead; sparse = cheaper but more recomputation on failure. A strong interview answer is a fixed 30s interval, then discuss adapting based on job duration and provider reliability.
+
+One video per worker: GPU memory is large but model runtime is heavy; per-job interference makes latency and checkpoint timing unpredictable; failure isolation is stronger. If the interviewer asks about higher utilization, discuss batching or multi-tenancy only for smaller models or lower-quality tiers.
+
+How the round actually plays out
+
+Despite the flashy name, this is a job-scheduler / task-queue design in disguise — interviewers explicitly tell candidates not to get stuck on video-generation internals, and several wave off scale questions ("don't worry about DAU, design what you think is right"). Spend your time on scheduling, worker lifecycle, and failure handling, not on diffusion-model specifics.
+
+The two make-or-break deep dives are consistently: what happens when the GPU pool is exhausted (how queued jobs wait), and how a preempted / terminated worker resumes — checkpoint-restore vs full re-run, and how to avoid wasting compute on a half-finished job.
+
+It is asked at both the phone screen and the onsite system-design slot. Some onsite rounds end early because the candidate covered every follow-up and the interviewer had nothing left to ask — a covered round, not necessarily a failed one.
+
+Queue choice and failure probes
+
+A current deep-dive explicitly asks why AWS SQS is the queue and then walks through multiple failure cases. Be ready to defend the queue choice against the delivery semantics assumed by the rest of the design and to trace each failure end to end.
+
+Preparation
+
+Task queue + worker pool patterns (Celery / Kafka) — practice articulating the durable-queue + lease-based-claim flow end-to-end
+
+Worker preemption → checkpoint-based recovery; have a concrete number for checkpoint cadence and explain the IO-vs-rework trade-off
+
+Skim modern k8s GPU scheduling patterns (NVIDIA GPU Operator, DRA + KAI scheduler, utilization-aware preemption plugins, MIG slicing for multi-tenancy)
+
+Pre-bake a 3-minute story for "GPU pool is fixed at N, request rate spikes 10×, what gives" — admission queue + priority + per-tenant fair-share is the standard answer
+
+Interview checklist: confirm async API + one-worker-per-video constraint upfront; introduce durable job state + retryable attempts before deep-diving; cover fencing tokens, checkpoint upload/resume, cancellation, GPU cold starts, queue partitioning, and provider outage handling
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

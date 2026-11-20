@@ -1,0 +1,102 @@
+===H1===
+Project Architecture Deep Dive (AI Engineer / Backend)
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/project-deep-dive-ai-engineer
+===BODY===
+Salesforce
+Other·60 minMembers
+Project Architecture Deep Dive (AI Engineer / Backend)
+Salesforce dedicates a round to one past project and drills into architecture, trade-offs, challenges, scale, and hindsight. AI Engineer versions favor agent orchestration and ML-system decisions; a backend version uses a notification system to probe service decomposition, event-driven messaging, failure handling, consumer concurrency, and production operations.
+MLE
+SWE
+deep-dive
+presentation
+ml-knowledge
+llm-agent
+system-design
+kafka
+messaging
+concurrency
+race-condition
+circuit-breaker
+transactions
+medium
+Frequency
+Low
+Last asked
+2026-07-17
+Stage
+onsite-deep-dive
+Requirements
+
+Pick one project to drive the conversation. Choose for architectural complexity + visible challenges and trade-offs — not for headline impact alone.
+
+Be ready to discuss:
+
+System architecture end-to-end.
+
+Key technical decisions and the alternatives you rejected (and why).
+
+Specific challenges encountered and how you resolved them.
+
+Scale numbers (QPS, latency, data volume) if relevant.
+
+What you would do differently in hindsight.
+
+For AI Engineer specifically, the interviewer is biased toward projects involving Multi-Agent Orchestration, LLM serving, or significant ML system-design components.
+
+Strongly recommended to bring or pre-draw an architecture diagram; candidates who walk in with one consistently report a smoother round.
+
+For an event-driven backend project, prepare precise answers to questions such as:
+
+Why split a monolith into microservices?
+
+Why choose asynchronous event-driven communication over synchronous calls?
+
+Why use Kafka rather than RabbitMQ or Redis?
+
+How does the notification system work end to end?
+
+How do you detect, debug, and recover from a poison message?
+
+Where would a circuit breaker belong?
+
+How can a consumer race condition occur, and how do you prevent it?
+
+How would you implement a dead-letter queue for Kafka?
+
+What is the on-call response after a pager alert?
+
+Where do the outbox and sidecar patterns fit?
+
+Notes
+
+The round is closer to a system-design discussion than a slide-show — interviewers will redraw or annotate your diagram. Prepare for whiteboard / shared-canvas use.
+
+Trade-off questions are the most predictive scoring axis. "Why this DB, why this model, why this concurrency choice" — have a defended answer for each non-trivial decision in the project, even if the answer is "it was the default and we never had to revisit it" with justification.
+
+Failure / challenge story is expected. Pick something with real complexity (a debugging saga, a scaling crisis, a model regression) — not "the PR review took longer than expected".
+
+Pace: ~10 minutes overview, ~30 minutes deep-dive on whatever the interviewer probes, ~15 minutes on what-you-learned and what-you-would-change. Don't burn 30 minutes on overview.
+
+AI Engineer loop specifically values: agent orchestration, tool-use design, evaluation framework, latency / cost trade-offs in LLM serving, RAG architecture. Hook into one of these if your project touches it.
+
+Backend interviewers may stay on one resume project across multiple rounds and ask for operational detail: poison-message debugging, dead-letter handling, race conditions, on-call practice, and how architectural patterns fit the actual production system.
+
+Preparation
+
+Pick 2 candidate projects in advance; rehearse a 10-minute overview for each.
+
+Draw the architecture diagram for the primary project — boxes-and-arrows level, with traffic flow and data flow on the same canvas. Memorise it.
+
+For each box on the diagram, prepare a 1-sentence trade-off story.
+
+Run a mock with a friend at the depth level interviewers expect ("why is this Kafka and not RabbitMQ", "why did you pick fine-tuning over RAG", "why this many shards") — the gap between rehearsed and unrehearsed is large on this round.
+
+For an event-driven project, rehearse one concrete failure from detection through mitigation and permanent fix, then defend the broker, retry, idempotency, and concurrency choices.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

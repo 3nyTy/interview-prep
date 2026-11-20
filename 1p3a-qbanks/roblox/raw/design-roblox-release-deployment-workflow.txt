@@ -1,0 +1,612 @@
+===H1===
+Design Roblox Release Deployment Workflow
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/design-roblox-release-deployment-workflow
+===BODY===
+Roblox
+System DesignMembers
+Design Roblox Release Deployment Workflow
+Design a Roblox release deployment workflow with staged rollout, rollback, health checks, and multi-region coordination.
+SWE
+Infra Eng
+ci-cd
+versioning
+scaling
+distributed-systems
+Frequency
+Single report
+Last asked
+2026-03-03
+Stage
+onsite-system-design
+Problem Statement
+
+Design a release deployment workflow for Roblox. Engineers should be able to take a code change or build artifact through CI, validation, approval, staged rollout, health monitoring, and rollback. The system should support safe releases for backend services, platform infrastructure, and client/game-runtime components.
+
+The observed Roblox infra variant was explicitly CI/CD-focused: design the workflow for deploying a Roblox release. Treat this as a release-safety and deployment-control-plane problem, not just a generic build runner.
+
+This overlaps with OpenAI's Multi-Tenant CI/CD Workflow System. Use that question for deeper practice on workflow scheduling, job execution, and exactly-once semantics. For this Roblox prompt, spend more time on artifact promotion, canaries, health gates, compatibility, and rollback.
+
+Phase 1: Requirements (~5 minutes)
+
+Functional Requirements
+
+Engineers can create a release from a commit or immutable artifact.
+
+The system runs automated gates such as build, unit tests, integration tests, security checks, and smoke tests.
+
+The system supports release approval and promotion across dev, staging, canary, and production.
+
+The system progressively deploys releases by environment, region, cluster, cohort, platform, or percentage.
+
+The system monitors rollout health and can automatically pause, resume, or roll back a release.
+
+Operators can audit every release decision, including who approved it, what artifact was deployed, and which targets received it.
+
+Out of scope unless the interviewer asks:
+
+Full source-control implementation.
+
+A complete generic GitHub Actions clone.
+
+App-store submission mechanics for mobile clients.
+
+Database schema migration framework internals.
+
+ML-based anomaly detection for release health.
+
+Non-Functional Requirements
+
+RequirementTargetWhy it matters
+SafetyBad releases should affect only a small canary before promotion stopsReleases can impact players, creators, and internal services
+AvailabilityDeployment control-plane failures should not take down running servicesExisting workloads should keep serving traffic
+Rollback speedRoll back service releases in minutes; disable risky features in secondsFast mitigation matters more than perfect diagnosis
+Artifact integrityEvery deployed target runs a signed, immutable artifactPrevent drift and make rollback deterministic
+CompatibilityNew server and client versions should interoperate during rolloutRoblox clients and services may update at different speeds
+ObservabilityPer-release status, target versions, health deltas, and logs are visibleOperators need to know whether a rollout is safe
+ScalabilityThousands of services, many clusters, and hundreds of releases/dayThe platform should not depend on one manual release coordinator
+
+Clarifying Questions
+
+What is being released?
+Assume the system supports backend services and infrastructure releases first, with notes for client/runtime releases.
+
+Are releases manually or automatically approved?
+Assume automated gates plus human approval for production or high-risk changes.
+
+What rollout targets matter?
+Assume environment, region, cluster, service, player cohort, and platform.
+
+How do services receive deployments?
+Assume Kubernetes-like clusters for services and a separate update channel for clients.
+
+What does rollback mean?
+For stateless services, redeploy the previous artifact. For risky behavior, feature flags and kill switches should be faster than rebuilding.
+
+Capacity Estimation
+
+Example Roblox-scale internal platform:
+- 2,000 services or deployable components
+- 500 engineers creating releases
+- 300 releases/day across all environments
+- 20 production releases/day
+- 100 regions/clusters/cells as rollout targets
+- 10-50 deployment steps per release
+- 10K-100K total deploy target transitions/day
+
+Build and test workload:
+- 5K-20K CI jobs/day
+- Job duration ranges from seconds for lint to 30+ minutes for integration tests
+- Artifact sizes from tens of MB to several GB
+
+The write volume is moderate. The hard parts are correctness, safe progression, fleet visibility, and failure handling.
+
+Phase 2: Data Model (~5 minutes)
+
+Core Entities
+
+Repository
+- repo_id
+- name
+- owner_team
+- default_branch
+- release_policy_id
+
+BuildArtifact
+- artifact_id
+- repo_id
+- commit_sha
+- artifact_type (container_image, binary, config_bundle, client_build)
+- artifact_uri
+- digest
+- signature
+- build_provenance
+- created_at
+
+Release
+- release_id
+- artifact_id
+- release_type (service, infra, client, config)
+- created_by
+- status (draft, validating, waiting_approval, rolling_out, paused, rolling_back, completed, failed, rolled_back)
+- current_stage
+- risk_level
+- rollback_release_id
+- created_at
+
+ReleaseStage
+- stage_id
+- release_id
+- stage_order
+- name (staging, canary, regional, global)
+- target_selector
+- cohort_percent
+- bake_minutes
+- health_gate_policy_id
+- status
+
+DeploymentTarget
+- target_id
+- environment
+- region
+- cluster
+- service_name
+- platform
+- desired_artifact_id
+- current_artifact_id
+- last_heartbeat_at
+
+HealthGate
+- gate_id
+- release_id
+- metric_name
+- baseline_window
+- threshold
+- status (pending, passed, failed)
+- evaluated_at
+
+AuditEvent
+- event_id
+- actor
+- action
+- entity_type
+- entity_id
+- metadata
+- created_at
+
+Storage Choices
+
+DataStoreWhy
+Release metadata and statePostgreSQL or strongly consistent relational DBNeeds transactions, uniqueness, and auditability
+ArtifactsBlob/object store plus registryLarge immutable files should not live in the control DB
+Deployment work queueKafka, Pub/Sub, or durable queueDecouples orchestrator from agents
+Target status cacheRedis or materialized viewsFast dashboard reads
+Metrics and logsTime-series store plus log indexHealth gates need recent signals
+Audit eventsAppend-only DB table plus warehouse sinkCompliance, debugging, and incident review
+
+The artifact digest should be the identity. A release points to an immutable artifact; targets should never deploy "latest" by tag.
+
+Phase 3: API Design (~5 minutes)
+
+Use REST for operator-facing release commands because these are workflow-style resources: create a release, approve it, pause it, roll it back, and query status. Use gRPC streaming or long polling between deployment agents and regional deployment services because agents need low-latency desired-state updates and periodic heartbeats. Internal stage progression can flow through a durable queue or event bus.
+
+Control Plane APIs
+
+POST /api/v1/releases
+Content-Type: application/json
+
+{
+  "repo_id": "avatar-service",
+  "commit_sha": "a1b2c3d4",
+  "artifact_id": "artifact_123",
+  "release_type": "service",
+  "risk_level": "medium",
+  "strategy": {
+    "stages": [
+      { "name": "staging", "targets": { "environment": "staging" }, "bake_minutes": 10 },
+      { "name": "canary", "targets": { "environment": "prod", "cohort_percent": 1 }, "bake_minutes": 15 },
+      { "name": "regional", "targets": { "region": "us-west", "cohort_percent": 25 }, "bake_minutes": 20 },
+      { "name": "global", "targets": { "environment": "prod", "cohort_percent": 100 }, "bake_minutes": 0 }
+    ]
+  }
+}
+
+Response: 201 Created
+{
+  "release_id": "rel_789",
+  "status": "validating"
+}
+
+POST /api/v1/releases/{release_id}/approve
+{
+  "comment": "Gates passed. Approved for production canary."
+}
+
+POST /api/v1/releases/{release_id}/promote
+{
+  "target_stage": "canary"
+}
+
+POST /api/v1/releases/{release_id}/pause
+{
+  "reason": "Elevated error rate in canary"
+}
+
+POST /api/v1/releases/{release_id}/rollback
+{
+  "rollback_to": "previous_stable",
+  "scope": { "region": "us-west" }
+}
+
+GET /api/v1/releases/{release_id}
+
+Response: 200 OK
+{
+  "release_id": "rel_789",
+  "status": "rolling_out",
+  "current_stage": "canary",
+  "artifact_id": "artifact_123",
+  "targets_total": 1000,
+  "targets_updated": 10,
+  "health": {
+    "error_rate_delta": "+0.02%",
+    "latency_p95_delta": "+4ms",
+    "gate_status": "passing"
+  }
+}
+
+Agent APIs
+
+Use gRPC streaming or long polling between deployment agents and the regional deployment service:
+
+GET /api/v1/agents/desired-state?target_id=cluster-usw2-avatar-42
+
+Response: 200 OK
+{
+  "release_id": "rel_789",
+  "artifact_id": "artifact_123",
+  "digest": "sha256:abc123",
+  "action": "deploy",
+  "deadline_seconds": 600
+}
+
+POST /api/v1/agents/deployment-acks
+{
+  "target_id": "cluster-usw2-avatar-42",
+  "release_id": "rel_789",
+  "artifact_id": "artifact_123",
+  "status": "deployed",
+  "details": {
+    "started_at": "2025-06-21T18:00:00Z",
+    "completed_at": "2025-06-21T18:03:00Z"
+  }
+}
+
+Make deployment commands idempotent. Retrying "deploy artifact digest X to target Y" should converge to the same state instead of creating duplicate work.
+
+Phase 4: High-Level Design (~15-25 minutes)
+
+Architecture Overview
+
+End-to-End Flow
+
+Engineer merges a change or manually starts a release from a known commit.
+
+CI orchestrator runs build, lint, unit tests, integration tests, security checks, and package creation.
+
+Build workers publish an immutable signed artifact to the artifact registry.
+
+Release API creates a release record that references the artifact digest and requested rollout strategy.
+
+Policy service checks ownership, risk level, required approvers, test requirements, and freeze windows.
+
+Deployment orchestrator starts the first stage after validation and approval.
+
+Regional deployment services receive desired-state updates for selected targets.
+
+Cluster agents pull the artifact by digest, verify signature, deploy it, and ack the result.
+
+Health gate evaluator compares canary metrics against baseline metrics.
+
+Orchestrator promotes, pauses, or rolls back based on gate results and operator commands.
+
+Audit log records every state transition and decision.
+
+Release State Machine
+
+Component Responsibilities
+
+CI Orchestrator
+
+Receives git triggers or manual release requests
+
+Runs deterministic build and test jobs
+
+Produces signed artifacts and provenance metadata
+
+Reports pass/fail status to the release control plane
+
+Release API
+
+Owns release creation, status queries, approvals, pause, resume, and rollback commands
+
+Enforces optimistic concurrency on state transitions
+
+Records audit events for every operator-visible action
+
+Policy and Approval Service
+
+Maps service ownership to approvers
+
+Enforces mandatory gates based on risk level
+
+Blocks releases during freeze windows unless an override is approved
+
+Requires extra review for infra, database, or client protocol changes
+
+Deployment Orchestrator
+
+Maintains the release state machine
+
+Computes target sets for each rollout stage
+
+Writes desired-state updates for regional deployment planes
+
+Advances stages only after bake time and health gates pass
+
+Regional Deployment Service
+
+Keeps deployment work close to target clusters
+
+Continues serving last desired state during global control-plane disruption
+
+Buffers commands and acks when network links are unreliable
+
+Reduces fanout pressure on the central orchestrator
+
+Cluster Agent
+
+Pulls desired state
+
+Downloads and verifies artifact digest and signature
+
+Performs rolling, blue-green, or canary deployment inside the target cluster
+
+Reports progress, failures, and current version
+
+Health Gate Evaluator
+
+Compares post-deploy metrics to baseline
+
+Evaluates error rate, latency, crash rate, saturation, and business metrics
+
+Emits pass, warn, or fail decisions to the orchestrator
+
+A useful interview framing is "the central control plane decides what should run, while regional agents converge targets to that desired state." This makes retries and partial failures much easier to reason about.
+
+Phase 5: Scaling and Trade-offs (~15-20 minutes)
+
+Progressive Rollout and Blast Radius
+
+Use staged rollout as the default:
+
+Pre-production: dev and staging environments.
+
+Internal canary: employee traffic or synthetic traffic.
+
+Production canary: 1% of one low-risk region or cell.
+
+Regional expansion: 10-25% of selected regions.
+
+Global rollout: all regions after bake time and healthy metrics.
+
+For service binary deployments, percentage rollout usually maps to clusters, cells, hosts, or traffic slices. For player-level rollout, use stable cohort assignment in the routing layer or feature flag system, such as hashing user_id or experience_id into a release bucket. Do not randomly choose a new 1% on every request.
+
+Health gates should evaluate both service-level and product-level signals:
+
+Error rate and timeout rate
+
+P95 and P99 latency
+
+Crash loops and restart count
+
+CPU, memory, and queue depth
+
+Client crash rate for runtime releases
+
+Login, matchmaking, purchase, or creator workflow success rate
+
+The orchestrator should pause by default on uncertain health. It is better to require an operator decision than to auto-promote through missing metrics.
+
+Idempotency and "Exactly Once" Deployment
+
+Exactly-once deployment is the wrong primitive. A more robust framing is:
+
+Release state transitions are transactional.
+
+Deployment commands are at-least-once.
+
+Agent actions are idempotent.
+
+Each target reports the artifact digest it is currently running.
+
+If the same command is delivered twice, the agent checks whether it already runs that digest and returns success. This gives reliable convergence without pretending the network delivers each command exactly once.
+
+Artifact Immutability and Supply Chain Safety
+
+Every artifact should include:
+
+Commit SHA
+
+Build job ID
+
+Content digest
+
+Signature
+
+Dependency lockfile hash
+
+Test results
+
+Build provenance
+
+The deploy agent verifies the digest and signature before rollout. This prevents mutable tags, compromised registries, or accidental rebuild drift from changing what production runs.
+
+Rollback Strategy
+
+For backend services:
+
+Keep the previous stable artifact available.
+
+Use rolling or blue-green deployment so old capacity remains ready.
+
+Roll back by writing desired state to the previous digest.
+
+Stop promotion immediately when health gates fail.
+
+For behavior changes:
+
+Put risky paths behind feature flags.
+
+Keep a kill switch that can disable behavior without redeploying.
+
+Separate config rollout from code rollout when possible.
+
+For database changes:
+
+Prefer expand-and-contract migrations.
+
+Make schema changes backward compatible across at least one release window.
+
+Do not roll back code to a version that cannot read the migrated schema.
+
+A common mistake is saying "just roll back" without discussing data and protocol compatibility. Rollback is easy for stateless binaries and much harder after irreversible schema or client protocol changes.
+
+Client and Runtime Release Compatibility
+
+Roblox has client/runtime concerns that a pure backend CI/CD answer may miss:
+
+Mobile and desktop clients update at different speeds.
+
+Some players may remain on old clients for days or weeks.
+
+Servers must tolerate multiple client protocol versions.
+
+Feature flags should gate server-side behavior until enough clients support it.
+
+Release channels can include internal, beta, percentage rollout, and stable.
+
+For client releases, the deployment system may publish artifacts to channel manifests rather than directly updating all clients. Clients fetch manifests, verify signatures, and update according to channel policy.
+
+Regional Reliability
+
+The central control plane should not be required for every local deployment step:
+
+Regional deployment services cache desired state.
+
+Agents keep retrying from local regional endpoints.
+
+Acks can be buffered and replayed.
+
+Running services keep their current version if the release system is down.
+
+If a region is partitioned during rollout, the orchestrator can skip it, pause the global rollout, or mark it for later reconciliation depending on risk.
+
+Build and Test Scaling
+
+CI workload can be much heavier than deployment metadata:
+
+Use isolated ephemeral workers for untrusted code execution.
+
+Cache dependencies and intermediate build layers.
+
+Prioritize release-blocking jobs over low-priority validation.
+
+Shard large test suites and report partial progress.
+
+Store logs separately from workflow state.
+
+This is where the OpenAI CI/CD workflow question becomes relevant: if the interviewer wants a deeper job scheduler, discuss queues, leases, worker heartbeats, retries, and idempotent job completion.
+
+Observability and Operations
+
+Dashboards should answer:
+
+Which artifact is running in each target?
+
+Which stage is each release in?
+
+Why is a rollout blocked?
+
+Which health gate failed?
+
+Who approved or overrode a gate?
+
+How many targets have acked the desired version?
+
+What changed between the current release and the previous stable release?
+
+Alert on:
+
+Health gate failures
+
+High rollback rate
+
+Stuck rollout stage
+
+Missing target heartbeats
+
+Artifact verification failures
+
+Deployment duration outliers
+
+Common Pitfalls
+
+Designing only GitHub Actions misses the release workflow. The interview is likely looking for validation, promotion, canary, monitoring, rollback, and auditability.
+
+Using mutable tags like "latest" makes it hard to know what production is running. Deploy immutable digests.
+
+Auto-promoting without health gates creates large blast radius. Bake time and metric comparison are core to the design.
+
+Ignoring client/server compatibility is risky for Roblox-style systems where clients and servers may not update at the same time.
+
+Assuming one global orchestrator can push to every target synchronously creates a scaling and availability bottleneck. Use regional deployment planes and idempotent agent convergence.
+
+Interview Checklist
+
+  Clarified whether the release is backend service, infra, config, or client/runtime
+
+  Described immutable artifacts with digest, signature, and provenance
+
+  Included CI validation, policy checks, approval, and audit trail
+
+  Designed staged rollout with canary, bake time, and health gates
+
+  Used desired-state agents instead of fragile one-shot push commands
+
+  Explained idempotency and target-level state tracking
+
+  Covered rollback, feature flags, and kill switches
+
+  Addressed database and client/server compatibility
+
+  Included observability for release status and per-target versions
+
+  Mentioned the deeper CI/CD scheduler angle if the interviewer pivots there
+
+Summary
+
+AspectDecisionRationale
+Artifact identityImmutable digest plus signatureDeterministic deploy and rollback
+Control planeRelease API, policy service, orchestrator, release DBCentralizes decisions and audit
+Deployment planeRegional services plus cluster agentsScales fanout and survives partial outages
+RolloutStaged canary with bake timeLimits blast radius
+Health gatesMetrics compared against baselinePrevents bad promotion
+RollbackPrevious stable artifact plus feature flagsRestores service quickly and safely
+ConsistencyTransactional release state, eventual target convergencePractical for distributed deployments
+Roblox-specific depthClient/runtime compatibility and release channelsAvoids treating the prompt as generic CI/CD only
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

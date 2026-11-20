@@ -1,0 +1,74 @@
+===H1===
+Credit Card System (OOD)
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/credit-card-system-ood
+===BODY===
+Amazon
+System Design·45 minMembers
+Credit Card System (OOD)
+Lightweight OOD design of a credit card system — card issuance, swipe / authorize transactions, repayment, statement generation, and minimal business rules.
+SWE
+oop-design
+payment
+medium
+Frequency
+Single report
+Last asked
+2026-04-05
+Stage
+onsite-coding
+Requirements
+
+Entities: Card, Account, Transaction, Statement (with explicit class definitions).
+
+Operations: issueCard(account), authorize(card, amount), settle(transaction), repay(card, amount), generateStatement(card, period).
+
+Business rules: credit limit enforcement, pending vs settled balances, interest accrual on unpaid balance.
+
+Be explicit about pre-/post-conditions for each operation.
+
+Examples
+
+authorize decrements available credit immediately but increments only the pending balance; settle moves the amount into settled balance.
+
+repay first pays interest accrued, then principal.
+
+Notes
+
+Treat this as 60% design, 40% code. Sketch the class diagram on the whiteboard before writing any methods.
+
+Watch for the floating-point trap on currency — use integer cents, not double.
+
+Use the State pattern for Card (Active / Frozen / Closed) and the Strategy pattern for fee calculations.
+
+Money math is integer cents (or BigDecimal with explicit rounding mode) — every senior interviewer probes for this within the first few minutes and a double balance is an instant downgrade signal.
+
+The State pattern for Card (Active / Frozen / Closed / PendingActivation) and Strategy for FeeCalculator / InterestCalculator cover the two most common follow-ups ("add a card lock feature" / "add a promotional 0% APR period"). Sketch both up front so you don't have to refactor mid-round.
+
+Pending vs settled balance is the single hardest modeling decision. The clean shape: availableCredit = creditLimit - settledBalance - sum(pendingAuthorizations). authorize adds to pending, settle moves pending -> settled, void removes pending without touching settled. Walk through all three transitions explicitly.
+
+Concurrency on authorize is the realistic deep dive: two authorizations for the same card racing through available >= amount checks. The interview-appropriate answers are (a) optimistic concurrency with a version column on Account or (b) a per-card lock acquired before the check. Mention both, pick one.
+
+Statement generation is a state-machine over a billing period: cycle close -> grace period -> due date -> delinquent. Interest accrues on the average daily balance during the cycle, not on the closing balance — a common mistake.
+
+Preparation
+
+Practice classic OOD prompts: Parking Lot, Vending Machine, ATM. The Credit Card variant adds time-based statements but otherwise mirrors them.
+
+Prepare a 60-second pitch on "how I'd model time" — statement cutoffs, interest accrual, grace periods.
+
+Be ready to extend with rewards / cashback — a common follow-up that exercises Strategy and Observer patterns.
+
+Drill the parking-lot / vending-machine OOD skeleton first; this prompt reuses 80% of that structure plus a time dimension (statement cycle, grace period, interest accrual).
+
+Practice a 60-second pitch on "how I'd model time": billing cycle as a value object, statement as the immutable snapshot at cycle close, accrual job as a separate domain service that operates on cycles rather than mutating live balances.
+
+Write the class skeleton from memory in 5 minutes: Card, Account, Transaction (with Authorization / Settlement / Refund subtypes), Statement, FeeCalculator Strategy, CardState Strategy enum.
+
+Be ready to extend with rewards / cashback (Observer on settle events) and dispute / chargeback flow (new Transaction subtype that compensates an earlier settlement).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,63 @@
+===H1===
+ML Intern OA (CodeSignal: MCQ + NN Forward + Coding + ML Implementations)
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/mle-intern-codesignal-oa
+===BODY===
+Pinterest
+Coding·90 minMembers
+ML Intern OA (CodeSignal: MCQ + NN Forward + Coding + ML Implementations)
+ML-flavored CodeSignal OA for ML interns: a block of ML MCQs, a hand-computed neural-network forward pass (bring paper, calculator, and a webcam-friendly workspace), one LeetCode-style coding problem, and two ML implementation problems (bootstrap tree without NumPy; naive Bayes from formulas).
+MLE
+codesignal
+oa
+ml-knowledge
+classification
+python
+medium
+Frequency
+Low
+Last asked
+2026-06-14
+Stage
+oa
+Requirements
+
+MCQ block — concept questions covering classification metrics (TP/FP/precision/recall confusion-matrix table reading), ensemble methods and interpretability, overfitting diagnosis (train high / test low), classification loss families (cross-entropy and friends), and what causes model parameters to drop to zero (L1 / regularization).
+
+Neural-network forward pass — given weights and an input, hand-compute the output through a small network including a sigmoid. Many intermediate sigmoid values; you cannot keep them in your head.
+
+LeetCode-style coding — given a sliding window of size k, determine whether the window is "monotonic from the center" (the value at the current position is locally extremal — decreasing to both left and right).
+
+Bootstrap tree — decision-tree code is provided; implement the bootstrap-data resampling and the prediction-aggregation portions. NumPy disabled — pure-Python random only.
+
+Naive Bayes — implement from the standard formulas (prior, per-feature likelihood, posterior argmax); data is provided.
+
+Gradient descent — fill in the gradient-computation / parameter-update portion of a provided training-loop template.
+
+Notes
+
+The webcam stays on. The platform forbids physical books and second monitors, but a notebook for arithmetic is permitted — and necessary for the NN forward pass. Have it set up before you start.
+
+The NumPy-disabled bootstrap tree is the most distinctive constraint — practice resampling with random.choices on a Python list and reducing a list of predictions to a majority vote without numpy.bincount.
+
+The naive Bayes problem is purely formula-following — log-space the multiplications to avoid underflow, sum across features, and pick the argmax class.
+
+The sliding-window monotonicity problem is unusual phrasing. Clarify what "monotonic from the center" means before coding — candidates interpret it as "the center is locally extremal", but the prompt wording leaves room for misreading.
+
+The exact problem set and tooling rotate by sitting: some OAs disable NumPy for the ML-implementation problems (bootstrap tree from pure Python), others permit it (naive Bayes prior/posterior, gradient-descent completion). Confirm the per-problem NumPy rule in the instructions before you start coding. The OA is 70 minutes / ~10 problems.
+
+Preparation
+
+Pre-stage paper, pen, and a basic calculator before you launch the OA. The webcam will see everything; this is allowed.
+
+Drill a from-scratch bootstrap-sampling pass without NumPy — the most likely place to lose time.
+
+Refresh the closed-form decision-tree code (gini, info gain) so you understand the provided scaffold rather than re-deriving it under time pressure.
+
+Rehearse one naive-Bayes worked example on Iris or a similar toy dataset; the implementation is short but easy to scramble under time pressure.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,54 @@
+===H1===
+Wheat Harvest Optimisation Case
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/wheat-harvest-case
+===BODY===
+Capital One
+Other·45 minMembers
+Wheat Harvest Optimisation Case
+Strategy / Data Analytics Power Day case. A second case round, distinct from the amusement-park one. The prompt is brief — a high-frequency analyst case about wheat harvest economics or scheduling. Expect the same structured-thinking format as the amusement-park case.
+DS
+critical-thinking
+open-ended
+verbal
+medium
+ambiguous-spec
+Frequency
+Single report
+Last asked
+2026-05-13
+Stage
+final-round
+Requirements
+
+Set-up: optimise some axis of a wheat harvest — typical framings are scheduling the harvest across multiple fields of different yields, deciding when to harvest given weather risk, or pricing wheat futures against storage cost.
+
+This case surfaces in the BA / SDA Power Day rotation and runs 45 minutes.
+
+Notes
+
+The exact prompt variant is not pinned down; treat this as a structured-thinking exercise and apply the same skeleton as the amusement-park case: decompose the objective, identify levers, propose a decision rule, then sanity-check with numbers.
+
+Common framings the interviewer can extend into:
+
+Harvest scheduling: given N fields with different yields and a fixed crew, in what order do you harvest to maximise revenue before weather risk? → greedy by yield_per_day_remaining_window.
+
+Harvest timing: a single field whose yield grows with time but whose loss probability grows faster after a threshold. → expected-value optimisation with a stopping rule.
+
+Storage vs sell-now: held inventory accrues storage cost but futures lock in price. → break-even analysis on storage cost vs forward price minus spot.
+
+The graded signal is the same as on any C1 case: structure first, then numbers, then sensitivity.
+
+Preparation
+
+Drill the three framings above so the candidate can pivot quickly once the interviewer pins down which variant they want.
+
+Practise the stopping-rule framing — it generalises to any "when to sell / when to harvest / when to upgrade" decision and shows up across analytic case rounds.
+
+The prompt spec is thin; if this round comes up live, ask 2-3 clarifying questions before drawing any framework. Capital One grades the clarification reflex here.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

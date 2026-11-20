@@ -1,0 +1,51 @@
+===H1===
+Count Unique Pairs With Difference K
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/unique-pairs-difference-k
+===BODY===
+Goldman Sachs
+Coding·60 minMembers
+Count Unique Pairs With Difference K
+Count the number of unique pairs `(a, b)` in an integer array such that `b - a = k`. The variant where `k` may be zero is a common trip-up.
+SWE
+hashmap
+set
+array
+easy
+Frequency
+Single report
+Last asked
+2024-10-26
+Stage
+oa
+Requirements
+
+Given numbers[] and a non-negative integer k, count the number of unique pairs (a, b) from numbers with b - a == k.
+
+"Unique pair" means each value pair (a, b) is counted at most once, regardless of how many times a or b appears in the input.
+
+k may be 0 — in that case the answer counts each value that appears at least twice once.
+
+public static int countPair(int[] numbers, int k)
+
+Notes
+
+Standard hashset approach: put every value into a set; for each unique value v, check whether v + k is in the set. Count one pair per matching v.
+
+k == 0 case is the trap: with the hashset-only approach you must instead count values that appear ≥ 2 times in the original input (use a count map for that branch).
+
+O(n) time, O(n) space.
+
+A naïve implementation has a subtle bug — storing num + "" + (num + k) as the pair key but comparing against num + k (an int) in the set; rewrite cleanly before relying on it.
+
+Preparation
+
+Implement the general version that handles k == 0 correctly with a Map<Integer, Integer> count, not just a Set. Interviewers love this edge case as a follow-up.
+
+LC 532 "K-diff Pairs in an Array" is the canonical equivalent; LC 1 "Two Sum" is the same fingerprint pattern.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

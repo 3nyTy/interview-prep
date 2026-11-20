@@ -1,0 +1,54 @@
+===H1===
+Color Match-Three Grid
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/color-match-three-grid
+===BODY===
+Capital One
+Coding·70 minMembers
+Color Match-Three Grid
+Given a numeric matrix where each value represents a color, repeatedly explode every cell whose 4-neighborhood contains at least two same-colored cells, then let surviving cells fall under gravity. Return the resulting matrix.
+SWE
+grid
+simulation
+medium
+oa
+codesignal
+Frequency
+Single report
+Last asked
+2026-01-09
+Stage
+oa
+Requirements
+
+Input: an n x m integer matrix; each value is a color.
+
+A cell at (r, c) is marked for elimination if at least two of its 4-neighbors (up / down / left / right, within bounds) share its color.
+
+Mark all qualifying cells in one pass, then remove them simultaneously (do not cascade mid-pass; this is a single-step elimination).
+
+After removal, surviving cells fall straight down within their column so empty cells end up at the top.
+
+Return the resulting matrix.
+
+Notes
+
+Two-phase pattern: (1) iterate over all cells, compute a same-color neighbour count, mark those with count ≥ 2 in a boolean grid; (2) for each column, collect surviving values bottom-up and re-emit with leading zeros / sentinel above.
+
+The prompt does not specify whether the process repeats until no further eliminations are possible. The default interpretation is one round; if the interviewer extends it to cascade, wrap the two phases in a while changed loop.
+
+Edge cells have fewer neighbours; the threshold is ≥ 2 same-colored existing neighbours, not 2 out of 4.
+
+Gravity is per-column and stable (preserves the relative order of surviving cells).
+
+Preparation
+
+Implement the two-phase pattern cleanly on a 3x3 sample with a corner cluster, an isolated cell, and an edge case.
+
+If the interviewer extends to cascading rounds, the wrapping loop typically terminates in O(n·m) rounds for adversarial inputs; add a guard against infinite loops just in case.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

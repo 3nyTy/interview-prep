@@ -1,0 +1,83 @@
+URL: https://www.1point3acres.com/interview/problems/eb23542d-56fe-54a3-902f-bf2b36d17b6c
+Captured: 2026-09-21
+
+Toggle Sidebar
+Popular Questions
+Details
+Search companies, questions, guides…⌘KInterview Copilot中
+Find Unreachable Heap Objects with References
+Related Discussion
+anduril
+Problem: Heap Object Reachability Analysis with References
+
+You are given a list of addresses stored on the stack, stack_addresses, and a list of heap objects, heap_objects. Each heap object contains:
+
+address: the object's own address.
+
+references: a list of other addresses referenced by this object.
+
+class HeapObject:
+    def __init__(self, address: int, references: List[int]):
+        self.address = address
+        self.references = references
+
+Implement:
+
+def dead_objects(stack_addresses: List[int], heap_objects: List[HeapObject]) -> List[HeapObject]:
+
+Starting from stack_addresses, if an address corresponds to a heap object, that object is reachable. Then, any heap object referenced by a reachable object is also reachable, recursively. Return all heap objects that are ultimately unreachable.
+
+Assumptions
+
+Addresses in heap_objects are unique.
+
+references may contain addresses that do not exist in heap_objects; ignore them.
+
+The reference graph may contain cycles.
+
+The result should preserve the original order of heap_objects.
+
+Input Format
+
+For testing, use the following stdin format:
+
+n m
+s1 s2 ... sn
+address_1 k_1 ref_1 ref_2 ... ref_k1
+address_2 k_2 ref_1 ref_2 ... ref_k2
+...
+address_m k_m ref_1 ref_2 ... ref_km
+
+Where:
+
+n is the number of stack addresses.
+
+m is the number of heap objects.
+
+The second line contains n integers representing stack_addresses. If n = 0, this line may be empty.
+
+Each of the next m lines describes one heap object: its address address_i, the number of references k_i, followed by k_i referenced addresses.
+
+Output Format
+
+Print the addresses of all dead objects in the original heap_objects order, separated by spaces. If there are no dead objects, print an empty line.
+
+Constraints
+
+0 <= n, m <= 10^5
+
+Total number of references R <= 2 * 10^5
+
+Addresses are 32-bit signed integers.
+
+Example
+Unlock to view complete problem details
+and practice with sample input/output
+Unlock with Membership
+Was this article helpful?
+Python 3Java12px14px16px18px20px22px24px
+View Test Cases & Run Code requires membership
+Unlock with Membership
+Standard Input
+RunHistory
+Execution Result:

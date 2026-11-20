@@ -1,0 +1,45 @@
+===H1===
+First Bad Version with Parallel Search Follow-up
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/first-bad-version-parallel-search
+===BODY===
+Google
+CodingMembers
+First Bad Version with Parallel Search Follow-up
+Phone-screen R1 coding round. The base problem is the standard first-bad-version monotonic search — given an `isBadVersion(v)` oracle over versions `1..n`, find the first bad version with a single binary search. The graded follow-up requires parallelizing the search: partition the range into buckets and search them concurrently (bucket + binary search), with working code expected.
+SWE
+binary-search
+parallelism
+concurrency
+medium
+Frequency
+Single report
+Last asked
+2026-06-15
+Stage
+phone-screen
+Requirements
+
+Base: versions are numbered 1..n and a monotonic predicate isBadVersion(v) -> bool holds — once a version is bad, every later version is bad. Return the first bad version using as few calls as possible. A single-threaded binary search over [1, n] is the expected base answer, and the interviewer treats it as a warm-up.
+
+Follow-up (the graded part): make the search use parallel processing. Partition the version range into buckets and search across them concurrently — for example, probe the bucket boundaries in parallel to localize which bucket contains the good→bad transition, then binary-search inside that bucket. You are expected to write working code for the parallel version, not just sketch it.
+
+Notes
+
+The base is trivial; budget your time for the parallel follow-up and aim to get a complete, compiling version through even if it has minor bugs — finishing the parallel version is what passes this round.
+
+Be explicit about what the parallel design optimizes: wall-clock latency (fire many isBadVersion probes at once) versus total number of calls. Splitting into k buckets and probing each boundary concurrently localizes the transition in one parallel round, then a binary search finishes it.
+
+Common bugs: off-by-one when mapping a bucket index back to an absolute version range; the transition sitting exactly on a bucket boundary; integer overflow in mid if you write (lo + hi) / 2 instead of lo + (hi - lo) // 2.
+
+Preparation
+
+Write the single-threaded binary search first and verify it on small n.
+
+Then implement the bucketed parallel version with real concurrency primitives (Python concurrent.futures.ThreadPoolExecutor, or Java ExecutorService / CompletableFuture): split [1, n] into k buckets, probe the k boundaries concurrently, pick the bucket where the predicate flips, and binary-search within it. Practice getting this to compile and run in under 20 minutes.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

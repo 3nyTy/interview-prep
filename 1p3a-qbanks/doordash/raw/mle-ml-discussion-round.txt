@@ -1,0 +1,76 @@
+===H1===
+MLE Onsite: ML Knowledge / Discussion Round
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/mle-ml-discussion-round
+===BODY===
+DoorDash
+Other·60 minMembers
+MLE Onsite: ML Knowledge / Discussion Round
+MLE-specific onsite slot. Open-ended ML discussion driven by the interviewer's interests: A/B testing fundamentals, ranking metric definitions, multi-objective ranker design, offline-vs-online metric reconciliation, marketplace-specific experiment design. Less infrastructure than the ML system design round.
+MLE
+RS
+ml-knowledge
+ab-testing
+ranking
+experiment-design
+verbal
+medium
+Frequency
+Medium
+Last asked
+2026-07-02
+Stage
+onsite-research
+Requirements
+
+Open-ended ML discussion. No coding.
+
+Common interviewer threads:
+
+A/B test fundamentals: hypothesis formulation, power analysis, variance reduction (CUPED), interpreting confidence intervals.
+
+Ranking metric design: CTR vs CVR vs revenue per session; offline NDCG / AUC vs online conversion.
+
+Multi-objective ranking: how to combine multiple business signals (CVR, delivery time, freshness, ad slots) in a single ranker.
+
+Marketplace experimentation: switchback vs AB for marketplace effects; how to detect novelty effects; guard-rail metrics.
+
+Offline-online gap: why an offline win didn't ship online; data leakage; feature serving skew.
+
+ML system observability and debugging.
+
+Methods used in the candidate's own recent work, with follow-ups on why those methods were chosen and how they behaved after launch.
+
+The interviewer drives the conversation; the candidate's role is to demonstrate breadth across applied-ML practice.
+
+Notes
+
+DoorDash's marketplace flavor is heavier than at most peer companies — switchback design, supply-demand elasticity, and per-region treatment effects come up specifically.
+
+Two-head ranker is the canonical multi-objective answer; the interviewer may push for joint loss as a follow-up.
+
+A/B testing depth is unusually high for an MLE round. Brush up on power calculation, MDE, and variance-reduction techniques.
+
+Common failure mode: shallow answers on offline-online metric reconciliation. Have a specific story ready (a project where an offline metric improved but the online metric didn't, and what you found).
+
+Some interviewers are non-ML by background ("backend engineer asking ML questions"); answers may need to be lower in formalism and higher in intuition. Read the room.
+
+The PhD-intern loop runs a lighter "ML case analysis" version of this discussion as one of its two VOs — same breadth-of-applied-ML signal, less depth.
+
+Recent Senior MLE loops can position this as a resume-grounded domain-knowledge round: expect the interviewer to ask which methods you used at work, why they fit the product problem, and where the model / experiment failed.
+
+Preparation
+
+Pre-write 3 stories: (1) an A/B test you designed and shipped, (2) a ranking model you launched with offline + online metrics, (3) an offline-online metric divergence and how you root-caused it.
+
+Brush up on switchback experiments via a standard reference (Statsig blog or similar industry post-mortem).
+
+Practice articulating multi-objective ranking trade-offs (two heads + lambda; joint loss as alternative) in under 2 minutes.
+
+Have 2–3 marketplace-specific examples ready (dasher allocation, surge, restaurant ranking) — DoorDash interviewers reward domain-specific intuition.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

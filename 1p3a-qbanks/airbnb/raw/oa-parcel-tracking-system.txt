@@ -1,0 +1,97 @@
+===H1===
+Parcel Tracking System
+===URL===
+https://www.1point3acres.com/interview/problems/company/airbnb/oa-parcel-tracking-system
+===BODY===
+Airbnb
+CodingMembers
+Parcel Tracking System
+Implement a progressively unlocked parcel-tracking system. The first level records per-parcel event counts; later levels add parcel ranking, courier assignment with courier-specific events, and undo plus courier sign-out behavior.
+SWE
+data-structure
+state-machine
+object-design
+testing
+codesignal
+oa
+hard
+Frequency
+Single report
+Last asked
+2026-07-27
+Stage
+oa
+Requirements
+
+Implement a simplified parcel-tracking system in the supplied class structure.
+
+Progress through multiple levels; each level unlocks after the current unit tests pass.
+
+Level 1 — parcel event counts
+
+Each parcel has a string parcelId. Counts are maintained independently for each string eventType.
+
+int? RecordEvent(string parcelId, string eventType, int count)
+
+Add count to the running total for the parcel and event type.
+
+Create the event type when it does not yet exist.
+
+Return the new running total.
+
+int? GetEventCount(string parcelId, string eventType)
+
+Return the current running count.
+
+Return null when either the parcel or event type does not exist.
+
+bool RemoveEvent(string parcelId, string eventType)
+
+Remove the event-type record from the parcel.
+
+Return true when a record was removed and false when it did not exist.
+
+Delete the parcel when removing the event leaves it with no remaining event types.
+
+Later levels
+
+Level 2: rank parcels by the number of recorded events.
+
+Level 3: support courier assignment and courier-specific event recording.
+
+Level 4: support undoing courier changes and courier sign-out.
+
+Examples
+
+RecordEvent("A", "B", 5)    -> 5
+RecordEvent("A", "B", 6)    -> 11
+GetEventCount("A", "B")     -> 11
+GetEventCount("A", "C")     -> null
+RemoveEvent("A", "B")       -> true
+RemoveEvent("A", "B")       -> false
+
+Notes
+
+The environment is unit-test driven; passing behavior matters more than producing the most efficient implementation.
+
+A single test can be run from the terminal with the supplied run_single_test.sh command.
+
+Data from the current and all previous levels remains available, so later operations should reuse earlier behavior instead of duplicating it.
+
+The first-level interface is complete; the exact later-level method signatures are not exposed.
+
+Preparation
+
+Implement the Level 1 interface and unit-test creation, accumulation, missing lookups, repeated removal, and automatic parcel cleanup.
+
+Add a deterministic ranking layer over the same state without breaking Level 1 behavior.
+
+Sketch explicit courier-assignment and undo state transitions, including sign-out after reassignment.
+
+Practice evolving one class through progressive hidden-test levels while keeping earlier contracts stable.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

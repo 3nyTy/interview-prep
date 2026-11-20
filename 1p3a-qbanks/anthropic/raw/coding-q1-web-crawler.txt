@@ -1,0 +1,98 @@
+===H1===
+Coding Q1 — Concurrent Web Crawler
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/coding-q1-web-crawler
+===BODY===
+Anthropic
+Coding·55 minFree preview
+Coding Q1 — Concurrent Web Crawler
+Implement a same-domain web crawler given a pre-supplied `htmlParser.getUrls(url)` helper. Starts as a single-threaded BFS; the bulk of the round is the follow-up to parallelize it (threads, processes, or async) and reason about scaling across machines.
+SWE
+MLE
+Infra Eng
+concurrency
+threading
+async
+bfs
+python
+medium
+Frequency
+High
+Last asked
+2026-09-09
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Implement crawl(startUrl: str, htmlParser: HtmlParser) -> list[str]:
+
+Visit every URL reachable from startUrl whose hostname matches urlparse(startUrl).hostname.
+
+Deduplicate visited URLs.
+
+The interview environment provides htmlParser.getUrls(url) -> list[str] (LeetCode 1242-style).
+
+Code must compile and run inside CodeSignal; tests pass when the returned set size is below a target threshold (often < 100).
+
+Then, in order, the follow-ups:
+
+Concurrent version. Add multithreading (typically concurrent.futures.ThreadPoolExecutor with a thread-safe visited set and a work queue). Some interviewers ask for an asyncio implementation instead — pick whichever matches what you told the recruiter you'd use.
+
+CPU-bound vs IO-bound. Justify the choice between threads, processes, and asyncio. The expected answer: crawling is IO-bound, so threads or async beat processes; parsing-heavy variants would push toward processes.
+
+Distributed crawler. How would you shard hostnames across N machines, dedupe across them (Redis / central queue), throttle per-host, and resume after a worker dies. Implementation is verbal, not code.
+
+Coroutine semantics sometimes asked: difference between asyncio.gather, asyncio.as_completed, and a manual semaphore-bounded pool.
+
+In the fragment-normalizing variant, strip URL fragments before deduplication. Make the concurrent visited check/update thread-safe so the same URL is not fetched twice.
+
+Examples
+
+From a typical reference solution:
+
+from urllib.parse import urlparse
+from collections import deque
+
+def crawl(startUrl: str, htmlParser):
+    host = urlparse(startUrl).hostname
+    seen = {startUrl}
+    q = deque([startUrl])
+    while q:
+        u = q.popleft()
+        for v in htmlParser.getUrls(u):
+            if v in seen:
+                continue
+            if urlparse(v).hostname == host:
+                seen.add(v)
+                q.append(v)
+    return list(seen)
+
+Notes
+
+Replit was used through mid-2025 and has since been replaced by CodeSignal. The IDE shows no linter errors before run; expect a few minutes of fixing imports on the first run.
+
+Interviewers do not deduct for using Google or library docs, but they watch how you decide between ThreadPoolExecutor and asyncio — pick one and be able to defend it.
+
+Common stumble: writing a custom async HTML parser instead of staying with the supplied getUrls API. The bonus codec edge cases (0x89 PNG headers etc.) are not part of the spec.
+
+The Q1 prompt blurb is shared with the image-processing variant; the recruiter usually does not tell you which one you'll get.
+
+Two clarifying questions worth asking explicitly before coding: (1) how to treat URL fragments (http://x.com/p#section vs #section2 — same page or different?) and (2) whether URL normalization is in scope. Assume "all links use http, no port numbers" unless told otherwise. The supplied HtmlParser interface is List<String> getUrls(String url) (Java-style; Python harness mirrors it as htmlParser.getUrls(url) -> list[str]).
+
+A September 2026 phone screen tested different hostnames, fragment-bearing URLs, and cycles after the single-threaded implementation was converted to concurrent execution. Fragment stripping was explicitly required in that variant; clarify the normalization contract before coding.
+
+Preparation
+
+Write the single-threaded BFS from scratch, then add a ThreadPoolExecutor wrapper with a Lock-guarded visited set in under 15 minutes.
+
+Practice an asyncio rewrite: asyncio.Semaphore, asyncio.gather, awaiting the parser as if it were async.
+
+Be able to whiteboard the multi-machine sharding answer: central queue (Redis / SQS), consistent hashing on hostname, dedupe in a shared Bloom filter or Redis set, per-host rate limiting via token buckets.
+
+Cross-train the image-processing sibling prompt in parallel — same recruiter blurb, different problem.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,49 @@
+===H1===
+Spiral Matrix Traversal
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/spiral-matrix-output
+===BODY===
+Goldman Sachs
+Coding·60 minMembers
+Spiral Matrix Traversal
+Output the elements of an `m × n` matrix in spiral order, walking from the outside layer to the innermost. A warm-up problem in GSAM Infra phone screens.
+SWE
+Infra Eng
+grid
+simulation
+easy
+Frequency
+Single report
+Last asked
+2024-11-15
+Stage
+phone-screen
+Requirements
+
+Input: an m × n matrix.
+
+Output: a single list containing every element in spiral order — right across the top, down the right edge, left across the bottom, up the left edge, then inward to the next layer.
+
+Notes
+
+Maintain four boundary pointers (top, bottom, left, right); contract each one after the corresponding side is consumed.
+
+Stop when top > bottom or left > right.
+
+The classic off-by-one trap is processing the last single row or column twice when the matrix is non-square — guard the inner two passes with top <= bottom and left <= right.
+
+O(m·n) time, O(1) extra space (output array aside).
+
+This problem serves as the warm-up before the harder follow-up Maximum-Sum Path in a Matrix in GSAM Infra loops; expect it to be solved in under 10 minutes, leaving room for the second question.
+
+Preparation
+
+Implement once with explicit boundary pointers; drill the off-by-one cases on a 3×5 and a 5×3 matrix.
+
+LC 54 "Spiral Matrix" is the canonical equivalent.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

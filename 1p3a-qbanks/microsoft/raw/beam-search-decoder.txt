@@ -1,0 +1,59 @@
+===H1===
+Beam Search Decoder Implementation
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/beam-search-decoder
+===BODY===
+Microsoft
+Coding·60 minMembers
+Beam Search Decoder Implementation
+Implement beam search decoding for a language model — greedy first, then top-K beam expansion. The neural network is stubbed; you only own the decoding logic and the beam bookkeeping.
+MLE
+beam-search
+heap
+llm
+hard
+Frequency
+Single report
+Last asked
+2026-03-03
+Stage
+onsite-coding
+Requirements
+
+A callable next_token_logits(prefix: list[int]) -> list[float] is provided that returns log-probabilities over the vocabulary given a prefix. Implement two decoding strategies.
+
+Part 1 — Greedy sampling
+
+Until the end-of-sequence token is emitted (or a max length is reached), pick the highest-probability next token and append it to the prefix. Return the generated sequence.
+
+Part 2 — Beam search (width K)
+
+Maintain the top-K most-likely partial sequences by cumulative log-probability. At each expansion step, score every (beam, next-token) pair, then keep the global top-K across all expansions. Continue until every active beam has emitted EOS or the max length is hit. Return all surviving beams ranked by score.
+
+Part 2 was framed with the simplification "you don't need to support arbitrary beam width — just implement top-K beam keeping with K fixed at decoding time."
+
+Notes
+
+The whole problem is bookkeeping with a min-heap of size K. At each step you produce up to K × V candidate extensions; pushing all of them into a heapq of size K (popping when oversized) gives O(K·V·log K) per step.
+
+The neural network call is the inner-loop cost — interviewers will let you treat it as O(1) but watch for candidates who unnecessarily recompute logits for the same prefix twice. Memoize by prefix tuple if the API allows.
+
+Score in log-space and add rather than multiply; numerical underflow in raw probability space is the most common bug. Length normalization (dividing log-score by length^α) is the standard follow-up — interviewers expect you to know it but rarely make you implement it.
+
+EOS handling: once a beam emits EOS, freeze its score and stop expanding it, but keep it in the candidate pool so it competes with longer partial beams. Returning beams sorted by final score completes the contract.
+
+Preparation
+
+Write the greedy loop in five lines, then layer beam search on top — do not start with beam search.
+
+Drill the top-K heap pattern: maintain a heapq of size K, push every candidate, pop when size exceeds K. This is the same skeleton as the "K closest points" family.
+
+Pre-write a length-normalized score function (log_p / length^0.7) so you can add it under follow-up pressure without thinking.
+
+Read the streaming stop-token problem in the same bank — they often appear in the same loop and share decoding-pipeline framing.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

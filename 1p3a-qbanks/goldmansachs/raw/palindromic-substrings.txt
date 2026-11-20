@@ -1,0 +1,49 @@
+===H1===
+Count Palindromic Substrings
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/palindromic-substrings
+===BODY===
+Goldman Sachs
+Coding·60 minMembers
+Count Palindromic Substrings
+Count the total number of palindromic substrings in the input string. The canonical expand-around-center problem appears verbatim in both engineering and Quant Strats OAs, including a 30-minute coding segment for the 2027 summer-intern cycle.
+SWE
+RS
+string
+palindromes
+medium
+Frequency
+Low
+Last asked
+2026-08-29
+Stage
+oa
+Requirements
+
+Input: a string s.
+
+Return: the total count of substrings of s that are palindromes. Each occurrence counts separately even if the substring content repeats.
+
+public int palindromeCount(String s)
+
+Notes
+
+Expand-around-center is the standard answer: each of the 2n-1 centers (n single-character + n-1 between-character centers) is expanded outward while the characters match. O(n²) time, O(1) space.
+
+Manacher's algorithm gives O(n) but is rarely necessary at Goldman — bring it up as an optimization only if pressed.
+
+Edge cases: empty string returns 0; single character returns 1.
+
+In the Quant Strats summer-intern OA, this coding segment was allocated 30 minutes and appeared alongside five to seven math questions.
+
+Preparation
+
+Implement the two-pointer expand-around-center form and walk through "aaa" by hand: 6 palindromic substrings (a, a, a, aa, aa, aaa).
+
+LC 647 "Palindromic Substrings" is the canonical equivalent; LC 5 "Longest Palindromic Substring" uses the same skeleton and is worth practicing alongside.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,68 @@
+===H1===
+Pair Concatenation to Target
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/pair-concatenation-to-target
+===BODY===
+Capital One
+Coding·70 minMembers
+Pair Concatenation to Target
+Given a list of non-negative integers and a target integer, count the number of ordered index pairs whose decimal-string concatenation equals the target. Ordering matters; the same numeric value at different indices counts as distinct pairs.
+SWE
+MLE
+hashmap
+string
+string-processing
+oa
+codesignal
+easy
+Frequency
+Medium
+Last asked
+2026-04-08
+Stage
+oa
+Requirements
+
+Input: a list of non-negative integers numbers and an integer target.
+
+Return the count of ordered pairs (i, j) with i != j such that str(numbers[i]) + str(numbers[j]) == str(target).
+
+Pairs are ordered: (i, j) and (j, i) are different pairs.
+
+Same numeric value at different indices is counted separately.
+
+target can have up to ~10 digits; the array can have up to ~10^5 elements (CodeSignal hidden tests will TLE an O(n²) brute force on the largest case).
+
+Examples
+
+numbers = [1, 212, 12, 12], target = 1212
+
+Pair 1: numbers[0], numbers[1] -> "1" + "212" = "1212"
+Pair 2: numbers[2], numbers[3] -> "12" + "12" = "1212"
+Pair 3: numbers[3], numbers[2] -> "12" + "12" = "1212"
+
+Return 3
+
+Notes
+
+The canonical approach is a single pass over the array building a counter cnt[str(v)] -> count, then for each number s = str(numbers[i]) scan every split point k from 1 to len(target_str) - 1: if target_str[:k] == s, the right half is target_str[k:] and the contribution is cnt[target_str[k:]]. Total work is O(n · d) where d is the digit length of target (around 10), well under the constraint.
+
+Off-by-one trap: when the chosen number s itself appears as both the left half and the right half (i.e. a palindromic split where the same index could pair with itself), subtract one to avoid self-pairs.
+
+Leading-zero trap: numeric 0 becomes the string "0", not "". Splitting target_str = "1212" at k=0 or k=len(target_str) produces an empty half and must be skipped.
+
+A two-pointer / sort approach does not generalise here because the strings are concatenated, not summed; stick with the hashmap pattern.
+
+Preparation
+
+Implement the hashmap approach end-to-end with a clean self-pair correction; write three test cases covering distinct values, duplicate values at different indices, and the palindromic split (numbers=[12,12], target=1212).
+
+Practice the split-loop pattern on a fresh paper: it generalises to any "two-piece concatenation = target" question (string composition, prefix-suffix dictionaries, regex-free wildcard matching of a fixed shape).
+
+Time-budget drill: on a real CodeSignal-style timer, aim to finish reading + implementing this problem in under 12 minutes — it usually appears as Q2 or Q4 and the rest of the OA needs the remaining time.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

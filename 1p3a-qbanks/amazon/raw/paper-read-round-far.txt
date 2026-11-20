@@ -1,0 +1,74 @@
+===H1===
+Paper Read Round (FAR / Premium Loops)
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/paper-read-round-far
+===BODY===
+Amazon
+Other·60 minMembers
+Paper Read Round (FAR / Premium Loops)
+Amazon FAR (Foundational AI Research) and premium-tier loops add a paper-read round: the paper arrives 48 hours before the interview, and the slot splits ~30-35 minutes of technical discussion plus 20-25 minutes of behavioral.
+RS
+MLE
+deep-dive
+ml-knowledge
+presentation
+hard
+Frequency
+Single report
+Last asked
+2026-03-21
+Stage
+onsite-research · onsite-deep-dive
+Requirements
+
+Read and internalize the assigned paper end-to-end (one recent assignment was the DeepSeek-V3 Technical Report).
+
+Be able to discuss in depth: problem framing, key idea, architecture, design rationale, evidence, limitations, and how you'd translate it to production.
+
+Pair with 20-25 minutes of LP-flavored behavioral.
+
+Examples
+
+A recent FAR loop assigned the DeepSeek-V3 Technical Report and drilled:
+
+Discussion topics: MLA (Multi-head Latent Attention), Aux-Loss-Free MoE, MTP (Multi-Token Prediction), DualPipe.
+
+Recurring probes: "Why this design choice?" and "How would you use this in production?"
+
+Notes
+
+Bring a 7-point framework you can walk through verbally: Problem → Key Idea → Architecture → Why These Choices → Evidence → Limitations → Production Translation.
+
+The interviewer wants opinions, not summaries. Critique freely — name what the paper does not convince you of and what you'd run as a follow-up experiment.
+
+Pace tightly: 30 minutes of paper is enough for 3 deep topics, not 10 shallow ones.
+
+A reusable 7-point critique framework: Problem (what gap, why now) → Key idea (one sentence) → Architecture (block diagram you can sketch) → Why these choices (the alternatives the authors rejected) → Evidence (which experiment proves the key idea, which is incidental) → Limitations (what they hide, what scale they didn't test) → Production translation (latency / memory / data cost of running this at your company).
+
+Interviewers reward calibrated disagreement: pick one ablation you don't believe, or one baseline they didn't compare against, and explain why it matters. "I'd want to see this against X with the same compute budget" lands better than rephrasing the abstract.
+
+For systems-y papers (DeepSeek-V3-style), have a separate axis ready: training-compute cost, inference cost per token, serving-side memory, and what would break if you scaled it 10×.
+
+Time budget: 30 minutes of paper Q&A is 3 deep topics, not 10 shallow ones. Pick which 3 you'd defend before you walk in.
+
+Preparation
+
+Spend the 48 hours making notes on the 7-point framework, not re-reading the paper line by line.
+
+Build a 'production translation' angle for each major contribution — Amazon disproportionately rewards 'how does this run at scale' answers.
+
+Practice with a peer: present the paper for 5 minutes, then absorb 10 minutes of pushback.
+
+Drill ladder: (1) spend the first hour making notes in the 7-point framework, not re-reading the paper line by line; (2) sketch the architecture from memory — if you can't, you don't know it well enough; (3) draft one production-translation paragraph ("to serve this at 10k QPS we'd need…"); (4) practice with a peer: present for 5 minutes, absorb 10 minutes of pushback, iterate.
+
+Pre-build a generic "why this design choice" template per paper subsystem: attention variant, training objective, data mixture, scaling law — for each, name the alternative the authors didn't pick and one reason for and against.
+
+Memorize one number per major contribution (parameter count, training tokens, throughput delta) — concrete numbers signal you actually read the paper.
+
+Build the production-translation muscle: pick one recent paper you weren't assigned and write a 1-page "how would Amazon run this" doc. The skill transfers directly to the interview.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

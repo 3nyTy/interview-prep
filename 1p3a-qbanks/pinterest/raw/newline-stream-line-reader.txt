@@ -1,0 +1,56 @@
+===H1===
+Newline-Split Stream Reader
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/newline-stream-line-reader
+===BODY===
+Pinterest
+Coding·60 minMembers
+Newline-Split Stream Reader
+Given a class with a `next()` method that returns arbitrary string chunks containing zero or more embedded newlines, write a wrapper that yields one full line per call. Chunks can split a line mid-word; partial lines from one chunk must be joined with the start of the next.
+SWE
+string
+iterator
+string-processing
+streaming
+medium
+Frequency
+Single report
+Last asked
+2025-11-28
+Stage
+onsite-coding
+Requirements
+
+The given class exposes next() -> string, where each call returns one chunk of the underlying stream. Chunks may contain zero, one, or many \n characters and may end mid-line.
+
+Example chunk sequence (literal \n shown for clarity):
+
+"one\ntw",  "o\n",  "three\nfour",  "\nfi",  "ve"
+
+The expected output, one full line per emission:
+
+"one", "two", "three", "four", "five"
+
+Implement a wrapper class whose own nextLine() (or generator) consumes chunks as needed and emits one complete line per call.
+
+Notes
+
+Maintain a buffer string of "text seen but not yet emitted". On each nextLine call: scan the buffer for \n; if found, slice and emit the prefix; else call the underlying next() and append, repeat. End-of-stream needs an explicit sentinel — define what next() returns when exhausted and emit any leftover buffered text as the final line.
+
+The most common bug: language split quirks. Java's String.split("\n") drops trailing empty strings by default and treats a leading \n as a leading empty match; pass a negative limit (split("\n", -1)) to preserve them. Python's str.split("\n") keeps empties.
+
+Edge cases the interviewer will probe: a chunk that is exactly "\n" (emit one empty line and continue), consecutive newlines "a\n\nb" (emit "a", then "", then continue buffering "b"), and a stream that never terminates with a newline (emit the tail on EOF only).
+
+Preparation
+
+Practice the buffer-scan + lazy-pull pattern in 10 minutes on a small example before adding any language-specific helpers.
+
+Pre-rehearse the split quirks for the language you plan to use — losing 15 minutes to a split edge case is the single most-cited reason this round goes sideways.
+
+Walk the example chunk sequence by hand on a whiteboard before writing code; the chunk boundaries are deliberately placed to expose all the edge cases at once.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

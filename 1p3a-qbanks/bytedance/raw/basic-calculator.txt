@@ -1,0 +1,62 @@
+===H1===
+Basic Calculator (with and without parentheses)
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/basic-calculator
+===BODY===
+ByteDance / TikTok
+Coding·60 minFree preview
+Basic Calculator (with and without parentheses)
+Implement a string calculator supporting +, -, *, / on integers. Variants range from no-parentheses (operator precedence only) to full infix with parentheses and unary minus.
+SWE
+stack
+parsing
+string-processing
+hard
+Frequency
+Medium
+Last asked
+2026-08-26
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Implement calculate(s: str) -> int over an expression string. Variants asked, easiest first:
+
+No parentheses, +/-/*//: operator precedence matters but no nesting. Single pass with a stack of running terms.
+
+With parentheses: same operators plus ( and ), including nested. Handle unary minus at the start of an expression or right after (.
+
+Full infix expression (reported as the toughest variant): includes spaces, multi-digit numbers, possible nested parentheses, and the interviewer expects you to handle every edge case before writing code.
+
+Common signatures:
+
+def calculate(s: str) -> int: ...
+
+Notes
+
+The canonical pattern is a one-pass scan with a stack of partially-evaluated terms and a prev_op register. On seeing +/-, push the current number with its sign; on *//, pop the top, combine, push back.
+
+For nested parentheses, push (result_so_far, sign_before_paren) onto a stack when you see ( and unwind on ).
+
+Integer division semantics: most variants want truncation toward zero, not floor — clarify with the interviewer because Python's // is floor division.
+
+A common follow-up: add support for unary -, then for ^ (right-associative exponent). The shunting-yard algorithm generalizes cleanly if asked to go further.
+
+Reported pitfall: candidates who jump straight to shunting-yard / two-stack approaches sometimes get stuck on edge cases like "3+ -2" or empty parens. The single-stack template is more forgiving.
+
+Preparation
+
+Write the no-parentheses version from scratch until you can do it in 10 minutes with full test cases.
+
+Then extend to support parentheses by adding the (value, sign) stack frame trick.
+
+Practice walking through "(2+3)*(4-1)" and "3+5/2" on the whiteboard — these are the standard sanity checks interviewers reach for.
+
+Have a clean test harness ready: at least one test per operator, one nested-parens test, one division-rounding test.
+
+A current e-commerce screen used the four-operator integer version as the implemented task and reserved parenthesis handling for a verbal follow-up. Clarify whether the extension must be coded before choosing the parsing structure.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

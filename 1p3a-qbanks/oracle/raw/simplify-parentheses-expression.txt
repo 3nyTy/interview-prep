@@ -1,0 +1,67 @@
+===H1===
+Simplify Expression by Removing Parentheses
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/simplify-parentheses-expression
+===BODY===
+Oracle
+Coding·30 minMembers
+Simplify Expression by Removing Parentheses
+Given an arithmetic expression containing variables, `+`, `-`, and parentheses, return an equivalent expression with all parentheses removed and signs propagated. Asked in the Oracle Labs AI/ML SDE3 onsite as one of two coding problems.
+MLE
+SWE
+string
+stack
+parsing
+medium
+Frequency
+Single report
+Last asked
+2025-06-10
+Stage
+onsite-coding
+Requirements
+
+Input: a string representing an expression over single-letter variables, +, -, and parentheses. Example: -(a+b-(c-d)).
+
+Output: an equivalent expression with all parentheses removed and signs distributed. Example output: -a-b+c-d.
+
+No multiplication, division, or numeric literals — only addition / subtraction over symbols.
+
+Whitespace handling is not strictly specified; trim it on input or treat it as transparent.
+
+Examples
+
+Input:  "-(a+b-(c-d))"
+Output: "-a-b+c-d"
+
+Input:  "a-(b-c)"
+Output: "a-b+c"
+
+Input:  "a+(b-(c+d))"
+Output: "a+b-c-d"
+
+Notes
+
+The canonical solution is a single left-to-right scan maintaining a stack of effective signs. Push +1 initially. On ( preceded by a sign, push current_sign * stack.top(). On ), pop. For each variable letter, emit it with current_sign * stack.top().
+
+An equivalent formulation: walk the string with an integer sign ∈ {+1, -1} flipped lazily on each - and pushed onto a stack at (. Variables emit their letter with the sign as a prefix.
+
+Common bug: forgetting that a leading -( or +( toggles the effective sign for everything inside the group. Test with -(a+b) → -a-b.
+
+Edge case: nested groups must compose. -(-(a)) → a (two sign flips cancel). Walk one nested test case by hand before coding.
+
+If the interviewer extends to include multiplication or division, the problem changes character — it becomes expression tokenisation + tree evaluation. The Oracle round in question did not extend that way.
+
+Preparation
+
+Implement the stack-of-signs approach from scratch in 15 minutes.
+
+Drill three nested-sign test cases by hand: -(a+b-(c-d)), a-(b-(c-(d+e))), and -(-(-a)).
+
+Have the recursive-descent version ready as a backup — some interviewers prefer that framing when they realise the iterative version requires careful stack accounting.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

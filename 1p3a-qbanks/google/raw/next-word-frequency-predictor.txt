@@ -1,0 +1,50 @@
+===H1===
+Next-Word Predictor
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/next-word-frequency-predictor
+===BODY===
+Google
+CodingMembers
+Next-Word Predictor
+Process training data and predict the most frequent next word for a supplied word. Maintain prediction state during processing so prediction can run in constant time.
+SWE
+string
+hashmap
+data-structure
+Frequency
+Single report
+Last asked
+2026-09-02
+Stage
+onsite-coding
+Requirements
+
+Provide a processing operation that consumes training data and records which words follow each word.
+
+Provide a prediction operation that takes a word and returns the next word with the highest observed frequency.
+
+Maintain the current highest-frequency successor during processing, allowing prediction in O(1) time.
+
+Notes
+
+Exact method signatures, tokenization rules, frequency ties, and behavior for an unseen word are unspecified.
+
+The candidate used a dictionary and stored the current best successor during processing. Calling this state a cache caused a misunderstanding: the interviewer initially thought updates would happen during prediction. Explain the update timing explicitly.
+
+After agreeing on tokenization and sequence boundaries, increment a counter for each adjacent pair (previous_word, next_word). For each previous word, retain a successor whose count is maximal. Compare the updated successor with the retained best immediately during processing; prediction only reads that stored best.
+
+With insertion-only counts, a pair whose count did not change cannot newly overtake the best. Under a practice convention that retains the incumbent on ties, replace the best only when the updated count is strictly larger. If a different tie rule is required, apply it explicitly on equal counts.
+
+Hash-table updates per observed pair and prediction are expected O(1), excluding tokenization/string hashing costs. Store O(P + V) state for P distinct pairs and V predecessor words. Clarify unseen-word results and whether separate training sequences create cross-boundary pairs.
+
+Preparation
+
+Implement pair counting and best-successor maintenance during processing, then compare predictions with a full scan of each successor counter.
+
+Trace repeated pairs, a tie, a new leader, an unseen word, and separate training sequences; write down the tie and sequence-boundary conventions before testing.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

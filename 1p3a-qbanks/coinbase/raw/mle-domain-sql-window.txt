@@ -1,0 +1,47 @@
+===H1===
+MLE Onsite — Domain Round (ML Coding + SQL Window Function)
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/mle-domain-sql-window
+===BODY===
+Coinbase
+Coding·60 minMembers
+MLE Onsite — Domain Round (ML Coding + SQL Window Function)
+MLE domain round: one short ML coding warm-up (e.g. a logistic-regression update step or k-means iteration) followed by a medium SQL problem that almost always requires a window function and a sub-query. Tight on time — both halves need to land.
+MLE
+ml-knowledge
+sql
+query-optimization
+medium
+Frequency
+Single report
+Last asked
+2025-12-19
+Stage
+onsite-coding
+Requirements
+
+ML coding (≈20 min): a small implementation problem from the same family as the OA's classical-ML items — implement one method (gradient step, similarity, etc.) from spec.
+
+SQL (≈40 min): a medium-difficulty analytical query. Recent prompts have required a window function (ROW_NUMBER, LAG, or SUM() OVER (PARTITION BY ...)) combined with a sub-query or CTE. Typical shape: "for each user, the X-th most recent event meeting condition Y, joined to its preceding event for delta computation."
+
+Notes
+
+The window-function half is the most common failure point — interviewers seem to specifically probe whether you can move beyond GROUP BY into proper analytics SQL. If your SQL is rusty, this is the single highest-leverage refresh before the round.
+
+Show the query plan thought process verbally: which columns are partitioned, which are ordered, what the inner CTE produces. Whiteboard-quality reasoning matters more than syntactic perfection on the first try.
+
+The ML coding half tends to be short and unambiguous — don't over-invest. Land it cleanly and move on.
+
+Preparation
+
+Drill window-function patterns: rolling sums, per-partition rankings, lag-based deltas. Mode Analytics' SQL window exercises or LeetCode's Hard SQL set covers the surface in a few hours.
+
+Pre-rehearse a verbal template: "I'll use a CTE that partitions by X ordered by Y, then row-number to filter to the N-th event, then self-join for the delta."
+
+Refresh one classical-ML implementation (logistic regression gradient step is the most common) so the warm-up takes < 15 minutes.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,62 @@
+===H1===
+Deduplicating File System
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/deduplicating-file-system
+===BODY===
+Citadel / Citadel Securities
+CodingMembers
+Deduplicating File System
+Implement a Python FileSystem with writefile(path, data) and readfile(path), storing identical file contents only once. Discuss avoiding unnecessary hashing and extending shared storage to support deletion.
+SWE
+filesystem
+dedup
+hashing
+python
+oop-design
+Frequency
+Single report
+Last asked
+2026-09-08
+Stage
+phone-screen
+Requirements
+
+Complete a supplied Python FileSystem class with writefile(path, data) and readfile(path).
+
+Store one physical copy of identical content while allowing multiple file paths to access it through a shared-file mapping.
+
+Model physical storage with a path → data dictionary and shared paths with a path → original_path dictionary. Maintain a global index keyed by file size, with lists of (hash_value, original_path) entries. A mock hash(x) function is provided.
+
+On a write, identify matching content using the size index and hash comparison. For duplicate content, record the shared-path mapping; otherwise store the data and update the index.
+
+On a read, resolve a shared path to its original path before returning the stored data; read ordinary paths directly from physical storage.
+
+Follow-up: reduce hashing overhead by first checking whether any existing file has the same size. Compute and compare hashes only when a size match exists.
+
+Deletion follow-up: explain a shared storage pool with reference counts. Increment the count for another reference to identical content, decrement it on deletion, and reclaim the underlying storage when the count reaches zero.
+
+Examples
+
+/a/b/c.txt and /a/b/e.txt both contain "hello". They should share one stored copy of that content.
+
+Notes
+
+The initial implementation computes the hash before looking up the size bucket; the optimization discussion moves that work after the size check. Distinguish the working baseline from the requested optimization.
+
+The exercise uses matching mock hashes to identify duplicate content. Hash-collision handling and overwrite semantics are unspecified and should be clarified before extending the implementation.
+
+Coding and design discussion consumed the technical interview; the session moved directly to candidate Q&A without a behavioral segment.
+
+Preparation
+
+Implement the two path mappings and size index, then run the existing identical-content example. Verify that both paths read the same data while physical storage contains one copy; also test empty content and different contents of equal size.
+
+Instrument the mock hash function with a call counter and implement the size-first optimization. If hashing is skipped for the first file of a size, defer its index hash and compute it when that bucket is next compared; verify that a previously unseen size requires no hash call.
+
+Implement the deletion follow-up with stable shared-storage objects and reference counts. Delete the first-created path while another path still shares its content, verify the surviving read, then delete the final reference and verify storage reclamation.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,73 @@
+===H1===
+Active Users Sliding Window
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/active-users-sliding-window
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Active Users Sliding Window
+Implement a request-log aggregator that supports adding `(timestamp, userId)` events and returning the number of distinct users active in the last five minutes. The main trap is duplicate users inside the window and whether timestamps are guaranteed to arrive in order.
+SWE
+streaming
+sliding-window
+hashmap
+queue
+tree
+medium
+Frequency
+Single report
+Last asked
+2026-05-03
+Stage
+phone-screen
+Requirements
+
+Implement a class over request logs. Each log has a timestamp and a user id:
+
+class ActiveUsers:
+    def add(self, timestamp: int, userId: str) -> None: ...
+    def getActiveUsers(self, currentTimestamp: int) -> int: ...
+
+A user is active if they appear at least once in the previous five-minute window. Clarify whether the boundary is inclusive before coding; the interviewer explicitly probes the currentTimestamp - 300 edge.
+
+Base assumptions:
+
+Timestamps arrive in nondecreasing order.
+
+The return value is the number of distinct active users, not the raw number of events.
+
+Multiple events from the same user inside the window count once.
+
+Follow-ups:
+
+If the same user appears many times inside the window, maintain a per-user count so the user is removed only when their last in-window event expires.
+
+If timestamps are not increasing, a FIFO queue no longer suffices. Use a TreeMap / balanced BST keyed by timestamp, with each bucket holding per-user counts, then expire all buckets older than the window.
+
+If the data no longer fits on one machine, shard by userId so each user belongs to exactly one shard; aggregate the per-shard active-user counts without double-counting.
+
+If getActiveUsers is called very frequently, discuss lazy cleanup, short-lived result caching, or background cleanup. Be precise that changing currentTimestamp changes the window and limits cache validity.
+
+Notes
+
+In the ordered-timestamp version, keep a queue of (timestamp, userId) events plus a hashmap userId -> countInWindow. add pushes the event and increments the count. getActiveUsers(t) pops expired events from the queue, decrements counts, deletes users whose count reaches zero, and returns len(counts).
+
+Complexity under ordered timestamps: add is O(1). getActiveUsers is O(k) for the number of events expired by that call, amortized O(1) per event across the stream. Space is O(n) for events still in the active window.
+
+Boundary semantics must be confirmed before writing tests. A common implementation deletes timestamp < current - 300; if the interviewer defines the window differently, this off-by-one flips at exactly five minutes.
+
+The scale follow-up is more important than it first appears: sharding by timestamp can double-count users across shards, while sharding by user id preserves distinct-count correctness.
+
+Preparation
+
+Implement the queue + hashmap version and write tests for duplicate users, empty state, all events expired, and the exact 300-second boundary.
+
+Rewrite the cleanup step with both inclusive and exclusive window semantics so the comparison is deliberate rather than accidental.
+
+Sketch the out-of-order version with a balanced timestamp map and bucket-level user counters; be able to explain why the simple queue invariant breaks.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

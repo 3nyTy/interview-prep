@@ -1,0 +1,96 @@
+===H1===
+Shard Rebalance / Overlapping Key Range
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/shard-rebalance
+===BODY===
+OpenAI
+Coding·60 minMembers
+Shard Rebalance / Overlapping Key Range
+Given a set of shards (each with id/start/end key range), support `add_shard / remove_shard` and implement `rebalance()` so that no more than `limit` shards overlap at any point. Trim excess, fill gaps, minimize data movement.
+SWE
+algorithm
+interval
+simulation
+medium
+Frequency
+Medium
+Last asked
+2026-06-26
+Stage
+phone-screen
+Requirements
+
+class Shard:
+ id: str
+ start: int
+ end: int
+
+class Shards:
+ def __init__(self, limit: int): ...
+ def add_shard(self, shard: Shard): ...
+ def remove_shard(self, shard_id: str): ...
+ def rebalance(self): # implement
+ ...
+
+Example (limit = 1):
+
+add('A', 0, 100)
+add('B', 80, 180)
+→
+('A', 0, 100)
+('B', 101, 180) # later shard yields its overlap
+
+Canonical string-form variant
+
+A common rotation packs each shard as "id:start:end" and exposes rebalance(limit, shards) as a pure function:
+
+def rebalance(limit: int, shards: list[str]) -> list[str]: ...
+    # Each input string has the format "id:start:end" with distinct, colon-free ids.
+    # Coverage on key k = number of shards whose [start, end] contains k.
+    # 1. Sort the input by start asc, then end asc.
+    # 2. Walk in order; if a shard would push any key's coverage past `limit`,
+    #    shift its start forward to the earliest key where coverage is strictly < limit.
+    # 3. If the shift makes start > end, drop the shard.
+    # 4. After all shifts/drops, if a gap opens inside the original
+    #    [min(start), max(end)] envelope, extend the most recently kept shard's
+    #    end forward to cover the gap so coverage stays contiguous.
+    # Output strings may be returned in any order.
+    # Constraints: 1 <= limit <= 1e5, 0 <= len(shards) <= 1e4, -1e9 <= start <= end <= 1e9.
+
+Notes
+
+Priority rule: when overlap exceeds limit, trim the later/right-most-added range because that minimizes data movement.
+
+Gaps must also be filled so coverage stays continuous.
+
+A hot 'new general coding' question.
+
+The core mechanic is a sweep-line over interval endpoints: sort the (start, end, shard_id) triples by start, walk the events with an active-set counter, and when the counter would exceed limit clip the newer range's start (or split it) to enforce the cap. This is the canonical merge-intervals skeleton with a per-event "too many active" predicate instead of "any overlap". Time O(n log n) for the sort, O(n) for the sweep; the segment-tree variant only pays off if you need range-count queries between add_shard calls.
+
+Chained-shift corner case
+
+When multiple shards pile up at the same starting key, shifts can cascade across several shards in sequence. Consider limit = 2 with shards A:0:30, B:0:31, C:0:32, D:0:100 (sorted by start asc, end asc). After A and B saturate [0, 30], shard C must start at 31; then D finds [0, 31] also saturated and must start at 32. The rebalanced output is A:0:30, B:0:31, C:31:32, D:32:100. The sweep must re-evaluate the effective coverage frontier after each shift — a simple "shift once and move on" loop will mis-handle this case.
+
+Gap-fill invariant
+
+After all shifts and drops, if a gap opens between the last kept shard's end and the next surviving shard's start, extend the most recently kept shard's end to nextShard.start − 1 to restore contiguous coverage from the original min(start) to max(end). The worked example: with limit = 2 and shards A:0:100, B:40:110, C:80:200, D:210:300, shard C shifts to 101 and is then extended to 209 to close the gap before D starts at 210, yielding A:0:100, B:40:110, C:101:209, D:210:300.
+
+Add/remove shard follow-up
+
+A newer onsite variant splits the prompt into two parts. Part 1 is the overlapping-range rebalance above. Part 2 pivots to implementing add_shard / remove_shard plus key hashing with an algorithm of your choice; consistent hashing with virtual nodes is an acceptable design direction, but the interviewer expects executable code rather than only a verbal sketch. Clarify early whether Part 2 should build on the interval-rebalance state or is an independent sharding API.
+
+Preparation
+
+Sort intervals by start; sweep and track active shard count
+
+Sweep-line / segment-tree thinking: when count would exceed limit, truncate the new range's start
+
+Decide upfront whether 'minimize data movement' is measured in bytes or range length
+
+Warm up on the canonical sort-and-sweep merge-intervals pattern, then drill the variant where the predicate is active_count > limit instead of next.start <= prev.end
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,462 @@
+===H1===
+RLE + Bit-Packing Encoder / Decoder
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/rle-bit-packing-encoder-decoder
+===BODY===
+Databricks
+Coding·60 minMembers
+RLE + Bit-Packing Encoder / Decoder
+Implement a streaming integer encoder that chooses between run-length encoding and bit-packing, then optionally implement an iterator-style decoder. Edge cases include negative values and integer limits.
+SWE
+Infra Eng
+compression
+iterator
+streaming
+medium
+Frequency
+Medium
+Last asked
+2026-08-13
+Stage
+phone-screen · onsite-coding
+Problem Statement
+
+Build an encoder and decoder to compress a list of 32-bit integers. You must use two specific methods: Run-Length Encoding (RLE) and Bit-Packing (BP).
+
+The encoder must work in streaming mode. This means you get integers one by one. You cannot save the whole list before you start. You must choose the best encoding method while following the rules below.
+
+How Encoding Works
+
+1. Run-Length Encoding (RLE)
+
+This method compresses a list of identical numbers into a single pair: (value, count).
+
+Example:
+
+Input:  [7, 7, 7, 7, 7, 7, 7, 7, 7]
+Output: RLE[7, 9]
+
+Why use it: It saves a lot of space when the same number repeats many times.
+
+2. Bit-Packing (BP)
+
+This method stores exactly 8 values in a group. The values do not need to be the same.
+
+Example:
+
+Input:  [1, 2, 3, 4, 5, 6, 7, 8]
+Output: BP[1, 2, 3, 4, 5, 6, 7, 8]
+
+Why use it: It handles numbers that don't repeat. It is more efficient than storing numbers individually.
+
+Rules for Encoding
+
+You must follow these strict rules:
+
+Keep the Order: You cannot change the order of the numbers.
+
+RLE Needs 8 Items: You can only use RLE if you have at least 8 identical values in a row.
+
+Exception: The very last group can have fewer than 8.
+
+Extend RLE: If you start an RLE group, keep adding to it as long as the values are the same.
+
+BP Needs 8 Items: A Bit-Packing group must have exactly 8 values.
+
+Exception: The very last group can have fewer than 8.
+
+Prefer RLE: Always try to use RLE first. Only use BP if you don't have enough repeated numbers to make an RLE group.
+
+Mixing: You can mix these methods in any order (e.g., [RLE, BP, RLE, BP]).
+
+Example Scenarios
+
+Example 1: Short repeated sequence
+
+Input:  [1, 1, 1]
+Output: RLE[1, 3]
+
+Reason: There are only 3 numbers. Since this is the end of the stream,
+        we can use RLE even though it is less than 8.
+
+Example 2: Different values
+
+Input:  [1, 1, 1, 1, 2, 3, 4, 5]
+Output: BP[1, 1, 1, 1, 2, 3, 4, 5]
+
+Reason: We only have four 1s. That is not enough for RLE (needs 8).
+        We fit all 8 numbers into one BP group.
+
+Example 3: RLE threshold met
+
+Input:  [1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5]
+Output: RLE[1, 8], BP[2, 3, 4, 5]
+
+Reason: The first 8 numbers are the same, so we use RLE.
+        The last 4 numbers are different, so we use BP.
+
+Example 4: Long RLE run
+
+Input:  [1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5]
+Output: RLE[1, 9], BP[2, 3, 4, 5]
+
+Reason: The first 9 numbers are the same. We make the RLE group as long as possible.
+
+Example 5: Multiple RLE runs
+
+Input:  [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1]
+Output: RLE[5, 10], BP[1, 2, 1, 1, 1, 1, 1, 1], RLE[1, 2]
+
+Reason:
+- First 10 fives -> RLE
+- Next 8 mixed numbers -> BP
+- Last 2 ones -> RLE (allowed because it's the end)
+
+Constraints and Challenges
+
+Streaming Requirement
+
+Crucial: You must build a Streaming Encoder.
+
+Numbers arrive one by one using an append(value) function.
+
+You cannot see the whole list at once.
+
+You must make decisions immediately.
+
+You do not know when the data will end until the finish() command is called.
+
+The "Last Run" Challenge
+
+Because you don't know if more data is coming:
+
+Any group you are building might be the last one.
+
+The last group is allowed to be small (less than 8).
+
+Dilemma: If you have five 3s ([3, 3, 3, 3, 3]), should you output them now?
+
+If you output now, you might break a long RLE chain if more 3s come later.
+
+If you wait, you need a place (buffer) to store them.
+
+Code Structure
+
+You need to write code for these classes:
+
+1. Run Interface
+
+interface Run {
+    String encode();  // Returns string representation
+}
+
+2. RLERun Class
+
+class RLERun implements Run {
+    int value;
+    int count;
+
+    RLERun(int value, int count) {
+        this.value = value;
+        this.count = count;
+    }
+
+    @Override
+    public String encode() {
+        return "RLE[" + value + ", " + count + "]";
+    }
+}
+
+3. BPRun Class
+
+class BPRun implements Run {
+    List<Integer> values;
+
+    BPRun(List<Integer> values) {
+        this.values = values;
+    }
+
+    @Override
+    public String encode() {
+        return "BP" + values.toString();
+    }
+}
+
+4. Encoder Class (Your Task)
+
+class Encoder {
+    // TODO: Add variables to store streaming state
+
+    // Process one value at a time
+    public void append(int value) {
+        // TODO: Write streaming logic here
+    }
+
+    // Finish and return all runs
+    public List<Run> finish() {
+        // TODO: Clear buffer
+        // TODO: Return final list
+    }
+}
+
+5. Decoder Class (Your Task)
+
+class Decoder {
+    public List<Integer> decode(List<Run> runs) {
+        // TODO: Convert runs back to numbers
+    }
+}
+
+Solution Approach
+
+Key Ideas
+
+Buffer: Keep a list of "pending" numbers that you haven't encoded yet.
+
+Wait for 8: You cannot decide to use RLE until you see at least 8 identical numbers.
+
+Fallback to BP: If you have 8 numbers in your buffer and they don't form an RLE group, turn the first 8 into a BP group.
+
+Track State: Keep track of what number you are currently counting.
+
+Algorithm Logic
+
+Variables:
+- buffer: A list of numbers waiting to be processed.
+- result: The final list of encoded objects.
+
+When append(value) is called:
+1. Add the value to the buffer.
+2. Check if the start of the buffer has >= 8 identical values:
+   - If yes: Create an RLE run, add it to results, and remove those numbers from the buffer.
+3. Check if the buffer has >= 8 mixed values (and RLE didn't work):
+   - If yes: Create a BP run with the first 8 values, add to results, and remove them from buffer.
+
+When finish() is called:
+1. Look at the remaining buffer.
+   - If all values are the same -> Make an RLE run.
+   - If values are mixed -> Make a BP run.
+2. Return the result list.
+
+Solution 1: Batch Encoder (Easier Version)
+
+This version assumes you have the entire array at the start. It is easier than streaming but helps understand the logic.
+
+class Encoder {
+    public List<Run> encode(int[] input) {
+        List<Run> result = new ArrayList<>();
+        int i = 0;
+
+        while (i < input.length) {
+            // Count how many times the current number repeats
+            int j = i;
+            while (j < input.length && input[j] == input[i]) {
+                j++;
+            }
+            int count = j - i;
+
+            // Rule: If 8 or more repeats, use RLE
+            if (count >= 8) {
+                result.add(new RLERun(input[i], count));
+                i = j;
+            }
+            // If less than 8 repeats
+            else {
+                int remaining = input.length - i;
+
+                // Special Case: If we are at the end and values are same,
+                // RLE is better than BP.
+                if (remaining == count) {
+                    result.add(new RLERun(input[i], count));
+                    i = j;
+                }
+                // Otherwise, take next 8 (or fewer) for BP
+                else {
+                    int bpEnd = Math.min(input.length, i + 8);
+                    List<Integer> bpValues = new ArrayList<>();
+                    for (int k = i; k < bpEnd; k++) {
+                        bpValues.add(input[k]);
+                    }
+                    result.add(new BPRun(bpValues));
+                    i += bpValues.size();
+                }
+            }
+        }
+
+        return result;
+    }
+}
+
+Why this works:
+
+It grabs RLE groups greedily (whenever it sees 8+ matches).
+
+It handles the last group correctly (prefers RLE if possible).
+
+It defaults to BP for mixed numbers.
+
+Solution 2: Decoder Implementation
+
+The decoder is simple. It just expands the groups back into a list of numbers.
+
+class Decoder {
+    public List<Integer> decode(List<Run> runs) {
+        List<Integer> output = new ArrayList<>();
+
+        for (Run run : runs) {
+            if (run instanceof RLERun) {
+                RLERun rle = (RLERun) run;
+                // Add the value 'count' times
+                for (int i = 0; i < rle.count; i++) {
+                    output.add(rle.value);
+                }
+            } else if (run instanceof BPRun) {
+                // Add all values from the list
+                output.addAll(((BPRun) run).values);
+            }
+        }
+
+        return output;
+    }
+}
+
+Follow-Up Questions
+
+1. Implement Streaming
+
+Task: Write the streaming version using append(value) and finish().
+Hint: Use a buffer (List) to hold values until you have enough data to make a decision (usually 8 items).
+
+2. Optimize Input
+
+Task: Calling append(value) one million times for the number "5" is slow. Create a new method append(value, count).
+Hint: Update your logic to handle "chunks" of numbers arriving at once.
+
+3. Real Bit-Packing details
+
+Task: BP usually means packing numbers into fewer bits. Implement actual bit-packing.
+Example: If the largest number in a group is 7, you only need 3 bits per number. Pack 8 numbers into a byte array.
+
+4. Configurable RLE Size
+
+Task: Allow the user to set the minimum RLE size (instead of hardcoding 8).
+Example: new Encoder(minRleSize=5).
+
+5. Measure Compression
+
+Task: Add a function to calculate the compression ratio.
+Formula: Ratio = (Original Size) / (Encoded Size).
+
+Test Cases
+
+class Main {
+    public static void main(String[] args) {
+        Encoder encoder = new Encoder();
+        Decoder decoder = new Decoder();
+
+        // Test 1: Short repeated sequence (last run < 8)
+        int[] input1 = {1, 1, 1};
+        List<Run> encoded1 = encoder.encode(input1);
+        System.out.println("Test 1:");
+        for (Run run : encoded1) {
+            System.out.println("  " + run.encode());
+        }
+        // Expected: RLE[1, 3]
+
+        // Test 2: Mixed sequence
+        int[] input2 = {1, 1, 1, 1, 2, 3, 4, 5};
+        List<Run> encoded2 = encoder.encode(input2);
+        System.out.println("Test 2:");
+        for (Run run : encoded2) {
+            System.out.println("  " + run.encode());
+        }
+        // Expected: BP[1, 1, 1, 1, 2, 3, 4, 5]
+
+        // Test 3: RLE threshold met
+        int[] input3 = {1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5};
+        List<Run> encoded3 = encoder.encode(input3);
+        System.out.println("Test 3:");
+        for (Run run : encoded3) {
+            System.out.println("  " + run.encode());
+        }
+        // Expected: RLE[1, 8], BP[2, 3, 4, 5]
+
+        // Test 4: Extended RLE
+        int[] input4 = {1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5};
+        List<Run> encoded4 = encoder.encode(input4);
+        System.out.println("Test 4:");
+        for (Run run : encoded4) {
+            System.out.println("  " + run.encode());
+        }
+        // Expected: RLE[1, 9], BP[2, 3, 4, 5]
+
+        // Test 5: Decoder verification
+        List<Integer> decoded = decoder.decode(encoded4);
+        System.out.println("Decoded Test 4: " + decoded);
+        // Expected: [1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5]
+
+        // Test 6: Streaming encoder
+        StreamingEncoder streamEncoder = new StreamingEncoder();
+        for (int val : input4) {
+            streamEncoder.append(val);
+        }
+        List<Run> streamEncoded = streamEncoder.finish();
+        System.out.println("Streaming Test:");
+        for (Run run : streamEncoded) {
+            System.out.println("  " + run.encode());
+        }
+        // Expected: RLE[1, 9], BP[2, 3, 4, 5]
+    }
+}
+
+Time and Space Complexity
+
+Batch Encoder
+
+Time: O(n). We look at every number once.
+
+Space: O(k). k is the number of groups created.
+
+Streaming Encoder
+
+Time: O(n). Same as batch, but spread out over calls.
+
+Space: O(b + k). b is the buffer size (small), k is the output.
+
+Decoder
+
+Time: O(n). We recreate every number.
+
+Space: O(n). The size of the final array.
+
+Real-World Uses
+
+Databases: Systems like Apache Spark use this to store columns of data.
+
+Sensors: Thermometers often record the same temperature many times in a row.
+
+Images: Simple images are compressed using RLE.
+
+Networks: Sending data efficiently over the internet.
+
+Tips for the Interview
+
+Clarify BP: Ask if BP means "list of 8 ints" or "bit manipulation".
+
+Start Simple: Write the Batch Encoder first. It proves you understand the logic. Then do Streaming.
+
+Explain Trade-offs:
+
+RLE is great for repeats, bad for random numbers.
+
+BP is good for random numbers.
+
+Check Edge Cases: What happens with an empty list? What if there is only 1 number?
+
+Focus on "Online" Algorithms: The interviewer wants to see how you handle data that comes in piece by piece. Show that you know how to buffer data.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

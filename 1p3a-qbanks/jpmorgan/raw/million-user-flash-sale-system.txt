@@ -1,0 +1,75 @@
+===H1===
+Million-User Flash Sale System
+===URL===
+https://www.1point3acres.com/interview/problems/company/jpmorgan/million-user-flash-sale-system
+===BODY===
+JPMorgan Chase
+System Design·60 minMembers
+Million-User Flash Sale System
+Design a system that handles a million-user flash-sale event. The expected discussion covers necessary components, happy and unhappy paths, and smoothing high-concurrency traffic.
+SWE
+flash-sale
+queueing
+rate-limiting
+idempotency
+scaling
+medium
+Frequency
+Single report
+Last asked
+2025-06-21
+Stage
+onsite-system-design
+Requirements
+
+Functional requirements:
+
+Let users enter a high-demand purchase flow during a flash sale.
+
+Track limited inventory accurately.
+
+Complete purchase / reservation for successful users.
+
+Show clear failure states when inventory is gone or payment fails.
+
+Scale / constraints:
+
+Millions of users can arrive around the same launch time.
+
+Inventory is scarce relative to demand.
+
+The system must degrade gracefully instead of overwhelming checkout, inventory, or payment dependencies.
+
+Design decisions to discuss:
+
+waiting room / queue vs direct checkout
+
+token or reservation TTL before payment
+
+rate limiting and backpressure at the edge
+
+idempotent checkout and duplicate-click handling
+
+happy path and unhappy path workflows
+
+Notes
+
+The prompt asks for both happy path and unhappy path. Do not stop at a component diagram; walk through success, sold-out, timeout, payment failure, and retry.
+
+Smoothing traffic is central. A queue, admission token, or staged release is more relevant than simply adding more web servers.
+
+Inventory correctness matters more than cart convenience; overselling is the failure mode to design against.
+
+Preparation
+
+Draw the request flow from edge throttle to waiting room to reservation service to payment to confirmation.
+
+Prepare one idempotency story: request IDs, reservation IDs, payment retries, and duplicate callback handling.
+
+Practice capacity language: peak arrivals, admitted requests per second, queue depth, reservation TTL, and dependency timeouts.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

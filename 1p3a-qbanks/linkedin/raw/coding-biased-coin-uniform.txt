@@ -1,0 +1,86 @@
+===H1===
+Biased Coin to Uniform Range
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-biased-coin-uniform
+===BODY===
+LinkedIn
+Coding·55 minMembers
+Biased Coin to Uniform Range
+Given a biased Bernoulli (returns 0 with probability `p`, 1 with probability `1-p`), construct a uniform sampler over `[0, 6]`. The canonical recipe: combine two biased draws to get a fair coin (Von Neumann's trick), then bit-pack three fair coins and reject draws outside `[0, 6]`.
+SWE
+MLE
+probability
+sampling
+math-reasoning
+medium
+Frequency
+Low
+Last asked
+2026-02-23
+Stage
+phone-screen · onsite-coding
+Requirements
+
+def getRandom01Biased() -> int:
+    # returns 0 with probability p, 1 with probability 1 - p (p unknown to you)
+    ...
+
+def getRandom06Uniform() -> int:
+    # must return each integer 0..6 with probability exactly 1/7
+    ...
+
+The canonical chain of constructions:
+
+Biased → fair coin (Von Neumann). Call getRandom01Biased() twice. Return 0 on (0, 1), 1 on (1, 0), retry on (0, 0) and (1, 1). The two non-retry outcomes have equal probability p(1-p).
+
+Fair coin → uniform [0, 7). Call the fair coin three times, bit-pack as b₀ * 4 + b₁ * 2 + b₂. Each of the 8 outcomes is 1/8.
+
+Uniform [0, 7) → uniform [0, 6]. Reject the value 7 and retry. The 7 valid outcomes are each 1/7 exactly.
+
+Expected number of fair-coin triplets per accepted value: 8 / 7. Expected biased calls per fair coin: 1 / (2 p (1 - p)), unbounded as p → 0 or p → 1.
+
+Follow-ups reported:
+
+Make it O(1) worst-case. Cannot — any uniform-from-biased construction is unbounded in worst case when p is unknown. The interviewer is checking whether the candidate names this rather than chasing a non-existent algorithm.
+
+Generalize to uniform [0, N). Find the smallest k with 2^k >= N, draw k fair bits, reject if >= N.
+
+Sample uniformly from a disk. Polar coordinates with r = sqrt(Uniform[0, 1]). Sometimes asked as a tangent because it tests inverse-transform sampling intuition.
+
+Examples
+
+biased_p = 0.3 (unknown to you)
+
+# Fair coin from two biased draws
+(0, 0) -> retry
+(0, 1) -> 0
+(1, 0) -> 1
+(1, 1) -> retry
+
+# Three fair bits -> 0..7
+(0, 0, 0) -> 0
+(0, 0, 1) -> 1
+...
+(1, 1, 1) -> 7 (reject)
+
+Notes
+
+The Von Neumann construction works only because the two outcomes (0, 1) and (1, 0) are symmetric under the biased Bernoulli — that's the load-bearing observation in the proof.
+
+Interviewers like to ask the expected-cost question; quoting E[draws] = 1 / (2 p (1 - p)) for the fair coin without prompting earns clear signal.
+
+If asked about a uniform-over-circle-area variant during the same loop, the connection is "inverse-CDF sampling for radius" — both problems share the inverse-transform template.
+
+Preparation
+
+Write all three stages on the board in < 4 minutes; this should be a memorized template.
+
+Be ready to compute the expected number of biased calls per output sample symbolically — (2 / (2 p (1 - p))) × 3 × (8 / 7).
+
+Drill the generalization to arbitrary [0, N); the rejection-on-overflow trick is reused in many sampling problems.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,52 @@
+===H1===
+Group Anagrams
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/lc-group-anagrams
+===BODY===
+Meta
+Coding·20 minMembers
+Group Anagrams
+Classic LC 49 — bucket strings into anagram groups. Surfaced in a recent Sr SDE phone screen as the warm-up.
+SWE
+hashmap
+string
+sorting
+easy
+Frequency
+Single report
+Last asked
+2026-05-08
+Stage
+phone-screen
+Requirements
+
+Input: List[str] strs.
+
+Return groups of strings that are anagrams of each other. Any group ordering is acceptable; group internal order does not matter.
+
+Empty string is a valid anagram of itself.
+
+Examples
+
+Input:  ["eat", "tea", "tan", "ate", "nat", "bat"]
+Output: [["eat","tea","ate"], ["tan","nat"], ["bat"]]
+
+Notes
+
+Standard pattern: hash by sorted string (O(n·k·log k)) or by 26-length character-count tuple (O(n·k) for lowercase ASCII).
+
+For an interviewer who pushes on k being large, the count-tuple variant wins; otherwise either is acceptable.
+
+Phone-screen pace: aim for one-pass build + return values in under 10 minutes so the second problem has room.
+
+Preparation
+
+Write both the sort-key and the tuple-key versions cold; pick the tuple version under time pressure.
+
+Practice the follow-up of returning groups sorted by group size descending — adds a single sorted(groups.values(), key=len, reverse=True) step.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

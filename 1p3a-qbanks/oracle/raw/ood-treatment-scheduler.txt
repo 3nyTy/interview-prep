@@ -1,0 +1,71 @@
+===H1===
+OOD — Treatment Frequency Scheduler
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/ood-treatment-scheduler
+===BODY===
+Oracle
+Coding·45 minMembers
+OOD — Treatment Frequency Scheduler
+Design classes that schedule patient treatments at varying frequencies within a date range, then enumerate every required treatment instance. Asked as the OHAI phone-screen problem with explicit allowance to write pseudo-code or comments for date arithmetic syntax.
+SWE
+oop-design
+object-design
+scheduling
+medium
+Frequency
+Single report
+Last asked
+2025-09-15
+Stage
+phone-screen
+Requirements
+
+Model a treatment with a configurable repeat frequency (e.g. every 4 hours, every 12 hours, daily at 9 AM).
+
+Given a treatment and a date range [start, end], produce the list of all treatment times that fall within the range.
+
+Multiple treatments per patient; the output should be sortable and groupable per patient.
+
+Date arithmetic syntax is not graded — the interviewer explicitly allowed leaving the date math as comments. Logical structure of the classes is what's scored.
+
+Notes
+
+Core class skeleton:
+enum FrequencyUnit { MINUTES, HOURS, DAYS, WEEKS }
+class TreatmentSchedule {
+    String name;
+    int every;          // every N units
+    FrequencyUnit unit;
+    Instant anchor;     // first scheduled time
+    // Optional: time-of-day constraint, weekday filter, etc.
+    List<Instant> occurrencesWithin(Instant from, Instant to) { ... }
+}
+class PatientTreatmentPlan {
+    String patientId;
+    List<TreatmentSchedule> schedules;
+    List<(String, Instant)> allOccurrences(Instant from, Instant to) { ... }
+}
+
+The occurrencesWithin method is the core algorithm: starting from anchor, generate anchor + k * frequency for increasing k while the result falls within [from, to]. Skip generated times before from.
+
+If a treatment has a time-of-day constraint (e.g. "every day at 9 AM"), encode it as (anchor: 9:00 AM today, every: 1, unit: DAYS) rather than a special-case field.
+
+Trap: do not eagerly precompute all occurrences across the patient's lifetime. The query is range-bounded; iterate lazily within [from, to].
+
+Trap: time zones. The interviewer didn't ask, but in healthcare scenarios time-zone-aware scheduling matters — call this out explicitly.
+
+Don't over-engineer with strategy patterns / factories before requirements emerge — same lesson as the body-temperature variant of this prompt.
+
+Preparation
+
+Draft the two-class skeleton in 15 minutes.
+
+Implement occurrencesWithin as a tight loop; verify with a 4-hour treatment over a 24-hour range produces exactly 6 entries.
+
+Have the time-zone caveat ready as a follow-up comment, even if the prompt doesn't surface it explicitly.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

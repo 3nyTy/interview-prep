@@ -1,0 +1,93 @@
+===H1===
+Design an AI Chatbot System
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/design-ai-chatbot-system
+===BODY===
+OpenAI
+System DesignMembers
+Design an AI Chatbot System
+Design a simple AI chatbot system similar to ChatGPT's main interface. The prompt emphasizes frontend architecture and full-stack concepts, with no server-side persistence — all chat state lives in the browser. Key design decisions include streaming response delivery, client-side session management, and authentication flow.
+SWE
+frontend
+fullstack
+chat
+streaming
+sse
+websocket
+api-integration
+access-control
+Frequency
+Low
+Last asked
+2026-07-21
+Stage
+onsite-system-design · phone-screen
+The Task
+
+You need to build a simple AI chatbot that works like ChatGPT. Users should be able to chat with an AI assistant using a website.
+
+System Requirements
+
+User Authentication: Users must log in before they can use the chatbot.
+
+Message Exchange: Users can send text messages and get answers from the AI.
+
+Streaming Responses: The AI's answer should appear on the screen in real-time as it is generated (like a typing effect), rather than waiting for the whole message to finish.
+
+Session Management: Chats are temporary. If a user refreshes the page, the conversation clears, and a new one starts.
+
+Important Rules
+
+No Backend Storage: Do not save user messages or chat history in a database.
+
+Client-Side Storage: You must keep all chat data inside the browser.
+
+Frontend Focus: The design should focus heavily on the Frontend architecture and full-stack concepts.
+
+Deep Dive Topics
+
+During the interview, the interviewer might ask you to explain:
+
+Streaming Technology Choice: Why you chose a specific tool (like Server-Sent Events vs WebSockets) to show the AI's response.
+
+API Integration: How you connect to Chat Completion APIs properly.
+
+Credential Management: How you handle user logins and keep passwords safe.
+
+State Management: How you keep track of the chat data inside the browser.
+
+Error Handling: What happens if the internet cuts out or the API stops working.
+
+Notes
+
+Interview format
+
+Duration: 60 minutes.
+
+Role type: Usually scoped for Full-stack Engineer roles.
+
+Interviewer background: The interviewer often has a Frontend engineering background, so the discussion tends to skew toward the frontend.
+
+Evaluation focus
+
+The interviewer typically drills into these specific areas:
+
+Frontend architecture: how the client-side code is organized, how chat state is managed, and how streaming text is displayed efficiently (avoid re-rendering the whole transcript on every token).
+
+Streaming implementation: the difference between Server-Sent Events (SSE) and WebSockets, when to use which, and how to handle connection issues / dropped streams.
+
+API design: how the frontend sends requests to the Chat Completion API, plus error handling and retry-on-failure logic.
+
+Authentication flow: managing user login details, token-based authentication, and handling sessions without persisting them server-side.
+
+Browser storage: practical ways to keep chat history locally, handle storage limits, and clear data on page refresh.
+
+Additional deep-dive axes
+
+After the no-persistence baseline, the discussion can expand into scalability, availability, fault tolerance, and the system metrics used to judge the design.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

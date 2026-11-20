@@ -1,0 +1,604 @@
+===H1===
+Book Seller External Fan-Out
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/book-seller-external-fanout
+===BODY===
+Databricks
+System Design·60 minMembers
+Book Seller External Fan-Out
+Design a broker that fans out an ISBN, bid price, and payment method to partner bookstores, selects the lowest available price, and orders or returns the best quote. An alternate storefront form covers browse/search, inventory, checkout, payment, and order management within the marketplace itself.
+SWE
+api-integration
+fan-out
+caching
+idempotency
+circuit-breaker
+medium
+Frequency
+High
+Last asked
+2026-08-13
+Stage
+phone-screen · onsite-system-design
+Problem Requirements
+
+Design a service that helps customers buy books at the cheapest price. This service does not sell books directly. Instead, it looks at many other book sellers to find the best deal.
+
+Main Goals:
+
+You are building a web service where:
+
+Customers send a request with:
+
+Book ID (like an ISBN)
+
+The highest price they want to pay (Max Price)
+
+Payment details (Credit Card)
+
+Your Service:
+
+Asks 50 to 200 other sellers for their prices.
+
+Finds the lowest price.
+
+If the price is good (Low Price ≤ Max Price): It buys the book and charges the customer.
+
+If the price is too high: It tells the customer the lowest price it found as a suggestion.
+
+Scale & Constraints:
+
+Books: 1-2 million unique books.
+
+Sellers: 50-200 different seller APIs.
+
+Latency SLA: The whole process must finish in 10-20 seconds.
+
+Request Type: Asynchronous. This means we don't need to answer instantly. We want to avoid crashing the seller APIs.
+
+Common Interview Challenges
+
+The interviewer might ask how you handle specific hard problems.
+
+1. Speeding Up Quotes
+
+How do you ask 200 sellers for prices without waiting too long?
+
+If you ask one by one, it takes too long (20 seconds or more).
+
+You need to ask them all at the same time (Parallel processing).
+
+You must be careful not to ask a single seller too fast (Rate Limiting).
+
+2. Protecting Sellers
+
+How do you stop sending too many orders to a seller at once?
+
+Limit how many requests you send per second.
+
+Use a "Circuit Breaker." This stops requests if a seller is broken.
+
+If a request fails, wait a bit before trying again (Exponential Backoff).
+
+3. Missing Inventory
+
+What if the price was good, but the book is sold out when you try to buy it?
+
+Do not just try the cheapest seller once.
+
+Make a list of sellers from cheapest to most expensive.
+
+Try the cheapest one first. If they are sold out, try the next one on the list.
+
+4. Handling Errors
+
+Other sellers might be broken or slow. How do you handle this?
+
+The seller might be offline.
+
+The seller might send an error code (500 Internal Server Error).
+
+The seller might be too slow.
+
+Decision: Do you wait for every single seller to answer, or do you stop waiting after a few seconds?
+
+5. Managing Money
+
+When do you take money from the customer?
+
+Should you charge them immediately?
+
+Should you charge them only after the seller confirms the book is yours?
+
+What if the seller cancels the order after you took the money?
+
+6. Growing to Big Numbers
+
+How would you change the design if there were 10,000 sellers instead of 200?
+
+You cannot ask 10,000 sellers at once. It is too slow.
+
+You need a smart way to choose which sellers to ask.
+
+You could use Machine Learning to guess which sellers usually have the book.
+
+7. Changing Prices
+
+What if the price changes between the time you check and the time you buy?
+
+You need rules for when a price quote expires.
+
+Sample Solution
+
+Note: This is an example. In a real interview, there are many right answers.
+
+Step 1: Understanding the Goals
+
+First, let's make sure we understand exactly what the system needs to do.
+
+What the System Must Do
+
+Q: What are the main actions?
+
+Take a request (Book, Max Price, Payment).
+
+Ask many sellers for prices.
+
+Buy the book if the price is right.
+
+Tell the customer if the price is too high.
+
+Handle the money safely.
+
+Q: What can the sellers do?
+
+Tell us the price.
+
+Hold a book for us (Reserve it).
+
+Sell the book.
+
+Note: Each seller allows a different number of requests per second.
+
+Q: Is this instant or background work?
+
+Asynchronous: We tell the user "We are working on it" and give them an ID. We email or notify them when we are done.
+
+Q: How do we handle security?
+
+Users must log in.
+
+We must follow strict rules for credit cards (PCI Compliance). We store a token, not the real card number.
+
+System Speed and Quality
+
+Q: How fast and reliable must it be?
+
+Latency SLA: 10-20 seconds total.
+
+Reliability: It should almost always be working (High Availability).
+
+Traffic: We do more reading (checking prices) than writing (buying books).
+
+Step 2: Math and Scale Estimation
+
+Let's do some math to see how big the system needs to be.
+
+Traffic Numbers
+
+Assumptions:
+
+1 million users.
+
+Each user looks for 2 books a month.
+
+Only 20% of searches become actual buy requests.
+
+The Math:
+
+Total Requests: 400,000 per month.
+
+Requests Per Second (QPS): Very low (0.15 QPS). Even at peak times, it is only about 1.5 QPS.
+
+Seller API Calls:
+
+For every 1 customer request, we ask 100 sellers.
+
+Seller QPS: About 150 requests per second at peak times.
+
+Data Storage
+
+Request Info: Very small. About 4.8 GB per year.
+
+Seller Quotes: We store the prices we find. About 240 GB per year.
+
+Bandwidth: Not a problem. The files are small text (JSON).
+
+Latency (Speed) Analysis
+
+Goal: Finish in 10-20 seconds.
+
+Sequential (One by one):
+
+200 sellers × 0.1 seconds each = 20 seconds.
+
+Result: This is too slow.
+
+Parallel (All at once):
+
+Ask 100 sellers at the same time.
+
+It takes about 0.5 seconds total.
+
+Result: This works well.
+
+Step 3: API Design
+
+Public API (For Customers)
+
+1. Send a Buy Request
+
+POST /api/v1/purchase-requests
+Content-Type: application/json
+Authorization: Bearer {customer_token}
+
+Request:
+{
+  "bookId": "isbn-123456",
+  "maxPrice": 29.99,
+  "paymentInfo": {
+    "cardToken": "tok_abc123"
+  }
+}
+
+Response (Accepted - Async Processing):
+{
+  "requestId": "req-xyz",
+  "status": "pending",
+  "estimatedCompletionTime": "2024-01-15T10:30:20Z",
+  "webhookUrl": "/api/v1/purchase-requests/req-xyz/status"
+}
+
+2. Check Request Status
+
+GET /api/v1/purchase-requests/{requestId}
+Authorization: Bearer {customer_token}
+
+Response (Success):
+{
+  "requestId": "req-xyz",
+  "status": "purchased",
+  "finalPrice": 24.99,
+  "sellerId": "seller-42",
+  "orderDetails": {
+    "orderId": "order-456",
+    "confirmationNumber": "CONF-789"
+  },
+  "completedAt": "2024-01-15T10:30:15Z"
+}
+
+Seller API (Internal Use)
+
+This is how our system talks to the book sellers.
+
+1. Get Price
+
+GET /api/v1/books/{bookId}/quote
+
+Response:
+{
+  "bookId": "isbn-123456",
+  "available": true,
+  "price": 24.99,
+  "stock": 5,
+  "quoteId": "quote-abc",
+  "expiresAt": "2024-01-15T10:30:00Z"
+}
+
+2. Buy Book
+
+POST /api/v1/books/{bookId}/purchase
+Content-Type: application/json
+
+Request:
+{
+  "quantity": 1,
+  "paymentToken": "tok_123",
+  "customerId": "user-789"
+}
+
+Response (Success):
+{
+  "orderId": "order-456",
+  "status": "confirmed",
+  "price": 24.99
+}
+
+Step 4: Database Design
+
+We need to save requests, quotes from sellers, and purchase attempts.
+
+-- Track customer purchase requests
+CREATE TABLE purchase_requests (
+    request_id UUID PRIMARY KEY,
+    customer_id VARCHAR(255) NOT NULL,
+    book_id VARCHAR(255) NOT NULL,
+    max_price DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(50) NOT NULL,  -- pending, purchased, price_not_met, failed
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    INDEX idx_customer_created (customer_id, created_at),
+    INDEX idx_status (status)
+);
+
+-- Track quotes from each seller for each request
+CREATE TABLE seller_quotes (
+    quote_id UUID PRIMARY KEY,
+    request_id UUID NOT NULL,
+    seller_id VARCHAR(255) NOT NULL,
+    book_id VARCHAR(255) NOT NULL,
+    price DECIMAL(10, 2),
+    available BOOLEAN NOT NULL,
+    response_time_ms INT,
+    error_message TEXT,
+    quoted_at TIMESTAMP NOT NULL,
+    FOREIGN KEY (request_id) REFERENCES purchase_requests(request_id),
+    INDEX idx_request (request_id),
+    INDEX idx_request_price (request_id, price)  -- For sorting quotes by price
+);
+
+-- Track purchase attempts and outcomes
+CREATE TABLE purchase_attempts (
+    attempt_id UUID PRIMARY KEY,
+    request_id UUID NOT NULL,
+    seller_id VARCHAR(255) NOT NULL,
+    quote_id UUID,
+    attempt_order INT NOT NULL,  -- 1st cheapest, 2nd cheapest, etc.
+    status VARCHAR(50) NOT NULL,  -- success, out_of_stock, failed
+    error_message TEXT,
+    attempted_at TIMESTAMP NOT NULL,
+    FOREIGN KEY (request_id) REFERENCES purchase_requests(request_id)
+);
+
+-- Track seller health and rate limits
+CREATE TABLE seller_metrics (
+    seller_id VARCHAR(255) PRIMARY KEY,
+    total_requests INT DEFAULT 0,
+    failed_requests INT DEFAULT 0,
+    avg_response_time_ms INT,
+    last_failure_at TIMESTAMP,
+    circuit_breaker_status VARCHAR(20),  -- open, closed, half_open
+    requests_last_minute INT DEFAULT 0,
+    rate_limit_per_minute INT NOT NULL,
+    updated_at TIMESTAMP NOT NULL
+);
+
+Why use SQL?
+
+Transactions (ACID): We are dealing with money and purchases. SQL ensures we don't accidentally buy two books or lose an order.
+
+Structure: The data fits well into tables with rows and columns.
+
+Step 5: System Architecture
+
+Here is how the system parts fit together.
+
+┌─────────────┐
+│   Client    │
+│ (Customer)  │
+└──────┬──────┘
+       │
+       │ POST /purchase-request
+       ▼
+┌─────────────────────────────────────────┐
+│         API Gateway / Load Balancer     │
+└──────────────────┬──────────────────────┘
+                   │
+                   ▼
+┌──────────────────────────────────────────┐
+│      Purchase Request Service (API)      │
+│  - Validate request                      │
+│  - Authorize payment (hold funds)        │
+│  - Create purchase_request record        │
+│  - Enqueue to message queue              │
+│  - Return request_id immediately         │
+└──────────────────┬───────────────────────┘
+                   │
+                   │ Publish event
+                   ▼
+┌──────────────────────────────────────────┐
+│       Message Queue (Kafka/SQS)          │
+│  Topic: purchase-requests                │
+└──────────────────┬───────────────────────┘
+                   │
+                   │ Consume
+                   ▼
+┌──────────────────────────────────────────┐
+│    Price Aggregator Service (Worker)     │
+│  - Fetch seller list for book            │
+│  - Query sellers in parallel (fan-out)   │
+│  - Collect and sort quotes by price      │
+│  - Store quotes in database              │
+│  - Check if lowest price ≤ max price     │
+└──────────────────┬───────────────────────┘
+                   │
+                   ├─────────────┬─────────────┬─────────────┐
+                   │             │             │             │
+                   ▼             ▼             ▼             ▼
+            ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
+            │ Seller 1 │  │ Seller 2 │  │  ...     │  │Seller 200│
+            │   API    │  │   API    │  │          │  │   API    │
+            └──────────┘  └──────────┘  └──────────┘  └──────────┘
+                   │
+                   │ If price acceptable
+                   ▼
+┌──────────────────────────────────────────┐
+│      Purchase Orchestrator Service       │
+│  - Attempt purchase with cheapest seller │
+│  - Retry with next cheapest if failed    │
+│  - Capture payment on success            │
+│  - Update purchase_request status        │
+└──────────────────────────────────────────┘
+                   │
+                   ├─────────────┬─────────────┬─────────────┐
+                   │             │             │             │
+                   ▼             ▼             ▼             ▼
+            ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
+            │ Seller 1 │  │ Seller 2 │  │  ...     │  │Seller 200│
+            │ Purchase │  │ Purchase │  │          │  │ Purchase │
+            └──────────┘  └──────────┘  └──────────┘  └──────────┘
+                   │
+                   ▼
+┌──────────────────────────────────────────┐
+│       Notification Service (SNS/Email)   │
+│  - Email customer with result            │
+└──────────────────────────────────────────┘
+
+Component Details
+
+API Gateway: This is the front door. It checks if the user is logged in and sends the request to the right place.
+
+Purchase Request Service: This saves the request quickly and gives the user an ID. It holds the money on the credit card but doesn't charge it yet.
+
+Message Queue: This holds the requests in a line so the workers can pick them up when they are ready. It prevents the system from crashing if too many people click buy at once.
+
+Price Aggregator: This worker asks all the sellers for prices at the same time (Parallel). It finds the best price.
+
+Purchase Orchestrator: This worker actually buys the book. If the cheapest seller is sold out, it tries the next cheapest one.
+
+Database (PostgreSQL): Keeps all the records.
+
+Cache (Redis): Stores prices for a short time (e.g., 60 seconds) so we don't have to ask sellers repeatedly.
+
+Step 6: Deep Dive and Improvements
+
+6.1 Asking Sellers in Parallel
+
+Problem: Asking 200 sellers one by one is too slow.
+Solution: Use "Async I/O" to ask them all at once.
+
+We send 200 requests instantly. We set a time limit (e.g., 3 seconds). We collect all the answers that come back within that time. We ignore the slow ones.
+
+6.2 Scaling to 10,000 Sellers
+
+Problem: We cannot ask 10,000 sellers at once.
+Solution: Guess the best sellers.
+
+We can use logic or Machine Learning to pick the top 50 sellers who usually have this book.
+
+History: Has this seller sold this book before?
+
+Category: Does this seller sell this type of book?
+
+Price: Is this seller usually cheap?
+
+6.3 Circuit Breaker (Handling Broken Sellers)
+
+Problem: If a seller is broken, our system might wait for them and get stuck.
+Solution: Use a Circuit Breaker.
+
+Closed (Normal): Requests go through.
+
+Open (Broken): If a seller fails too many times (e.g., 50% failure), we stop sending requests entirely for 30 seconds.
+
+Half-Open (Testing): After 30 seconds, we send one test request. If it works, we go back to Normal.
+
+6.4 Caching (Remembering Prices)
+
+Problem: Asking for the price of "Harry Potter" 100 times a minute is wasteful.
+Solution: Save the price in Redis for 60 seconds.
+
+Key: quote:{book_id}:{seller_id}
+
+TTL (Time To Live): 60 seconds.
+
+If a new customer asks for the same book, show them the saved price immediately.
+
+6.5 Combining Duplicate Requests
+
+Problem: Three customers ask for the same book at the exact same second.
+Solution: Group them together.
+
+Instead of sending 3 separate requests to the sellers, we send 1. When the answer comes back, we give the same answer to all 3 customers. This saves money and bandwidth.
+
+6.6 Payment: Hold First, Charge Later
+
+Problem: If we charge the card immediately, we might have to refund it if the book is sold out. Refunds are messy.
+Solution: Authorization and Capture.
+
+Authorize: We tell the bank to "hold" $30. The money is still there, but the customer can't spend it.
+
+Buy Book: We try to buy the book from the seller.
+
+Capture: If we get the book, we tell the bank "Okay, take the $25 now."
+
+Void: If the purchase fails, we tell the bank "Never mind, release the hold."
+
+Step 7: Fixing Problems and Slow Spots
+
+1. What if a part breaks? (Single Points of Failure)
+
+API Gateway: Use multiple servers so if one breaks, the others take over.
+
+Database: Have a backup database (Replica) ready to take over.
+
+Payment: If Stripe is down, have Braintree ready as a backup.
+
+2. Database is too slow
+
+Write Less: Group updates together (Batching).
+
+Read Faster: Use Indexes on the columns we search most (like request_id).
+
+Use Replicas: Send read requests to a copy of the database, not the main one.
+
+3. Too much traffic (Network Congestion)
+
+Reuse Connections: Opening a new connection takes time. Keep the connection open and reuse it (Connection Pooling).
+
+HTTP/2: This allows us to send many requests over one connection.
+
+4. Sellers blocking us (Rate Limiting)
+
+Token Bucket: Give each seller a "bucket" of tokens. Every request takes a token. If the bucket is empty, wait.
+
+Distributed Limiting: Use Redis to count tokens so all our servers know the limit.
+
+5. Slow Sellers
+
+Adaptive Timeouts:
+
+If a seller is usually fast, give them 1 second.
+
+If a seller is usually slow, give them 3 seconds.
+
+This keeps the system fast but fair.
+
+Final Summary
+
+Key Concepts to Remember:
+
+Async Processing: Don't make the user wait on the screen. Give them an ID and email them later.
+
+Parallel Queries: Ask all sellers at the same time to save time.
+
+Smart Retries: If the cheapest seller fails, try the second cheapest.
+
+Circuit Breakers: Don't waste time talking to broken services.
+
+Rate Limiting: Don't spam the sellers or they will block you.
+
+Caching: Remember answers for a short time to reduce work.
+
+Two-Phase Payment: Hold the money first, charge it only when the purchase is confirmed.
+
+Notes
+
+Alternate canonical variant — marketplace storefront
+
+An alternate form frames the service as the online bookstore itself rather than an external purchasing broker. It must support book browsing and search, inventory, order placement, payment, and order management. Clarify whether the platform owns inventory or fans out to third-party sellers before choosing the data model and purchase workflow.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

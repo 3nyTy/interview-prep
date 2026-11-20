@@ -1,0 +1,78 @@
+===H1===
+LFU Cache
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-lfu-cache
+===BODY===
+LinkedIn
+Coding·60 minMembers
+LFU Cache
+LeetCode 460 — implement an `O(1)` LFU cache. Two hashmaps (key→node, freq→doubly-linked-list) plus a `min_freq` cursor. Surfaces in both phone screens and onsite coding rounds, often as the candidate's second algorithmic problem in a tight window.
+SWE
+data-structure
+hashmap
+linked-list
+hard
+Frequency
+Low
+Last asked
+2026-04-17
+Stage
+onsite-coding
+Requirements
+
+Implement:
+
+class LFUCache:
+    def __init__(self, capacity: int): ...
+    def get(self, key: int) -> int: ...
+    def put(self, key: int, value: int) -> None: ...
+
+Eviction policy: when full, evict the least-frequently-used key; on ties, evict the least-recently-used among them. Both get and put must be O(1).
+
+The canonical structure:
+
+key_to_node: dict[int, Node] where Node = (key, value, freq).
+
+freq_to_dll: dict[int, DoublyLinkedList] — every frequency bucket holds an LRU-ordered list of nodes that share that freq.
+
+min_freq: int — pointer to the smallest frequency currently present.
+
+Mutations:
+
+get(key): look up the node, splice it from its current freq_to_dll[f], increment f, append to freq_to_dll[f+1] (head = most recent). Update min_freq if the old bucket became empty and equalled min_freq.
+
+put(key, value) on miss: if at capacity, evict head/tail of freq_to_dll[min_freq]. Insert new node at freq_to_dll[1]; set min_freq = 1.
+
+Examples
+
+LFUCache cache = new LFUCache(2);
+cache.put(1, 1);                // freq: {1:[1]}, min_freq=1
+cache.put(2, 2);                // freq: {1:[2,1]}, min_freq=1
+cache.get(1);    // 1            // freq: {1:[2], 2:[1]}, min_freq=1
+cache.put(3, 3); // evict key 2  // freq: {1:[3], 2:[1]}, min_freq=1
+cache.get(2);    // -1
+cache.get(3);    // 3            // freq: {1:[], 2:[3,1]}, min_freq=2
+cache.get(4);    // -1
+cache.put(4, 4); // evict key 1  // freq: {1:[4], 2:[3]}, min_freq=1
+
+Notes
+
+The trap is the min_freq invariant. Many candidates only update min_freq on eviction; it actually needs to be reset to 1 on every new-key insert and incremented when a get drains the min_freq bucket.
+
+Each frequency bucket needs its own LRU ordering — collapsing all keys at a frequency into a single set silently loses the tiebreaker behaviour.
+
+Use collections.OrderedDict per bucket in Python; in Java use LinkedHashSet<Integer> or a custom DLL.
+
+Preparation
+
+Implement from scratch end-to-end in < 20 minutes; this is one of the longest O(1)-required problems in the canon.
+
+Practice walking through the trace example aloud while coding — interviewers grade clarity of the min_freq updates.
+
+Treat this and Max Stack as the same template family (DLL + dictionary lookup) — practicing one accelerates the other.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

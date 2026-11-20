@@ -1,0 +1,72 @@
+===H1===
+Real-Time Trading Event Feed Dashboard (React)
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/react-trading-event-feed-dashboard
+===BODY===
+Citadel / Citadel Securities
+CodingMembers
+Real-Time Trading Event Feed Dashboard (React)
+Build a React dashboard that subscribes to a supplied stream of trade and quote events. Render newest-first feeds by event type, maintain summary statistics over the most recent 30 seconds, and support pause/resume with an explicit explanation of resume behavior; styling is out of scope and AI assistance is disallowed.
+SWE
+frontend
+react
+streaming
+sliding-window
+trading
+medium
+Frequency
+Single report
+Last asked
+2026-07-27
+Stage
+tech-screen
+Requirements
+
+Use React and subscribe to the supplied stream function; the stream provider itself does not need to be implemented.
+
+Each event has the following shape:
+
+{
+  id,
+  timestamp,
+  tradeType,
+  side,
+  size,
+  price,
+  bid,
+  ask,
+  askSize,
+  bidSize
+}
+
+Display incoming events with the newest event first and separate the display by trade type. The prompt examples name quote and sell sections.
+
+Display summary statistics over the most recent 30 seconds. Once an event is older than 30 seconds, it must no longer contribute to the summary.
+
+Add pause and resume controls. Pausing stops dashboard data updates; resuming continues them, and the candidate must explain the chosen resume behavior.
+
+Notes
+
+Keep subscription setup and cleanup in an effect, and route each callback through a reducer or functional state update so rapid events do not read a stale render snapshot.
+
+For the 30-second summary, keep timestamp-ordered active events and evict expired entries while updating the corresponding aggregates. Use a periodic clock tick as well as arrival-time eviction so an event expires even when the stream is temporarily quiet.
+
+Styling is explicitly out of scope.
+
+AI assistance is explicitly disallowed.
+
+Clarify the event-bucket taxonomy before coding because the supplied examples mix a quote event type with a sell-side label.
+
+State whether resume applies buffered events or resumes from the current stream position; the interviewer asks for the semantics to be explained rather than prescribing one behavior.
+
+Preparation
+
+Build a small React prototype around a mock subscription callback, bucket the events for display, and keep each bucket newest-first.
+
+Drill a time-windowed summary with pause/resume controls, writing down the chosen resume semantics before coding.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

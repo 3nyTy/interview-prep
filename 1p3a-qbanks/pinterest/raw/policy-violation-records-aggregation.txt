@@ -1,0 +1,87 @@
+===H1===
+Policy Violation Records Aggregation
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/policy-violation-records-aggregation
+===BODY===
+Pinterest
+CodingMembers
+Policy Violation Records Aggregation
+Given violation records `(pinId, policy, date)`, implement three queries: unique pins that violated a given policy, unique pins that violated any policy inside a date range, and unique pins per policy inside a date range. The interviewer leaves return shapes and duplicate handling for the candidate to clarify, and duplicate `pinId` records are explicitly part of the problem.
+SWE
+hashmap
+dedup
+interval
+medium
+Frequency
+Low
+Last asked
+2026-09-03
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input records have the shape:
+
+(pinId: int, policy: string, date: string)
+
+Implement query support for:
+
+Given a policy, return the number of unique pins that violated that policy.
+
+Given a date range [startDate, endDate], return the number of unique pins that violated any policy inside that range.
+
+Given a date range [startDate, endDate], return the number of unique pins per policy inside that range.
+
+Clarify the return type before coding. The problem statement leaves room for returning a scalar count for the first two operations and a policy -> count map for the third.
+
+Notes
+
+Duplicate pinId records are an explicit edge case. Count unique pins, not violation rows.
+
+A straightforward implementation stores policy -> Set<pinId> for the first query and scans records for range queries, accumulating either one global Set<pinId> or a Map<policy, Set<pinId>>. That is acceptable as a base solution if the input size is moderate.
+
+The follow-up pressure is indexing: for many date-range queries, pre-sort records by date and binary-search the active slice, or maintain date-bucketed maps that merge into sets over the requested range. The trade-off is memory versus repeated scan cost.
+
+Be explicit about date comparison semantics. If dates are ISO yyyy-mm-dd, lexicographic comparison works; otherwise parse to a numeric day or timestamp once during ingestion.
+
+The interviewer may be quiet and leave ambiguity unresolved. State assumptions out loud: inclusive range bounds, whether the same pin violating two policies counts once globally, and what to return when no violations match.
+
+The five-query screen requires running test cases live. Completing the first three queries can leave insufficient time to implement both range queries, even after explaining their approaches.
+
+Alternate canonical variant — Five timestamp queries
+
+Input is a list sorted by timestamp, with each record shaped as [postId, policy, timestamp].
+
+Count unique posts by policy.
+
+Get the policies violated by a given post.
+
+Count unique posts at a given timestamp.
+
+Count unique posts within a time range.
+
+Count violations by policy within a time range. Clarify whether this final operation counts violation records or distinct posts; its wording differs from the unique-pin query above.
+
+For the five-query form, build policy -> Set<postId> and postId -> Set<policy> in one pass. The reverse index answers the policy-list query without rescanning all records.
+
+For an exact timestamp, binary-search its first and one-past-last positions and deduplicate post IDs in that slice. For an inclusive range, use the first timestamp at least the start and the first timestamp greater than the end; an empty slice yields zero counts.
+
+For the final query, use per-policy integer counters when the agreed contract counts records, or per-policy sets when it counts distinct posts. The base variant's unique-pin rule does not override this clarification.
+
+With n sorted records and k matching rows, timestamp/range queries take O(log n + k) expected time with hash sets or maps. Building the two indexes takes O(n) expected time and O(n) space; returning a policy list also costs time proportional to its size.
+
+Preparation
+
+Implement the scan-based version first: parse records, dedupe with sets, and write the three query methods cleanly.
+
+Drill the indexed variant separately: sort by date, use two binary searches to find the range, then aggregate unique pins without double-counting.
+
+Practice explaining memory trade-offs between policy -> Set<pinId>, date -> records, and date -> policy -> Set<pinId> indexes.
+
+Implement all five timestamp queries and test repeated rows, one post with multiple policies, exact endpoint timestamps, and empty matches. Run both final-query counting contracts to expose accidental row-versus-post confusion.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,50 @@
+===H1===
+Temperature Monitoring Data Structure
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/temperature-monitor-moving-window
+===BODY===
+Google
+CodingMembers
+Temperature Monitoring Data Structure
+Implement temperature insertion, a moving average, and a constant-time maximum query for a recent window. Clarify whether the window is based on reading count or elapsed days.
+SWE
+data-structure
+streaming
+sliding-window
+Frequency
+Single report
+Last asked
+2026-09-10
+Stage
+onsite-coding
+Requirements
+
+Implement insert(temperature) to insert a new temperature reading.
+
+Implement get_moving_average() to return the average of the most recent N readings.
+
+Implement get_max_temp() to return the maximum of the most recent N readings in O(1) query time.
+
+Notes
+
+The introductory description refers to the most recent N days, while the API requirements refer to the most recent N readings. Clarify the window definition before coding; the day-based variant does not specify how timestamps enter the interface.
+
+Empty-window behavior and insertion complexity are unspecified.
+
+For the reading-count window with positive N, retain the last N readings in a FIFO queue and maintain their sum. Add the new reading and subtract any expired reading. Agree whether a partially filled window returns its current mean or is unavailable.
+
+Maintain a second deque of reading indices with nonincreasing temperatures. Expire old indices at the front and remove smaller or equal temperatures from the back before adding the new index. The front holds the current maximum; indices distinguish duplicate readings.
+
+Average and maximum queries are O(1). Each reading enters and leaves each deque at most once, so insertion is amortized O(1) but can take O(N) for one update; auxiliary space is O(N). This implements the reading-count contract. A day-based contract additionally needs timestamps, expiration timing, and an ordering rule.
+
+Preparation
+
+Implement all three reading-count operations using a running sum and deques; compare outputs with direct window scans.
+
+Test N=1, duplicate maxima, negative readings, expiration of the maximum, and partially filled windows under an explicitly chosen contract; explain amortized versus worst-case insertion cost.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

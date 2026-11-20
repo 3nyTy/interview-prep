@@ -1,0 +1,44 @@
+===H1===
+Binary Tree Zigzag Level Order Traversal (LC 103)
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/binary-tree-zigzag-level-order
+===BODY===
+Microsoft
+CodingMembers
+Binary Tree Zigzag Level Order Traversal (LC 103)
+Return a binary tree's values level by level, alternating left-to-right and right-to-left order on successive levels. The follow-up asks for a formulation using two alternating stacks.
+SWE
+tree
+bfs
+queue
+tree-traversal
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-coding
+Requirements
+
+Given a binary tree, return its node values grouped by depth.
+
+Traverse the first level left to right, the next right to left, and continue alternating direction.
+
+Follow-up: implement the same traversal with two stacks that alternate between levels.
+
+Notes
+
+A breadth-first traversal can keep a direction flag and place each level's values at the appropriate end of a deque, avoiding a separate full reversal. Two alternating stacks are also valid, but make child-push order and direction changes more verbose.
+
+Preparation
+
+Implement both the queue/deque form and the two-stack form, including an empty tree and a one-sided tree.
+
+Trace child insertion order by hand for three levels so the stack variant does not reverse the wrong level.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

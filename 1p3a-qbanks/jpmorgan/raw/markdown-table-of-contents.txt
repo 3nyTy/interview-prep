@@ -1,0 +1,58 @@
+===H1===
+Markdown Table of Contents
+===URL===
+https://www.1point3acres.com/interview/problems/company/jpmorgan/markdown-table-of-contents
+===BODY===
+JPMorgan Chase
+Coding·60 minMembers
+Markdown Table of Contents
+Given an array of document lines, generate a table of contents: lines starting with `#` are chapters, lines starting with `##` are sections under the latest chapter, and other lines are ignored.
+SWE
+string
+parsing
+simulation
+oa
+easy
+Frequency
+Single report
+Last asked
+2026-03-14
+Stage
+oa
+Requirements
+
+Input: lines, an array of strings representing document lines.
+
+A line starting with #  is a chapter.
+
+A line starting with ##  is a section belonging to the most recent chapter.
+
+All other lines are ignored.
+
+Output a list of numbered TOC entries:
+
+chapter: "1. Title", "2. Title", ...
+
+section: "1.1. Title", "1.2. Title", ... under the current chapter
+
+Preserve scan order.
+
+Notes
+
+Check ##  before # , or make the chapter check exact enough that a section is not misclassified as a chapter.
+
+Reset the section counter whenever a new chapter is encountered.
+
+Clarify whether a section can appear before any chapter. A safe implementation can skip it or treat it as invalid, depending on interviewer preference.
+
+Preparation
+
+Implement with two counters: chapter_count and section_count.
+
+Test consecutive chapters, multiple sections under one chapter, ignored body text, and malformed heading strings such as ###.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

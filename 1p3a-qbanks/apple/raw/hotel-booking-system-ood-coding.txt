@@ -1,0 +1,56 @@
+===H1===
+Hotel Booking System OOD Coding
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/hotel-booking-system-ood-coding
+===BODY===
+Apple
+Coding·45 minMembers
+Hotel Booking System OOD Coding
+Design and implement a small hotel booking system with availability checks and room booking over date ranges, then discuss how to prevent conflicting bookings under concurrency.
+SWE
+object-design
+concurrency
+backend
+medium
+Frequency
+Single report
+Last asked
+2026-06-28
+Stage
+phone-screen
+Requirements
+
+Design an object-oriented hotel booking system. The core interface is:
+
+checkAvailability(dateRange) -> available rooms / availability result
+bookRoom(customerName, roomId, dateRange) -> booking confirmation or failure
+
+The system must support:
+
+Checking whether a room is available for a requested date range.
+
+Booking a specific room for a customer over that date range.
+
+Rejecting overlapping bookings for the same room.
+
+Returning a clear failure when the room is already booked.
+
+Notes
+
+Model the date range explicitly and define overlap semantics before coding. A common convention is half-open intervals [start, end), where checkout day is not occupied. Store bookings by roomId, and for each room keep intervals sorted by start date so availability checks only need to inspect neighboring intervals or scan the room's bookings for overlap.
+
+The main follow-up is concurrency: two callers can both observe availability and then attempt to book the same room. Treat checkAvailability plus bookRoom as a critical section for the chosen room. Reasonable designs include a per-room lock, a database transaction with a uniqueness / exclusion constraint on overlapping intervals, or optimistic concurrency with retry.
+
+Preparation
+
+Practice writing overlaps(a, b) for date ranges and testing boundary cases.
+
+Decide whether the API books a specific roomId or searches for any room of a type. The reported interface books a specific room.
+
+Be ready to explain why a global lock is simple but too coarse, and why per-room locking or transactional constraints scale better.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

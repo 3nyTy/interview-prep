@@ -1,0 +1,62 @@
+===H1===
+Branch Merge Minimum Conflicts
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/branch-merge-minimum-conflicts
+===BODY===
+Amazon
+CodingMembers
+Branch Merge Minimum Conflicts
+Merge two commit-priority strings while preserving each branch’s order, minimizing the number of lower-priority commits placed before higher-priority commits.
+SWE
+string
+merge
+Frequency
+Low
+Last asked
+2026-09-01
+Stage
+oa
+Requirements
+
+getMinimumConflicts accepts strings primary and secondary, each representing a sequence of commits.
+
+Each character is a commit priority; a lower alphabetical character has higher priority.
+
+Merge the two strings while preserving the order of commits from each original branch.
+
+A conflict occurs for a pair in which a lower-priority commit appears before a higher-priority commit in the merged sequence.
+
+Return the minimum number of conflicts over all valid merges.
+
+Both input lengths are between 1 and 1000.
+
+Examples
+
+primary = "zc"
+secondary = "d"
+
+"zcd": 2 conflicts
+"zdc": 3 conflicts
+"dzc": 2 conflicts
+
+Minimum conflicts: 2
+
+Notes
+
+The example counts conflicts within an original branch as well as those introduced between branches: the order of the original commits must remain intact.
+
+Use dynamic programming on consumed prefix lengths. Let dp[i][j] be the fewest conflicts after consuming primary[:i] and secondary[:j]. Appending character c adds the number of characters greater than c in the already consumed prefixes. Try appending the next character from either branch and keep the lower total. Equal-priority pairs add nothing.
+
+Initialize dp[0][0] = 0 and other states as unreachable. Precompute, for each input prefix and each distinct priority, the count of larger characters. Each transition then takes O(1). This counts both within-branch and cross-branch conflicts and preserves both orders. For lengths n, m and alphabet size A, preprocessing costs O((n+m)A), DP costs O(nm), and rolling rows use O(m+(n+m)A) space. The final state is dp[n][m].
+
+Preparation
+
+Compute all three merges in the existing example, then trace the corresponding DP states.
+
+Implement the recurrence and compare it with exhaustive interleavings of short strings, including repeated priorities.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

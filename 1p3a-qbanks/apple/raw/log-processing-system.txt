@@ -1,0 +1,373 @@
+===H1===
+Log Processing System
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/log-processing-system
+===BODY===
+Apple
+System DesignMembers
+Log Processing System
+Design a log processing system that ingests a continuous stream of application logs from a large service fleet and counts errors in real time. A dashboard and alerting layer sits on top, so error counts must be accurate and available with low latency.
+SWE
+streaming
+data-engineering
+parsing
+Frequency
+Single report
+Last asked
+2026-06-28
+Stage
+phone-screen · onsite-system-design
+Problem Statement
+
+Design a log processing system that ingests a continuous stream of application logs from a large service fleet and counts errors in real time. A dashboard and alerting layer sits on top, so error counts must be accurate and available with low latency.
+
+This appears as an Apple system-design round for Software Engineer candidates. The interviewer starts with the core question and can push on two follow-ups:
+
+How do you scale this?
+
+How do you reduce latency?
+
+Phase 1: Requirements
+
+Functional Requirements
+
+Ingest structured log events from thousands of hosts with fields for timestamp, level, service, host, message, and optional trace_id.
+
+Count errors in real time, broken down by service and host, over rolling 1-minute, 5-minute, and 1-hour windows.
+
+Serve dashboards that query these counts with sub-second latency.
+
+Fire alerts when an error rate crosses a configured threshold for a service.
+
+Retain raw logs for a configurable window (say 7 days) for debugging, and keep rolled-up counts longer.
+
+Keep scope tight. Defer full-text search, log parsing DSLs, security audit, and multi-tenant isolation unless the interviewer asks. The core story is "stream in, aggregate, query, alert." Every extra feature risks blowing past 60 minutes.
+
+Non-Functional Requirements
+
+Scale: 1M+ log events per second peak across the fleet, hundreds of thousands of hosts, tens of thousands of services.
+
+End-to-end latency: an error should be visible in counts and trigger alerts within 5 seconds.
+
+Availability: 99.9% on the ingest path. Dashboards can degrade without taking the pipeline down.
+
+Durability: no silent log loss on the ingest path. Data loss during an outage is acceptable only if it is detectable and bounded.
+
+Query latency: dashboard queries return in under 500 ms at p95.
+
+Log processing prioritizes ingest availability and end-to-end latency over strong consistency of counts. Off-by-small on error counts for a few seconds is tolerable; dropping logs silently or alerting five minutes late is not.
+
+Capacity Estimation
+
+Ingest volume:
+
+1M events/sec peak, ~300k events/sec average over a day.
+
+At the average rate: 300k × 86,400 seconds ≈ 26B events/day.
+
+Size the ingest tier for peak (~1M/sec sustained for minutes), size storage for the daily average.
+
+Average log event size: 500 bytes. 26B × 500 B ≈ ~13 TB/day of raw logs.
+
+Storage:
+
+7-day hot retention: 13 TB × 7 ≈ ~90 TB of raw logs in object storage. Compression (gzip/zstd on Parquet) typically cuts this by 5x to 10x.
+
+Aggregated counts are orders of magnitude smaller. One row per (service, host, minute) at ~50 bytes. With ~500k hosts running a few services each, assume ~1M distinct (service, host) keys. 1M × 1,440 minutes/day × 50 bytes ≈ ~70 GB/day of 1-minute rollups, far less after 5m/1h rollups and compression.
+
+Query volume:
+
+Dashboard: roughly 100 to 1,000 QPS, dominated by a few hot services.
+
+Alert evaluations: one per alert rule per evaluation interval; even 10k rules at 30-second intervals is ~300 QPS.
+
+The asymmetry matters. Writes are millions per second, reads are thousands per second. That is what justifies a streaming aggregation architecture: aggregate once at write time so reads are cheap.
+
+Phase 2: Data Model
+
+Core Entities
+
+LogEvent (ingested from hosts)
+├── event_id            UUID or Snowflake ID
+├── timestamp           ISO8601 with millisecond precision
+├── ingest_timestamp    when the ingest service received it
+├── service             e.g. "checkout-api"
+├── host                e.g. "checkout-api-7f3b"
+├── level               DEBUG | INFO | WARN | ERROR | FATAL
+├── message             free-text log line
+├── trace_id            optional, for distributed tracing correlation
+└── attributes          key-value map for structured fields
+
+ErrorCount (aggregated, time-bucketed)
+├── service             (PK component)
+├── host                (PK component)
+├── window_start        (PK component, e.g. minute boundary)
+├── granularity         minute | five_minute | hour
+├── count               integer
+└── last_updated        for late-arrival corrections
+
+AlertRule
+├── rule_id
+├── service
+├── threshold_count     e.g. 100 errors per minute
+├── window              e.g. 60 seconds
+├── notification_channel  slack | pagerduty | email
+└── enabled             boolean
+
+Storage Choices
+
+DataStoreWhy
+Raw logs in motionKafka (or Pulsar, Kinesis)Durable, replayable buffer between ingest and processing
+Raw logs at restS3 / GCS / object storeCheap long-tail retention, partitioned by day and service
+Aggregated countsTime-series DB (ClickHouse, Druid, Prometheus remote write)Fast range queries, native time-bucket semantics
+Hot counters for alertsRedis or in-memory state in the stream processorSub-second read, no query-layer hop
+Alert rulesPostgreSQLSmall, relational, rarely updated
+
+Kafka is the backbone in nearly every real-world logging pipeline. It decouples the ingest fleet from the variable-speed consumers downstream, and its replay semantics are what let you safely reprocess after a bug or schema change.
+
+Phase 3: API Design
+
+Ingest API (Host Agent to Ingest Service)
+
+POST /v1/logs
+Headers:
+  X-Agent-ID: <host_id>
+  Content-Encoding: gzip
+
+Request Body:
+{
+  "events": [
+    {
+      "timestamp": "2026-03-23T12:05:11.382Z",
+      "service": "checkout-api",
+      "host": "checkout-api-7f3b",
+      "level": "ERROR",
+      "message": "payment gateway timeout",
+      "trace_id": "abc123",
+      "attributes": {"customer_id": "...", "latency_ms": 5000}
+    }
+  ]
+}
+
+Response: 202 Accepted
+{ "accepted": 128, "rejected": 0 }
+
+Return 202 Accepted rather than 200. The ingest service durably appends to Kafka, but downstream aggregation is asynchronous. The status code communicates that honestly.
+
+Query API (Dashboard and Alerts)
+
+GET /v1/metrics/errors
+Query Parameters:
+  service        (optional)
+  host           (optional)
+  start_time     ISO8601
+  end_time       ISO8601
+  granularity    minute | five_minute | hour
+
+Response: 200 OK
+{
+  "series": [
+    {
+      "service": "checkout-api",
+      "host": "checkout-api-7f3b",
+      "buckets": [
+        { "window_start": "2026-03-23T12:05:00Z", "count": 42 },
+        { "window_start": "2026-03-23T12:06:00Z", "count": 51 }
+      ]
+    }
+  ]
+}
+
+Alert Management
+
+POST   /v1/alerts
+       Body: { "service": "checkout-api", "threshold_count": 100, "window": 60, "notification_channel": "pagerduty" }
+GET    /v1/alerts?service=checkout-api
+DELETE /v1/alerts/{rule_id}
+
+Choose REST for the ingest and query APIs. Logs flow one-way from agents; no bidirectional streaming is needed, so WebSockets or gRPC streaming add complexity without payoff. gRPC is reasonable internally between the ingest service and Kafka proxies if you want a compact wire format.
+
+Phase 4: High-Level Design
+
+Architecture
+
+Data Flow
+
+Host agent (Fluent Bit, Vector, or a lightweight in-house agent) tails log files, parses into structured events, batches, and ships over a persistent HTTP/2 connection to the ingest load balancer.
+
+Ingest service validates the payload, tags each event with an ingest timestamp, and produces to a Kafka topic partitioned by (service, host_bucket). The service is stateless and horizontally scalable.
+
+Kafka acts as the durable, replayable buffer. Retention is set to 24 to 72 hours, enough for replay after a bug or downstream outage.
+
+Stream processor (Flink or Spark Structured Streaming) consumes the Kafka topic, filters to error-level events, windows them by (service, host) over 1-minute and 5-minute tumbling windows, and emits counts to the time-series DB.
+
+Archive sink is a separate consumer group that writes raw events in compressed columnar format (Parquet) to object storage, partitioned by day and service.
+
+Alert engine is a second lightweight consumer that maintains short rolling counters in memory and fires notifications directly when thresholds are crossed, bypassing the windowed pipeline for minimum latency.
+
+Dashboard / Query API reads from the time-series DB with aggressive caching for the common "last 15 minutes" queries.
+
+Windowing Strategy
+
+Use tumbling windows keyed by (service, host) at the stream processor. Every minute the processor emits (service, host, window_start, count) to the TSDB. Two levels of granularity:
+
+1-minute buckets kept for 48 hours. Used for live dashboards and recent-history alerts.
+
+5-minute and 1-hour rollups kept longer (30 and 90 days). Generated by a downstream rollup job, not the live stream.
+
+Sliding windows are tempting but expensive. A tumbling window emits one value per key per minute. A 1-minute sliding window with a 10-second slide emits six. If the interviewer pushes for fresher numbers, offer incremental aggregation (emit partial counts every second while the window is still open) rather than sliding windows. Same freshness, less state.
+
+Idempotency and Exactly-Once Semantics
+
+The ingest service assigns an event_id if the agent did not.
+
+Kafka producers use idempotent-producer mode to avoid duplicates on retry.
+
+Flink's exactly-once checkpointing pairs with an idempotent sink (ClickHouse ReplacingMergeTree dedupes on primary key) or a true two-phase-commit connector for end-to-end exactly-once.
+
+Acknowledge to the interviewer that "exactly once" is really "effectively once given idempotent producers and transactional sinks," and that drift on raw counts by a handful of events during failover is usually acceptable.
+
+Phase 5: Scaling and Trade-offs
+
+This is where you address the two explicit follow-ups: how do you scale this, and how do you reduce latency?
+
+Scaling the Pipeline
+
+Walk the pipeline stage by stage and name the bottleneck and the fix at each.
+
+StageBottleneckFix
+Host agentDisk I/O, CPU on the hostCap agent CPU, use mmap tailing, drop or sample DEBUG in the agent
+Ingest LB / ServiceConnection count, CPUStateless, horizontally scale behind L4 LB, autoscale on CPU and active connections
+KafkaPartition throughput, broker I/OAdd partitions (for parallelism) and brokers (for throughput); partition by (service, host_bucket) so no single service hot-spots one partition
+Stream processorKeyed state distributionKey by (service, host); sub-shard hot keys with (service, host, shard_id) and pre-aggregate locally before the keyBy
+Time-series DBWrite fan-out, storage growthShard by service; downsample aggressively (1m → 5m → 1h); tier older data to cheaper storage
+Alert engineState size for rolling countersKeep only last N seconds in memory per rule; evict aggressively
+
+Partitioning by service alone is a classic mistake. One very chatty service (say, a crashlooping microservice) dumps all its traffic onto one Kafka partition and one stream-processor slot. Always include a host bucket or hash in the partitioning key, and be ready to re-shard hot keys dynamically.
+
+Reducing Latency
+
+End-to-end latency is the sum of several stage latencies. Attack each explicitly.
+
+Agent-side batching. Agents flush every few seconds by default. Tune down to 200 to 500 ms for latency-sensitive services. You trade more small writes for faster visibility.
+
+Ingest to Kafka. Use acks=1 on the producer if a small risk of replica-lag loss is acceptable, or acks=all with larger in-flight batches if durability is paramount. Co-locate ingest and Kafka brokers in the same AZ to minimize network RTT.
+
+Kafka to stream processor. Keep consumer lag near zero. Use a short fetch.max.wait.ms and small fetch.min.bytes so the processor does not wait for a large batch to fill.
+
+Windowing choice. Tumbling windows emit only at boundary close, so they add up-to-window-size latency. For the error-count use case, emit incremental partial counts every second using Flink's ProcessingTimeTrigger or Spark's continuous processing mode.
+
+Hot-path shortcut for alerts. Alert evaluation does not need the full windowed pipeline. Run a separate lightweight consumer that keeps a 60-second rolling counter per (service, rule) in memory and fires notifications directly. Target alert latency: under 2 seconds from log line to PagerDuty.
+
+Separate the archival path. Writing raw logs to object storage is higher-latency and cheaper. Keep it on a distinct consumer group so a slow S3 sink never back-pressures the real-time counting path.
+
+The two-path pattern is the key insight for latency. The windowed pipeline is the source of truth for counts and dashboards; the hot-path alert consumer exists only to make alerts fast. Both read from the same Kafka topic; neither blocks the other.
+
+Availability and Fault Tolerance
+
+Ingest service is stateless; an unhealthy instance is removed from the LB with no data loss.
+
+Kafka replicates each partition across brokers (typically RF=3). A broker failure costs latency, not data.
+
+Stream processor checkpoints state to durable storage (S3, HDFS) every few seconds. On task failure, it restores from the last checkpoint and replays from the Kafka offset.
+
+TSDB shards are replicated; reads fail over transparently.
+
+Archive sink can lag for hours during object-store incidents without affecting real-time counts or alerts, because it is on its own consumer group.
+
+Design the pipeline so that each consumer group is independent. A slow or failing consumer should not stall Kafka for any other consumer. This is the single most important availability property of the whole system.
+
+Trade-offs Worth Naming
+
+Latency vs. durability on ingest: acks=1 vs. acks=all. Most log pipelines pick acks=1 and accept rare replica-lag loss, because losing a second of logs during a broker failover is usually fine.
+
+Freshness vs. state size in the stream processor: tumbling vs. sliding vs. incremental emission. Incremental emission is usually the best trade for alerts.
+
+Accuracy vs. cost in deduplication: exactly-once costs non-trivial coordination. For counts, at-least-once with idempotent writes and a ReplacingMergeTree sink is usually good enough.
+
+Storage cost vs. retention: raw logs are huge. Tier aggressively (hot 24h, warm 7d, cold 30d) and prune DEBUG at the agent or ingest layer.
+
+Deep Dives
+
+Why Kafka and not a direct writer to the TSDB?
+
+The stream processor and the TSDB move at different rates, and the TSDB is the most fragile component in the pipeline. Writing directly would couple ingest availability to TSDB availability. Kafka as a buffer lets the pipeline absorb 30 minutes of downstream failure without losing data, and gives you replay for reprocessing bugs.
+
+Why not just use Prometheus or Datadog?
+
+You absolutely can for the metrics side. In a real system, the stream processor's output could be Prometheus remote write or a Datadog StatsD aggregation. The interview question is still about the pipeline that produces those metrics from raw logs. Prometheus alone does not ingest 1M logs per second from your fleet; it scrapes pre-aggregated metrics endpoints.
+
+What about log parsing?
+
+In a real system, logs arrive as structured JSON from modern services and as unstructured text from legacy ones. A parsing stage (Grok patterns, regex rules, or LLM-assisted extraction for nastier cases) sits between ingest and Kafka. It is worth mentioning in the interview but rarely the focus of the question.
+
+Common Pitfalls
+
+Partitioning Kafka by service only. Hot services create hot partitions. Partition by (service, host_bucket) or by a hash that includes the host.
+
+Letting the archival path share a consumer group with real-time counting. An S3 outage will stall dashboards and alerts. Always separate consumer groups.
+
+Assuming tumbling windows are fast enough for alerts. A 1-minute tumbling window adds up to a minute of latency. Use incremental emission or a hot-path consumer for alerts.
+
+Skipping capacity estimation. Without the "1M events/sec, 50 TB/day" anchor, you cannot justify Kafka over a single database, or the need for sharding the TSDB. The numbers drive the architecture.
+
+Promising exactly-once without naming the cost. Exactly-once exists at the boundary of transactional Kafka producers and a transactional sink. Mention it, but be clear about what breaks (throughput, sink choice) if you require it.
+
+Interview Checklist
+
+Requirements
+
+  Clarified ingest volume, retention, and end-to-end latency SLOs
+
+  Distinguished functional (count errors) from non-functional (latency, scale)
+
+  Did a quick capacity calc that justifies Kafka and stream processing
+
+Data Model
+
+  Named the core entities: LogEvent, ErrorCount (time-bucketed), AlertRule
+
+  Picked stores with justification: Kafka, TSDB, object storage, Redis
+
+API Design
+
+  Batched ingest API with 202 Accepted
+
+  Query API keyed by (service, host, time range, granularity)
+
+  Alert rule CRUD
+
+High-Level Design
+
+  Drew the pipeline end-to-end with at least two consumer groups
+
+  Explained partitioning and keying choices
+
+  Covered windowing strategy
+
+Scaling and Trade-offs
+
+  Walked every stage and named its bottleneck
+
+  Addressed the "reduce latency" follow-up with batching, windowing, and hot-path alerts
+
+  Named trade-offs: latency vs. durability, freshness vs. state size, exactly-once cost
+
+Summary
+
+ConcernDecision
+Transport between ingest and processingKafka, partitioned by (service, host_bucket)
+Stream processorFlink or Spark Structured Streaming
+Real-time counts storeClickHouse or Druid, sharded by service
+Raw log archiveObject storage, Parquet, partitioned by day
+Alert latency pathSeparate lightweight consumer with in-memory counters
+Window strategyTumbling 1m/5m, incremental emission for freshness
+Durabilityacks=1 default, acks=all for critical services
+Consumer group separationReal-time, alerts, and archive are always separate
+
+The system's defining properties: one durable buffer, many independent consumers, and a hot-path shortcut for the one thing that cannot wait. Everything else is tuning.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

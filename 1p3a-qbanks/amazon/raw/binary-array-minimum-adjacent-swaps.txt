@@ -1,0 +1,52 @@
+===H1===
+Binary Array Rearrangement
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/binary-array-minimum-adjacent-swaps
+===BODY===
+Amazon
+CodingMembers
+Binary Array Rearrangement
+Return the fewest adjacent swaps needed to group all zeros at one end and all ones at the other; either ordering is allowed.
+SWE
+array
+Frequency
+Single report
+Last asked
+2026-09-02
+Stage
+oa
+Requirements
+
+Input: an array containing only 0 and 1.
+
+Rearrange it into either 000...111 or 111...000.
+
+One move swaps two adjacent elements; return the minimum number of moves.
+
+Function: minMoves(arr).
+
+Approximate input bound: 1 ≤ n ≤ 100,000.
+
+Examples
+
+Input:  [0, 1, 0, 1]
+Output: 1
+After one swap: [0, 0, 1, 1]
+
+Notes
+
+For zeros-first order, scan left to right, counting preceding ones for every zero. Their sum I is the inversion count and the exact number of necessary adjacent swaps. Every adjacent swap fixes at most one misplaced pair, and moving zeros left achieves this bound.
+
+With z zeros and o ones, the opposite order costs zo - I. Return min(I, zo - I). The scan takes O(n) time and O(1) extra space. Use 64-bit counters: pair counts can reach 2,500,000,000 at the stated maximum input length.
+
+Preparation
+
+Implement the counting scan and verify the existing example and already grouped arrays.
+
+Enumerate short binary arrays and compare the result with a breadth-first search over adjacent swaps.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

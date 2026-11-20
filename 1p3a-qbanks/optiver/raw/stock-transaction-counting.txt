@@ -1,0 +1,72 @@
+===H1===
+Stock Transaction Sequence Counting (Catalan / DP)
+===URL===
+https://www.1point3acres.com/interview/problems/company/optiver/stock-transaction-counting
+===BODY===
+Optiver
+Coding·90 minMembers
+Stock Transaction Sequence Counting (Catalan / DP)
+A HackerRank counting problem framed as market-making transactions: count the number of valid buy/sell sequences that start and end flat without ever going negative. The canonical version is a Catalan number; common variants generalize to bounded transactions or arbitrary order sizes and are solved with DP.
+RS
+SWE
+DS
+dp
+combinatorics
+math
+trading
+oa
+medium
+Frequency
+High
+Last asked
+2026-08-08
+Stage
+oa
+Requirements
+
+Primary (canonical) version:
+
+You must perform exactly 2n transactions of 1 share each. You start with 0 position and must end with 0 position, and your position may never go negative (the stock is impossible to borrow).
+
+Given n, return the number of distinct transaction sequences (buy/sell strings) achieving this.
+
+Example: n = 2 → 2 (buy-sell-buy-sell, buy-buy-sell-sell).
+
+This is the n-th Catalan number; a 1-D DP over (step, position) also passes. Watch for large-n overflow / modular arithmetic.
+
+# Complete the 'NumberOfSequences' function below.
+# Returns an INTEGER. Parameters: INTEGER n  (canonical)
+
+Examples
+
+n = 2 → 2
+
+Generalized order-size version: n = 3, k = [1, 2] → 3 ([1,1,1], [1,2], [2,1]); n = 3, k = [2, 4] → 0.
+
+Bounded-transactions version: target n = 2, initial k = 1, at most m = 3 transactions → 4 (buy, buy-sell-buy, buy-buy-sell, sell-buy-buy).
+
+Notes
+
+This problem appears in several interchangeable forms in the OA rotation — clarify which one you've been given before coding:
+
+Alternate canonical variant — bounded ±1 transactions
+
+You start with k shares, target n shares, and may buy or sell one share at most m times (never below 0). Count the valid sequences. Solve with 2-D DP over (transactions used, current position).
+
+Alternate canonical variant — arbitrary order sizes
+
+You want exactly n shares; each order's size is chosen from a set of unique positive integers k = [k1, k2, …]. Count the ordered sequences summing to n (a compositions count). 1-D DP: dp[s] = Σ dp[s - ki], dp[0] = 1. Return 0 if unreachable.
+
+All three reduce to counting lattice paths / compositions; the borrow-constraint version is the one that maps to Catalan.
+
+Preparation
+
+Derive the Catalan recurrence and closed form by hand; implement both the DP and the closed-form, with modular arithmetic for large n.
+
+Implement the compositions DP (dp[s] += dp[s-ki]) and the 2-D bounded-transaction DP so you can switch instantly based on the exact prompt.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

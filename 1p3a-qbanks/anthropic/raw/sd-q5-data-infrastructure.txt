@@ -1,0 +1,64 @@
+===H1===
+System Design Q5 — Data Infrastructure
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/sd-q5-data-infrastructure
+===BODY===
+Anthropic
+System Design·55 minMembers
+System Design Q5 — Data Infrastructure
+A data-engineering / data-infra system design: design a system that ingests large-scale data, processes it, and serves it to many stakeholders with varying access needs and sensitivities. Specifics have not yet been publicly documented; the recruiter blurb spells out the expected coverage.
+SWE
+DS
+Infra Eng
+data-engineering
+ingestion
+etl
+access-control
+medium
+Frequency
+Low
+Last asked
+2026-09-07
+Stage
+phone-screen · onsite-system-design
+Requirements
+
+From the recruiter blurb:
+
+"This interview focuses on data infrastructure systems design and doesn't need specialized ML knowledge. You'll be asked to design a system that ingests, processes, and serves large-scale data to multiple stakeholders with varying needs. We recommend brushing up on ingestion architectures, processing patterns, storage strategies at scale, and data access controls for data of varying levels of sensitivity. Being prepared to reason about tradeoffs, estimate infrastructure requirements for each facet, and discuss how your design handles failure and growth will serve you well."
+
+Expected coverage:
+
+Ingestion — batch vs. streaming, replay safety, schema evolution, dead-letter routing.
+
+Processing — Lambda vs. Kappa, materialized views, late-arriving data, idempotent transforms.
+
+Storage at scale — columnar warehouses, lakehouses, partitioning, compaction, cost tiers.
+
+Access control — row/column-level policies, sensitivity classification, audit trail.
+
+Failure and growth — backfill strategies, capacity estimation, blast radius of bad data.
+
+Notes
+
+Detailed candidate write-ups have not yet been publicly documented; treat the recruiter blurb above as the most authoritative source.
+
+The round is run in a Google Doc like the other SD rounds; expect to write down your tradeoffs.
+
+September 2026 telemetry variant
+
+A concrete Data Infrastructure interview asks for a telemetry system and probes inconsistent names emitted by already-deployed clients for the same telemetry metric. One candidate proposed mapping at ingestion and storage to address both new data and historical records, and cautioned that fuzzy matching or AI/ML clustering can incorrectly merge metrics. The interviewer continued probing, so this proposal is not a confirmed accepted solution. The full functional scope and numerical scale constraints remain unspecified.
+
+Preparation
+
+Sketch a canonical lakehouse stack on paper: Kafka (ingest) → Spark/Flink (process) → Iceberg/Delta (store) → Trino/Snowflake (serve), with separate metadata, catalog, and access-control layers.
+
+Have a one-paragraph back-of-envelope for ingest sizing (events/sec × bytes/event × retention) and warehouse storage (rows × bytes × replication × cold-tier ratio).
+
+Be able to explain row-level security (RBAC vs. ABAC) and PII tagging end-to-end.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

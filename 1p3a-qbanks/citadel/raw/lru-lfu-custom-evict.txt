@@ -1,0 +1,58 @@
+===H1===
+LRU + LFU + Custom Eviction Function
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/lru-lfu-custom-evict
+===BODY===
+Citadel / Citadel Securities
+Coding·60 minMembers
+LRU + LFU + Custom Eviction Function
+Cache-design ladder asked in a Citsec phone screen. Implement an LRU cache, then an LFU cache, then generalize to a cache parameterized by a pluggable eviction function. The interviewer explicitly grades how cleanly each variant inherits scaffolding from the previous one.
+SWE
+data-structure
+hashmap
+linked-list
+oop-design
+medium
+Frequency
+Single report
+Last asked
+2026-01-25
+Stage
+phone-screen
+Requirements
+
+Three stages, in order.
+
+LRU cache with get(key) and put(key, value) in O(1) amortized for a fixed capacity.
+
+LFU cache with the same interface but evicting the least-frequently-used entry on overflow. Ties are broken by least-recently-used among same-frequency entries.
+
+Custom eviction — refactor the cache so that the eviction strategy is injected (function or interface) and the surrounding get / put machinery is reused. The interviewer suggests a few candidate policies (size-weighted, TTL-weighted) to test the abstraction.
+
+Notes
+
+LRU canonical structure: hashmap from key to doubly-linked-list node, with the list ordered by recency. Each access splices the node to the head; eviction pops the tail.
+
+LFU canonical structure: hashmap from key to (value, frequency), plus a hashmap from frequency to an ordered set (or doubly-linked list) of keys at that frequency, plus a min_freq cursor. Updates bump frequency and re-thread the entry; eviction picks the LRU at min_freq.
+
+The third stage is the discriminator. The clean refactor exposes the eviction policy as an object with two operations: on_access(key) to update metadata, and pick_victim() to nominate the next eviction. The shared cache holds the storage; the policy holds its own auxiliary structures.
+
+Interviewer description: "not hard, but it feels like everyone in the building is determined not to pass you." Plan for a high standard on code cleanliness, naming, and the abstraction boundary in stage 3.
+
+Common slip on LFU: forgetting that ties at min_freq must use LRU as the secondary key. A frequency bucket implemented as a plain hashset breaks this.
+
+Preparation
+
+Write LRU and LFU both with hashmap + linked list (LRU) and hashmap + frequency-bucketed linked lists (LFU). Time-box each at 15 minutes.
+
+Practice the policy-as-strategy refactor: same get / put body, swap the policy object. The exercise mirrors what stage 3 is testing.
+
+Walk through O(1) claims for both — interviewer often asks for the worst-case argument, not the average-case.
+
+Have a one-line answer ready for "how would you make this thread-safe?" — it is a common follow-up; sketch a coarse-grained mutex first, then suggest sharded locks for higher throughput.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,76 @@
+===H1===
+AI Coding — Maze Solver
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/ai-coding-maze-solver
+===BODY===
+Meta
+Coding·60 minFree preview
+AI Coding — Maze Solver
+Meta's signature AI-Enabled Coding prompt. 4-5 progressive sub-tasks on a grid-maze codebase, building from bug-fix to BFS to key/door bitmask state to a Q5 bomb-blast variant added in April.
+SWE
+MLE
+Infra Eng
+RS
+ai-coding
+bfs
+bitmask
+simulation
+grid
+medium
+Frequency
+Very high
+Last asked
+2026-09-04
+Stage
+onsite-coding · phone-screen
+Requirements
+
+Starter codebase: a maze with S start, E end, # walls, . open cells. The interviewer hands you a small Python project with solver.py, a print helper, and a tests/ folder. You progress through 4-5 sub-tasks.
+
+Q1 — Bug fix, AI typically disallowed. Either the path symbol overwrites the S/E markers in the printed output, or the diff-style output is malformed. Fix by giving the start/end glyphs display priority in the print logic.
+
+Q2 — BFS / DFS infinite-loop bug. Search loops forever because a visited set is missing. Add dedupe before enqueue.
+
+Q3 — Directional gates. Cells marked > or < force the next move direction. Patch get_neighbors / move to consult the current cell glyph.
+
+Q4 — Keys and doors. Lowercase letters are keys; uppercase letters are doors. Expand state from (x, y) to (x, y, collected_keys_bitmask). Candidates may need to revisit cells once they hold new keys.
+
+Q5 (since April 2026) — Bombs. A bomb glyph destroys walls within a fixed radius (commonly 2-cell Chebyshev or a 1-cell + cross). Generate a get_affected_area(x, y) helper, fold the destroyed-walls set into search state, decide whether destruction is one-shot or persistent.
+
+Q5 alt — Energy / shortest weighted path. Cells carry energy costs; minimize total energy to reach the exit. Dijkstra is the expected answer. Some loops use this instead of bombs.
+
+Trap to watch
+
+One candidate reports the Q1 starter contains an intentionally invalid test case that must be commented out before the bug fix can be validated — the interviewer expects you to recognize the bad test, not patch the codebase to satisfy it. If 30+ min into Q1 the failing test still won't pass after seemingly correct fixes, ask whether any test cases themselves are wrong.
+
+Examples
+
+One candidate's run: S.....#...E style 8×10 grid; Q1 fixes the * path overwriting S; Q2 adds visited to BFS; Q3 forbids leftward moves on > cells; Q4 introduces a/A, b/B pairs; Q5 places one bomb that, when stepped on, clears a 5×5 wall block. Multiple threads report 7 hidden test cases with the bar set at passing the first 4.
+
+Notes
+
+Since mid-March the AI assistant writes directly into the CoderPad editor (Cursor-style). Model picker exposes Claude Opus 4.6, GPT-5.x, and Sonnet — Opus 4.6 is the consensus pick for this prompt.
+
+The interviewer will ask you to explain whatever the AI wrote. Generating a working solution but failing the explanation is a common rejection path.
+
+Reaching Q4 is the typical "strong" bar; Q5 is reach-territory and was added in April 2026.
+
+Underspecified glyph rules: confirm with the interviewer whether bombs are triggered on entry, exit, or by adjacency before prompting the AI.
+
+The Maze Solver also appears in phone screens. During AI-assisted work, keep explaining your reasoning to the interviewer while interacting with the assistant.
+
+Preparation
+
+Drill the canonical Q1-Q4 ladder by hand first so you can dictate the algorithm to the AI rather than read what it produces blind.
+
+Practice on the public Hello Interview maze harness (hellointerview.com/practice/ai-coding) — same class layout, with a runnable AI panel.
+
+Rehearse the prompt loop: "decide algorithm yourself → break into small functions → prompt the AI per function → read + explain." Letting the AI drive end-to-end fails the explanation follow-up.
+
+For Q5, pre-write a mental template for radius-N blast geometry and bitmask state extension so you don't burn time deriving it live.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

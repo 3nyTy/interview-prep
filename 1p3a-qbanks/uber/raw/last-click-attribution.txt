@@ -1,0 +1,66 @@
+===H1===
+Last-Click Attribution Tracker
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/last-click-attribution
+===BODY===
+Uber
+Coding·60 minMembers
+Last-Click Attribution Tracker
+Phone-screen design-coding round. Build an in-memory attribution tracker: record click and conversion events, and for each conversion attribute it to the same user's most recent click inside a fixed conversion window. Implement the API and write your own tests.
+SWE
+design
+hashmap
+binary-search
+medium
+Frequency
+Single report
+Last asked
+2026-05-29
+Stage
+phone-screen
+Requirements
+
+Implement a last-click attribution tracker with two event types:
+
+click(timestamp, userId, campaignId)
+
+conversion(timestamp, userId)
+
+For each conversion, attribute it to the same user's most recent click such that:
+
+the click timestamp is <= the conversion timestamp, and
+
+the click falls within a fixed window: click_time >= conversion_time - conversion_window_seconds.
+
+If no qualifying click exists, the conversion is unattributed.
+
+API to implement:
+
+recordClick(userId, campaignId, timestamp)
+recordConversion(userId, timestamp)
+getCampaignConversions(campaignId)   # conversions attributed to a campaign
+getUserAttribution(userId)           # attribution result(s) for a user
+
+Assume conversion_window_seconds = 300: a conversion at time t is attributed to the same user's latest click in [t - 300, t]. You must write and run your own test cases.
+
+Notes
+
+Per user, keep clicks in timestamp order. For each conversion, find the latest click <= t and check it is still inside the 300s window.
+
+Decide up front whether events arrive in non-decreasing timestamp order. If they can arrive out of order, you need a sorted structure per user plus binary search; if strictly increasing, an append-only list with a back-scan suffices. Clarify this before coding — it changes the data structure.
+
+Maintain a campaign -> conversions index incrementally as each conversion is attributed so getCampaignConversions is an O(1) lookup rather than a full rescan.
+
+The interviewer cares about correct window-boundary handling (inclusive on both ends) and the unattributed case; cover both explicitly in your tests.
+
+Preparation
+
+Write the per-user sorted-clicks + window-check core, then add the campaign and user reverse indexes.
+
+Test the boundaries: a click exactly at t-300, a click exactly at t, a click at t-301 (excluded), and a conversion with no prior click.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,61 @@
+===H1===
+Clone Linked List with Random + Next Pointer
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/clone-linked-list-random-and-next-pointer
+===BODY===
+Amazon
+Coding·30 minMembers
+Clone Linked List with Random + Next Pointer
+Variant of LC 138 (Copy List with Random Pointer) where each node has both a `next` and a `random` pointer. Deep-clone in O(n) time.
+SWE
+hashmap
+medium
+Frequency
+Single report
+Last asked
+2026-03-25
+Stage
+onsite-coding
+Requirements
+
+Each node has val, next, and random (random may point anywhere in the list or be null).
+
+Return a deep copy where every reference points to a newly allocated node — no aliasing with the original list.
+
+Discuss O(n) extra space (hashmap) vs O(1) extra space (interleaved-clone trick).
+
+Examples
+
+See LC 138 — same shape, no behavioral difference beyond confirming both pointer types are cloned.
+
+Notes
+
+Two-pass hashmap solution is the easiest to explain: pass 1 maps original -> clone, pass 2 fixes pointers.
+
+The O(1) interleave trick is worth knowing for follow-up depth: insert each clone after its original, then split the two lists.
+
+Watch for random pointing to the same node, to nodes ahead/behind, or to null — common bug spots.
+
+Two canonical solutions worth knowing cold: (1) two-pass hashmap original -> clone — pass 1 allocates all clones and fills next, pass 2 wires random by lookup; O(n) time, O(n) space. (2) Interleave-and-split: insert each clone immediately after its original (so original.next = clone, clone.next = original_next); set clone.random = original.random.next for every original; then detach the two interleaved lists. O(n) time, O(1) extra space.
+
+The interleave trick's subtlety: original.random may be null, so guard clone.random = original.random.next if original.random else null — easy to miss. The final detach pass also needs to fully restore both lists' next pointers, not just the cloned one's; interviewers verify the original list is unchanged.
+
+Recursion + memoization is a third valid approach (clone(node) memoized in a dict) and is the shortest to write, but uses O(n) stack — call this out for very long lists.
+
+Preparation
+
+Reimplement LC 138 from scratch with both the hashmap and the interleave approaches.
+
+Practice drawing the pointer rewiring on paper — pointer bugs are the main interview risk here.
+
+Be ready for the immutability follow-up: "What if you can't mutate the original list?" — that forces the hashmap approach.
+
+Layered drill: (1) reimplement LC 138 with the two-pass hashmap in 8 minutes; (2) reimplement with the O(1)-space interleave-and-split in 15 minutes; (3) write the recursive + memoized variant in under 6 minutes; (4) practice the immutability follow-up ("can't mutate the original list") which rules out interleave and forces the hashmap.
+
+Draw the pointer rewiring on paper for a 3-node list with at least one random pointing backward and one pointing to null before trusting the implementation.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

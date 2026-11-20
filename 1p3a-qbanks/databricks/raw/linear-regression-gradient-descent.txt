@@ -1,0 +1,55 @@
+===H1===
+Linear Regression Gradient Descent
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/linear-regression-gradient-descent
+===BODY===
+Databricks
+Coding·60 minMembers
+Linear Regression Gradient Descent
+Hand-code gradient descent for simple linear regression using MSE loss, then discuss learning rate, early stopping, convergence bugs, and project / ML-design follow-ups.
+MLE
+linear-regression
+gradient-descent
+numpy
+medium
+Frequency
+Low
+Last asked
+2026-04-17
+Stage
+onsite-coding
+Requirements
+
+Given feature matrix X and targets Y, fit a simple regression model with gradient descent.
+
+Use mean squared error; remember the mean term, not just squared error sum.
+
+Update weights iteratively with a learning rate.
+
+Discuss learning-rate selection, convergence, early stopping, and debugging non-convergence.
+
+Follow-up variants include project deep-dive and notebook OOM prediction design.
+
+Notes
+
+The round is a coding exercise, not only an ML oral. Be ready to write loops, vectorized operations, and tests.
+
+Numerical scale matters. Normalize inputs or at least discuss why large features can destabilize training.
+
+A common bug is missing the mean in MSE or using the wrong gradient sign.
+
+Know the canonical math so you can name the trade-off: MSE loss L = (1/n) * sum((Xw - y)^2) has gradient (2/n) * X^T (Xw - y), and the closed-form normal-equation solution is w = (X^T X)^-1 X^T y. Closed form is O(d^3) in the feature dimension and numerically unstable when X^T X is ill-conditioned; gradient descent converges linearly with rate set by the condition number kappa = lambda_max / lambda_min of X^T X. That is why feature normalization (or ridge regularization (X^T X + lambda I)^-1) matters in practice.
+
+Preparation
+
+Implement linear regression gradient descent in both pure Python loops and NumPy.
+
+Derive the MSE gradient by hand before the interview.
+
+Prepare tests on synthetic data where the true slope / intercept are known.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

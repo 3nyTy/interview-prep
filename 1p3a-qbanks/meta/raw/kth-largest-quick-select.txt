@@ -1,0 +1,51 @@
+===H1===
+Kth Largest Element / Quick Select
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/kth-largest-quick-select
+===BODY===
+Meta
+Coding·40 minMembers
+Kth Largest Element / Quick Select
+LeetCode 215 (Kth Largest Element in an Array). Phone-screen workhorse — heap or in-place quickselect, with the streaming-Kth variant as a typical follow-up.
+SWE
+MLE
+Infra Eng
+array
+heap
+quickselect
+medium
+Frequency
+Medium
+Last asked
+2026-05-06
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Return the k-th largest element from an unsorted array.
+
+Both O(n log k) heap and O(n) average quickselect accepted; some interviewers explicitly ask for quickselect when you offer heap.
+
+Follow-up: support online insertion → maintain a min-heap of size k. Some variants ask for k-th smallest or duplicates handling.
+
+Notes
+
+Speed-first: phone screens budget 20-25 min for this; aim for bug-free first run, including empty input and k > n guards.
+
+Quickselect pivot choice (random vs Lomuto vs Hoare) is a common follow-up. Be ready to argue worst-case O(n^2) and randomized expected O(n).
+
+One report pairs it with Subarray Sum Equals K in the same 40-min slot — expect a fast second problem.
+
+Preparation
+
+Write quickselect and heap solutions from memory in under 8 minutes each.
+
+Drill LeetCode 215 + 703 (Kth Largest in a Stream) back-to-back.
+
+Be ready to dictate trade-offs: heap is simpler + supports streaming; quickselect is faster in expectation but harder to keep bug-free under time pressure.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,68 @@
+===H1===
+News Aggregation / Subscription System
+===URL===
+https://www.1point3acres.com/interview/problems/company/optiver/news-subscription-system
+===BODY===
+Optiver
+Coding·120 minMembers
+News Aggregation / Subscription System
+The flagship SWE/SDE OA: implement a NewsProvider class that registers topic subscriptions with interest thresholds and per-second rate limits, ingests timestamped news, and publishes the right news to the right subscribers under sliding-window and priority rules. Most sittings allow about 75–90 minutes; a senior SWE variant allows two hours.
+SWE
+oop-design
+simulation
+sliding-window
+hashmap
+heap
+oa
+hard
+Frequency
+Medium
+Last asked
+2026-07-27
+Stage
+oa
+Requirements
+
+Implement the NewsProvider class. Constraints violated during an operation cause it to fail (return false / empty); "guaranteed" constraints never occur. Timestamps are seconds since the Unix epoch (float, millisecond precision).
+
+AddSubscription(id, minInterest, maxNewsPerSecond, topics) -> bool — register or (if id exists) update a subscription. maxNewsPerSecond is a rolling-window cap counted since the last published timestamp.
+
+RemoveSubscription(id) -> bool — remove an existing subscription; fail if it doesn't exist.
+
+NewsReceived(id, timestamp, interest, topics) -> bool — record a news item; fail if id was already used.
+
+Publish(timestamp, maxAge) -> dict[int, list[int]] — compute news to publish at timestamp, returning, per news id, the subscription ids to notify. timestamp is ever-increasing across calls.
+
+Publish rules:
+
+A subscriber receives a news item only if it subscribes to at least one of the item's topics and the item's interest ≥ the subscriber's minInterest.
+
+Only news within maxAge of timestamp is eligible.
+
+Respect each subscriber's maxNewsPerSecond rolling-window limit.
+
+A subscriber must never receive the same news twice.
+
+Prioritize by highest interest, then oldest timestamp, then highest id.
+
+Notes
+
+Data-structure shape: a hash map of subscriptions (with their topic sets), an index from topic → subscriptions, per-subscriber dedupe of already-sent news ids, and a per-subscriber sliding-window counter / timestamp queue for the rate limit.
+
+The hard parts are the multi-key priority ordering in Publish and the rolling-window rate limit — get the comparator and the window bookkeeping right.
+
+Brute force first to pass some test cases, then optimize; hidden tests are extensive. The class/method names vary slightly between sittings (e.g. addSubscriber / publishNews), but the semantics match.
+
+A senior SWE sitting used the same four-operation process-engine format with a two-hour limit; the longer window did not remove the time pressure.
+
+Preparation
+
+Build the class end to end: registration with update semantics, topic indexing, eligibility filtering, the three-key priority sort, and the per-subscriber rolling-window limiter.
+
+Unit-test the tricky rules in isolation: duplicate-news rejection, re-subscribe (same id update), all-topics-mismatch, and the rate-limit boundary.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

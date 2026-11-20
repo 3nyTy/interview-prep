@@ -1,0 +1,338 @@
+===H1===
+Streaming Entropy (numerical stability + online accumulation)
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/streaming-entropy
+===BODY===
+OpenAI
+Coding·60 minMembers
+Streaming Entropy (numerical stability + online accumulation)
+Given logits, compute the entropy of the distribution, handling exp/log numerical stability. Then make it streaming: logits arrive one at a time, accumulate entropy online.
+RS
+RE
+MLE
+numerical-stability
+streaming
+medium
+Frequency
+Medium
+Last asked
+2026-07-26
+Stage
+tech-screen
+Problem Overview
+
+A 60-minute ML coding round (Research Scientist onsite flavor). You are given a one-dimensional NumPy array of logits:
+
+logits: shape (N,)
+
+Let p = softmax(logits). The entropy term is built from p_i * log(p_i). In standard ML notation:
+
+H(p) = -sum_i (p_i * log(p_i))
+
+where sum_i runs over every index i. Note sum_i (p_i * log(p_i)) is the negative entropy — the prompt sometimes states the bare p * log(p) form, so confirm the sign with the interviewer before coding. The implementations below return standard (positive) entropy by default and show where to flip the sign if the raw sum_i (p_i * log(p_i)) value is wanted.
+
+Assume logits contains finite floating-point values and N > 0.
+
+Requirements
+
+Implement, in order:
+
+A direct entropy function using NumPy.
+
+A numerically safe version:
+
+subtract the maximum logit before computing softmax;
+
+compute log(softmax(x)) in centered form, (x - max(x)) - log(sum(exp(x - max(x)))), not as log(exp(x) / sum(exp(x))).
+
+A block-wise entropy implementation using only O(1) extra space, with a small fixed block size such as 2.
+
+A block-wise safe entropy implementation (online softmax).
+
+Part 1 — Direct NumPy entropy
+
+import numpy as np
+
+def softmax_entropy(logits: np.ndarray, *, standard_entropy: bool = True) -> float:
+    """
+    Compute entropy of softmax(logits).
+
+    standard_entropy=True  -> return -sum_i (p_i * log(p_i))
+    standard_entropy=False -> return  sum_i (p_i * log(p_i))
+    """
+    x = np.asarray(logits, dtype=np.float64)
+    if x.ndim != 1 or x.size == 0:
+        raise ValueError("logits must be a non-empty 1D array")
+
+    exp_x = np.exp(x)
+    p = exp_x / np.sum(exp_x)
+    raw = np.sum(p * np.log(p))
+    return float(-raw if standard_entropy else raw)
+
+Fine for small logits like [1.0, 2.0, 3.0], but not numerically safe: np.exp(1000) overflows to inf, and very small probabilities underflow to 0, so p * log(p) can become 0 * -inf.
+
+Part 2 — Safe softmax entropy
+
+Use the log-sum-exp trick. With m = max_i x_i:
+
+log_s    = log(sum_i exp(x_i - m))
+log(p_i) = (x_i - m) - log_s
+p_i      = exp(log(p_i))
+H(p)     = -sum_i (p_i * log(p_i))
+
+def log_softmax_safe(logits: np.ndarray) -> np.ndarray:
+    """Return log softmax without forming exp(logits) directly."""
+    x = np.asarray(logits, dtype=np.float64)
+    if x.ndim != 1 or x.size == 0:
+        raise ValueError("logits must be a non-empty 1D array")
+
+    m = np.max(x)
+    shifted = x - m
+    log_s = np.log(np.sum(np.exp(shifted)))
+    return shifted - log_s
+
+def softmax_safe(logits: np.ndarray) -> np.ndarray:
+    return np.exp(log_softmax_safe(logits))
+
+def softmax_entropy_safe(logits: np.ndarray, *, standard_entropy: bool = True) -> float:
+    log_p = log_softmax_safe(logits)
+    p = np.exp(log_p)
+    raw = np.sum(p * log_p)
+    return float(-raw if standard_entropy else raw)
+
+The load-bearing detail is not merely subtracting max(logits) before softmax. For log_softmax, do not write:
+
+np.log(np.exp(x - m) / np.sum(np.exp(x - m)))   # can still hit log(0)
+
+Instead keep it centered:
+
+shifted - np.log(np.sum(np.exp(shifted)))
+
+This keeps the log probability finite even when the probability itself underflows to zero.
+
+Part 3 — Block-wise entropy with O(1) extra space
+
+A typical skeleton hands you:
+
+def compute_entropy_blockwise(logits):
+    block_size = 2
+    block_nums = logits.shape[0] // block_size
+    ...
+    return entropy
+
+The key constraint is memory: do not allocate a full p vector. With a fixed block_size, each temporary block has constant size, so extra space is O(1). A direct two-pass version:
+
+def compute_entropy_blockwise(
+    logits: np.ndarray,
+    *,
+    block_size: int = 2,
+    standard_entropy: bool = True,
+) -> float:
+    """
+    Block-wise entropy, O(1) extra space for fixed block_size.
+    Not numerically safe — forms exp(logits) directly.
+    """
+    x = np.asarray(logits, dtype=np.float64)
+    if x.ndim != 1 or x.size == 0:
+        raise ValueError("logits must be a non-empty 1D array")
+    if block_size <= 0:
+        raise ValueError("block_size must be positive")
+
+    total = 0.0
+    for start in range(0, x.size, block_size):
+        block = x[start : start + block_size]
+        total += float(np.sum(np.exp(block)))
+
+    raw = 0.0
+    for start in range(0, x.size, block_size):
+        block = x[start : start + block_size]
+        p_block = np.exp(block) / total
+        raw += float(np.sum(p_block * np.log(p_block)))
+
+    return float(-raw if standard_entropy else raw)
+
+Slicing handles odd N automatically (the last slice may hold one element). O(N) time, O(1) extra space for fixed block size — but the same overflow/underflow problems as the unsafe full-vector version.
+
+Part 4 — Block-wise safe entropy (online softmax)
+
+Avoid materializing the full probability vector and avoid taking log after a division. Use the identity:
+
+H(p) = log Z - sum_i (p_i * x_i),   Z = sum_i exp(x_i),   p_i = exp(x_i) / Z
+
+To stay stable (no subtraction of two huge near-equal numbers at the end), maintain centered running state:
+
+m = running maximum logit
+s = sum_i exp(x_i - m)
+u = sum_i (exp(x_i - m) * (x_i - m))
+
+so at the end:
+
+log Z              = m + log(s)
+sum_i (p_i * x_i)  = m + u / s
+H(p)               = log(s) - u / s
+
+For a new block with max block_m, sum block_s, centered weighted sum block_u, rescale both running accumulators to the new maximum before folding in:
+
+new_m = max(m, block_m)
+new_s = s * exp(m - new_m) + block_s * exp(block_m - new_m)
+new_u = (u       + s       * (m       - new_m)) * exp(m       - new_m)
+      + (block_u + block_s * (block_m - new_m)) * exp(block_m - new_m)
+
+This rescale-on-max-change step is the chunk of math the interviewer most wants to see on the board.
+
+def compute_entropy_blockwise_safe(
+    logits: np.ndarray,
+    *,
+    block_size: int = 2,
+    standard_entropy: bool = True,
+) -> float:
+    """Numerically stable block-wise entropy, O(1) extra space for fixed block_size."""
+    x = np.asarray(logits, dtype=np.float64)
+    if x.ndim != 1 or x.size == 0:
+        raise ValueError("logits must be a non-empty 1D array")
+    if block_size <= 0:
+        raise ValueError("block_size must be positive")
+
+    m = -np.inf
+    s = 0.0
+    u = 0.0
+
+    for start in range(0, x.size, block_size):
+        block = x[start : start + block_size]
+
+        block_m = float(np.max(block))
+        shifted = block - block_m
+        exp_shifted = np.exp(shifted)
+        block_s = float(np.sum(exp_shifted))
+        block_u = float(np.sum(exp_shifted * shifted))
+
+        if s == 0.0:
+            m, s, u = block_m, block_s, block_u
+            continue
+
+        new_m = max(m, block_m)
+        old_scale = np.exp(m - new_m)
+        block_scale = np.exp(block_m - new_m)
+
+        u = (u + s * (m - new_m)) * old_scale
+        u += (block_u + block_s * (block_m - new_m)) * block_scale
+        s = s * old_scale + block_s * block_scale
+        m = new_m
+
+    entropy = np.log(s) - (u / s)
+    return float(entropy if standard_entropy else -entropy)
+
+This is the online-softmax form: equivalent to safe full-vector entropy, but storing only a few scalars plus a constant-size block.
+
+Notes
+
+Compact streaming-accumulator view
+
+Equivalently the offline derivation collapses to H = LSE(z) − ⟨p, z⟩ (log-sum-exp minus the probability-weighted logit sum). Two scalar accumulators — the running LSE and the weighted-sum — suffice offline; the streaming twist is exactly the rescale above: when a new logit exceeds the running max m, multiply both accumulators by exp(m_old − m_new) before folding in the new term. Concretely you are tracking sum(exp z), sum(z · exp z), and the running max; be able to write H = LSE(z) − ⟨p, z⟩ and the rescale acc *= exp(m_old − m_new) cold.
+
+Alternate canonical variant — safe two-pass block-wise
+
+If the interviewer does not require a one-pass online update, a simpler safe block-wise solution avoids the rescale recurrence entirely:
+
+First pass: m = max(logits) block by block.
+
+Second pass: s = sum(exp(logits - m)) block by block.
+
+Third pass: entropy via log_p = (logits - m) - log(s) block by block.
+
+def compute_entropy_blockwise_safe_two_pass(
+    logits: np.ndarray,
+    *,
+    block_size: int = 2,
+    standard_entropy: bool = True,
+) -> float:
+    x = np.asarray(logits, dtype=np.float64)
+    if x.ndim != 1 or x.size == 0:
+        raise ValueError("logits must be a non-empty 1D array")
+    if block_size <= 0:
+        raise ValueError("block_size must be positive")
+
+    m = -np.inf
+    for start in range(0, x.size, block_size):
+        m = max(m, float(np.max(x[start : start + block_size])))
+
+    s = 0.0
+    for start in range(0, x.size, block_size):
+        block = x[start : start + block_size]
+        s += float(np.sum(np.exp(block - m)))
+
+    log_s = np.log(s)
+
+    raw = 0.0
+    for start in range(0, x.size, block_size):
+        block = x[start : start + block_size]
+        log_p = (block - m) - log_s
+        p = np.exp(log_p)
+        raw += float(np.sum(p * log_p))
+
+    return float(-raw if standard_entropy else raw)
+
+Often easier to explain and still O(1) extra space for fixed block size. Reach for the one-pass online version only if online softmax is specifically requested.
+
+Verification
+
+Cover normal, large, and very-negative logits — the safe variants must agree, the unsafe ones only on moderate input:
+
+def check_solution():
+    cases = [
+        np.array([1.0, 2.0, 3.0]),
+        np.array([1000.0, 1001.0, 999.0]),
+        np.array([0.0, -1000.0, -1001.0]),
+        np.array([5.0]),
+        np.array([2.0, -1.0, 0.5, 7.0, -3.0]),
+        np.array([1e16, 1e16, 1e16]),
+    ]
+    for logits in cases:
+        expected = softmax_entropy_safe(logits)
+        got_online = compute_entropy_blockwise_safe(logits, block_size=2)
+        got_two_pass = compute_entropy_blockwise_safe_two_pass(logits, block_size=2)
+        assert np.allclose(got_online, expected, rtol=1e-12, atol=1e-12)
+        assert np.allclose(got_two_pass, expected, rtol=1e-12, atol=1e-12)
+
+    # Unsafe direct implementations only match on moderate logits.
+    moderate = np.array([1.0, 2.0, 3.0, -1.0])
+    assert np.allclose(softmax_entropy(moderate), softmax_entropy_safe(moderate))
+    assert np.allclose(
+        compute_entropy_blockwise(moderate, block_size=2),
+        softmax_entropy_safe(moderate),
+    )
+
+check_solution()
+
+Complexity summary
+
+MethodTimeExtra spaceNumerically safeNotes
+Direct full-vector entropyO(N)O(N)NoSimple baseline
+Safe full-vector entropyO(N)O(N)YesUses stable log_softmax
+Direct block-wise entropyO(N)O(1)*NoMeets memory bar but can overflow
+Online safe block-wise entropyO(N)O(1)*YesRunning max, sum, centered weighted sum
+Safe two-pass block-wise entropyO(N)O(1)*YesEasier to explain, more passes
+
+* for fixed block size.
+
+Frequency / interviewer signal
+
+Surfaced in only a single detailed candidate report so far — well-documented but rare.
+
+The numerically-stable derivation (log-sum-exp / centered log-softmax) and the rescale-on-max-change recurrence are the parts interviewers probe; have them derivable cold.
+
+Preparation
+
+Review log-sum-exp / softmax numerical stability; know why centered log_softmax beats log(exp(x)/sum(exp(x))).
+
+Derive the streaming entropy recurrence: how to update (m, s, u) accumulators when the max changes.
+
+Write H = LSE(z) − ⟨p, z⟩ and the rescale step acc *= exp(m_old − m_new) from memory.
+
+Practice the block-wise skeleton (block_size = 2, odd N) in both one-pass online and two-pass safe forms.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

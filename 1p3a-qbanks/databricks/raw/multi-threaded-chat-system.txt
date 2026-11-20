@@ -1,0 +1,460 @@
+===H1===
+Multi-Threaded Chat System
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/multi-threaded-chat-system
+===BODY===
+Databricks
+CodingMembers
+Multi-Threaded Chat System
+Design and implement a thread-safe, single-machine chat system where multiple clients communicate through channels.
+SWE
+concurrency
+threading
+chat
+medium
+Frequency
+Single report
+Last asked
+2025-10-24
+Stage
+onsite-coding
+The Challenge
+
+Design a thread-safe chat system for one computer. This system needs to let many clients talk through different channels at the same time. You must handle multiple threads doing things at once while keeping data safe using manual synchronization.
+
+Why this matters: This problem tests if you truly understand concurrency primitives. Interviewers want you to explain:
+
+Why you used specific locks.
+
+When you lock and when you unlock.
+
+How you stop errors where threads fight over data (race conditions).
+
+The good and bad points of your choices.
+
+What the System Needs
+
+Main Features
+
+Users: People can join multiple channels.
+
+Channels: Groups where messages are sent.
+
+Sending Messages: When someone posts to a channel, everyone in that group gets the message.
+
+Thread Safety: Many threads must be able to do these things at the same time:
+
+Join or leave channels.
+
+Send messages.
+
+Read messages.
+
+The Big Rule
+
+Do NOT use thread-safe collections (like ConcurrentHashMap or CopyOnWriteArrayList).
+
+Why? The interviewer wants to see if you understand how locks work under the hood. If you use a pre-made tool, you hide that knowledge. You must show:
+
+Where to put locks.
+
+How to stop locks from slowing everything down.
+
+That you know which parts of code are "critical."
+
+Class Definitions
+
+class ChatSystem {
+    // Subscribe a user to a channel
+    void subscribe(String userId, String channelId);
+
+    // Unsubscribe a user from a channel
+    void unsubscribe(String userId, String channelId);
+
+    // Send message to a channel (all subscribers receive it)
+    void sendMessage(String userId, String channelId, String message);
+
+    // Get all messages for a user (from all subscribed channels)
+    List<Message> getMessages(String userId);
+}
+
+class Message {
+    String channelId;
+    String senderId;
+    String content;
+    long timestamp;
+}
+
+How It Works
+
+ChatSystem chat = new ChatSystem();
+
+// Thread 1: User A joins "sports" and sends a message
+Thread t1 = new Thread(() -> {
+    chat.subscribe("userA", "sports");
+    chat.sendMessage("userA", "sports", "Go team!");
+});
+
+// Thread 2: User B joins two channels
+Thread t2 = new Thread(() -> {
+    chat.subscribe("userB", "sports");
+    chat.subscribe("userB", "tech");
+});
+
+// Thread 3: User C joins "tech" and sends a message
+Thread t3 = new Thread(() -> {
+    chat.subscribe("userC", "tech");
+    chat.sendMessage("userC", "tech", "New framework released!");
+});
+
+t1.start(); t2.start(); t3.start();
+t1.join(); t2.join(); t3.join();
+
+// User B is in both channels, so they get both messages
+List<Message> messagesB = chat.getMessages("userB");
+// messagesB contains:
+// - "Go team!" (from sports channel)
+// - "New framework released!" (from tech channel)
+
+What the Interviewer Will Ask
+
+Usually, the interviewer will:
+
+Ask about data storage: "How will you store the data?"
+
+Question your tools: "Why didn't you use ConcurrentHashMap?"
+
+Check your locking: "Show me exactly where you lock. Why there?"
+
+Test weird situations: "What happens if someone leaves a channel while a message is arriving?"
+
+Discuss speed: "Can we make the locking faster?"
+
+Be ready to explain every single lock you use.
+
+The Plan
+
+How to Structure the Data
+
+We need to keep track of two things:
+
+Channel Lists: Which users are in which channel.
+
+User Inboxes: A list of messages for each user.
+
+Channels:
+    "sports" -> [userA, userB]
+    "tech"   -> [userB, userC]
+
+User Messages:
+    userA -> [Message(...)]
+    userB -> [Message(...), Message(...)]
+    userC -> [Message(...)]
+
+Locking Strategy
+
+The Main Idea: Give each shared map its own lock.
+
+channelSubscriptions (Map<String, Set<String>>)
+    ↓
+channelLock (ReentrantReadWriteLock)
+
+userMessages (Map<String, List<Message>>)
+    ↓
+messagesLock (ReentrantReadWriteLock)
+
+Why two locks instead of one?
+
+It stops threads from waiting too long (less contention).
+
+Joining a channel doesn't stop messages from being delivered.
+
+It is faster than using one big lock for everything.
+
+The Code
+
+import java.util.*;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+class ChatSystem {
+
+    // Standard maps (NOT thread-safe versions)
+    private final Map<String, Set<String>> channelSubscriptions;  // channel -> set of userIds
+    private final Map<String, List<Message>> userMessages;        // userId -> list of messages
+
+    // Locks to handle safety manually
+    private final ReadWriteLock channelLock;
+    private final ReadWriteLock messagesLock;
+
+    public ChatSystem() {
+        this.channelSubscriptions = new HashMap<>();
+        this.userMessages = new HashMap<>();
+        this.channelLock = new ReentrantReadWriteLock();
+        this.messagesLock = new ReentrantReadWriteLock();
+    }
+
+    /**
+     * Subscribe a user to a channel.
+     * Thread-safe: We prepare the message list first, then add the user to the channel.
+     * This order is important. It stops a bug where a message might arrive
+     * before the user has a list to put it in.
+     */
+    public void subscribe(String userId, String channelId) {
+        // First: Make sure the user has an inbox list
+        // CRITICAL: Do this BEFORE adding them to the channel
+        messagesLock.writeLock().lock();
+        try {
+            userMessages.putIfAbsent(userId, new ArrayList<>());
+        } finally {
+            messagesLock.writeLock().unlock();
+        }
+
+        // Second: Add user to the channel list
+        // We know the inbox exists now
+        channelLock.writeLock().lock();
+        try {
+            // Get the set of users for this channel, or create one
+            Set<String> subscribers = channelSubscriptions.get(channelId);
+            if (subscribers == null) {
+                subscribers = new HashSet<>();
+                channelSubscriptions.put(channelId, subscribers);
+            }
+            subscribers.add(userId);
+        } finally {
+            channelLock.writeLock().unlock();
+        }
+    }
+
+    /**
+     * Remove a user from a channel.
+     * Thread-safe: We lock the channel list to remove the user safely.
+     */
+    public void unsubscribe(String userId, String channelId) {
+        channelLock.writeLock().lock();
+        try {
+            Set<String> subscribers = channelSubscriptions.get(channelId);
+            if (subscribers != null) {
+                subscribers.remove(userId);
+                // Clean up: remove the channel if no one is left
+                if (subscribers.isEmpty()) {
+                    channelSubscriptions.remove(channelId);
+                }
+            }
+        } finally {
+            channelLock.writeLock().unlock();
+        }
+    }
+
+    /**
+     * Send a message to a channel.
+     * All users in the channel get the message.
+     *
+     * Thread-safe:
+     * 1. Read lock on channels (to see who is there).
+     * 2. Write lock on messages (to put the message in inboxes).
+     */
+    public void sendMessage(String userId, String channelId, String content) {
+        Message message = new Message(channelId, userId, content, System.currentTimeMillis());
+
+        // Step 1: Find out who is subscribed right now
+        // We use a READ lock because we are only looking, not changing
+        Set<String> subscribers;
+        channelLock.readLock().lock();
+        try {
+            Set<String> channelSubs = channelSubscriptions.get(channelId);
+            if (channelSubs == null || channelSubs.isEmpty()) {
+                return; // No one is listening
+            }
+            // Copy the list so we don't hold the lock while delivering
+            subscribers = new HashSet<>(channelSubs);
+        } finally {
+            channelLock.readLock().unlock();
+        }
+
+        // Step 2: Give the message to every subscriber
+        // We use a WRITE lock because we are changing the message lists
+        messagesLock.writeLock().lock();
+        try {
+            for (String subscriberId : subscribers) {
+                List<Message> messages = userMessages.get(subscriberId);
+                if (messages != null) {
+                    messages.add(message);
+                }
+            }
+        } finally {
+            messagesLock.writeLock().unlock();
+        }
+    }
+
+    /**
+     * Get all messages for a user.
+     * Thread-safe: Uses a read lock on the messages map.
+     */
+    public List<Message> getMessages(String userId) {
+        messagesLock.readLock().lock();
+        try {
+            List<Message> messages = userMessages.get(userId);
+            if (messages == null) {
+                return new ArrayList<>();
+            }
+            // Return a copy so the original list stays safe inside
+            return new ArrayList<>(messages);
+        } finally {
+            messagesLock.readLock().unlock();
+        }
+    }
+}
+
+class Message {
+    final String channelId;
+    final String senderId;
+    final String content;
+    final long timestamp;
+
+    public Message(String channelId, String senderId, String content, long timestamp) {
+        this.channelId = channelId;
+        this.senderId = senderId;
+        this.content = content;
+        this.timestamp = timestamp;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[%s] %s in #%s: %s", timestamp, senderId, channelId, content);
+    }
+}
+
+Why We Built It This Way
+
+1. Using ReadWriteLock instead of ReentrantLock
+
+Why? sendMessage() happens the most often. It needs to read the list of subscribers. A ReadWriteLock lets many threads read at the same time, but only lets one thread write (change) things.
+
+Good Point: It makes the system 10x faster when there are lots of reads (which is normal for chat).
+
+Trade-off: It is slightly more complex than a basic lock, but it is worth it here.
+
+2. Copying the List (Snapshot Pattern)
+
+When we send a message, we copy the list of users (new HashSet<>(channelSubs)) and then unlock the channel lock immediately.
+
+Good Points:
+
+Lock is held for less time: We release channelLock fast.
+
+No deadlock: We don't hold two locks at the same time.
+
+Better flow: People can join or leave the channel while the message is being delivered.
+
+Trade-off: If someone leaves the channel while we are delivering, they might still get that one last message. This is okay (eventual consistency).
+
+3. Using Separate Locks
+
+Why two locks? If we used one big global lock, only one thing could happen at a time.
+
+With two locks:
+
+Thread 1: Sending message (reads channel lock, writes message lock)
+Thread 2: Subscribing (writes channel lock)
+
+These actions can overlap. This makes the system much faster when many people are using it.
+
+Tricky Situations
+
+1. Leaving a Channel While Getting a Message
+
+If a user unsubscribes exactly when a message is being sent, they might still get it because we copied the list earlier. This is acceptable. It is better than pausing the whole system just to be perfectly exact.
+
+2. Sending to a Channel that Doesn't Exist
+
+The code checks if the channel is null or empty. If so, it just stops (return). This is standard—we don't need to throw an error.
+
+3. Many People Joining at Once
+
+If 100 threads try to join the same channel at the same time, they will wait in line for the channelLock.writeLock(). This keeps the HashSet safe so no data is lost.
+
+Speed and Efficiency
+
+Where it Slows Down (Bottlenecks)
+
+OperationLock UsedTime TakenHow Often
+subscribe()message lock, then channel lockVery FastLow
+unsubscribe()channel lockVery FastLow
+sendMessage()channel lock (read), then message lockFast (copying) + Medium (delivery)High
+getMessages()message lock (read)FastMedium
+
+Main Slow Spot: If many users send messages to the same popular channel at once.
+
+They can all read the subscriber list at the same time (fast).
+
+But they have to wait in line to add messages to user inboxes (slower).
+
+How Fast Is It? (Throughput)
+
+Guessing with numbers:
+
+1000 threads.
+
+100 channels.
+
+If we used one normal lock:
+
+Everything waits. Max speed: ~10,000 ops/sec.
+
+With our ReadWriteLock:
+
+Reading is parallel. Max speed: ~100,000 ops/sec.
+
+10x improvement for reading.
+
+Memory Usage
+
+Subscriptions: $O(C \times U)$ where C is channels and U is users.
+
+Messages: $O(U \times M)$ where M is messages.
+
+Snapshots: Small temporary memory usage during sending.
+
+Other Ways to Solve It
+
+❌ ConcurrentHashMap
+
+Using ConcurrentHashMap is too easy. It hides the logic. Interviewers want to see you do the locking yourself. You can mention it, but say "I want to show you I understand how to prevent race conditions manually."
+
+❌ Single Global Lock
+
+This is safe but very slow. sendMessage("sports") would stop someone else from doing sendMessage("tech"). They shouldn't block each other. Only use this if the system is very small.
+
+✅ Lock-Free (Advanced)
+
+You could use AtomicReference and loop until successful. This is "lock-free." It is very fast for reading but complex to write and uses more CPU power when busy. It is usually overkill for this interview question.
+
+Questions You Should Prepare For
+
+Q1: "Why didn't you use synchronized?"
+
+Answer: synchronized only allows one thread at a time. ReadWriteLock lets many threads read at the same time. Since sendMessage reads the list often, ReadWriteLock is much faster.
+
+Q2: "What if we need to save messages to a database?"
+
+Answer: Don't do it inside the lock! Use a background thread (async):
+
+executor.submit(() -> saveToDb(message));
+
+This keeps the chat fast.
+
+Q3: "How do you prevent deadlocks?"
+
+Answer: Order matters. We never hold two locks at the same time in a nested way.
+
+In subscribe, we lock Messages -> release -> lock Channels.
+
+In sendMessage, we lock Channels -> release -> lock Messages.
+
+Because we release the first lock before grabbing the second, a deadlock (circular wait) is impossible.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

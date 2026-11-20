@@ -1,0 +1,80 @@
+===H1===
+OOD — Body-Temperature Measurement Classes
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/ood-patient-temperature-classes
+===BODY===
+Oracle
+Coding·45 minMembers
+OOD — Body-Temperature Measurement Classes
+Design Java classes for storing and reasoning about patient body-temperature readings. The interviewer drives the requirements iteratively: measurement methods, unit handling, and method-specific fever thresholds emerge as the discussion deepens. No algorithm is required.
+SWE
+oop-design
+object-design
+ambiguous-spec
+medium
+Frequency
+Single report
+Last asked
+2025-01-15
+Stage
+onsite-coding
+Requirements
+
+Model a patient's body-temperature reading well enough to support fever-trend reasoning.
+
+Driven from a minimal initial spec, with the interviewer adding requirements as the design takes shape:
+
+A reading carries a numeric value, a unit (Celsius / Fahrenheit), and a measurement method (oral, axillary, rectal, tympanic, forehead).
+
+The fever threshold is method-dependent (e.g. rectal vs axillary readings have different cut-offs).
+
+Should support converting between units when comparing readings.
+
+Eventually: store a sequence of readings per patient and expose a "is this trending toward fever" query.
+
+No algorithm round — purely class design and refactoring as the spec evolves.
+
+Notes
+
+Core class skeleton:
+enum TemperatureUnit { CELSIUS, FAHRENHEIT }
+enum MeasurementMethod {
+    ORAL, AXILLARY, RECTAL, TYMPANIC, FOREHEAD;
+    double feverThresholdCelsius() { ... }
+}
+class TemperatureReading {
+    double value;
+    TemperatureUnit unit;
+    MeasurementMethod method;
+    Instant takenAt;
+    double valueInCelsius() { ... }
+    boolean isFebrile() { return valueInCelsius() >= method.feverThresholdCelsius(); }
+}
+class PatientTemperatureHistory {
+    String patientId;
+    List<TemperatureReading> readings;
+    void add(TemperatureReading r) { ... }
+    boolean trendingTowardFever(Duration lookback) { ... }
+}
+
+The interviewer's iterative spec is the load-bearing signal: stop and re-confirm after each addition before refactoring. Premature deep nesting (e.g. OralAxillaryRectalMeasurement subclass hierarchies) is the common over-engineering trap.
+
+Use enums with attached behaviour for both the unit and the measurement method. This keeps the threshold-per-method logic local to the enum and avoids switch statements in client code.
+
+Equality / comparison: define compareTo carefully — comparing two readings of different units must convert first; comparing across methods is meaningful only after threshold normalisation.
+
+The interviewer rewarded explicit small-step refactors: "now let me extract the unit conversion into the enum" was scored higher than "let me rewrite this from scratch."
+
+Preparation
+
+Draft the enum-with-behaviour pattern from scratch in Java; practise the valueInCelsius() conversion utility separately.
+
+Walk through 3-4 spec increments before the round: (a) basic class, (b) add unit conversion, (c) method-dependent threshold, (d) per-patient history with a fever-trend query.
+
+Avoid generic abstractions until they're requested — BaseMeasurement<T>, MeasurementFactory, etc. are exactly the kind of pre-emptive complexity interviewers explicitly graded down on in this round.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

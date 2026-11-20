@@ -1,0 +1,77 @@
+===H1===
+Zero Array Transformation
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/zero-array-transformation
+===BODY===
+Uber
+CodingMembers
+Zero Array Transformation
+Given an integer array nums and a list of range queries [li, ri, vali], decide whether nums can be reduced entirely to zeros, where each query lets you subtract any amount between 0 and vali from every index in its range.
+SWE
+array
+prefix-sum
+greedy
+medium
+Frequency
+Single report
+Last asked
+2026-03-08
+Stage
+oa
+You are given an integer array nums of length n and a 2D integer array queries, where queries[i] = [li, ri, vali].
+
+For every index j such that li <= j <= ri, you may decrease nums[j] by any integer amount between 0 and vali (inclusive). The amount chosen at each index can differ.
+
+Return true if it is possible to transform nums into a Zero Array (an array where every element is 0) after applying all queries; otherwise return false.
+
+Examples
+
+Example 1:
+
+Input: nums = [1,0,1], queries = [[0,2,1]]
+
+Output: true
+
+Explanation:
+
+Each index in [0, 2] can be decremented by up to 1. Subtract 1 at indices 0 and 2 to get [0, 0, 0].
+
+Example 2:
+
+Input: nums = [4,3,2,1], queries = [[1,3,2],[0,2,1]]
+
+Output: false
+
+Explanation:
+
+The total decrement budget at index 0 is 1, but nums[0] is 4, so it can never reach 0.
+
+Example 3:
+
+Input: nums = [2,2], queries = [[0,1,1],[0,1,1]]
+
+Output: true
+
+Explanation:
+
+Each index has total capacity 2, matching nums[i].
+
+Constraints
+
+1 <= nums.length <= 10^5
+
+0 <= nums[i] <= 10^9
+
+0 <= queries.length <= 10^5
+
+queries[i].length == 3
+
+0 <= li <= ri < nums.length
+
+0 <= vali <= 10^4
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

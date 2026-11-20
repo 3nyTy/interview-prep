@@ -1,0 +1,54 @@
+===H1===
+MLP Compute-vs-Memory Bound Analysis
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/mlp-compute-memory-bound-analysis
+===BODY===
+Amazon
+OtherMembers
+MLP Compute-vs-Memory Bound Analysis
+Analyze `Y = GELU(X @ W + bias) + residual` on hardware with 1 TB/s HBM bandwidth, 25 MB SRAM, 100 TFLOP/s peak BF16 throughput, and model dimension 4096. Calculate compute time, memory time, and latency for batch sizes 1 and 256, then prove which case is compute-bound and which is memory-bound.
+EM
+gpu
+arithmetic-intensity
+performance-modeling
+inference
+medium
+Frequency
+Single report
+Last asked
+2026-08-08
+Stage
+phone-screen
+Requirements
+
+Layer: Y = GELU(X @ W + bias) + residual.
+
+Hardware limits: 1 TB/s HBM bandwidth, 25 MB SRAM, and 100 TFLOP/s peak BF16 throughput.
+
+Model dimension: 4096.
+
+Evaluate batch size 1 and batch size 256. For each case, calculate compute time, memory time, and end-to-end latency, then establish whether the layer is compute-bound or memory-bound.
+
+Notes
+
+State tensor-shape and residency assumptions before calculating: whether W is a square 4096 × 4096 matrix, which tensors use BF16, whether weights stream from HBM for each invocation, and whether intermediates spill beyond SRAM.
+
+Under one explicit roofline model, take square BF16 weights, BF16 inputs/residuals/outputs, a fused bias-GELU-residual epilogue, one HBM weight read per invocation, and ideal compute-memory overlap. The 4096 × 4096 weight matrix occupies 33,554,432 bytes, so it does not fit in 25 MB SRAM.
+
+The leading matrix multiplication work is 2BD^2 FLOPs. At batch 1 this is 33,554,432 FLOPs, or about 0.336 microseconds at 100 TFLOP/s; at batch 256 it is 8,589,934,592 FLOPs, or about 85.9 microseconds. Elementwise work is lower order and should be added only after stating a FLOP convention for GELU.
+
+With fused intermediates, approximate HBM traffic as weights + input + residual + output + bias: 2D^2 + 6BD + 2D bytes. This gives about 33.6 microseconds at batch 1 and 39.9 microseconds at batch 256 over a 1 TB/s link.
+
+The ideal-overlap latency is the larger of compute and memory time: about 33.6 microseconds and memory-bound for batch 1, versus about 85.9 microseconds and compute-bound for batch 256. If overlap is disallowed, report the sum as a separate upper-bound model rather than mixing the two assumptions.
+
+Preparation
+
+Recompute the FLOP, byte, and latency table from a blank page in under 10 minutes, labeling decimal bytes versus MiB and max(compute, memory) versus compute + memory.
+
+Write a small roofline calculator and vary batch size until the bound flips; under the stated assumptions the crossover is near batch 108, which is a useful arithmetic check.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

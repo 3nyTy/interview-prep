@@ -1,0 +1,54 @@
+===H1===
+Russian Doll Envelopes
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/russian-doll-envelopes
+===BODY===
+Google
+Coding·40 minMembers
+Russian Doll Envelopes
+LeetCode 354. Maximum chain of envelopes that strictly fit inside each other. Sort + LIS reduction.
+SWE
+array
+dp
+binary-search
+sorting
+medium
+Frequency
+Single report
+Last asked
+—
+Stage
+phone-screen
+Requirements
+
+Input: list of (width, height) envelopes.
+
+Output: longest chain where each envelope strictly fits in the next.
+
+Trick: sort by width ascending, height descending (when widths tie); run LIS (Longest Increasing Subsequence) on heights.
+
+LIS with patience-sort gives O(n log n).
+
+Examples
+
+[[5,4],[6,4],[6,7],[2,3]] → 3.
+
+Notes
+
+Sorting heights descending on width-ties prevents same-width envelopes from chaining — easy to miss.
+
+LIS via bisect_left on a tails array is the standard O(n log n) implementation.
+
+Preparation
+
+Write LIS O(n log n) from memory in under 8 min.
+
+Justify the descending-height-on-tie trick out loud.
+
+Plain LIS and the mountain-LIS variant make good drill partners.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

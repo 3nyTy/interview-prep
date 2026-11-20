@@ -1,0 +1,69 @@
+===H1===
+Record Linkage by Weighted Similarity
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/record-linkage-similarity
+===BODY===
+Stripe
+Coding·45 minMembers
+Record Linkage by Weighted Similarity
+Phone-screen coding. Given user records (id, name, email, company) and per-field similarity weights, find all records linked to a target user, with follow-ups for transitive linkage.
+SWE
+graph
+union-find
+bfs
+medium
+Frequency
+Single report
+Last asked
+2025-12-04
+Stage
+phone-screen
+Requirements
+
+Input: rows (list of user records with id, name, email, company), weights (dict mapping each field to its weight, summing to 1), threshold, target_user_id.
+
+Two records are "linked" if the weighted sum of per-field equality (1 if equal else 0) is >= threshold.
+
+Part 1: return all record ids directly linked to target_user_id.
+
+Part 2 (Follow-up 1): also include records linked via exactly one hop (transitively reachable in one step).
+
+Part 3 (Follow-up 2): return the full connected component containing target_user_id regardless of hop count.
+
+Examples
+
+rows = [
+  { id: 1, name: "Alice",  email: "alice@gmail.com", company: "Stripe" },
+  { id: 2, name: "Alicia", email: "alice@gmail.com", company: "Stripe" },
+  { id: 3, name: "Alice",  email: "alice@yahoo.com", company: "Google" },
+  { id: 4, name: "Bob",    email: "bob@gmail.com",   company: "Stripe" }
+]
+weights   = { name: 0.2, email: 0.5, company: 0.3 }
+threshold = 0.5
+target    = 1
+
+Notes
+
+Part 3 is plainly union-find or BFS over the similarity graph. Both are accepted; interviewers care that you correctly model the graph and avoid recomputing pairwise similarity inside the BFS.
+
+Watch the cost of pairwise comparison — Part 3 is O(n^2) per traversal if you don't precompute an adjacency list.
+
+The canonical formulation is the connected-components / accounts-merge family: build a hashmap from each shared attribute value to the record ids that carry it; whenever a value already maps to another record, union the two records under a union-find. After one pass, every record's find() root identifies its component. Time is near-linear O((n·m)·α(n)) and avoids the O(n²) pairwise scan that the brute solution falls into.
+
+Preparation
+
+Drill union-find with both union-by-rank and path compression.
+
+Pre-write a function that computes pairwise weighted similarity for a list of dicts.
+
+Practice articulating when to switch from naive pairwise BFS to a precomputed adjacency list under time pressure.
+
+Implement the canonical accounts-merge skeleton (per-attribute hashmap + union-find with path compression and union-by-rank), then translate it onto this prompt where "shared attribute" is "weighted similarity ≥ threshold" instead of strict equality.
+
+Stage your work explicitly: a brute O(n²) pairwise scan for Parts 1-2, then refactor to the adjacency-list / union-find form for Part 3 — interviewers want to see the trade-off articulated, not the optimal solution on attempt one.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

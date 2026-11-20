@@ -1,0 +1,67 @@
+===H1===
+Task Dependency Ordering
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/task-dependency-ordering
+===BODY===
+Citadel / Citadel Securities
+CodingMembers
+Task Dependency Ordering
+Given a map from string task names to prerequisite lists, return any valid ordering of all tasks. The screen supplies a Java-style `Map<String, List<String>>` interface and follows with feasibility and time-complexity questions.
+SWE
+graph
+topological-sort
+medium
+Frequency
+Single report
+Last asked
+2026-08-15
+Stage
+phone-screen
+Requirements
+
+The input is a map whose keys are task names and whose values are the tasks that each key depends on. Task names are strings.
+
+Return any ordering containing every task such that each dependency appears before the task that requires it.
+
+Use the supplied Java-style interface without changing the input parameter:
+
+public static List solution(Map<String, List<String>> tasks) { … }
+
+Follow-ups:
+
+Determine whether every task can be completed.
+
+State the time complexity and derive it from how often tasks and dependency edges are processed.
+
+Examples
+
+Input: {
+  "Task1": ["Task0"],
+  "Task3": ["Task0", "Task1", "Task2"],
+  "Task2": ["Task0"]
+}
+
+Valid output:   ["Task0", "Task2", "Task1", "Task3"]
+Invalid output: ["Task0", "Task1", "Task3", "Task2"]
+
+Notes
+
+Input handling is part of the evaluation: the function call could not be changed, and the implementation had to work without modifying the input parameter.
+
+Test cases may be typed live, leaving less time than expected. Confirm the exact map contents and function call before coding.
+
+A standard solution treats every distinct name in both the map keys and prerequisite lists as a vertex. Build edges from each prerequisite to its dependent task, track every vertex's indegree, and repeatedly emit any zero-indegree vertex while decrementing its dependents.
+
+If the emitted order contains fewer vertices than the graph, a cycle prevents all tasks from being completed. With V distinct tasks and E dependency edges, this traversal uses O(V + E) time and O(V + E) auxiliary space.
+
+Preparation
+
+Implement both an indegree-based traversal and a three-color depth-first traversal over string-named tasks; make each version detect a cycle and include tasks that appear only in prerequisite lists.
+
+Dry-run the supplied example plus an empty map, independent tasks, disconnected components, and a directed cycle. For every returned order, verify each dependency's index is smaller than its dependent task's index.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

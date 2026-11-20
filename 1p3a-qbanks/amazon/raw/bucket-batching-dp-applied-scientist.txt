@@ -1,0 +1,67 @@
+===H1===
+Bucket Batching DP (Applied Scientist Phone Screen)
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/bucket-batching-dp-applied-scientist
+===BODY===
+Amazon
+Coding·30 minMembers
+Bucket Batching DP (Applied Scientist Phone Screen)
+K documents of varying lengths must be split into G GPU batches to minimize total padding (each batch pads to the longest document in it). A high-discrimination phone-screen DP — interviewers describe it as a low pass-rate question.
+RS
+MLE
+dp
+math-reasoning
+hard
+Frequency
+Single report
+Last asked
+2026-04-28
+Stage
+phone-screen
+Requirements
+
+Inputs: lengths L[0..K-1] (positive integers), number of GPUs G.
+
+Partition the documents into exactly G contiguous buckets after sorting L ascending.
+
+Cost of a bucket is (size_of_bucket) * (max_length_in_bucket).
+
+Minimize total cost. Constraint reported: 0 <= K and the candidate must derive K >= G for feasibility.
+
+Examples
+
+L = [1, 3, 4, 7], G = 2
+# bucket options after sort: e.g. [1,3] [4,7] -> 2*3 + 2*7 = 20; [1] [3,4,7] -> 1*1 + 3*7 = 22; [1,3,4] [7] -> 3*4 + 1*7 = 19 (best)
+answer = 19
+
+Notes
+
+Sort L; let dp[i][g] = min cost to partition the first i items into g buckets. Transition: dp[i][g] = min over j<i of dp[j][g-1] + (i - j) * L[i-1]. Time O(K^2 * G). Reconstruct buckets via a par table.
+
+Note that AI tools are not explicitly banned, but the interviewer's framing ("just write a brute force if coding is your strength") implies hand-derivation is the scoring point.
+
+The interviewer offered a hint to consider G = 2; treat that as a cue to derive the recurrence on the simplest case before generalizing.
+
+After sorting L ascending, the DP transition collapses to dp[i][g] = min over j<i of dp[j][g-1] + (i - j) * L[i-1] because L[i-1] is the max of any bucket ending at index i-1. Without sorting, you would have to track the per-bucket max separately and the recurrence loses its closed form.
+
+Reconstruction: keep par[i][g] = argmin j; trace back from par[K][G] to recover the partition boundaries.
+
+Convex-hull / divide-and-conquer DP optimization brings it to O(K G log K) because the cost function (i - j) * L[i-1] satisfies the quadrangle inequality in j. Mention as the follow-up answer; do not implement under time pressure unless asked.
+
+Preparation
+
+Solve LC 410 (Split Array Largest Sum) and LC 1959 (Minimum Total Space Wasted with K Resizing Operations) — both are partition-DP siblings and 1959 is structurally identical.
+
+Drill the O(K^2 * G) DP plus path reconstruction.
+
+Be ready to discuss the convex/quadrangle-inequality speedup (Knuth/SMAWK) for follow-up depth, even if you don't implement it.
+
+Solve LC 410 first (binary-search version too — it generalizes to monotone-feasibility partition problems), then LC 1959 to lock in the sorted-partition variant. Doing both in one sitting cements the pattern.
+
+Practice writing the par reconstruction code separately; many candidates can produce the cost but forget to recover the partition, which the grader explicitly asks for.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

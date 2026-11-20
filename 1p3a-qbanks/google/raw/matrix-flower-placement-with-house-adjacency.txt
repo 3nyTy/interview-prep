@@ -1,0 +1,63 @@
+===H1===
+Matrix Flower Placement with House Adjacency
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/matrix-flower-placement-with-house-adjacency
+===BODY===
+Google
+Coding·45 minMembers
+Matrix Flower Placement with House Adjacency
+Onsite coding prompt: place flowers on a grid with houses and empty cells. Each row and column can contain at most one flower, and every house must have exactly one adjacent flower that is not shared with another house.
+SWE
+grid
+backtracking
+hard
+Frequency
+Low
+Last asked
+2026-05-31
+Stage
+onsite-coding
+Requirements
+
+Input: an N x N grid with houses (H) and empty plantable cells (0 / O).
+
+Place flowers (F) so that each row and each column contains at most one flower. One variant states exactly one flower per row and column; clarify which rule applies before coding.
+
+Every house must have exactly one flower among its up / down / left / right neighbors.
+
+In the stricter variant, a flower cannot be shared by two houses; it must belong to one adjacent house only.
+
+Return either any valid placement or a boolean for whether a valid placement exists, depending on the interviewer prompt.
+
+Follow-up: return all valid grid states.
+
+Examples
+
+H 0 0 0
+H 0 0 0
+0 0 0 H
+0 0 0 0
+
+The task is to fill some 0 cells with F while satisfying both the row/column constraint and each house's adjacency requirement.
+
+Notes
+
+This is an N-Queens-style DFS / backtracking problem with extra local constraints around houses.
+
+Track occupied rows and columns, then validate the four-neighbor requirement either incrementally or at the leaf.
+
+The two variants differ on at most one vs exactly one flower per row/column; state the assumption before coding.
+
+Preparation
+
+Practice N-Queens with row/column sets and a recursive placement order.
+
+Drill grid-neighbor helpers and constraint pruning before writing the full DFS.
+
+Prepare the boolean version first, then generalize to collect all solutions.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

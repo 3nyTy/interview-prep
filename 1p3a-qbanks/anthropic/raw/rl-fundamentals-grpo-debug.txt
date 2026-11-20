@@ -1,0 +1,97 @@
+===H1===
+RL Fundamentals — GRPO Debug
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/rl-fundamentals-grpo-debug
+===BODY===
+Anthropic
+Coding·55 minMembers
+RL Fundamentals — GRPO Debug
+Debug a GRPO training script (typically three implanted bugs), then defend the underlying RL math: ratio clipping, advantage normalization, on-policy vs. off-policy effects. The last 15 minutes pivot to a knowledge interrogation tied to the code you just fixed.
+RE
+RS
+MLE
+reinforcement-learning
+grpo
+pytorch
+ml-knowledge
+debugging
+hard
+Frequency
+Low
+Last asked
+2026-03-02
+Stage
+phone-screen · tech-screen · onsite-coding
+Requirements
+
+Part 1 — Debug
+
+The interviewer supplies a small GRPO trainer in PyTorch. Three concrete bugs reported across candidates:
+
+Missing softmax before torch.multinomial — sampling from raw logits.
+
+Missing epsilon in the advantage standard-deviation denominator (NaN on near-zero variance).
+
+A subtle one tied to ratio = exp(model_logprob - old_logprob) not being identically 1 even on the first step (because the policy is being updated within the batch).
+
+Part 2 — Discussion
+
+Follow-ups range across:
+
+What happens if ratio = model_logprob - old_logprob (no exp)? Can the model still train?
+
+Why clip ratio? When does it actually get clipped? What does clipping do to gradients?
+
+Why is the implementation not strictly on-policy? Trace through where the divergence arises and what its sign is.
+
+Print ratio at runtime, observe it is not 1, debug why.
+
+The role of KL vs. clipping in PPO/GRPO; advantages of GRPO over PPO; group-relative advantage estimation.
+
+Notes
+
+This round explicitly tests whether you have implemented GRPO yourself or only read the paper. Theoretical-only candidates routinely stall on the "why isn't ratio = 1" question.
+
+The bugs are intentionally subtle — none of them throw an exception; all of them silently degrade training. Bring a debugging methodology: log shapes, log stats, sanity-check on a tiny synthetic dataset.
+
+The interviewer will speed up the Q&A if your code-fix phase finishes early. Pre-loading the discussion answers is leverage.
+
+Canonical GRPO formulation
+
+For a group of G responses {o_1, …, o_G} sampled for the same prompt with rewards {r_1, …, r_G}, GRPO uses the group-relative advantage:
+
+A_i = (r_i − mean(r)) / (std(r) + ε)
+
+This is the central simplification vs. PPO: no critic network, no GAE, no value-function target — the baseline is implicit in the group mean. The ε in the denominator is exactly the bug-hunt target.
+
+The surrogate objective per token mirrors PPO's clipped form:
+
+L = − E[ min( r_t · A_i, clip(r_t, 1−ε, 1+ε) · A_i ) ] + β · D_KL(π_θ || π_ref)
+
+where r_t = exp(logπ_θ − logπ_old) is the per-token ratio. Two things to memorize:
+
+The KL term is against a frozen reference policy (typically the SFT model), not against π_old. This is the per-step regularizer that keeps the policy from drifting catastrophically.
+
+r_t is per-token, but the advantage A_i is per-sequence (broadcast across all tokens in the response). Mis-broadcasting this is a common subtle bug.
+
+Why ratio isn't 1 at step 1
+
+In the standard implementation you take multiple gradient steps per rollout batch (the inner PPO loop). After the first inner step, π_θ ≠ π_old, so the ratio drifts away from 1. Walking through this trace is the canonical follow-up.
+
+Preparation
+
+Re-implement GRPO from a paper-sized scratch in PyTorch in a weekend. Run it on a toy bandit so the loss curves are familiar.
+
+Memorize the canonical PPO/GRPO loss with all stabilizers: clip, KL penalty, value-loss clipping, gradient clipping.
+
+Have a one-liner answer for: why is empirical ratio not 1 even at step 1? (Multi-step minibatch updates within one rollout.)
+
+Brush up on on/off-policy distinction; advantage normalization; standard tricks like reward normalization and value-baseline subtraction.
+
+Be able to write the group-relative advantage formula A_i = (r_i − mean(r)) / (std(r) + ε) on the whiteboard and immediately point to the ε as the obvious NaN trap.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

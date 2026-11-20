@@ -1,0 +1,58 @@
+===H1===
+Onsite System Design: Rider-Driver Matching
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/onsite-sd-rider-driver-matching
+===BODY===
+Uber
+System Design·60 minMembers
+Onsite System Design: Rider-Driver Matching
+Design Uber's rider-driver matching system. The round emphasizes million-scale driver location updates, low-latency geospatial search, scalable service decomposition, availability under network partitions, and consistency around match state.
+SWE
+location
+geohash
+scaling
+distributed-systems
+medium
+Frequency
+Low
+Last asked
+2026-06-26
+Stage
+onsite-system-design
+Requirements
+
+Accept rider requests and find nearby eligible drivers with low latency.
+
+Continuously ingest driver location updates at million-request-per-second scale and keep the search index fresh enough for dispatch.
+
+Maintain a match lifecycle so a driver is not double-assigned and rider / driver state remains consistent.
+
+Decompose the system into services: location ingestion, candidate search, dispatch / matching, trip state, notifications, and persistence.
+
+Discuss database choice and consistency model for active trips, driver availability, and historical trip data.
+
+Scale the architecture across cities / regions without one global hot partition.
+
+Preserve high availability and partition tolerance during network instability.
+
+Notes
+
+The interviewer explicitly pushed on efficient geo search, low latency, scalability, microservice boundaries, database selection, and consistency.
+
+Treat the prompt as Uber's core marketplace system, not a generic map app: driver availability and assignment correctness are central.
+
+Make the assignment transition atomic so two riders cannot reserve the same driver concurrently.
+
+Preparation
+
+Prepare one geospatial indexing strategy and one fallback plan for sparse-driver areas.
+
+Practice explaining the exact state transitions from request created to driver accepted to trip started.
+
+Drill consistency trade-offs for driver assignment: locks, compare-and-swap, idempotency, and retry behavior.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

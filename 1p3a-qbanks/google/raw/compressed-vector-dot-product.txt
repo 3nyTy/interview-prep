@@ -1,0 +1,65 @@
+===H1===
+Run-Length Vector Storage + Dot Product
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/compressed-vector-dot-product
+===BODY===
+Google
+Coding·45 minMembers
+Run-Length Vector Storage + Dot Product
+Phone-screen-style coding round for an AI Infra L4 loop: design an efficient storage format for a very long integer vector with many repeated values, then implement dot-product over two such compressed vectors.
+SWE
+Infra Eng
+data-structure
+two-pointer
+medium
+Frequency
+Single report
+Last asked
+2026-01-21
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Part 1 — design
+
+Input: a long integer vector with many repeats (e.g. [7, 7, 7, 0, 0, 0, 0, 5, 5]).
+
+Design a compact representation that captures the repetition without storing every element.
+
+Discuss tradeoffs: run-length pairs (value, runLength) vs sparse (index, value) vs delta-from-default.
+
+Part 2 — dot product
+
+Given two vectors of equal logical length encoded in your format, compute their dot product.
+
+Optimize for the case where both encodings are short relative to the logical length.
+
+Examples
+
+Logical A = [3, 3, 3, 0, 0, 0, 4, 4]
+Logical B = [1, 1, 1, 1, 2, 2, 2, 2]
+Encoded A (RLE): [(3,3),(0,3),(4,2)]
+Encoded B (RLE): [(1,4),(2,4)]
+Dot product = 3·1·3 + 3·1·0 + 0·1·0 + 0·2·0 + 4·2·2 = 9 + 0 + 16 = 25
+
+Notes
+
+Two-pointer walk over the two RLE encodings: at each step compute the overlap length min(remainA, remainB), multiply values, advance the pointer whose run is exhausted.
+
+Mention compression-friendly variations: sparse format wins when most entries are 0 (just enumerate non-zero indices and skip zeros entirely in the dot product).
+
+Interviewer cared more about clean data-structure choice and the walk over both encodings than about absolute optimality.
+
+Preparation
+
+Memorize the two-pointer RLE walk pattern (it generalizes to interval intersection, range addition, etc.).
+
+Practice articulating when RLE wins vs sparse (O(distinct_runs) vs O(nonzeros)).
+
+Have a one-liner for sparse case: store (idx → value) map; iterate over the smaller map and look up the other.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

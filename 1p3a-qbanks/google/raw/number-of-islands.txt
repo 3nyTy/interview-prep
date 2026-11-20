@@ -1,0 +1,55 @@
+===H1===
+Number of Islands
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/number-of-islands
+===BODY===
+Google
+Coding·40 minMembers
+Number of Islands
+LeetCode 200. Count 4-connected components of 1s in a binary grid. DFS or BFS or Union-Find — all accepted; Google asks the follow-ups.
+SWE
+MLE
+grid
+dfs
+bfs
+union-find
+medium
+Frequency
+Low
+Last asked
+2026-08-29
+Stage
+onsite-coding · phone-screen
+Requirements
+
+Binary grid; return the number of 4-connected islands of 1s.
+
+DFS or BFS marking visited; Union-Find equally valid.
+
+Follow-up commonly asked: a streaming version where land cells arrive one at a time and the island count is reported after each addition.
+
+Examples
+
+[[1,1,0,0],[1,1,0,0],[0,0,1,1],[0,0,1,1]] → 2.
+
+Streaming: [[0,0],[0,1],[1,1]] adds → counts [1, 1, 1] (last addition merges the two land cells).
+
+Notes
+
+For streaming, Union-Find with path compression is the natural choice — each addLand is amortized α(n).
+
+In one onsite, the follow-up arrived after a working BFS solution and explicitly required a Union-Find rewrite; retrofitting the original traversal consumed the remaining time.
+
+Common edge cases: diagonal connectivity (some prompts use 8-connectivity), grid with no land.
+
+Preparation
+
+Write both the static count and the streaming addLand version from memory in under 15 min total.
+
+Be ready to switch between DFS / BFS / Union-Find on demand.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

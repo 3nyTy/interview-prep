@@ -1,0 +1,95 @@
+===H1===
+Design Search Autocomplete System
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/design-search-autocomplete-system
+===BODY===
+Roblox
+CodingMembers
+Design Search Autocomplete System
+Design an autocomplete system that returns top suggestions for the current prefix and learns completed queries.
+SWE
+trie
+heap
+search
+hard
+Frequency
+Single report
+Last asked
+2026-01-16
+Stage
+phone-screen
+You are given three arrays:
+
+queries[i] is a search query issued by a user.
+
+timestamps[i] is the time when queries[i] was issued.
+
+prefixes[j] is a prefix typed into an autocomplete box.
+
+For each prefix, return every distinct query that starts with that prefix, ordered by:
+
+Higher occurrence count first.
+
+If counts tie, smaller earliest timestamp first.
+
+If both still tie, lexicographically smaller query first.
+
+Return one ranked list per prefix. If a prefix has no matching query, return an empty list for that prefix.
+
+This is a batch version of the classic search autocomplete system design question. In an interview, clarify whether the output should include all matching queries or only the top k suggestions.
+
+Examples
+
+Example 1:
+
+Input: queries = ["roblox studio","roblox","roadblocks","roblox studio","roblox game","roblox"], timestamps = [5,1,7,3,4,2], prefixes = ["rob","robl","road","x"]
+
+Output: [["roblox","roblox studio","roblox game"],["roblox","roblox studio","roblox game"],["roadblocks"],[]]
+
+Explanation:
+
+roblox and roblox studio each appear twice, so the earlier first timestamp puts roblox first. roblox game appears once.
+
+Example 2:
+
+Input: queries = ["alpha","alpine","alpha","alpine"], timestamps = [10,3,2,8], prefixes = ["al"]
+
+Output: [["alpha","alpine"]]
+
+Explanation:
+
+Both queries appear twice. alpha has earliest timestamp 2, while alpine has earliest timestamp 3.
+
+Example 3:
+
+Input: queries = ["aba","abb","aba","abb"], timestamps = [1,1,5,7], prefixes = ["ab"]
+
+Output: [["aba","abb"]]
+
+Explanation:
+
+The count and earliest timestamp both tie, so lexicographic order breaks the tie.
+
+Constraints
+
+queries.length == timestamps.length
+
+0 <= queries.length <= 10^5
+
+1 <= prefixes.length <= 10^4
+
+1 <= queries[i].length <= 100
+
+0 <= prefixes[i].length <= 100
+
+0 <= timestamps[i] <= 10^9
+
+queries[i] contains printable ASCII characters
+
+prefixes[i] is empty or contains printable ASCII characters
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,73 @@
+===H1===
+Equal Character Frequency (Remove-One Variant)
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/equal-character-frequency
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Equal Character Frequency (Remove-One Variant)
+Decide whether all characters in a string occur with the same frequency, then a follow-up: whether removing exactly one character can produce a string in which all surviving characters have equal frequency. The interviewer escalates by demanding better-than-naive time and space.
+SWE
+string
+hashmap
+complexity-analysis
+medium
+Frequency
+Single report
+Last asked
+2026-01-21
+Stage
+onsite-coding
+Requirements
+
+Two functions, each on a lowercase string s:
+
+allEqualFrequency(s) — return true iff every distinct character in s appears the same number of times.
+
+canRemoveOneToBalance(s) — return true iff there exists exactly one position i such that removing s[i] results in a string in which every distinct surviving character appears the same number of times.
+
+Note on part 2: if s is already balanced and removing one character would un-balance it, the answer is false. Removing the only occurrence of a character is allowed (that character simply disappears).
+
+The interviewer will explicitly ask for the optimal time / space and will push back on the first answer.
+
+Examples
+
+allEqualFrequency:
+  'abc'    -> true
+  'abcabc' -> true
+  'aab'    -> false
+
+canRemoveOneToBalance:
+  'aabbccc'   -> true   (remove one 'c': aabbcc, all freq 2)
+  'aaabbbccc' -> false  (already balanced; removing any char un-balances)
+  'aaa'       -> true   (remove any: 'aa' still all-equal)
+
+Notes
+
+Part 1 is one pass into a frequency counter, then check that all counts equal the first count. Time O(n), space O(σ) where σ is the alphabet size.
+
+Part 2 has an elegant O(n) solution that avoids re-counting n times. Count characters into freq, then build a count-of-counts map. The answer is true iff one of these holds:
+
+There is exactly one character with frequency 1 and all others share a single common frequency (remove that frequency-1 character).
+
+All but one character share a frequency f, and exactly one character has frequency f + 1 (remove one occurrence from it).
+
+The count-of-counts has size 1 and either the shared frequency is 1 or there is only a single distinct character — in both cases removing one occurrence leaves an all-equal string (this is the case the naive count-of-counts check forgets, e.g. aaa).
+
+Time O(n), space O(σ) for part 2. The naive O(n * σ) (try removing each distinct character and re-check) is what most candidates write first; interviewers explicitly grade for the count-of-counts optimization.
+
+An alternative phrasing of the optimal check uses LeetCode 1224's logic (Maximum Equal Frequency) — pre-fix-scan with the same count-of-counts trick generalized to any prefix.
+
+Preparation
+
+Derive the three terminal conditions for part 2 by hand on the example set (aabbccc, aaabbbccc, aaa, abc, aabc). Most candidates miss one of the edge cases.
+
+Implement once with the naive try-each-character approach to confirm correctness, then refactor into the count-of-counts solution and prove they agree on a brute-force test harness.
+
+Be explicit about why the optimization works: the answer depends only on the distribution of frequencies, not on which specific character is removed.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

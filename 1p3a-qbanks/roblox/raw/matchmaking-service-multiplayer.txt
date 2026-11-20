@@ -1,0 +1,468 @@
+===H1===
+Matchmaking Service for Multiplayer Games
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/matchmaking-service-multiplayer
+===BODY===
+Roblox
+System Design·60 minMembers
+Matchmaking Service for Multiplayer Games
+Design a matchmaking service that places players into balanced multiplayer sessions. Players enter a queue, get grouped by skill into teams of a fixed size (commonly 16), and are allocated to a freshly provisioned game server. The interview focuses on queue partitioning, the skill-bucketing strategy, time-vs-fairness trade-offs as wait time grows, and how to keep matches from leaking across regions.
+SWE
+Infra Eng
+system-design
+scaling
+distributed-lock
+queueing
+game-engine
+hard
+Frequency
+Medium
+Last asked
+2026-04-08
+Stage
+phone-screen · onsite-system-design
+Problem Statement
+
+Design a multiplayer game matchmaking system for Roblox. Users choose a game, enter a waiting room, and should be matched into a playable session with other users who are close in skill, compatible by region, and not forced to wait too long.
+
+Common variants of this prompt include:
+
+Design a game matching system
+
+Design a matchmaking service for multiplayer games
+
+Many users enter a waiting queue before starting a game; design the matching and waiting process
+
+Match users for many games using a skill score from 0 to 100
+
+The core trade-off is match quality versus wait time. Do not optimize only for perfect skill matching; a real game platform must start games promptly, especially for long-tail games and smaller regions.
+
+Lead with queues partitioned by game, region, mode, and skill bucket. Then deep dive on the matcher loop, wait-time expansion, idempotent join/cancel, and how to allocate a game server once a group is formed.
+
+Phase 1: Requirements (~5 minutes)
+
+Functional Requirements
+
+Players should be able to join matchmaking for a selected game and mode.
+
+Players should be matched with compatible players by game, region, platform, party size, and skill.
+
+Players should receive a match assignment with the game server or reserved session to connect to.
+
+Players should be able to cancel or leave the queue before a match is committed.
+
+The system should prevent duplicate queue entries for the same player across games or modes.
+
+Optional follow-ups:
+
+Party matchmaking where friends queue as a group.
+
+Ranked versus casual queues with different match-quality thresholds.
+
+Backfill players into an already running game.
+
+Abuse controls for repeated join/cancel behavior.
+
+Non-Functional Requirements
+
+RequirementTargetWhy it matters
+Match latencyP95 under 30 seconds for popular gamesPlayers abandon if queue time is too long
+Join/cancel latencyP95 under 100 msQueue UI must feel responsive
+Scale1M DAU, thousands of games, bursty joinsRoblox has many experiences with uneven traffic
+Availability99.9%+ for queue operationsA failed matcher blocks game entry
+ConsistencyStrong enough to avoid duplicate active queue stateA user should not be committed to two sessions
+RegionalityPrefer same region, allow expansion if neededLatency affects gameplay quality
+FairnessAvoid starvation for low-skill, high-skill, or long-waiting playersQueue policy must not only serve the easy matches
+
+Clarifying Questions
+
+What counts as a good match?
+Assume same game and mode are mandatory, region is strongly preferred, and skill starts within +/-5 but expands over time.
+
+How many players are needed per match?
+Assume each game mode has min_players, target_players, and max_players. Low traffic can start at min_players.
+
+Can a user wait for multiple games?
+Assume no. A user has one active matchmaking ticket unless party matchmaking is introduced.
+
+Who creates the game server?
+The matchmaking service forms the group, then calls a session allocator or game server fleet service.
+
+Is skill lookup synchronous?
+Assume we can call a skill service, but cache skill on the ticket to avoid calling it repeatedly inside the matcher loop.
+
+Capacity Estimation
+
+Assumptions:
+- 1M daily active users
+- 10 matchmaking attempts per active user per day
+- 10M join attempts/day ~= 116 joins/sec average
+- Peak can be 50x average during weekends or game launches ~= 5.8K joins/sec
+
+Queue state:
+- If 200K players are concurrently waiting
+- MatchTicket record ~= 500 bytes
+- Active queue data ~= 100 MB before indexes/Redis overhead
+- This fits in memory, but must be partitioned for hot games and regions
+
+Matcher work:
+- If average match size is 10 players
+- 5.8K peak joins/sec can create up to 580 matches/sec
+- Session allocator and notification fanout must absorb this burst
+
+The storage size is small compared with feeds or logs. The design challenge is low-latency mutable queue state, fairness, and avoiding duplicate commits under concurrency.
+
+Phase 2: Data Model (~5 minutes)
+
+Core Entities
+
+GameMode
+- game_id
+- mode_id
+- target_players
+- min_players
+- max_players
+- allowed_platforms
+- region_policy
+- ranked: boolean
+
+MatchTicket
+- ticket_id
+- user_id
+- party_id: nullable
+- game_id
+- mode_id
+- region
+- platform
+- skill_score: 0-100
+- status: queued | matching | assigned | canceled | expired
+- enqueued_at
+- last_expanded_at
+- version
+
+UserMatchmakingState
+- user_id
+- active_ticket_id
+- status
+- updated_at
+
+MatchGroup
+- match_id
+- game_id
+- mode_id
+- region
+- player_ticket_ids
+- average_skill
+- status: forming | allocating_server | assigned | failed
+- server_id
+- created_at
+
+GameServerSession
+- server_id
+- game_id
+- region
+- capacity
+- current_players
+- connection_info
+- status
+
+Queue Indexes
+
+Use the database as durable source of truth and Redis or another in-memory store for active queue indexes.
+
+Durable store:
+- match_tickets by ticket_id
+- user_matchmaking_state by user_id
+- match_groups by match_id
+
+Active queue indexes:
+- queue:{game_id}:{mode_id}:{region}:{skill_bucket} -> sorted set by enqueued_at
+- user_queue_state:{user_id} -> active_ticket_id
+- ticket:{ticket_id} -> compact ticket payload
+
+Skill bucket example:
+
+skill_score 0-100
+bucket size = 5
+bucket 0: 0-4
+bucket 1: 5-9
+...
+bucket 20: 100
+
+Relationships
+
+A user has at most one active MatchTicket.
+
+A GameMode defines how many compatible tickets are needed.
+
+A MatchGroup contains multiple claimed tickets and records the final assignment once server allocation succeeds.
+
+A GameServerSession is allocated only after a group is formed.
+
+Avoid using only a single queue per game. Popular games become hot, and scanning one massive list for compatible players makes skill and region matching inefficient.
+
+Phase 3: API Design (~5 minutes)
+
+Protocol Choice
+
+Use REST for queue commands because join, cancel, and status are simple request-response operations. Use WebSocket or push notifications for match assignment so clients do not poll aggressively.
+
+Internal services can use gRPC for low-latency calls between the matcher, skill service, and server allocator.
+
+External APIs
+
+POST /api/matchmaking/tickets
+Content-Type: application/json
+Idempotency-Key: 7a09...
+
+{
+  "game_id": "game_123",
+  "mode_id": "ranked_5v5",
+  "region_preference": "us-west",
+  "platform": "ios"
+}
+
+201 Created
+{
+  "ticket_id": "ticket_abc",
+  "status": "queued",
+  "estimated_wait_seconds": 18
+}
+
+DELETE /api/matchmaking/tickets/{ticket_id}
+
+200 OK
+{ "status": "canceled" }
+
+GET /api/matchmaking/tickets/{ticket_id}
+
+200 OK
+{
+  "ticket_id": "ticket_abc",
+  "status": "assigned",
+  "match_id": "match_789",
+  "server": {
+    "server_id": "server_456",
+    "connection_url": "roblox://join/..."
+  }
+}
+
+Push Event
+
+{
+  "type": "match_assigned",
+  "ticket_id": "ticket_abc",
+  "match_id": "match_789",
+  "server_id": "server_456",
+  "connection_url": "roblox://join/..."
+}
+
+Internal APIs
+
+SkillService.GetSkill(user_id, game_id, mode_id) -> { skill_score }
+ServerAllocator.ReserveSession(game_id, mode_id, region, player_count) -> { server_id, connection_info }
+PresenceService.NotifyUsers(user_ids, event)
+
+Make POST /tickets idempotent. Mobile clients retry, and retries must return the existing active ticket instead of inserting duplicate queue entries.
+
+Phase 4: High-Level Design (~15-25 minutes)
+
+Join Queue Flow
+
+Client sends POST /api/matchmaking/tickets with game, mode, region, and platform.
+
+Matchmaking API checks user_queue_state:{user_id} or durable UserMatchmakingState.
+
+If the user already has an active ticket, return it idempotently.
+
+API calls Skill Service and stores the skill score on the ticket.
+
+API creates a MatchTicket in durable storage with status queued.
+
+API inserts the ticket into the Redis sorted set for game, mode, region, and skill bucket.
+
+API emits a queue event so matchers responsible for that partition wake up quickly.
+
+Client receives ticket_id and opens or reuses a WebSocket for assignment.
+
+Matcher Loop
+
+Each matcher owns a set of queue partitions. A partition can be defined by game_id, mode_id, and region, with skill buckets inside it.
+
+for each active game-mode-region partition:
+  read oldest tickets from skill buckets
+  for each anchor ticket:
+    wait_time = now - enqueued_at
+    skill_range = expansion_policy(wait_time)
+    region_range = region_policy(wait_time)
+    candidate_tickets = fetch tickets in compatible buckets
+    if candidate count >= target_players:
+      claim tickets with compare-and-set
+      allocate server
+      assign users
+    else if candidate count >= min_players and wait_time is high:
+      start smaller match
+
+Claim and Commit Flow
+
+Matcher picks candidate ticket IDs from Redis.
+
+Matcher attempts a conditional update in the DB: queued -> matching for each ticket, checking version and status.
+
+If any ticket was canceled or claimed by another worker, remove stale entries and retry.
+
+Matcher creates a MatchGroup with status allocating_server.
+
+Matcher calls Server Allocator for the best region and capacity.
+
+On success, matcher updates tickets to assigned, stores server info, and notifies clients.
+
+On allocator failure, matcher can either return tickets to queued or retry allocation with backoff.
+
+State transitions should be durable before client notification. If the push message fails, the client can still poll GET /tickets/{id} and learn the assigned server.
+
+Cancel Flow
+
+Client calls DELETE /tickets/{ticket_id}.
+
+API conditionally updates the ticket from queued to canceled.
+
+API clears user_queue_state:{user_id}.
+
+API removes the ticket from active Redis queues.
+
+If a matcher is already committing the ticket as matching, cancellation may fail with 409 Conflict or return the final assigned state.
+
+Component Responsibilities
+
+ComponentResponsibility
+Matchmaking APIValidates requests, owns user active-ticket rules, writes durable state
+Skill ServiceProvides per-game skill score
+Active Queue Redis ClusterLow-latency mutable queue indexes
+Queue Event StreamWakes matchers and absorbs join bursts
+Matcher WorkersApply matching policy and commit groups
+Server AllocatorReserves Roblox game server capacity
+Presence / Push GatewayDelivers assignment events to online clients
+
+Phase 5: Scaling & Trade-offs (~15-20 minutes)
+
+Partitioning Strategy
+
+Partition active matchmaking by:
+
+game_id -> mode_id -> region -> skill_bucket
+
+For hot games, split further by subqueue_id or consistent hash over ticket_id, then let a coordinator merge candidates across subqueues. For long-tail games, multiple games can share the same matcher worker pool to avoid idle workers.
+
+Skill Expansion Policy
+
+0-10 seconds:   skill +/- 5, same region only
+10-30 seconds:  skill +/- 10, same region only
+30-60 seconds:  skill +/- 20, neighboring regions allowed
+60+ seconds:    skill +/- 30, allow min_players start
+
+This policy prevents starvation while keeping early matches high quality.
+
+Do not make the matcher scan every waiting player for a game on every loop. Bucket by skill and region so candidate selection is bounded.
+
+Handling Low-Traffic Games
+
+Low-traffic games cannot wait forever for a perfect target_players group.
+
+Options:
+
+Dynamic minimum player count: Start once min_players is reached after a timeout.
+
+Region expansion: Merge nearby regions if gameplay latency is still acceptable.
+
+Bot or NPC fill: Only if the product supports it.
+
+User feedback: Show estimated wait and allow players to switch modes.
+
+Burst Handling
+
+API writes queue changes quickly and emits events to a stream.
+
+Matchers consume by partition so hot games can scale independently.
+
+Redis stores active queue indexes for low-latency selection.
+
+Server Allocator must reserve capacity before assignment; otherwise users get assigned to nonexistent sessions.
+
+Apply per-user and per-IP rate limits to repeated join/cancel churn.
+
+Consistency and Race Conditions
+
+RaceHandling
+Duplicate join retriesIdempotency key and UserMatchmakingState uniqueness
+User queues for another gameReject or cancel existing ticket before creating a new one
+Cancel during match commitConditional queued -> canceled versus queued -> matching transition
+Two matchers claim same ticketDB compare-and-set by status/version
+Server allocation succeeds but notification failsPersist assignment, client polls status
+API crashes after DB write before Redis insertRepair job scans durable queued tickets and repopulates active queue indexes
+Redis loses active queue stateRebuild from durable queued tickets
+
+Data Store Choices
+
+StoreGood fitTrade-off
+Redis sorted setsActive waiting lists ordered by enqueue timeMust rebuild from DB after loss
+SQL or strongly consistent NoSQLTicket state transitions and uniquenessHigher write latency than memory
+Kafka/PubSub streamBurst absorption and matcher wakeupNot source of truth
+In-memory matcher stateFast candidate evaluationNeeds ownership and recovery logic
+
+Observability
+
+Track:
+
+Queue length by game, mode, region, and skill bucket.
+
+P50/P95/P99 wait time.
+
+Match quality distribution by skill delta and region delta.
+
+Cancel rate and timeout rate.
+
+Server allocation failure rate.
+
+Duplicate ticket creation attempts.
+
+The best interview answer ties metrics back to product quality: low wait time is not enough if match quality collapses; perfect match quality is not enough if players abandon the queue.
+
+Common Pitfalls
+
+Ignoring user active state - If you only store waiting lists by game, the same user can enter multiple games and receive multiple assignments.
+
+Treating Redis as the only source of truth - Redis is excellent for active queue indexes, but ticket status and assignments must survive process and cache failures.
+
+Allocating a server after notifying users - Users should only receive a connection target after capacity is reserved.
+
+Interview Checklist
+
+Start with game, mode, region, platform, party size, and skill as compatibility dimensions.
+
+Define MatchTicket, UserMatchmakingState, MatchGroup, and GameServerSession.
+
+Use REST for queue commands and WebSocket/push for assignments.
+
+Draw API, Redis queue indexes, durable DB, matcher workers, server allocator, and push gateway.
+
+Explain skill buckets and wait-time expansion.
+
+Cover cancel/commit races with conditional state transitions.
+
+Discuss hot games, low-traffic games, burst joins, and region expansion.
+
+Summary
+
+AreaRecommended Answer
+Queue shapePartition by game, mode, region, and skill bucket
+Source of truthDurable ticket DB plus user active-ticket state
+Fast matchingRedis sorted sets and matcher workers
+AssignmentCommit tickets, reserve server, then notify clients
+CorrectnessIdempotency, compare-and-set status changes, Redis rebuild path
+Key trade-offSkill quality versus wait time
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

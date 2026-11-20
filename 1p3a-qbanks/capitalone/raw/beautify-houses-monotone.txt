@@ -1,0 +1,53 @@
+===H1===
+Beautify Houses to Strict Monotone
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/beautify-houses-monotone
+===BODY===
+Capital One
+Coding·70 minMembers
+Beautify Houses to Strict Monotone
+Given an integer array of house heights, return the minimum number of `+1` operations needed so the array is either strictly `+1`-increasing (each entry exactly one greater than the previous) or strictly `-1`-decreasing.
+MLE
+array
+greedy
+math
+medium
+oa
+codesignal
+Frequency
+Single report
+Last asked
+2026-04-25
+Stage
+oa
+Requirements
+
+Input: integer array nums[] (house heights).
+
+One operation increments a single entry by 1. (Decrement is not allowed in this version.)
+
+After all operations, the array must be either strictly +1-increasing (nums[i+1] = nums[i] + 1) or strictly -1-decreasing (nums[i+1] = nums[i] - 1).
+
+Return the minimum total operations across the two target shapes.
+
+Notes
+
+For the +1-increasing shape, the target row is a sequence of consecutive integers anchored at some integer a. The minimum operations is achieved by picking a = max_i (nums[i] - i); any smaller anchor would push some entry below its current height, which is impossible without decrements. The total ops is sum_i ((a + i) - nums[i]).
+
+Symmetric closed-form for the -1-decreasing shape: pick a = max_i (nums[i] + i) and total ops is sum_i ((a - i) - nums[i]).
+
+Return the minimum of the two totals.
+
+Watch for integer overflow on large arrays; the anchor a can grow with input size.
+
+Preparation
+
+Derive the closed-form by hand once; once it clicks, the implementation is two passes per shape (find a, then sum the deltas).
+
+Drill the increasing case on [1, 5, 2]: a = max(1-0, 5-1, 2-2) = 4, target [4, 5, 6], ops 3 + 0 + 4 = 7.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

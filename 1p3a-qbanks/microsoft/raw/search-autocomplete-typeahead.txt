@@ -1,0 +1,81 @@
+===H1===
+Search Autocomplete / Typeahead System Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/search-autocomplete-typeahead
+===BODY===
+Microsoft
+System Design·45 minMembers
+Search Autocomplete / Typeahead System Design
+MAI VO SD slot. Design a low-latency prefix-search service that powers a search bar's typeahead suggestions.
+SWE
+trie
+search
+caching
+scaling
+distributed-systems
+medium
+Frequency
+Single report
+Last asked
+2026-04-21
+Stage
+onsite-system-design
+Requirements
+
+Functional
+
+Given a user-typed prefix, return the top K most relevant suggestions in < 100 ms.
+
+Suggestions are ranked by frequency / recency / personalization.
+
+Index updates on a moderate cadence (minutes to hours).
+
+Non-functional
+
+Read-heavy (every keystroke is a query). 10K-100K QPS at the edge.
+
+95-99th percentile latency < 100 ms.
+
+Suggestion freshness within the day is acceptable for most queries; trending topics may need faster updates.
+
+Notes
+
+Index choice.
+
+Trie is the textbook answer: each node holds the top K completions for the prefix ending at that node, so a query walks down the trie character by character and reads the cached top-K at the deepest matched node. Updates are slow (rebuild affected subtrees) but reads are O(prefix length).
+
+Inverted index (Elasticsearch n-gram tokenizer) is the production alternative: standard search-engine pipeline, easier to scale write-side, slightly higher read latency. Often the right answer when the prompt allows for richer ranking signals than pure frequency.
+
+For an interview, lead with the trie design (because it is the prefix-search-specific answer) and mention inverted-index as the alternative.
+
+Ranking signals. Frequency of the underlying query / completion. Recency-weighted (decay older counts). Personalization (rerank top K' > K from index with per-user signals at request time). Trending topic boost (separate hot-list overlay, refreshed every minute).
+
+Distributed sharding. Shard the trie by first character (or first two characters for skew control). Each shard fits in a single server's memory for many real-world data sets. Replicate read replicas behind a load balancer.
+
+Update path. Async pipeline aggregates user query logs, computes top-K per prefix on a schedule, ships updated index snapshots to query servers. Atomic swap on the read path; no incremental in-place mutation (avoids read/write contention).
+
+Edge caching. Top-N most frequent prefixes hit a CDN edge cache with short TTL. Misses fall through to the trie servers.
+
+Trade-offs to surface.
+
+DecisionPickWhy
+Index structureTrie with cached top-K per nodeRead-optimal prefix search
+Update cadenceOffline batch + snapshot swapAvoids read/write contention
+Sharding keyFirst 1-2 charactersBounded per-shard memory
+Edge cachingCDN on hot prefixesAbsorbs head of query distribution
+
+Preparation
+
+Pre-write the trie-with-cached-top-K diagram; this is the single most expected pattern.
+
+Know the inverted-index alternative one-liner: "ES n-gram tokenizer with custom scoring".
+
+Drill the async snapshot-update story; interviewers probe how you handle index updates without locking reads.
+
+Pre-rehearse the personalization rerank story: index returns K' > K, request-time reranker picks top K with user signals.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,54 @@
+===H1===
+Decode String with `(group){k}` Repeat Syntax
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/decode-string-curly-repeat
+===BODY===
+Waymo
+Coding·45 minMembers
+Decode String with `(group){k}` Repeat Syntax
+Phone screen variant of LeetCode 394 (Decode String). The repeat-count syntax is `(group){k}` instead of `k[group]`. Nested repeats such as `"a(b(c){2}){2}"` must expand correctly. Solvable with the same stack pattern as the canonical problem.
+SWE
+stack
+parsing
+string
+recursion
+medium
+Frequency
+Single report
+Last asked
+2026-05-13
+Stage
+phone-screen
+Requirements
+
+Input: a string composed of literal characters, parenthesized groups, and {k} suffixes that repeat the preceding group k times.
+
+Nesting is allowed: "a(b(c){2}){2}" expands to "abccbcc".
+
+Output: the fully expanded decoded string.
+
+Example: "abs(cs){3}g" → "abscscscsg".
+
+Notes
+
+The same two patterns that solve LC 394 work here: an explicit stack (pushing partial strings and their pending repeat counts), or a recursive descent that returns the decoded suffix at each ) boundary.
+
+The lexer is the only meaningful difference from the canonical prompt: the repeat count appears after the closing paren in {k} form rather than before the opening bracket. Pre-scan / tokenize before applying the stack walk to keep the control flow clean.
+
+Edge cases worth surfacing: k = 0 (drop the group), missing {...} after ) (treat as multiplier of 1), multi-digit k, characters between groups ((a){2}b(c){3} → "aabccc").
+
+Complexity is O(N + M) where N is input length and M is output length; reject the temptation to repeatedly slice the partial string inside the loop (that drives the complexity to O(M²)).
+
+Preparation
+
+Drill LC 394 (Decode String) until the stack pattern is automatic, then rewrite it for the (group){k} syntax in under 20 minutes.
+
+Walk through the nested example by hand on paper before coding — the off-by-one between 'where does the group end' and 'where does {k} end' is the most common bug.
+
+Have a 3-line tokenizer ready that emits (, ), {int}, and literal runs so the parser can ignore lexing details.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,65 @@
+===H1===
+OA — DNS Resolver (Fellows CodeSignal, Round 1)
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/oa-fellows-dns-resolver
+===BODY===
+Anthropic
+Coding·90 minMembers
+OA — DNS Resolver (Fellows CodeSignal, Round 1)
+First of two Fellows CodeSignal OAs (Spring 2026 rotation). 90 minutes, Python, proctored. Implement a simplified DNS resolver step-by-step against a fixed unit-test harness — early steps cover basic name lookup, later steps layer aliasing, fallback, error handling, cycle detection, caching, and concurrency.
+Fellows
+codesignal
+simulation
+recursion
+medium
+Frequency
+Low
+Last asked
+2026-05-27
+Stage
+oa
+Requirements
+
+90-minute proctored CodeSignal session (webcam + mic). Python only.
+
+The harness ships a partial codebase plus a multi-step spec; each step unlocks a unit-test group that must pass before moving on.
+
+The simulated DNS resolver must support, in roughly the order the steps add them:
+
+basic name normalization (case-folding, trailing-dot stripping) and direct A-record lookup
+
+recursive resolution through CNAME aliases
+
+fallback chains when the primary record path errors
+
+error propagation versus error swallowing (the spec is explicit about which step is which)
+
+cycle detection in alias chains
+
+response caching with a per-record TTL
+
+concurrent resolution — multiple in-flight queries against the same alias chain must coalesce rather than recompute
+
+Notes
+
+Difficulty is workmanship rather than algorithmic depth — closer to LeetCode Medium in raw skill but with the engineering surface area of a small library. Keep code structurally clean from step 1; otherwise later steps (cache, concurrency) wedge themselves into a brittle resolver.
+
+The proctor permits standard library only; no external resolver, no networking.
+
+The same Fellows cohort also receives the round-2 Python debugging OA (a separate session of 60 minutes; see the Fellows inventory entry).
+
+Preparation
+
+Implement, from scratch in under 45 minutes, a recursive name resolver over a static {name: record} map that handles CNAME chains and MX-style record-type dispatch.
+
+Layer a lru_cache-style TTL cache on top; verify that expiry is read-time lazy, not write-time eager, so the test harness's clock-advance semantics work.
+
+Build a tiny cycle detector using a per-call "visited" set; then convert it to a shared coalescing structure (a dict of in-flight Futures keyed by name) for the concurrency step.
+
+Refresh threading.Lock, concurrent.futures, and functools.wraps — the concurrency step is more idiomatic-Python than systems-programming.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

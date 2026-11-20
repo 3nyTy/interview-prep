@@ -1,0 +1,67 @@
+===H1===
+Single-Threaded CPU (LeetCode 1834)
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/single-threaded-cpu
+===BODY===
+Roblox
+CodingMembers
+Single-Threaded CPU (LeetCode 1834)
+Simulate a single-threaded CPU that picks available tasks by shortest processing time, then original index.
+SWE
+heap
+sorting
+scheduling
+medium
+Frequency
+Single report
+Last asked
+2026-03-23
+Stage
+phone-screen
+You are given n tasks labeled from 0 to n - 1 represented by a 2D integer array tasks, where tasks[i] = [enqueueTime_i, processingTime_i] means that the i^th task will be available to process at enqueueTime_i and will take processingTime_i to finish.
+
+You have a single-threaded CPU that can process at most one task at a time and will act in the following way:
+
+If the CPU is idle and there are no available tasks to process, the CPU remains idle.
+
+If the CPU is idle and there are available tasks, the CPU will choose the one with the shortest processing time. If multiple tasks have the same shortest processing time, it will choose the task with the smallest index.
+
+Once a task is started, the CPU will process the entire task without stopping.
+
+The CPU can finish a task then start a new one instantly.
+
+Return the order in which the CPU will process the tasks.
+
+Examples
+
+Example 1:
+
+Input: tasks = [[1,2],[2,4],[3,2],[4,1]]
+
+Output: [0,2,3,1]
+
+Explanation:
+
+CPU starts at t=1 with task 0 (length 2). At t=3, tasks 1 and 2 are ready — task 2 wins (length 2 vs 4). At t=5 only task 3 remains and runs (length 1). At t=6 task 1 runs (length 4).
+
+Example 2:
+
+Input: tasks = [[7,10],[7,12],[7,5],[7,4],[7,2]]
+
+Output: [4,3,2,0,1]
+
+Explanation:
+
+All tasks arrive at t=7; the CPU drains them by shortest processing time, breaking ties by index.
+
+Constraints
+
+1 <= tasks.length <= 10^5
+
+1 <= enqueueTime_i, processingTime_i <= 10^9
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

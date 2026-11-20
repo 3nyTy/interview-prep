@@ -1,0 +1,60 @@
+===H1===
+Reconstruct Itinerary (LC 332)
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/reconstruct-itinerary
+===BODY===
+Pinterest
+Coding·60 minMembers
+Reconstruct Itinerary (LC 332)
+LeetCode 332 verbatim: reconstruct a flight itinerary from a list of tickets, starting at JFK, lexicographically smallest when ties. Asked both as a phone-screen warmup and as an onsite coding round. A minority phone variant removes the fixed start and asks you to infer an origin before printing the full path.
+SWE
+MLE
+graph
+dfs
+hashmap
+medium
+Frequency
+Medium
+Last asked
+2026-09-02
+Stage
+phone-screen · tech-screen · onsite-coding
+Requirements
+
+Given a list of airline tickets [from, to], reconstruct the itinerary starting at JFK that uses every ticket exactly once. If multiple valid itineraries exist, return the lexicographically smallest one when read as a single string.
+
+Follow-up: handle the case where the ticket graph contains a cycle (the route revisits a city).
+
+Minority variant: the starting city is not fixed; infer a valid origin and print the complete path rather than assuming JFK. Clarify before coding.
+
+Examples
+
+The canonical LeetCode 332 examples apply; interviewers do not introduce a Pinterest-specific framing.
+
+Notes
+
+The standard solution is Hierholzer's algorithm for Eulerian path: DFS where each city's outbound destinations are kept in a min-heap; on each recursive return, prepend the city to the itinerary. This handles cycles correctly without special casing.
+
+A naive backtracking approach (try lexicographically-smallest next ticket; backtrack if the recursion dead-ends) also passes and is what most candidates write first. Be prepared to defend the worst-case complexity — O(E^d) for backtracking vs O((V + E) log E) for Hierholzer.
+
+The cycle follow-up is where candidates stall: Hierholzer naturally handles cycles, but candidates who wrote the greedy-with-no-backtrack version (which is incorrect even on the base problem) cannot patch it for cycles. The fix is to backtrack or to switch to Hierholzer.
+
+The canonical problem has small input bounds (up to 300 tickets), which is why backtracking with no memoization passes — the search tree is heavily pruned by the use-each-ticket-once constraint.
+
+A frequent interviewer push: "can you do this iteratively?" — yes, with an explicit stack mirroring the recursive DFS. Practice the iterative version once; it doubles as the answer to "what if the recursion depth blows the stack".
+
+Preparation
+
+Implement Hierholzer once from scratch (min-heap per node, DFS, post-order append) and explain why the post-order produces the path in correct order.
+
+Drill the iterative version with an explicit stack — interviewers occasionally ask for it as a follow-up.
+
+Practice the cycle test case (e.g., JFK → A → B → A → C) by hand to make sure your implementation handles revisits without infinite-looping.
+
+Add a no-fixed-start test and explain how you identify a valid origin before constructing the path.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

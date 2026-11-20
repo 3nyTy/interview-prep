@@ -1,0 +1,55 @@
+===H1===
+15-Puzzle Minimum Moves (BFS)
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/15-puzzle-bfs
+===BODY===
+Microsoft
+Coding·45 minMembers
+15-Puzzle Minimum Moves (BFS)
+Given a 4×4 sliding tile puzzle state, return the minimum number of moves to reach the solved configuration (or `-1` if unreachable). Pure BFS on a state graph.
+SWE
+bfs
+graph
+grid
+medium
+Frequency
+Single report
+Last asked
+2026-01-26
+Stage
+onsite-coding
+Requirements
+
+A 4×4 board contains tiles 1..15 and one blank (0). Each move slides one of the blank's 4-neighbor tiles into the blank. The solved state has tiles 1..15 in row-major order and the blank at position (3, 3).
+
+Return the minimum number of moves to reach the solved state from the given starting state, or -1 if no solution exists. The HE round narrows the spec to "an arbitrary tile puzzle (could be 3×3 or 4×4) and the test cases are small enough that pure BFS passes."
+
+Notes
+
+Canonical BFS on the state graph:
+
+State representation: tuple of 16 ints (hashable). Position of the blank can be derived from the state on demand.
+
+Neighbor generation: locate the blank (r, c), swap with each in-bounds neighbor (r±1, c) / (r, c±1).
+
+Visited set: hash the state tuple.
+
+Queue: standard (state, depth) BFS.
+
+Time complexity is bounded by the state space (16!/2 ≈ 10^13 for the 4×4, but small puzzles converge in far fewer states). For the 3×3 the full space is ~181,000 states — pure BFS is fine; for 4×4 the interviewer either gives a state within a few moves of solved or accepts that BFS is too slow and pivots to discussing A* with the Manhattan-distance heuristic.
+
+Reachability check: a state is solvable iff its permutation-parity matches the parity of the blank's position offset from the solved blank. Compute the number of inversions in the linearized state; combine with the row-distance of the blank. Standard result; cite it if asked, do not derive.
+
+Preparation
+
+Drill the BFS state-graph pattern on paper: state tuple, visited set, queue with depth.
+
+Pre-write the swap-neighbor enumeration as a helper; it is reusable for any grid-puzzle BFS problem.
+
+Know the A* upgrade for 4×4 instances: heuristic = sum of Manhattan distances of each tile from its goal. Mention it when the interviewer asks "what if the board is bigger".
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

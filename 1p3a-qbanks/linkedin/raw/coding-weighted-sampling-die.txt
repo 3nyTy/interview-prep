@@ -1,0 +1,91 @@
+===H1===
+Weighted Sampling from a Probability Distribution
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-weighted-sampling-die
+===BODY===
+LinkedIn
+Coding·60 minMembers
+Weighted Sampling from a Probability Distribution
+Given a probability distribution over `N` categories (e.g. an M-faced biased die or softmax weights), draw a sample in `O(log N)`. The canonical solution is inverse-CDF sampling — build a cumulative prefix and binary-search a uniform `[0, 1)` draw. Follow-ups dig into probabilities that don't sum to 1, very large or peaked distributions, and rejection-sampling expected cost.
+MLE
+SWE
+RS
+probability
+sampling
+binary-search
+prefix-sum
+numerical-stability
+medium
+Frequency
+Medium
+Last asked
+2026-03-25
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Implement a sampler that returns an index 0..N-1 proportional to a given probability array. Typical interface:
+
+class Sampler:
+    def __init__(self, probs: list[float]): ...
+    def sample(self) -> int: ...
+
+Common framings reported in the loop:
+
+An unfair N-face die where each face probability is given by a softmax over logits.
+
+An array of category weights drawn from a recommender or ranker.
+
+An ML-modelling variant: given a multinomial parameter vector, simulate draws used downstream by a calibration step.
+
+The expected baseline is inverse CDF sampling:
+
+Compute the prefix-sum cum[i] = sum(probs[:i+1]).
+
+Draw u ~ Uniform[0, 1).
+
+Return the first index i with cum[i] > u via binary search.
+
+Construction is O(N), each sample is O(log N).
+
+Follow-ups consistently asked:
+
+Probabilities don't sum to 1. Two acceptable answers — normalize by the total, or run rejection sampling against the maximum bucket. If you pick rejection sampling, expect the interviewer to ask for the expected number of draws per accepted sample (1 / E[p], often ≈ 2 for the canonical case where the total mass is ~0.5).
+
+Distribution is huge but heavily concentrated on a few values. Discuss alias method (O(1) per draw after O(N) build), Walker's alias table, or bucketing rare categories. Be ready to give pros/cons on memory vs precomputation cost.
+
+Continuous variant. Sample uniformly from the area of a circle — expected answer uses polar coordinates with r = sqrt(Uniform[0, 1]), not r = Uniform[0, 1].
+
+Streaming weights. Reservoir-style weighted sampling (A-Res) when probabilities arrive online.
+
+Examples
+
+A worked construction from a recent loop:
+
+probs = [0.1, 0.2, 0.3, 0.4]
+cum   = [0.1, 0.3, 0.6, 1.0]
+u = 0.55  -> bisect_right(cum, 0.55) = 2  -> sample = 2
+
+Notes
+
+Inverse-CDF is the canonical and expected baseline. Trying to be clever with rejection sampling without first stating the prefix-sum approach loses points.
+
+For numerical stability on long tails, build the cumulative sum in float64 and avoid subtracting near-equal values; log-sum-exp tricks come up when the input is given as logits rather than probabilities.
+
+The alias method is a strong follow-up answer when asked about repeated sampling — O(1) per draw after O(N) setup — but interviewers rarely require its implementation, just the outline.
+
+Preparation
+
+Implement the inverse-CDF version from scratch in < 8 minutes; you should be able to dictate it in pseudocode while talking.
+
+Derive the rejection-sampling expected-draws formula on the board so the follow-up doesn't catch you cold.
+
+Memorize the polar-coordinate trick for uniform-over-disk and the inverse-transform recipe for exponential and Gaussian draws — variants surface in MLE loops.
+
+Skim the alias-method construction so you can sketch the two-array form when pressed.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

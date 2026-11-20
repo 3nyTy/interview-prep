@@ -1,0 +1,60 @@
+===H1===
+Greedy Longest-Match Dictionary Tokenizer
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/tokenize-longest-dict-match-greedy
+===BODY===
+Google
+Coding·45 minMembers
+Greedy Longest-Match Dictionary Tokenizer
+Phone-screen coding round (R1). Tokenize a text against a dictionary of `key:id` entries using greedy longest-match; emit the matched id when a key matches, otherwise output the unmatched character as a literal. One follow-up on changing the tie-breaking / priority rule for which token wins. A second follow-up appears when the dictionary is very large: discuss how to keep the matcher memory- and lookup-efficient at scale.
+SWE
+string
+trie
+hashmap
+greedy
+medium
+Frequency
+Low
+Last asked
+2026-06-15
+Stage
+phone-screen
+Requirements
+
+Input: a text string and a dictionary mapping key (string) → id.
+
+Sweep the text left-to-right. At each position, find the longest dictionary key that matches a prefix of the remaining text; emit its id. If no key matches at the current position, emit the single character as a literal and advance by one.
+
+Output the concatenation (or list) of ids and literal characters in order.
+
+Follow-up: the interviewer changes the tie-breaking / priority rule for which key wins when multiple match (e.g., not longest but highest-priority by dictionary order). Adapt the data structure so the rule swap is cheap.
+
+Follow-up: the dictionary becomes very large. Discuss how to keep memory and per-position lookup efficient — a compressed / radix trie (or sharding the key space) instead of holding every key in a flat map.
+
+Notes
+
+The key:id dictionary format and the literal-passthrough for unmatched characters are confirmed across multiple candidates.
+
+Two natural shapes:
+
+Hashmap of keys + per-position scan up to maxKeyLen. Easy to write, O(n · maxKeyLen) time; O(n · L) if the longest key length L dominates.
+
+Trie of keys + walk the trie one character at a time from each position; remember the deepest reached is_end node and emit it. O(n · L) worst case but does only one pass per starting position and adapts cleanly to the priority-rule follow-up (store priority at each terminal node and keep the best matched terminal along the walk, not necessarily the deepest).
+
+Edge cases to discuss: overlapping keys with different lengths ("ab" vs "abc"), key whose match would consume the rest of the string, empty dictionary, key that is a single character (still apply longest-match, not literal-fallback).
+
+If the follow-up generalizes to "non-overlapping tokenization that maximizes total score", that's the word-break with weights DP variant — flag it as a different problem class rather than patching the greedy.
+
+Preparation
+
+Implement both versions (hashmap-scan and trie-walk) from scratch in under 15 min each. Run them on a small dict like {"the": 1, "theater": 2, "a": 3} against text "theater" to confirm the trie returns id 2 and the hashmap version returns the same.
+
+For the priority-tie follow-up: practice attaching a priority field to terminal nodes and picking the highest-priority terminal seen along the trie walk, not just the deepest. Time complexity should not change.
+
+If asked to stream the input, switch to the Aho-Corasick mental model — the trie augmented with failure links emits all dictionary matches in a single linear pass over the text.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

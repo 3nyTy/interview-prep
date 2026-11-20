@@ -1,0 +1,42 @@
+===H1===
+Longest Substring Without Repeating Characters
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/longest-substring-without-repeating-characters
+===BODY===
+Amazon
+CodingMembers
+Longest Substring Without Repeating Characters
+Given a string, return the length of its longest substring containing no repeated characters.
+SWE
+string
+Frequency
+Single report
+Last asked
+2026-09-10
+Stage
+onsite-coding
+Requirements
+
+Input: a string.
+
+Return the length of the longest contiguous substring with no repeated characters.
+
+Notes
+
+The candidate explicitly confirmed this was the unchanged public problem, LC 3.
+
+It shared a 30-minute coding block with Word Search II, following behavioral questions about deadlines.
+
+Keep the last index of each character and a nondecreasing left boundary. At index r, update left to max(left, last_seen[character] + 1), using -1 when absent; then update last_seen and the best length r-left+1. The max prevents a stale occurrence from moving the boundary backward. Empty input returns zero. With hash lookups, the scan takes expected O(n) time and O(min(n,A)) space for alphabet size A.
+
+Preparation
+
+Implement the window in 10 minutes and test empty input, all-equal characters, and a repeated character outside the current window.
+
+Enumerate short strings and compare against a brute-force distinct-substring checker.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,397 @@
+===H1===
+Generate Random NFT (DFS + Weighted Sampling)
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/nft-generation-combinations
+===BODY===
+Coinbase
+Coding·60 minMembers
+Generate Random NFT (DFS + Weighted Sampling)
+Generate NFTs from a set of attribute categories (e.g. ears, eyes, mouth), each with multiple possible values. Level 1 enumerates all valid combinations (DFS / Cartesian product); Level 2 deduplicates against an existing collection; Level 3 introduces per-value weights and asks for weighted random sampling. The unstated work is parsing your own input and writing your own tests.
+SWE
+dfs
+backtracking
+dedup
+sampling
+ambiguous-spec
+testing
+medium
+Frequency
+Low
+Last asked
+2026-05-06
+Stage
+onsite-coding
+NFT Feature Generation
+
+Problem Requirements
+
+You need to build a tool that creates descriptions for an NFT collection. Each NFT consists of several categories (like Ears, Eyes, or Hats). Each category has a list of choices (values). Your goal is to combine these choices to make unique NFTs.
+
+This interview question has three parts. Each part adds a new rule to the previous one.
+
+Part 1: Create All Combinations
+
+Problem Statement
+
+You have K categories. Each category has a name and a list of values. You must create every possible NFT by picking exactly one value from each category.
+
+First, print the total number of combinations. Then, print each combination on its own line. Use the format Name=Value, separated by commas.
+
+Input Format:
+
+Line 1: integer K (number of categories)
+For each category:
+  Line: category name
+  Line: integer M (number of values in this list)
+  Next M lines: the values (one per line)
+
+Output Format:
+
+Line 1: Total number of combinations
+Next lines: One combination per line (Name=Value pairs joined by commas)
+
+Example
+
+Input:
+2
+Ears
+2
+Pointy
+Wide
+Eyes
+2
+Blue
+Green
+
+Output:
+4
+Ears=Pointy,Eyes=Blue
+Ears=Pointy,Eyes=Green
+Ears=Wide,Eyes=Blue
+Ears=Wide,Eyes=Green
+
+This is a "Cartesian product." You take one item from every list and combine them in every possible way.
+
+Part 1 Code Solution
+
+import sys
+from itertools import product
+
+def solve():
+    data = sys.stdin.read().split('\n')
+    idx = 0
+
+    k = int(data[idx]); idx += 1
+    categories = []
+
+    for _ in range(k):
+        name = data[idx].strip(); idx += 1
+        m = int(data[idx]); idx += 1
+        values = []
+        for _ in range(m):
+            values.append(data[idx].strip())
+            idx += 1
+        categories.append((name, values))
+
+    # Get the list of values for each category
+    all_values = [cat[1] for cat in categories]
+    # Create every possible combination
+    combos = list(product(*all_values))
+
+    print(len(combos))
+    for combo in combos:
+        parts = [f"{categories[i][0]}={combo[i]}" for i in range(k)]
+        print(",".join(parts))
+
+solve()
+
+Solution without itertools (Using recursion/DFS):
+
+def generate_combos(categories):
+    results = []
+
+    def dfs(index, current):
+        # Base case: we have picked one item for every category
+        if index == len(categories):
+            results.append(list(current))
+            return
+        _, values = categories[index]
+        for v in values:
+            current.append(v)
+            dfs(index + 1, current)
+            current.pop() # Backtrack
+
+    dfs(0, [])
+    return results
+
+Complexity Analysis:
+
+MetricValue
+TimeO(M₁ × M₂ × ... × Mₖ) — the product of all list sizes
+SpaceO(K) for recursion, O(total combos × K) for output
+
+Part 2: Remove Duplicates
+
+Problem Statement
+
+Interviewer: "What if a list has the same value twice? For instance, the 'Eyes' list might say 'Blue' two times. The output must not show the same combination twice."
+
+Update your code to handle this. If a category has duplicate values, merge them so you only create unique combinations.
+
+Example
+
+Input:
+2
+Ears
+2
+Pointy
+Wide
+Eyes
+3
+Blue
+Blue
+Green
+
+Output:
+4
+Ears=Pointy,Eyes=Blue
+Ears=Pointy,Eyes=Green
+Ears=Wide,Eyes=Blue
+Ears=Wide,Eyes=Green
+
+"Blue" is listed twice under Eyes, but we only use it once. The total count is 2 × 2 = 4, not 2 × 3 = 6.
+
+Part 2 Code Solution
+
+The best way to fix this is to remove duplicates inside each category before you start mixing them. We use dict.fromkeys() because it removes duplicates but keeps the original order.
+
+import sys
+from itertools import product
+
+def solve():
+    data = sys.stdin.read().split('\n')
+    idx = 0
+
+    k = int(data[idx]); idx += 1
+    categories = []
+
+    for _ in range(k):
+        name = data[idx].strip(); idx += 1
+        m = int(data[idx]); idx += 1
+        values = []
+        for _ in range(m):
+            values.append(data[idx].strip())
+            idx += 1
+        # Remove duplicates while keeping order
+        unique_values = list(dict.fromkeys(values))
+        categories.append((name, unique_values))
+
+    all_values = [cat[1] for cat in categories]
+    combos = list(product(*all_values))
+
+    print(len(combos))
+    for combo in combos:
+        parts = [f"{categories[i][0]}={combo[i]}" for i in range(k)]
+        print(",".join(parts))
+
+solve()
+
+Why do this?
+It is much faster to clean the input first. If a list has 50 items but only 10 are unique, you save a lot of work by ignoring the 40 duplicates immediately.
+
+Complexity Analysis:
+
+MetricValue
+TimeO(U₁ × U₂ × ... × Uₖ) where Uᵢ is the number of unique values in category i
+SpaceO(total unique combos × K)
+
+Part 3: Random Selection with Weights
+
+Problem Statement
+
+Interviewer: "Now, every value has a 'weight' (a number showing how rare or common it is). For example, Pointy ears are 0.6 and Wide ears are 0.4. Write a function to pick one random NFT based on these weights."
+
+You must sample one value from each category. The chance of picking a value depends on its weight.
+
+If a value appears multiple times in a category, add their weights together.
+
+Print the full list from Part 2, then print one random NFT at the end.
+
+Updated Input Format:
+
+Line 1: integer K
+For each category:
+  Line: category name
+  Line: integer M
+  Next M lines: value weight (separated by a space)
+
+Updated Output Format:
+
+(Part 2 output: count + all unique combinations)
+RANDOM: Name1=Val1,Name2=Val2,...
+
+Example
+
+Input:
+2
+Ears
+2
+Pointy 0.6
+Wide 0.4
+Eyes
+3
+Blue 1
+Blue 1
+Green 2
+
+Output (The random line will change):
+4
+Ears=Pointy,Eyes=Blue
+Ears=Pointy,Eyes=Green
+Ears=Wide,Eyes=Blue
+Ears=Wide,Eyes=Green
+RANDOM: Ears=Wide,Eyes=Green
+
+In the Eyes category, "Blue" appears twice with weight 1. So, the total weight for Blue is 2. Green also has weight 2. This means Blue and Green have an equal 50% chance.
+
+Part 3 Code Solution
+
+To select based on weights, we calculate the "cumulative weight" (running total). Then we pick a random number and see where it lands.
+
+import sys
+import random
+from itertools import product
+
+def weighted_sample(values_with_weights):
+    """Pick one value based on weight."""
+    total = sum(w for _, w in values_with_weights)
+    r = random.uniform(0, total)
+    cumulative = 0
+    for value, weight in values_with_weights:
+        cumulative += weight
+        if r <= cumulative:
+            return value
+    return values_with_weights[-1][0]  # Safety check for rounding errors
+
+def solve():
+    data = sys.stdin.read().split('\n')
+    idx = 0
+
+    k = int(data[idx]); idx += 1
+    categories = []
+
+    for _ in range(k):
+        name = data[idx].strip(); idx += 1
+        m = int(data[idx]); idx += 1
+        raw_values = []
+        for _ in range(m):
+            parts = data[idx].strip().split()
+            value = parts[0]
+            weight = float(parts[1])
+            raw_values.append((value, weight))
+            idx += 1
+
+        # Combine duplicates by adding their weights
+        weight_map = {}
+        for value, weight in raw_values:
+            weight_map[value] = weight_map.get(value, 0) + weight
+
+        unique_values = list(weight_map.keys())
+        weighted_values = [(v, weight_map[v]) for v in unique_values]
+        categories.append((name, unique_values, weighted_values))
+
+    # Part 1+2: Create all unique combinations
+    all_values = [cat[1] for cat in categories]
+    combos = list(product(*all_values))
+
+    print(len(combos))
+    for combo in combos:
+        parts = [f"{categories[i][0]}={combo[i]}" for i in range(k)]
+        print(",".join(parts))
+
+    # Part 3: Generate one random NFT
+    random_combo = []
+    for name, _, weighted_values in categories:
+        chosen = weighted_sample(weighted_values)
+        random_combo.append(f"{name}={chosen}")
+    print(f"RANDOM: {','.join(random_combo)}")
+
+solve()
+
+Simpler Random Choice (Python 3.6+):
+
+import random
+
+def weighted_sample(values_with_weights):
+    values = [v for v, _ in values_with_weights]
+    weights = [w for _, w in values_with_weights]
+    # k=1 means pick 1 item
+    return random.choices(values, weights=weights, k=1)[0]
+
+Complexity Analysis:
+
+OperationTimeSpace
+Parse inputs + merge weightsO(Sum of all Mᵢ)O(Sum of all Uᵢ)
+Create all combosO(U₁ × U₂ × ... × Uₖ)O(total combos × K)
+Weighted random choiceO(K × max(Uᵢ))O(1)
+
+Here, Mᵢ is the total number of items in a list, and Uᵢ is the number of unique items.
+
+Common Follow-Up Questions
+
+Discussed in Interviews
+
+Big Data: What if the number of combinations is huge (e.g., 50¹⁰)?
+
+Answer: Do not try to print them all. Only write the code for the random selection. If you really need to list them, use "lazy generation" (make one at a time instead of a big list).
+
+Unique Random NFTs: How do you make N random NFTs that are all different?
+
+Answer: Generate them one by one. Use a Set (hash set) to remember what you made. If you generate a duplicate, throw it away and try again.
+
+Forbidden Combinations: What if "Laser Eyes" cannot go with "Sunglasses"?
+
+Answer: Create a "conflict list." When generating an NFT, check this list. If the NFT breaks a rule, discard it.
+
+Testing: How do you verify the weights are working?
+
+Answer: Run the generator thousands of times. Count how often each item appears. Compare this to the expected math (using a Chi-squared test).
+
+Complexity Overview
+
+PartTime ComplexitySpace Complexity
+Part 1: All combosO(∏ Mᵢ)O(∏ Mᵢ × K)
+Part 2: Unique combosO(∏ Uᵢ)O(∏ Uᵢ × K)
+Part 3: Random pickO(K × max(Uᵢ))O(Σ Uᵢ)
+
+K = Number of categories
+
+Mᵢ = Total values in category i
+
+Uᵢ = Unique values in category i
+
+Candidate-Report Notes
+
+You define the input format. JSON is the lowest-friction choice; spell out the schema verbally first so the interviewer can object before you commit to a parser.
+
+For Level 1, recursive DFS over categories is cleaner than nested loops because categories can be added arbitrarily.
+
+For Level 2, hash each combination canonically (e.g. concatenate values in a fixed category order). A Set of these strings drives O(1) dedup.
+
+For Level 3, the building block is weighted-pick on a single category: cumulative-sum the weights, draw r ∈ [0, total), binary-search the cdf. Reject-and-resample handles minted duplicates; if the search space shrinks below ~5x the minted set you should switch to "enumerate all unminted, sample uniformly" instead.
+
+Several candidates report the interviewer asking for explicit test cases — write 2–3 (one minimum 1×1×1, one with duplicates) as you go, not all at the end.
+
+Preparation
+
+Pre-write a generic "Cartesian product over a list of lists" helper. This shows up in NFT, log-parser, and many small object-design rounds.
+
+Drill the weighted-pick-by-cdf pattern: ~10 lines, almost always asked once per ML/sampling-flavored round.
+
+For each round of this shape, practice the "I'll use JSON; here's a sample input; tell me if you want a different format" verbal opening — it gets the API negotiation out of the way in 60 seconds.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

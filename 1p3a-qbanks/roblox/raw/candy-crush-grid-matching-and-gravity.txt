@@ -1,0 +1,187 @@
+===H1===
+Candy Crush Grid Matching and Gravity
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/candy-crush-grid-matching-and-gravity
+===BODY===
+Roblox
+CodingMembers
+Candy Crush Grid Matching and Gravity
+Implement Candy Crush-style grid matching, clearing, gravity, and repeated stabilization.
+SWE
+grid
+simulation
+array
+medium
+Frequency
+Single report
+Last asked
+2026-03-21
+Stage
+onsite-coding
+Problem Overview
+
+You are given an m x n grid of non-negative integers. A positive value represents a candy type, and 0 represents an empty cell. A match is any horizontal or vertical run of at least three adjacent cells with the same positive value.
+
+Part 1: Find Matching Runs
+
+Problem Statement
+
+Return every horizontal and vertical run of length at least 3. This implementation returns all vertical matches first, then all horizontal matches, because several reports mention a direction priority requirement. Within each direction group, scan start cells from the top-left of the board to the bottom-right.
+
+from typing import List, Tuple
+
+Match = Tuple[int, int, str, int]  # row, col, "V" or "H", length
+
+def find_matches(board: List[List[int]]) -> List[Match]:
+    pass
+
+Example
+
+board = [
+    [1, 2, 2, 2],
+    [1, 3, 4, 5],
+    [1, 3, 3, 3],
+    [6, 7, 8, 9],
+]
+
+find_matches(board)
+# [
+#   (0, 0, "V", 3),
+#   (0, 1, "H", 3),
+#   (2, 1, "H", 3),
+# ]
+
+The first column has three 1s vertically. Row 0 has three 2s horizontally, and row 2 has three 3s horizontally.
+
+Solution
+
+Scan start positions in row-major order. For vertical runs, only start counting from a cell when the cell above it is different or out of bounds. For horizontal runs, only start counting when the cell to the left is different or out of bounds.
+
+from typing import List, Tuple
+
+Match = Tuple[int, int, str, int]
+
+def find_matches(board: List[List[int]]) -> List[Match]:
+    if not board or not board[0]:
+        return []
+
+    rows = len(board)
+    cols = len(board[0])
+    matches: List[Match] = []
+
+    for row in range(rows):
+        for col in range(cols):
+            value = board[row][col]
+            if value == 0 or (row > 0 and board[row - 1][col] == value):
+                continue
+
+            end = row
+            while end < rows and board[end][col] == value:
+                end += 1
+
+            length = end - row
+            if length >= 3:
+                matches.append((row, col, "V", length))
+
+    for row in range(rows):
+        for col in range(cols):
+            value = board[row][col]
+            if value == 0 or (col > 0 and board[row][col - 1] == value):
+                continue
+
+            end = col
+            while end < cols and board[row][end] == value:
+                end += 1
+
+            length = end - col
+            if length >= 3:
+                matches.append((row, col, "H", length))
+
+    return matches
+
+Complexity:
+
+Time: O(m * n)
+
+Space: O(k) for the returned matches, where k is the number of observed runs.
+
+Part 2: Crush Matches and Apply Gravity
+
+Problem Statement
+
+Remove every cell that belongs to at least one match, then apply gravity independently in each column. Non-zero values fall downward while preserving their relative order within the column. Empty cells at the top become 0.
+
+from typing import List
+
+def crush_once(board: List[List[int]]) -> List[List[int]]:
+    pass
+
+Example
+
+board = [
+    [1, 2, 2, 2],
+    [1, 3, 4, 5],
+    [1, 3, 3, 3],
+    [6, 7, 8, 9],
+]
+
+crush_once(board)
+# [
+#   [0, 0, 0, 0],
+#   [0, 0, 0, 0],
+#   [0, 3, 4, 5],
+#   [6, 7, 8, 9],
+# ]
+
+The matched 1s, 2s, and 3s are removed. The remaining values in each column fall to the bottom.
+
+Solution
+
+First mark all cells covered by any match. Use a separate to_crush grid to avoid changing the board while matches are still being discovered. Then compact each column from bottom to top.
+
+from typing import List
+
+def crush_once(board: List[List[int]]) -> List[List[int]]:
+    if not board or not board[0]:
+        return board
+
+    rows = len(board)
+    cols = len(board[0])
+    to_crush = [[False] * cols for _ in range(rows)]
+
+    for row, col, direction, length in find_matches(board):
+        if direction == "V":
+            for offset in range(length):
+                to_crush[row + offset][col] = True
+        else:
+            for offset in range(length):
+                to_crush[row][col + offset] = True
+
+    for row in range(rows):
+        for col in range(cols):
+            if to_crush[row][col]:
+                board[row][col] = 0
+
+    for col in range(cols):
+        write = rows - 1
+        for row in range(rows - 1, -1, -1):
+            if board[row][col] != 0:
+                board[write][col] = board[row][col]
+                write -= 1
+
+        for row in range(write, -1, -1):
+            board[row][col] = 0
+
+    return board
+
+Complexity:
+
+Time: O(m * n)
+
+Space: O(m * n) for the crush marker grid.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

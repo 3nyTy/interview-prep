@@ -1,0 +1,74 @@
+===H1===
+Small Business Network: Degrees of Separation
+===URL===
+https://www.1point3acres.com/interview/problems/company/intuit/small-business-network-degrees-of-separation
+===BODY===
+Intuit
+CodingFree preview
+Small Business Network: Degrees of Separation
+Build a QuickBooks-flavored graph feature that returns the shortest business relationship path between two companies. The prompt is under-specified, so clarifying the input and return type is part of the screen.
+SWE
+graph
+bfs
+search
+ambiguous-spec
+medium
+Frequency
+Single report
+Last asked
+2026-05-08
+Stage
+phone-screen
+Requirements
+
+QuickBooks has business relationship data. For example, Company A purchases dairy from Company B, and Company B purchases pet feed from Company C:
+
+A <--> B <--> C
+
+Deliver a feature that checks how many degrees of separation exist between two businesses and returns the shortest path when multiple paths exist.
+
+Clarify the interface before coding. The prompt may not specify argument types or output shape. A reasonable contract is:
+
+def shortest_business_path(edges: list[tuple[str, str]], source: str, target: str) -> list[str] | None:
+    ...
+
+Requirements:
+
+Treat business relationships as graph edges.
+
+Return the shortest path from source to target if one exists.
+
+Return None or an empty result if there is no relationship path.
+
+Also be able to compute degrees of separation from the returned path.
+
+Run the code on the A <--> B <--> C example.
+
+Examples
+
+For A <--> B <--> C, the shortest path between A and C is:
+
+A -> B -> C
+
+The degree of separation is described as 1 in the prompt.
+
+Notes
+
+The natural implementation is BFS over an adjacency list, storing a parent pointer so the shortest path can be reconstructed once the target is reached. The interviewer asks why DFS is not the right default; the key answer is that unweighted shortest path requires level-order traversal, while DFS can find a longer path first.
+
+The degree wording is slightly non-standard: the example says A and C are separated by 1 degree even though the path has two edges. Clarify whether the expected count is number of intermediary businesses or number of edges.
+
+For large inputs, build dict[str, list[str]] once and mark nodes visited when they are enqueued, not when popped, so the same business is not queued repeatedly. The path reconstruction invariant is: when a neighbor is first discovered, record parent[neighbor] = current; after the target is found, walk parents backward and reverse the list. Complexity is O(V + E) time and O(V + E) adjacency storage, or O(V) extra storage after the graph is built.
+
+Preparation
+
+Implement the function twice from memory: first returning only reachability, then returning the actual shortest path via a parent map.
+
+Run tests for source == target, disconnected components, duplicate edge input, and multiple equal-length paths where any shortest path is acceptable.
+
+Practice explaining the degree count both ways: edges in the returned path versus intermediary businesses, because the reported example uses non-standard wording.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

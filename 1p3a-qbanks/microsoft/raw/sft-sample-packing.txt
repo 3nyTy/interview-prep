@@ -1,0 +1,67 @@
+===H1===
+SFT Sample Packing
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/sft-sample-packing
+===BODY===
+Microsoft
+Coding·60 minMembers
+SFT Sample Packing
+Implement supervised fine-tuning sample packing: greedily pack variable-length (prompt, answer) pairs into fixed-length training sequences, emit per-token loss masks aligned to answer positions only, and balance sequence usage across the batch.
+MLE
+pytorch
+data-engineering
+batching
+hard
+Frequency
+Single report
+Last asked
+2026-04-19
+Stage
+onsite-coding
+Requirements
+
+Given:
+
+A list of (prompt_tokens, answer_tokens) examples of variable length.
+
+A fixed seq_len (e.g. 4096) for packed training sequences.
+
+A separator / EOS token id.
+
+Produce a stream of PackedSample(input_ids, loss_mask, position_ids) objects where:
+
+input_ids is exactly seq_len long. Multiple short examples are concatenated into a single packed sequence (with separator tokens between examples) until adding the next example would overflow.
+
+loss_mask is 0 on prompt positions and 1 on answer positions — the model trains only on the answer tokens of each packed example.
+
+position_ids resets to 0 at the start of every packed example (so attention does not bleed positional context across examples — assuming the model uses attention masking that respects packing boundaries).
+
+Sequence-length variance across the batch should be minimized — pack greedily but balance.
+
+Notes
+
+The shape of the answer is a length-bin packing problem with constraints. A simple greedy First-Fit-Decreasing pass produces near-optimal packing density; a fully optimal solver is not expected in 45 minutes.
+
+The mask and position_ids bookkeeping is where candidates lose time. Three pitfalls reported:
+
+Forgetting the separator token contributes to seq_len budget — easy off-by-one.
+
+Masking out the EOS / sep token itself when the trainer expects the model to learn to emit it.
+
+Resetting position_ids per example but not adjusting the attention mask, so attention leaks across examples.
+
+For the balancing requirement, sort examples by length descending, then round-robin them into open buckets, closing a bucket when adding the next item would overflow. This gives uniform per-sequence utilization without the complexity of bin-packing approximation algorithms.
+
+Preparation
+
+Pre-write the FFD packing skeleton; it doubles as practice for any "bin-pack short items into fixed-size containers" interview problem.
+
+Drill the mask alignment by hand on a 3-example trace: convince yourself the loss-mask boundaries align with answer-token positions even after concatenation.
+
+Read up on packed-attention masking (block-diagonal mask) in case the interviewer extends to "now also produce the attention mask".
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

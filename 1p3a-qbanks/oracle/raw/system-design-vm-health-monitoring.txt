@@ -1,0 +1,88 @@
+===H1===
+System Design — VM Health Monitoring at 1M Scale
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/system-design-vm-health-monitoring
+===BODY===
+Oracle
+System Design·45 minMembers
+System Design — VM Health Monitoring at 1M Scale
+Design centralized health monitoring for roughly one million VMs or edge devices. Compare pull-based pings with pushed heartbeats, identify each bottleneck, and justify a hybrid in which push is primary and pull verifies missed health signals.
+SWE
+Infra Eng
+system-design
+distributed-systems
+presence
+scaling
+infra
+medium
+Frequency
+Low
+Last asked
+2026-08-11
+Stage
+onsite-system-design
+Requirements
+
+Monitor 1,000,000 VMs.
+
+Each VM either:
+
+Responds to a control-plane ping (pull-based), or
+
+Pushes a heartbeat every 10 seconds (push-based).
+
+All 1M statuses must be collected and reflected in the monitoring system within a 5-minute window.
+
+Interviewer's explicit deep dive: where is the bottleneck in each of the two methods, and how does it differ?
+
+Notes
+
+Push-based heartbeat (every 10s)
+
+Steady-state load: 1M VMs × 1 heartbeat / 10s = 100k events / second arriving at the monitoring backend.
+
+Bottleneck: ingestion bandwidth + write throughput on the heartbeat-storage layer. Backend must absorb 100k WPS continuously and store at least the most-recent heartbeat per VM.
+
+Failure detection: a VM is unhealthy if no heartbeat received in the last K intervals (K = 2 or 3). Detection latency = K × 10s ≈ 20-30s, well within the 5-minute SLA.
+
+Architectural pattern: each VM POSTs to a sharded ingest endpoint (consistent-hash on VM ID); the ingest node writes to a last_seen[vm_id] table (Redis cluster or sharded KV). A background sweeper scans last_seen for stale entries.
+
+Scaling levers: shard on VM ID; use Kafka in front of the writes to absorb bursts; cap heartbeat payload size.
+
+Pull-based ping
+
+To pull 1M VMs in 5 minutes the control plane must issue ~3,333 pings / second.
+
+Bottleneck: control-plane fan-out and the round-trip latency tail. A single coordinator cannot fan-out to 1M endpoints in 5 minutes without parallelism.
+
+Architecture: shard the VM list across N worker pollers (each owning ~1M / N VMs); each worker pings its slice within the 5-minute interval. N = 50 workers × 20k VMs × 15-second ping cycle is workable.
+
+Trade-off vs heartbeat: ping wastes bandwidth probing healthy VMs but doesn't require VM-side instrumentation; heartbeat scales better at steady state but trusts the VM agent to push reliably.
+
+Hybrid
+
+Many production systems combine both: heartbeat is the primary signal; pull is the verification step when a heartbeat is missed. Reduces both bandwidth and false-positive risk.
+
+Common deep dives
+
+Detecting silent partial failures (VM is up but agent is dead): heartbeat-only systems miss this; pull-only systems catch it.
+
+Avoiding stampede on monitoring backend after a control-plane restart.
+
+Storing historical health for triage vs only current health.
+
+Preparation
+
+Drill the two-method bottleneck comparison until you can articulate it in 90 seconds (heartbeat → write throughput; ping → fan-out latency).
+
+Sketch a hybrid architecture: heartbeat first, then ping-verify on missed heartbeats. This is the answer most interviewers want.
+
+Have rough capacity numbers ready (100k WPS for the heartbeat path; 3.3k pings/sec for the pull path) without needing to recompute mid-round.
+
+Know the Hello Interview "presence" / "heartbeat" write-ups well enough to switch terminology mid-discussion.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,109 @@
+===H1===
+Weighted Cache And Timed Cache
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/weighted-cache-and-timed-cache
+===BODY===
+Weighted Cache And Timed Cache
+
+<https://www.1point3acres.com/interview/problems/company/netflix/weighted-cache-and-timed-cache>
+
+Netflix
+Coding
+
+60 min
+Members
+Weighted Cache / Timed Cache
+
+Implement a cache with either weighted capacity eviction or fixed per-item expiration. Follow-ups focus on cleanup strategy, hot-path `get`, capacity limits, and production trade-offs.
+
+SWE
+Infra Eng
+data-structure
+heap
+caching
+ttl
+concurrency
+medium
+Frequency
+Medium
+Last asked
+2026-07-09
+Stage
+phone-screen  onsite-coding
+Requirements
+Weighted cache variant:
+put(key, value, weight) inserts or updates an item.
+get(key) returns the value if present.
+Total weight must not exceed capacity; when over capacity, evict the heaviest item or apply the interviewer-specified policy.
+Timed cache variant:
+Each item has a fixed cache time / TTL.
+get is the hot path and should avoid doing heavy cleanup.
+A sidecar cleanup process may remove expired entries.
+Build the implementation from scratch, including the cache class, tests, and a dry run. Clarify the input/output contract and edge cases before coding.
+Follow-ups: lazy cleanup, capacity limit, LRU cleanup, concurrency, scale, OOM failure modes, and the choice among cache-eviction policies.
+Notes
+For weighted eviction, maintain key -> node plus an ordered structure by weight. A max-heap is simple but needs lazy deletion for updates; a balanced tree or buckets by weight gives cleaner deletions.
+If the policy is truly "evict heaviest," it is not LFU or LRU. Clarify ties: oldest, newest, or arbitrary.
+For timed cache, store expires_at with each value. get can check only the requested key and return miss if stale; background cleanup handles memory pressure.
+If get must never clean, stale entries remain until sidecar cleanup, so memory can exceed live-key count. Make this trade-off explicit.
+With concurrency, use either a coarse lock first or lock striping by key. Avoid holding a global lock during long cleanup scans.
+Be ready to connect OOM behavior to stale-entry buildup, capacity enforcement, cleanup cadence, and the chosen eviction policy. The production discussion also covers scalability rather than stopping at an in-memory implementation.
+A common timed-cache phrasing is a print-dedup: print a key's value only if it was not printed within the last 10 seconds. The interviewer then pivots to engineering follow-ups  if the server crashes in production, how does the cache survive (persistence, replication, warm rebuild)? Have a durability story ready, not just the in-memory data structure.
+Preparation
+Implement weighted cache with lazy heap deletion.
+Implement TTL cache with put, get, deleteExpired(now).
+Add tests for update existing key, equal weights, expired key, and capacity overflow.
+Prepare a production discussion around cleanup cadence, clock skew, and memory pressure.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Preparation
+Related discussions  7
+??? Ads L5 ?? + ?????
+???L4 CBP? ??
+????
+??????
+?Netflix technical ????
+??????????
+? ? ps
+Related questions
+
+Other Netflix questions sharing tags with this one
+
+Movie Billboard Rotation Service
+Low
+heap
+caching
+data-structure
++3
+Thread-Safe KV Store / Atomic Counter / Blocking Queue
+Low
+concurrency
+ttl
+medium
++4
+Command Executor with Undo and Tags
+Medium
+data-structure
+medium
+stack
++3
+Homepage Viewport / Shelf Dedupe
+Medium
+caching
+medium
+dedup
++4
+Music Playlist History
+Single report
+data-structure
+medium
+hashmap
++2
+Code editor

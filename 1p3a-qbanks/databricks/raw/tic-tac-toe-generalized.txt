@@ -1,0 +1,599 @@
+===H1===
+Generalized Tic-Tac-Toe
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/tic-tac-toe-generalized
+===BODY===
+Databricks
+Coding·60 minMembers
+Generalized Tic-Tac-Toe
+Implement tic-tac-toe with custom board dimensions and a custom win length. One intern variant adds a simple AI move by calling a random API.
+SWE
+simulation
+grid
+object-design
+medium
+Frequency
+Medium
+Last asked
+2026-08-07
+Stage
+onsite-coding
+Problem Statement
+
+Create a Tic-Tac-Toe game class. It must follow these rules:
+
+Requirements
+
+Board Setup:
+
+The board size is M x N. It might not be a square.
+
+A player needs K marks in a row to win. K can be any number.
+
+Main Functions:
+
+Create a TicTacToe class. The constructor takes the board size and the winning number K.
+
+Create a move(i, j) method. This method should:
+
+Put the current player's mark at row i and column j.
+
+Print the board.
+
+Print "Player X won" if someone wins.
+
+Return the winner (1 for Player 1, 2 for Player 2, or 0 if the game is still going).
+
+Rules:
+
+Player 1 and Player 2 take turns.
+
+Assume all moves are valid (you do not need to check for errors).
+
+Check if someone won after every move.
+
+A player wins by connecting K marks in:
+
+A row
+
+A column
+
+The main diagonal (top-left to bottom-right)
+
+The anti-diagonal (bottom-left to top-right)
+
+Usage Example
+
+TicTacToe game = new TicTacToe(3, 4, 3); // 3x4 board, need 3 to win
+
+game.move(0, 0); // Player 1
+Board:
+|  X  |     |     |     |
+|     |     |     |     |
+|     |     |     |     |
+
+game.move(0, 1); // Player 2
+Board:
+|  X  |  O  |     |     |
+|     |     |     |     |
+|     |     |     |     |
+
+game.move(1, 0); // Player 1
+Board:
+|  X  |  O  |     |     |
+|  X  |     |     |     |
+|     |     |     |     |
+
+game.move(1, 1); // Player 2
+Board:
+|  X  |  O  |     |     |
+|  X  |  O  |     |     |
+|     |     |     |     |
+
+game.move(2, 0); // Player 1
+Board:
+|  X  |  O  |     |     |
+|  X  |  O  |     |     |
+|  X  |     |     |     |
+Player 1 won
+
+Input Limits
+
+M and N are between 2 and 100.
+
+K is at least 2 and cannot be bigger than the board size.
+
+Players are defined as 1 and 2.
+
+i and j are valid coordinates inside the board.
+
+Speed is not the main goal.
+
+Solution Details
+
+How It Works
+
+Board Data: Use a 2D array. 0 is empty, 1 is Player 1, and 2 is Player 2.
+
+Making a Move:
+
+Save the mark on the board.
+
+Show the board.
+
+Look in 4 directions from the new mark to see if the player won.
+
+If yes, return the winner.
+
+Checking for a Win: After a move at (row, col), check for K connected marks in:
+
+Horizontal (Left + Right)
+
+Vertical (Up + Down)
+
+Diagonal (Top-Left + Bottom-Right)
+
+Anti-Diagonal (Bottom-Left + Top-Right)
+
+Checking for a Draw: The game is a draw if the board is full and no one won.
+
+Note: You do not need to check if a win is mathematically impossible early on. Just check if the board is full.
+
+Time Performance
+
+Constructor: O(M × N) to build the empty board.
+
+move(): O(max(M, N)) to scan the lines for a winner.
+
+Total: O(M × N) for the whole game.
+
+Space Usage
+
+O(M × N) to store the board in memory.
+
+Code Implementation
+
+class TicTacToe:
+    def __init__(self, M: int, N: int, K: int):
+        """
+        Setup M x N board. Need K marks to win.
+        """
+        self.rows = M
+        self.cols = N
+        self.k = K
+        self.board = [[0] * N for _ in range(M)]
+        self.current_player = 1  # Player 1 goes first
+        self.game_over = False
+
+    def move(self, i: int, j: int) -> int:
+        """
+        Place mark at (i, j). Print board and check winner.
+        Returns: 0 (no winner), 1 (player 1 wins), 2 (player 2 wins)
+        """
+        if self.game_over:
+            print("Game is already over!")
+            return 0
+
+        # Place the mark
+        self.board[i][j] = self.current_player
+
+        # Print the board
+        self._print_board()
+
+        # Check for winner
+        if self._check_win(i, j):
+            print(f"Player {self.current_player} won")
+            self.game_over = True
+            return self.current_player
+
+        # Switch player
+        self.current_player = 3 - self.current_player  # Toggle between 1 and 2
+
+        return 0
+
+    def _print_board(self):
+        """Print the board visually."""
+        symbols = {0: '   ', 1: ' X ', 2: ' O '}
+        print("\nBoard:")
+        for row in self.board:
+            print('|' + '|'.join(symbols[cell] for cell in row) + '|')
+        print()
+
+    def _check_win(self, row: int, col: int) -> bool:
+        """
+        Check if the last move at (row, col) caused a win.
+        """
+        player = self.current_player
+
+        # Check all 4 directions
+        directions = [
+            (0, 1),   # Horizontal
+            (1, 0),   # Vertical
+            (1, 1),   # Main diagonal
+            (1, -1)   # Anti-diagonal
+        ]
+
+        for dr, dc in directions:
+            count = 1  # Count the current spot
+
+            # Count going forward
+            count += self._count_consecutive(row, col, dr, dc, player)
+
+            # Count going backward
+            count += self._count_consecutive(row, col, -dr, -dc, player)
+
+            if count >= self.k:
+                return True
+
+        return False
+
+    def _count_consecutive(self, row: int, col: int, dr: int, dc: int, player: int) -> int:
+        """
+        Count how many marks match in one direction.
+        """
+        count = 0
+        r, c = row + dr, col + dc
+
+        while 0 <= r < self.rows and 0 <= c < self.cols and self.board[r][c] == player:
+            count += 1
+            r += dr
+            c += dc
+
+        return count
+
+# Example usage
+if __name__ == "__main__":
+    game = TicTacToe(3, 4, 3)
+
+    game.move(0, 0)  # Player 1
+    game.move(0, 1)  # Player 2
+    game.move(1, 0)  # Player 1
+    game.move(1, 1)  # Player 2
+    game.move(2, 0)  # Player 1 wins
+
+Extension: Adding an AI
+
+Add an AI player that plays automatically.
+
+New Requirements
+
+Update Constructor:
+
+Add a parameter isAI.
+
+Signature: TicTacToe(int M, int N, int K, boolean isAI).
+
+AI Logic:
+
+If isAI is true, Player 2 is the computer.
+
+The AI picks a valid empty spot.
+
+The game ends when someone wins or draws.
+
+Update move():
+
+When a human plays (Player 1), the AI should immediately play afterwards (Player 2).
+
+Draws:
+
+If the board is full and no one wins, print "Draw".
+
+AI Logic
+
+The AI decides where to move in this order:
+
+Win: If the AI can win right now, take that spot.
+
+Block: If the human can win on their next turn, block that spot.
+
+Random: If neither of the above, pick a random empty spot.
+
+Code Implementation
+
+import random
+from typing import Optional, Tuple
+
+class TicTacToeWithAI:
+    def __init__(self, M: int, N: int, K: int, isAI: bool = False):
+        """
+        Setup board. If isAI is True, Player 2 is computer.
+        """
+        self.rows = M
+        self.cols = N
+        self.k = K
+        self.board = [[0] * N for _ in range(M)]
+        self.current_player = 1  # Player 1 starts (human)
+        self.game_over = False
+        self.is_ai_enabled = isAI
+        self.ai_player = 2  # AI is Player 2
+
+    def move(self, i: int, j: int) -> int:
+        """
+        Human move at (i, j). If AI is on, AI moves immediately after.
+        """
+        if self.game_over:
+            print("Game is already over!")
+            return 0
+
+        # Place the mark
+        result = self._make_move(i, j)
+
+        if result != 0:  # Game ended (win or draw)
+            return result
+
+        # If AI is enabled and it's now AI's turn, make AI move
+        if self.is_ai_enabled and self.current_player == self.ai_player:
+            return self._ai_move()
+
+        return 0
+
+    def _make_move(self, i: int, j: int) -> int:
+        """
+        Helper to place mark and check result.
+        """
+        # Place the mark
+        self.board[i][j] = self.current_player
+
+        # Print the board
+        self._print_board()
+
+        # Check for winner
+        if self._check_win(i, j):
+            print(f"Player {self.current_player} won")
+            self.game_over = True
+            return self.current_player
+
+        # Check for draw
+        if self._is_board_full():
+            print("Draw")
+            self.game_over = True
+            return -1
+
+        # Switch player
+        self.current_player = 3 - self.current_player
+
+        return 0
+
+    def _ai_move(self) -> int:
+        """
+        AI logic: Win -> Block -> Random.
+        """
+        print(f"AI (Player {self.ai_player}) is thinking...")
+
+        # Strategy 1: Try to win
+        move = self._find_winning_move(self.ai_player)
+        if move:
+            print(f"AI plays at ({move[0]}, {move[1]})")
+            return self._make_move(move[0], move[1])
+
+        # Strategy 2: Block opponent from winning
+        opponent = 3 - self.ai_player
+        move = self._find_winning_move(opponent)
+        if move:
+            print(f"AI blocks at ({move[0]}, {move[1]})")
+            return self._make_move(move[0], move[1])
+
+        # Strategy 3: Random move
+        move = self._get_random_empty_cell()
+        if move:
+            print(f"AI plays at ({move[0]}, {move[1]})")
+            return self._make_move(move[0], move[1])
+
+        return 0
+
+    def _find_winning_move(self, player: int) -> Optional[Tuple[int, int]]:
+        """
+        Look for a move that wins immediately for 'player'.
+        """
+        for i in range(self.rows):
+            for j in range(self.cols):
+                if self.board[i][j] == 0:  # Empty cell
+                    # Try this move
+                    self.board[i][j] = player
+                    wins = self._check_win(i, j, player)
+                    self.board[i][j] = 0  # Undo
+
+                    if wins:
+                        return (i, j)
+
+        return None
+
+    def _get_random_empty_cell(self) -> Optional[Tuple[int, int]]:
+        """
+        Pick any empty spot.
+        """
+        empty_cells = []
+        for i in range(self.rows):
+            for j in range(self.cols):
+                if self.board[i][j] == 0:
+                    empty_cells.append((i, j))
+
+        return random.choice(empty_cells) if empty_cells else None
+
+    def _is_board_full(self) -> bool:
+        """Check if board is full."""
+        for row in self.board:
+            if 0 in row:
+                return False
+        return True
+
+    def _print_board(self):
+        """Print the board."""
+        symbols = {0: '   ', 1: ' X ', 2: ' O '}
+        print("\nBoard:")
+        for row in self.board:
+            print('|' + '|'.join(symbols[cell] for cell in row) + '|')
+        print()
+
+    def _check_win(self, row: int, col: int, player: Optional[int] = None) -> bool:
+        """
+        Check if 'player' won after a move at (row, col).
+        """
+        if player is None:
+            player = self.current_player
+
+        # Check all 4 directions
+        directions = [
+            (0, 1),   # Horizontal
+            (1, 0),   # Vertical
+            (1, 1),   # Main diagonal
+            (1, -1)   # Anti-diagonal
+        ]
+
+        for dr, dc in directions:
+            count = 1  # Count the current position
+
+            # Count in positive direction
+            count += self._count_consecutive(row, col, dr, dc, player)
+
+            # Count in negative direction
+            count += self._count_consecutive(row, col, -dr, -dc, player)
+
+            if count >= self.k:
+                return True
+
+        return False
+
+    def _count_consecutive(self, row: int, col: int, dr: int, dc: int, player: int) -> int:
+        """
+        Count consecutive marks in one direction.
+        """
+        count = 0
+        r, c = row + dr, col + dc
+
+        while 0 <= r < self.rows and 0 <= c < self.cols and self.board[r][c] == player:
+            count += 1
+            r += dr
+            c += dc
+
+        return count
+
+# Example usage
+if __name__ == "__main__":
+    print("=== Game with AI ===")
+    game = TicTacToeWithAI(3, 3, 3, isAI=True)
+
+    # Human player makes moves, AI responds automatically
+    game.move(0, 0)  # Human (Player 1)
+    # AI automatically responds
+
+    game.move(0, 1)  # Human (Player 1)
+    # AI automatically responds
+
+    game.move(0, 2)  # Human (Player 1) tries to win
+    # Game ends
+
+Example Output
+
+=== Game with AI ===
+
+Board:
+| X |   |   |
+|   |   |   |
+|   |   |   |
+
+AI (Player 2) is thinking...
+AI plays at (1, 1)
+
+Board:
+| X |   |   |
+|   | O |   |
+|   |   |   |
+
+Board:
+| X | X |   |
+|   | O |   |
+|   |   |   |
+
+AI (Player 2) is thinking...
+AI blocks at (0, 2)
+
+Board:
+| X | X | O |
+|   | O |   |
+|   |   |   |
+
+Performance Overview
+
+Basic Game
+
+Time: O(M × N) maximum. Each move takes O(max(M, N)).
+
+Space: O(M × N) to hold the grid.
+
+With AI
+
+Time: The AI is slower. It might take O(M × N × K) because it checks every empty spot to see if it's a winning move.
+
+Space: Same as above, O(M × N).
+
+Special Cases
+
+Full board (Draw): Return -1 or print "Draw" correctly.
+
+Small games: If K=2 and the board is 2x2, the game ends very fast.
+
+Impossible K: If K is larger than the board rows or columns, no one can win.
+
+Non-square boards: If M and N are different sizes, diagonals might be shorter.
+
+AI trapped: If the AI has no moves, handle the draw logic carefully.
+
+Important Takeaways
+
+Evaluation Points
+
+The Basics:
+
+Did you set up the board correctly?
+
+Do players switch turns correctly?
+
+Do you check all 4 directions for a win?
+
+Win Logic:
+
+You must check from the last move.
+
+Count marks going "forward" and "backward" from that spot.
+
+Common mistake: Only looking one way (like only looking right, but forgetting left).
+
+Code Style:
+
+Keep logic separate (one function for moves, one for checking wins).
+
+Use clear names for variables.
+
+Common Errors
+
+Bad Win Check: Not checking the negative direction (e.g., checking up but not down).
+
+Counting Errors: Forgetting to include the piece you just placed in the count.
+
+Board Data: Storing strings like "X" and "O" is okay, but numbers (1, 2) are often easier to manage.
+
+AI Loops: If the board is full, the AI might loop forever if you don't check for a draw first.
+
+Discussion Topics
+
+Detecting Draws Early: Can we tell it's a draw before the board is full?
+
+Yes, but it is hard to code. You would need to check if enough empty spots exist in a line to make K. For a simple interview, checking for a full board is enough.
+
+Large Boards: How to handle a 1000x1000 board?
+
+Don't use a 2D array. Use a HashMap to store only the moves made.
+
+When checking for a win, only look at spots near the last move.
+
+Smarter AI:
+
+Use the Minimax algorithm. It looks ahead at future turns to find the perfect move.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

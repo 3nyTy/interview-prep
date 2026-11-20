@@ -1,0 +1,53 @@
+===H1===
+Phone Screen: Service Dependency Topological Order
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/phone-screen-topological-dependency-order
+===BODY===
+Uber
+Coding·60 minMembers
+Phone Screen: Service Dependency Topological Order
+Phone-screen prompt, equivalent to LeetCode 207 / 210 (Course Schedule). Given a service dependency graph (initially acyclic), return a build order for a given target service. Follow-up handles cycles.
+SWE
+graph
+topological-sort
+dfs
+medium
+Frequency
+Medium
+Last asked
+2025-12-01
+Stage
+phone-screen
+Requirements
+
+Input: n services and a list of dependency pairs (a, b) meaning service a depends on service b (so b must be built first).
+
+Query: given a target service, return any valid build order containing all of that service's transitive dependencies and the service itself, in dependency-respecting order.
+
+Initial assumption: the dependency graph is acyclic.
+
+Notes
+
+Standard Kahn's algorithm (BFS on in-degree 0) or DFS-based topological sort.
+
+For a single-target query: run a reverse BFS from the target to collect the relevant subgraph, then topo-sort that subgraph. Naive full-graph sort works but is wasteful for sparse target subgraphs.
+
+Time O(V + E) on the relevant subgraph.
+
+Follow-up — cycles: detect with DFS coloring (white / grey / black) or by checking that Kahn's processes all visited nodes. On cycle, return "" or throw.
+
+This prompt has tripped multiple candidates because the interviewer pushes hard on exact time / space complexity; loose estimates fail. State O(V + E) and be ready to identify V and E in the problem.
+
+Preparation
+
+Drill LC 207 / 210 with both Kahn's and DFS-based implementations.
+
+Pre-write the cycle-detection variant; the follow-up is reported in roughly half of these rounds.
+
+Practice giving precise complexity bounds in the moment — "O(V + E) where V is services in the target's closure and E is edges among them" reads better than "O(n)".
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,590 @@
+{
+  "company": "twosigma",
+  "display_name": "Two Sigma",
+  "qbank_count": 16,
+  "questions_scraped": 16,
+  "site_total_count": 50,
+  "oj_count": 34,
+  "external_count": 0,
+  "description": "Two Sigma's loops split sharply by track: QR and data roles emphasize linear models, statistics, data-analysis case work, and domain reasoning, while SWE/QSE loops favor implementation-heavy trading, database, data-structure, and OOD prompts. The process is fast, high-variance, and often unforgiving on incomplete code or unclear statistical reasoning.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/twosigma",
+  "scraped_at": "2026-09-20",
+  "source": "1point3acres qbank (logged-in session)",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "qr-oa-linear-interpolator",
+      "title": "QR OA — Linear Interpolator",
+      "category": "coding",
+      "duration": "105 min",
+      "frequency": "High",
+      "last_asked": "2026-09-09",
+      "stage": "oa",
+      "access": "Free preview",
+      "roles": [
+        "RS",
+        "DS"
+      ],
+      "tags": [
+        "binary-search",
+        "math",
+        "linear-regression",
+        "medium"
+      ],
+      "roles_slug": [
+        "rs",
+        "ds"
+      ],
+      "tags_slug": [
+        "binary-search",
+        "math",
+        "linear-regression",
+        "medium"
+      ],
+      "overview": "Implement a piecewise linear interpolator from sorted knot points. The function must support interpolation inside the knot range, extrapolation outside the range, efficient lookup, and duplicate x-coordinate edge cases.",
+      "source_count": 9,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/twosigma/qr-oa-linear-interpolator"
+    },
+    {
+      "n": 2,
+      "slug": "qr-oa-nyc-temperature-regression",
+      "title": "QR OA — NYC Temperature Regression",
+      "category": "coding",
+      "duration": "105 min",
+      "frequency": "High",
+      "last_asked": "2026-09-09",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "rs",
+        "ds"
+      ],
+      "tags": [
+        "pandas",
+        "linear-regression",
+        "scikit-learn",
+        "feature-engineering",
+        "medium"
+      ],
+      "roles_slug": [
+        "rs",
+        "ds"
+      ],
+      "tags_slug": [
+        "pandas",
+        "linear-regression",
+        "scikit-learn",
+        "feature-engineering",
+        "medium"
+      ],
+      "overview": "Analyze daily town temperatures and use simple linear models to predict NYC temperature. The task mixes pandas-style aggregation, statistics, least-squares regression, MSE comparison, and greedy featu...",
+      "source_count": 9,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/twosigma/qr-oa-nyc-temperature-regression"
+    },
+    {
+      "n": 3,
+      "slug": "qr-oa-efficient-univariate-ols",
+      "title": "QR OA — Efficient Univariate OLS Regression",
+      "category": "coding",
+      "duration": "105 min",
+      "frequency": "Medium",
+      "last_asked": "2026-09-09",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "rs",
+        "ds"
+      ],
+      "tags": [
+        "linear-regression",
+        "streaming",
+        "pandas",
+        "math",
+        "medium"
+      ],
+      "roles_slug": [
+        "rs",
+        "ds"
+      ],
+      "tags_slug": [
+        "linear-regression",
+        "streaming",
+        "pandas",
+        "math",
+        "medium"
+      ],
+      "overview": "Compute no-intercept univariate OLS slopes, then update the slope over streaming or batched data using maintained sufficient statistics rather than refitting from scratch.",
+      "source_count": 6,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/twosigma/qr-oa-efficient-univariate-ols"
+    },
+    {
+      "n": 4,
+      "slug": "swe-oa-ipo-share-allocation",
+      "title": "SWE / QSE OA — IPO Share Allocation",
+      "category": "coding",
+      "duration": "120 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-23",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "queue",
+        "sorting",
+        "simulation",
+        "trading",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "queue",
+        "sorting",
+        "simulation",
+        "trading",
+        "medium"
+      ],
+      "overview": "Allocate IPO shares to bidders by descending price. Single bidders receive their requested amount up to remaining supply; tied price groups are allocated round-robin by timestamp until supply or group...",
+      "source_count": 7,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/twosigma/swe-oa-ipo-share-allocation"
+    },
+    {
+      "n": 5,
+      "slug": "swe-oa-sewer-tree-partition",
+      "title": "SWE / QSE OA — Sewer Tree Partition",
+      "category": "coding",
+      "duration": "120 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-23",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "tree",
+        "dfs",
+        "prefix-sum",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "dfs",
+        "prefix-sum",
+        "medium"
+      ],
+      "overview": "Given a rooted tree encoded by parent pointers and per-node input values, cut one edge / node partition so the absolute difference between the two resulting component sums is minimized.",
+      "source_count": 7,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/twosigma/swe-oa-sewer-tree-partition"
+    },
+    {
+      "n": 6,
+      "slug": "huffman-style-binary-encode-decode",
+      "title": "Huffman-Style Binary Encode / Decode",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-12-15",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "heap",
+        "tree",
+        "compression",
+        "binary-string",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "heap",
+        "tree",
+        "compression",
+        "binary-string",
+        "hard"
+      ],
+      "overview": "Build binary encodings for characters by constructing a frequency tree, then implement both encode and decode. The prompt is long and conceptually close to Huffman coding, with the main challenge bein...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/twosigma/huffman-style-binary-encode-decode"
+    },
+    {
+      "n": 7,
+      "slug": "maximum-independent-set-on-tree",
+      "title": "Maximum Independent Set on a Tree",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-11-18",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "tree",
+        "dp",
+        "graph",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "dp",
+        "graph",
+        "hard"
+      ],
+      "overview": "Given a social graph that is guaranteed to be a tree, select the largest possible group of people such that no two selected people know each other. Follow-up: remove the tree guarantee.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/twosigma/maximum-independent-set-on-tree"
+    },
+    {
+      "n": 8,
+      "slug": "palindrome-and-task-scheduling-round",
+      "title": "Palindrome Warmup + Two-Task Worker Scheduling",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-10-09",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "rs",
+        "ds"
+      ],
+      "tags": [
+        "palindromes",
+        "greedy",
+        "scheduling",
+        "medium"
+      ],
+      "roles_slug": [
+        "rs",
+        "ds"
+      ],
+      "tags_slug": [
+        "palindromes",
+        "greedy",
+        "scheduling",
+        "medium"
+      ],
+      "overview": "QR onsite coding round: start with palindrome checks, then generate the smallest palindrome greater than K, then reason verbally about assigning 2n workers across two tasks to minimize total time.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/twosigma/palindrome-and-task-scheduling-round"
+    },
+    {
+      "n": 9,
+      "slug": "maximum-product-path-in-complete-directed-graph",
+      "title": "Maximum Product Path in a Complete Directed Graph",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-10-09",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "rs",
+        "ds"
+      ],
+      "tags": [
+        "graph",
+        "bitmask",
+        "dp",
+        "math",
+        "hard"
+      ],
+      "roles_slug": [
+        "rs",
+        "ds"
+      ],
+      "tags_slug": [
+        "graph",
+        "bitmask",
+        "dp",
+        "math",
+        "hard"
+      ],
+      "overview": "Given a complete directed graph with positive edge weights, find the no-repeated-node path that maximizes the product of edge weights. The candidate recognized the exponential nature and considered lo...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/twosigma/maximum-product-path-in-complete-directed-graph"
+    },
+    {
+      "n": 10,
+      "slug": "order-matching-engine",
+      "title": "Order Matching Engine",
+      "category": "coding",
+      "duration": "30 min",
+      "frequency": "Low",
+      "last_asked": "2026-05-12",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe",
+        "mle"
+      ],
+      "tags": [
+        "order-book",
+        "heap",
+        "trading",
+        "data-structure",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "order-book",
+        "heap",
+        "trading",
+        "data-structure",
+        "medium"
+      ],
+      "overview": "Implement a simplified stock exchange that matches buy and sell orders by price-time priority, handles partial fills, and maintains an order book.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/twosigma/order-matching-engine"
+    },
+    {
+      "n": 11,
+      "slug": "in-memory-sql-like-database",
+      "title": "In-Memory SQL-Like Database",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-04-07",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "in-memory-database",
+        "sql",
+        "parsing",
+        "data-structure",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "in-memory-database",
+        "sql",
+        "parsing",
+        "data-structure",
+        "medium"
+      ],
+      "overview": "Build an in-memory database that supports creating tables, inserting integer rows, and selecting rows with AND-combined predicates over comparison operators.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/twosigma/in-memory-sql-like-database"
+    },
+    {
+      "n": 12,
+      "slug": "add-two-strings-with-single-digit-adder",
+      "title": "Add Two Strings with a Single-Digit Adder",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-02-18",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "rs",
+        "ds"
+      ],
+      "tags": [
+        "string",
+        "simulation",
+        "easy"
+      ],
+      "roles_slug": [
+        "rs",
+        "ds"
+      ],
+      "tags_slug": [
+        "string",
+        "simulation",
+        "easy"
+      ],
+      "overview": "Given only a helper that can add two single digits, implement addition for two non-negative integer strings. The live round expects careful carry handling and time/space complexity explanation.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/twosigma/add-two-strings-with-single-digit-adder"
+    },
+    {
+      "n": 13,
+      "slug": "hashmap-from-scratch",
+      "title": "HashMap from Scratch",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2025-11-13",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "hashmap",
+        "linked-list",
+        "data-structure",
+        "oop-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "hashmap",
+        "linked-list",
+        "data-structure",
+        "oop-design",
+        "medium"
+      ],
+      "overview": "Implement a hashmap without using built-in hash-table libraries. The round centers on buckets, collision handling, resizing, hash-function tradeoffs, and clean get/put semantics.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/twosigma/hashmap-from-scratch"
+    },
+    {
+      "n": 14,
+      "slug": "qr-statistics-domain-oral",
+      "title": "QR Statistics / Domain Knowledge Oral",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-02-18",
+      "stage": "onsite-research",
+      "access": "Members",
+      "roles": [
+        "rs",
+        "ds"
+      ],
+      "tags": [
+        "probability",
+        "linear-algebra",
+        "linear-regression",
+        "expected-value",
+        "math-reasoning",
+        "hard"
+      ],
+      "roles_slug": [
+        "rs",
+        "ds"
+      ],
+      "tags_slug": [
+        "probability",
+        "linear-algebra",
+        "linear-regression",
+        "expected-value",
+        "math-reasoning",
+        "hard"
+      ],
+      "overview": "Math-heavy oral round covering statistics, regression, Markov chains, random graph expectations, and candidate-specific domain knowledge. The interviewer expects derivations, not just concept names.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/twosigma/qr-statistics-domain-oral"
+    },
+    {
+      "n": 15,
+      "slug": "qr-data-analysis-prediction-case",
+      "title": "QR Data Analysis Prediction Case",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-02-18",
+      "stage": "onsite-research · onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "rs",
+        "ds"
+      ],
+      "tags": [
+        "data-analysis",
+        "linear-regression",
+        "feature-engineering",
+        "experiment-design",
+        "open-ended",
+        "medium"
+      ],
+      "roles_slug": [
+        "rs",
+        "ds"
+      ],
+      "tags_slug": [
+        "data-analysis",
+        "linear-regression",
+        "feature-engineering",
+        "experiment-design",
+        "open-ended",
+        "medium"
+      ],
+      "overview": "Open-ended data-analysis round: define features, targets, models, and evaluation for a prediction problem such as housing prices, CitiBike demand, rental price, stock price from search/social data, or...",
+      "source_count": 6,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/twosigma/qr-data-analysis-prediction-case"
+    },
+    {
+      "n": 16,
+      "slug": "genai-quant-swe-manager-deep-dive",
+      "title": "GenAI Quant SWE Manager Deep Dive",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-05-12",
+      "stage": "final-round · onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "mle",
+        "swe"
+      ],
+      "tags": [
+        "llm",
+        "lora",
+        "agentic-workflow",
+        "evaluation",
+        "technical-deep-dive",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "swe"
+      ],
+      "tags_slug": [
+        "llm",
+        "lora",
+        "agentic-workflow",
+        "evaluation",
+        "technical-deep-dive",
+        "medium"
+      ],
+      "overview": "Manager round for a GenAI / quant-infra SWE role, focused on practical LLM fine-tuning tradeoffs, production agent frameworks, prior scope, scale, latency, quality, cost, and reliability decisions.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/twosigma/genai-quant-swe-manager-deep-dive"
+    }
+  ]
+}

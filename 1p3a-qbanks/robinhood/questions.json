@@ -1,0 +1,457 @@
+{
+  "company": "robinhood",
+  "display_name": "Robinhood",
+  "qbank_count": 13,
+  "questions_scraped": 13,
+  "site_total_count": 40,
+  "oj_count": 27,
+  "external_count": 0,
+  "description": "Robinhood's loop leans on a small, stable bank of recurring problems: a graph load-factor / referral-count coding question, a Job Scheduler system design, and a stock-quote / trading-system design. Onsites pair these with a project deep dive that is graded as hard as the technical rounds, and interviewers consistently reward complete, edge-case-correct code over elegant-but-unfinished design.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/robinhood",
+  "scraped_at": "2026-09-20",
+  "source": "1point3acres qbank (logged-in session)",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "service-load-factor-referral-count",
+      "title": "Service Load Factor / Referral Count",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "High",
+      "last_asked": "2026-09-04",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "graph",
+        "dfs",
+        "topological-sort",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "graph",
+        "dfs",
+        "topological-sort",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Given a dependency (or referral) DAG, compute for each node the number of unique nodes that directly or indirectly depend on it. Robinhood's most frequent coding screen; shows up under several names (...",
+      "source_count": 9,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/robinhood/service-load-factor-referral-count"
+    },
+    {
+      "n": 2,
+      "slug": "chainable-rectangle-manipulation-api",
+      "title": "Chainable Rectangle Manipulation API",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-03",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "javascript",
+        "dom",
+        "async",
+        "frontend",
+        "oop-design",
+        "api-design"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "javascript",
+        "dom",
+        "async",
+        "frontend",
+        "oop-design",
+        "api-design"
+      ],
+      "overview": "Implement a chainable JavaScript class for selecting rectangles in a supplied 3-by-3 HTML grid, changing their color, delaying subsequent actions, and shifting them while preserving method-chain execu...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/robinhood/chainable-rectangle-manipulation-api"
+    },
+    {
+      "n": 3,
+      "slug": "analytics-engineer-sql-python",
+      "title": "Analytics Engineer: SQL + Python Sessionization",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-03-06",
+      "stage": "tech-screen",
+      "access": "Members",
+      "roles": [
+        "ds"
+      ],
+      "tags": [
+        "sql",
+        "python",
+        "data-analysis",
+        "csv"
+      ],
+      "roles_slug": [
+        "ds"
+      ],
+      "tags_slug": [
+        "sql",
+        "python",
+        "data-analysis",
+        "csv"
+      ],
+      "overview": "Analytics Engineer technical: SQL over a sharded user table plus its edit log to answer time-windowed residency questions, then a Python task to sessionize an event log with a 30-minute cap.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/robinhood/analytics-engineer-sql-python"
+    },
+    {
+      "n": 4,
+      "slug": "security-coding-constrained-ds-validation",
+      "title": "Security-Flavored Coding: Constrained Data Structure & Input Validation",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-09",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "security",
+        "data-structure",
+        "string",
+        "concurrency"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "security",
+        "data-structure",
+        "string",
+        "concurrency"
+      ],
+      "overview": "Staff security-track coding: implement a resource-constrained data structure and a hardened string validator, with the interviewer repeatedly probing behavior under high concurrency, malicious input, ...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/robinhood/security-coding-constrained-ds-validation"
+    },
+    {
+      "n": 5,
+      "slug": "word-frequency-large-paragraph",
+      "title": "Word Frequency from a Large Paragraph",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-09-11",
+      "stage": "tech-screen",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "string-processing",
+        "parsing",
+        "hashmap",
+        "sorting",
+        "memory-bounded",
+        "parallelism",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string-processing",
+        "parsing",
+        "hashmap",
+        "sorting",
+        "memory-bounded",
+        "parallelism",
+        "medium"
+      ],
+      "overview": "Parse a potentially very large string into case-insensitive words, ignore punctuation, count occurrences, and return formatted word/count entries sorted by frequency. Follow-ups move from the in-memor...",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/robinhood/word-frequency-large-paragraph"
+    },
+    {
+      "n": 6,
+      "slug": "fractional-share-inventory",
+      "title": "Fractional Share Buy/Sell Inventory",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Low",
+      "last_asked": "2026-09-03",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "hashmap",
+        "simulation",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "hashmap",
+        "simulation",
+        "easy"
+      ],
+      "overview": "Process a sequence of fractional-share buy/sell operations and maintain the resulting inventory. A recurring Robinhood screen/onsite coding problem solvable with a hashmap.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/robinhood/fractional-share-inventory"
+    },
+    {
+      "n": 7,
+      "slug": "friend-money-transfer-ood",
+      "title": "Friend / Money-Transfer Request Parsing (OOD)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-07-20",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "oop-design",
+        "parsing",
+        "simulation",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "oop-design",
+        "parsing",
+        "simulation",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Parse a stream of request strings (sign up, send/acknowledge friend request, send money) into a small object model and output each user's final balance, validating invalid requests. Graded on working,...",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/robinhood/friend-money-transfer-ood"
+    },
+    {
+      "n": 8,
+      "slug": "weekly-calendar-react",
+      "title": "Weekly Calendar (React)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-05-09",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "frontend",
+        "react",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "frontend",
+        "react",
+        "medium"
+      ],
+      "overview": "Frontend coding round: build a 7-day weekly calendar grid in React where clicking a time cell opens a dialog to create a named event. Graded heavily on state management and avoiding two sources of tru...",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/robinhood/weekly-calendar-react"
+    },
+    {
+      "n": 9,
+      "slug": "job-scheduler-design",
+      "title": "Job Scheduler System Design",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-09-03",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Free preview",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "system-design",
+        "job-system",
+        "scheduling",
+        "idempotency",
+        "retry",
+        "distributed-systems"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "system-design",
+        "job-system",
+        "scheduling",
+        "idempotency",
+        "retry",
+        "distributed-systems"
+      ],
+      "overview": "Design a distributed job scheduler that runs typed jobs under an SLA, surfaces failures and logs, and guarantees each job runs at most once. The anchor Robinhood system-design prompt, especially for Senior+; often delivered nearly word-for-word and open-book.",
+      "source_count": 7,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/robinhood/job-scheduler-design"
+    },
+    {
+      "n": 10,
+      "slug": "stock-trading-quote-system-design",
+      "title": "Stock Trading / Real-Time Quote System Design",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-04-23",
+      "stage": "phone-screen · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "system-design",
+        "trading",
+        "api-integration",
+        "scaling",
+        "data-modeling"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "system-design",
+        "trading",
+        "api-integration",
+        "scaling",
+        "data-modeling"
+      ],
+      "overview": "Design Robinhood's core stock product: place buy/sell orders against an external exchange API and/or serve real-time quotes and historical price ranges. The second fixed system-design prompt alongside...",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/robinhood/stock-trading-quote-system-design"
+    },
+    {
+      "n": 11,
+      "slug": "photo-album-frontend-design",
+      "title": "Photo Album Frontend System Design",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-05-09",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "frontend",
+        "react",
+        "data-modeling",
+        "system-design"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "frontend",
+        "react",
+        "data-modeling",
+        "system-design"
+      ],
+      "overview": "Frontend-flavored system design for a photo-album app: album list, album detail with add/rename, and a photo-info view, with cross-device real-time sync. Centers on state management and data normaliza...",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/robinhood/photo-album-frontend-design"
+    },
+    {
+      "n": 12,
+      "slug": "recruiter-hr-screen",
+      "title": "Recruiter / HR Screen",
+      "category": "behavioral",
+      "duration": "30 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-16",
+      "stage": "recruiter-screen",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "behavioral",
+        "recruiter",
+        "screening",
+        "why-company"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "behavioral",
+        "recruiter",
+        "screening",
+        "why-company"
+      ],
+      "overview": "A ~15-minute recruiter/HR call covering motivation, logistics, and light behavioral signals. Treated as a real screen, not a formality — a fast reject can follow when there's no headcount.",
+      "source_count": 7,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/robinhood/recruiter-hr-screen"
+    },
+    {
+      "n": 13,
+      "slug": "project-deep-dive",
+      "title": "Project Deep Dive",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-09-03",
+      "stage": "onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "deep-dive",
+        "behavioral"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "deep-dive",
+        "behavioral"
+      ],
+      "overview": "A near-universal onsite round: present a past project in depth and defend its design under detailed questioning. Graded as rigorously as the technical rounds and a frequent reason candidates fail.",
+      "source_count": 12,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/robinhood/project-deep-dive"
+    }
+  ]
+}

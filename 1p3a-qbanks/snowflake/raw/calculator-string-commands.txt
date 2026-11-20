@@ -1,0 +1,121 @@
+===H1===
+String-Command Calculator
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/calculator-string-commands
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+String-Command Calculator
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+·
+45 min
+Members
+String-Command Calculator
+
+Implement a calculator that consumes a stream of string commands (`ADD 2`, `MULT 3`, ...) and returns the running result. The follow-up nests a calculation inside another (parenthesized sub-expression).
+
+SWE
+parsing
+recursion
+stack
+string-processing
+medium
+Frequency
+Single report
+Last asked
+2026-02-26
+Stage
+phone-screen · onsite-coding
+Requirements
+Input: sequence of commands, each a (operator, operand) pair encoded as a string like "ADD 2", "SUB 5", "MULT 3", "DIV 4".
+Maintain a running accumulator that starts at 0 (or 1 for multiplicative-only sequences; clarify with the interviewer).
+After each command, return or store the updated accumulator.
+Follow-up: a command's operand can itself be a nested sub-expression of commands ("calculate this list of commands first, then apply MULT with its result"). Recursive evaluation required.
+Notes
+The base version is a one-pass tokenizer + accumulator: split each command on whitespace, dispatch on the operator string, update the accumulator.
+For the nested follow-up, the natural shape is recursive descent: when a command's operand position contains a sub-expression marker (parentheses or a leading sentinel), recursively evaluate the inner command list and use the result as the operand.
+Operator precedence is generally not part of the prompt — commands apply left-to-right against the accumulator. Confirm this explicitly; if precedence is required, the round becomes a full expression-evaluator (shunting-yard) instead.
+Time discipline matters: candidates frequently spend too long on input parsing and run out of time for the nested follow-up. Pre-write a tokenizer helper on the side.
+Edge cases: empty command list, division by zero, unknown operator (raise or return current accumulator?), nested expression that produces a non-numeric (shouldn't happen in this prompt but worth a guard).
+Preparation
+Implement the flat command processor first; verify on a 4-5 command sequence by hand.
+Add a recursive sub-expression evaluator that consumes the same command grammar.
+Drill the time-budget: set a 10-minute timer for the flat version so the nested follow-up has room.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Preparation
+Related discussions · 1
+🔑雪花mid level滇缅
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Grep With Context Lines
+Single report
+string-processing
+parsing
+medium
++1
+Serialize and Deserialize Dictionary Trie
+Single report
+parsing
+medium
+trie
++2
+Longest Univalue Path
+Single report
+recursion
+medium
+tree
++1
+Frontend Grid: Robot Eats Candies
+Single report
+medium
+frontend
+bfs
++2
+Min Coins to Pay with Change Allowed
+Single report
+medium
+dp
+greedy
++1
+Code editor

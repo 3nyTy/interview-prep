@@ -1,0 +1,80 @@
+===H1===
+Cloud / Domain Knowledge Oral Round (GCP / AWS / K8s)
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/cloud-domain-knowledge-round
+===BODY===
+Salesforce
+Other·45 minMembers
+Cloud / Domain Knowledge Oral Round (GCP / AWS / K8s)
+Salesforce GCP / Public-Cloud-team loops include a dedicated domain-knowledge round drilling on cloud platform internals and Kubernetes — even if the candidate's background is on a different cloud. Concept fluency on K8s, cloud pipelines, and (where relevant) cloud-migration experience.
+SWE
+Infra Eng
+domain-knowledge
+cs-fundamentals
+infra
+cloud
+verbal
+medium
+Frequency
+Low
+Last asked
+2026-03-04
+Stage
+phone-screen · tech-screen
+Requirements
+
+Verbal-only round; no coding (but interviewers may sketch on the shared whiteboard).
+
+Topics drilled vary by team:
+
+Kubernetes fundamentals: pods vs deployments vs services, scheduling, autoscaling (HPA / VPA / Cluster Autoscaler), networking (CNI, services, ingress), storage (PV / PVC / StorageClass), troubleshooting (kubectl describe, events, common pod failure modes).
+
+Cloud platform: GCP-equivalents are weighted on GCP team loops; AWS-equivalents on candidates with AWS background. EC2 / GCE, S3 / GCS, IAM, VPC, security groups / firewall rules, load balancers, managed databases. Operational detail ("how do you actually set up Y") not just concepts.
+
+CI/CD and pipelines: deployment pipelines, blue-green vs canary, infra-as-code (Terraform, Pulumi), GitOps (ArgoCD, Flux).
+
+Cloud migration: specific to candidates who have done one — what got migrated, how data was moved, what broke, how it was validated.
+
+Domain-specific architectures: e.g. pipeline system design for the GCP organisation.
+
+Round structure: rapid-fire concept questions for 15-20 minutes, then one or two open-ended scenario / architecture questions ("design a deployment pipeline for X", "diagnose this incident").
+
+Notes
+
+K8s answers interviewers reward:
+
+Pod lifecycle (Pending → ContainerCreating → Running → Succeeded/Failed/CrashLoopBackoff). Common failure modes per state.
+
+Difference between Deployment, StatefulSet, DaemonSet — and when each is right.
+
+Service types (ClusterIP, NodePort, LoadBalancer, ExternalName, headless service).
+
+Scheduling: requests vs limits, taints / tolerations, node affinity, pod-affinity / anti-affinity.
+
+Autoscaling: HPA (per-pod horizontal), VPA (per-pod vertical), CA (node count). Know which signal each consumes.
+
+Cloud answers: know the difference between region / zone / AZ, object storage consistency (S3 strong read-after-write since 2020), managed-DB failover semantics, IAM role assumption flow. Salesforce GCP team interviewers explicitly probe on whichever cloud the candidate's resume lists — don't bluff on a cloud you haven't operated.
+
+Cloud migration: be specific about what data, what cutover strategy (dual-write, shadow read, hard cutover), what monitoring you added during cutover, what rolled back. "We did a cloud migration" with no specifics is the failure mode here.
+
+Pipeline system design: same expectations as a regular SD round (ingestion → processing → serving), but the interviewer expects you to name concrete cloud services.
+
+Cross-cloud probing happens: an AWS-experienced candidate may be asked AWS questions and judged on whether they actually know AWS deeply, not on whether they know GCP. Honesty about cloud experience scores better than improvisation.
+
+Preparation
+
+Refresh K8s fundamentals: CKAD-style flashcards (objects, controllers, networking, storage, troubleshooting).
+
+For each cloud you list on your resume, be able to walk through one full architecture you built end-to-end — services used, scale, what you'd do differently.
+
+If migration experience is on your resume, prep a 5-minute migration story with timeline, blockers, rollback plan, validation.
+
+Refresh one IaC tool (Terraform) at the level of: how state works, how plan/apply differs, how to handle drift, how to manage multi-environment workspaces.
+
+For the pipeline SD sub-prompt, have a Kafka / Pub-Sub → Flink / Dataflow → BigQuery / Snowflake reference architecture ready.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

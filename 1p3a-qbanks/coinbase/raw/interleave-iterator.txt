@@ -1,0 +1,380 @@
+===H1===
+Interleave Iterator (Round-Robin + Iterator Pattern)
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/interleave-iterator
+===BODY===
+Coinbase
+CodingMembers
+Interleave Iterator (Round-Robin + Iterator Pattern)
+Build an interleaving system that round-robins across multiple integer sources. Part 1 flattens a list of arrays by taking turns; Part 2 defines an Iterator interface with list-backed and range-backed implementations; Part 3 composes them into an InterleaveIterator that cycles across underlying iterators and drops each as it exhausts. Tests iterator-pattern fluency and clean OOD more than algorithms.
+SWE
+iterator
+object-design
+oop-design
+queue
+data-structure
+medium
+Frequency
+Single report
+Last asked
+2026-02-13
+Stage
+onsite-coding
+Interleave Iterator
+
+Overview
+
+In this problem, we will build a system to mix (interleave) numbers from different sources. We will do this in three steps:
+
+Write a simple function to mix arrays.
+
+Create basic Iterators.
+
+Build a complex Interleave Iterator that manages multiple iterators at once.
+
+This tests if you understand the Iterator Pattern and how to design clean code.
+
+Step 1: Simple Array Mixing
+
+The Task
+
+You are given a list of arrays. Your job is to create a single flat array. You must take one number from each array in order (round-robin). If an array runs out of numbers, skip it and keep going with the others.
+
+def interleave(arrays: list[list[int]]) -> list[int]:
+    """
+    Mix elements from multiple arrays by taking turns.
+
+    Args:
+        arrays: A list of integer arrays.
+
+    Returns:
+        A single list with mixed elements.
+
+    Examples:
+        interleave([[1, 2, 3], [6], [7, 8]])
+        # Returns: [1, 6, 7, 2, 8, 3]
+    """
+    pass
+
+How It Works
+
+Input: [[1, 2, 3], [6], [7, 8]]
+
+Round 1: Take index 0 from each -> 1, 6, 7
+Round 2: Take index 1 from each (skip [6], it is empty) -> 2, 8
+Round 3: Take index 2 from each (skip the empty ones) -> 3
+
+Output: [1, 6, 7, 2, 8, 3]
+
+Solution Code
+
+def interleave(arrays: list[list[int]]) -> list[int]:
+    result = []
+    # Find the length of the longest array
+    max_len = max((len(a) for a in arrays), default=0)
+
+    for i in range(max_len):
+        for a in arrays:
+            if i < len(a):
+                result.append(a[i])
+
+    return result
+
+Complexity Breakdown:
+
+AspectComplexity
+TimeO(N) where N is the total number of elements
+SpaceO(N) for the result list
+
+Step 2: Building Basic Iterators
+
+The Task
+
+Interviewer: "Now, let's use the Iterator Pattern. Please define a base interface and two specific classes."
+
+You need to build:
+
+Iterator Interface: A base class with has_next() and get_next().
+
+ListIterator: An iterator that goes through a standard list.
+
+RangeIterator: An iterator that counts from a start number to an end number (like Python's range()).
+
+from abc import ABC, abstractmethod
+
+class Iterator(ABC):
+    @abstractmethod
+    def has_next(self) -> bool:
+        """Return True if there are more items."""
+        pass
+
+    @abstractmethod
+    def get_next(self) -> int:
+        """Return the next item. Raise StopIteration if empty."""
+        pass
+
+class ListIterator(Iterator):
+    def __init__(self, items: list[int]):
+        pass
+
+    def has_next(self) -> bool:
+        pass
+
+    def get_next(self) -> int:
+        pass
+
+class RangeIterator(Iterator):
+    def __init__(self, start: int, end: int):
+        pass
+
+    def has_next(self) -> bool:
+        pass
+
+    def get_next(self) -> int:
+        pass
+
+Solution Code
+
+from abc import ABC, abstractmethod
+
+class Iterator(ABC):
+    @abstractmethod
+    def has_next(self) -> bool:
+        pass
+
+    @abstractmethod
+    def get_next(self) -> int:
+        pass
+
+class ListIterator(Iterator):
+    def __init__(self, items: list[int]):
+        self.items = items
+        self.index = 0
+
+    def has_next(self) -> bool:
+        return self.index < len(self.items)
+
+    def get_next(self) -> int:
+        if not self.has_next():
+            raise StopIteration("No more elements")
+        val = self.items[self.index]
+        self.index += 1
+        return val
+
+class RangeIterator(Iterator):
+    def __init__(self, start: int, end: int):
+        self.current = start
+        self.end = end
+
+    def has_next(self) -> bool:
+        return self.current < self.end
+
+    def get_next(self) -> int:
+        if not self.has_next():
+            raise StopIteration("No more elements")
+        val = self.current
+        self.current += 1
+        return val
+
+Complexity Breakdown:
+
+Classhas_next()get_next()Space
+ListIteratorO(1)O(1)O(1) extra
+RangeIteratorO(1)O(1)O(1)
+
+Step 3: The Interleave Iterator
+
+The Task
+
+Interviewer: "Combine Step 1 and Step 2. Create a class that takes a list of Iterators and mixes their output."
+
+You must create InterleaveIterator. It should cycle through a list of other iterators. It takes one item from the first iterator, then one from the second, and so on. If an iterator runs out, it is removed from the rotation.
+
+How It Works
+
+Iterators:
+  it1 = ListIterator([1, 2, 3])
+  it2 = RangeIterator(10, 12)   -> yields 10, 11
+  it3 = ListIterator([20])
+
+Round 1: it1->1, it2->10, it3->20
+Round 2: it1->2, it2->11, it3 is empty (skip)
+Round 3: it1->3, it2 is empty (skip), it3 is empty (skip)
+
+Output sequence: 1, 10, 20, 2, 11, 3
+
+Solution Code
+
+from collections import deque
+
+class InterleaveIterator(Iterator):
+    def __init__(self, iterators: list[Iterator]):
+        self.queue = deque()
+        # Only add iterators that actually have data
+        for it in iterators:
+            if it.has_next():
+                self.queue.append(it)
+
+    def has_next(self) -> bool:
+        return len(self.queue) > 0
+
+    def get_next(self) -> int:
+        if not self.has_next():
+            raise StopIteration("No more elements")
+
+        # Take the first iterator from the front
+        it = self.queue.popleft()
+        val = it.get_next()
+
+        # If it still has data, put it back at the end
+        if it.has_next():
+            self.queue.append(it)
+
+        return val
+
+Full Working Code
+
+from abc import ABC, abstractmethod
+from collections import deque
+
+class Iterator(ABC):
+    @abstractmethod
+    def has_next(self) -> bool:
+        pass
+
+    @abstractmethod
+    def get_next(self) -> int:
+        pass
+
+class ListIterator(Iterator):
+    def __init__(self, items: list[int]):
+        self.items = items
+        self.index = 0
+
+    def has_next(self) -> bool:
+        return self.index < len(self.items)
+
+    def get_next(self) -> int:
+        if not self.has_next():
+            raise StopIteration
+        val = self.items[self.index]
+        self.index += 1
+        return val
+
+class RangeIterator(Iterator):
+    def __init__(self, start: int, end: int):
+        self.current = start
+        self.end = end
+
+    def has_next(self) -> bool:
+        return self.current < self.end
+
+    def get_next(self) -> int:
+        if not self.has_next():
+            raise StopIteration
+        val = self.current
+        self.current += 1
+        return val
+
+class InterleaveIterator(Iterator):
+    def __init__(self, iterators: list[Iterator]):
+        self.queue = deque()
+        for it in iterators:
+            if it.has_next():
+                self.queue.append(it)
+
+    def has_next(self) -> bool:
+        return len(self.queue) > 0
+
+    def get_next(self) -> int:
+        if not self.has_next():
+            raise StopIteration
+        it = self.queue.popleft()
+        val = it.get_next()
+        if it.has_next():
+            self.queue.append(it)
+        return val
+
+# --- Usage Example ---
+
+it1 = ListIterator([1, 2, 3])
+it2 = RangeIterator(10, 12)  # yields 10, 11
+it3 = ListIterator([20])
+
+interleave = InterleaveIterator([it1, it2, it3])
+
+result = []
+while interleave.has_next():
+    result.append(interleave.get_next())
+
+print(result)  # Output: [1, 10, 20, 2, 11, 3]
+
+Why use a queue?
+We use a deque (queue) to manage the turns.
+
+Pop an iterator from the front.
+
+Get a number from it.
+
+If it still has numbers, push it to the back.
+
+If it is empty, do nothing (it drops out).
+
+This is better than checking an index because we never waste time checking empty iterators.
+
+Complexity Breakdown:
+
+MethodTimeSpace
+__init__O(K) where K = number of iteratorsO(K) for the queue
+has_nextO(1)O(1)
+get_nextO(1) amortizedO(1)
+
+Common Follow-Up Questions
+
+Why did you use a queue instead of an index?
+If you use an index (like current_index % total), you have to scan over empty iterators every time. This can be slow. With a queue, we physically remove empty iterators, so get_next() is always O(1).
+
+How would you handle multiple threads?
+If many threads call get_next() at the same time, it could break. You should add a lock inside get_next(). This ensures only one thread changes the queue at a time.
+
+Lazy vs Eager Loading:
+
+Lazy (Step 3): We only fetch numbers when asked. This is good for huge datasets or infinite lists.
+
+Eager (Step 1): We build the whole list at the start. This is good if you need the data immediately and it fits in memory.
+
+Infinite Iterators:
+What if one iterator never ends? This code still works. That iterator will just stay in the queue forever, and the InterleaveIterator will never stop producing numbers.
+
+Summary Table
+
+PartApproachTimeSpace
+Step 1Nested loopO(N)O(N)
+Step 2Simple IteratorsO(1) per callO(1) extra
+Step 3Queue-based IteratorO(1) per callO(K) where K = iterators
+
+Note: N is total elements, K is number of iterators.
+
+Candidate-Report Notes
+
+Drive Part 3 with a queue of live iterators, not a modular index. Pop the front iterator, take one value, and if it still has_next() push it back to the tail; otherwise let it fall out. This keeps get_next() O(1) amortized — an index-mod-k scheme has to scan past already-dead iterators and degrades as sources exhaust.
+
+Seed the queue lazily: only enqueue an underlying iterator if it is non-empty at construction, so an all-empty input reports has_next() == False immediately.
+
+Part 1 is the warm-up, Part 2 is the contract. The signal in Part 2 is a clean abstract base plus two implementations that don't leak their backing representation — RangeIterator must count, not build the list. Candidates lose points by special-casing instead of programming to the interface.
+
+Likely follow-ups: thread-safety (guard the shared queue with a lock so concurrent get_next() calls don't corrupt it) and behavior under an infinite iterator (it simply never leaves the rotation, so the interleaver never terminates — which is the correct behavior, not a bug).
+
+Preparation
+
+Pre-write the Iterator base + ListIterator + RangeIterator from memory so Part 2 costs under 5 minutes and you spend the round on Part 3.
+
+Drill the deque-rotation pattern (popleft → get_next → append if has_next) until reflexive; it is the whole trick of Part 3 and recurs in any "round-robin across streams" prompt.
+
+Rehearse the one-sentence justification for queue-over-index (O(1) amortized vs scanning dead iterators) and the lock-based thread-safety answer — both are the standard follow-ups.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

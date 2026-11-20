@@ -1,0 +1,149 @@
+===H1===
+Closest Bathroom / Desk on a Grid
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/closest-bathroom-desk-grid
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Closest Bathroom / Desk on a Grid
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+·
+60 min
+Free preview
+Closest Bathroom / Desk on a Grid
+
+Given a 2-D grid with cells marked `B` (bathroom), `D` (desk), and `_` (empty), return the shortest distance from each desk to its nearest bathroom under 4-directional movement. Variants use a 1-D array to find the nearest target value or character; follow-ups extend to global assignment and streaming input.
+
+SWE
+bfs
+grid
+two-pointer
+heap
+medium
+Frequency
+High
+Last asked
+2026-07-17
+Stage
+phone-screen · onsite-coding
+Requirements
+2-D grid input where each cell is one of B, D, _.
+For every D cell, output the Manhattan / step distance to the nearest B cell (4-directional movement, no obstacles in the base case).
+1-D variant: array of {0, 1, 2} where 0 = empty, 1 = person, 2 = cake. Return the minimum distance between any person and any cake.
+Character-array variant: given an array containing values such as a, b, and c, find the nearest c for each relevant position. Start with a precomputed representation, then discuss how the contract changes when values arrive as a stream.
+Follow-up (Global Assignment): pair every person with a unique cake so the total walking distance is minimized. If there are more people than cakes, the assignment is impossible. Given a target person index, return which cake that person receives in the globally optimal assignment.
+The interviewer typically does not provide a function signature or example I/O — both must be clarified before coding.
+Own test cases expected.
+Examples
+
+1-D variant:
+
+input  = [0, 1, 0, 0, 2, 0, 1]
+output = 2   # person at index 6, cake at index 4
+
+Notes
+The 2-D base case is the canonical multi-source BFS: seed the queue with every B cell at distance 0, then expand outward writing the first-reached distance into each D cell. One pass, O(R × C) time and space.
+A single-source BFS per desk also works but is O(D × R × C); interviewers will push toward multi-source if the brute-force version is presented first.
+The 1-D variant is a one-pass two-pointer sweep: track the most recent person index and most recent cake index; whenever the cell currently being scanned belongs to the opposite kind, update the running minimum.
+The Global Assignment follow-up is materially harder than it looks. A clean approach collects sorted person and cake indices and runs dynamic programming: dp[i][j] is the minimum total distance to match the first i people using the first j cakes. The transition either skips cake j or matches it to person i; backtracking reconstructs the queried person-to-cake assignment.
+Common stumbling points: forgetting that empty grids and grids with no D cells are valid inputs; in the 1-D variant, off-by-one when both 1 and 2 occur at the same index in different test cases.
+A point-to-point variant hands you an m x n grid of 0/1 and a start and target cell, asking for the shortest path that never steps on a 1. This is plain single-source BFS, and interviewers frequently ask you to justify why BFS rather than DFS gives the shortest path. The {0, 1, 2} array (empty / person / cake) version then asks for the nearest-opposite distance of each person and cake — the same one-pass sweep. One AI-team screen ran both back to back and stated up front that no AI tools were allowed.
+The character-array version explicitly invites a precomputation-first solution before moving to streaming semantics. Clarify whether earlier answers may be revised after a future target arrives and what output latency the stream requires.
+Preparation
+Implement the 2-D multi-source BFS from scratch, then re-implement it using only an in-place distance grid (no separate visited set).
+Implement the 1-D two-pointer sweep, then prove its correctness by induction on the running minimum.
+Drill the Global Assignment follow-up: heap of (distance, person, cake) tuples plus two visited sets, then walk through a 4-person 4-cake example by hand.
+Practice driving the prompt with no signature given: ask up-front about grid bounds, whether walls exist, whether multiple bathrooms / cakes can coexist, what to return when no path exists.
+One-dimensional cake assignment variant
+A precise one-dimensional variant splits the prompt into two tasks. Task 1 receives A: list[int] where 1 marks a cake plus a start index, and returns the nearest cake distance from start; return -1 when the array contains no cake and reject an out-of-range start.
+The global assignment follow-up minimizes total person-to-cake distance, not each person's nearest individual cake. If there are more people than cakes, the assignment is impossible.
+The safe solution is dynamic programming over sorted person and cake indices: dp[i][j] = minimum cost to match the first i people using the first j cakes, with transitions that either skip cake j or match it to person i. Backtrack through the table to answer which cake a queried person receives.
+Minority variant: Some reports phrase the follow-up as a greedy nearest-pair matching. Clarify whether the objective is one-to-one nearest assignment or globally minimum total distance before coding.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Examples
+Notes
+Preparation
+One-dimensional cake assignment variant
+Related discussions · 9
+⭐新鲜出炉的Snow面经
+🔑雪花mid level滇缅
+🔑雪花店面
+🔑雪花VO coding
+🔑雪花 店面
+🔑问下雪花的title/level 顺便分享下电面 求加米
+雪花大夫完整莫名挂经GG HF 攒人品求加米
+雪花店面
+🔑SDE AI role tech screen
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Frontend Grid: Robot Eats Candies
+Single report
+bfs
+grid
+medium
++2
+Word Search
+Single report
+grid
+medium
+backtracking
++1
+Meeting Rooms II
+Single report
+heap
+medium
+interval
++1
+Recipe as Contiguous Ingredient Subsequence
+Single report
+two-pointer
+medium
+string
++4
+Maximum Number of Events That Can Be Attended
+Single report
+heap
+medium
+greedy
++1
+Code editor

@@ -1,0 +1,75 @@
+===H1===
+Number of Islands and Grid BFS Variants
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/number-of-islands-family
+===BODY===
+ByteDance / TikTok
+Coding·60 minMembers
+Number of Islands and Grid BFS Variants
+Grid traversal in the 'number of islands' family — count connected components, then a follow-up that adds a constraint such as no-modify-in-place, equal-shape detection, water-flow direction, or 2D scaling.
+SWE
+Infra Eng
+grid
+bfs
+dfs
+union-find
+medium
+Frequency
+High
+Last asked
+2026-08-08
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Multiple variants of the canonical island-counting grid problem appear across rounds. Be ready for all of them:
+
+Count islands: classic numIslands(grid) — count connected groups of 1 cells (4-directional adjacency).
+
+No-modify variant: solve with BFS but you may not mutate the grid. Track visited in a separate set.
+
+Same-shape islands: after counting, find how many islands share the same shape (normalize each component's relative coordinates and hash).
+
+Huge-map variant: the grid is too large to fit in memory. Partition the map into blocks, solve local components per block, then union components that touch across block boundaries.
+
+Water-flow variant: from each cell, mark whether it can flow strictly downhill to the boundary. Output every cell that reaches at least one edge.
+
+2D follow-up: starting from a 1D longest run of 1s warmup, generalize to "largest contiguous all-ones region in a 2D grid."
+
+Boundary follow-up: after the base island count, a follow-up asks you to compute the island boundary (perimeter) rather than just counting components.
+
+Area aggregation variant: traverse every connected component and return the largest island size alongside the base result in the same pass.
+
+Notes
+
+BFS and DFS both work; with deep grids prefer iterative BFS to avoid stack overflow on Python / Java defaults.
+
+For the same-shape variant the standard trick is to BFS each island, record (dr, dc) offsets relative to the first cell visited, sort, and use the tuple as a dictionary key.
+
+For the huge-map variant, name the block boundary merge explicitly. The interviewer is looking for an external-memory / distributed-grid answer, not just a faster in-memory DFS.
+
+For the no-modify variant, a (r, c) set of visited cells costs O(mn) extra memory but keeps the input clean — interviewers like to see this called out explicitly.
+
+Time complexity is O(mn) for the basic count; the shape-equivalence variant adds an O(k log k) sort per island of size k.
+
+Common bug: forgetting to mark a cell visited before enqueuing it leads to exponential queue growth on dense grids.
+
+Senior SDE phone screens (e.g. Trust & Safety) sometimes spend ~45 minutes on resume plus an AI-related system design and leave only the last 15 minutes for this — the base count with no follow-up, so write it fast and clean rather than over-engineering.
+
+Preparation
+
+Drill the 4-direction BFS template until you can write it without thinking.
+
+Write the no-modify variant once with a visited-set and once with grid-mutation, and be prepared to argue the trade-off in an interview.
+
+Practice the same-shape normalization: pick the top-leftmost cell as origin, subtract, sort, hash.
+
+For the huge-map follow-up, rehearse a tile-local component pass plus boundary-union pass; be ready to state what metadata each block emits.
+
+For the 2D "largest connected block of 1s" follow-up, drill the simpler 1D longest-run warmup first — interviewers often start there and add a dimension.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

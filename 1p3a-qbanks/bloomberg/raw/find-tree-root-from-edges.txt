@@ -1,0 +1,67 @@
+===H1===
+Find Tree Root from Edge List
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/find-tree-root-from-edges
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Find Tree Root from Edge List
+Given an edge list `[node, [children]]` describing a tree of log nodes, find the root — the single node that is never anyone's child. The Bloomberg twist is that the input may include duplicates or noise; treat it as the warm-up before the harder bucketize-by-boundary follow-up.
+SWE
+tree
+graph
+hashmap
+set
+easy
+Frequency
+Single report
+Last asked
+2026-02-25
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Given a list of pairs [node, [children]] describing a directed tree (each child appears with exactly one parent), return the root of the tree — the node that appears as a parent but never as a child.
+
+Function signature:
+
+Node findRoot(List<Pair<Node, List<Node>>> edges)
+
+Follow-ups:
+
+What if the input includes cycles or disconnected components? Detect and raise.
+
+What if multiple nodes have no parent (a forest)? Return all of them.
+
+Stream the input: edges arrive one at a time; return the current root candidate after each insert.
+
+Examples
+
+edges = [(A, [B, C]), (B, [D]), (C, [E, F])]
+findRoot -> A
+
+# A is the only node never appearing as a child of any other node.
+
+Notes
+
+The cleanest solution is set difference: build the set of all nodes that appear anywhere (parents and children) and the set of all nodes that appear as a child; the root is the unique element of all - children. Time O(n), space O(n).
+
+A union-find solution works as well: union each parent with each child; the root is the unique component representative with parent[r] == r. More machinery than needed; mention only if asked about dynamic edges.
+
+Handle malformed input gracefully: zero candidates means cycle / no root; multiple candidates means forest. Surface these explicitly in the return type for the follow-ups.
+
+The interviewer follows up by reusing the same edge format for a bucketize-by-boundary problem; treat this as a paired round and keep code modular.
+
+Preparation
+
+Implement the set-difference solution in five lines; this is the warm-up that should leave time for the harder follow-up.
+
+Drill the streaming variant: maintain allNodes and childNodes sets and re-derive the root candidate after each insertion.
+
+Be ready to surface input-validation concerns (cycles, multi-root, dangling references) before the interviewer asks.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,74 @@
+===H1===
+Hand-Written K-Means
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/handwritten-k-means
+===BODY===
+Microsoft
+Coding·45 minMembers
+Hand-Written K-Means
+Implement K-Means from scratch in numpy / PyTorch / plain Python. The HM phone screen for Applied Scientist 2 routinely opens with this; sometimes followed by a time-complexity discussion.
+MLE
+RS
+ml-knowledge
+numpy
+pytorch
+medium
+Frequency
+Low
+Last asked
+2026-02-13
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Given X: list[list[float]] of shape (N, D) and integer K, return cluster assignments labels: list[int] of length N and final centroids centroids: list[list[float]] of shape (K, D).
+
+Allowed frameworks: pure Python, NumPy, or PyTorch — candidate's choice. The interviewer rarely requires the code to actually run; correctness of the algorithm structure plus complexity analysis is the bar.
+
+Standard variant:
+
+def kmeans(X, K, max_iter=100, seed=42):
+    ...
+    return labels, centroids
+
+Follow-ups asked when time remains:
+
+Time complexity in N, K, D, and iteration count.
+
+Centroid initialization strategy — name the failure mode of pure random init and what K-Means++ does to fix it.
+
+Convergence criterion — fixed iteration count vs centroid-shift threshold.
+
+Empty-cluster handling — if a centroid wins zero points, what next.
+
+Notes
+
+The canonical loop is two steps per iteration:
+
+Assignment: for each of N points, compute distance to each of K centroids (O(N·K·D)), assign each point to the nearest centroid.
+
+Update: for each of K clusters, set the new centroid to the mean of assigned points (O(N·D)).
+
+Total: O(I·N·K·D) time, O(N + K·D) space.
+
+Vectorized form in NumPy: ((X[:, None, :] - centroids[None, :, :])**2).sum(-1) gives an (N, K) distance matrix in one expression. Candidates who write the double for loop in pure Python are not penalized but should mention they would vectorize in numpy in practice.
+
+K-Means++ initialization picks the first centroid uniformly, then each subsequent centroid with probability proportional to squared distance to the nearest already-chosen centroid. Reduces sensitivity to bad starting positions.
+
+Empty-cluster handling: either re-initialize the empty centroid to a random data point, or split the largest cluster. Standard scikit-learn uses re-init.
+
+Preparation
+
+Memorize the 12-line NumPy vectorized form. Type it out three times.
+
+Pre-rehearse the complexity analysis aloud — "I, N, K, D, where I is iterations" — interviewers expect every letter named.
+
+Drill the K-Means++ initialization in 5 lines as a follow-up; it is the second-most-asked extension after complexity.
+
+For the PyTorch variant, the only change is replacing np.argmin with torch.argmin and using scatter_mean for the centroid update if it exists; otherwise the code is identical.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

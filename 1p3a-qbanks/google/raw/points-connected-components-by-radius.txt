@@ -1,0 +1,53 @@
+===H1===
+2D Points Connected Components by Radius
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/points-connected-components-by-radius
+===BODY===
+Google
+Coding·45 minMembers
+2D Points Connected Components by Radius
+Given 2D points and radius `r`, connect two points when their distance is at most `r`; connectivity is transitive, and the output is the final number of clusters. The interviewer accepted or preferred a brute-force neighbor scan after discussing optimization ideas.
+SWE
+graph
+dfs
+bfs
+union-find
+clustering
+medium
+Frequency
+Low
+Last asked
+2026-08-04
+Stage
+phone-screen
+Requirements
+
+Input: a list of 2D points and a radius r.
+
+Two points are connected if their Euclidean distance is <= r.
+
+Connectivity is transitive: if A connects to B and B connects to C, all three belong to the same cluster.
+
+Return the number of final clusters.
+
+Notes
+
+DFS, BFS, or Union-Find all fit the core connected-components model.
+
+For many points, discuss how to avoid checking every pair by narrowing neighbor candidates spatially; in this round, the interviewer still preferred the brute-force implementation path.
+
+Clarify squared-distance comparison to avoid unnecessary square roots.
+
+Preparation
+
+Implement connected components once with DFS/BFS and once with Union-Find.
+
+Practice stating the O(n^2) brute-force baseline clearly before proposing spatial indexing.
+
+Dry-run a case where three points form one cluster only through transitive links.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

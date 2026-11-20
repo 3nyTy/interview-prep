@@ -1,0 +1,67 @@
+===H1===
+Staff (BPS) Round: Scope & Impact + Architecture
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/staff-bps-scope-architecture
+===BODY===
+Uber
+Behavioral·60 minMembers
+Staff (BPS) Round: Scope & Impact + Architecture
+Staff-level (L6) BPS loop replaces some standard rounds with two named segments: **Scope & Impact** (org-level decision radius) and **Architecture** (full-project architectural walkthrough). Coding is reduced or skipped; the depth of the architectural narrative is the deciding signal.
+MLE
+SWE
+behavioral
+deep-dive
+presentation
+Frequency
+Single report
+Last asked
+2025-12-11
+Stage
+onsite-bq · onsite-deep-dive · final-round
+Requirements
+
+Round 1 — Scope & Impact (60 min, often a senior manager / director):
+
+Walk through a project you led recently in detail. The interviewer probes the same architecture and decisions as a deep-dive but also asks about org context — how the project was scoped, who you influenced, where the technical direction came from, and what was given vs invented.
+
+Questions on org structure, scope of ownership, cross-team partnerships, and how you measure scope of influence at the staff level.
+
+Reverse questions (what they expect from a Staff candidate) consistently land on: "redefine the problem from the ground up, not just scale the existing solution."
+
+Round 2 — Architecture (60 min, often a Principal Engineer):
+
+Present a complex project (multiple subsystems, latency-sensitive, ML or infra-heavy). Bringing a prepared architecture diagram is strongly recommended.
+
+The interviewer probes nearly every component: latency budget, model choice, infra orchestration, failure modes, on-call story.
+
+The bar tilts toward insight and root-cause framing rather than implementation detail.
+
+Notes
+
+A consistent failure mode reported by candidates: presenting incremental improvements to an existing system ("we improved latency by 30%") instead of root-cause re-architectures ("we eliminated the latency by re-thinking the request boundary"). The Staff bar explicitly grades the latter.
+
+Reverse questions are highly informative: ask the interviewer directly what they expect at the Staff bar in their team, and tailor your second-half stories to that.
+
+The BPS loop is typically 2 rounds total, not the standard 4–5; outcome arrives within 1–2 weeks.
+
+A reported pain point: feedback after a fail is sparse — recruiters often decline to share which round caused the rejection. Plan to debrief with peers immediately after the round while detail is fresh.
+
+The Architecture round consistently rewards redefining the problem boundary over scaling an existing solution. Candidates who present a 30%-latency-improvement story land at Senior; candidates who present a request-shape change that eliminated the latency entirely land at Staff. Pre-script your story so the framing leads with the boundary change.
+
+Preparation
+
+Prepare a 1-page architecture diagram for your strongest project — printed or on a slide. Spend 1–2 minutes presenting it, then let the interviewer drive.
+
+For Scope & Impact, pre-script answers to: "What is your team's scope today?" "How many engineers across how many teams did you influence?" "What technical direction did you set vs follow?"
+
+For Architecture, pre-bake a 2-level deep dive: high-level boxes-and-arrows, then drilling into one component (e.g. the inference pipeline) with latency / capacity numbers.
+
+Re-frame each story around root-cause redesign. Avoid "we improved X by Y%" framings — replace with "we removed the need for X entirely by …"
+
+Bring a 1-page architecture diagram (PDF) and a 1-page "scope summary" (teams involved, your decision rights, the alternatives you rejected). Both get referenced repeatedly across the two rounds.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

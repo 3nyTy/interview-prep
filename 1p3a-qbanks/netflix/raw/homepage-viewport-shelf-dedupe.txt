@@ -1,0 +1,122 @@
+===H1===
+Homepage Viewport Shelf Dedupe
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/homepage-viewport-shelf-dedupe
+===BODY===
+Homepage Viewport Shelf Dedupe
+
+<https://www.1point3acres.com/interview/problems/company/netflix/homepage-viewport-shelf-dedupe>
+
+Netflix
+Coding
+
+60 min
+Members
+Homepage Viewport / Shelf Dedupe
+
+Given Netflix homepage shelves, dedupe titles shown in the viewport. The prompt is deliberately vague: candidates must clarify horizontal shelf windows, vertical scrolling, global vs local dedupe, insertion in the middle, and production-scale trade-offs.
+
+SWE
+dedup
+set
+array
+ambiguous-spec
+testing
+caching
+medium
+Frequency
+Medium
+Last asked
+2026-08-02
+Stage
+phone-screen  onsite-coding
+Requirements
+Input: shelves: list[list[title_id]], where each inner list is one homepage shelf.
+Basic output: a transformed list of shelves with duplicate titles removed according to the agreed viewport rule.
+Common rule: while filling the first X visible slots of each shelf, avoid titles already visible globally; after visible slots are filled, dedupe only within the current shelf.
+Variant: horizontal and vertical scrolling both matter, so the visible viewport is not simply the first X items of every shelf.
+A frequently used concrete rule: dedupe titles within a row, but once a row already holds 6 distinct titles, later slots in that row may repeat.
+Follow-up: the per-row dedupe threshold is dynamic (could be 6 or any N), passed in as a parameter.
+Follow-up: only dedupe the first N rows; rows after that may repeat freely.
+Follow-up: conditional dedupe  certain special rows are exempt and skip dedupe entirely.
+Follow-up: a new shelf can be inserted in the middle; update the visible dedupe result.
+Follow-up: discuss production scale, cache locality, Redis / Bloom filter trade-offs, and false positives.
+Write test cases in the editor.
+Example
+shelves = [
+  ["A", "B", "C", "A"],
+  ["B", "D", "E", "D"],
+  ["C", "F", "A"]
+]
+X = 2
+# One common interpretation:
+# shelf 0 visible: A, B; tail dedup within shelf keeps C
+# shelf 1 visible skips B, keeps D, E; tail avoids local duplicate D
+# shelf 2 visible skips C and A, keeps F
+
+Notes
+The clean implementation uses two sets: global_visible across shelves and local_seen within the current shelf.
+The trap is adding a title to global_visible without also adding it to the local set. That allows duplicates later in the same shelf.
+Do not assume ranking changes are allowed. Several rounds explicitly ignore recommendation ranking and focus only on dedupe behavior.
+Pin down the replacement policy before coding  it is the most common clarification gap: which shelf keeps a contended title (top shelf usually wins by priority), and when a duplicate is removed from a visible slot, do you (a) shift the remaining titles forward, (b) pull a fresh title from the hidden tail of the shelf to backfill the slot, or (c) just leave a gap? Each choice changes the expected output.
+For production, a Bloom filter can reduce memory but introduces false positives. A false positive hides a valid title; be ready to decide whether that is acceptable.
+If middle insertion must be exact, global state after the insertion point may need recomputation. Incremental patching works only if the rule is local enough.
+Preparation
+Implement the global_visible + local_seen version cleanly.
+Create tests for duplicate within one shelf, duplicate across shelves, empty shelf, X = 0, and inserted middle shelf.
+Practice a 5-minute production discussion: cache scope, invalidation, recomputation cost, and approximate membership filters.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Example
+Notes
+Preparation
+Related discussions  6
+?Netflix ????????????
+?????
+???????
+Netflix L5 SDE ??
+?? ?? ????
+????????
+Related questions
+
+Other Netflix questions sharing tags with this one
+
+Weighted Cache / Timed Cache
+Medium
+caching
+medium
+data-structure
++3
+Spam Email Detection
+Single report
+ambiguous-spec
+medium
+classification
++2
+Merge Intervals
+Single report
+array
+medium
+interval
++1
+Movie Billboard Rotation Service
+Low
+caching
+medium
+heap
++3
+User Engagement Pattern Classification
+Single report
+array
+medium
+hashmap
++1
+Code editor
+
+---

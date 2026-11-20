@@ -1,0 +1,69 @@
+===H1===
+Experiment Bucket Allocation / Rebalancing
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/experiment-bucket-allocation-rebalancing
+===BODY===
+Pinterest
+CodingMembers
+Experiment Bucket Allocation / Rebalancing
+Manage experiment assignments over bucket IDs 0–999. First return every unallocated bucket; then rebalance control and enabled groups while preserving existing assignments. The free-bucket subtask is defined, but the rebalance variant still requires explicit endpoint, rounding, contiguity, and tie-break rules before implementation.
+SWE
+array
+set
+simulation
+medium
+Frequency
+Low
+Last asked
+2026-08-03
+Stage
+phone-screen · onsite-coding
+Requirements
+
+The bucket-ID universe is the inclusive range 0..999. The input contains one control group and n enabled groups; each group holds a set of distinct bucket IDs from that universe.
+
+Return every bucket ID that is not allocated to any group.
+
+Given desired group sizes or percentages, rebalance the allocation. Keep existing assignments when possible and consume currently unallocated IDs before moving IDs that already belong to another group.
+
+State how the result is represented and clarify whether ranges must remain contiguous.
+
+Examples
+
+A rebalance to 20% control and 20% for one enabled group can preserve both existing ranges and fill the shortfall from free IDs:
+
+before:
+  control   = 0..99
+  enabled_1 = 100..199
+
+target:
+  control   = 20%
+  enabled_1 = 20%
+
+after:
+  control   = 0..99, 200..299
+  enabled_1 = 100..199, 300..399
+
+Notes
+
+Clarify whether a desired value is a percentage of all 1,000 IDs or an absolute cardinality, and how fractional percentages should round.
+
+Confirm that groups are globally disjoint, how ties among free IDs are broken, and whether output order matters.
+
+An alternate form supplies named buckets with assigned ID ranges, then introduces a bucket with a desired size. In the concrete follow-up, bucket a grows from IDs 1..99 to 1..199 when its desired size becomes 200. Under the inclusive notation used elsewhere, those ranges contain 99 and 199 IDs, respectively; an exact size of 200 with lower endpoint 1 would end at 200. Treat the supplied range as an endpoint-convention ambiguity and settle it before coding.
+
+Build a 1,000-slot owner array or bitset while validating bounds and global disjointness; unallocated IDs are exactly the slots without an owner. Once integer target cardinalities are fixed, and if contiguity is not required, retain up to each group's target count, release only mandatory excess, fill deficits from originally free IDs first, and use released surplus only if needed. Define a deterministic order, reject a target sum above 1,000, and specify whether a target sum below 1,000 leaves IDs unallocated. This preserves the maximum possible number of existing assignments for fixed targets.
+
+Preparation
+
+Implement the unallocated-bucket pass and verify that its output is exactly the complement of the union of all group assignments within 0..999.
+
+Dry-run the 20% / 20% rebalance above and assert both target cardinalities and the invariant that existing IDs stay put whenever free IDs can satisfy the request.
+
+Practice the desired-size variant separately, including shrink, grow, insufficient-free-capacity, overlap, and out-of-range inputs; announce a deterministic tie-break for choosing free IDs.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

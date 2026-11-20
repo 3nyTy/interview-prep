@@ -1,0 +1,58 @@
+===H1===
+OA: Largest Group Sharing a Digit
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/oa-group-two-digit-numbers-shared-digit
+===BODY===
+Google
+Coding·90 minMembers
+OA: Largest Group Sharing a Digit
+Second problem in the 90-min Google SWE Early Career / NG OA. Given a list of two-digit numbers, return the size of the largest subset where every chosen number shares at least one common digit.
+SWE
+array
+hashmap
+easy
+Frequency
+Medium
+Last asked
+2026-05-07
+Stage
+oa
+Requirements
+
+Input: an integer array (length ≤ 100), each value is a two-digit number (10–99).
+
+A group is valid only if there exists at least one digit d ∈ {0..9} that appears in every number in the group.
+
+Return: the maximum group size.
+
+Examples
+
+Input:  [52, 25, 55, 11, 34]
+Group:  [52, 25, 55] all contain digit 5 → size 3
+Output: 3
+
+Input:  [11, 21, 31, 41, 16, 17, 18, 34, 57]
+Group:  [11, 21, 31, 41, 16, 17, 18] all contain digit 1 → size 7
+Output: 7
+
+Notes
+
+Each number has at most two distinct digits, so there are only 10 candidate digits to enumerate.
+
+A number with repeated digits (e.g. 55) still has one distinct digit; that's fine.
+
+The OA gives 2 sample test cases and no hidden tests — add your own (digit 0 in tens place is impossible for two-digit numbers, but still verify singletons and full-array cases).
+
+Standard pattern: for each number, union it with a virtual node for each of its digits (0-9). Largest component size via DSU rank/size tracking, O(N * d) where d is digits per number. The 10 digit-nodes act as connector hubs so you avoid O(N^2) pairwise checks.
+
+Preparation
+
+For each digit d in 0–9, count how many input numbers contain d; return the maximum count.
+
+Practice writing it cleanly in 5 minutes — this is the easier of the two OA problems, so save time for the coin board.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

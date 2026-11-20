@@ -1,0 +1,100 @@
+===H1===
+Merge Step Functions of (timestamp, value) Pairs
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/merge-step-functions
+===BODY===
+Uber
+CodingMembers
+Merge Step Functions of (timestamp, value) Pairs
+Given two step functions over time, each encoded as sorted [timestamp, value] checkpoints, return the checkpoints of their pointwise sum. The follow-up extends the merge to k functions via divide-and-conquer.
+SWE
+array
+two-pointer
+merge
+divide-and-conquer
+medium
+Frequency
+Single report
+Last asked
+2026-05-13
+Stage
+onsite-coding
+You are given two arrays a and b, each describing a step function over time. Every entry has the form [t, v] and means "on the segment ending at timestamp t (and starting just after the previous checkpoint), the value is v". Both arrays are sorted by timestamp.
+
+Concretely, if a has checkpoints t_1 < t_2 < ... < t_n with values v_1, ..., v_n, then the step function takes value v_k on the half-open segment (t_{k-1}, t_k], where t_0 = -infinity. After t_n the function is undefined and contributes 0 to the merge.
+
+Return the array of [timestamp, mergedValue] checkpoints obtained by adding the two step functions, using one checkpoint per distinct event time across the two inputs. Do not coalesce adjacent segments that happen to share the same merged value.
+
+Example unpacking. With a = [[1,3], [3,1], [5,3], [6,4], [10,1]]:
+
+value 3 on (-inf, 1]
+
+value 1 on (1, 3]
+
+value 3 on (3, 5]
+
+value 4 on (5, 6]
+
+value 1 on (6, 10]
+
+And with b = [[2,3], [6,3], [11,2]]:
+
+value 3 on (-inf, 2]
+
+value 3 on (2, 6]
+
+value 2 on (6, 11]
+
+The merged checkpoints are [[1,6], [2,4], [3,4], [5,6], [6,7], [10,3], [11,2]].
+
+Follow-up. What if the input is k step functions instead of two? Apply the same pairwise merge in a divide-and-conquer pattern: merge halves recursively, then merge the two halves. With N total checkpoints across all k arrays, this runs in O(N log k).
+
+Examples
+
+Example 1:
+
+Input: a = [[1,3],[3,1],[5,3],[6,4],[10,1]], b = [[2,3],[6,3],[11,2]]
+
+Output: [[1,6],[2,4],[3,4],[5,6],[6,7],[10,3],[11,2]]
+
+Explanation:
+
+At each timestamp from the union of checkpoints, sum the active value of a and b. After timestamp 10, a is exhausted and contributes 0, so the final entry inherits b's value 2.
+
+Example 2:
+
+Input: a = [[5,1]], b = [[5,2]]
+
+Output: [[5,3]]
+
+Explanation:
+
+Both functions end at the same timestamp. Emit one merged entry with the summed value.
+
+Example 3:
+
+Input: a = [], b = [[1,7],[4,2]]
+
+Output: [[1,7],[4,2]]
+
+Explanation:
+
+When one array is empty, the merged function is just the other array.
+
+Constraints
+
+0 <= a.length, b.length <= 10^5
+
+a[i].length == b[j].length == 2
+
+0 <= a[i][0], b[j][0] <= 10^9 (timestamps)
+
+-10^4 <= a[i][1], b[j][1] <= 10^4 (values)
+
+Within each input array, timestamps are strictly increasing.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

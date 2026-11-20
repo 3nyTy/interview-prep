@@ -1,0 +1,67 @@
+===H1===
+Tiny Next-Token Prediction Model (PyTorch Fill-In)
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/tiny-next-token-pytorch
+===BODY===
+Microsoft
+Coding·60 minMembers
+Tiny Next-Token Prediction Model (PyTorch Fill-In)
+MSR Senior Researcher take-home-style live round: fill in TODOs in a tiny PyTorch repo — DataLoader, model layers, forward, training loop, next-token input/target preparation.
+MLE
+RS
+RE
+pytorch
+transformer
+medium
+ml-knowledge
+Frequency
+Single report
+Last asked
+2026-04-25
+Stage
+phone-screen · onsite-research
+Requirements
+
+The interviewer hands you a partially-filled PyTorch skeleton and asks you to complete it so that a feed-forward (no recurrence, no attention) model can be trained for next-token prediction conditioned only on the current token.
+
+Components to fill:
+
+DataLoader — wrap a provided SyntheticDataset(num_samples, seq_len, vocab_size) with DataLoader(dataset, batch_size=32, shuffle=True).
+
+Model — Embedding(vocab_size, hidden_dim) → Linear(hidden_dim, hidden_dim) → ReLU → Linear(hidden_dim, vocab_size).
+
+forward(x) — return logits with shape (batch, seq_len, vocab_size).
+
+Input / target prep — given sequences of shape (batch, seq_len), split into inputs = sequences[:, :-1] and targets = sequences[:, 1:]. Flatten over token positions so cross-entropy sees (batch·(seq_len-1), vocab_size) and (batch·(seq_len-1),).
+
+Training loop — forward, cross-entropy loss, backward, optimizer step. Adam is fine.
+
+The interviewer's hidden tests check that loss decreases on a fixed seed and that the input/target shift is correct (off-by-one is the most common failure).
+
+Notes
+
+The full model is ~25 lines of PyTorch — the round is testing whether you know the API, not whether you can derive backprop. Common mistakes reported:
+
+Treating the model as autoregressive over the sequence dimension and adding a hand-written mask. The prompt explicitly says "conditioned only on the current token" — broadcast the embedding through both linears with no positional info.
+
+Forgetting to call .zero_grad() before backward. Loss explodes.
+
+Passing (batch, seq_len, vocab_size) directly into F.cross_entropy without flattening — PyTorch only accepts (N, C) and (N,).
+
+The training loop wants 1-3 epochs with lr=1e-3. The hidden test asserts loss strictly decreases on consecutive epochs — if your first epoch lands below baseline already, you forgot the input/target shift and predicted the input as target.
+
+Preparation
+
+Write this skeleton from a blank file in under 15 minutes, twice, with no IDE help.
+
+Memorize the F.cross_entropy(logits.view(-1, V), targets.view(-1)) flatten incantation.
+
+Practice the inputs[:, :-1] / targets[:, 1:] shift and explain it aloud — interviewers ask why even when the test passes.
+
+This skeleton plus the K-Means problem covers ~70% of MAI / MSR phone-screen ML-coding prompts.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

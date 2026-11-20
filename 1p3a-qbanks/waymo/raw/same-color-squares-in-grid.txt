@@ -1,0 +1,52 @@
+===H1===
+Count Same-Color Squares in an Unbounded Grid
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/same-color-squares-in-grid
+===BODY===
+Waymo
+Coding·45 minMembers
+Count Same-Color Squares in an Unbounded Grid
+Phone screen on a 2-D grid whose cells carry color labels A / B / C / D. Count the number of axis-aligned squares formed by connected same-color cells. Grid has no a-priori size bound — the data structure must handle sparse cell sets.
+SWE
+grid
+bfs
+hashmap
+union-find
+medium
+Frequency
+Single report
+Last asked
+2026-05-06
+Stage
+phone-screen
+Requirements
+
+Input: a 2-D grid of cells, each labeled with one of a small fixed set of colors (e.g. A / B / C / D).
+
+No fixed maximum grid size — the solution should work on a sparse cell set rather than a tight rectangular array.
+
+Output: the number of axis-aligned squares whose interior cells are all the same color and form a connected region under 4-directional adjacency.
+
+Notes
+
+Standard approach: BFS / union-find to group connected same-color cells, then for each component, check whether its cells form a square — both width == height of the bounding box and |cells| == width * height.
+
+Store cells as a hashmap (x, y) -> color rather than a dense matrix so the algorithm scales when the grid is sparse or unbounded.
+
+For each component, also compare the bounding box's actual width / height against the cell count to reject L-shapes, rectangles, and holey shapes that pass the connectivity check but fail the square constraint.
+
+An alternative inverted formulation enumerates (x, y, side) candidate squares and checks that every interior cell exists and matches the color; this is O(N · max_side) and only competitive when squares are small.
+
+Preparation
+
+Practice BFS / union-find on a hashmap-backed grid (sparse representation) so the unbounded grid framing doesn't force a redesign mid-interview.
+
+Pre-write a is_axis_aligned_square(component) helper that returns true iff the bounding box is square and fully filled.
+
+Rehearse the trade-off discussion between component-first traversal (good for many small squares) and candidate-first enumeration (good for sparse colors and small max side).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

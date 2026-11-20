@@ -1,0 +1,137 @@
+===H1===
+Task Management System OA
+===URL===
+https://www.1point3acres.com/interview/problems/company/airbnb/oa-task-management-system
+===BODY===
+Airbnb
+CodingMembers
+Task Management System OA
+Implement a four-level task-management system. The progression covers task creation, update, lookup, and compact JSON output; filtered and priority-ordered search; users, quotas, and expiring assignments; then completion and overdue-assignment history.
+SWE
+data-structure
+object-design
+sorting
+scheduling
+testing
+codesignal
+hard
+Frequency
+Single report
+Last asked
+2026-08-07
+Stage
+oa
+Requirements
+
+Global constraints:
+
+priority and quota values are non-negative integers.
+
+timestamp and finish_time values are positive integer seconds since the system started.
+
+Operation timestamps strictly increase.
+
+Level 1 — basic task operations:
+
+add_task(timestamp, name, priority) -> str creates a task and returns sequential IDs beginning with task_id_1. Duplicate names and priorities are allowed.
+
+update_task(timestamp, task_id, name, priority) -> bool replaces the task's name and priority, returning False when the ID does not exist.
+
+get_task(timestamp, task_id) -> str | None returns a compact JSON string with keys ordered as name, then priority; it returns None for an unknown ID. Preserve whitespace inside task names while adding no formatting whitespace to the JSON.
+
+Level 2 — search and ordering:
+
+search_tasks(timestamp, name_filter, max_results) -> list[str] performs a case-sensitive substring match on task names. Return at most max_results IDs ordered by descending priority, then ascending creation order. Return an empty list when max_results <= 0.
+
+list_tasks_sorted(timestamp, limit) -> list[str] applies the same ordering to all tasks and returns at most limit IDs. Numeric ID order determines creation order, so task_id_2 precedes task_id_10.
+
+Level 3 — users, quotas, and expiring assignments:
+
+add_user(timestamp, user_id, quota) -> bool creates a user with a maximum number of simultaneous active assignments. Duplicate user IDs return False.
+
+assign_task(timestamp, task_id, user_id, finish_time) -> bool creates an assignment active on [timestamp, finish_time). Return False when the task or user is missing or the user's active quota is full.
+
+Each successful assignment consumes one quota slot. The same task may be assigned independently to multiple users or multiple times to one user. An expired assignment stops consuming quota.
+
+get_user_tasks(timestamp, user_id) -> list[str] returns active task IDs ordered by ascending finish_time, then ascending assignment start time. Unknown users return an empty list.
+
+Level 4 — completion and overdue history:
+
+complete_task(timestamp, task_id, user_id) -> bool completes an assignment only while it is active and frees its quota slot immediately. Return False when the task or user is missing or no matching active assignment exists.
+
+If the same task has multiple overlapping active assignments for one user, completion affects only the assignment with the earliest start time.
+
+get_overdue_assignments(timestamp, user_id) -> list[str] returns assignments whose finish_time <= timestamp and that were not completed before their individual finish time. Evaluate repeated assignments independently, so one task ID may appear more than once.
+
+Order overdue results by ascending finish time, then ascending assignment start time. Unknown users and users with no overdue work return an empty list.
+
+Examples
+
+Level 1 examples from the assessment:
+
+QueryResult
+add_task(1, "Task 1", 5)"task_id_1"
+add_task(2, "Task 1", 5)"task_id_2"; duplicate name and priority are allowed
+update_task(3, "task_id_1", "Updated Task 1", 4)True
+get_task(4, "task_id_1"){"name":"Updated Task 1","priority":4} with no spaces between fields
+
+Level 2 examples from the assessment:
+
+QueryResult
+add_task(1, "Alpha", 10)"task_id_1"
+add_task(2, "Bravo", 15)"task_id_2"
+add_task(3, "Bravo Alpha", 5)"task_id_3"
+list_tasks_sorted(4, 2)["task_id_2", "task_id_1"]
+search_tasks(6, "Bra", 5)["task_id_2", "task_id_3"]
+update_task(6, "task_id_1", "Alpha Updated", 20)True
+search_tasks(7, "Al", 1)["task_id_1"]
+
+Level 3 examples from the assessment:
+
+QueryResult
+add_user(1, "user1", 2)True
+add_user(2, "user1", 1)False because the user already exists
+add_task(3, "Task X", 10)"task_id_1"
+add_task(4, "Task Y", 5)"task_id_2"
+assign_task(6, "task_id_1", "user1", 15)True; the assignment is active on [6, 15)
+get_user_tasks(7, "user1")["task_id_1"]
+
+Notes
+
+The Level 1 method contract says a missing task_id makes update_task return False, while one example labels the result as None. Follow the supplied interface and unit tests if they disagree.
+
+Expired, uncompleted assignments must remain queryable after they stop consuming quota; Level 4's overdue history depends on that distinction.
+
+Assignment start time means the timestamp passed to assign_task, not the task's creation time.
+
+Both active and overdue queries use half-open time semantics: an assignment is active strictly before finish_time and becomes eligible for overdue results at finish_time.
+
+The Level 2 sample reuses timestamp 6 for search_tasks and update_task, contradicting the global strictly-increasing timestamp rule. Preserve the sample and let the supplied tests decide equal-timestamp behavior.
+
+The contract does not state how assign_task handles finish_time <= timestamp; accepting it would create an immediately inactive assignment, so do not silently assume a return value outside the supplied tests.
+
+Implementation skeleton
+
+Store tasks in tasks_by_id with a numeric creation sequence separate from the display ID. That sequence is the stable secondary key after descending priority.
+
+Keep append-only assignment records containing task ID, user ID, start time, finish time, and completion time. At a query timestamp, an assignment is active only when it is uncompleted and its half-open interval contains that timestamp.
+
+Compute quota from active records only. For completion, filter to matching active records and choose the earliest start time; retain completed and expired records so overdue history remains reconstructable.
+
+Implement search and listing through one shared ordering helper. A full scan plus sort is the simplest correct baseline; add per-user or name indexes only if the supplied constraints require them.
+
+Preparation
+
+Implement the four levels incrementally against unit tests, re-running every completed level after changing the state representation.
+
+Drill deterministic ordering with equal priorities, two-digit task IDs, equal finish times, and repeated assignments of the same task.
+
+Write boundary tests immediately before and exactly at finish_time, plus overlapping assignments where completion must select the earliest start time.
+
+Practice preserving historical records while computing current quota usage from only active, uncompleted assignments.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

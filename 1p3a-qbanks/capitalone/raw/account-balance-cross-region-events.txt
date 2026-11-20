@@ -1,0 +1,80 @@
+===H1===
+Account Balance & Cross-Region Event Platform
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/account-balance-cross-region-events
+===BODY===
+Capital One
+System Design·60 minMembers
+Account Balance & Cross-Region Event Platform
+Senior Principal Power Day variant — two system design rounds. The first prompt: design a highly reliable account balance service. The second: design a cross-region event processing platform. Both are senior-leveling discussions where consistency, replication, and failure modes are the entire conversation.
+SWE
+system-design
+distributed-systems
+transactions
+messaging
+kafka
+scaling
+persistence
+Frequency
+Single report
+Last asked
+2026-01-24
+Stage
+onsite-system-design
+Requirements
+
+Round 1 — Highly Reliable Account Balance System
+
+Design a service that returns a customer's current account balance with strong consistency on writes and acceptable read latency.
+
+Survive single-region outages without losing or duplicating balance updates.
+
+Reconcile against the authoritative ledger; surface drift if it occurs.
+
+Round 2 — Cross-Region Event Processing Platform
+
+Design a platform that ingests events from one region, processes them (transforms, enrichments, downstream side effects), and emits results to consumers in another region.
+
+Survive a full region outage with bounded data loss (or zero, depending on the configured tier).
+
+Ordering guarantees per partition / key; throughput target up into the millions of events per second per region.
+
+Backpressure and reprocessing semantics on consumer failure.
+
+Notes
+
+Account balance system
+
+The pattern that scores in this round is ledger-as-source-of-truth with a balance cache. Every write is an append-only ledger entry inside a transactional boundary; the balance cache is updated via change-data-capture and is advisory, not authoritative. Reads default to the cache; reconciliation jobs replay the ledger nightly to detect drift.
+
+For HA, the ledger writes go to a primary region with synchronous replication to a standby (cross-AZ minimum, cross-region for tier-1 accounts). Failover promotes the standby; data loss is bounded by the replication lag, which should be sub-second.
+
+The interesting question is what does "balance" mean during a failover. Answer: pending in-flight writes that haven't replicated may be replayed by the client (with idempotency keys); the post-failover balance equals the last-replicated ledger sum + any retried in-flight entries. Do not handwave this — the round grades on how concretely you can describe the failover envelope.
+
+Drift detection: a recurring reconciler reads the full ledger for each account in batches, recomputes the balance, and alerts on mismatch. Capital One's actual production system runs this hourly for high-value accounts and nightly for the long tail.
+
+Cross-region event platform
+
+Kafka with MirrorMaker 2 is the obvious-and-correct baseline answer. The graded signal is whether the candidate can talk about its failure modes: replication lag during a region outage, offset translation between regions, and the consumer-rewinding-back-to-an-older-offset problem on failover.
+
+Per-key ordering: partition by event key; downstream consumers commit per partition. Re-balancing during failover loses ordering across the gap unless the platform freezes consumption on the failing partition during failover, which costs availability.
+
+Exactly-once semantics across regions is essentially impossible without sacrificing availability. The honest answer is effectively-once with consumer-side deduplication keyed on an event id. Candidates who claim exactly-once without caveats lose senior-credibility points.
+
+For million-events-per-second scale, the bottleneck is usually network egress between regions; mention compression, batching, and tier-2 events being downsampled or aggregated before cross-region shipping.
+
+Backpressure: producers honour broker-level pressure signals (Kafka quotas); consumers rely on lag monitoring with auto-pause when consumer lag exceeds a threshold. Reprocessing uses offset reset to a known good checkpoint.
+
+Preparation
+
+For the account balance round, drill the ledger / cache split and the failover envelope question. Practise drawing one diagram with three boxes (ledger primary, ledger standby, balance cache) and labelling the replication lag explicitly.
+
+For the cross-region event round, build a one-page mental map of Kafka MirrorMaker 2 — replication topology, offset translation, consumer rebalance behavior during failover. Most candidates know Kafka basics but not the cross-cluster failure modes.
+
+Both rounds are 45 minutes. Time-budget: 20 minutes on the model and write path, 15 minutes on failure modes, 10 minutes on follow-ups. Going deep on a single failure mode is rewarded; going broad without depth is not.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

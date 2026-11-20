@@ -1,0 +1,57 @@
+===H1===
+Maximal Rectangle (LeetCode 85)
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/maximal-rectangle
+===BODY===
+Salesforce
+CodingMembers
+Maximal Rectangle (LeetCode 85)
+The prompt is the unchanged LeetCode 85 Maximal Rectangle problem: given a binary matrix, return the area of the largest rectangle containing only `1` values. The expected path converts each row into a histogram and derives the monotonic-stack procedure for the largest rectangle.
+SWE
+grid
+stack
+monotonic-stack
+hard
+Frequency
+Single report
+Last asked
+2026-07-17
+Stage
+onsite-coding
+Requirements
+
+Input: an m x n binary matrix represented with "0" and "1" cells.
+
+Find the largest axis-aligned rectangle whose cells are all "1".
+
+Return the rectangle's area.
+
+Explain how each matrix row updates a histogram and derive the largest-rectangle logic before or while implementing it.
+
+Examples
+
+Input: [["1","0","1","0","0"],["1","0","1","1","1"],["1","1","1","1","1"],["1","0","0","1","0"]]
+
+Output: 6
+
+Notes
+
+This is the unchanged LeetCode 85 problem.
+
+The interview explicitly probes the monotonic-stack invariant and the connection to Largest Rectangle in Histogram.
+
+Update one height per column: increment it when the current cell is 1, otherwise reset it to zero. Each row then becomes a Largest Rectangle in Histogram instance.
+
+Scan the histogram with a monotonic stack of indices. When the current height is lower than the stack top, pop that bar and use the current index as its exclusive right boundary and the new stack top as its exclusive left boundary; append a zero-height sentinel to flush the stack. The full matrix algorithm takes O(mn) time and O(n) auxiliary space.
+
+Preparation
+
+Implement the histogram subproblem from a blank editor and narrate exactly when a bar is pushed, popped, and assigned its final width.
+
+Drill the matrix reduction with increasing, decreasing, equal-height, all-zero, and all-one rows.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

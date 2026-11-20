@@ -1,0 +1,66 @@
+===H1===
+Resumable Batch Dataloader with Weighted Sampling
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/resumable-batch-dataloader
+===BODY===
+Microsoft
+Coding·60 minMembers
+Resumable Batch Dataloader with Weighted Sampling
+Build an iterator over a multi-source dataset that supports checkpointable resume, mixed batching by source weight, and weights that don't divide the batch size cleanly.
+MLE
+data-structure
+iterator
+checkpointing
+sampling
+hard
+Frequency
+Low
+Last asked
+2026-03-18
+Stage
+onsite-coding
+Requirements
+
+Wrap several underlying iterable datasets (source_a, source_b, …) in a single BatchDataLoader that yields fixed-size batches of size B.
+
+Part 1 — Mixed batching with integer weights
+
+Each source has a weight w_i. Every batch should contain w_i / sum(w) of its items from source i. When the weights divide B cleanly (e.g. B=8, w=[1,3], so 2 from A + 6 from B), pick deterministically from each source.
+
+Part 2 — Resumable checkpointing
+
+loader.state_dict() returns a checkpoint capturing the current position in every source plus any in-flight batching state. loader.load_state_dict(state) restores the loader to that exact point so the next next(loader) yields the same batch as it would have without the checkpoint round-trip.
+
+Part 3 — Non-dividing weights
+
+Weights now do not necessarily divide B. For B=10, w=[1,2,4] the per-batch shares are 1.43 / 2.86 / 5.71. The loader must converge to the weighted distribution over the long run (running sum of per-source draws within ±1 of the target ratio) without breaking the deterministic shuffle order within each source.
+
+Reported as a 3-question coding round; Part 3 is the differentiator. One candidate noted "you probably want a reserved buffer to amortize the fractional rounding across batches" — interviewers accept that direction.
+
+Notes
+
+Part 1 is a deterministic interleave: precompute the per-batch quota per source, draw exactly that many from the source's underlying iterator, concatenate, and yield. Internal source state is just a position pointer.
+
+Part 2 reduces to surfacing every piece of per-iteration state into a serializable dict: source positions, any RNG state used for within-source shuffle, and the in-flight batch accumulator if you use one. A common bug is forgetting to save the in-flight batch and losing alignment after restore.
+
+Part 3's clean solution is a fractional-accumulator (Bresenham-style) trick: maintain a floating-point quota per source, draw floor(quota) items, carry the fractional remainder to the next batch. This guarantees the running ratio converges to the target with bounded error and avoids per-batch rounding bias.
+
+An alternative is reservoir-style weighted sampling per item, but it loses determinism — the cleaner answer is the fractional accumulator. If the interviewer pushes on "what if weights change at step N", the same accumulator handles it without buffer restructuring.
+
+Memory-bounded variants surface as a follow-up — interviewers will ask "what if a source is too big for memory" and expect you to keep the source as an external iterator and only pull floor(quota) items per batch.
+
+Preparation
+
+Implement the deterministic interleave first; do not start with the fractional version.
+
+Practice state_dict / load_state_dict round-trips for a stateful iterator; common bug is dropping the in-flight buffer.
+
+For the fractional variant, write the Bresenham accumulator on paper before coding — it is easy to get the carry direction wrong.
+
+This problem shows up alongside the in-memory SQL problem in MAI infra rounds; budget similar time.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,47 @@
+===H1===
+Word Search II
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/word-search-ii
+===BODY===
+Amazon
+CodingMembers
+Word Search II
+Find the dictionary words that can be formed through adjacent cells in a character board, without reusing a cell within a word.
+SWE
+string
+grid
+Frequency
+Single report
+Last asked
+2026-09-10
+Stage
+onsite-coding
+Requirements
+
+Input: a two-dimensional character board and a list of words.
+
+Return the words that can be formed from sequentially adjacent board cells.
+
+Adjacency is horizontal or vertical; the same cell cannot be reused within one word.
+
+Notes
+
+The candidate explicitly confirmed this was the unchanged public Word Search II problem, LC 212.
+
+It shared a 30-minute coding block with Longest Substring Without Repeating Characters.
+
+Build a trie of the dictionary and start depth-first search from each board cell. Follow only matching trie edges, mark each cell for the current path, and restore it on backtracking. Emit a terminal word once, clearing its terminal marker or using a result set to prevent duplicates. Search only the four orthogonal neighbors.
+
+If S is total dictionary length, RC is board size, and L is the smaller of maximum word length and board size, trie construction costs O(S). A conservative search bound is O(RC*4^L); prefix pruning reduces actual work. Auxiliary space is O(S+L), excluding output, when cells are marked in place and restored.
+
+Preparation
+
+Implement trie-guided backtracking and test a word that would require reusing a cell.
+
+Compare against independent per-word searches on tiny boards; verify duplicate paths emit a word only once and the board is restored.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

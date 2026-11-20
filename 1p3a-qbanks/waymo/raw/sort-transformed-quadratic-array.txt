@@ -1,0 +1,57 @@
+===H1===
+Sort a Quadratic-Transformed Sorted Array
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/sort-transformed-quadratic-array
+===BODY===
+Waymo
+Coding·45 minMembers
+Sort a Quadratic-Transformed Sorted Array
+Phone screen: given coefficients `a, b, c` of a quadratic `f(x) = ax² + bx + c` and a sorted integer array, return the sorted array of `f(nums[i])`. `a` may be negative — solve in O(n) with a two-pointer sweep that handles the parabola's monotonicity. Equivalent to LeetCode 360 (Sort Transformed Array).
+SWE
+array
+two-pointer
+math
+medium
+Frequency
+Single report
+Last asked
+2026-03-23
+Stage
+phone-screen
+Requirements
+
+Input: three integer coefficients a, b, c defining the quadratic f(x) = a·x² + b·x + c, plus a sorted (ascending) integer array nums.
+
+Output: the array [f(nums[0]), f(nums[1]), …] returned in sorted (ascending) order.
+
+a may be positive, zero, or negative — the sign controls which way the parabola opens.
+
+Notes
+
+A quadratic on a sorted input is not monotonic in general; sorting the transformed values naively costs O(n log n). The canonical optimal is O(n) using a two-pointer sweep.
+
+Split on the sign of a:
+
+a > 0: the parabola opens upward, so the largest values live at the array's two ends. Walk two pointers inward, emitting the larger of f(nums[lo]) and f(nums[hi]) from the back of the output.
+
+a < 0: opens downward; the largest values live near the vertex. Walk pointers inward emitting the smaller of f(nums[lo]) and f(nums[hi]) from the front of the output.
+
+a == 0: f is linear; the result is already sorted if b ≥ 0, otherwise reversed.
+
+Compute f(x) once per pointer position and cache; recomputing inside the inner loop is the most common micro-bug.
+
+Watch the vertex location for the a < 0 case — the pointers converge at the parabola's apex, which is where the max sits.
+
+Preparation
+
+Practice the two-pointer pattern on LC 977 (Squares of a Sorted Array) until the inward-sweep idiom is automatic; then adapt it for arbitrary a and b.
+
+Sketch each parabola case (a > 0, a < 0, a = 0) on paper and label which endpoint produces the next emitted value.
+
+Code the O(n log n) baseline (map → sort) first in the actual interview before optimizing — interviewers reliably credit the brute-force-then-improve discussion.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

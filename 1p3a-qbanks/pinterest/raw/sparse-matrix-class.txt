@@ -1,0 +1,52 @@
+===H1===
+Sparse Matrix Class (Store / Print / Add / Multiply)
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/sparse-matrix-class
+===BODY===
+Pinterest
+Coding·60 minMembers
+Sparse Matrix Class (Store / Print / Add / Multiply)
+After a ~15-minute resume shallow-dive, the MLE phone screen turns into an object-design coding task: build a class that stores a sparse matrix compactly and supports printing it back as a dense grid, matrix addition, and matrix multiplication.
+MLE
+object-design
+hashmap
+medium
+Frequency
+Single report
+Last asked
+2026-05-26
+Stage
+phone-screen
+Requirements
+
+Design a class to store a sparse matrix (most entries are zero) in a compact representation.
+
+Support:
+
+Storage — hold non-zero entries without materializing the full dense grid.
+
+Print — render the matrix back as a normal dense 2-D grid (zeros filled in).
+
+Addition — add two sparse matrices, returning a new sparse matrix.
+
+Multiplication — multiply two sparse matrices.
+
+Notes
+
+The expected representation is a dictionary keyed by (row, col) -> value, storing only non-zero cells, with the matrix dimensions tracked separately so print can fill in zeros.
+
+Addition iterates the union of populated keys. Multiplication is where candidates stumble under time pressure: group the left matrix's entries by their column index k and the right matrix's by their row index k, then only multiply the overlapping non-zero k indices instead of looping the dense shapes.
+
+The MLE screen front-loads a ~15-minute resume shallow-dive before the coding starts — have a crisp project summary ready so it doesn't eat coding time.
+
+Preparation
+
+Implement the dict-of-(row, col) class with add and multiply once end-to-end; the shared-inner-index k multiplication is the part to rehearse.
+
+Pre-draft the print method that reconstructs the dense grid so you don't burn live time on it.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

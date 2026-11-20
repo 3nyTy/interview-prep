@@ -1,0 +1,51 @@
+===H1===
+Longest Consecutive Sequence — Adjacent Gap ≤ K
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/longest-consecutive-subsequence-bounded-gap
+===BODY===
+Amazon
+Coding·60 minMembers
+Longest Consecutive Sequence — Adjacent Gap ≤ K
+LC 128 variant: instead of demanding successive integers, two values are considered consecutive when their absolute difference is at most `k`.
+SWE
+array
+sorting
+greedy
+medium
+Frequency
+Single report
+Last asked
+2026-05-13
+Stage
+onsite-coding
+Requirements
+
+Input: an integer array nums and a positive integer k.
+
+Define a "chain" as a sequence of values from nums ordered so that every adjacent pair differs by at most k.
+
+Return the length of the longest such chain that can be assembled from distinct elements of nums.
+
+Clarify with the interviewer whether duplicates count once or as repeated chain members — the loop report did not pin this down.
+
+Notes
+
+Reduces to walking the sorted unique values once: extend the current chain while sorted[i] - sorted[i-1] <= k, otherwise restart. O(n log n) time, O(n) space.
+
+The hashmap-based LC 128 trick (start a chain only at values with no v - 1 predecessor) does not generalize directly because gaps up to k mean the "start" check would need a sliding window — sort-and-scan is simpler.
+
+When k = 1 this collapses back to the original Longest Consecutive Sequence; using that as a sanity test confirms the chain logic before adding the k knob.
+
+Preparation
+
+Re-solve LC 128 from scratch (hashmap O(n) version), then port to the sort-and-scan variant and benchmark mentally for n = 1e5.
+
+Pre-build a 60-second derivation that justifies why sort-and-scan is correct: any optimal chain, once sorted, still satisfies the gap constraint.
+
+Practice articulating the duplicate-handling clarifying question — this is exactly the kind of unspecified knob Amazon coding rounds reward you for surfacing.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

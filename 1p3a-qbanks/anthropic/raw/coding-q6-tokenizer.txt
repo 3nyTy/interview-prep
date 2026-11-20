@@ -1,0 +1,72 @@
+===H1===
+Coding Q6 — Longest-Match Tokenizer
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/coding-q6-tokenizer
+===BODY===
+Anthropic
+Coding·55 minMembers
+Coding Q6 — Longest-Match Tokenizer
+Given a vocabulary mapping tokens to ids (plus a sentinel `UNK`), implement a longest-match tokenizer over a text string. The base solution is two nested loops; optimizations and follow-ups (consecutive UNK merging, vocab-length bound, trie acceleration) drive the score.
+SWE
+MLE
+string-processing
+greedy
+trie
+python
+medium
+Frequency
+Medium
+Last asked
+2026-06-26
+Stage
+phone-screen · onsite-coding
+Requirements
+
+vocab = {"app": 1, "apple": 2, "UNK": -1}
+tokenize("apple", vocab)         # -> [2]
+tokenize("bbb", vocab)           # -> [-1, -1, -1]
+tokenize("appbbbapp", vocab)     # -> [1, -1, -1, -1, 1] base ; -> [1, -1, 1] after dedup
+
+Iterations the interviewer walks you through
+
+Base longest-match. At each position, scan the longest possible prefix of the remaining text that is in vocab; emit its id and advance. If none matches, emit vocab["UNK"] and advance by 1 char.
+
+Bound by max vocab length. Don't scan to len(text) — precompute max_len = max(len(w) for w in vocab if w != "UNK") and shrink the inner loop.
+
+Collapse consecutive UNKs. After tokenization, runs of -1 should fold into a single -1 in the output. Either post-process the token list or merge in-place during the main loop.
+
+Discussion: trie acceleration. Build a trie from vocab so the inner loop becomes a walk down the trie until you can't advance. This is the textbook answer, but the interviewer typically accepts the bounded two-loop solution as long as you mention trie as the asymptotic improvement.
+
+Follow-ups
+
+Handle large vocab + short text (the trie wins) vs. small vocab + long text (the bounded loop is competitive).
+
+Streaming variant: tokenize as bytes arrive without rescanning.
+
+How would you parallelize this across many strings? (Embarrassingly parallel — main subtlety is balancing batch sizes.)
+
+Notes
+
+Several candidates report passing without ever building a trie. The interviewer cares more about correctness of the longest-match semantics and the UNK-merge behavior.
+
+Be proactive: write your own test cases, run them, and iterate. "Run tests, observe output, refine" is explicitly part of the grading signal here.
+
+Be careful with the UNK sentinel — it lives in the vocab dict and should never participate in matching.
+
+One rotation opens as a bug-hunt entry: the harness ships a paired tokenize(text, vocab) + detokenize(tokens, vocab) where tokenize greedily emits the shortest match (extends key until it hits the vocab once, then resets) instead of the longest. Phase 1 is to identify why this fails on inputs like vocab={"a":1,"ab":2} + text="ab" (emits [1,?] and chokes); phase 2 is to rewrite to longest-match with the bounded loop above; phase 3 picks up the UNK/trie follow-ups.
+
+Preparation
+
+Write the bounded two-loop tokenizer cold in under 10 minutes.
+
+Drill the UNK-collapse follow-up both as a post-process and as in-loop bookkeeping.
+
+Pre-write a 30-line trie + tokenize function so it's available if the interviewer escalates.
+
+Test on adversarial inputs: empty string, vocab containing only UNK, vocab where one token is a prefix of another (app / apple).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,193 @@
+===H1===
+Zero Out Duplicates and Sort Without Native Sort
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/zero-out-duplicates-and-sort-without-native-sort
+===BODY===
+Apple
+Coding·45 minMembers
+Zero Out Duplicates and Sort Without Native Sort
+Given an unsorted integer array of about 75 elements with duplicates, zero out duplicate values and sort the data without using native sort, quicksort, or bubble sort.
+SWE
+array
+dedup
+sorting
+hashmap
+easy
+Frequency
+Single report
+Last asked
+2026-02-03
+Stage
+phone-screen
+Problem
+
+You are given an unsorted integer array of about 75 elements that may contain duplicates. Write a function that:
+
+Zeroes out duplicate values. If a value appears more than once, replace the extra occurrences with 0.
+
+Sorts the resulting array in ascending order.
+
+Does not use any built-in or native sorting routine. That means no Array.prototype.sort, no std::sort, no quicksort, no bubblesort. Implement the ordering yourself.
+
+Keeps time and space complexity in mind.
+
+// Example
+const input  = [4, 2, 7, 2, 9, 4, 1, 7, 7, 3];
+
+// Step 1: zero out duplicates (keep the first occurrence of each value)
+//   [4, 2, 7, 0, 9, 0, 1, 0, 0, 3]
+
+// Step 2: sort ascending
+const output = [0, 0, 0, 0, 1, 2, 3, 4, 7, 9];
+
+Clarify Before Coding
+
+The phrase "zero out duplicates" is genuinely ambiguous. Ask first. This is half the point of the question.
+
+Interpretation[1, 2, 2, 3, 3, 3] becomesNotes
+A. Keep first, zero the rest[0, 0, 0, 1, 2, 3]Most common reading. Each distinct value survives exactly once.
+B. Zero every value that has any duplicate[0, 0, 0, 0, 0, 1]Only values that were unique survive.
+
+The solution below uses Interpretation A (keep one copy). State the assumption before you start.
+
+Also ask:
+
+Range of values? If the integers are bounded (e.g., 0..1000), counting sort gets you O(n + k) and sidesteps the "implement a comparison sort" requirement neatly.
+
+Does order of zeros matter? "Sorted ascending" puts all zeros at the front, so no, but worth confirming.
+
+Can negatives appear? Changes whether counting sort works directly.
+
+Why the Constraints Matter
+
+The interviewer has explicitly outlawed sort, quicksort, and bubblesort. That is a signal. They want to see you pick the right algorithm for the data, not reach for the language's sort().
+
+n ≈ 75 is small. Even an O(n²) algorithm finishes in a few thousand comparisons, which is instant.
+
+But "keep time and space complexity in mind" is the tell that they want you to reason about it, not to just ship insertion sort without comment.
+
+The duplicate-handling step is O(n) with a Set. The interesting trade-off is in the sort.
+
+Solution: Hash Set + Counting Sort
+
+When values are bounded non-negative integers (common assumption for this problem), counting sort is the right tool. It's not on the banned list, it's O(n + k), and it handles the "zeros bunch at the front" requirement for free.
+
+function zeroOutAndSort(arr) {
+  const seen = new Set();
+  const deduped = new Array(arr.length);
+
+  // Pass 1: keep first occurrence, zero the rest. O(n) time, O(n) space.
+  for (let i = 0; i < arr.length; i++) {
+    const v = arr[i];
+    if (seen.has(v)) {
+      deduped[i] = 0;
+    } else {
+      seen.add(v);
+      deduped[i] = v;
+    }
+  }
+
+  // Pass 2: counting sort. Assumes values in [0, MAX].
+  const max = Math.max(...deduped);
+  const counts = new Array(max + 1).fill(0);
+  for (const v of deduped) counts[v]++;
+
+  const out = new Array(deduped.length);
+  let idx = 0;
+  for (let v = 0; v <= max; v++) {
+    for (let c = 0; c < counts[v]; c++) out[idx++] = v;
+  }
+  return out;
+}
+
+Complexity:
+
+Time: O(n + k) where k = max(arr).
+
+Space: O(n + k) for the Set, the deduped array, and the counts bucket.
+
+Solution: Hash Set + Heap Sort (General Integers)
+
+If values are unbounded or may be negative, counting sort is a poor fit: k blows up or indexing breaks. A binary heap gives you O(n log n) comparison sorting without using any banned algorithm.
+
+function zeroOutAndSort(arr) {
+  const seen = new Set();
+  const a = arr.slice();
+
+  // Pass 1: zero duplicates in place.
+  for (let i = 0; i < a.length; i++) {
+    if (seen.has(a[i])) a[i] = 0;
+    else seen.add(a[i]);
+  }
+
+  // Pass 2: heap sort (in place).
+  heapSort(a);
+  return a;
+}
+
+function heapSort(a) {
+  const n = a.length;
+  // Build max-heap.
+  for (let i = (n >> 1) - 1; i >= 0; i--) siftDown(a, i, n);
+  // Repeatedly extract the max to the end.
+  for (let end = n - 1; end > 0; end--) {
+    [a[0], a[end]] = [a[end], a[0]];
+    siftDown(a, 0, end);
+  }
+}
+
+function siftDown(a, i, end) {
+  while (true) {
+    const l = 2 * i + 1;
+    const r = 2 * i + 2;
+    let largest = i;
+    if (l < end && a[l] > a[largest]) largest = l;
+    if (r < end && a[r] > a[largest]) largest = r;
+    if (largest === i) return;
+    [a[i], a[largest]] = [a[largest], a[i]];
+    i = largest;
+  }
+}
+
+Complexity:
+
+Time: O(n log n).
+
+Space: O(n) for the Set; the heap sort itself is in-place.
+
+Solution: Insertion Sort (Simplest Legal Answer)
+
+For n = 75, insertion sort is perfectly reasonable and fits in ~10 lines. A strong candidate acknowledges that the "right" asymptotic answer is heap or counting sort, then offers this as the pragmatic choice given the tiny input.
+
+function zeroOutAndSort(arr) {
+  const seen = new Set();
+  const a = arr.slice();
+  for (let i = 0; i < a.length; i++) {
+    if (seen.has(a[i])) a[i] = 0;
+    else seen.add(a[i]);
+  }
+
+  // Insertion sort: O(n^2). For n=75 that is at most n*(n-1)/2 ≈ 2,775 comparisons.
+  for (let i = 1; i < a.length; i++) {
+    const x = a[i];
+    let j = i - 1;
+    while (j >= 0 && a[j] > x) {
+      a[j + 1] = a[j];
+      j--;
+    }
+    a[j + 1] = x;
+  }
+  return a;
+}
+
+Complexity:
+
+Time: O(n²) worst case, O(n) on already-sorted input.
+
+Space: O(n) for the Set; sort is in-place.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

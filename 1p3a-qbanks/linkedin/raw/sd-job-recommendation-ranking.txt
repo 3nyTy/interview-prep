@@ -1,0 +1,71 @@
+===H1===
+LinkedIn Learning / Job Recommendation Ranking
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/sd-job-recommendation-ranking
+===BODY===
+LinkedIn
+System Design·60 minMembers
+LinkedIn Learning / Job Recommendation Ranking
+Design a recommender that surfaces LinkedIn Learning courses (or jobs) based on the user's profile, recently applied jobs, and behavioural history. Standard candidate-generation + ranking architecture; the LinkedIn-specific twist is heavy feature engineering on the job-posting side and explicit explainability for the recommended item.
+MLE
+mlsd
+recommendation
+ranking
+two-tower
+retrieval
+feature-engineering
+ab-testing
+medium
+Frequency
+Low
+Last asked
+2026-03-18
+Stage
+onsite-system-design
+Requirements
+
+Functional:
+
+Given a user, return a ranked list of courses (or jobs) the user is likely to engage with.
+
+Cold-start handling for new users / new items.
+
+Explainability — why is this course recommended? (e.g. "skills you applied for last week").
+
+Non-functional:
+
+Sub-200 ms candidate generation + ranking budget.
+
+Recall over the full catalog; precision over the top-10 served.
+
+Online learning loop closes within hours, not days.
+
+Notes
+
+Two-stage architecture:
+
+Candidate generation — retrieve ~1000 candidates per request. Two-tower retrieval (user tower + item tower) trained on co-engagement; ANN index over item embeddings.
+
+Ranking — gradient-boosted tree (or a deep ranker) over ~hundreds of features. Score the ~1000 candidates, take top-K.
+
+Feature engineering on the job / course side is the recurring deep-dive: parse the job posting, extract required skills, level, location, salary band; cross with user profile features.
+
+Calibration of the ranker's output probability matters when downstream business logic (promoted course budgets, position eligibility) consumes it — discuss isotonic regression or Platt scaling.
+
+Multi-objective ranking is a frequent follow-up: blend engagement, business value, fairness. Common framing is a linear blend with weights tuned offline and validated A/B online.
+
+Preparation
+
+Walk the two-stage architecture end-to-end in < 15 minutes.
+
+Drill the feature-engineering discussion — for both user and item sides, list ~10 features each with a one-line motivation.
+
+Pre-load the A/B testing discussion: counterfactual evaluation, treatment-control split, novelty effects, business metric vs proxy metric.
+
+For the explainability follow-up, propose feature-attribution (top-3 features by contribution) rather than per-prediction LIME / SHAP — production explanations are usually rule-based attributions of the top driver.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

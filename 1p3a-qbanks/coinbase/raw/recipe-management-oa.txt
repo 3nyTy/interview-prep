@@ -1,0 +1,633 @@
+===H1===
+Recipe Management System OA
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/recipe-management-oa
+===BODY===
+Coinbase
+Coding·70 minMembers
+Recipe Management System OA
+A recipe-CRUD rotation of the standard four-level OA — add / update / get / delete a recipe object, then case-insensitive search and sorted listing, then per-user ownership, then a version-history + rollback model that mirrors the in-memory database Level-4 pattern.
+SWE
+hashmap
+object-design
+versioning
+snapshot
+codesignal
+oa
+medium
+Frequency
+Single report
+Last asked
+2025-12-15
+Stage
+oa
+Recipe Manager Interview Question
+
+Problem Overview
+
+You need to build an in-memory recipe management system. The system must handle creating, reading, updating, and deleting (CRUD) recipes. You also need to add search, user logins, and version history.
+
+This is a multi-step problem. You will build the solution level by level.
+
+Each recipe has three parts:
+
+recipe_id: A unique string ID.
+
+name: The name of the recipe.
+
+ingredients: A list of strings.
+
+Level 1: Basic Requirements
+
+Problem Requirements
+
+Create a class called RecipeManager. It needs four methods:
+
+Add: Create a new recipe.
+
+Get: Find a recipe by its ID.
+
+Update: Change a recipe's name and ingredients.
+
+Delete: Remove a recipe.
+
+Rules:
+
+Unique Names: Recipe names must be unique. The check is case-insensitive.
+
+Example: If "Pasta" exists, you cannot add "pasta" or "PASTA".
+
+Updates: You can keep the current name during an update (even if you change the capitalization), but you cannot change it to a name that another recipe already uses.
+
+Code Stub
+
+class RecipeManager:
+    def __init__(self):
+        """Initialize the system."""
+        pass
+
+    def add_recipe(self, recipe_id: str, name: str, ingredients: list[str]) -> bool:
+        """
+        Create a new recipe.
+        Returns True if successful.
+        Returns False if ID exists or Name exists (case-insensitive).
+        """
+        pass
+
+    def get_recipe(self, recipe_id: str) -> dict | None:
+        """
+        Get a recipe by ID.
+        Returns a dictionary or None.
+        """
+        pass
+
+    def update_recipe(self, recipe_id: str, name: str, ingredients: list[str]) -> bool:
+        """
+        Update an existing recipe.
+        Returns True if successful.
+        Returns False if recipe is missing or new name is taken.
+        """
+        pass
+
+    def delete_recipe(self, recipe_id: str) -> bool:
+        """
+        Delete a recipe by ID.
+        Returns True if successful.
+        """
+        pass
+
+Example Usage
+
+manager = RecipeManager()
+
+# Adding recipes
+manager.add_recipe("1", "Spaghetti Bolognese", ["pasta", "ground beef", "tomato sauce"])  # True
+manager.add_recipe("2", "Caesar Salad", ["lettuce", "croutons", "parmesan"])               # True
+manager.add_recipe("3", "spaghetti bolognese", ["pasta"])  # False (Name already taken)
+
+# Getting recipes
+manager.get_recipe("1")   # Returns recipe data
+manager.get_recipe("99")  # Returns None
+
+# Updating
+manager.update_recipe("1", "Classic Bolognese", ["pasta", "beef", "tomatoes"])  # True
+manager.update_recipe("1", "caesar salad", ["pasta"])                          # False (Name taken)
+manager.update_recipe("99", "Nothing", [])                                     # False (ID not found)
+
+# Deleting
+manager.delete_recipe("2")   # True
+manager.delete_recipe("99")  # False
+
+Level 1: Solution Code
+
+We use two HashMaps (dictionaries):
+
+recipes: Maps recipe_id to the recipe data.
+
+name_to_id: Maps the lowercase name to the recipe_id. This helps us check for duplicate names quickly (O(1)).
+
+class RecipeManager:
+    def __init__(self):
+        self.recipes = {}      # recipe_id -> recipe data with history
+        self.name_to_id = {}   # lowercase name -> recipe_id (for uniqueness check)
+
+    def add_recipe(self, recipe_id: str, name: str, ingredients: list[str]) -> bool:
+        if recipe_id in self.recipes:
+            return False
+        if name.lower() in self.name_to_id:
+            return False
+
+        self.recipes[recipe_id] = {
+            'id': recipe_id,
+            'history': [{'name': name, 'ingredients': ingredients.copy()}]
+        }
+        self.name_to_id[name.lower()] = recipe_id
+        return True
+
+    def get_recipe(self, recipe_id: str) -> dict | None:
+        if recipe_id not in self.recipes:
+            return None
+        recipe = self.recipes[recipe_id]
+        current = recipe['history'][-1]
+        return {
+            'id': recipe_id,
+            'name': current['name'],
+            'ingredients': current['ingredients'].copy()
+        }
+
+    def update_recipe(self, recipe_id: str, name: str, ingredients: list[str]) -> bool:
+        if recipe_id not in self.recipes:
+            return False
+        existing_id = self.name_to_id.get(name.lower())
+        if existing_id is not None and existing_id != recipe_id:
+            return False
+
+        old_name = self.recipes[recipe_id]['history'][-1]['name']
+        del self.name_to_id[old_name.lower()]
+
+        self.recipes[recipe_id]['history'] = [{'name': name, 'ingredients': ingredients.copy()}]
+        self.name_to_id[name.lower()] = recipe_id
+        return True
+
+    def delete_recipe(self, recipe_id: str) -> bool:
+        if recipe_id not in self.recipes:
+            return False
+        current_name = self.recipes[recipe_id]['history'][-1]['name']
+        del self.name_to_id[current_name.lower()]
+        del self.recipes[recipe_id]
+        return True
+
+Complexity Analysis:
+
+MethodTimeSpace
+add_recipeO(1)O(1)
+get_recipeO(1)O(1)
+update_recipeO(1)O(1)
+delete_recipeO(1)O(1)
+
+Level 2: Search and Sort
+
+Problem Requirements
+
+Add a search feature.
+
+Search: Find recipes where the name contains the search query (case-insensitive).
+
+Get All: Return every recipe in the system.
+
+Sorting Rules:
+Both methods must return a list sorted by:
+
+Number of ingredients (smallest number first).
+
+Recipe ID (ascending order).
+
+If IDs are numbers ("1", "2"), sort numerically.
+
+If IDs are text ("a", "b"), sort alphabetically.
+
+Example Usage
+
+manager = RecipeManager()
+manager.add_recipe("1", "Spaghetti", ["pasta", "sauce"])
+manager.add_recipe("2", "Salad", ["lettuce", "cheese", "croutons"])
+
+# Search for "salad"
+manager.search_recipes("salad")
+# Returns: [{"id": "2", "name": "Salad", ...}]
+
+# Get all recipes
+manager.get_all_recipes()
+# Returns: Spaghetti first (2 ingredients), then Salad (3 ingredients).
+
+Level 2: Solution Code
+
+We add a helper method _sort_recipes to handle the sorting logic.
+
+class RecipeManager:
+    # ... (Previous code stays the same) ...
+    def __init__(self):
+        self.recipes = {}
+        self.name_to_id = {}
+
+    def add_recipe(self, recipe_id: str, name: str, ingredients: list[str]) -> bool:
+        if recipe_id in self.recipes:
+            return False
+        if name.lower() in self.name_to_id:
+            return False
+        self.recipes[recipe_id] = {
+            'id': recipe_id,
+            'history': [{'name': name, 'ingredients': ingredients.copy()}]
+        }
+        self.name_to_id[name.lower()] = recipe_id
+        return True
+
+    def get_recipe(self, recipe_id: str) -> dict | None:
+        if recipe_id not in self.recipes:
+            return None
+        recipe = self.recipes[recipe_id]
+        current = recipe['history'][-1]
+        return {
+            'id': recipe_id,
+            'name': current['name'],
+            'ingredients': current['ingredients'].copy()
+        }
+
+    def update_recipe(self, recipe_id: str, name: str, ingredients: list[str]) -> bool:
+        if recipe_id not in self.recipes:
+            return False
+        existing_id = self.name_to_id.get(name.lower())
+        if existing_id is not None and existing_id != recipe_id:
+            return False
+        old_name = self.recipes[recipe_id]['history'][-1]['name']
+        del self.name_to_id[old_name.lower()]
+        self.recipes[recipe_id]['history'] = [{'name': name, 'ingredients': ingredients.copy()}]
+        self.name_to_id[name.lower()] = recipe_id
+        return True
+
+    def delete_recipe(self, recipe_id: str) -> bool:
+        if recipe_id not in self.recipes:
+            return False
+        current_name = self.recipes[recipe_id]['history'][-1]['name']
+        del self.name_to_id[current_name.lower()]
+        del self.recipes[recipe_id]
+        return True
+
+    def _sort_recipes(self, recipes: list[dict]) -> list[dict]:
+        """Sort by ingredient count (asc), then by ID (numeric asc)."""
+        def sort_key(r):
+            ingredient_count = len(r['ingredients'])
+            recipe_id = r['id']
+            if recipe_id.isdigit():
+                return (ingredient_count, 0, int(recipe_id), "")
+            else:
+                return (ingredient_count, 1, 0, recipe_id)
+        return sorted(recipes, key=sort_key)
+
+    def search_recipes(self, query: str) -> list[dict]:
+        results = []
+        query_lower = query.lower()
+        for recipe_id, recipe in self.recipes.items():
+            current = recipe['history'][-1]
+            if query_lower in current['name'].lower():
+                results.append({
+                    'id': recipe_id,
+                    'name': current['name'],
+                    'ingredients': current['ingredients'].copy()
+                })
+        return self._sort_recipes(results)
+
+    def get_all_recipes(self) -> list[dict]:
+        results = []
+        for recipe_id, recipe in self.recipes.items():
+            current = recipe['history'][-1]
+            results.append({
+                'id': recipe_id,
+                'name': current['name'],
+                'ingredients': current['ingredients'].copy()
+            })
+        return self._sort_recipes(results)
+
+Complexity Analysis:
+
+MethodTimeSpace
+search_recipesO(R log R)O(R)
+get_all_recipesO(R log R)O(R)
+
+R is the number of recipes. Sorting takes the most time.
+
+Level 3: Adding Users
+
+Problem Requirements
+
+Add a user system. Some actions now require a valid user.
+
+Add User: Create a user with an ID and username.
+
+Edit Recipe: This is a new function. It updates a recipe, but first checks if the user_id is valid.
+
+Note: The old update_recipe function (Level 1) stays the same (it doesn't check users). edit_recipe is a wrapper that adds security.
+
+Example Usage
+
+manager = RecipeManager()
+manager.add_recipe("1", "Pasta", ["noodles"])
+manager.add_user("u1", "chef_john")
+
+manager.edit_recipe("u1", "1", "New Pasta", ["noodles", "sauce"]) # True (User exists)
+manager.edit_recipe("u99", "1", "Bad User", ["noodles"])          # False (User missing)
+
+Level 3: Solution Code
+
+We add a users dictionary to store user data.
+
+class RecipeManager:
+    def __init__(self):
+        self.recipes = {}
+        self.users = {}
+        self.name_to_id = {}
+
+    # ... (Level 1 & 2 methods stay the same) ...
+
+    def add_user(self, user_id: str, username: str) -> bool:
+        if user_id in self.users:
+            return False
+        self.users[user_id] = {'id': user_id, 'username': username}
+        return True
+
+    def edit_recipe(self, user_id: str, recipe_id: str, name: str, ingredients: list[str]) -> bool:
+        if user_id not in self.users:
+            return False
+        if recipe_id not in self.recipes:
+            return False
+
+        existing_id = self.name_to_id.get(name.lower())
+        if existing_id is not None and existing_id != recipe_id:
+            return False
+
+        old_name = self.recipes[recipe_id]['history'][-1]['name']
+        del self.name_to_id[old_name.lower()]
+
+        # Overwrite the data (Level 3 style)
+        self.recipes[recipe_id]['history'] = [{'name': name, 'ingredients': ingredients.copy()}]
+        self.name_to_id[name.lower()] = recipe_id
+        return True
+
+Complexity Analysis:
+
+MethodTimeSpace
+add_userO(1)O(1)
+edit_recipeO(1)O(1)
+
+Level 4: Version History
+
+Problem Requirements
+
+Now, when you edit a recipe, do not overwrite the old data. Instead, save it as a history.
+
+Edit Recipe: Appends a new version to the list. Version numbers start at 1 and go up (1, 2, 3...).
+
+Get History: Returns a list of all versions of a recipe.
+
+Rollback: Takes a recipe back to an old version.
+
+This does not delete newer versions.
+
+It copies the old version's data and adds it as the newest version.
+
+Example: If you rollback Version 1, it becomes Version 4 (if there were 3 versions before).
+
+Edge Cases:
+
+Rollback Conflicts: You can rollback to an old name, but only if that name isn't currently used by a different recipe.
+
+Example Usage
+
+manager = RecipeManager()
+manager.add_user("u1", "chef")
+manager.add_recipe("1", "Pasta", ["noodles"]) # Version 1
+
+# Edit creates Version 2
+manager.edit_recipe("u1", "1", "Spaghetti", ["noodles", "sauce"])
+
+# Rollback to Version 1 (Pasta) -> Creates Version 3
+manager.rollback_recipe("u1", "1", 1)
+
+# History is now:
+# v1: Pasta
+# v2: Spaghetti
+# v3: Pasta
+
+Level 4: Solution Code
+
+We modify the class to store a list of versions in history.
+
+class RecipeManager:
+    def __init__(self):
+        self.recipes = {}      # recipe_id -> recipe data with history
+        self.users = {}        # user_id -> user data
+        self.name_to_id = {}   # lowercase name -> recipe_id (for uniqueness check)
+
+    # ==================== Level 1: Basic CRUD ====================
+
+    def add_recipe(self, recipe_id: str, name: str, ingredients: list[str]) -> bool:
+        if recipe_id in self.recipes:
+            return False
+        if name.lower() in self.name_to_id:
+            return False
+
+        self.recipes[recipe_id] = {
+            'id': recipe_id,
+            'history': [{'name': name, 'ingredients': ingredients.copy()}]
+        }
+        self.name_to_id[name.lower()] = recipe_id
+        return True
+
+    def get_recipe(self, recipe_id: str) -> dict | None:
+        if recipe_id not in self.recipes:
+            return None
+        recipe = self.recipes[recipe_id]
+        current = recipe['history'][-1]
+        return {
+            'id': recipe_id,
+            'name': current['name'],
+            'ingredients': current['ingredients'].copy()
+        }
+
+    def update_recipe(self, recipe_id: str, name: str, ingredients: list[str]) -> bool:
+        if recipe_id not in self.recipes:
+            return False
+        existing_id = self.name_to_id.get(name.lower())
+        if existing_id is not None and existing_id != recipe_id:
+            return False
+
+        old_name = self.recipes[recipe_id]['history'][-1]['name']
+        del self.name_to_id[old_name.lower()]
+
+        self.recipes[recipe_id]['history'] = [{'name': name, 'ingredients': ingredients.copy()}]
+        self.name_to_id[name.lower()] = recipe_id
+        return True
+
+    def delete_recipe(self, recipe_id: str) -> bool:
+        if recipe_id not in self.recipes:
+            return False
+        current_name = self.recipes[recipe_id]['history'][-1]['name']
+        del self.name_to_id[current_name.lower()]
+        del self.recipes[recipe_id]
+        return True
+
+    # ==================== Level 2: Search and Sort ====================
+
+    def _sort_recipes(self, recipes: list[dict]) -> list[dict]:
+        """Sort by ingredient count (asc), then by ID (numeric asc)."""
+        def sort_key(r):
+            ingredient_count = len(r['ingredients'])
+            recipe_id = r['id']
+            if recipe_id.isdigit():
+                return (ingredient_count, 0, int(recipe_id), "")
+            else:
+                return (ingredient_count, 1, 0, recipe_id)
+        return sorted(recipes, key=sort_key)
+
+    def search_recipes(self, query: str) -> list[dict]:
+        results = []
+        query_lower = query.lower()
+        for recipe_id, recipe in self.recipes.items():
+            current = recipe['history'][-1]
+            if query_lower in current['name'].lower():
+                results.append({
+                    'id': recipe_id,
+                    'name': current['name'],
+                    'ingredients': current['ingredients'].copy()
+                })
+        return self._sort_recipes(results)
+
+    def get_all_recipes(self) -> list[dict]:
+        results = []
+        for recipe_id, recipe in self.recipes.items():
+            current = recipe['history'][-1]
+            results.append({
+                'id': recipe_id,
+                'name': current['name'],
+                'ingredients': current['ingredients'].copy()
+            })
+        return self._sort_recipes(results)
+
+    # ==================== Level 3: User System ====================
+
+    def add_user(self, user_id: str, username: str) -> bool:
+        if user_id in self.users:
+            return False
+        self.users[user_id] = {'id': user_id, 'username': username}
+        return True
+
+    def edit_recipe(self, user_id: str, recipe_id: str, name: str, ingredients: list[str]) -> bool:
+        if user_id not in self.users:
+            return False
+        if recipe_id not in self.recipes:
+            return False
+
+        existing_id = self.name_to_id.get(name.lower())
+        if existing_id is not None and existing_id != recipe_id:
+            return False
+
+        old_name = self.recipes[recipe_id]['history'][-1]['name']
+        del self.name_to_id[old_name.lower()]
+
+        # Add new version (Level 4 behavior)
+        self.recipes[recipe_id]['history'].append({
+            'name': name,
+            'ingredients': ingredients.copy()
+        })
+        self.name_to_id[name.lower()] = recipe_id
+        return True
+
+    # ==================== Level 4: Version Control ====================
+
+    def get_recipe_history(self, recipe_id: str) -> list[dict] | None:
+        if recipe_id not in self.recipes:
+            return None
+        history = []
+        for i, version in enumerate(self.recipes[recipe_id]['history'], 1):
+            history.append({
+                'version': i,
+                'name': version['name'],
+                'ingredients': version['ingredients'].copy()
+            })
+        return history
+
+    def rollback_recipe(self, user_id: str, recipe_id: str, version: int) -> bool:
+        if user_id not in self.users:
+            return False
+        if recipe_id not in self.recipes:
+            return False
+
+        history = self.recipes[recipe_id]['history']
+
+        if version < 1 or version > len(history):
+            return False
+
+        old_version = history[version - 1]
+
+        # Check name conflict: if old name differs from current, check for conflicts
+        current_name = history[-1]['name']
+        if old_version['name'].lower() != current_name.lower():
+            existing_id = self.name_to_id.get(old_version['name'].lower())
+            if existing_id is not None and existing_id != recipe_id:
+                return False
+
+        # Remove current name mapping
+        del self.name_to_id[current_name.lower()]
+
+        # Add rolled-back version as new version
+        history.append({
+            'name': old_version['name'],
+            'ingredients': old_version['ingredients'].copy()
+        })
+        self.name_to_id[old_version['name'].lower()] = recipe_id
+        return True
+
+Complexity Analysis:
+
+MethodTimeSpace
+edit_recipeO(1)O(1)
+get_recipe_historyO(V)O(V)
+rollback_recipeO(1)O(1)
+
+V is the number of versions for that recipe.
+
+Discussion Topics
+
+Here are common follow-up questions you might face in an interview:
+
+Why use name_to_id?
+
+This HashMap lets us check for duplicate names in O(1) time. Without it, we would have to loop through every single recipe (O(R)) every time we add or edit something, which is very slow.
+
+How should we store history?
+
+Snapshots (Used here): We save a full copy of the recipe for every version. This is easy to code but uses more memory if recipes are large.
+
+Deltas: We could save only the changes (e.g., "Added salt"). This saves memory but makes it harder to reconstruct the full recipe later.
+
+Concurrency (Multi-threading)
+
+This code assumes only one person uses it at a time. If two people try to edit_recipe at the exact same moment, the data could get corrupted. In a real system, you would need "locks" or database transactions to prevent this.
+
+Candidate-Report Notes
+
+Difficulty is reported as noticeably easier than the in-memory database variant; Level 4 here is materially simpler because there is no TTL and the rollback target is named by id, not by timestamp.
+
+The cleanest Level 4 model is Map<recipeName, List<Snapshot>> plus Map<versionId, (recipeName, index)>. Every mutation appends a snapshot and registers the version id.
+
+Preparation
+
+Reuse the same level-1 / level-2 templates you drilled for the banking-system and in-memory-database rotations — the surface is interchangeable.
+
+Practice the snapshot-on-mutation pattern once; once you have it, this rotation falls in under 50 minutes.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

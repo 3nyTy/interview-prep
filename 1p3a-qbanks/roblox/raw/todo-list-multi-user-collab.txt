@@ -1,0 +1,523 @@
+===H1===
+To-Do List with Multi-User Collaboration
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/todo-list-multi-user-collab
+===BODY===
+Roblox
+System Design·60 minMembers
+To-Do List with Multi-User Collaboration
+Design a shared to-do list product where multiple users can read and edit the same list concurrently. The interview is intentionally under-specified; the candidate is expected to clarify requirements up front and drive the conversation. Focus is on the schema, the read/write conflict model, and the API surface for collaboration.
+SWE
+system-design
+schema-design
+ambiguous-spec
+concurrency
+websocket
+medium
+Frequency
+Low
+Last asked
+2026-09-05
+Stage
+phone-screen · onsite-system-design
+Problem Statement
+
+Design a collaborative to-do list system. Users can create lists, add tasks, share lists with collaborators, update tasks, and receive near real-time updates when collaborators make changes.
+
+Common variants of this prompt include:
+
+Design a to-do list
+
+Design a shared to-do list
+
+Design a collaborative todo list app
+
+Support sharing, real-time collaboration, and update notifications
+
+Clarify the collaboration granularity. A shared task list is usually not the same as collaborative rich text editing. For a 45-60 minute interview, use versioned task/list records first, then mention CRDT or OT only if the interviewer asks for simultaneous free-form text editing.
+
+Phase 1: Requirements (~5 minutes)
+
+Functional Requirements
+
+Users should be able to create and manage to-do lists.
+
+Users should be able to add, update, complete, reorder, and delete tasks.
+
+Users should be able to share a list with collaborators with read or write permissions.
+
+Collaborators should see updates in near real time when tasks change.
+
+Users should receive notifications for important list changes, such as being invited or mentioned.
+
+Optional follow-ups:
+
+Offline edits and sync after reconnect.
+
+Comments, mentions, assignments, due dates, and reminders.
+
+Audit history and undo.
+
+Fine-grained permissions per task.
+
+Non-Functional Requirements
+
+RequirementTargetWhy it matters
+Read latencyP95 under 100 ms for opening a listLists are opened frequently
+Write latencyP95 under 150 ms for task mutation acknowledgmentEditing should feel responsive
+Update fanoutUnder 1 second to online collaboratorsCollaboration should feel live
+Availability99.9%+ for CRUD APIsUsers depend on task data
+DurabilityNo lost accepted writesTasks are user-owned durable data
+ConsistencyStrong for permissions and task writes; eventual for notificationsAvoid unauthorized or conflicting writes
+ScaleMillions of users, many small lists, occasional large shared listsWorkload is skewed by team and popular lists
+
+Clarifying Questions
+
+How large can a list be?
+Assume most lists have fewer than 500 tasks, with rare lists up to 10K tasks.
+
+How many collaborators can a list have?
+Assume typical lists have 2-20 collaborators; large teams may have hundreds.
+
+Do we need character-by-character collaborative editing?
+No for the base design. We support entity-level task mutations with optimistic concurrency.
+
+Should users work offline?
+Mention it as a follow-up. The base design handles reconnect and missed events, not full offline merge.
+
+Are notifications required for every edit?
+No. Real-time update events go to online clients; persistent notifications are for invites, assignments, mentions, and major changes.
+
+Capacity Estimation
+
+Assumptions:
+- 50M registered users
+- 10M DAU
+- Average active user opens 10 lists/day and writes 20 task changes/day
+
+Reads:
+- 10M * 10 list opens/day = 100M reads/day
+- Average ~= 1.2K reads/sec
+- Peak 20x ~= 24K reads/sec
+
+Writes:
+- 10M * 20 changes/day = 200M writes/day
+- Average ~= 2.3K writes/sec
+- Peak 20x ~= 46K writes/sec
+
+Real-time fanout:
+- If average collaborator count is 5
+- 46K writes/sec can create roughly 230K online fanout events/sec at peak
+
+The base data is not huge per list. The hard parts are permission checks, write conflicts, ordering/reordering, and efficiently pushing updates to online collaborators.
+
+Phase 2: Data Model (~5 minutes)
+
+Core Entities
+
+User
+- user_id
+- display_name
+- email
+
+TodoList
+- list_id
+- owner_id
+- title
+- archived
+- version
+- created_at
+- updated_at
+
+ListMembership
+- list_id
+- user_id
+- role: owner | editor | viewer
+- status: invited | active | removed
+- created_at
+- updated_at
+
+Task
+- task_id
+- list_id
+- title
+- notes
+- status: open | completed | deleted
+- assignee_id: nullable
+- due_at: nullable
+- position
+- version
+- created_by
+- updated_by
+- created_at
+- updated_at
+
+ListChangeEvent
+- event_id
+- list_id
+- target_type: list | task | membership
+- target_id: nullable
+- actor_id
+- event_type
+- payload
+- list_version
+- created_at
+
+Notification
+- notification_id
+- user_id
+- list_id
+- event_id
+- type
+- read_at
+- created_at
+
+Storage and Indexes
+
+todo_lists:
+- primary key: list_id
+- index: owner_id, updated_at desc
+
+list_memberships:
+- primary key: (list_id, user_id)
+- index: user_id, status, updated_at desc
+
+tasks:
+- primary key: task_id
+- index: list_id, status, position
+- index: list_id, updated_at desc
+
+list_change_events:
+- partition key: list_id
+- sort key: list_version or created_at
+
+notifications:
+- partition key: user_id
+- sort key: created_at desc
+
+Modeling Decisions
+
+Membership is explicit so permission checks are cheap and auditable.
+
+Tasks have versions so clients can detect stale updates.
+
+List version increments on every accepted mutation so clients can resume missed events after reconnect.
+
+Change events are append-only and power real-time fanout, sync, audit history, and notifications.
+
+Deletes can be soft deletes to support undo and event replay.
+
+Do not put all collaborators or all tasks into one giant JSON blob on TodoList. It makes permissions, pagination, concurrent writes, and partial updates much harder.
+
+Phase 3: API Design (~5 minutes)
+
+Protocol Choice
+
+Use REST for list and task CRUD because the operations map cleanly to resources. Use WebSocket or Server-Sent Events for real-time updates to online collaborators. Use an internal queue for notification fanout and durable background work.
+
+List and Sharing APIs
+
+POST /api/todo-lists
+Content-Type: application/json
+
+{ "title": "Launch checklist" }
+
+201 Created
+{ "list_id": "list_123", "title": "Launch checklist", "version": 1 }
+
+POST /api/todo-lists/{list_id}/members
+Content-Type: application/json
+
+{ "user_id": "user_456", "role": "editor" }
+
+201 Created
+{ "status": "invited" }
+
+GET /api/todo-lists/{list_id}?include_tasks=true&cursor=...
+
+200 OK
+{
+  "list_id": "list_123",
+  "title": "Launch checklist",
+  "version": 42,
+  "tasks": []
+}
+
+Task Mutation APIs
+
+POST /api/todo-lists/{list_id}/tasks
+Content-Type: application/json
+Idempotency-Key: 1d72...
+
+{ "title": "Run load test", "position_after": "task_abc" }
+
+201 Created
+{ "task_id": "task_789", "version": 1, "list_version": 43 }
+
+PATCH /api/tasks/{task_id}
+Content-Type: application/json
+If-Match: "task-version-3"
+
+{
+  "title": "Run load test at 5K RPS",
+  "status": "open"
+}
+
+200 OK
+{ "task_id": "task_789", "version": 4, "list_version": 44 }
+
+If the client edits a stale task:
+
+409 Conflict
+{
+  "error": "task_version_conflict",
+  "current_task": { "task_id": "task_789", "version": 5 }
+}
+
+Real-Time Connection
+
+GET /api/realtime/connect
+Authorization: Bearer ...
+
+Client subscribes:
+
+{
+  "type": "subscribe",
+  "list_id": "list_123",
+  "last_seen_list_version": 41
+}
+
+Server emits:
+
+{
+  "type": "task_updated",
+  "list_id": "list_123",
+  "task_id": "task_789",
+  "list_version": 44,
+  "patch": { "status": "completed" }
+}
+
+Use If-Match or an explicit expected_version on updates. It gives you a concrete answer when the interviewer asks how to handle read/write conflicts.
+
+Phase 4: High-Level Design (~15-25 minutes)
+
+Create or Update Task Flow
+
+Client sends POST /tasks or PATCH /tasks/{task_id}.
+
+API authenticates the user and checks ListMembership for editor or owner permission.
+
+API reads the current task version if this is an update.
+
+API performs a conditional write:
+
+update only if task.version == expected_version
+
+increment task.version
+
+increment todo_list.version
+
+insert ListChangeEvent
+
+insert an outbox row
+
+API returns the new task version and list version.
+
+Outbox publisher sends the change event to the event stream.
+
+Realtime Gateway pushes the event to online collaborators subscribed to the list.
+
+Notification workers create persistent notifications only when needed.
+
+Open List Flow
+
+Client calls GET /todo-lists/{list_id}.
+
+API checks membership.
+
+API reads list metadata and task page from cache or DB.
+
+API returns list version and tasks.
+
+Client opens WebSocket and subscribes with last_seen_list_version.
+
+Realtime Gateway replays missed events from ListChangeEvent if the client is behind.
+
+Sharing Flow
+
+Owner or editor with sharing permission invites a collaborator.
+
+API inserts or updates ListMembership with status invited.
+
+API creates a notification for the invitee.
+
+When the invitee accepts, membership becomes active.
+
+Future list reads and task mutations check active membership.
+
+Reorder Flow
+
+For reordering, avoid updating every task position on each drag.
+
+Use sparse positions:
+
+Task A position = 1000
+Task B position = 2000
+Move Task C between them -> position = 1500
+
+If positions become too dense, run a background compaction job for that list.
+
+Reordering can become a hidden bottleneck if every move rewrites hundreds of tasks. Sparse ordering or fractional indexing is the practical interview answer.
+
+Component Responsibilities
+
+ComponentResponsibility
+Todo APICRUD, permission checks, versioned writes
+Primary DBDurable lists, memberships, tasks, events
+List CacheSpeeds up hot list reads and task pages
+Transactional OutboxEnsures accepted writes produce events
+Event StreamDelivers task/list changes to fanout workers
+Realtime GatewayMaintains online connections and subscriptions
+Notification WorkersCreates persistent notifications and emails/push
+
+Phase 5: Scaling & Trade-offs (~15-20 minutes)
+
+Conflict Handling
+
+For task-level collaboration, use optimistic concurrency.
+
+Client reads Task version 3
+Client sends PATCH with expected_version = 3
+Server accepts only if current version is still 3
+If accepted, server writes version 4
+If current version is 4 or higher, server returns 409 Conflict
+
+Conflict options:
+
+StrategyWhen to useTrade-off
+Last-write-winsLow-value fields like collapsed UI stateCan lose user edits
+Optimistic concurrencyTask title, status, assignee, due dateRequires client retry/merge
+Field-level mergeTwo users edit different fieldsMore complex but user-friendly
+CRDT/OTRich text notes edited character-by-characterHeavy for a simple task list
+
+If asked about simultaneous edits, say you would use optimistic concurrency for task entities and reserve CRDT/OT for rich text fields. That is a better scoped answer than forcing Google Docs machinery onto every task mutation.
+
+Scaling Reads
+
+Cache list metadata and first task pages by list_id.
+
+Use pagination for large lists.
+
+Index memberships by user_id for "my lists".
+
+Use read replicas for list browsing and notification reads.
+
+Invalidate or update cache after accepted writes through the change event stream.
+
+Scaling Writes
+
+Partition tasks and events by list_id.
+
+Keep each task update as a narrow row update.
+
+Use a transactional outbox so real-time updates are not lost if the stream publish fails.
+
+Rate limit abusive clients that repeatedly reorder or toggle tasks.
+
+For very large lists, route all writes for a list through a per-list sequencer if ordering becomes critical.
+
+Real-Time Fanout
+
+Online collaborators are connected to Realtime Gateways. Each gateway tracks subscriptions:
+
+connection_id -> user_id
+list_id -> set(connection_id)
+
+When a ListChangeEvent arrives, the gateway checks which connected users are active members of the list and pushes the event. For large lists, use pub/sub channels per list and avoid storing huge subscription sets in one process.
+
+Offline and Reconnect
+
+Base reconnect flow:
+
+Client stores last_seen_list_version.
+
+On reconnect, client subscribes with that version.
+
+Server replays events with list_version > last_seen_list_version.
+
+If too many events are missing or compacted, client refetches the list snapshot.
+
+Full offline editing follow-up:
+
+Store local pending mutations.
+
+Send mutations with base versions.
+
+Server accepts non-conflicting updates and rejects conflicts.
+
+Client surfaces conflicts or merges field-level changes.
+
+Permissions and Security
+
+Every read and write checks ListMembership.
+
+Changes to membership produce audit events.
+
+Removing a user should revoke future WebSocket subscriptions.
+
+Invitation links should be scoped, expiring, and revocable.
+
+Do not leak list existence through different 403/404 behavior if privacy matters.
+
+Bottlenecks
+
+BottleneckMitigation
+Hot shared listPartition events, cache snapshots, optionally per-list write sequencer
+Notification fanoutQueue and batch persistent notifications
+Reorder stormsSparse positions and rate limits
+Permission checksCache membership with short TTL and invalidate on membership changes
+WebSocket gateway memoryShard connections by user/list and use pub/sub between gateways
+
+Common Pitfalls
+
+Skipping schema - This Roblox prompt has observed feedback about missing schema discussion. Define lists, tasks, memberships, events, and notifications early.
+
+Confusing live updates with persistent notifications - Online clients need real-time events; users do not need a durable notification for every checkbox toggle.
+
+Ignoring stale writes - Without task versions or expected versions, two collaborators can silently overwrite each other.
+
+Interview Checklist
+
+Clarify collaboration granularity: task-level versus rich-text editing.
+
+Define TodoList, ListMembership, Task, ListChangeEvent, and Notification.
+
+Use REST for CRUD and WebSocket/SSE for live updates.
+
+Explain optimistic concurrency with expected_version or If-Match.
+
+Draw API, DB, cache, outbox, event stream, realtime gateway, and notification workers.
+
+Discuss list opening, task update, sharing, reconnect, and conflict flows.
+
+Mention sparse positions for efficient reordering.
+
+Summary
+
+AreaRecommended Answer
+Primary modelLists, memberships, tasks, change events
+CRUD protocolREST
+CollaborationWebSocket/SSE events with list versions
+Conflict handlingOptimistic concurrency; field merge as follow-up
+NotificationsDurable only for invites, assignments, mentions, major changes
+Main trade-offSimplicity of task-level writes versus complexity of CRDT/OT
+
+Notes
+
+In a shared-list phone screen, a candidate identified adding Kafka to the synchronization path as a mistake because the resulting asynchronous flow delayed collaborator updates. Be ready to explain the latency impact of any queue in that path.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

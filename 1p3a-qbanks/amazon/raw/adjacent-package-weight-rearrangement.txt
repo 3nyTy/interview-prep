@@ -1,0 +1,65 @@
+===H1===
+Package Weight Rearrangement
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/adjacent-package-weight-rearrangement
+===BODY===
+Amazon
+Coding·30 minMembers
+Package Weight Rearrangement
+Given package weights drawn only from 0 through 9, decide whether they can be rearranged so every adjacent pair sums to at most 9; one version phrases the boundary as strictly below 10. The interviewer pushes for linear time by exploiting the ten-value domain.
+SWE
+array
+greedy
+bucket-sort
+medium
+Frequency
+Low · New
+Last asked
+2026-08-24
+Stage
+phone-screen
+Requirements
+
+Input: a collection or digit string of package weights; every weight is an integer from 0 through 9.
+
+Rearrange all weights so the sum of every adjacent pair is at most 9. One phrasing uses the equivalent rule “strictly less than 10.”
+
+Return whether a valid arrangement exists; the digit-string version asks for the rearranged sequence.
+
+Follow-up: improve a sorting-based construction to O(n) by using the fixed ten-value domain.
+
+Examples
+
+weights = [9, 0, 8, 1, 7]
+
+A valid arrangement is:
+9, 0, 8, 1, 7
+
+9 + 0 < 10
+0 + 8 < 10
+8 + 1 < 10
+1 + 7 < 10
+
+Notes
+
+Clarify whether the deliverable is a Boolean or an explicit arrangement before coding.
+
+A frequency array of length ten replaces general comparison sorting and is the intended optimization signal.
+
+Propose edge cases and dry-run at least two of them; communication during the construction is part of the round.
+
+Use a ten-slot frequency table and consume the hardest-to-place compatible weight first: start from the largest remaining weight, then repeatedly choose the largest remaining value no greater than 9 - previous. If no nonempty bucket fits, the multiset is infeasible.
+
+Scanning the ten buckets per placement is O(10n) = O(n) time and O(10) = O(1) auxiliary space.
+
+Preparation
+
+Implement a frequency-array construction and test all-one-value, dominant-large-value, and zero-heavy inputs.
+
+Practice explaining the feasibility invariant and the O(n) time / O(1) auxiliary-space bound without relying on trial-and-error permutations.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

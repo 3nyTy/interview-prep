@@ -1,0 +1,66 @@
+===H1===
+Earliest One-Time Visiting User
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/earliest-one-time-visiting-user
+===BODY===
+Amazon
+Coding·30 minMembers
+Earliest One-Time Visiting User
+Build a structure that ingests user logins and can return the earliest-logged user who has visited exactly once. Follow-up generalizes to the top-X earliest one-time visitors.
+SWE
+hashmap
+data-structure
+oop-design
+medium
+Frequency
+Low
+Last asked
+2026-04-15
+Stage
+onsite-coding
+Requirements
+
+newUserLogin(username): record a login for the given user.
+
+getOldestOneTimeVisitingUser(): return the username with the earliest login among users whose total visit count is exactly 1. Return null (or equivalent) if no such user exists.
+
+Follow-up — getOldestOneTimeVisitingUsers(X): return the top-X earliest one-time visitors in order.
+
+Examples
+
+newUserLogin("john")
+newUserLogin("jeff")
+newUserLogin("jeff")
+getOldestOneTimeVisitingUser() -> "john"  # jeff visited twice, so disqualified
+
+Notes
+
+The clean data structure pairing is a hashmap user -> visit_count plus an ordered collection of one-time users (Python OrderedDict, Java LinkedHashMap, or a doubly-linked list keyed by username). When a user's count rises from 1 to 2, remove them from the ordered collection.
+
+For the top-X follow-up, an iteration over the ordered collection is enough; if X is repeatedly queried for large datasets, a balanced BST keyed by login timestamp is the canonical upgrade.
+
+This problem also surfaces as the first round in OOD-style intern loops; treat it as both a data-structure design and a coding question.
+
+The clean structure pairing is count: dict[user, int] plus singles: OrderedDict[user, None] (or any insertion-ordered set). On newUserLogin: increment count; if it became 1, append to singles; if it became 2, remove from singles. Both ops are O(1) average.
+
+For the top-X follow-up, iterating the first X items of singles is O(X). If the system needs ranked queries across very large user bases or supports deletion-by-timestamp, the upgrade is a balanced BST keyed by (login_ts, user), giving O(log n) per op and O(X) for the top-X scan.
+
+Edge case to confirm: when a user logs in for the third or later time, no state change is needed beyond bumping the counter. Some candidates redundantly attempt to remove from singles again — the structure should tolerate the no-op.
+
+Preparation
+
+Reimplement OrderedDict semantics with a doubly-linked list + hashmap so you can write the structure without language helpers.
+
+Drill the invariant updates: any time you bump a count, decide whether to add to or remove from the one-time collection.
+
+Be ready to discuss thread-safety: which method is the hot path, what locking granularity makes sense, and whether you'd shard by user prefix.
+
+Layered drill: (1) implement with Python OrderedDict / Java LinkedHashMap in 8 minutes; (2) replace the helper with a hand-rolled hashmap + doubly-linked list to prove you can do it without language features; (3) add getOldestOneTimeVisitingUsers(X) and the timestamp-keyed BST extension as a verbal walkthrough.
+
+Drill the invariant updates: every time you bump a count, decide explicitly whether to add to or remove from the one-time collection. Most bugs come from skipping the "count just became 2" branch.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

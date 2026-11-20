@@ -1,0 +1,160 @@
+===H1===
+Course Schedule with Time / Batches
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/course-schedule-time-batches
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Course Schedule with Time / Batches
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+·
+55 min
+Members
+Course Schedule with Time / Batches
+
+Course Schedule (LC 207 / 210) is the base, but Snowflake almost always layers a time or batching follow-up: each course takes a given unit time, and a batch of courses must finish before the next batch begins. The follow-up asks for total wall-clock time to complete all courses given prerequisites.
+
+SWE
+topological-sort
+graph
+bfs
+dijkstra
+oop-design
+medium
+Frequency
+High
+Last asked
+2026-08-11
+Stage
+phone-screen · onsite-coding
+Requirements
+Base: given numCourses and a prerequisites list, decide whether all courses can be completed (LC 207) or return a valid completion order (LC 210).
+Cycle detection is sometimes left implicit — clarifying with the interviewer that cycles must be detected and rejected is worth a signal.
+Follow-up 1 (per-course time): each course takes 1 time unit. Return the total wall-clock time to finish all courses, executing in topological waves so that a course only starts once all its prerequisites have finished.
+Follow-up 2 (variable durations): a times[] array gives each course's duration. The wave still advances only when every course in the current batch has finished, so the wave time equals the maximum duration in that batch.
+Example: prerequisites [[1, 2], [3, 4]], times = [1, 10, 10, 1] → total = 20 (wait 10 for course 1, then 10 for course 3).
+Follow-up 3 (variant): if a course can start as soon as any one prerequisite finishes (not all), the problem becomes shortest-path on a DAG instead of layered BFS. Dijkstra-style relaxation works.
+Examples
+
+Base (LC 207):
+
+numCourses = 4, prerequisites = [[1,0],[2,1],[3,2]]   # all clear → true
+numCourses = 2, prerequisites = [[1,0],[0,1]]         # cycle → false
+
+
+Per-batch wall-clock with durations:
+
+prerequisites = [[1, 2], [3, 4]]
+times         = [_, 1, 10, 10, 1]
+result        = 20
+
+Notes
+The base problem is canonical Kahn's algorithm: build an in-degree map, push all in-degree-0 courses into a queue, pop and decrement neighbours, fail if the final visited count ≠ numCourses.
+Total wall-clock with uniform durations is BFS depth from the in-degree-0 frontier; with per-course durations the BFS still runs level by level but the level time becomes max(durations in level).
+The "any one prerequisite" variant is the trap. A naive layered BFS gives the wrong answer because a course can start mid-batch. The clean solution is Dijkstra on the DAG with edge weight = predecessor's duration, or equivalently a DAG-relaxation in topological order.
+Edge cases: zero courses, all independent courses (answer = max duration), single chain (answer = sum of durations), self-loop (cycle → fail).
+Snowflake interviewers will sometimes invent an OOP wrapper on top: courses as objects with id and prevCoursesList, with an external didFail(course) API that may force a re-run. Topological order still holds; on didFail push the course back onto the queue.
+The variable-duration / parallel-completion follow-up (the "hard" version) recurs often, and LC 2050 (Parallel Courses III) has been handed over essentially verbatim as the full prompt. Drill the topological-DP earliest-finish formulation until it is automatic.
+Preparation
+Re-implement Kahn from scratch in under 5 minutes; cycle-detection variant returns a Boolean and a sample cycle path.
+Add a per-course duration array and compute total wall-clock time using both layered BFS and DAG relaxation; verify both give the same answer on a uniform-duration test.
+Drill the "any one prerequisite" variant explicitly — write a 5-node example by hand to see why layered BFS over-counts.
+Practice the OOP wrapper: define a Course class with id, prerequisites, and run() → bool, then plug Kahn through it.
+Alternate canonical variant — Course Schedule II / Parallel Courses III
+def findOrder(numCourses: int, prerequisites: list[list[int]]) -> list[int]: ...
+# Return any topological order; return [] when a cycle makes completion impossible.
+
+def minimumTime(n: int, relations: list[list[int]], time: list[int]) -> int: ...
+# Courses are 1-indexed in relations; time[i] is the duration of course i+1.
+# A course starts as soon as all prerequisites have finished, so finish[v] = time[v] + max(finish[p]).
+
+The minimumTime shape is not a batch/barrier model: independent courses can finish at different months, and a dependent course starts when its own prerequisites are complete. The intended solution is topological DP over earliest finish times; the answer is max(finish).
+For the base order-returning variant, constraints are roughly numCourses <= 2000 and len(prerequisites) <= 5000, which keeps standard Kahn / DFS topological sort comfortably in range.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Examples
+Notes
+Preparation
+Alternate canonical variant — Course Schedule II / Parallel Courses III
+Related discussions · 9
+⭐雪花第一面coding
+🔑雪花片店面挂经
+🔑Snowflake 电面挂经
+雪花点面挂筋
+雪花 电面
+雪花IC2 phone screen + VO 一套挂经
+🔑Snowflake 店面
+雪花店面
+🔑雪花 onsite 挂经
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+DAG Allow / Disallow Propagation
+Medium
+graph
+topological-sort
+medium
++2
+Frontend Grid: Robot Eats Candies
+Single report
+bfs
+medium
+frontend
++2
+Closest Bathroom / Desk on a Grid
+High
+bfs
+medium
+grid
++2
+Service Failure Forensics
+Single report
+graph
+medium
+dfs
++2
+Serialize and Deserialize Dictionary Trie
+Single report
+medium
+trie
+compression
++2
+Code editor

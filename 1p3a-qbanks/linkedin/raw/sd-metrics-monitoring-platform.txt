@@ -1,0 +1,84 @@
+===H1===
+Metrics & Monitoring Platform
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/sd-metrics-monitoring-platform
+===BODY===
+LinkedIn
+System Design·60 minMembers
+Metrics & Monitoring Platform
+Design a metrics platform that ingests production telemetry, supports arbitrary-granularity queries, and powers a visualization layer. Recurring twists: `top-k` exceptions by error class, severity histograms over time, and explicit *no-alerting* scope (the interviewer wants you to scope tight and not drift into pager design).
+SWE
+Infra Eng
+mlsd
+system-design
+storage
+streaming
+scaling
+ranking
+top-k
+medium
+Frequency
+Medium
+Last asked
+2026-03-20
+Stage
+onsite-system-design
+Requirements
+
+Functional:
+
+Ingest tagged metric events from many production services at high write throughput.
+
+Support range queries (metric, tag-filter, time-range, aggregation) at arbitrary granularity — second-level for the recent window, hour/day for historical.
+
+Stream results to an external visualization service (Grafana-like) without that service owning the storage.
+
+A common variant: top-k exceptions in a rolling window, keyed by error class.
+
+Out of scope (interviewers explicitly say so): alerting, on-call paging, ML-based anomaly detection.
+
+A reasonable end-state architecture combines a streaming aggregation layer (Flink / Spark Streaming with event-time windows) for the recent window and a batch correction layer for historical fidelity — the Lambda-architecture split lets you keep the hot path cheap without losing the long-tail correctness guarantee. Storage tiering: row-store buffers for ingest, OLAP column-store (ClickHouse / Druid / a managed Snowflake-like) for the query API, with TTL'd downsampling rolling up second-granularity into hour/day buckets.
+
+Non-functional:
+
+Write-heavy — millions of events per second across services.
+
+Query latency under one second for the recent (5-minute) hot window; few-second budgets acceptable for historical.
+
+Retention split: full-fidelity for the recent hot window, downsampled for long-term.
+
+Examples
+
+Reference architectures the interviewers commonly nod at:
+
+Datadog / Prometheus-style pull-based scrape vs OpenTelemetry / push ingestion. Discuss why most LinkedIn-internal systems lean push for tagged event streams.
+
+Time-series storage — InfluxDB / Prometheus / VictoriaMetrics. The discriminator follow-up: how the storage engine handles high-cardinality tag values (per-user IDs, request IDs).
+
+Top-K exceptions — exponential-decay count-min sketch per error class, periodic compaction.
+
+Notes
+
+Scope discipline is the load-bearing skill. The recurring failure mode: spending 20 minutes on the schema of a relational DB column for severity tags, then running out of time on storage tiering.
+
+Be explicit early about cardinality limits — interviewers grade whether the candidate volunteers "we cap tag-value cardinality at K per metric" without prompting.
+
+For the top-k variant, the canonical formulation is space-saving / Misra-Gries over a per-window sketch, not a heap-over-everything design.
+
+Schema-design tangents (column naming, normalization) are a recognized rabbit hole — keep the discussion at the indexing / read-path level.
+
+Preparation
+
+Walk through a metrics platform end-to-end in < 25 minutes: ingest path → write buffer → storage engine → query API → downsampling → retention.
+
+Drill the cardinality discussion: how to cap, how to detect runaway tags, what the storage failure modes look like.
+
+Brush up on count-min and space-saving sketches for top-K queries; sketches are the right answer when the heap-of-all-counts gets too large.
+
+Pre-write the high-level diagram with labelled components — Datadog and Prometheus blog posts are reasonable inspiration but recreate from first principles in the round.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

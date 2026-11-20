@@ -1,0 +1,59 @@
+===H1===
+HFT Onsite Round 3 — Sort Complexity + Linux Fundamentals + tail(n) Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/citadel-hft-onsite-fundamentals
+===BODY===
+Citadel / Citadel Securities
+Coding·60 minMembers
+HFT Onsite Round 3 — Sort Complexity + Linux Fundamentals + tail(n) Design
+Citsec HFT (Singapore) onsite round 3: no coding submission, but a wide-ranging interrogation on sort-algorithm complexity (especially quicksort worst case), Linux systems primitives (shared memory, interrupts), and a `tail -n` design on a very large file. Reported as the round that failed the loop and triggered same-day cancellation of round 4.
+SWE
+operating-systems
+cs-fundamentals
+io
+sorting
+complexity-analysis
+hard
+Frequency
+Single report
+Last asked
+2026-05-07
+Stage
+onsite-coding · onsite-system-design
+Requirements
+
+Fully verbal / whiteboard-style round, no live coding submission. The interviewer drives, the candidate responds. Reported topic coverage:
+
+Walk through standard sorting algorithms and their time / space complexity. Quicksort gets the most attention: average vs worst case, pivot-selection strategies, when quicksort outperforms / underperforms heapsort and mergesort.
+
+Linux fundamentals: shared memory (shm, mmap), interrupt handling, context switching, system calls.
+
+Design: print the last n lines of a very large file. Discuss optimizations — backward seeking, chunked reads, mmap, what to do when n is itself large.
+
+Notes
+
+Quicksort complexity: average O(n log n), worst case O(n^2) on adversarial inputs (sorted / reverse-sorted with naive pivot, all-equal inputs with two-way partition). Mitigations: randomized pivot, median-of-three, introspective sort (switch to heapsort when recursion depth exceeds 2 log n), three-way partition for duplicate-heavy inputs. State all three.
+
+Shared memory: shm_open + mmap (POSIX) or shmget + shmat (System V). Used for low-latency inter-process communication; pairs with semaphores or futexes for synchronization. HFT-relevant because it removes copy overhead between producer and consumer processes co-located on the same machine.
+
+Interrupts: hardware vs software, top-half / bottom-half handler structure (interrupt service routine acknowledges and defers heavy work to a tasklet / softirq), interrupt coalescing on NICs to amortize per-packet cost. For HFT, lowering interrupt latency (busy-polling NICs in user space via DPDK / kernel-bypass) is a known design pattern.
+
+tail -n on a huge file: same backward-seek pattern as the reverse-file-tac-implementation problem — seekg(0, std::ios::end), walk backward in fixed-size chunks counting \n characters until you have n newlines, then emit forward from that anchor. mmap variant trades virtual-memory footprint for simpler index arithmetic. For unbounded n, the question collapses to streaming the whole file in reverse, which the backward-chunk pattern handles directly.
+
+The Russian interviewer in this round reportedly applied high-pressure cross-examination (interrupting follow-ups, demanding rapid answers) — a known signal pattern for senior Citsec HFT roles. Treat it as part of the calibration, not personal.
+
+Preparation
+
+Build a one-pager listing every standard sort with average / worst-case time, space, and stability. Memorize it. The first 5 minutes of an HFT systems round can disappear into this without contributing signal — get past it fast.
+
+Walk through man shmget, man mmap, and man epoll once. The HFT loop assumes Linux fluency at the syscall level.
+
+Drill the backward-file-read pattern in C++ until the seekg / read / scan-for-newline loop is automatic. It re-appears in both tac and tail -n framings.
+
+Skim a kernel-bypass / DPDK overview (one or two blog posts is enough) so you can reference "user-space NIC polling to bypass the interrupt cost" when the discussion goes there. The interviewer in this round was clearly probing systems-depth signal, not asking for a literal driver implementation.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

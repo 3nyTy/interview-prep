@@ -1,0 +1,53 @@
+===H1===
+Course Scheduler — Print Path (Simplified)
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/course-scheduler-simplified
+===BODY===
+Oracle
+Coding·20 minMembers
+Course Scheduler — Print Path (Simplified)
+A simplified course-scheduler variant: no multi-prerequisite courses, and the answer is the explicit ordered path of courses (not just a count). Asked as the 20-minute coding portion of an Oracle Health phone screen, paired with a job-scheduler design in the same round.
+SWE
+graph
+topological-sort
+tree
+easy
+Frequency
+Single report
+Last asked
+2025-11-19
+Stage
+phone-screen
+Requirements
+
+Input: a set of courses, each with at most one direct prerequisite (the prompt explicitly states there are no multi-prerequisite courses).
+
+Output: the ordered sequence of courses such that every course's prerequisite (if any) appears earlier in the sequence; print the path.
+
+The simplification (single-prerequisite-max) reduces the problem from a general DAG topological sort to a forest where each node has at most one parent.
+
+Notes
+
+With at-most-one-parent, the structure is a forest. Each tree's correct order is just root → ... → leaf, recursive or iterative.
+
+Algorithm: find all nodes with no prerequisite (roots). For each root, walk its tree in depth-first order, appending each node to the output list. If multiple roots exist (forest), emit them in any consistent order (alphabetical is the safest interviewer-friendly choice).
+
+This is materially simpler than LeetCode 210; the simplification was the interviewer's deliberate framing for a 20-minute coding window paired with a job-scheduler design afterwards.
+
+If the simplification is unexpectedly relaxed mid-round ("now allow multiple prerequisites"), pivot to the general topological-sort algorithm — same skeleton, in-degree tracking and a BFS queue.
+
+Output format: print the path on stdout, one course per line or comma-separated; the round did not specify, so confirm at the start.
+
+Preparation
+
+Implement the at-most-one-parent forest traversal in under 10 minutes.
+
+Have the general Kahn's-algorithm topological sort ready as the fallback in case the constraint is relaxed.
+
+This round paired coding (20 min) with system design (20 min) within a single 60-minute slot; do not over-engineer the coding solution at the expense of the design portion.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

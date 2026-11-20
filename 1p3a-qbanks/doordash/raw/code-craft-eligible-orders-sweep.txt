@@ -1,0 +1,53 @@
+===H1===
+Code Craft: Eligible Orders / Neighbor-Check Sweep
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/code-craft-eligible-orders-sweep
+===BODY===
+DoorDash
+Coding·60 minMembers
+Code Craft: Eligible Orders / Neighbor-Check Sweep
+Code Craft round centered on processing an ordered list of orders where each removal can re-enable its neighbors. Naive `O(n²)` works but interviewer pushes for `O(n)` using a doubly-linked-list / neighbor-eligibility recomputation pattern.
+SWE
+linked-list
+data-structure
+two-pointer
+medium
+Frequency
+Single report
+Last asked
+2025-12-18
+Stage
+phone-screen
+Requirements
+
+Input: a list of orders with some eligibility predicate (varies by interviewer — distance threshold, time-window adjacency, etc.).
+
+Repeatedly pick an eligible order, append it to the output, and remove it from the list. Removing an order can cause its neighbors to become newly eligible.
+
+Output: the order of removals.
+
+Notes
+
+Naive: scan the list, find an eligible order, remove, repeat. O(n²) because each scan touches the whole list.
+
+Optimized O(n): maintain a doubly-linked list over the orders and a set of currently eligible orders. When you remove an order, only check its (up to) two neighbors and possibly add them to the eligible set. Each order's eligibility is checked a bounded number of times.
+
+Sketching the linked-list + eligibility-set data structure clearly is the graded signal; the interviewer wants to see the abstraction, not just the optimization.
+
+Variants of this round appear with different eligibility predicates; the algorithmic skeleton (DLL + eligibility set + neighbor recompute on remove) carries over.
+
+The poster cited GPT-assisted explanation post-interview as the way they understood the optimal version — confirms the problem is non-trivial cold.
+
+Preparation
+
+Write a DLL-based remove-and-recompute pattern from memory; this is the core skill for the round.
+
+Practice articulating amortized analysis ("each neighbor is re-checked at most twice across the whole process, so total work is O(n)").
+
+Have a small concrete example ready (5–6 elements) to walk through with the interviewer before coding.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

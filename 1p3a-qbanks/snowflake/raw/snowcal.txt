@@ -1,0 +1,166 @@
+===H1===
+SnowCal
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/snowcal
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+SnowCal
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+Members
+SnowCal
+
+SnowCal is a small programming language that keeps a single integer in memory. The program arrives as one complete list of instructions rather than a stream of individual commands.
+
+SWE
+parsing
+simulation
+data-structure
+medium
+Frequency
+Low
+Last asked
+2026-08-10
+Stage
+phone-screen · onsite-coding
+SnowCal Language Interpreter
+Problem Overview
+
+SnowCal is a simple coding language. It stores exactly one integer, X, in memory. The value of X always starts at 0.
+
+Available Commands
+
+The language uses the following instructions:
+
+ADD Y: Add the value Y to X.
+MUL Y: Multiply X by the value Y.
+FUN F: Start defining a new function named F.
+END: Finish defining the current function.
+INV F: Call (invoke) the function named F.
+Language Rules
+Every function has a unique name.
+You cannot define one function inside another (no nested functions).
+You can define a function but never use it.
+If the code contains INV F, the function F is guaranteed to exist.
+
+Your Goal: You are given a list of instructions. Run the program and return the final value of X.
+
+Important: Commands inside a function (FUN ... END) do not run immediately. They only change X when that function is called using INV.
+
+Sample Cases
+
+Case 1
+
+Input: program = ["MUL 2", "ADD 3"]
+
+Output: 3
+
+Explanation:
+
+X starts at 0.
+MUL 2: 0 * 2 equals 0.
+ADD 3: 0 + 3 equals 3.
+
+Case 2
+
+Input: program = ["FUN INCREMENT", "ADD 1", "END", "INV INCREMENT", "MUL 2", "ADD 3"]
+
+Output: 5
+
+Case 3
+
+Input: program = ["FUN INCREMENT", "ADD 1", "END", "FUN INCREMENT2", "ADD 1", "MUL 2", "END", "MUL 2", "INV INCREMENT2", "ADD 3", "INV INCREMENT"]
+
+Output: 6
+
+Input Limits
+The list of program lines is between 1 and 10,000 items long.
+Each line is one of the valid commands listed above.
+Y is an integer between -1,000,000,000 and 1,000,000,000.
+There are no nested functions.
+Notes
+The program is supplied as one complete list of instructions, not as a stream of individual commands. Confirm this input shape before choosing the parser state and public interface.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+SnowCal Language Interpreter
+Problem Overview
+Available Commands
+Language Rules
+Sample Cases
+Input Limits
+Notes
+Related discussions · 3
+🔑vo 面经
+🔑雪花全套
+雪花店面挂经
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Filter System with Dynamic Blacklist
+Single report
+simulation
+data-structure
+medium
++3
+Frontend Grid: Robot Eats Candies
+Single report
+simulation
+medium
+frontend
++2
+Grep With Context Lines
+Single report
+parsing
+medium
+string-processing
++1
+Connect Four - Can Play Win
+Single report
+simulation
+medium
+game-engine
++1
+Top-K Search Terms (Per-User Deduped)
+Single report
+medium
+hashmap
+set
++2
+Code editor

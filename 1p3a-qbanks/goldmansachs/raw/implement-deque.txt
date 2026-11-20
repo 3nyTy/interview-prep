@@ -1,0 +1,49 @@
+===H1===
+Implement a Deque
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/implement-deque
+===BODY===
+Goldman Sachs
+CodingMembers
+Implement a Deque
+Implement a string deque from scratch with addFirst/addLast, removeFirst/removeLast, peekFirst/peekLast, and getSize, all O(1). A doubly linked list is the expected backing structure; a Python list makes addFirst O(n), which the interviewer probes directly.
+SWE
+linked-list
+queue
+data-structure
+easy
+Frequency
+Single report
+Last asked
+2026-06-18
+Stage
+phone-screen
+Requirements
+
+Implement a double-ended queue (deque) for string elements from scratch — no built-in deque/collections.
+
+Methods: addFirst(data), addLast(data), removeFirst(), removeLast(), peekFirst(), peekLast(), getSize().
+
+Every operation must be O(1).
+
+Notes
+
+A doubly linked list keeps all operations O(1). Backing the deque with a Python list makes addFirst O(n), and the interviewer will push on that complexity.
+
+Edge cases: removing or peeking on an empty deque, keeping size correct, and keeping head/tail pointers consistent when the deque drops to zero or one element.
+
+CoderPad gotcha: the editor mixes tabs and spaces by default, and Python 3 raises TabError: inconsistent use of tabs and spaces. Switch the editor to spaces-only indentation before you start.
+
+Be ready to write your own tests — the interviewer asks you to add 3-5 scenarios in a doTestsPass() helper.
+
+Preparation
+
+Implement a doubly linked list with sentinel head/tail nodes, then layer the deque API on top.
+
+Test empty-deque operations, single-element add/remove, and alternating front/back operations.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

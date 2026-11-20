@@ -1,0 +1,47 @@
+===H1===
+Detect and Break a Linked-List Cycle
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/linked-list-detect-break-cycle
+===BODY===
+Amazon
+CodingMembers
+Detect and Break a Linked-List Cycle
+Onsite coding. Determine whether a singly linked list contains a cycle; if it does, break it by setting the offending `next` (the last node in the cycle, whose `next` points back to the cycle entry) to NULL. Floyd's tortoise-and-hare, then reset one pointer to head and advance both one step to find the entry. Expect heavy whiteboard tracing and 'prove why this works' / 'why reset to head' follow-ups.
+SWE
+linked-list
+cycle-detection
+two-pointer
+medium
+Frequency
+Single report
+Last asked
+2026-06-22
+Stage
+onsite-coding
+Requirements
+
+Given the head of a singly linked list, detect whether it contains a cycle.
+
+If a cycle exists, break it: set the offending next pointer — the last node in the cycle, whose next currently points back to the cycle entry — to NULL.
+
+Notes
+
+Floyd's tortoise-and-hare: advance slow by one and fast by two; they meet inside the cycle iff one exists. Then reset one pointer to head and advance both by one step — they meet at the cycle entry. The node before that entry (the one whose next is the entry) is the offending node to NULL out.
+
+The round grades understanding, not just a passing run. Be ready to trace on a whiteboard: which step slow and fast first meet, why fast is where it is, and why the reset-to-head walk lands exactly on the entry. Have the modular-arithmetic argument ready.
+
+A common follow-up contrasts this with a hash-set approach: walk nodes, store visited references, stop at the first repeat. Discuss the O(n) space vs Floyd's O(1) trade-off and why you'd pick each.
+
+To find the offending node (not just the entry), keep a trailing pointer one step behind as you walk to the entry, or detect when the next hop would re-enter the entry.
+
+Preparation
+
+Implement detect-entry with Floyd, then extend to return the node preceding the entry so you can null its next.
+
+Rehearse the verbal proof: why slow/fast meet, why resetting one to head and stepping in lockstep converges on the cycle entry. The round leans on this explanation as much as the code.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

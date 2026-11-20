@@ -1,0 +1,38 @@
+===H1===
+Non-Overlapping Intervals (LeetCode 435)
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/non-overlapping-intervals
+===BODY===
+ByteDance / TikTok
+CodingMembers
+Non-Overlapping Intervals (LeetCode 435)
+Find the minimum removals needed to eliminate overlapping intervals.
+interval
+array
+Frequency
+Single report
+Last asked
+—
+Stage
+—
+Requirements
+
+Find the minimum removals needed to eliminate overlapping intervals.
+
+Notes
+
+Coding in a USDS hiring-manager round alongside behavioral questions; detailed interface and constraints are unspecified.
+
+For canonical practice, intervals have start < end, and touching endpoints are compatible. Sort by end time and keep an interval whenever its start is at least the previous kept end. Return total minus kept. Choosing the earliest available end leaves maximal room for future intervals. Sorting costs O(n log n); the scan costs O(n), with sorting-dependent storage.
+
+Preparation
+
+Implement the greedy scan in 15 minutes.
+
+In 10 minutes, compare against exhaustive subsets on small inputs, including duplicates and touching endpoints.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

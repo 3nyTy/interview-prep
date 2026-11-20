@@ -1,0 +1,578 @@
+===H1===
+Time-Based Key-Value Store with Production Testing
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/time-based-kv-store
+===BODY===
+OpenAI
+CodingMembers
+Time-Based Key-Value Store with Production Testing
+Design and implement a time-based key-value data structure that stores multiple values for the same key at different timestamps and retrieves values based on temporal queries. The problem extends beyond basic implementation to cover test strategy with mock clocks, monotonic timestamp enforcement, and thread-safe concurrency approaches.
+SWE
+hashmap
+binary-search
+data-structure
+concurrency
+testing
+medium
+Frequency
+Low
+Last asked
+2025-10-19
+Stage
+oa · onsite-coding
+The Challenge
+
+You need to build a "Time Map" data structure. This system stores a Key and a Value, but it also records when that value was saved (a timestamp).
+
+Later, you need to look up a value based on a specific time.
+
+Key differences from standard coding problems:
+
+Real Time: You must use real timestamps (like Unix epoch seconds), not just simple integers like 1, 2, 3.
+
+Real-World Problems: You must handle testing, fixing time errors, and managing multiple threads at once.
+
+Part 1: How to Build It
+
+Create a TimeMap class to store data and handle time-based lookups.
+
+What You Need to Build
+
+Start the System: TimeMap() creates the empty structure.
+
+Save Data (set):
+
+Inputs: key, value, and timestamp.
+
+Note: Timestamps are floats (seconds).
+
+Note: You can save multiple values for the same key at different times.
+
+Note: Sometimes, data arrives out of order (an older timestamp might arrive after a newer one).
+
+Find Data (get):
+
+Inputs: key and timestamp.
+
+Logic: Find the value saved at timestamp OR the closest value saved before it.
+
+If there is no value at or before that time, return an empty string "".
+
+How to Use It
+
+from datetime import datetime
+import time
+
+timemap = TimeMap()
+
+# 1. Save "online" at time t1
+t1 = time.time()  # Example: 1678901234.567
+timemap.set("user:1:status", "online", t1)
+
+time.sleep(0.1)
+t2 = time.time()
+
+# 2. Check status at t2. It should be "online"
+assert timemap.get("user:1:status", t2) == "online"
+
+# 3. Update status to "away" at time t3
+t3 = time.time()
+timemap.set("user:1:status", "away", t3)
+
+# 4. Check between t2 and t3. It is still "online"
+assert timemap.get("user:1:status", t2 + 0.01) == "online"
+
+# 5. Check at t3. It is now "away"
+assert timemap.get("user:1:status", t3) == "away"
+
+# 6. Check a time before any data existed. Returns empty.
+assert timemap.get("user:1:status", t1 - 100) == ""
+
+# 7. Check a key that doesn't exist. Returns empty.
+assert timemap.get("unknown", t3) == ""
+
+Solution Details
+
+We use a HashMap (Dictionary) where the Key is a string, and the Value is a List. The List stores tuples of (timestamp, value). We keep this list sorted by time so we can use Binary Search to find values quickly.
+
+from typing import Dict, List, Tuple
+import bisect
+
+class TimeMap:
+    def __init__(self):
+        # Dictionary mapping a key to a list of (timestamp, value) tuples
+        # We keep the list sorted by timestamp to use Binary Search
+        self.store: Dict[str, List[Tuple[float, str]]] = {}
+
+    def set(self, key: str, value: str, timestamp: float) -> None:
+        """
+        Save the value and timestamp for a key.
+        Time Complexity: O(n) because inserting into a list takes time.
+        Space Complexity: O(1) per entry.
+        """
+        if key not in self.store:
+            self.store[key] = []
+
+        # Use bisect.insort to insert while keeping the list sorted.
+        # This handles cases where data arrives out of order.
+        entry = (timestamp, value)
+        bisect.insort(self.store[key], entry)
+
+    def get(self, key: str, timestamp: float) -> str:
+        """
+        Find the value with the largest timestamp <= the requested timestamp.
+        Time Complexity: O(log n) using Binary Search.
+        """
+        if key not in self.store:
+            return ""
+
+        entries = self.store[key]
+
+        # Use Binary Search to find the rightmost timestamp <= target.
+        # bisect_right finds the insertion point after the target.
+        idx = bisect.bisect_right(entries, (timestamp, chr(255)))
+
+        if idx == 0:
+            return ""  # All stored timestamps are larger than the query
+
+        # Return the value at the index before the insertion point
+        return entries[idx - 1][1]
+
+Alternative Approach: Two Lists
+
+Instead of a list of tuples [(t, v), (t, v)], you can use two separate lists: one for timestamps and one for values. This helps if the "value" objects are very large.
+
+class TimeMap:
+    def __init__(self):
+        # Map key to a tuple of two lists: ([timestamps], [values])
+        self.store: Dict[str, Tuple[List[float], List[str]]] = {}
+
+    def set(self, key: str, value: str, timestamp: float) -> None:
+        if key not in self.store:
+            self.store[key] = ([], [])
+
+        timestamps, values = self.store[key]
+
+        # Find where to insert to keep order
+        idx = bisect.bisect_left(timestamps, timestamp)
+        timestamps.insert(idx, timestamp)
+        values.insert(idx, value)
+
+    def get(self, key: str, timestamp: float) -> str:
+        if key not in self.store:
+            return ""
+
+        timestamps, values = self.store[key]
+
+        # Find the rightmost timestamp <= query
+        idx = bisect.bisect_right(timestamps, timestamp)
+
+        if idx == 0:
+            return ""
+
+        return values[idx - 1]
+
+Part 2: Testing and Mocking Time
+
+The interviewer will ask: "How do you write tests for this?"
+
+This is hard because time.time() changes every time you run the code. If a test relies on the system clock, it might pass one day and fail the next.
+
+Why Testing is Hard
+
+Different Results: The clock always changes.
+
+Slow Tests: Using sleep() makes tests run slowly.
+
+Flakiness: Sometimes the computer pauses, causing timing errors.
+
+Solution 1: Pass the Clock as an Argument (Dependency Injection)
+
+Instead of calling time.time() directly inside the class, let the user pass a function that gives the time. In tests, we pass a fake clock.
+
+from typing import Callable, Optional
+import time
+
+class TimeMap:
+    def __init__(self, time_provider: Optional[Callable[[], float]] = None):
+        """
+        Args:
+            time_provider: A function that returns the time.
+                          If None, we use the real time.time().
+        """
+        self.store: Dict[str, List[Tuple[float, str]]] = {}
+        # Use the provided clock or the real clock
+        self.time_provider = time_provider or time.time
+
+    def set(self, key: str, value: str, timestamp: Optional[float] = None) -> None:
+        """
+        If no timestamp is given, ask time_provider for the time.
+        """
+        if timestamp is None:
+            timestamp = self.time_provider()
+
+        if key not in self.store:
+            self.store[key] = []
+
+        entry = (timestamp, value)
+        bisect.insort(self.store[key], entry)
+
+    def get(self, key: str, timestamp: Optional[float] = None) -> str:
+        """
+        If no timestamp is given, query using the current time_provider time.
+        """
+        if timestamp is None:
+            timestamp = self.time_provider()
+
+        if key not in self.store:
+            return ""
+
+        entries = self.store[key]
+        idx = bisect.bisect_right(entries, (timestamp, chr(255)))
+
+        if idx == 0:
+            return ""
+
+        return entries[idx - 1][1]
+
+How to Write the Test
+
+import unittest
+from unittest.mock import Mock
+
+class TestTimeMap(unittest.TestCase):
+    def test_basic_set_and_get(self):
+        """Test with manually provided numbers"""
+        tm = TimeMap()
+
+        tm.set("key1", "value1", 1000.0)
+        tm.set("key1", "value2", 2000.0)
+        tm.set("key1", "value3", 3000.0)
+
+        # Check exact times
+        assert tm.get("key1", 1000.0) == "value1"
+        # Check time between updates
+        assert tm.get("key1", 1500.0) == "value1"
+        # Check future updates
+        assert tm.get("key1", 3000.0) == "value3"
+        # Check before any data
+        assert tm.get("key1", 500.0) == ""
+
+    def test_with_mock_time_provider(self):
+        """Test with a fake clock function"""
+        mock_time = Mock()
+        # Set the clock to 1000.0
+        mock_time.return_value = 1000.0
+
+        tm = TimeMap(time_provider=mock_time)
+
+        # Save at time 1000
+        tm.set("user:status", "online")
+        assert tm.get("user:status") == "online"
+
+        # Change the clock to 2000.0
+        mock_time.return_value = 2000.0
+        tm.set("user:status", "away")
+
+        # Now it should return "away"
+        assert tm.get("user:status") == "away"
+
+        # Look back at time 1500
+        assert tm.get("user:status", 1500.0) == "online"
+
+    def test_out_of_order_timestamps(self):
+        """Test inserting data in the wrong order"""
+        tm = TimeMap()
+
+        tm.set("key1", "value3", 3000.0)
+        tm.set("key1", "value1", 1000.0) # Arrives late
+        tm.set("key1", "value2", 2000.0) # Arrives late
+
+        # It should still sort correctly
+        assert tm.get("key1", 1500.0) == "value1"
+        assert tm.get("key1", 2500.0) == "value2"
+        assert tm.get("key1", 3500.0) == "value3"
+
+    def test_duplicate_timestamps(self):
+        """Test what happens if two values have the exact same time"""
+        tm = TimeMap()
+
+        tm.set("key1", "value1", 1000.0)
+        tm.set("key1", "value2", 1000.0)
+
+        # bisect logic will usually pick the one inserted last
+        result = tm.get("key1", 1000.0)
+        assert result in ["value1", "value2"]
+
+Solution 2: Using a Library (Bonus)
+
+You can use a library called freezegun to freeze time for the whole test.
+
+from freezegun import freeze_time
+
+@freeze_time("2024-01-01 12:00:00")
+def test_with_freezegun():
+    import datetime
+
+    # The lambda function gets the "frozen" time
+    tm = TimeMap(time_provider=lambda: datetime.datetime.now().timestamp())
+
+    tm.set("key1", "value1")
+
+    # Move time forward 5 minutes
+    with freeze_time("2024-01-01 12:05:00"):
+        tm.set("key1", "value2")
+        assert tm.get("key1") == "value2"
+
+Part 3: Keeping Time Strictly Increasing
+
+The interviewer asks: "What if the server clock goes backward? How do you ensure timestamps always go up?"
+
+The Problem
+
+Clock Drift: Server clocks are not perfect. They can jump backward.
+
+Fast Updates: If you save two things in the same microsecond, they might have the same timestamp.
+
+Method 1: Reject Bad Times
+
+If a new timestamp is older than the last one, throw an error.
+
+class StrictTimeMap:
+    def __init__(self):
+        self.store: Dict[str, List[Tuple[float, str]]] = {}
+        self.last_timestamp: Dict[str, float] = {}
+
+    def set(self, key: str, value: str, timestamp: float) -> None:
+        """
+        Reject if timestamp is not strictly greater than the last one.
+        """
+        if key in self.last_timestamp:
+            if timestamp <= self.last_timestamp[key]:
+                raise ValueError(
+                    f"Timestamp {timestamp} must be greater than "
+                    f"last timestamp {self.last_timestamp[key]}"
+                )
+
+        if key not in self.store:
+            self.store[key] = []
+
+        self.store[key].append((timestamp, value))
+        self.last_timestamp[key] = timestamp
+
+Method 2: Logical Clocks (Counters)
+
+Instead of real time, use a counter (1, 2, 3...). Use the real time only to help order them.
+
+class LogicalTimeMap:
+    def __init__(self):
+        self.store: Dict[str, List[Tuple[int, str]]] = {}
+        self.logical_clock: Dict[str, int] = {}
+
+    def set(self, key: str, value: str, wall_clock_time: float) -> int:
+        if key not in self.logical_clock:
+            self.logical_clock[key] = 0
+
+        # Always increase the counter by 1
+        self.logical_clock[key] += 1
+        logical_time = self.logical_clock[key]
+
+        if key not in self.store:
+            self.store[key] = []
+
+        # Store the logical counter, not just the wall clock
+        self.store[key].append((logical_time, value))
+
+        return logical_time
+
+    # get() would query by logical_time
+
+Method 3: Auto-Adjust (Nudge the Time)
+
+If the new timestamp is too old, add a tiny amount to it so it is technically "newer."
+
+class AdjustedTimeMap:
+    def __init__(self, epsilon: float = 0.001):
+        self.store: Dict[str, List[Tuple[float, str]]] = {}
+        self.last_timestamp: Dict[str, float] = {}
+        self.epsilon = epsilon
+
+    def set(self, key: str, value: str, timestamp: float) -> float:
+        """
+        If timestamp is too old, move it forward slightly.
+        """
+        if key in self.last_timestamp:
+            if timestamp <= self.last_timestamp[key]:
+                # Make the new timestamp slightly larger than the last one
+                timestamp = self.last_timestamp[key] + self.epsilon
+
+        if key not in self.store:
+            self.store[key] = []
+
+        self.store[key].append((timestamp, value))
+        self.last_timestamp[key] = timestamp
+
+        return timestamp
+
+Part 4: Handling Multiple Users at Once
+
+The interviewer asks: "How do you handle multiple threads accessing this at the same time?"
+
+The Problem
+
+If two threads try to set() or get() at the exact same time, the data structure might break or return wrong data (Race Conditions).
+
+Option 1: Global Lock (Simplest)
+
+Use one lock for the entire class. Only one person can do anything at a time.
+
+import threading
+from typing import Dict, List, Tuple
+import bisect
+
+class ThreadSafeTimeMap:
+    def __init__(self):
+        self.store: Dict[str, List[Tuple[float, str]]] = {}
+        # Create one lock for everything
+        self.lock = threading.Lock()
+
+    def set(self, key: str, value: str, timestamp: float) -> None:
+        with self.lock:
+            if key not in self.store:
+                self.store[key] = []
+            entry = (timestamp, value)
+            bisect.insort(self.store[key], entry)
+
+    def get(self, key: str, timestamp: float) -> str:
+        with self.lock:
+            if key not in self.store:
+                return ""
+            entries = self.store[key]
+            idx = bisect.bisect_right(entries, (timestamp, chr(255)))
+            if idx == 0:
+                return ""
+            return entries[idx - 1][1]
+
+Good: Very simple to write. Correct.
+
+Bad: Slow. If User A is writing "Key 1", User B cannot write "Key 2".
+
+Option 2: Lock Per Key (Faster)
+
+Give every Key its own lock.
+
+from collections import defaultdict
+import threading
+
+class PerKeyLockTimeMap:
+    def __init__(self):
+        self.store: Dict[str, List[Tuple[float, str]]] = {}
+        self.locks: Dict[str, threading.Lock] = defaultdict(threading.Lock)
+        self.locks_lock = threading.Lock()
+
+    def _get_lock(self, key: str) -> threading.Lock:
+        # Safely get the lock for a specific key
+        with self.locks_lock:
+            return self.locks[key]
+
+    def set(self, key: str, value: str, timestamp: float) -> None:
+        lock = self._get_lock(key)
+        # Lock ONLY this key
+        with lock:
+            if key not in self.store:
+                self.store[key] = []
+            bisect.insort(self.store[key], (timestamp, value))
+
+Good: Fast. User A (Key 1) and User B (Key 2) can work at the same time.
+
+Bad: Uses more memory (lots of lock objects).
+
+Option 3: Read-Write Lock (Best for Reads)
+
+Allow many people to Read (get) at the same time, but only one person can Write (set).
+
+from readerwriterlock import rwlock
+
+class RWLockTimeMap:
+    def __init__(self):
+        self.store: Dict[str, List[Tuple[float, str]]] = {}
+        self.rwlock = rwlock.RWLockFair()
+
+    def set(self, key: str, value: str, timestamp: float) -> None:
+        # Blocks everyone else
+        with self.rwlock.gen_wlock():
+            # ... insert logic ...
+            pass
+
+    def get(self, key: str, timestamp: float) -> str:
+        # Allows other readers, blocks writers
+        with self.rwlock.gen_rlock():
+            # ... read logic ...
+            pass
+
+Good: Great if you read way more than you write (like a cache).
+
+Comparison Table
+
+StrategySpeed for ReadersSpeed for WritersComplexity
+Global LockSlowSlowSimple
+Per-Key LockFastFastMedium
+Read-Write LockVery FastSlowMedium
+
+Testing Concurrency
+
+You can stress-test your locks by launching many threads at once.
+
+import concurrent.futures
+
+def test_concurrent_access():
+    tm = ThreadSafeTimeMap()
+
+    def writer(id):
+        # Write a lot of data
+        for i in range(100):
+            tm.set(f"key{id}", f"val{i}", 1000.0 + i)
+
+    # Run 10 writers at the exact same time
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        futures = [executor.submit(writer, i) for i in range(10)]
+        concurrent.futures.wait(futures)
+
+    # If code didn't crash and data is sorted, the lock worked
+    entries = tm.store["key0"]
+    timestamps = [t for t, v in entries]
+    assert timestamps == sorted(timestamps)
+
+Complexity and Summary
+
+Performance:
+
+set(): O(n). Inserting into a list takes linear time.
+
+get(): O(log n). Binary search is very fast.
+
+Space: O(Total Entries).
+
+Common Mistakes:
+
+Sorting: Forgetting that timestamps might not arrive in order.
+
+Comparison: Comparing floats with == (floating point math is tricky).
+
+Locks: Forgetting to unlock, or locking too much code.
+
+Timezones: Mixing UTC and Local time.
+
+Real World Uses:
+
+Databases: InfluxDB, Prometheus (metrics).
+
+Git: Storing code versions over time.
+
+Caching: Redis (expiring old keys).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

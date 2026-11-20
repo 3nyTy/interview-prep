@@ -1,0 +1,140 @@
+===H1===
+Incident Monitor — Transaction Alert Trigger / Resolve
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/transaction-logs-trigger-resolve
+===BODY===
+Stripe
+Coding·60 minMembers
+Incident Monitor — Transaction Alert Trigger / Resolve
+HackerRank OA and technical-screen problem. Process sorted `(timestamp, merchant_id, status_code, count)` logs in a 30-second window, trigger per-error alerts when both volume and impact thresholds are met, and resolve active alerts when later traffic causes the condition to lapse.
+SWE
+streaming
+data-structure
+interval
+medium
+Frequency
+Medium
+Last asked
+2026-09-07
+Stage
+oa · tech-screen · phone-screen
+Requirements
+
+Implement detect_incidents(logs) and return every alert event produced while processing the transaction log.
+
+Each input string has the format timestamp,merchant_id,status_code,count.
+
+timestamp is an integer number of seconds.
+
+status_code is 200 for successful transactions, a 4xx client error, or a 5xx server error.
+
+count is the number of transactions with that outcome for the merchant at that second.
+
+Input is valid, sorted by timestamp, and contains no duplicate (timestamp, merchant_id, status_code) entries.
+
+Evaluate each arriving log against a 30-second sliding window. The prompt defines the inclusive window at time T as [T-29, T].
+
+Each alert belongs to one (merchant_id, error_status_code) pair. A merchant may therefore have several active alerts at once.
+
+Do not emit a duplicate TRIGGER while an alert for the same pair remains active.
+
+Part 1 — Basic incident detection
+
+Emit TRIGGER when at least five failures with the same error code occur for the same merchant inside the current window.
+
+Part 2 — Impact-rate filtering
+
+A pair triggers only when both conditions hold inside the current window:
+
+At least five failures have that error code.
+
+Those failures are strictly more than 1% of that merchant's successful transaction volume, measured by the total count of status 200 entries in the same window.
+
+Part 3 — Incident resolution
+
+An active alert transitions to RESOLVE when a new log for that merchant arrives and the current window no longer meets the Part 2 conditions.
+
+A time gap with no new log for that merchant does not change alert state.
+
+A resolved pair may trigger again if a later window meets both conditions.
+
+Return strings in the format timestamp,event_type,merchant_id,status_code. Sort by timestamp, merchant ID, status code, and event type, all ascending; alphabetical event ordering places RESOLVE before TRIGGER on a complete tie.
+
+Examples
+
+Part 1:
+
+Input
+10,merchant1,500,2
+10,merchant2,500,1
+15,merchant1,500,2
+20,merchant1,500,1
+20,merchant2,500,4
+
+Output
+20,TRIGGER,merchant1,500
+20,TRIGGER,merchant2,500
+
+Part 2:
+
+Input
+10,merchant1,200,600
+12,merchant1,500,6
+15,merchant2,200,599
+16,merchant2,500,6
+
+Output
+16,TRIGGER,merchant2,500
+
+At timestamp 12, merchant 1's six errors are exactly 1% of 600 successes, so the strict impact condition is false. At timestamp 16, merchant 2's six errors are more than 1% of 599 successes.
+
+Part 3:
+
+Input
+10,merchant1,500,6
+16,merchant2,500,6
+45,merchant1,200,1
+46,merchant2,200,1
+
+Output
+10,TRIGGER,merchant1,500
+16,TRIGGER,merchant2,500
+45,RESOLVE,merchant1,500
+
+Notes
+
+Test coverage progresses by part: Part 1 covers test cases 0–3, Part 2 extends coverage through case 8, and Part 3 is required for the complete suite.
+
+Minority variant: All three requirements are visible from the start and can be handled by one function; clarify the assessment layout before coding rather than assuming the next prompt unlocks only after passing earlier tests.
+
+The written [T-29, T] definition and the Part 3 boundary example appear inconsistent about an event exactly 30 seconds old. Clarify the inclusive lower boundary before coding if the live prompt preserves both statements.
+
+Resolution is driven by active traffic for the merchant, not by a global clock tick.
+
+Simultaneous transitions across merchants and error codes must follow the specified deterministic ordering.
+
+Solution skeleton
+
+Process records in timestamp order and maintain rolling counts per merchant and status. Keep contributing rows in FIFO deques so eviction decrements the same counters that insertion increments; isolate the disputed lower-bound convention in one window helper.
+
+After each log for a merchant, re-evaluate every error status affected by expired rows or by the updated success-volume denominator. Store active (merchant_id, error_status_code) pairs in a set and emit only when the eligibility predicate changes value.
+
+If a merchant has s distinct error codes, the direct implementation is O(n·s) time and O(n) worst-case space; because the HTTP status-code domain is bounded, the scan is effectively linear in the input size.
+
+Candidates with approximately three years of experience can receive this OA; it is not restricted to applicants with five or more years. A 60-minute assessment leaves little time for misreading the progression.
+
+Preparation
+
+Implement a rolling per-merchant, per-status counter and test eviction immediately before, at, and after the window boundary.
+
+Write an explicit inactive → active → inactive alert-state machine that suppresses duplicate triggers and permits re-triggering after resolution.
+
+Drill the strict impact comparison with zero successes, exactly 1%, and just over 1%.
+
+Practice parsing CSV-like records and sorting multiple emitted events by the full output key.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,50 @@
+===H1===
+Minimum Anagram Edits
+===URL===
+https://www.1point3acres.com/interview/problems/company/jpmorgan/minimum-anagram-edits
+===BODY===
+JPMorgan Chase
+Coding·60 minMembers
+Minimum Anagram Edits
+Compute the minimum number of character operations needed to make one string an anagram of another. One OA variant provides two strings directly; another splits a numeric string into two halves and compares those halves.
+SWE
+hashmap
+string
+string-processing
+oa
+easy
+Frequency
+Low
+Last asked
+2026-03-18
+Stage
+oa · tech-screen
+Requirements
+
+Main variant: given two strings s1 and s2, return the minimum number of edits needed so one can be transformed into an anagram of the other.
+
+Numeric-string variant: given one digit string, split it into two halves by length, then compute the minimum steps needed to make the two halves anagrams.
+
+Treat the operation definition carefully. In the common HackerRank-style version, one replacement fixes one excess character in one half, so the answer is half the sum of absolute frequency differences when lengths match.
+
+If lengths do not match in the two-string variant, clarify whether insertions/deletions are allowed or whether the case is invalid.
+
+Notes
+
+Use a frequency counter. The core signal is recognizing that order does not matter once the target is an anagram.
+
+For equal-length strings with replacement operations, count the surplus characters on one side; do not double-count both directions.
+
+The numeric-string split variant depends on correct midpoint handling. If the length is odd, ask whether the input is guaranteed even.
+
+Preparation
+
+Write both versions: min_steps(s1, s2) and min_steps_split(s).
+
+Test equal strings, completely disjoint alphabets, duplicate-heavy strings, and odd-length input handling.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

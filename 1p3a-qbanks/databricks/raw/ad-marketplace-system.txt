@@ -1,0 +1,544 @@
+===H1===
+Design an Ad Marketplace System
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/ad-marketplace-system
+===BODY===
+Databricks
+System DesignMembers
+Design an Ad Marketplace System
+Design a scalable ad marketplace connecting publisher websites with ad providers, covering bidding, matching, serving, and budget accounting.
+SWE
+ads
+scaling
+system-design
+medium
+Frequency
+Single report
+Last asked
+2025-11-05
+Stage
+onsite-system-design
+Problem Overview
+
+Design a scalable ad marketplace system that connects websites (publishers) with advertisers. The system must handle these main tasks:
+
+Ad Requests: Websites ask the system for an ad to show.
+
+Click Tracking: The system records when a user clicks an ad.
+
+Budget Management: Every ad has a daily budget. Money goes down when people click. It resets every day.
+
+Ad Bidding: Advertisers bid against each other. The system picks the best one (usually the cheapest or most profitable).
+
+Fund Management: Advertisers have an account balance that we must track carefully.
+
+System Requirements
+
+Ad Selection: When a website asks for an ad, the system finds one from the available advertisers.
+
+Bidding: Advertisers compete for the spot.
+
+Budget Control: Stop showing an ad if the daily budget hits zero.
+
+Daily Reset: Reset the budget at the start of every day.
+
+Money Handling: Allow advertisers to add money or get refunds.
+
+Global Scale: The system must work fast all over the world.
+
+Common Interview Questions
+
+How do you track budgets in real-time without making mistakes?
+
+What happens if 1,000 people click an ad at the exact same moment it runs out of money?
+
+How do you make sure advertisers don't spend more than they planned?
+
+How does the bidding process work between different providers?
+
+What caching strategies will speed up ad selection?
+
+How do you handle budget resets for advertisers in different time zones?
+
+How do you stop fake clicks (fraud)?
+
+What speed (Latency) do you promise for showing ads?
+
+Helpful Resources
+
+Before looking at the solution, this video is very useful for understanding ad systems:
+
+📺 System Design: Ad Click Aggregation
+
+Proposed Solution
+
+Note: This is just one example. To prepare best, try to solve this problem on your own first. Interviewers want to see how you think and how you handle trade-offs.
+
+Step 1: Clarifying the Goal
+
+First, we need to ask questions to understand exactly what to build.
+
+Functional Requirements (Features)
+
+Core Features:
+
+Is ad selection real-time?
+
+Do we support images, videos, and text ads?
+
+Do we track views (impressions) or just clicks?
+
+Can we target specific users (age, location)?
+
+Money & Budget:
+
+Do advertisers pay per click (CPC) or per view (CPM)?
+
+What happens if the budget runs out in the middle of the day?
+
+Do we need to tell advertisers immediately when money runs out?
+
+Bidding:
+
+How does the auction work? (First-price or Second-price?)
+
+How often do bids change?
+
+Non-Functional Requirements (Performance)
+
+Scale:
+
+How many requests per second? (100,000 RPS)
+
+How many advertisers? (10,000)
+
+How many clicks? (2,000 per second)
+
+Speed (Latency):
+
+Ad selection must happen very fast (usually < 100ms).
+
+Budget updates should be quick.
+
+Accuracy:
+
+Budget tracking must be very accurate (99.9%). We are dealing with money.
+
+Assumptions for This Design
+
+10,000 active advertisers.
+
+100,000 ad requests per second.
+
+2,000 clicks per second (2% Click-Through Rate).
+
+Needs to run in 3-5 global regions.
+
+Ad selection Latency target: < 50ms p99.
+
+Step 2: Estimating Scale and Capacity
+
+Traffic Numbers
+
+Requests: 100,000 RPS. Peak traffic might be 300,000 RPS.
+
+Clicks: 2,000 clicks per second.
+
+Bids: If 10 providers bid per request, that is 1 million checks per second.
+
+Storage Needs
+
+Campaign Data: Very small (100 MB).
+
+Budget Data: Tiny current state (10 MB). History is about 7 GB/year.
+
+Click Logs: Big. ~86 GB per day. ~31 TB per year.
+
+Bandwidth (Network Speed)
+
+Incoming Requests: ~400 Mbps.
+
+Outgoing Ads: ~160 Mbps.
+
+Click Data: ~5 Mbps.
+
+Total: ~600 Mbps. This is easy for modern servers.
+
+Memory (RAM) for Caching
+
+We need to cache budgets, bids, and ad details.
+
+Total needed: ~500 MB to 1 GB. This fits easily into Memory.
+
+Step 3: API Design
+
+1. Ad Request (For Publishers)
+
+Websites call this to get an ad.
+
+GET /api/v1/ads/request
+
+Request:
+{
+  "publisher_id": "pub_12345",
+  "placement_id": "banner_top",
+  "user_context": {
+    "user_id": "user_abc123",
+    "ip_address": "192.168.1.1",
+    "device_type": "mobile"
+  },
+  "page_url": "https://example.com/article",
+  "placement_dimensions": {
+    "width": 728,
+    "height": 90
+  }
+}
+
+Response:
+{
+  "ad_id": "ad_98765",
+  "campaign_id": "camp_54321",
+  "creative_url": "https://cdn.example.com/ads/ad_98765.jpg",
+  "click_url": "https://ads.example.com/click?ad_id=ad_98765&token=..."
+}
+
+2. Click Tracking (For Publishers)
+
+The browser calls this when a user clicks.
+
+POST /api/v1/ads/click
+
+Request:
+{
+  "ad_id": "ad_98765",
+  "campaign_id": "camp_54321",
+  "timestamp": "2025-01-17T10:30:00Z",
+  "token": "encrypted_verification_token"  // Security check
+}
+
+Response:
+{
+  "success": true,
+  "redirect_url": "https://advertiser.com/landing-page"
+}
+
+3. Fund Management (For Advertisers)
+
+Advertisers call this to add money.
+
+POST /api/v1/advertisers/{advertiser_id}/funds/add
+
+Request:
+{
+  "amount": 10000.00,
+  "currency": "USD"
+}
+
+Response:
+{
+  "success": true,
+  "new_balance": 15000.00
+}
+
+4. Campaign Budget API (For Advertisers)
+
+Check how much money is left for the day.
+
+GET /api/v1/campaigns/{campaign_id}/budget
+
+Response:
+{
+  "campaign_id": "camp_54321",
+  "daily_budget": 1000.00,
+  "spent_today": 732.50,
+  "remaining_today": 267.50,
+  "status": "active"
+}
+
+Step 4: Database Schema and Storage
+
+Core Data Models
+
+Advertisers
+
+account_balance: How much money they have total.
+
+Campaigns
+
+daily_budget: Limit for one day.
+
+daily_spent: How much used today.
+
+status: Active, Paused, or Budget Exhausted.
+
+Click Events
+
+cost: How much this specific click cost.
+
+fraud_score: Used to detect fake clicks.
+
+Transactions
+
+Records every deposit or charge (Audit log).
+
+Database Choices
+
+PostgreSQL (Primary DB):
+
+Best for managing money (Transactions).
+
+Reliable (ACID compliance).
+
+Redis (Cache):
+
+Stores active budgets and bids for super fast access.
+
+Handles the real-time counters.
+
+InfluxDB or TimescaleDB (Time-Series):
+
+Stores millions of click logs efficiently.
+
+Great for graphs and analytics.
+
+S3 (File Storage):
+
+Stores the actual ad images and videos.
+
+Step 5: High-Level Architecture
+
+We need a system that routes traffic globally and processes data quickly.
+
+┌─────────────┐
+│  Publisher  │
+│  Websites   │
+└──────┬──────┘
+       │
+       ▼
+┌─────────────────────────────────────────────┐
+│         Global Load Balancer (DNS)          │
+│            (Routes to nearest location)     │
+└──────────────────┬──────────────────────────┘
+                   │
+       ┌───────────┼───────────┐
+       ▼           ▼           ▼
+   ┌──────┐   ┌──────┐   ┌──────┐
+   │Region│   │Region│   │Region│
+   │ US   │   │ EU   │   │ Asia │
+   └──┬───┘   └──┬───┘   └──┬───┘
+      │
+      ▼
+┌────────────┐
+│ API Gateway│
+└─────┬──────┘
+      │
+      ├───► [Ad Selection Service] ──► Queries Redis & Bidders
+      │
+      ├───► [Click Tracking Service] ──► Pushes to Kafka
+      │
+      └───► [Fund Service] ──► Updates PostgreSQL
+
+            ┌─────────┐
+            │  Kafka  │ (Queue)
+            └────┬────┘
+                 │
+            ┌────▼─────┐
+            │  Worker  │ (Updates Budgets)
+            └────┬─────┘
+                 │
+            ┌────▼────┐
+            │  Redis  │ (Real-time Budget)
+            └─────────┘
+
+Main Components
+
+Ad Selection Service: Finds the right ad, checks budget in Redis, runs the auction, and returns the ad.
+
+Click Tracking Service: Checks for fraud, sends the user to the destination, and logs the click to a queue (Kafka).
+
+Budget Worker: Reads clicks from the queue and updates the budget in Redis and the Database.
+
+Redis Cache: Keeps track of how much money is spent right now.
+
+Kafka: A buffer that holds click data so the database doesn't get overwhelmed.
+
+Step 6: Deep Dive into Core Components
+
+6.1 Ad Selection Logic
+
+Filter: Find campaigns that match the user (location, device) and have status = 'active'.
+
+Check Budget: Look at Redis. If spent >= budget, skip this ad.
+
+Bid: Ask providers for their price (parallel requests).
+
+Select: Pick the winner (lowest cost or highest bid).
+
+Return: Send the ad URL to the publisher.
+
+6.2 Managing Budget Safely
+
+We need to update budgets without race conditions (two clicks updating at the same time).
+
+Solution: Optimistic Locking with Redis
+
+We use a version number to make sure we are updating the latest data.
+
+def deduct_budget(campaign_id, cost):
+    # Redis key stores: daily_budget, spent, and a version number
+
+    max_retries = 3
+    for attempt in range(max_retries):
+        # 1. Read current state
+        budget_data = redis.hgetall(f"budget:{campaign_id}")
+
+        current_spent = float(budget_data['spent'])
+        daily_budget = float(budget_data['daily_budget'])
+        version = int(budget_data['version'])
+
+        # 2. Check if money is left
+        if current_spent + cost > daily_budget:
+            return False  # Out of money
+
+        # 3. Try to update safely using version check (Lua script for atomicity)
+        new_spent = current_spent + cost
+        lua_script = """
+            if redis.call('HGET', KEYS[1], 'version') == ARGV[1] then
+                redis.call('HSET', KEYS[1], 'spent', ARGV[2])
+                redis.call('HINCRBY', KEYS[1], 'version', 1)
+                return 1
+            else
+                return 0
+            end
+        """
+        # If version matches, update spent. If not, fail and retry.
+        success = redis.eval(lua_script, 1, f"budget:{campaign_id}", str(version), str(new_spent))
+
+        if success:
+            # Send update to database asynchronously
+            kafka.publish('budget-updates', {
+                'campaign_id': campaign_id,
+                'spent': new_spent
+            })
+            return True
+
+    return False  # Failed too many times
+
+6.3 Daily Budget Reset
+
+Budgets need to reset to 0 at midnight. Since we have users all over the world, we use a background job.
+
+# Runs every hour
+def reset_daily_budgets():
+    # Find campaigns where it is currently midnight in their timezone
+    campaigns_to_reset = db.query("""
+        SELECT campaign_id, daily_budget
+        FROM campaigns
+        WHERE status = 'active'
+        AND EXTRACT(HOUR FROM (NOW() AT TIME ZONE timezone)) = 0
+    """)
+
+    for campaign in campaigns_to_reset:
+        # Reset the counter in Redis
+        redis.hset(f"budget:{campaign.campaign_id}", {
+            'spent': 0,
+            'daily_budget': campaign.daily_budget,
+            'version': 0
+        })
+
+        # Reset in Database
+        db.execute("UPDATE campaigns SET daily_spent = 0 WHERE ...")
+
+6.4 The Bidding Auction
+
+We usually want the cheapest ad for the publisher or the highest revenue for the platform.
+
+def select_lowest_cost(bids):
+    # Sort bids from lowest price to highest
+    if not bids:
+        return None
+
+    bids.sort(key=lambda x: x.amount)
+    winning_bid = bids[0]  # The cheapest option
+
+    return {
+        'ad_id': winning_bid.ad_id,
+        'bid_amount': winning_bid.amount
+    }
+
+6.5 Preventing Fraud
+
+We must stop people from creating fake clicks to drain budgets. One way is using a secret token.
+
+# 1. When serving the ad, create a secret token
+token = hmac.new(SECRET_KEY, f"{ad_id}:{timestamp}", sha256).hexdigest()
+
+# 2. When the click happens, check the token
+def handle_click(click_data):
+    # Re-create the token to see if it matches
+    expected = hmac.new(SECRET_KEY, f"{click_data['ad_id']}:{click_data['timestamp']}", sha256).hexdigest()
+
+    if click_data['token'] != expected:
+        return reject_click("Invalid token")
+
+    # Also check rate limits (e.g., max 5 clicks per user per day)
+    clicks_today = redis.incr(f"clicks:{user_id}")
+    if clicks_today > 5:
+        return reject_click("Too many clicks")
+
+    process_valid_click()
+
+6.6 Global Scaling
+
+If we have servers in the US, Europe, and Asia, how do we handle one budget?
+
+Option 1: Split the Budget. Give 40% to US, 30% to EU, 30% to Asia. Simple, but might waste budget if one region is slow.
+
+Option 2: Central Redis. All regions talk to one Redis in the US. Accurate, but slower (Latency) for Asia/EU.
+
+Option 3 (Recommended): Regional Sync. Each region has a local Redis. They sync with a central DB every few seconds. We allow a small "overspend" buffer (e.g., 5%) to keep things fast.
+
+Step 7: Fixing Bottlenecks and Scaling Issues
+
+Bottleneck 1: Too Many Database Writes
+
+Problem: 2,000 clicks/second means 2,000 DB inserts. This is heavy.
+
+Solution: Use Kafka. Buffer the clicks and insert them into the DB in batches (groups) every 5 seconds.
+
+Bottleneck 2: Slow Ad Selection
+
+Problem: If bidding takes too long, the website loads slowly.
+
+Solution: Set a strict timeout (e.g., 30ms). If a bidder doesn't reply in time, ignore them. Also, pre-calculate which ads are valid in Redis so we don't have to search the DB every time.
+
+Bottleneck 3: Redis Failure
+
+Problem: If Redis dies, we can't check budgets.
+
+Solution: Use Redis Cluster (multiple nodes). If one fails, another takes over automatically. If the whole cluster fails, fall back to the Database (slower, but works).
+
+Bottleneck 4: Concurrent Clicks
+
+Problem: Many people clicking at once can mess up the math.
+
+Solution: The Lua script in Redis (shown in Step 6.2) ensures that updates happen one at a time, even if they arrive at the same millisecond.
+
+Final Thoughts
+
+This design balances speed, accuracy, and scale.
+
+Speed: We use Redis to check budgets in under 10ms.
+
+Scale: We use Kafka to handle huge spikes in traffic without crashing the database.
+
+Accuracy: We use atomic locks to ensure money is counted correctly.
+
+Reliability: The system works across multiple regions and handles failures gracefully.
+
+In your interview, remember to mention Trade-offs. For example, we chose to use a small "overspend buffer" in exchange for much faster global performance.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

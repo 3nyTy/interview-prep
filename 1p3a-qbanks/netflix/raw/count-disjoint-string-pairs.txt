@@ -1,0 +1,116 @@
+===H1===
+Count Disjoint String Pairs
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/count-disjoint-string-pairs
+===BODY===
+Count Disjoint String Pairs
+
+<https://www.1point3acres.com/interview/problems/company/netflix/count-disjoint-string-pairs>
+
+Netflix
+Coding
+
+60 min
+Members
+Count Disjoint String Pairs
+
+Count unique index pairs (i<j) of lowercase strings that share no common character; bitmask each word's 26-letter set and AND the masks.
+
+SWE
+bitmask
+string
+hashmap
+medium
+Frequency
+Low
+Last asked
+2026-08-02
+Stage
+phone-screen  onsite-coding
+Count Disjoint String Pairs
+
+Given an array of lowercase strings words, return the number of unique index pairs (i, j) such that i < j and the two strings share no common characters.
+
+Two strings are disjoint if there is no character that appears in both strings.
+
+Examples
+
+Example 1:
+
+Input: words = ["apple","banana","peach","kiwi"]
+
+Output: 3
+
+Explanation:
+
+Valid pairs are ["apple","kiwi"], ["banana","kiwi"], and ["peach","kiwi"].
+
+Example 2:
+
+Input: words = ["abc","def","gh"]
+
+Output: 3
+
+Example 3:
+
+Input: words = ["a","aa","aaa"]
+
+Output: 0
+
+Constraints
+1 <= words.length <= 1000
+1 <= words[i].length <= 1000
+words[i] consists of lowercase English letters.
+Notes
+A phone-screen variant returns the actual index pairs instead of just a count: e.g. ["a", "ab", "b"] returns [[0, 2]] (only "a" and "b" share no character). Building the 26-bit mask per word and AND-ing every pair runs in O(n^2 * 26); this O(n^2) solution has been accepted without an optimization follow-up.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Count Disjoint String Pairs
+Examples
+Constraints
+Notes
+Related discussions  2
+?????????
+??????
+Related questions
+
+Other Netflix questions sharing tags with this one
+
+Movie History Friends I / II
+Single report
+hashmap
+string
+medium
++1
+JSON Path Query / Inverted Index
+Low
+hashmap
+medium
+json
++4
+Music Playlist History
+Single report
+hashmap
+medium
+data-structure
++2
+User Engagement Pattern Classification
+Single report
+hashmap
+medium
+array
++1
+Number Pairs That Match Target
+Single report
+hashmap
+medium
+array
++1
+Code editor
+
+---

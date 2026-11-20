@@ -1,0 +1,67 @@
+===H1===
+Fence Painting Minimum Operations (Gemini Team)
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/fence-painting-min-ops
+===BODY===
+Google
+Coding·45 minMembers
+Fence Painting Minimum Operations (Gemini Team)
+Asked in a Gemini team coding round: given the heights of N adjacent fence planks (each width 1), compute the minimum number of paint-roller operations to cover the fence, given a 1-unit-wide brush that either paints one plank top-to-bottom (cost 1) or paints a horizontal strip across a contiguous block of planks tall enough (cost 1).
+SWE
+dp
+recursion
+medium
+Frequency
+Single report
+Last asked
+2026-04-27
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input: integer n and array a[1..n] where a[i] is the height of the i-th plank.
+
+Two paint operations, each costs 1:
+
+Vertical stroke: fully paint one plank from bottom to top.
+
+Horizontal stroke: pick a height h and paint a contiguous range [l, r] at that height; only legal if a[i] >= h for every i ∈ [l, r].
+
+Output: the minimum total operations to paint the entire fence.
+
+Examples
+
+n = 5, a = [2, 2, 1, 2, 1]
+Optimal:
+  1) Horizontal stroke at h=1 across [1..5]   (covers row 1 across whole fence)
+  2) Horizontal stroke at h=2 across [1..2]
+  3) Vertical stroke at plank 4 (height 2 still missing row 2)
+Optimal answer: 3.
+
+Notes
+
+Classic recursive divide-and-conquer: for range [l..r] with base height h:
+
+Option A: paint every plank vertically → cost r - l + 1.
+
+Option B: paint a horizontal band of height min - h, then recurse on the sub-ranges above the band split by planks at height min.
+
+Take the minimum.
+
+Equivalent to Cartesian-tree DP; runs in O(N log N) with min-stack or sparse table, or O(N²) with the recursive form.
+
+Verbalize the recursion's correctness: the band optimally covers all planks ≥ min in the range, then each "taller column block" is solved independently.
+
+Preparation
+
+Drill The canonical largest-rectangle-in-histogram problem — the geometric setup is the same.
+
+Practice the recursive painter pattern on small inputs by hand; mistakes around the band height (min - base) are common.
+
+Be ready for the follow-up: "the brush has width W instead of 1" — extends to bounded horizontal width.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

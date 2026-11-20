@@ -1,0 +1,59 @@
+===H1===
+GQS Quant Phone — Correlation Range + Box-Muller-Style Sampling
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/gqs-quant-phone-brainteasers
+===BODY===
+Citadel / Citadel Securities
+Other·45 minMembers
+GQS Quant Phone — Correlation Range + Box-Muller-Style Sampling
+Citadel GQS Quant Researcher phone screen: short brainteaser-style probability questions delivered after a deep resume drill. Reported questions cover the achievable range of `corr(Y, Z)` given two other pairwise correlations, and how to transform `Uniform(0, 1)` samples into `Normal(0, 1)`.
+MLE
+RS
+probability
+linear-algebra
+math-reasoning
+sampling
+hard
+Frequency
+Low
+Last asked
+2026-04-28
+Stage
+phone-screen
+Requirements
+
+Short verbal questions during a 45-60 minute phone screen with deep resume drilling first. Two reported questions:
+
+Suppose X, Y, Z are random variables with corr(X, Y) = 0.8 and corr(X, Z) = 0.9. What is the range of corr(Y, Z)? Follow-up: can you construct X, Y, Z such that corr(X, Y) = corr(Y, Z) = corr(X, Z) = -1/2?
+
+Suppose you have access to an RNG that draws from Uniform(0, 1). How do you produce a draw from Normal(0, 1)?
+
+The round also opens with a behavioral-flavored question about prior research and motivation, and reportedly closes with one or two more behavioral probes that disproportionately weigh into the final decision.
+
+Notes
+
+Correlation bound argument: the correlation matrix Σ of (X, Y, Z) must be positive semi-definite. With corr(X, Y) = a, corr(X, Z) = b, and corr(Y, Z) = c, the 3x3 correlation matrix is PSD if and only if its determinant 1 + 2abc - a^2 - b^2 - c^2 >= 0. Solving the quadratic in c with a = 0.8, b = 0.9: bounds work out to ab - sqrt((1-a^2)(1-b^2)) <= c <= ab + sqrt((1-a^2)(1-b^2)) = 0.72 ± sqrt(0.36 * 0.19) = 0.72 ± sqrt(0.0684) ≈ 0.72 ± 0.2615. So corr(Y, Z) ∈ [0.4585, 0.9815] approximately.
+
+All-equal negative correlations: the same PSD condition with a = b = c = ρ gives 1 + 2ρ^3 - 3ρ^2 >= 0. For ρ = -1/2 this is 1 - 1/4 - 3/4 = 0, so the matrix is rank-deficient but still PSD — the construction exists. One concrete realization: take three unit vectors in 2D forming an equilateral triangle (angles 120° apart); the pairwise inner products are cos(120°) = -1/2.
+
+Uniform to Normal: two standard methods. Box-Muller: given independent U1, U2 ~ Uniform(0, 1), set Z1 = sqrt(-2 ln U1) cos(2π U2) and Z2 = sqrt(-2 ln U1) sin(2π U2); both are independent standard normals. Alternative: inverse-CDF method using the standard normal quantile function Φ^{-1}(U), computed via a rational-function approximation (e.g. Beasley-Springer-Moro).
+
+The interviewer's behavioral probes at the end were reportedly heavier than candidates expect. Prepare the "why-Citadel / why-QR" narrative in advance; this round graded it harder than the technical content.
+
+Sanity check on the correlation bound: when a = b = 1, c is forced to 1 — verify the formula collapses (1 + 2c - 1 - 1 - c^2 >= 0 ⇒ -(c-1)^2 >= 0 ⇒ c = 1).
+
+Preparation
+
+Memorize the 3x3 correlation-matrix PSD inequality. It appears across multiple quant interviews and is the canonical answer to any "what is the range of correlation given two others" question.
+
+Practice the Box-Muller derivation: change-of-variables from (U1, U2) to (R, Θ) where R^2 ~ Exponential(1/2) and Θ ~ Uniform(0, 2π). Be ready to sketch the Jacobian in 60 seconds.
+
+Drill the standard quant probability brainteaser canon (50 Challenging Problems in Probability, Heard on the Street, A Practical Guide to Quantitative Finance Interviews). GQS phone screens pull heavily from this canon at quick verbal pace.
+
+Rehearse a tight 90-second "why Citadel GQS" narrative — the behavioral close on this round carries unusual weight in the hire / no-hire decision.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

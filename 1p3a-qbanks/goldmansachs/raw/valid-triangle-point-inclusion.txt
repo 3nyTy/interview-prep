@@ -1,0 +1,62 @@
+===H1===
+Valid Triangle + Point Inclusion
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/valid-triangle-point-inclusion
+===BODY===
+Goldman Sachs
+Coding·60 minMembers
+Valid Triangle + Point Inclusion
+Geometry OA: validate that three points form a real triangle, then classify whether each of two query points lies inside it. A coordinate-geometry exercise testing the area-sum invariant.
+SWE
+math
+medium
+Frequency
+Single report
+Last asked
+2024-10-26
+Stage
+oa
+Requirements
+
+Given the coordinates of three triangle vertices A(x1,y1), B(x2,y2), C(x3,y3) and two query points P(xp,yp), Q(xq,yq):
+
+First validate the triangle: the three side lengths must satisfy the triangle inequality (and any pair must not be collinear, i.e. AB + BC > AC strictly).
+
+If the triangle is invalid, return 0.
+
+If valid, return:
+
+1 if only P is inside,
+
+2 if only Q is inside,
+
+3 if both are inside,
+
+4 if neither is inside.
+
+public static int pointsBelong(int x1, int y1, int x2, int y2, int x3, int y3,
+                               int xp, int yp, int xq, int yq)
+
+Notes
+
+Inclusion test: a point P is inside triangle ABC iff area(ABC) == area(PAB) + area(PBC) + area(PCA).
+
+Compute the signed area with the cross-product formula ½ |x1(y2 - y3) + x2(y3 - y1) + x3(y1 - y2)|.
+
+Floating-point equality is dangerous — compare areas with a small epsilon (or work entirely in integer arithmetic with 2*area).
+
+Boundary semantics ("on the edge" = inside or outside?) are not specified; clarify before coding.
+
+This is the standard inclusion-test trick from computational geometry; the OA tests do not probe degenerate cases (collinear vertices, point exactly on a vertex) deeply, but real interviewers may.
+
+Preparation
+
+Derive the signed-area formula by hand from the determinant; do it twice without notes.
+
+Practice the integer-only variant (work with 2*area as an int) — it is the safer form for an interviewer to see.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

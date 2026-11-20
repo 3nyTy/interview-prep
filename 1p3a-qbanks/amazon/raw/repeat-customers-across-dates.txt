@@ -1,0 +1,53 @@
+===H1===
+Count Repeat Customers Across Dates
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/repeat-customers-across-dates
+===BODY===
+Amazon
+Coding·30 minMembers
+Count Repeat Customers Across Dates
+Given customer store-entry time records, count customers who appear on at least two different dates. Follow-ups ask for counts within a unified time window and for a design that handles very large logs.
+SWE
+hashmap
+streaming
+dedup
+medium
+Frequency
+Single report
+Last asked
+2026-08-19
+Stage
+phone-screen
+Requirements
+
+Input: customer store-entry records containing customer identity and entry time.
+
+A repeat customer is one who enters on different calendar dates; repeated entries on the same date do not qualify by themselves.
+
+Return the number of repeat customers.
+
+Follow-up: count customers within a specified time window.
+
+Follow-up: adapt the computation when the log is too large to hold in memory.
+
+Notes
+
+Clarify timezone and calendar-date normalization before grouping records.
+
+For the window follow-up, clarify whether the window is fixed, tumbling, or sliding and whether the result is one aggregate or a time series.
+
+For the all-time batch form, normalize each timestamp to a calendar date and keep a first-seen date plus a qualified flag per customer. Increment the answer exactly once when a later record has a different date.
+
+For exact logs that exceed memory, hash-partition or externally sort by customer ID, then run the same per-customer aggregation within each partition. A sliding-window form instead needs timestamp eviction semantics defined before choosing retained state.
+
+Preparation
+
+Implement a batch version and a streaming version while retaining only the minimum per-customer state.
+
+Test same-day duplicates, midnight boundaries, out-of-order events, and a customer appearing on three or more dates.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

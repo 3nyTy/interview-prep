@@ -1,0 +1,74 @@
+===H1===
+AI Enhanced Pilot — Domain (AI-Assisted Coding Round)
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/ai-enhanced-pilot-domain
+===BODY===
+Coinbase
+Coding·60 minMembers
+AI Enhanced Pilot — Domain (AI-Assisted Coding Round)
+A newer onsite "Domain" round (announced in postings as "AI Enhanced Pilot") in which the candidate works with an in-IDE AI assistant on a 4-part script: find a bug, propose a new feature, review a PR, debug a production scenario. Interviewers explicitly observe how you prompt, validate, and accept AI output — the format of the collaboration is graded, not just the final answer. One instantiation runs all four parts against an in-memory transaction-pagination service.
+SWE
+ai-coding
+ai-tools
+ai-collaboration
+code-reading
+refactoring
+debugging
+new-round
+Frequency
+Low
+Last asked
+2026-07-11
+Stage
+onsite-coding
+Requirements
+
+The round is presented as four sequential sub-tasks against a small starter codebase (one candidate report describes it as a CodeSignal-mock OOD database with cursor-based queries). All four are AI-allowed:
+
+Find the bug. A failing test is provided; locate and explain the bug, then fix it.
+
+Propose a new feature. Spec is short and ambiguous; sketch the design, then implement.
+
+Review a PR. A diff is provided; talk through what you would accept, change, or reject before approving.
+
+Debug a production scenario. A runtime symptom is described (errors, slow query, etc.); reason from symptom to root cause and propose remediation.
+
+Screen-share is mandatory. The interviewer records how you prompt the AI and how you validate its output.
+
+A fully specified instantiation runs the four sub-tasks against a transaction-record pagination service (records carry timestamp, amount, id; pagination is entirely in-memory — same family as the Domain filter + pagination round):
+
+Debug an existing sort-by-timestamp pagination implementation: an invalid cursor format, duplicate timestamps that need an id tie-break, and keeping the cursor change backward compatible.
+
+Design support for sorting by amount: analyze trade-offs across the candidate designs — offset vs cursor pagination, whether the cursor embeds the sort-key field, and whether the cursor is hashed/opaque.
+
+Diagnose from logs why a specific API request keeps timing out (no index on the amount column) and propose improvements, including options that avoid adding an index.
+
+Review another engineer's code while screen-sharing; the AI assistant can see the task description and the open files.
+
+Every sub-task carries a dense set of small follow-up questions — time pressure is the defining constraint of the round.
+
+Notes
+
+Read first, prompt second. On the bug-find and PR-review sub-tasks, candidates who paste the whole file into the AI without first reading it produce vague prompts and get vague outputs. Skim the code, form a hypothesis, then ask the AI to confirm or check a specific area.
+
+Show your validation loop. When the AI proposes a fix, narrate "I'll add a test that exercises X to confirm the fix" before accepting. The interviewer wants to see you treat the AI as a senior collaborator whose suggestions you verify, not as an oracle.
+
+Reject confidently when wrong. Some prompt outputs will be plausible but wrong (especially on the PR-review sub-task, which is designed to elicit a "this looks fine" failure mode). Talking the interviewer through why you are rejecting an AI suggestion is high-signal.
+
+Time budget: 60 minutes for 4 sub-tasks gives ~15 minutes each — do not let any single one over-run. The production-debug sub-task is the most open-ended and the easiest to lose time on.
+
+The format is new enough that interviewer calibration varies. Treat it as a normal pair-programming round where the third pair member happens to be an AI; the social dynamics matter as much as the code.
+
+Preparation
+
+Run a dry run on a small repo: pick a real GitHub project, plant 1 deliberate bug, and time yourself fixing it with Cursor / Claude Code while narrating each prompt. Aim for ≤10 minutes from "open repo" to "green test."
+
+Practice writing PR review notes verbally: 30 seconds per change, "this is correct because X / this should change because Y / this is fine but I'd add a test." Most candidates default to either rubber-stamp or nit-pick — neither lands.
+
+Build a small library of phrasings for common prompts: "Here is a failing test (paste). The relevant file is X (paste). What is the smallest change that makes the test pass without altering Y behavior?" The interview is short — pre-loaded phrasings save tokens.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

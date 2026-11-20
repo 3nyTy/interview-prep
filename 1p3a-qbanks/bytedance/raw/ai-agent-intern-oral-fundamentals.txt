@@ -1,0 +1,54 @@
+===H1===
+AI Agent Intern Technical Questions
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/ai-agent-intern-oral-fundamentals
+===BODY===
+ByteDance / TikTok
+OtherMembers
+AI Agent Intern Technical Questions
+A Chinese-language AI Agent internship screen combines virtual-memory and TCP questions with agent-quality evaluation and tool-call debugging.
+SWE
+agents
+evaluation
+troubleshooting
+operating-systems
+networking
+Frequency
+Single report
+Last asked
+2026-09-09
+Stage
+phone-screen
+Requirements
+
+Explain the purpose of virtual memory and whether virtual address space can exceed physical RAM.
+
+Describe the TCP three-way handshake and its purpose.
+
+Given three agents with different levels of trustworthiness, decide when precision, recall, or F1 is an appropriate evaluation metric. Relate the choice to tolerance for false positives and false negatives.
+
+Explain how to trace a failed or exceptional external tool call end to end, including trace/span identifiers, input/output logs, exception status codes, and retry behavior.
+
+Notes
+
+The interview was conducted in Chinese after the interviewer checked language preference. The oral discussion preceded directed-graph coding.
+
+Virtual memory maps process addresses to physical pages; address-space size can exceed RAM without all pages being resident. Page faults can demand allocation or loading, or signal invalid access; actual memory availability remains resource-limited.
+
+The TCP handshake exchanges SYN, SYN+ACK, then ACK to synchronize sequence numbers and confirm bidirectional communication. A handshake does not authenticate the application's identity.
+
+Precision is TP/(TP+FP), recall is TP/(TP+FN), and F1 is 2TP/(2TP+FP+FN). Define the positive class and zero-denominator convention first. High false-positive cost favors precision; high false-negative cost favors recall. Compare agents on the same labeled workload, not a vague trust ranking.
+
+Trace tool calls across parent and child spans, correlate sanitized request/response data and failures, and separate transient errors from invalid requests. Bound retries and check idempotency before repeating side effects.
+
+Preparation
+
+In 15 minutes, draw an address translation and a TCP handshake, then explain a missing mapping, an invalid access, and a lost handshake packet.
+
+In 15 minutes, calculate precision, recall, and F1 for three confusion matrices and justify which error cost matters. Sketch a failed tool call trace and identify the first failing span and safe retry condition.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,59 @@
+===H1===
+Order Book Matching Simulation
+===URL===
+https://www.1point3acres.com/interview/problems/company/optiver/order-book-matching
+===BODY===
+Optiver
+Coding·90 minMembers
+Order Book Matching Simulation
+A HackerRank matching-engine simulation: process a stream of buy/sell limit orders against an order book with price-time priority and return the sum of all executed transaction prices. Naturally solved with two heaps.
+RS
+SWE
+DS
+heap
+order-book
+trading
+simulation
+oa
+medium
+Frequency
+Medium
+Last asked
+2025-11-18
+Stage
+oa
+Requirements
+
+Market participants submit buy and sell orders at various prices, forming an order book.
+
+When a new buy order at price p arrives:
+
+If a sell order exists at price ≤ p, a transaction occurs at that sell order's price; both orders are removed. If multiple sells qualify, the one with the better (lower) price takes priority.
+
+Otherwise the buy order is added to the book.
+
+A new sell order is symmetric: it matches the highest viable buy (price ≥ the sell price), trading at that buy's price; otherwise it's added.
+
+Orders are encoded as a 2-element integer array: first element +1 (buy) or −1 (sell), second element the price.
+
+Given a sequence of orders, return the sum of prices across all transactions that occurred.
+
+Notes
+
+Maintain a max-heap of resting buys and a min-heap of resting sells; on each incoming order, check the opposite book's best price for a match.
+
+Each order matches at most once here (one share per order) — both matched orders are removed on a fill.
+
+Edge cases: equal prices (a buy at exactly a resting sell's price still trades), and an empty opposite book (order rests).
+
+Preparation
+
+Implement the two-heap matching engine and dry-run a mixed buy/sell stream by hand to confirm the price-priority and trade-price rules.
+
+Practice the symmetric sell-side logic so it mirrors the buy side exactly.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

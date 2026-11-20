@@ -1,0 +1,64 @@
+===H1===
+PE Troubleshooting — Web Server / Disk Full
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/pe-troubleshooting
+===BODY===
+Meta
+Other·45 minMembers
+PE Troubleshooting — Web Server / Disk Full
+Meta Production Engineer signature round. Interviewer states a production incident (web server down, disk full, customers failing) and you drive the diagnosis step by step — pure Linux/SRE skills, no code.
+Perf Eng
+Infra Eng
+operating-systems
+cs-fundamentals
+debugging
+medium
+Frequency
+Low
+Last asked
+2026-08-15
+Stage
+onsite-deep-dive · phone-screen
+Requirements
+
+The interviewer reads a one-sentence incident: e.g. "Customer orders are failing; you've just been paged at 2 AM; no recent code or traffic change." You drive the conversation:
+
+Ask what observation tool you'd run (tail -f, dmesg, ps, df, iostat, netstat, tcpdump, log search), and the interviewer reads back the output you'd see.
+
+Iterate: each output narrows the hypothesis space, you pick the next probe.
+
+Eventually surface a root cause (commonly: disk full, OOM kill, stuck connection pool, expired cert, broken DNS, runaway log, kernel OOM).
+
+Discuss the immediate mitigation and the durable fix separately.
+
+Reported scenarios:
+
+Web server returning 500s on order submission; root cause = DB write failing because disk hit 100%.
+
+Service crash loop after rotation; root cause = log rotation broke a config the daemon was reading mid-flight.
+
+High p99 latency only on one host; root cause = SMART warnings on a failing disk.
+
+Deployment-version mismatch or rollout issue investigated through Linux commands and terminal output.
+
+Notes
+
+The scoring axis is the order you ask, not the answer. A candidate who immediately asks for the dashboard fails — Meta wants Linux-level probing.
+
+Be explicit when you transition from "diagnose" to "mitigate" to "durable fix."
+
+The interviewer will keep adding constraints ("no metrics", "customer impact ongoing") to test how you reorder priorities.
+
+Preparation
+
+Drill a 10-step Linux triage cheat-sheet from memory: uptime, top, dmesg | tail, df -h, iostat -x 1, netstat -tan | grep ESTAB | wc -l, tail -F /var/log/..., ss -s, vmstat 1, journalctl -xe.
+
+Practice narrating an incident out loud — say what you'd look at and what you'd expect.
+
+Prep one war-story per layer: disk, memory, network, kernel, application.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

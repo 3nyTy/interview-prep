@@ -1,0 +1,71 @@
+===H1===
+RAG / Agent / Kafka Oral Drill
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/rag-agent-kafka-oral-drill
+===BODY===
+ByteDance / TikTok
+Other·60 minMembers
+RAG / Agent / Kafka Oral Drill
+A verbal fundamentals screen covering RAG, LangGraph / LangChain agent design, tool use, MCP, Kafka consumer groups, Redis / MySQL persistence, concurrency, and long-context memory handling.
+SWE
+Infra Eng
+rag
+llm-agent
+tool-use
+kafka
+redis
+concurrency
+networking
+verbal
+medium
+Frequency
+Single report
+Last asked
+2026-06-03
+Stage
+phone-screen
+Requirements
+
+60-minute network / agent-flavored technical screen. The first half is oral fundamentals; the second half can include linked-list coding. Concrete oral topics:
+
+RAG architecture and how the candidate used it in a project.
+
+LangGraph / LangChain usage and how the agent framework is designed.
+
+Agent tool use, MCP, and how tools are exposed to the agent.
+
+Agent memory: whether the system stores memory, how memory is retrieved, and what happens when conversation history exceeds a very large context window.
+
+Kafka rebalance behavior.
+
+Kafka topics, partitions, and consumer groups; whether different consumer groups receive the same messages.
+
+Network layers.
+
+Concurrency vs. parallelism.
+
+Python GIL.
+
+Whether MySQL and Redis can substitute for each other, whether Redis can persist data permanently, and how persistence is configured.
+
+Notes
+
+The round mixes project-specific agent questions with backend fundamentals. Do not answer RAG only at buzzword level; tie retrieval, memory, and tool execution back to your actual system design.
+
+For long-context handling, prepare a concrete policy: summarize old turns, retrieve memory snippets, evict low-value context, and store durable memory outside the prompt.
+
+For Kafka, be precise: partitions are consumed by members within a consumer group; separate consumer groups each receive their own copy of the topic stream.
+
+Preparation
+
+Draw your RAG / agent architecture from memory: ingestion, embedding, retrieval, reranking, prompt assembly, tool invocation, memory write-back.
+
+Rehearse Kafka consumer group and rebalance explanations with a small partition/member example.
+
+Prepare concise answers for Redis persistence modes, MySQL-vs-Redis trade-offs, Python GIL, and concurrency vs parallelism.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

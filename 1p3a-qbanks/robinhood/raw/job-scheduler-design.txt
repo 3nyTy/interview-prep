@@ -1,0 +1,66 @@
+===H1===
+Job Scheduler System Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/robinhood/job-scheduler-design
+===BODY===
+Robinhood
+System Design·60 minFree preview
+Job Scheduler System Design
+Design a distributed job scheduler that runs typed jobs under an SLA, surfaces failures and logs, and guarantees each job runs at most once. The anchor Robinhood system-design prompt, especially for Senior+; often delivered nearly word-for-word and open-book.
+SWE
+system-design
+job-system
+scheduling
+idempotency
+retry
+distributed-systems
+Frequency
+Medium
+Last asked
+2026-09-03
+Stage
+phone-screen · onsite-system-design
+Requirements
+
+Schedule and run jobs of a given type. Each job has an SLA; if it exceeds the deadline, raise/record an error and let the user inspect logs.
+
+Support recurring jobs (e.g. a job that runs every minute).
+
+Guarantee at-most-once execution per scheduled run.
+
+Handle a broad range of failure cases gracefully — this is where most of the follow-up time goes.
+
+Deep-dive directions interviewers push on:
+
+What happens when a worker or a component in the pipeline dies mid-execution? How do you still honor at-most-once and continue retrying?
+
+A recurring job that fails must still send a notification — design how the failure path reliably triggers the notification even when parts of the system are down.
+
+Retry strategy and backoff; how retries interact with the at-most-once guarantee.
+
+Explain deduplication and how to avoid duplicate execution.
+
+Design data sharding and the database schema, including partition-key and sort-key choices.
+
+Explain what happens when job status is not updated and how to prevent jobs from being lost.
+
+Notes
+
+The round is open-book and the prompt is stable, so the front half carries little differentiation. Proactively and thoroughly cover reliability and fault tolerance early; candidates who leave it thin get walked into follow-up traps and run out of time.
+
+A common at-most-once implementation is conditional writes (compare-and-set on a claim/lease record) so two workers can't both execute the same run.
+
+A frequently added constraint is that the scheduler only handles a single job type — don't over-generalize the model.
+
+Preparation
+
+Build a reference design end-to-end (queue + workers + a durable job/lease store + a notifier) and rehearse the at-most-once claim via conditional writes.
+
+Pre-script the failure-handling story: worker crash, lost notification on recurring-job failure, and retry/backoff — these are the graded follow-ups.
+
+Work the Hello Interview / ByteByteGo job-scheduler material, which maps directly onto this prompt.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

@@ -1,0 +1,53 @@
+===H1===
+Optimal Account Balancing (LeetCode 465)
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/optimal-account-balancing
+===BODY===
+Salesforce
+CodingMembers
+Optimal Account Balancing (LeetCode 465)
+The Futureforce university-recruiting prompt is the unchanged LeetCode 465 problem: consolidate a set of person-to-person transactions and return the minimum number of additional transfers required to settle every net balance.
+SWE
+transactions
+hard
+Frequency
+Single report
+Last asked
+2026-07-25
+Stage
+—
+Requirements
+
+Input: a list of transactions, where each transaction is [from, to, amount] and means from transferred amount to to.
+
+Compute each person's net balance after all original transactions.
+
+Return the minimum number of additional transactions needed to make every net balance zero.
+
+Examples
+
+Input: [[0, 1, 10], [2, 0, 5]]
+
+Output: 2
+
+Notes
+
+The prompt is the unchanged LeetCode 465 problem.
+
+Person identifiers do not need to be contiguous, and people with a zero net balance do not need to participate in settlement.
+
+Collapse the transaction graph into a list of non-zero net balances. In the exact search, take the first unsettled balance and pair it only with later balances of the opposite sign; apply that transfer in place, recurse, then backtrack.
+
+Skip counterparties with duplicate balance values at the same recursion depth, and stop trying alternatives after an exact cancellation. The search is exponential in the number of non-zero balances, while the balance reduction is linear in the number of input transactions.
+
+Preparation
+
+Re-solve the canonical problem from a blank editor and write the net-balance reduction before working on the minimum-transfer search.
+
+Test the implementation on already-balanced participants, repeated participants, and cases where several different settlement orders are possible.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

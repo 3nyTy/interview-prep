@@ -1,0 +1,374 @@
+{
+  "company": "vanta",
+  "display_name": "Vanta",
+  "qbank_count": 10,
+  "questions_scraped": 10,
+  "site_total_count": 18,
+  "oj_count": 8,
+  "external_count": 0,
+  "description": "Vanta runs a deliberately small, stable interview loop built around a handful of recycled problems — a topological-sort phone screen, a local-machine `uniq` build, and an internal DAU/MAU analytics design. Difficulty skews easy-to-moderate, but the prompts are verbose and reading-comprehension-heavy, and most rejections trace to requirement-clarification or following the interviewer's instructions rather than raw algorithmic strength.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/vanta",
+  "scraped_at": "2026-09-20",
+  "source": "1point3acres qbank (logged-in session)",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "unique-lines-command",
+      "title": "Implement `uniq` — Unique Lines in a File",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "High",
+      "last_asked": "2026-07-16",
+      "stage": "onsite-coding",
+      "access": "Free preview",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "io",
+        "hashing",
+        "streaming",
+        "memory-bounded",
+        "set",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "io",
+        "hashing",
+        "streaming",
+        "memory-bounded",
+        "set",
+        "medium"
+      ],
+      "overview": "Build a CLI command that prints each distinct line of a file once while preserving first-seen order. The graded follow-ups push you toward handling a file too large to fit in memory and preserving global output order when partitioning or spilling data to disk.",
+      "source_count": 9,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/vanta/unique-lines-command"
+    },
+    {
+      "n": 2,
+      "slug": "task-dependency-resolution",
+      "title": "Task Dependency Resolution (Topological Sort)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-16",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "topological-sort",
+        "graph",
+        "dfs",
+        "bfs",
+        "dependency-resolution",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "topological-sort",
+        "graph",
+        "dfs",
+        "bfs",
+        "dependency-resolution",
+        "medium"
+      ],
+      "overview": "Given a set of build/CI tasks each with a dependency list, return all tasks required to run a requested set, in a valid execution order with no duplicates — a topological sort dressed up in Vanta-prod...",
+      "source_count": 7,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/vanta/task-dependency-resolution"
+    },
+    {
+      "n": 3,
+      "slug": "training-status-group-aggregation",
+      "title": "Employee Training Status + Group Tree Aggregation",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-03-17",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "tree",
+        "dfs",
+        "hashmap",
+        "simulation",
+        "recursion",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "dfs",
+        "hashmap",
+        "simulation",
+        "recursion",
+        "medium"
+      ],
+      "overview": "Part 1: classify an employee's security-training status (not_required / pending / completed / overdue) on a given check day and compute days overdue. Part 2: roll those numbers up a tree of employee g...",
+      "source_count": 7,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/vanta/training-status-group-aggregation"
+    },
+    {
+      "n": 4,
+      "slug": "word-pattern-meta-match",
+      "title": "Word Pattern / Meta-Pattern Match (Backtracking)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2024-12-04",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "backtracking",
+        "hashmap",
+        "dfs",
+        "string",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "backtracking",
+        "hashmap",
+        "dfs",
+        "string",
+        "medium"
+      ],
+      "overview": "A Word Pattern variant: decide whether a numeric pattern can be consistently mapped to the words of a candidate string. The follow-up generalizes each position to a *set* of allowed numbers and asks w...",
+      "source_count": 7,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/vanta/word-pattern-meta-match"
+    },
+    {
+      "n": 5,
+      "slug": "test-status-monitor",
+      "title": "Test Run Status Monitor (Failing → Passing Windows)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-07-31",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "interval",
+        "interval-aggregation",
+        "streaming",
+        "hashmap",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "interval",
+        "interval-aggregation",
+        "streaming",
+        "hashmap",
+        "hard"
+      ],
+      "overview": "A logging/query design problem over test runs: ingest (test_id, timestamp, status) events with strictly increasing timestamps, then answer queries about how fast a test recovers from failing to passin...",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/vanta/test-status-monitor"
+    },
+    {
+      "n": 6,
+      "slug": "frontend-api-practical",
+      "title": "Frontend Practical Coding — Work Against a Provided API",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2025-07-24",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "frontend",
+        "react",
+        "typescript",
+        "api-integration",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "frontend",
+        "react",
+        "typescript",
+        "api-integration",
+        "medium"
+      ],
+      "overview": "A frontend track of the practical-coding round: build against a provided REST API — wire up fetch GET/POST/update calls, filter the returned data, and use basic data structures — in TypeScript, agains...",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/vanta/frontend-api-practical"
+    },
+    {
+      "n": 7,
+      "slug": "dau-mau-analytics-system",
+      "title": "DAU / MAU Internal Analytics System",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-06-10",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "swe"
+      ],
+      "tags": [
+        "system-design",
+        "analytics-dashboard",
+        "metrics",
+        "ingestion",
+        "data-engineering"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "system-design",
+        "analytics-dashboard",
+        "metrics",
+        "ingestion",
+        "data-engineering"
+      ],
+      "overview": "Design an internal analytics system that reports DAU/MAU, most-viewed pages, and the subscription funnel conversion rate for PMs and data scientists — then handle the wrinkle that the new instrumentat...",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/vanta/dau-mau-analytics-system"
+    },
+    {
+      "n": 8,
+      "slug": "rag-chatbot-ml-design",
+      "title": "RAG Q&A Chatbot — ML / AI Technical Deep Dive",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-07-10",
+      "stage": "onsite-system-design · onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "mle",
+        "rs"
+      ],
+      "tags": [
+        "mlsd",
+        "rag",
+        "retrieval",
+        "evaluation",
+        "llm"
+      ],
+      "roles_slug": [
+        "mle",
+        "rs"
+      ],
+      "tags_slug": [
+        "mlsd",
+        "rag",
+        "retrieval",
+        "evaluation",
+        "llm"
+      ],
+      "overview": "For Applied AI / ML roles, the AI Technical Deep Dive is a collaborative review of a retrieval-augmented Q&A chatbot: ingesting structured and unstructured data, evaluating answer quality, proposing i...",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/vanta/rag-chatbot-ml-design"
+    },
+    {
+      "n": 9,
+      "slug": "principles-and-leadership-bq",
+      "title": "Principles & Leadership Behavioral Rounds",
+      "category": "behavioral",
+      "duration": "60 min",
+      "frequency": "High",
+      "last_asked": "2026-07-10",
+      "stage": "onsite-bq",
+      "access": "Members",
+      "roles": [
+        "swe",
+        "mle"
+      ],
+      "tags": [
+        "behavioral",
+        "leadership",
+        "values",
+        "conflict",
+        "ambiguity"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "behavioral",
+        "leadership",
+        "values",
+        "conflict",
+        "ambiguity"
+      ],
+      "overview": "Vanta's behavioral loop runs in two flavors: a Principles round that hands you a hypothetical scenario and watches how you reason, and a Manager/Leadership round that digs into a project you led and h...",
+      "source_count": 8,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/vanta/principles-and-leadership-bq"
+    },
+    {
+      "n": 10,
+      "slug": "project-deep-dive",
+      "title": "Project Deep Dive",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-06-10",
+      "stage": "onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "swe",
+        "mle"
+      ],
+      "tags": [
+        "deep-dive",
+        "presentation",
+        "impact"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "deep-dive",
+        "presentation",
+        "impact"
+      ],
+      "overview": "A technical walkthrough of the largest / most significant project you've worked on: your specific role, the key technical decisions, and the trade-offs you made.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/vanta/project-deep-dive"
+    }
+  ]
+}

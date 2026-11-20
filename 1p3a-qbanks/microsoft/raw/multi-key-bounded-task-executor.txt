@@ -1,0 +1,65 @@
+===H1===
+Multi-Key Bounded Task Executor
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/multi-key-bounded-task-executor
+===BODY===
+Microsoft
+Coding·60 minMembers
+Multi-Key Bounded Task Executor
+Implement a thread-safe task executor that preserves submission order within each key, runs different keys concurrently under a global limit, bounds queued plus in-flight work, and shuts down gracefully with a timeout.
+Infra Eng
+SWE
+concurrency
+threading
+scheduling
+hard
+Frequency
+Single report
+Last asked
+2026-08-20
+Stage
+phone-screen
+Requirements
+
+Define a Task abstraction and implement two interfaces:
+
+boolean submit(String key, Task task)
+shutdown(int timeout)
+
+The executor must satisfy all of the following:
+
+Tasks submitted under the same key execute in submission order.
+
+Tasks under different keys may execute concurrently.
+
+No more than four tasks may be in flight at once.
+
+The combined number of scheduled and in-flight tasks may not exceed 1,000.
+
+submit returns false after shutdown begins or when accepting another task would exceed the capacity bound; otherwise it returns true.
+
+shutdown(timeout) lets in-flight tasks finish until the timeout, cancels every task that has not started, and then returns.
+
+Notes
+
+The prompt was allocated roughly 25 minutes after an extensive resume discussion, despite requiring the complete implementation. Clarify whether timeout is expressed in seconds or milliseconds, what cancellation means for the Task abstraction, and how exceptions from a running task affect later work for the same key.
+
+The capacity rejection condition was phrased inconsistently with the preceding “at most 1,000” invariant. Confirm that submit rejects when the scheduled-plus-in-flight count is already at capacity before coding.
+
+A clean design uses one lock around the lifecycle state, outstanding-task count, per-key FIFO queues, and a ready-key queue. Four worker threads repeatedly take a ready key, remove exactly one task for that key, mark the key active, and run the task outside the lock. A key is placed back on the ready queue only after its active task finishes, which preserves per-key order without preventing other keys from running concurrently. On completion, decrement the outstanding count, requeue the key if it still has work, and signal shutdown waiters.
+
+Make the capacity check and increment atomic with enqueueing. During shutdown, use the same lock to stop admission, remove and cancel all queued tasks, clear stale ready-key entries, and then wait on a condition until the running count reaches zero or the deadline expires. Always restore the key state and signal waiters in a finally block so a task exception cannot strand later work or shutdown. submit is amortized O(1), and executor-owned queue memory is O(capacity).
+
+Preparation
+
+Write the state invariants before coding: one active task per key, at most four active tasks globally, and outstanding = queued + running never above 1,000. Trace two keys through enqueue, completion, exception, and requeue transitions.
+
+Implement submit and the worker completion path under a single lock, then add a race test with many producers that verifies per-key FIFO order, the four-task concurrency ceiling, and exact capacity rejection.
+
+Exercise shutdown in three states: only queued work, mixed queued and running work, and a task that outlives the timeout. Verify that admission closes atomically and no queued task starts afterward.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

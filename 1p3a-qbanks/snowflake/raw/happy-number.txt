@@ -1,0 +1,181 @@
+===H1===
+Happy Number
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/happy-number
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Happy Number
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+Members
+Happy Number
+
+Write an algorithm to determine if a number n is happy.
+
+SWE
+math
+hashmap
+cycle-detection
+simulation
+easy
+Frequency
+Single report
+Last asked
+2026-06-08
+Stage
+phone-screen · onsite-coding
+The Challenge
+
+We need to create a function that checks if a specific number n is "happy."
+
+How It Works
+
+A number is considered "happy" if it follows these rules:
+
+Start with any positive number.
+Square each digit of the number and add the results together.
+Replace the original number with this new sum.
+Keep doing this until one of two things happens:
+You reach the number 1. In this case, the number is happy.
+You get stuck in a loop (a cycle) that never reaches 1. In this case, the number is not happy.
+
+Goal: Return true if n is happy, and false if it is not.
+
+Walkthrough Examples
+
+Case 1:
+
+Input: n = 19
+Process:
+1² + 9² = 82
+8² + 2² = 68
+6² + 8² = 100
+1² + 0² + 0² = 1
+Result: true (We reached 1).
+
+Case 2:
+
+Input: n = 2
+Result: false (This will loop endlessly and never reach 1).
+Technical Constraints
+The input n will be between 1 and 2^31 - 1 (Standard integer range).
+Solution Approach
+
+To solve this, we need to detect if the sequence of numbers enters a loop.
+
+Use a HashSet: We can use a HashSet to store every sum we calculate.
+Check Memory: Before calculating the next step, check if the current number is already in the HashSet.
+If it is, we have seen this number before. This means we are in a loop (cycle) and will never reach 1. Return false.
+If not, add it to the HashSet and continue.
+Success Condition: If the sum becomes 1, return true.
+Code Implementation (Java)
+class Solution {
+    public boolean isHappy(int n) {
+        // Use a HashSet to track numbers we have already seen
+        Set<Integer> seen = new HashSet<>();
+
+        // Loop until we reach 1 or detect a cycle
+        while (n != 1 && !seen.contains(n)) {
+            seen.add(n);
+            n = getSumOfSquares(n);
+        }
+
+        // If n is 1, it is a happy number
+        return n == 1;
+    }
+
+    // Helper function to calculate sum of squares of digits
+    private int getSumOfSquares(int n) {
+        int sum = 0;
+        while (n > 0) {
+            int digit = n % 10;
+            sum += digit * digit;
+            n /= 10;
+        }
+        return sum;
+    }
+}
+
+Notes
+Snowflake asks the O(n)-space hashset version first, then pushes for the O(1)-space follow-up: Floyd's tortoise-and-hare cycle detection over the digit-square sequence. Be ready to switch to it on request — it is the difference between a pass and a probe in this round.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+The Challenge
+How It Works
+Walkthrough Examples
+Technical Constraints
+Solution Approach
+Code Implementation (Java)
+Notes
+Related discussions · 1
+🔑雪花店面
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Calculate Amount Paid in Taxes
+Low
+math
+simulation
+easy
++1
+Throne Inheritance
+Single report
+hashmap
+simulation
+tree
++1
+Filter System with Dynamic Blacklist
+Single report
+simulation
+hashmap
+oop-design
++3
+Single Query Type, Max Revenue in K Minutes
+Single report
+math
+easy
+greedy
+Valid Tic-Tac-Toe State (Extended)
+Single report
+simulation
+math
+array
++1
+Code editor

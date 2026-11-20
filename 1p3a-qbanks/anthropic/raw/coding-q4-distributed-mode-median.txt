@@ -1,0 +1,88 @@
+===H1===
+Coding Q4 — Distributed Mode / Median
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/coding-q4-distributed-mode-median
+===BODY===
+Anthropic
+Coding·55 minMembers
+Coding Q4 — Distributed Mode / Median
+10 worker nodes hold disjoint shards of a large numeric dataset. Find the global mode (most common value) and global median using `send`/`recv`/`barrier` primitives with a fixed read bandwidth of 10 bytes/sec and inter-node bandwidth of 1 byte/sec. The grade is on iterative optimization, not the first solution.
+SWE
+MLE
+Infra Eng
+distributed-systems
+map-reduce
+bandwidth
+python
+hard
+Frequency
+Medium
+Last asked
+2026-09-04
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Setup
+
+10 nodes; each can read(n) -> bytes from local data at 10 bytes/sec and send(target, payload) / recv(source) / barrier() at 1 byte/sec between nodes.
+
+Total dataset is large enough that copying everything to node 0 is the wrong answer.
+
+Implement two passes:
+
+Mode — value with the highest global count.
+
+Median — global 50th-percentile element.
+
+Mode strategies
+
+Naive: each node sends its full counter to node 0. Sometimes wins on small alphabets because the cross-node traffic is dominated by the counter, not the data.
+
+Stream-aggregate: each node sends its top-k local values + counts; node 0 reconciles. Need to argue why top-k of locals contains the global mode (it might not — call out the false-negative case).
+
+Two-pass: locals send histograms keyed by hash buckets; node 0 picks the dominant bucket and asks for refinements.
+
+Median strategies
+
+Quantile sketches (t-digest, KLL) — explain why you can't just merge sorted lists.
+
+Iterative bisection: broadcast a guess g, each node returns count(x < g), halve the search space, repeat. Cost dominated by log(range) * 10 * (1 byte for the guess + a few bytes for the reply).
+
+Discuss precision-vs-bandwidth tradeoff explicitly.
+
+Follow-ups
+
+What if the dataset is skewed across nodes (one node has 90% of the data)? Talk about work-stealing and re-sharding.
+
+What if values are floats and you need exact median? Force fall-back to sort-merge with an explicit bandwidth budget.
+
+Membership in CodeSignal: verify each strategy actually finishes inside a bandwidth model the interviewer asks you to write down.
+
+A performance/infrastructure phone-screen variant uses 10 nodes and 1,000 elements. Discuss how collective communication topology (tree versus ring) and uniform versus skewed data distributions affect network traffic. In this version, the median follow-up is discussed without implementing it.
+
+Notes
+
+Several reports stress: the bar is iteration, not the first correct solution. Interviewers explicitly want to see you stand up something working, then squeeze it.
+
+Read the problem twice. Multiple candidates have lost points by skipping over the bandwidth numbers and over-engineering for the wrong bottleneck.
+
+The naive solution sometimes wins on the toy graders — be prepared to explain why and to argue when it generalizes.
+
+Canonical Python harness exposes only send(worker_id, data) and recv() (blocking, returns from any sender) plus your own worker_id and a WORKER_NUM constant (typically 10). The mode-only variant uses modulo-key reshuffle: hash each local value v to target = v % WORKER_NUM, send(target, (v, local_count)); after a barrier each worker owns the global count for its slice of the key space and only needs to forward its single best (value, count) to the aggregator — Top-1 per worker is enough because the per-key counts are now complete.
+
+Preparation
+
+Write a single-node groupby/median in vanilla Python so you don't burn time on the trivial part. The canonical streaming median is two heaps (max-heap on the lower half, min-heap on the upper half, sized to differ by at most 1) — you should be able to bang it out in two minutes before tackling the distribution layer.
+
+Practice the quantile-bisection routine: broadcast guess, count-less-than reduce, update bounds.
+
+Have a default t-digest mental model for the "what if the range is huge?" follow-up.
+
+Time yourself rebuilding the bandwidth-cost model: every send/recv has a per-byte cost — write it down on the doc and update it as you swap strategies.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

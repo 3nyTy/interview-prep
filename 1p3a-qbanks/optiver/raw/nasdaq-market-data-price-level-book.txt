@@ -1,0 +1,59 @@
+===H1===
+NASDAQ Market Data Price-Level Book
+===URL===
+https://www.1point3acres.com/interview/problems/company/optiver/nasdaq-market-data-price-level-book
+===BODY===
+Optiver
+CodingMembers
+NASDAQ Market Data Price-Level Book
+Maintain the AAPL order book from insert, modify, and cancel callbacks, then implement `GetPriceLevel(side, level_index)` to return the price and aggregate quantity at the requested zero-based bid or ask level.
+SWE
+order-book
+data-structure
+simulation
+medium
+Frequency
+Single report
+Last asked
+2026-07-06
+Stage
+tech-screen
+Requirements
+
+Maintain market data for exactly one symbol, AAPL.
+
+Consume these callbacks:
+
+OnOrderInsert(id, side, price, qty)
+
+OnOrderModify(id, price, qty)
+
+OnOrderCancel(id)
+
+Implement GetPriceLevel(side, level_index), where level_index is an unsigned, zero-based index and the return value is (price, total_qty).
+
+Aggregate all live orders at the same price into one price level.
+
+For buys, level 0 is the highest price; for sells, level 0 is the lowest price. Higher indices walk away from the best price in the corresponding direction.
+
+A modification must remove the order's previous contribution before adding its new price and quantity; a cancellation removes it completely.
+
+Notes
+
+Keep an ID-to-order map so modify and cancel operations can locate the old side, price, and quantity.
+
+Remove a price level when its aggregate quantity reaches zero; otherwise later level indices can point at empty levels.
+
+Preserve side-specific ordering: descending bids and ascending asks.
+
+Preparation
+
+Implement the four-method interface with an order map plus side-specific ordered price-level structures.
+
+Drill inserts at an existing price, moves between prices, quantity-only modifications, cancellations of the last order at a level, and retrieval beyond the populated depth according to the prompt's required behavior.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

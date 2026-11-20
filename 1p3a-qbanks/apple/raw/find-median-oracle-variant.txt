@@ -1,0 +1,80 @@
+===H1===
+Find Median (Oracle Variant)
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/find-median-oracle-variant
+===BODY===
+Apple
+CodingMembers
+Find Median (Oracle Variant)
+You are asked to find the median of an unseen array nums of n distinct or repeating integers. You cannot read the array directly — instead, you are given three oracle operations:.
+SWE
+hard
+binary-search
+algorithm-design
+Frequency
+Single report
+Last asked
+2026-02-06
+Stage
+phone-screen
+You are asked to find the median of an unseen array nums of n distinct or repeating integers. You cannot read the array directly — instead, you are given three oracle operations:
+
+int countLess(int x) — returns the number of elements in nums strictly less than x.
+
+int countGreater(int x) — returns the number of elements in nums strictly greater than x.
+
+int total() — returns n, the total number of elements.
+
+You may call x with any integer value; it does not have to be an element of nums.
+
+Task. Return the median of nums, defined as the k-th smallest element where k = (n + 1) / 2 (using integer division). For odd n this is the middle element; for even n this is the lower of the two central elements. The median is guaranteed to be a value present in nums.
+
+Design goal. Your solution should use O(log M) oracle calls, where M is the value range of nums — significantly better than reading every element.
+
+For the auto-grader, the function signature is simplified to accept nums directly, but treat access as oracle-only: your solution should not rely on reading nums by index or sorting it. Use the oracle helpers defined inside your function.
+
+Examples
+
+Example 1:
+
+Input: nums = [3, 1, 5]
+
+Output: 3
+
+Explanation:
+
+Sorted: [1, 3, 5]. k = (3 + 1) / 2 = 2 → the 2nd smallest is 3.
+
+Example 2:
+
+Input: nums = [7, 2, 9, 4, 6]
+
+Output: 6
+
+Explanation:
+
+Sorted: [2, 4, 6, 7, 9]. k = 3 → the 3rd smallest is 6.
+
+Example 3:
+
+Input: nums = [5, 5, 5, 1, 9]
+
+Output: 5
+
+Explanation:
+
+Sorted: [1, 5, 5, 5, 9]. k = 3 → the 3rd smallest is 5. Note: binary search still works with duplicates.
+
+Constraints
+
+1 <= n <= 10^5
+
+-10^9 <= nums[i] <= 10^9
+
+The median is guaranteed to be an element of nums.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

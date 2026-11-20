@@ -1,0 +1,65 @@
+===H1===
+Thread-Safe Key Call Counter
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/thread-safe-key-call-counter
+===BODY===
+Citadel / Citadel Securities
+Coding·60 minMembers
+Thread-Safe Key Call Counter
+Citsec phone-screen ladder: implement a counter that returns how many times a key has been called so far, make it thread-safe, then discuss how the same counter should work when multiple applications on one host call it concurrently.
+SWE
+hashmap
+metrics
+concurrency
+threading
+distributed-systems
+medium
+Frequency
+Single report
+Last asked
+2026-05-21
+Stage
+phone-screen
+Requirements
+
+Three-part phone-screen ladder:
+
+Implement a counter API. Given a key, increment its count and return how many times that key has been called so far.
+
+Make the counter thread-safe. Compare synchronization options.
+
+Extend the design for one host running multiple applications that all call the counter.
+
+A minimal interface is enough to clarify the expected behavior:
+
+count(key) -> integer
+
+Each call increments key's stored count and returns the post-increment count for that key.
+
+Notes
+
+Single-process implementation: hashmap from key to integer. Clarify whether keys are strings, integers, or opaque IDs; the core behavior is per-key atomic increment.
+
+Thread-safety options to compare: one global mutex around the hashmap, per-key locks / striped locks for better concurrency, atomic counters for existing keys plus a lock around insertion, and concurrent-map primitives if the chosen language provides them.
+
+Multi-application on one host changes the boundary from in-process synchronization to inter-process coordination. Plausible approaches include a local daemon exposing the counter over IPC, shared memory plus process-shared locks, or a local embedded store. Discuss crash recovery and whether counts must survive process restart.
+
+Ask whether the counter needs exact linearizable counts or approximate telemetry-style counts. Exactness pushes toward a single authority or durable atomic store; approximate counts allow sharded local buffers with periodic aggregation.
+
+Full prompt details are thin, so treat the third part as a design discussion rather than a fixed API implementation.
+
+Preparation
+
+Implement count(key) with a hashmap and lock, then refactor to striped locking; benchmark contention on a hot key vs many keys.
+
+Practice explaining mutex vs read-write lock vs atomic-counter trade-offs without overengineering the first version.
+
+Sketch a single-host multi-process design using a local daemon or shared memory. Be ready to state failure semantics: restart behavior, duplicate requests, and whether counts are durable.
+
+Review C++ / Java / Python concurrency primitives for the language you plan to use; the round can shift from code into synchronization trade-offs quickly.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

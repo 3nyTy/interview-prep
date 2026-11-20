@@ -1,0 +1,85 @@
+===H1===
+Shopping Cart Latency and Inventory
+===URL===
+https://www.1point3acres.com/interview/problems/company/jpmorgan/shopping-cart-latency-and-inventory
+===BODY===
+JPMorgan Chase
+System Design·60 minMembers
+Shopping Cart Latency and Inventory
+Design or improve an e-commerce shopping/cart system with fast user-facing operations, out-of-stock handling, duplicate-order prevention, and safe concurrent purchase of scarce inventory. Some versions frame it as improving an existing system; another asks for a shopping-website design with two focused deep dives.
+SWE
+caching
+storage
+messaging
+scaling
+backend
+medium
+Frequency
+Low
+Last asked
+2026-06-23
+Stage
+onsite-system-design
+Requirements
+
+Functional requirements:
+
+Add items to a cart and read the current cart state.
+
+Reflect product availability accurately enough that users are told when an item is out of stock.
+
+Keep cart reads and writes fast under normal traffic.
+
+Support checkout handoff without losing cart state.
+
+Prevent duplicate orders when clients retry or double-submit.
+
+Handle two users attempting to buy the last available item at the same time.
+
+Scale / constraints:
+
+Cart reads and writes are latency-sensitive user actions.
+
+Inventory changes can happen outside the cart service.
+
+Product unavailability should be surfaced quickly, but not every cart view needs a globally serializable inventory read.
+
+Design decisions to discuss:
+
+where cart state lives: cache, database, or hybrid
+
+how inventory updates reach active carts
+
+whether inventory is reserved at add-to-cart or checkout
+
+cache invalidation and stale-product handling
+
+idempotency key / order-state design for duplicate orders
+
+reservation, locking, or conditional-write strategy for scarce inventory
+
+Notes
+
+One version explicitly says the interviewer did not require detailed APIs or data models; the conversation focused on improving an existing system and handling faster latency plus real-time out-of-stock notification.
+
+Another version used a broader shopping-website prompt and then deep-dived on duplicate orders and simultaneous purchase of an out-of-stock / last-item product.
+
+A practical answer separates cart state from inventory source of truth, then uses events or a read-through check to reconcile availability.
+
+Clarify reservation semantics before designing: retail carts usually do not reserve inventory until checkout, while limited-sale systems may need reservations with TTL.
+
+Preparation
+
+Prepare a two-path design: normal add/read cart path, and inventory-change path that notifies or invalidates affected carts.
+
+Practice trade-offs between Redis cart storage, durable cart database, and event-driven inventory updates.
+
+Prepare concise answers for duplicate order prevention and the final-item race: idempotency keys, unique order state transitions, inventory reservation, conditional writes, and timeout cleanup.
+
+Be ready to explain stale reads clearly: what can be stale, for how long, and what user-visible correction happens at checkout.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

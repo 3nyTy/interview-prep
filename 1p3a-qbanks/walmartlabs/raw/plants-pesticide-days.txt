@@ -1,0 +1,66 @@
+===H1===
+Plants Pesticide — Days Until Stable
+===URL===
+https://www.1point3acres.com/interview/problems/company/walmartlabs/plants-pesticide-days
+===BODY===
+Walmart Labs
+Coding·60 minFree preview
+Plants Pesticide — Days Until Stable
+Given a row of plants with pesticide amounts, each day any plant whose pesticide is strictly greater than its left neighbor dies. All dying plants are removed simultaneously. Return the number of days until no more plants die.
+SWE
+monotonic-stack
+stack
+array
+simulation
+hard
+Frequency
+Single report
+Last asked
+2026-02-24
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input: plants: List[int] — pesticide amounts, ordered left to right.
+
+Each day, every plant i for which plants[i] > plants[i-1] dies. All deaths on a day happen at the same time, then the survivors close ranks.
+
+The leftmost plant never dies (no left neighbor).
+
+Repeat until a day passes with zero deaths.
+
+Return the number of days that elapsed before stability.
+
+Examples
+
+Input:  plants = [6, 5, 8, 4, 7, 10, 9]
+Output: 2
+
+Day 1: indices 2, 4, 5 die → [6, 5, 4, 9]
+Day 2: index 3 dies          → [6, 5, 4]
+Day 3: no deaths              → stop, answer = 2
+
+Notes
+
+Naive simulation is O(n²) in the worst case (long ascending runs). The interviewer expects an O(n) monotonic-stack solution after the brute force is on the board, and a frequent failure mode is jumping straight to the stack solution without explaining the brute force — the round reported here flagged "have you seen this before?" as soon as the stack name was dropped, so be ready to derive it from scratch.
+
+The canonical formulation walks the array left to right while maintaining a monotonically non-increasing stack of (value, daysSurvived) pairs. For each new plant, pop strictly smaller predecessors and track the maximum survival days they contributed; the new plant inherits max(popped_days) + 1 if it survives at least one day, else 0.
+
+The answer is the maximum survival count observed across the scan. Both time and space are O(n).
+
+The mirror version ("remove nums[i] where nums[i-1] > nums[i]") is the same problem with reversed comparison; the stack invariant flips but the algorithm is identical.
+
+Preparation
+
+Implement the brute-force simulation first on paper to internalize "simultaneous deaths" — a common bug is removing in-place during the scan and double-counting.
+
+Derive the monotonic-stack recurrence from a worked example before writing code; write max(prevDays) + 1 only after seeing why the +1 applies once and not per step.
+
+Practice articulating the stack invariant out loud ("the stack stores plants that have not yet been killed by something to their right") so the interviewer hears the reasoning rather than the algorithm name.
+
+Cover edge cases: strictly decreasing input → 0 days; strictly increasing input → n-1 days; duplicates (equal neighbors do not die).
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

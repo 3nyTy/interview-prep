@@ -1,0 +1,52 @@
+===H1===
+Package Tracking & Status Aggregator Engine
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/package-tracking-status-aggregator
+===BODY===
+Amazon
+Coding·60 minMembers
+Package Tracking & Status Aggregator Engine
+Build a Package Tracking & Status Aggregator Engine from a shipment-rule JSON file and real-time carrier-scanner JSONL events. Compute each package's current location and final ON_TIME, LATE, or PENDING status, then emit a ledger sorted by tracking ID.
+SWE
+backend
+json
+streaming
+state-machine
+medium
+Frequency
+Single report
+Last asked
+2026-08-21
+Stage
+oa
+Requirements
+
+Input dataset 1: a JSON master list of shipments, delivery rules, and deadlines.
+
+Input dataset 2: a continuous JSONL stream of carrier scanner events.
+
+Aggregate scanner events to determine every package's current location.
+
+Determine the final delivery status as exactly ON_TIME, LATE, or PENDING.
+
+Output the final ledger sorted lexicographically by tracking ID.
+
+Choose one implementation stack from Node.js, Django, C++, and Spring Boot.
+
+Notes
+
+Establish ordering and duplicate-event behavior before implementing the reducer over scanner events.
+
+Keep parsing, state aggregation, status classification, and output sorting as separate units so the AI assistant and tests can localize failures.
+
+Preparation
+
+Build the engine once in your strongest offered stack and feed it malformed lines, duplicate scans, out-of-order scans, and packages with no events.
+
+Practice a test-driven AI workflow that asks the embedded assistant to localize a failing behavior without delegating the final code change.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

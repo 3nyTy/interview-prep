@@ -1,0 +1,87 @@
+===H1===
+URL / Path Segment Compression
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/url-segment-compression
+===BODY===
+Stripe
+Coding·60 minMembers
+URL / Path Segment Compression
+Onsite coding. Compress a URL-like string by collapsing inner characters of each segment into a count. Major segments split by `/`, minor segments by `.`. Part 2 enforces a cap on minor-segment count before further compression.
+SWE
+string
+medium
+Frequency
+Single report
+Last asked
+2026-04-03
+Stage
+onsite-coding
+Requirements
+
+Input: a string built from major parts separated by / and minor parts separated by ., e.g. abcd/erfgsh/google.com.abc.
+
+Part 1: For each segment, keep the first and last character, replace the middle with the count of removed characters. Example: abcd/erfgsh/google.com.abc → a2d/e4h/g4e.c1m.a1c.
+
+Part 2: An extra integer m. After Part 1, if a major segment contains more than m minor parts, fold the trailing minor parts into a single compressed minor part using the Part 1 rule. The split point is precise: keep the first m - 1 compressed minor tokens unchanged, then merge minor parts m-1 through the end into one token by concatenating their original characters (dots dropped) and applying the Part 1 rule. A major with <= m minor parts passes through unchanged. Example with m=2: g4e.c1m.a1c → g4e.c4c (keep g4e, merge com+abc → comabc → c4c).
+
+Part 3 exists but candidates are routinely told to skip it and instead write test cases / refactor.
+
+def compress(s: str) -> str: ...
+    # Part 1. Split on '/' into majors, each major on '.' into minors.
+    # Each minor w -> w[0] + str(len(w) - 2) + w[-1]; rejoin with '.' then '/'.
+    # Assume every minor part has length >= 2 (len(w) - 2 goes negative otherwise);
+    # leading '/' / consecutive '..' (empty segments) are assumed absent — clarify first.
+
+def compress_bounded(s: str, m: int) -> str: ...
+    # Part 2, m >= 1. Per major: if minor-count <= m, behave like Part 1.
+    # Else keep first m-1 compressed tokens, then one merged token built from the
+    # ORIGINAL chars of minors[m-1:] joined (dots dropped), compressed by the Part 1 rule.
+    # Part 2 always operates on original characters, never the already-compressed form.
+
+Examples
+
+compress("abcd/erfgsh/google.com.abc") → "a2d/e4h/g4e.c1m.a1c".
+
+compress_bounded("abcd/erfgsh/google.com.abc", 2) → "a2d/e4h/g4e.c4c" — third major has 3 minors > 2, keep g4e, merge com+abc → c4c.
+
+compress_bounded("abcd/erfgsh/google.com.abc", 1) → "a2d/e4h/g10c" — reduce third major to 1 minor: keep 0 tokens, merge all three (googlecomabc, length 12) → g + 10 + c. The multi-digit middle count is the trap.
+
+compress_bounded("abcd/erfgsh/google.com.abc", 5) → "a2d/e4h/g4e.c1m.a1c" — m exceeds every major's minor-count, equivalent to plain Part 1.
+
+Notes
+
+The Part 2 fold rule is the most error-prone: the kept first/last characters are the first character of the first folded segment and the last character of the last folded segment, with the count of all other characters in between.
+
+The interviewer in the source report praised candidates who finish Parts 1-2 and use the remaining time on tests rather than racing to Part 3.
+
+The Part 1 inner rule is the canonical run-length / first-last-with-count compression: keep s[0], append the string form of len(s) - 2, append s[-1]. Iterate every count digit-by-digit when appending — collapsing a multi-digit count as a single token is the most common off-by-one in this family of problems.
+
+Reuse the same compress_word(w) = w[0] + str(len(w) - 2) + w[-1] helper for both parts: it does not care whether its input is one original minor part or the concatenation of several. The two-level split (split('/') then split('.')) keeps the minor list in hand, which makes the Part 2 merge cheap. Both parts are O(n) in input length.
+
+A major part with exactly one minor part (no dots) always satisfies len(minors) == 1 <= m for any valid m >= 1, so it passes through Part 2 untouched — only multi-minor majors can ever trigger the fold.
+
+Clarifications worth asking up front
+
+Can a minor part have length 1? The len - 2 formula goes negative. Options: max(0, len - 2) (yields ambiguous c0c), pass single chars through unchanged (breaks the uniform 3-char output), or reject as invalid — the right choice depends on how the output is later parsed.
+
+Are empty segments possible (leading /, consecutive ..)? Assume no unless told otherwise.
+
+Follow-up — streaming variant
+
+If the input arrives as a character stream rather than a full string: Part 1 is streamable — track only the first char and a running middle-count, emit first + count + last at each separator. Part 2 is not one-pass streamable: you cannot decide whether a minor part stands alone or folds into the merged tail until you have seen the whole major part, so a streaming solution must buffer at least the first m - 1 minor parts before committing.
+
+Preparation
+
+Drill nested split/join chains (split('/') → split('.') → compress → rejoin).
+
+Pre-write a compress(s) helper that handles segments of length 0, 1, 2 cleanly.
+
+Have test cases ready for: empty input, single-character segment, exactly-m minor parts (boundary), m=1 (head is empty, output is the single merged token), and a tail merge whose middle count is multi-digit (e.g. g10c).
+
+Practice the in-place run-length compression pattern with two pointers (read / write) on a character array — even though this prompt is string-level, the muscle memory for "count then emit digits one at a time" transfers directly and is the subtle bug-source candidates miss.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

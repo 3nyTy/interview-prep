@@ -1,0 +1,49 @@
+===H1===
+Happy Number Service
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/happy-number
+===BODY===
+Apple
+CodingMembers
+Happy Number Service
+Implement a service that decides whether a positive integer is a happy number, then scale it to billions of requests.
+SWE
+math
+cycle-detection
+hashmap
+easy
+Frequency
+Single report
+Last asked
+2026-05-27
+Stage
+onsite-coding
+Requirements
+
+Implement a service that takes a positive integer and decides whether it is happy:
+
+Replace the number with the sum of the squares of its digits.
+
+Repeat the process. The number is happy if it eventually reaches 1; otherwise it loops endlessly in a cycle that never reaches 1.
+
+Return whether the input is happy.
+
+Notes
+
+Standard cycle detection applies: non-happy numbers fall into a fixed cycle, so either a set of seen values or Floyd's slow/fast pointers terminates the loop. Any starting integer collapses into a small range within one or two iterations, because the sum of squares of the digits of a large number is far smaller than the number itself.
+
+Scaling follow-up
+
+"Now scale this to billions of requests." The intended answer is precomputation: every integer drops below a few thousand after one or two digit-square steps, so precompute and cache the happy / not-happy verdict for the small range the inputs collapse into (the interviewer pointed at numbers below ~1,000). At request time, fold the input down into the cached range with one or two steps and return the memoized answer, turning each query into near-constant work.
+
+Preparation
+
+Implement both the set-based and Floyd cycle-detection versions.
+
+Precompute the verdict for every integer below 1,000 and write the fold-down lookup that reduces an arbitrary input into that table.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

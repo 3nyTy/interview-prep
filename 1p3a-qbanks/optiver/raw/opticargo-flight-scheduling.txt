@@ -1,0 +1,50 @@
+===H1===
+OptiCargo — Cargo-to-Flight Scheduling
+===URL===
+https://www.1point3acres.com/interview/problems/company/optiver/opticargo-flight-scheduling
+===BODY===
+Optiver
+Coding·60 minMembers
+OptiCargo — Cargo-to-Flight Scheduling
+A phone/onsite engineering round (also an intern super-day round): given a long provided skeleton, implement order/cargo assignment to flights respecting departure-time and capacity constraints, with cargo splittable across planes. Heavy on reading large code, reasoning about correctness, and follow-up debugging/optimization.
+SWE
+greedy
+scheduling
+simulation
+code-reading
+hard
+Frequency
+Low
+Last asked
+2026-01-22
+Stage
+phone-screen · onsite-coding
+Requirements
+
+A transport company processes incoming orders; each order contains multiple cargo items (each with a size) and a ship/order time.
+
+There are multiple planes, each with a fixed departure time and a fixed capacity. An order's cargo may only go on planes that depart after the order's time, and a single order's cargo can be split across multiple planes.
+
+Implement the order-processing function (e.g. process_order(...)): decide whether the order can be accepted, and if so produce a concrete allocation of its cargo to flights and update each plane's remaining capacity.
+
+A long Python skeleton is provided (Order, Plane, Cargo, Scheduler/Manager classes and helpers already written); you implement the core logic.
+
+Notes
+
+The interviewer spends significant time up front having you read the prompt and the provided code and explain your data-structure choice, plane-selection strategy (greedy vs. sort by earliest departure / most remaining capacity), and how you enforce the time constraint — before writing.
+
+Heavy follow-up phase: where are the bugs, which corner cases are unhandled, what's the time complexity, how would you scale to many more orders, how to speed up flight lookup (heap / tree), is it thread-safe, how to support concurrent orders. The round grades correctness → efficiency → scalability → systems reasoning.
+
+The intern variant ("OptiCargo is not profitable — change the algorithm so it becomes profitable") frames the same model as a code-modification task: the existing code naively books every flight; you must select flights/cargo to maximize revenue given flight costs and cargo revenue/deadlines, and explain why a requested flight booking can fail (someone else booked it).
+
+Preparation
+
+Practice reading and extending a large unfamiliar codebase quickly; narrate your plan before coding, as the interviewer expects.
+
+Drill greedy/sorted assignment with splittable items under deadline + capacity constraints, and be ready to discuss heap-based flight lookup, complexity, thread-safety, and concurrency follow-ups.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

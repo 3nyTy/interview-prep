@@ -1,0 +1,51 @@
+===H1===
+Handwrite Sigmoid, Softmax, and Attention
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/handwrite-sigmoid-softmax-attention
+===BODY===
+Amazon
+CodingMembers
+Handwrite Sigmoid, Softmax, and Attention
+During an ML breadth-and-depth phone screen, implement sigmoid, softmax, and attention from scratch as the conversation reaches each concept. The implementation tasks are embedded in project probing rather than presented as a conventional LeetCode round.
+RS
+ml-knowledge
+attention
+math
+medium
+Frequency
+Single report
+Last asked
+2026-07-20
+Stage
+phone-screen
+Requirements
+
+Handwrite a sigmoid implementation.
+
+Handwrite a softmax implementation.
+
+Handwrite an attention implementation.
+
+Be ready to code each primitive when it arises during a detailed discussion of prior ML projects; the round does not isolate them into a separate algorithm section.
+
+Notes
+
+This phone screen focused entirely on ML breadth, ML depth, and project details. It did not follow the usual Leadership Principles plus LeetCode structure.
+
+Numerical stability is the detail worth showing unprompted: subtract the row max before exponentiating in softmax, and branch on the sign of the input in sigmoid so exp never overflows.
+
+For attention, the scaled dot-product form is the expected baseline: softmax(QK^T / sqrt(d_k)) V. Be ready to explain the scaling — large dot products push the softmax into regions with vanishing gradients — and where a mask enters (added to the scores before the softmax).
+
+Keep all three vectorized with explicit shapes (batch × seq × d) rather than element-wise loops.
+
+Preparation
+
+Write all three from scratch in numpy in under 15 minutes, then diff the outputs against framework equivalents on random inputs.
+
+Practice switching mid-conversation from project narration to code: have each primitive rehearsed to the point where the implementation costs no thinking budget while you keep talking.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

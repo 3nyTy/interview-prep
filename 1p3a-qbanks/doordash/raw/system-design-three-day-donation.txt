@@ -1,0 +1,97 @@
+===H1===
+System Design: 3-Day Donation Service
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/system-design-three-day-donation
+===BODY===
+DoorDash
+System Design·75 minMembers
+System Design: 3-Day Donation Service
+Design a donation service for a 3-day charity event integrated into the DoorDash app. Users browse charities, donate via the existing DoorDash payment integration, and receive confirmation. The round is dominated by payment-integration trade-offs: idempotency, exactly-once semantics, async vs sync flows, webhook handling, and reconciliation.
+SWE
+EM
+payment
+idempotency
+transactions
+messaging
+async
+kafka
+medium
+Frequency
+High
+Last asked
+2026-07-30
+Stage
+onsite-system-design
+Requirements
+
+Functional
+
+Users can browse a curated list of charities for a 3-day window.
+
+Users can select a charity and donate a custom amount.
+
+Donation is processed through DoorDash's existing payment integration (Stripe-equivalent third-party).
+
+Donation confirmation is shown in-app and emailed.
+
+Charities can see aggregated daily donation totals.
+
+Refunds are supported (timeframe varies).
+
+Non-functional
+
+Peak load is bursty: most donations happen in the first hours after a push notification fires. Plan for 10k+ donations per minute at peak, sustained ~1k/min during the 3-day window.
+
+Payment correctness is a hard requirement: exactly one charge per donation intent, even if the user double-taps or the network drops.
+
+Sub-second perceived latency on the donation confirmation page (the actual charge can complete async).
+
+Daily aggregates have an eventual-consistency budget of a few minutes.
+
+Notes
+
+Idempotency is the headline signal. Generate an idempotency key client-side per donation intent (uuid per tap), persist it to a dedupe table with TTL, and pass it both to the payment provider and to the internal write path. The same key replayed must produce the same response. Several recent loops have been failed specifically on a missing or weak idempotency story.
+
+Sync vs async charge. The clean design is: synchronous donation-intent creation + immediate UI confirmation "we're processing", then an async worker consuming a donation_created event from Kafka that actually calls the payment provider. The user sees "completed" once the webhook from the payment provider lands. Defending this over a fully-sync flow (where the user waits for the third-party round-trip) is graded.
+
+Exactly-once delivery is impossible in distributed systems, but at-least-once + dedupe is the standard pattern. Be explicit: producer writes to a transactional outbox in the same DB transaction as the donation row; outbox-relay publishes to Kafka; consumers dedupe by (idempotency_key, event_id).
+
+Webhook handling. The payment provider posts back asynchronously when the charge settles. Webhooks can arrive out of order, be retried, or be spoofed. Verify the HMAC signature; dedupe by webhook id; persist webhook receipts to an payment_events table; only then update the donation status.
+
+Reconciliation. Run a daily reconciliation job that pulls the provider's settlement report and cross-checks against the internal donations table. Surface mismatches to a dashboard; auto-resolve obvious cases (provider says succeeded but we recorded failed → fix); page on the rest.
+
+Storage layout. donations(id, user_id, charity_id, amount, idempotency_key, status, created_at); payment_events(id, donation_id, provider_event_id, type, raw_payload, received_at); daily_aggregates(charity_id, day, total) updated by a streaming consumer.
+
+Caching the charity catalog. Read-heavy, low-write; cache-aside in Redis with a 5-minute TTL plus pub-sub invalidation on edits.
+
+The redirect-vs-iframe payment integration trade-off is asked specifically — different choices imply different async architectures. A redirect flow (Stripe Checkout-style) handles the third-party round-trip outside our system; an iframe / embedded element gives us the token directly and pushes the async middleware burden onto our service. Surface the choice in the clarification phase.
+
+Round format: the round often opens with ~25 minutes where you present a past project of your own as an architecture diagram, then spends ~50 minutes on the donation design itself. Treat the project walkthrough as a mini system-design — draw the data flow rather than just narrating it.
+
+Common follow-up themes
+
+What happens when the payment provider times out mid-charge? (Idempotency key + status polling; do not retry blindly.)
+
+What if two webhooks for the same charge arrive 10 minutes apart? (Dedupe by provider_event_id; status transition is monotonic.)
+
+How do you handle refunds? (Separate refunds table with the same idempotency pattern; transition donation status to partially_refunded / refunded.)
+
+How do you scale the daily aggregates? (Streaming consumer with windowed reduce; checkpoint per partition; rebuild from Kafka log if state is lost.)
+
+How do you audit a single donation? (Trace by idempotency key across donations, payment_events, and provider settlement; surface in an internal admin tool.)
+
+Preparation
+
+Practice drawing the system in 5 minutes: client → API → donations DB + Kafka → async worker → payment provider → webhook receiver → status update. Memorize the diagram.
+
+Be able to articulate the exactly-once explanation without hedging: at-least-once delivery + producer-side idempotency key + consumer-side dedupe table.
+
+Drill the redirect-vs-iframe trade-off; if asked, pick the iframe / embedded element path for the standard answer (more control, async middleware required) and explain why.
+
+Brush up on webhook security: HMAC signature verification, replay-window enforcement, dedupe table.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

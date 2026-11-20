@@ -1,0 +1,90 @@
+===H1===
+System Design Q3 — Model Weight Distribution
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/sd-q3-model-distribution
+===BODY===
+Anthropic
+System Design·55 minMembers
+System Design Q3 — Model Weight Distribution
+Push a multi-hundred-GB model checkpoint from a model repo to several hundred hosts in a cluster, given a 10 Gbps bandwidth budget on every link. Design the fastest distribution strategy; expect to evolve from naive download → tree broadcast → chunked BitTorrent-style swarm. A phone-screen variant shares one 10 Gbps budget between worker upload and download, then probes deployment observability and readiness-gated routing.
+MLE
+Infra Eng
+SWE
+distribution
+bandwidth
+tree-broadcast
+bittorrent
+medium
+Frequency
+High
+Last asked
+2026-08-21
+Stage
+phone-screen · onsite-system-design
+Requirements
+
+Setup
+
+A cluster of 100–1000 hosts; the canonical OA prompt typically uses 100 workers as the warm-up scale and asks you to argue extrapolation to 1000+.
+
+Each host has a 10 Gbps full-duplex NIC — it can upload at 10 Gbps and download at 10 Gbps simultaneously.
+
+Minority variant: some candidate reports recall the spec as 10 GB/s (= 80 Gbps) instead of 10 Gbps — confirm the unit with the interviewer before doing arithmetic; the factor-of-8 difference cascades into every transfer-time estimate.
+
+Minority variant: one phone-screen version makes upload and download share a single 10 Gbps budget instead of granting 10 Gbps per direction — clarify whether the link budget is aggregate or full-duplex before doing arithmetic.
+
+The model repo (single source) has 10 Gbps egress to the cluster.
+
+The checkpoint is several hundred GB; the canonical OA value is 500 GB, but the prompt may inflate to TB-scale for the follow-up.
+
+Workers can copy to/from each other at NIC speed.
+
+Expected failure rate: 1–5% of workers may go down during a single deployment; the system must continue without operator intervention.
+
+Expected design progression
+
+Naive pull from source — every host downloads from the repo. Bottleneck: the source's 10 Gbps egress must carry one full copy per host, so completion time grows roughly as host count × file size / source bandwidth. Unworkable.
+
+Tree broadcast — source → first host, then each host fans out to children. Forms a binary or k-ary tree. Faster, but every node still has to wait for the full file before forwarding.
+
+Chunked broadcast (BitTorrent-like) — split the checkpoint into many chunks, start propagating each chunk as soon as it lands at a host, let the swarm overlap downloads and uploads. This is the answer most candidates evolve toward and it makes the bandwidth utilization additive across links.
+
+Follow-up directions
+
+Some hosts have bad networks. Add per-link health checks, exponential backoff, replace slow neighbors.
+
+Fault tolerance. A node dies mid-broadcast — how does the swarm recover? Reseed from the source, or rely on peer redundancy.
+
+Coordinator-free recovery. A common solution assigns chunks and tracks progress through a central coordinator; a frequent follow-up removes the coordinator and asks how the swarm detects a dead peer and re-fetches its outstanding chunks with no central assignment — gossip each peer's chunk-availability bitmap and let neighbors pull the missing (rarest-first) pieces from whoever still holds them.
+
+Verification. Per-chunk hashes; quarantine corrupted hosts.
+
+Cold start and update cadence. New model versions every N hours — does the swarm prewarm?
+
+Deployment observability. Explain how operators distinguish opaque node capacity from a stalled rollout and locate workers stuck during loading.
+
+Readiness-gated routing. Requests must reach only workers that have fully loaded and verified the intended model version; define the readiness signal that keeps incomplete or wrong-version instances out of service.
+
+Notes
+
+The interviewer expects you to evolve from naive to optimal in real time. Stating "BitTorrent" up front without the derivation is less impressive than walking the tree → chunked-tree path and explaining the speedup at each step.
+
+Some interviewers care more about a defensible minimum-time lower bound than a long tour of intermediate topologies. State the bound early, then show how peer-to-peer chunking approaches it; do not spend the round polishing suboptimal variants.
+
+Bandwidth arithmetic matters: be ready to estimate end-to-end transfer time for each design (link bandwidth × number of links × file size / chunk size).
+
+Common stumble: dwelling on consistent-hashing or sharding when the problem is broadcast, not partition.
+
+Preparation
+
+Read a short overview of BitTorrent's piece-selection and rarest-first policies.
+
+Practice the broadcast latency derivation on paper: source → 1 host → 2 hosts → 4 hosts (binary tree) vs. chunked-on-arrival fan-out.
+
+Have an answer for failure-recovery: per-chunk retries with checkpointed progress, peer replacement, source as fallback.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

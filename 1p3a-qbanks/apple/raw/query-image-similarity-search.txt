@@ -1,0 +1,160 @@
+===H1===
+Query Image Similarity Search
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/query-image-similarity-search
+===BODY===
+Apple
+CodingMembers
+Query Image Similarity Search
+This is a recent Apple onsite Round 4 ML Coding task for Machine Learning Engineer candidates.
+MLE
+medium
+pytorch
+retrieval
+ann
+Frequency
+Single report
+Last asked
+2026-03-30
+Stage
+phone-screen
+Problem Overview
+
+You are provided a few basic building blocks (an image loader, a pretrained feature extractor, and a tensor of corpus images) and asks you to implement "find the most similar image to a query image".
+
+The round is testing two things:
+
+Can you glue embedding extraction, similarity scoring, and top-k retrieval into clean code in a few minutes?
+
+Do you reach for batched tensor ops and cosine similarity on normalized embeddings, or do you write a Python loop and raw L2?
+
+There is no trick. The interviewer wants to see production-shaped retrieval code: embed once, normalize, score with a single matmul, take top-k.
+
+Clarify Before Coding
+
+What do "basic modules" mean? Usually a pretrained backbone like ResNet or CLIP exposed as extract_features(image) -> (D,) or a batched extract_features(images) -> (N, D). Ask which API you have. Prefer the batched one.
+
+One query or many? Start with a single query, return the top match. Extending to batched queries is one extra axis.
+
+Similarity metric. Cosine is the default for image embeddings. L2 on unit-normalized embeddings gives the same ranking. If the feature extractor is not L2-normalized, normalize yourself.
+
+Corpus size. Tens of thousands is fine to keep in memory as an (N, D) tensor. Past that, mention FAISS, ScaNN, or HNSW as the scaling story.
+
+top_k vs. nearest. The prompt says "most similar" (k=1). Write the function for arbitrary top_k so you can demo both.
+
+Precompute or re-embed? Embed the corpus once, cache the (N, D) matrix, re-embed only the query. Mention this out loud; it is the whole point of a retrieval index.
+
+Problem Statement
+
+Given:
+
+def extract_features(images: torch.Tensor) -> torch.Tensor:
+    """Pretrained backbone. Input: (B, 3, H, W). Output: (B, D)."""
+    ...
+
+corpus: torch.Tensor  # (N, 3, H, W), N candidate images
+query:  torch.Tensor  # (3, H, W),   the query image
+
+Implement:
+
+def most_similar(query: torch.Tensor, corpus: torch.Tensor, top_k: int = 1) -> list[int]:
+    """Return corpus indices ranked by similarity to the query, top_k first."""
+    ...
+
+Recommended Solution
+
+The shape of the answer: embed the corpus in one batched call, embed the query, L2-normalize both, score with a single matmul, then torch.topk.
+
+import torch
+import torch.nn.functional as F
+
+def most_similar(
+    query: torch.Tensor,
+    corpus: torch.Tensor,
+    top_k: int = 1,
+) -> list[int]:
+    # (1, 3, H, W) so the extractor sees a batch of 1.
+    query_batch = query.unsqueeze(0)
+
+    # One forward pass per side. In a real system the corpus embeddings
+    # would be precomputed and cached.
+    query_emb = extract_features(query_batch)    # (1, D)
+    corpus_emb = extract_features(corpus)         # (N, D)
+
+    # L2-normalize so the dot product equals cosine similarity.
+    query_emb = F.normalize(query_emb, p=2, dim=1)
+    corpus_emb = F.normalize(corpus_emb, p=2, dim=1)
+
+    # (1, D) @ (D, N) -> (1, N) similarity scores.
+    scores = query_emb @ corpus_emb.t()           # (1, N)
+    scores = scores.squeeze(0)                    # (N,)
+
+    top = torch.topk(scores, k=min(top_k, scores.numel()))
+    return top.indices.tolist()
+
+Why this shape:
+
+One batched extract_features call for the corpus. A Python loop over images would dominate the runtime. The interviewer is watching for this.
+
+F.normalize then matmul. Dot product of unit vectors is cosine similarity. You could also call torch.cosine_similarity(query_emb, corpus_emb), but the matmul generalizes cleanly to batched queries.
+
+torch.topk, not argsort then slice. topk is O(N log k), sort is O(N log N). For k = 1 either is fine; for top_k = 50 over a million items, topk matters.
+
+Batched Query Variant
+
+The same code generalizes if the interviewer asks for multiple queries at once:
+
+def most_similar_batched(
+    queries: torch.Tensor,   # (Q, 3, H, W)
+    corpus: torch.Tensor,    # (N, 3, H, W)
+    top_k: int = 1,
+) -> torch.Tensor:
+    q_emb = F.normalize(extract_features(queries), p=2, dim=1)   # (Q, D)
+    c_emb = F.normalize(extract_features(corpus),  p=2, dim=1)   # (N, D)
+    scores = q_emb @ c_emb.t()                                   # (Q, N)
+    return torch.topk(scores, k=top_k, dim=1).indices            # (Q, top_k)
+
+One matmul gives every query x every corpus score. For Q = 100 queries and N = 50k corpus, this is a (100, 50000) matrix, which fits in memory at fp32 no problem.
+
+Precomputed Index Variant
+
+In a real retrieval system, corpus_emb is computed once and stored. The query path becomes cheap:
+
+class ImageIndex:
+    def __init__(self, corpus: torch.Tensor):
+        emb = extract_features(corpus)                # (N, D)
+        self.emb = F.normalize(emb, p=2, dim=1)
+
+    def search(self, query: torch.Tensor, top_k: int = 1) -> list[int]:
+        q = F.normalize(extract_features(query.unsqueeze(0)), p=2, dim=1)
+        scores = (q @ self.emb.t()).squeeze(0)
+        return torch.topk(scores, k=top_k).indices.tolist()
+
+Mention this structure out loud: embed-once, search-many is what makes image retrieval fast in production.
+
+Complexity
+
+Let N be the corpus size, D the embedding dimension, T_ext the cost per extractor call.
+
+Indexing (once): O(N * T_ext + N * D) time, O(N * D) memory for stored embeddings.
+
+Query: O(T_ext + N * D) time for the extractor plus one matmul, O(N) for topk.
+
+For N on the order of 1e6, linear scan becomes painful and you want an ANN index (FAISS IVF / HNSW). Name-drop this only if the interviewer pushes on scale.
+
+What to Say Out Loud
+
+"I will batch the corpus through the extractor in one call, then score with a single matmul."
+
+"I normalize the embeddings so cosine similarity is just a dot product."
+
+"In production the corpus embeddings would be precomputed and the query does one forward pass plus one matmul."
+
+"Past a few million items I would swap the matmul for an ANN index like FAISS."
+
+That sequence is the whole round. The implementation is eight lines; what the interviewer grades is whether those eight lines are the right ones.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

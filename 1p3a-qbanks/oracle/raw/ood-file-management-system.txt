@@ -1,0 +1,63 @@
+===H1===
+OOD — File Management System
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/ood-file-management-system
+===BODY===
+Oracle
+Coding·45 minMembers
+OOD — File Management System
+Implement a simplified in-memory file-management system on HackerRank, with a starter HashMap of folder-name to file-list provided. Required operations: `checkIfFolderExists`, `createFolder`, `createFile`. Edge-case handling matters more than algorithmic depth.
+SWE
+oop-design
+filesystem
+hashmap
+easy
+Frequency
+Single report
+Last asked
+2025-09-16
+Stage
+phone-screen
+Requirements
+
+Starter code: a HashMap<String, List<String>> mapping folder name → list of files in that folder.
+
+Implement:
+
+checkIfFolderExists(name) → boolean
+
+createFolder(name) — create a new folder; behaviour on duplicate is one of the edge cases.
+
+createFile(folder, filename) — add a file under the named folder; folder must exist (or be created — confirm with the interviewer).
+
+Edge cases drive most of the round: duplicates, intermediate folders not yet existing, illegal names.
+
+Notes
+
+The candidate initially considered a Trie-based hierarchical layout, then matched the simpler HashMap structure the interviewer provided. Stick with the data model the prompt hands you unless extending to deeply-nested directories is part of the spec.
+
+For nested-path support (/a/b/c.txt), the natural extension is a tree of folder nodes, each holding its own file list — but this round did not require it.
+
+Edge cases that mattered in this round:
+
+createFolder("existing") — does it throw, silently no-op, or overwrite? Default to silent no-op unless the spec says otherwise.
+
+createFile("unknownFolder", "x") — auto-create the folder, throw, or error-return? The interviewer expected one explicit decision and consistent enforcement.
+
+Concurrent createFolder + createFile on the same key — call out the race condition even if not asked.
+
+HackerRank runs hidden tests; the reporting candidate had several edge-case failures but was allowed to pass anyway. The interviewer was scoring the design and the reasoning aloud, not the green check marks.
+
+Preparation
+
+Sketch the three operations in 10 minutes against the provided HashMap.
+
+Explicitly state the edge-case decision rule once at the start: "createFolder on existing → no-op; createFile on missing folder → throw".
+
+Have the Trie-based variant ready as a follow-up direction ("if the folder hierarchy is nested") — but only pivot if the interviewer asks.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,63 @@
+===H1===
+Get Nested Object by Path
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/get-nested-object-by-path
+===BODY===
+Amazon
+Coding·30 minMembers
+Get Nested Object by Path
+Implement `get(object, path)` for a nested structure built from maps and arrays, with a path string that mixes dotted keys and bracketed indices like `ab[1].c.d[2][13]`.
+SWE
+string
+recursion
+medium
+Frequency
+Single report
+Last asked
+2026-04-05
+Stage
+onsite-coding
+Requirements
+
+Input: an arbitrarily nested structure of Map and Array, plus a path string.
+
+Path syntax supports dotted keys (a.b.c) and bracket indices (a[0], possibly chained d[2][13]).
+
+Return the value at the resolved path, or a sentinel (undefined / null / throw) when any segment is missing — confirm with the interviewer which.
+
+Examples
+
+obj = {"ab": [None, {"c": {"d": [None, None, [...50 items...]]}}]}
+get(obj, "ab[1].c.d[2][13]")  # returns obj["ab"][1]["c"]["d"][2][13]
+
+Notes
+
+The cleanest implementation is a single tokenizer pass that emits ("key", name) and ("index", n) tokens, followed by an iterative reducer over the structure. Avoid regex-only solutions — they break on edge cases like empty path or trailing brackets.
+
+Discuss what to do for malformed paths (a..b, a[], a[1.2]) and for negative indices.
+
+Lodash and similar libraries have well-known semantics here; the interviewer will sometimes ask you to match Lodash get behavior specifically.
+
+The cleanest design is two stages: a tokenizer that emits a sequence of ('key', name) and ('index', n) segments, followed by a stateless reducer that walks the structure one segment at a time and fails fast on type mismatch. Avoid regex-only solutions — they break on a..b, trailing [, escaped dots, and empty bracket pairs.
+
+The reducer should explicitly check the runtime type of the current node against the segment kind: ('key', _) requires a map / object, ('index', _) requires an array / list. Mixing them silently is a Lodash-vs-strict semantic choice — confirm with the interviewer which behavior is expected.
+
+Discuss the sentinel return policy up front: undefined / null on miss vs throwing. Lodash returns the default; strict APIs throw. Both are reasonable; picking one and being consistent matters more than picking the "right" one.
+
+Preparation
+
+Write a token-by-token parser by hand: scan the path, alternate between key-mode and bracket-mode, handle escapes if asked.
+
+Practice the iterative resolver with explicit type-checking (map vs array vs primitive) so you can fail fast with a clear sentinel.
+
+Rehearse extension follow-ups: set(obj, path, value) and has(obj, path) are the natural next questions.
+
+Layered drill: (1) write the tokenizer alone with a unit test on a.b[0].c[2][13]; (2) write the reducer alone given a token list; (3) glue them and handle malformed paths (a..b, a[], a[1.2], trailing dot); (4) extend to set(obj, path, value) and has(obj, path) as standalone follow-ups.
+
+Prepare a 5-input edge-case battery to dry-run on paper before submitting: empty path, path of length 1 (key only), path of length 1 (index only), path missing midway, path that overshoots an array.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

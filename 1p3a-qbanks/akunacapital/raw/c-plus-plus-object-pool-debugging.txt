@@ -1,0 +1,70 @@
+===H1===
+C++ Object Pool Debugging
+===URL===
+https://www.1point3acres.com/interview/problems/company/akunacapital/c-plus-plus-object-pool-debugging
+===BODY===
+Akuna Capital
+Coding·45 minMembers
+C++ Object Pool Debugging
+A 45-minute C++ OA2 task gives a mostly written object-pool class that does not compile; candidates repair syntax/logic bugs and implement `numAllocated()`.
+SWE
+Infra Eng
+code-reading
+debugging
+oop
+data-structure
+medium
+Frequency
+Low
+Last asked
+2025-10-05
+Stage
+oa
+Requirements
+
+Given a partially implemented C++ object pool, fix compile-time bugs and implement numAllocated().
+
+Visible structure includes:
+
+template <typename ObjectT>
+struct Node {
+  ObjectT object;
+  Node* next;
+};
+
+struct Batches {
+  Batches* next;
+  Node* nodes;
+  size_t size;
+};
+
+Node* allocateBatch(size_t batchSize);
+Node& getNode();
+size_t capacity();
+size_t numAllocated();
+
+The code contains multiple deliberately simple bugs and is initially not compilable. The final goal is to compute how many nodes from the pool have been allocated.
+
+Notes
+
+Treat this as code reading plus C++ fundamentals. The likely invariant is that total capacity equals the sum of batch sizes, and unallocated/free nodes are reachable from a free-list. Then numAllocated() can be expressed as capacity - free_count, unless the skeleton already tracks an allocation counter.
+
+Common issues to check quickly: missing semicolons after structs, Node vs node capitalization, incorrect template syntax, pointer ownership, Batches vs batches naming, and references returned from functions whose lifetime is invalid.
+
+Because the interviewer explicitly states that the code does not compile, spend the first pass making the compiler happy before reasoning about allocation semantics.
+
+This is the OA2 of a C++ SWE assessment; the paired OA1 is a set of three LeetCode-style problems under a forced C++ language requirement. Candidates familiar with object-pool / free-list idioms generally clear OA2 quickly.
+
+Preparation
+
+Review C++ templates, nested structs, pointer syntax, references, and RAII basics.
+
+Practice reading object-pool and free-list code: batch allocation, linked free nodes, acquire, release, and capacity accounting.
+
+In a timed drill, first list invariants, then compile-fix, then implement the requested function; do not rewrite the whole class.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

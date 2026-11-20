@@ -1,0 +1,81 @@
+===H1===
+String to Integer (atoi)
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/string-to-integer-atoi
+===BODY===
+Bloomberg
+Coding·60 minMembers
+String to Integer (atoi)
+Implement a robust `atoi` that parses an optional sign, leading whitespace, and digit run, clamping to the 32-bit signed range. Bloomberg uses it as a phone-screen warm-up where overflow handling and a few targeted edge cases distinguish strong candidates.
+SWE
+string-processing
+parsing
+math
+medium
+Frequency
+Single report
+Last asked
+2026-01-04
+Stage
+phone-screen
+Requirements
+
+Implement a function:
+
+int myAtoi(String s)
+
+that behaves as follows:
+
+Skip leading whitespace.
+
+Read an optional '+' or '-' sign character.
+
+Read the digit run ('0'..'9') that follows. Stop at the first non-digit.
+
+Convert the digit run to a signed 32-bit integer with the sign from step 2.
+
+If the value exceeds the 32-bit signed range, clamp to INT_MAX (2^31 - 1) or INT_MIN (-2^31).
+
+If no digits were read after the optional sign, return 0.
+
+Follow-ups:
+
+How do you detect overflow before the multiplication overflows? Compare the accumulator against INT_MAX / 10 and the next digit against INT_MAX % 10.
+
+What about leading zeros, multiple signs ('--1'), or embedded whitespace ('1 23')? Walk through each case.
+
+Adapt to floats or scientific notation as a verbal follow-up.
+
+Examples
+
+'42'             -> 42
+'   -42'         -> -42
+'4193 with words'-> 4193
+'words and 987'  -> 0
+'-91283472332'   -> -2147483648  (clamped to INT_MIN)
+'+1'             -> 1
+'00000-42a1234'  -> 0            (digits start, then '-' stops)
+
+Notes
+
+The cleanest implementation is a single pass with three phases: skip whitespace, read sign, read digits with overflow check on each iteration. Time O(n), space O(1).
+
+The overflow check is the single most-graded detail. The idiomatic Java / C++ approach: if (acc > INT_MAX / 10 || (acc == INT_MAX / 10 && digit > INT_MAX % 10)) return sign == 1 ? INT_MAX : INT_MIN; Doing it any other way (catching exceptions, casting through long) is acceptable but invites follow-up.
+
+Bloomberg interviewers often ask about negative-overflow asymmetry: INT_MIN has one more representable value than -INT_MAX. Handle by clamping after applying the sign, not before.
+
+Edge cases to enumerate before coding: leading whitespace only, sign with no digits, only a sign character, only digits, embedded sign mid-number, very long digit run that triggers overflow halfway.
+
+Preparation
+
+Re-derive the overflow check from INT_MAX = 2_147_483_647 on paper; don't rely on language built-ins.
+
+Implement once in Java (where int is 32-bit and overflow matters) and once in Python (where it doesn't, and you must check the bound manually); the second exposes whether you actually understand the constraint.
+
+Practice articulating the parsing rules out loud — Bloomberg explicitly grades whether the candidate enumerates ambiguities before writing code.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

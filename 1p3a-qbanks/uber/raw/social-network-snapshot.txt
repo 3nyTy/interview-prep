@@ -1,0 +1,62 @@
+===H1===
+Versioned Social Network with Snapshots
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/social-network-snapshot
+===BODY===
+Uber
+Coding·60 minMembers
+Versioned Social Network with Snapshots
+Design a social network whose follow graph supports point-in-time snapshots: follow / unfollow apply to the current version, createSnapshot freezes a version, and isFollowing queries any historical snapshot. A snapshot/MVCC problem.
+SWE
+design
+snapshot
+versioning
+hashmap
+medium
+Frequency
+Single report
+Last asked
+2026-06-14
+Stage
+onsite-coding
+Requirements
+
+Design a social network that supports point-in-time snapshots of its follow graph.
+
+follow(followerId, followeeId) — follower follows followee (directed, one-way).
+
+unfollow(followerId, followeeId) — remove a follow edge.
+
+createSnapshot() -> int — record the current state of all follow relationships and return a snapshot/version id.
+
+isFollowing(followerId, followeeId, snapId) -> bool — whether the edge existed in the given snapshot.
+
+A new version is created only when createSnapshot() is called. follow / unfollow apply to the current (latest) version. Historical snapshots must stay queryable even after later unfollows.
+
+Examples
+
+sn.follow(1, 2)             // writes to version 0
+sn.createSnapshot()        // returns 0; current version becomes 1
+sn.unfollow(1, 2)          // writes to version 1
+sn.isFollowing(1, 2, 0)    // true
+sn.isFollowing(1, 2, 1)    // false
+
+Notes
+
+This is a snapshot / MVCC problem. Instead of copying the whole graph on every snapshot, store per edge a version history: for each (follower, followee) keep an ordered list of (version, isFollowing) changes, and answer isFollowing(..., snapId) by binary searching for the latest change at or before snapId.
+
+The write version only advances when createSnapshot() is called, so multiple edits to the same edge between snapshots collapse into one version — make sure repeated edits to an edge in a single version overwrite rather than append duplicate entries.
+
+Clarify that snapshot ids are dense integers starting at 0 (as in the example) so versions can be indexed directly.
+
+Preparation
+
+Implement the per-edge version-history map with binary search over versions; this generalizes the Snapshot Array pattern (LC 1146) from a single value to a set of edges.
+
+Test the example trace exactly, plus an edge that is followed, snapshotted, unfollowed, and re-followed across several versions.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

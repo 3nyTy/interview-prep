@@ -1,0 +1,49 @@
+===H1===
+Intersection of Two Interval Lists
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/intersection-of-two-interval-lists
+===BODY===
+ByteDance / TikTok
+CodingMembers
+Intersection of Two Interval Lists
+Given two interval lists, return their intersections. The prompt aligns with LC 986, while the interview report leaves sorting guarantees, endpoint semantics, and the exact output contract unspecified.
+SWE
+interval
+medium
+Frequency
+Single report
+Last asked
+—
+Stage
+phone-screen
+Requirements
+
+Given two lists of intervals, return the intersections between intervals from different lists.
+
+Clarify whether endpoints are closed or half-open.
+
+Clarify whether each list is already sorted and internally non-overlapping.
+
+Clarify the required output ordering and representation before coding.
+
+Notes
+
+In the canonical sorted, pairwise-disjoint version, keep one pointer per list. The current overlap is [max(startA, startB), min(endA, endB)] when that start does not exceed that end, then advance the interval with the smaller end.
+
+The two-pointer scan is O(m + n) time and uses O(1) auxiliary space excluding output. If the interview variant does not guarantee sorted input, account for sorting before the scan.
+
+Endpoint semantics determine whether touching intervals produce a point intersection, so state the inequality explicitly.
+
+Preparation
+
+Implement the sorted two-pointer version from a blank editor and narrate the pointer-advance invariant before writing the loop.
+
+Test empty input, disjoint ranges, containment, touching endpoints, and one interval intersecting several intervals in the other list.
+
+Rewrite the overlap predicate once for closed intervals and once for half-open intervals, then explain the difference.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

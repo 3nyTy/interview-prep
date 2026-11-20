@@ -1,0 +1,82 @@
+===H1===
+LRU Cache + Thread-Safe Follow-up
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-lru-cache-multithread
+===BODY===
+LinkedIn
+Coding·60 minMembers
+LRU Cache + Thread-Safe Follow-up
+Implement an LRU cache, then extend to a thread-safe version. In post-reform loops this is often delivered as the AI-coding round: candidates outline the doubly-linked-list + hashmap design, let the in-IDE assistant produce the skeleton, then dry-run unit tests and reason about lock granularity.
+SWE
+Infra Eng
+data-structure
+hashmap
+linked-list
+concurrency
+threading
+ai-tools
+medium
+Frequency
+Medium
+Last asked
+2026-01-22
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Implement an LRUCache(capacity) with:
+
+get(key) -> value — returns the value and marks the key as most-recently used; returns -1 (or sentinel) on miss.
+
+put(key, value) — inserts or updates, evicting the least-recently-used entry when full.
+
+Both operations must be O(1) amortized. The canonical structure is a doubly-linked list of (key, value) nodes plus a hashmap key -> node; access splices the node to the head, eviction drops the tail.
+
+Follow-up (always asked): make it thread-safe under concurrent get / put. Acceptable answers:
+
+A coarse ReentrantLock (or synchronized block) around the whole map. Simple, correct, but serializes all access — call out the throughput ceiling.
+
+A ReadWriteLock — multiple concurrent readers, exclusive writers. Note that get still mutates the recency list, so the "read" path actually needs the write lock unless you reorder lazily.
+
+Lock striping — partition the keyspace by hash(key) % stripes, lock per stripe. Trade-off discussion: cross-stripe consistency for eviction order.
+
+Lock-free / CAS approaches (very rare in this round) — usually called out only to defer.
+
+AI-coding variant. In the AI-enabled coding round the interviewer expects the candidate to: (a) state the design verbally, (b) prompt the in-IDE assistant for the implementation, (c) manually walk through test cases, and (d) drive the thread-safety follow-up themselves rather than re-prompting. Over-relying on the assistant for the design decision is the most common failure mode.
+
+Examples
+
+LRUCache cache = new LRUCache(2);
+cache.put(1, 1);
+cache.put(2, 2);
+cache.get(1);       // 1
+cache.put(3, 3);    // evicts key 2
+cache.get(2);       // -1 (not found)
+cache.put(4, 4);    // evicts key 1
+cache.get(1);       // -1 (not found)
+cache.get(3);       // 3
+cache.get(4);       // 4
+
+Notes
+
+The doubly-linked-list-plus-hashmap pattern is the canonical answer; using Java LinkedHashMap is acceptable as a short-circuit but the interviewer will then ask for a from-scratch implementation.
+
+In Python, collections.OrderedDict with move_to_end covers get; popitem(last=False) covers eviction.
+
+For the thread-safe extension, the read-also-mutates property of LRU is the trick — readers cannot simply share a read lock without giving up recency tracking.
+
+Lock striping is the strongest follow-up answer; be ready to estimate stripe count given a target throughput.
+
+Preparation
+
+Implement the dual-structure LRU from scratch in < 10 minutes without library shortcuts.
+
+Write a small ConcurrentLRU with a single ReentrantLock and a striped version; benchmarking is unnecessary, but the code structure should be familiar.
+
+Practice the AI-coding flow on the canonical interview tooling once: state design → prompt → test → iterate. This rehearses the pacing the interviewer is grading on.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,61 @@
+===H1===
+Maximum Concurrent Processes / Meeting Rooms
+===URL===
+https://www.1point3acres.com/interview/problems/company/ibm/maximum-concurrent-processes
+===BODY===
+IBM
+Coding·60 minFree preview
+Maximum Concurrent Processes / Meeting Rooms
+Given process or meeting intervals with inclusive endpoints, return the maximum number active at the same time. One version is a direct Meeting Rooms II-style prompt over `List<List<Integer>> meetingTimings`; another describes distributed-service process logs.
+SWE
+Infra Eng
+interval
+interval-aggregation
+sorting
+medium
+Frequency
+Low
+Last asked
+2026-02-26
+Stage
+oa
+Requirements
+
+Input: a list of intervals, where each interval is [start, end].
+
+Output: the maximum number of intervals active at any single time.
+
+Intervals are closed: an interval ending at time end is still active at that exact time.
+
+In the meeting-room version, the input is List<List<Integer>> meetingTimings; the return value is the minimum number of rooms needed.
+
+Examples
+
+Input: [[1, 3], [2, 4], [3, 6]]
+Output: 3
+
+At time 3, all three processes are active.
+
+Input: [[2, 6], [1, 2], [3, 5]]
+Output: 2
+
+Notes
+
+The sweep-line solution sorts starts and ends. Because intervals are inclusive, a start at time t must be processed before an end at time t when counting concurrency.
+
+A min-heap of end times also works for the meeting-room framing; pop only ends that are strictly before the current inclusive start.
+
+Difference-array / prefix-sum solutions are viable only when the time domain is small or coordinate-compressed. With times up to large values, sorted events or a heap are safer.
+
+This is the same algorithmic family as Meeting Rooms II; the IBM variant mainly changes the input container, story, and endpoint convention.
+
+Preparation
+
+Implement both versions: sorted event pairs with tie-breaking, and min-heap over end times. Add a test where one interval starts exactly when another ends.
+
+Drill the complexity explanation: sorting dominates at O(n log n), heap space is O(n), and coordinate compression changes the prefix-sum version from time-domain-sized memory to O(n) events.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

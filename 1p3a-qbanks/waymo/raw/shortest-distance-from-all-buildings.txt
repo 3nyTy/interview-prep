@@ -1,0 +1,51 @@
+===H1===
+Shortest Distance from All Buildings
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/shortest-distance-from-all-buildings
+===BODY===
+Waymo
+CodingMembers
+Shortest Distance from All Buildings
+The onsite coding round used the unmodified LC 317 prompt: choose an empty grid cell minimizing its total distance to every building, or return `-1` when no such cell can reach them all.
+SWE
+grid
+bfs
+shortest-path
+hard
+Frequency
+Low · New
+Last asked
+2026-09-08
+Stage
+onsite-coding
+Requirements
+
+Given an m × n grid containing empty land, buildings, and obstacles, choose an empty cell on which to build a house.
+
+Movement is allowed one cell at a time in the four cardinal directions, and paths may pass only through empty land — buildings and obstacles both block travel.
+
+Return the minimum sum of distances from the chosen empty cell to every building.
+
+Return -1 if no empty cell can reach every building.
+
+The prompt is the unmodified LeetCode 317 problem.
+
+Notes
+
+Run one BFS from each building over empty land, accumulating two per-cell aggregates: total distance and the count of buildings that reached the cell. The answer is the minimum total among empty cells reached by every building; O(B · m · n) time with O(m · n) extra space for the two aggregate grids.
+
+The reach count is where correctness lives: a cell with the smallest distance sum is invalid unless its count equals the number of buildings. Missing that check is the classic wrong answer, and it is also the mechanism behind the -1 case.
+
+A standard pruning keeps later passes cheap: during the k-th BFS, only expand cells already reached by all previous buildings (decrement a walkable marker per pass), which abandons dead regions early.
+
+Preparation
+
+Implement the per-building BFS with the distance-sum and reach-count grids, then test on a grid where one empty cell is walled off from a building — verify the -1 and unreachable-cell paths, not just the happy path.
+
+Dry-run the marker-decrement pruning on a 3×3 grid with two buildings until you can explain why a cell missed by any single BFS can never be the answer.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

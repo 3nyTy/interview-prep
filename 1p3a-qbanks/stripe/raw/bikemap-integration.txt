@@ -1,0 +1,95 @@
+===H1===
+Bikemap Integration
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/bikemap-integration
+===BODY===
+Stripe
+Coding·60 minMembers
+Bikemap Integration
+Integration-round task built around real HTTP API calls. Read JSON describing geometric/landmark data, hit a remote API to download tiles or static map images, then progressively annotate the images with markers and connecting lines. Speed-coding round — most candidates finish 3 of 5 parts.
+SWE
+api-integration
+http
+io
+medium
+Frequency
+High
+Last asked
+2026-08-18
+Stage
+onsite-coding
+Requirements
+
+Task 1: Read a JSON file that contains geometric data (coordinates / track points). Load from the given path, take the first N coordinates (usually 10), and print them. Inspect the layout and the coordinate order — latitude-first vs longitude-first — because the later tasks depend on it. Guard against a missing or malformed file.
+
+Task 2: Make an authenticated HTTP request to a tile/image API and save the returned image to disk. Know in advance how to write binary content from a requests response to a file. The base map is centered on the Stripe office.
+
+Task 3: Same as Task 2 but plot the Task 1 points on the image and connect them with line segments.
+
+Task 4: Read a second JSON file with landmarks; for each landmark find the nearest point on the track and annotate both on the image.
+
+Task 5: A speed/timing computation; rarely reached in 60 min.
+
+Examples
+
+# Task 1 shape: load, slice, print
+import json
+with open("coordinates.json") as f:
+    data = json.load(f)
+coords = data["coordinates"][:10]   # confirm lat/lon order before using downstream
+for c in coords:
+    print(c)
+
+Notes
+
+Most reports get through 3 of 5 parts; 3.5/5 has been seen as a passing signal.
+
+Pillow / PIL is the standard imaging library. Know Image.open, ImageDraw, ImageDraw.line, ImageDraw.ellipse. Practice saving images from requests.Response.content.
+
+One report notes the interviewer is light on feedback during this round; assume you will be working solo and budget time accordingly. The setup is typically: clone a starter repo (data + task list provided), code on your own machine, share your screen.
+
+You may solve it in the language of your choice — Python, JavaScript/Node.js, Java, or others are all accepted — so warm up the HTTP / file-IO / JSON idioms in whichever you pick.
+
+Do not over-engineer auth setup — most candidates lose 5+ minutes fighting authorization headers and JSON parsing they could have warmed up beforehand.
+
+Time budget is 45–60 minutes.
+
+The repo-understanding and recovery process is part of the signal: map the starter code before editing, narrate how you locate the next change point, and recover visibly when an assumption fails.
+
+Alternate canonical variant — server-rendered route via POST payload
+
+A common shape draws the route server-side rather than locally with Pillow: instead of fetching a base tile and drawing on it, you send the coordinates inside the request payload and the map API returns the finished image with the route already rendered.
+
+Step 2 (download base map): send an HTTP POST to the map URL using the JSON payload provided in the starter code; the response body is binary image data — save it with "wb" (write bytes, not a string), then open the file to confirm a map renders.
+
+Step 3 (draw the route): add the Task 1 coordinates to the same JSON payload and re-POST; the returned image now has the path drawn on it. You may also need to set line color / thickness in the payload.
+
+Coordinate-order corner case: this API typically expects [longitude, latitude] (GeoJSON order), which is the reverse of the latitude-first order familiar from Google Maps. Getting this backwards is a frequent silent bug — the route renders in the wrong place. This is why Task 1 asks you to nail down the order up front.
+
+Optional extras (if time): change line color/thickness/style, draw multiple routes, add markers, or split the route into segments based on the data.
+
+Discussion follow-ups
+
+After coding, expect open-ended design questions:
+
+How would you handle thousands of coordinates?
+
+How would you design this as a service used by many people?
+
+What happens if the API is slow or returns an error?
+
+How would you write tests for this code?
+
+Preparation
+
+Run a full practice round end-to-end against a public API such as https://pokeapi.co/: read JSON, save responses, paginate, draw on an image with Pillow.
+
+Pre-write helper snippets for: GET/POST with bearer token, write bytes to file, open image + draw circle/line, parse Unix epoch into datetime, and load JSON + slice the first N items safely.
+
+Practice reading long prompts under time pressure — multiple reports cite "read time > code time" as a failure mode.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

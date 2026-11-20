@@ -1,0 +1,81 @@
+===H1===
+Failed Login Log Ranking
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/failed-login-log-ranking
+===BODY===
+Apple
+Coding·45 minMembers
+Failed Login Log Ranking
+Parse system logs, extract failed login attempts, group by IP and machine, and sort by failed-attempt count.
+SWE
+Infra Eng
+parsing
+hashmap
+sorting
+top-k
+easy
+Frequency
+Single report
+Last asked
+2025-11-20
+Stage
+phone-screen
+You are given a list of system login log entries logs, where logs[i] = [ip, machine, status]:
+
+ip: the client IP address.
+
+machine: the hostname the client attempted to log into.
+
+status: either "failed" or "success".
+
+Return a list of every IP that has at least one failed login attempt, sorted in descending order by total failed attempt count. Break ties by IP address in ascending lexicographic order.
+
+The machine field is part of the log format but is not used in the return value.
+
+Examples
+
+Example 1:
+
+Input: logs = [["192.168.1.1","server-a","failed"],["192.168.1.1","server-b","failed"],["192.168.1.1","server-a","success"],["10.0.0.2","server-a","failed"],["10.0.0.2","server-a","failed"],["10.0.0.2","server-c","failed"]]
+
+Output: ["10.0.0.2","192.168.1.1"]
+
+Explanation:
+
+10.0.0.2 had 3 failed attempts and 192.168.1.1 had 2, so 10.0.0.2 comes first.
+
+Example 2:
+
+Input: logs = [["10.0.0.1","server-a","failed"],["10.0.0.2","server-a","failed"]]
+
+Output: ["10.0.0.1","10.0.0.2"]
+
+Explanation:
+
+Both IPs have 1 failed attempt. The tie is broken alphabetically, so 10.0.0.1 comes first.
+
+Example 3:
+
+Input: logs = [["192.168.1.1","server-a","success"]]
+
+Output: []
+
+Explanation:
+
+No failed attempts means no IPs qualify.
+
+Constraints
+
+0 <= logs.length <= 10^5
+
+logs[i].length == 3
+
+status is either "failed" or "success"
+
+ip and machine are non-empty strings of length at most 50
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

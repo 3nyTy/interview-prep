@@ -1,0 +1,54 @@
+===H1===
+Code Craft: Nearest Destination on 2D Grid (Multi-Source BFS)
+===URL===
+https://www.1point3acres.com/interview/problems/company/doordash/code-craft-multi-source-bfs-grid
+===BODY===
+DoorDash
+Coding·60 minMembers
+Code Craft: Nearest Destination on 2D Grid (Multi-Source BFS)
+Given a 2D grid containing obstacles and DashMart destinations, compute shortest distances to the nearest destination. The output is either a distance grid or one distance per supplied query location. Obstacles, queries already on a destination, and unreachable locations require explicit contract clarification.
+SWE
+bfs
+grid
+medium
+Frequency
+Low
+Last asked
+2026-07-28
+Stage
+phone-screen
+Requirements
+
+Input: a 2D character grid where x is an obstacle and d is a destination. Other cells (.) are walkable.
+
+Output: a 2D int grid of the same shape; each cell holds the shortest path distance (in number of 4-neighbor steps) to the nearest d.
+
+Edge case the interviewer surfaces: obstacle cells also need a distance value — clarify whether they should be treated as unreachable (−1 or ∞) or whether their distance is computed as if they were walkable. The canonical answer treats x as a non-traversable cell but still reports a distance using Manhattan / BFS from d ignoring x for the value lookup. Always clarify before implementing.
+
+Notes
+
+Standard multi-source BFS: enqueue every d with distance 0, sweep outward; first time a cell is dequeued is its shortest distance.
+
+For the obstacle-distance follow-up, run the BFS over walkable cells for actual reachability and run a second pass (also multi-source) over the obstacle-included grid for the "distance treating obstacles as passable" interpretation. Decide which the interviewer wants.
+
+Complexity: O(R × C) for both time and space; BFS visits each cell once.
+
+Common bug: enqueuing all sources individually with BFS and getting wrong distances because the BFS is single-source per call. Use multi-source BFS — enqueue all sources at distance 0 before the sweep.
+
+Alternate canonical variant — query locations
+
+Another API shape supplies the grid plus several query locations and asks for each location's distance to the nearest DashMart. A query already on a DashMart returns zero; queries on blocked roads and locations from which no DashMart is reachable need explicit sentinel behavior. Precompute distances once from all DashMarts, then answer each query from the distance table; clarify whether a blocked query is immediately unreachable or receives a geometric distance under the obstacle-ignoring interpretation.
+
+Preparation
+
+Drill the multi-source BFS pattern (LC 994 "Rotting Oranges," LC 542 "01 Matrix") until typing the boilerplate is automatic.
+
+Pre-write a 5-line BFS template with visited and dist 2D arrays in your preferred language.
+
+Have the clarification question ready ("how should obstacle cells be scored?") — interviewers grade this round on clarity of contract as much as code.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

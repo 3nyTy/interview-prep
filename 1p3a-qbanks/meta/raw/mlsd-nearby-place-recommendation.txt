@@ -1,0 +1,55 @@
+===H1===
+MLSD — Nearby Place Recommendation
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/mlsd-nearby-place-recommendation
+===BODY===
+Meta
+System Design·45 minMembers
+MLSD — Nearby Place Recommendation
+Location-aware recommender for nearby places (Marketplace shops, FB Places). Geohash retrieval + mobile real-time constraints + context features distinguish it from generic feed MLSD.
+MLE
+RS
+mlsd
+recommendation
+geohash
+location
+medium
+Frequency
+Medium
+Last asked
+2026-08-13
+Stage
+onsite-system-design
+Requirements
+
+Functional: given user location + intent (e.g., browsing Places near me), return ranked list of places.
+
+Retrieval: geohash / quadtree spatial index → candidates within radius; combine with content embedding retrieval for personalization.
+
+Ranking: standard 4-stage scaffold (retrieval → pre-rank → rank → re-rank) layered on top of the spatial pre-filter.
+
+Features: distance, dwell-time history, hour-of-day, device, friends-who-visited graph signal.
+
+Realtime constraint: user is mobile — location updates frequently; refresh interval and stale-cache trade-off.
+
+Metrics: click-through, visit conversion, complaint rate.
+
+Notes
+
+Multiple reports stress: interviewer probes metric design and feature engineering more than architecture. Lead with metrics + features, not model choice.
+
+Mobility / freshness is the differentiator from a static Reels recommender — highlight it early.
+
+Preparation
+
+Memorize geohash vs quadtree trade-offs (static vs dynamic locations).
+
+Practice the metric + feature pitch first; only then dive into model.
+
+Prep an A/B-test design where mobile-session length is the key randomization unit.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

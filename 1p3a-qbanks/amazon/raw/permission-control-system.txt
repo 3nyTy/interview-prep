@@ -1,0 +1,77 @@
+===H1===
+Permission Control System Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/permission-control-system
+===BODY===
+Amazon
+System Design·60 minMembers
+Permission Control System Design
+Design a file-sharing permission control system. Users can share files with other users; the homepage lists every file a user can access; explicit access checks must be supported.
+SWE
+system-design
+storage
+scaling
+medium
+Frequency
+Single report
+Last asked
+2026-03-17
+Stage
+onsite-system-design
+Requirements
+
+Functional:
+
+Share a file with another user (grant access).
+
+On a user's homepage, list every file they have access to.
+
+For any (user, file) pair, return whether the user has access.
+
+Non-functional: discuss read-heavy workload (homepage reads dominate), consistency model on share/revoke, audit trail.
+
+Open with clarifying questions on ACL granularity (user vs group), permission hierarchy (read/write/owner), and inheritance (folder → file).
+
+Examples
+
+ACL approach: (file_id, user_id, permission) rows; index on user_id for homepage, on (user_id, file_id) for the access check.
+
+Role-based approach: user belongs to groups; access derived through group membership + file-group ACL.
+
+Notes
+
+Decide early between a denormalized read model (cached user -> [file_ids] list) and on-the-fly ACL evaluation. The read model wins on homepage latency but adds a fan-out invalidation problem on share/revoke.
+
+Sharding by user_id keeps homepage reads single-shard; sharding by file_id keeps share/revoke single-shard. You can't have both without a secondary index — call out the trade-off.
+
+Bring up audit logging and revocation — disagree and commit interviewers often poke at the security side.
+
+The canonical relationship-based access model (subject, relation, object tuples with namespace-scoped relation rewrites) lets you express groups, folder inheritance, and shared roles in one schema; ACL rows are the degenerate case where every relation is viewer / editor / owner on a single resource.
+
+Three competing storage shapes show up in interviews: (1) normalized tuples with online expansion (cheap writes, expensive list-my-files reads), (2) a denormalized reverse index user -> [resource_ids] rebuilt on every share/revoke (cheap reads, fan-out writes that must converge), and (3) a hybrid where the reverse index is a write-through cache invalidated by a CDC stream off the tuple table. Most production designs land on (3).
+
+On consistency: share/revoke must be read-your-writes for the actor, but eventually consistent for everyone else is usually acceptable. Spell out the bound ("<5s propagation, no stale reads on the actor's own session") rather than waving at "strong consistency".
+
+Group expansion is the hidden cost. A file shared with a 10k-member group blows up a naive reverse index; production systems compute group membership lazily at check time and cache the (user, group) membership with a short TTL plus a group-change invalidation channel.
+
+Watch for the negative-permission / deny rule trap. If the model has explicit denies, the check is no longer monotonic and you cannot short-circuit on the first allow.
+
+Preparation
+
+Read the Google Zanzibar paper (consistent global ACL) at least for vocabulary; cite it as your inspiration if asked about scale.
+
+Prep a whiteboard-friendly diagram: client → API → permission service (cache + ACL store) → audit log + revocation queue.
+
+Practice the read/write trade-off pitch in under 2 minutes — Amazon system-design rounds reward decisive trade-off articulation.
+
+Drill the layered build: (1) whiteboard a single-node ACL table with check(user, resource) and list(user); (2) add a reverse-index cache and walk through share/revoke fan-out; (3) shard by user_id for the list endpoint and discuss the secondary index needed to keep check single-shard; (4) layer in groups / folder inheritance and explain how the check expands recursively with a depth cap.
+
+Practice a 90-second answer on how you'd bound staleness after revoke: invalidation token in the cache, CDC topic, fence value carried on the session.
+
+Be able to derive read vs write QPS from "homepage opens / day" and "shares per user / day" and use the ratio to justify the read-optimized denormalization.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

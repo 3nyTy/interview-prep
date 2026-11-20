@@ -1,0 +1,690 @@
+===H1===
+Banking System (Multi-Level OA)
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/banking-system-oa
+===BODY===
+Coinbase
+Coding·70 minFree preview
+Banking System (Multi-Level OA)
+Four-level CodeSignal OA: implement a small bank backend that grows from basic account operations to spending leaderboards, scheduled / cancellable payments, and account merges that preserve history. A current Cloud Compute Credits rotation keeps the leaderboard and merge/history spine but replaces scheduled outgoing payments with delayed compute-consumption rebates. The volume of code is the difficulty; each level is straightforward in isolation but few finish all four in 70 minutes without prior practice.
+SWE
+hashmap
+heap
+data-structure
+object-design
+codesignal
+oa
+medium
+Frequency
+Medium
+Last asked
+2026-08-23
+Stage
+oa
+Bank System
+
+System Overview
+
+You need to build a banking system. It must handle creating accounts, transferring money, tracking spending, paying bills later, and merging accounts. This problem has four levels. Each level adds new features to the last one.
+
+Every action gets a timestamp (current time in milliseconds). Time always moves forward. Sometimes, multiple things happen at the exact same time.
+
+Level 1: The Basics
+
+What You Need to Do
+
+Write a BankSystem class. It should let you create accounts, put money in, and move money between accounts.
+
+class BankSystem:
+    def __init__(self):
+        """Start the banking system."""
+        pass
+
+    def create_account(self, timestamp: int, account_id: str) -> bool:
+        """
+        Make a new account with $0.
+
+        Returns:
+            True if created.
+            False if that ID already exists.
+        """
+        pass
+
+    def deposit(self, timestamp: int, account_id: str, amount: int) -> bool:
+        """
+        Add money to an account.
+
+        Returns:
+            True if successful.
+            False if the account is missing.
+        """
+        pass
+
+    def transfer(self, timestamp: int, source_id: str, target_id: str, amount: int) -> bool:
+        """
+        Move money from one account to another.
+
+        Returns:
+            True if successful.
+            False if an account is missing, ids are the same, or money is too low.
+        """
+        pass
+
+How to Use It
+
+bank = BankSystem()
+
+bank.create_account(1, "acc1")    # True
+bank.create_account(2, "acc2")    # True
+bank.create_account(3, "acc1")    # False (already exists)
+
+bank.deposit(4, "acc1", 1000)     # True
+bank.deposit(5, "acc3", 500)      # False (acc3 does not exist)
+
+bank.transfer(6, "acc1", "acc2", 300)  # True (acc1 has 700, acc2 has 300)
+bank.transfer(7, "acc1", "acc2", 800)  # False (not enough money)
+bank.transfer(8, "acc1", "acc1", 100)  # False (cannot transfer to self)
+
+Level 1 Solution Approach
+
+We use a simple dictionary (HashMap) to store balances.
+
+class BankSystem:
+    def __init__(self):
+        self.accounts = {}  # Map: account_id -> balance
+
+    def create_account(self, timestamp: int, account_id: str) -> bool:
+        if account_id in self.accounts:
+            return False
+        self.accounts[account_id] = 0
+        return True
+
+    def deposit(self, timestamp: int, account_id: str, amount: int) -> bool:
+        if account_id not in self.accounts:
+            return False
+        self.accounts[account_id] += amount
+        return True
+
+    def transfer(self, timestamp: int, source_id: str, target_id: str, amount: int) -> bool:
+        # Check if accounts exist
+        if source_id not in self.accounts or target_id not in self.accounts:
+            return False
+        # Check if source and target are the same
+        if source_id == target_id:
+            return False
+        # Check for enough money
+        if self.accounts[source_id] < amount:
+            return False
+
+        # Perform transfer
+        self.accounts[source_id] -= amount
+        self.accounts[target_id] += amount
+        return True
+
+Big O Analysis:
+
+MethodTimeSpace
+create_accountO(1)O(1) per account
+depositO(1)O(1)
+transferO(1)O(1)
+
+Level 2: Tracking Spending
+
+What You Need to Do
+
+Now, you must track how much money leaves each account. You also need a function to find the accounts that spent the most.
+
+def top_spenders(self, timestamp: int, n: int) -> list:
+    """
+    Get the top N accounts that sent the most money.
+
+    Returns:
+        A list of strings like "account_id(total_spent)".
+        Sort by amount (highest first).
+        If amounts are equal, sort by ID (alphabetical).
+
+    Note:
+        - Only successful transfers count as spending.
+        - Deposits do NOT count.
+    """
+    pass
+
+How to Use It
+
+bank = BankSystem()
+# ... create accounts ...
+
+bank.deposit(4, "acc1", 2000)
+bank.deposit(5, "acc2", 1000)
+
+bank.transfer(7, "acc1", "acc2", 500)
+bank.transfer(8, "acc2", "acc3", 300)
+bank.transfer(9, "acc1", "acc3", 200)
+
+bank.top_spenders(10, 2)
+# Result: ["acc1(700)", "acc2(300)"]
+# acc1 sent 500 + 200 = 700 total.
+# acc2 sent 300 total.
+
+Level 2 Solution Approach
+
+We add a second dictionary called outgoing. This keeps track of the total money sent by each account. When asked for top spenders, we sort this list.
+
+class BankSystem:
+    def __init__(self):
+        self.accounts = {}      # account_id -> balance
+        self.outgoing = {}      # account_id -> total money sent
+
+    def create_account(self, timestamp: int, account_id: str) -> bool:
+        if account_id in self.accounts:
+            return False
+        self.accounts[account_id] = 0
+        self.outgoing[account_id] = 0
+        return True
+
+    def deposit(self, timestamp: int, account_id: str, amount: int) -> bool:
+        if account_id not in self.accounts:
+            return False
+        self.accounts[account_id] += amount
+        return True
+
+    def transfer(self, timestamp: int, source_id: str, target_id: str, amount: int) -> bool:
+        if source_id not in self.accounts or target_id not in self.accounts:
+            return False
+        if source_id == target_id:
+            return False
+        if self.accounts[source_id] < amount:
+            return False
+
+        self.accounts[source_id] -= amount
+        self.accounts[target_id] += amount
+        # Track the spending
+        self.outgoing[source_id] += amount
+        return True
+
+    def top_spenders(self, timestamp: int, n: int) -> list:
+        # Get accounts that have spent money
+        spenders = [
+            (account_id, total)
+            for account_id, total in self.outgoing.items()
+            if total > 0
+        ]
+        # Sort logic: Higher total first (-x[1]), then alphabetical ID (x[0])
+        spenders.sort(key=lambda x: (-x[1], x[0]))
+
+        # Format the output strings
+        return [f"{account_id}({total})" for account_id, total in spenders[:n]]
+
+Big O Analysis:
+
+MethodTimeSpace
+transferO(1)O(1)
+top_spendersO(A log A)O(A)
+
+A = number of accounts.
+
+Level 3: Future Payments
+
+What You Need to Do
+
+The system needs to handle scheduled payments. Users can set a payment to happen later (timestamp + delay). They can also cancel it before it happens.
+
+def schedule_payment(self, timestamp: int, account_id: str, amount: int, delay: int) -> str:
+    """
+    Plan a payment for the future.
+
+    Returns:
+        A unique ID like "payment1", "payment2".
+        Returns "" if account doesn't exist.
+
+    Rules:
+        - If the account doesn't have money when the payment is due, skip it.
+        - Successful payments count as spending (for top_spenders).
+        - If multiple payments are due at the same time, do the oldest one first.
+    """
+    pass
+
+def cancel_payment(self, timestamp: int, account_id: str, payment_id: str) -> bool:
+    """
+    Stop a scheduled payment.
+
+    Returns:
+        True if cancelled.
+        False if it's too late, already cancelled, or doesn't belong to the account.
+    """
+    pass
+
+Execution Order
+
+This is the most important rule:
+
+Old Tasks First: Before doing anything else (like a deposit or a new transfer), the system must check if any scheduled payments are due.
+
+Current Task: Perform the user's requested action.
+
+This means you can't cancel a payment if it is due right now. It executes before the cancel command runs.
+
+How to Use It
+
+# ... setup acc1 with 1000 ...
+
+# Schedule payment of 500, due at time 103
+pid1 = bank.schedule_payment(3, "acc1", 500, 100)
+
+# Cancel it way before it is due
+bank.cancel_payment(50, "acc1", pid1) # True
+
+# At time 103, nothing happens because it was cancelled.
+
+Level 3 Solution Approach
+
+We use a Min-Heap to store payments. This helps us quickly find the payment with the earliest due date.
+
+We also use a helper function called _process_scheduled. Every public method calls this function first to make sure due payments happen before new actions.
+
+import heapq
+
+class BankSystem:
+    def __init__(self):
+        self.accounts = {}          # account_id -> balance
+        self.outgoing = {}          # account_id -> total outgoing
+        self.payment_counter = 0    # counts total payments created
+        self.scheduled = []         # Min-Heap of pending payments
+        self.cancelled = set()      # IDs of cancelled payments
+        self.executed = set()       # IDs of finished payments
+
+    def _process_scheduled(self, timestamp: int):
+        """Run all payments due by this timestamp."""
+        # While there are payments, and the top one is due...
+        while self.scheduled and self.scheduled[0][0] <= timestamp:
+            due_time, _, payment_id, account_id, amount = heapq.heappop(self.scheduled)
+
+            # If cancelled, ignore it
+            if payment_id in self.cancelled:
+                continue
+
+            self.executed.add(payment_id)
+
+            # Skip if account is gone or poor
+            if account_id not in self.accounts:
+                continue
+            if self.accounts[account_id] >= amount:
+                self.accounts[account_id] -= amount
+                self.outgoing[account_id] += amount
+
+    def create_account(self, timestamp: int, account_id: str) -> bool:
+        self._process_scheduled(timestamp) # Check schedule first
+        if account_id in self.accounts:
+            return False
+        self.accounts[account_id] = 0
+        self.outgoing[account_id] = 0
+        return True
+
+    def deposit(self, timestamp: int, account_id: str, amount: int) -> bool:
+        self._process_scheduled(timestamp) # Check schedule first
+        if account_id not in self.accounts:
+            return False
+        self.accounts[account_id] += amount
+        return True
+
+    def transfer(self, timestamp: int, source_id: str, target_id: str, amount: int) -> bool:
+        self._process_scheduled(timestamp) # Check schedule first
+        if source_id not in self.accounts or target_id not in self.accounts:
+            return False
+        if source_id == target_id:
+            return False
+        if self.accounts[source_id] < amount:
+            return False
+        self.accounts[source_id] -= amount
+        self.accounts[target_id] += amount
+        self.outgoing[source_id] += amount
+        return True
+
+    def top_spenders(self, timestamp: int, n: int) -> list:
+        self._process_scheduled(timestamp) # Check schedule first
+        spenders = [
+            (account_id, total)
+            for account_id, total in self.outgoing.items()
+            if total > 0
+        ]
+        spenders.sort(key=lambda x: (-x[1], x[0]))
+        return [f"{account_id}({total})" for account_id, total in spenders[:n]]
+
+    def schedule_payment(self, timestamp: int, account_id: str, amount: int, delay: int) -> str:
+        self._process_scheduled(timestamp) # Check schedule first
+        if account_id not in self.accounts:
+            return ""
+
+        self.payment_counter += 1
+        payment_id = f"payment{self.payment_counter}"
+        due_time = timestamp + delay
+
+        # Add to heap: (due_time, creation_order, id, account, amount)
+        heapq.heappush(self.scheduled, (due_time, self.payment_counter, payment_id, account_id, amount))
+        return payment_id
+
+    def cancel_payment(self, timestamp: int, account_id: str, payment_id: str) -> bool:
+        self._process_scheduled(timestamp) # Check schedule first
+        if payment_id in self.cancelled or payment_id in self.executed:
+            return False
+
+        # Check if payment exists and belongs to this account
+        for entry in self.scheduled:
+            if entry[2] == payment_id and entry[3] == account_id:
+                self.cancelled.add(payment_id) # Mark as cancelled
+                return True
+        return False
+
+Big O Analysis:
+
+MethodTimeSpace
+schedule_paymentO(log P)O(1)
+cancel_paymentO(P)O(1)
+_process_scheduledO(K log P)O(1)
+
+P = pending payments, K = due payments.
+
+Level 4: Merging and History
+
+What You Need to Do
+
+Two new hard features:
+
+Merge: Combine two accounts. The old account is deleted, and its money moves to the new one.
+
+History: Check what an account's balance was at a specific time in the past.
+
+def merge_accounts(self, timestamp: int, account_id1: str, account_id2: str) -> bool:
+    """
+    Merge account_id2 into account_id1.
+
+    - Add acc2's balance to acc1.
+    - Move acc2's scheduled payments to acc1.
+    - Delete acc2.
+    """
+    pass
+
+def get_balance(self, timestamp: int, account_id: str, time_at: int) -> int:
+    """
+    Find the balance of an account at a past time (time_at).
+
+    - If the account was deleted (merged), you can still check its balance
+      from BEFORE it was deleted.
+    - If the account didn't exist at that time, return -1.
+    """
+    pass
+
+Tricky Cases
+
+Deleted Accounts: Even if acc2 is deleted, we keep its history. get_balance should still work for times when acc2 was alive.
+
+Post-Merge Queries: If you ask for acc2's balance after it was merged, return -1.
+
+Moving Payments: If acc2 had a scheduled payment, acc1 must now pay it.
+
+How to Use It
+
+bank.create_account(1, "acc1")
+bank.deposit(3, "acc1", 1000)
+# acc1 has 1000
+
+bank.merge_accounts(6, "acc1", "acc2")
+# Assume acc2 had 500. Now acc1 has 1500. acc2 is gone.
+
+# Check acc2 history BEFORE the merge
+bank.get_balance(7, "acc2", 5) # Returns 500 (correct)
+
+# Check acc2 history AFTER the merge
+bank.get_balance(8, "acc2", 6) # Returns -1 (it didn't exist)
+
+Level 4 Solution Approach
+
+To solve the history problem, we store a list of (time, balance) for every account. When asked for a past balance, we use Binary Search on this list to find the answer quickly.
+
+import heapq
+
+class BankSystem:
+    def __init__(self):
+        self.accounts = {}
+        self.outgoing = {}
+        self.payment_counter = 0
+        self.scheduled = []
+        self.cancelled = set()
+        self.executed = set()
+
+        # New history tracking
+        self.balance_history = {}   # account_id -> list of (time, balance)
+        self.created_at = {}        # account_id -> creation time
+        self.merged_at = {}         # account_id -> time it was merged (deleted)
+
+    def _record_balance(self, account_id: str, timestamp: int):
+        """Save the current balance to the history list."""
+        if account_id in self.accounts:
+            if account_id not in self.balance_history:
+                self.balance_history[account_id] = []
+            self.balance_history[account_id].append((timestamp, self.accounts[account_id]))
+
+    def _process_scheduled(self, timestamp: int):
+        while self.scheduled and self.scheduled[0][0] <= timestamp:
+            due_time, order, payment_id, account_id, amount = heapq.heappop(self.scheduled)
+            if payment_id in self.cancelled:
+                continue
+            self.executed.add(payment_id)
+            if account_id not in self.accounts:
+                continue
+            if self.accounts[account_id] >= amount:
+                self.accounts[account_id] -= amount
+                self.outgoing[account_id] += amount
+                # Record the balance change
+                self._record_balance(account_id, due_time)
+
+    def create_account(self, timestamp: int, account_id: str) -> bool:
+        self._process_scheduled(timestamp)
+        if account_id in self.accounts:
+            return False
+        self.accounts[account_id] = 0
+        self.outgoing[account_id] = 0
+        self.created_at[account_id] = timestamp
+        self.balance_history[account_id] = [(timestamp, 0)]
+        return True
+
+    def deposit(self, timestamp: int, account_id: str, amount: int) -> bool:
+        self._process_scheduled(timestamp)
+        if account_id not in self.accounts:
+            return False
+        self.accounts[account_id] += amount
+        self._record_balance(account_id, timestamp)
+        return True
+
+    def transfer(self, timestamp: int, source_id: str, target_id: str, amount: int) -> bool:
+        self._process_scheduled(timestamp)
+        if source_id not in self.accounts or target_id not in self.accounts:
+            return False
+        if source_id == target_id:
+            return False
+        if self.accounts[source_id] < amount:
+            return False
+        self.accounts[source_id] -= amount
+        self.accounts[target_id] += amount
+        self.outgoing[source_id] += amount
+        # Record changes for both
+        self._record_balance(source_id, timestamp)
+        self._record_balance(target_id, timestamp)
+        return True
+
+    def top_spenders(self, timestamp: int, n: int) -> list:
+        self._process_scheduled(timestamp)
+        spenders = [
+            (account_id, total)
+            for account_id, total in self.outgoing.items()
+            if total > 0
+        ]
+        spenders.sort(key=lambda x: (-x[1], x[0]))
+        return [f"{account_id}({total})" for account_id, total in spenders[:n]]
+
+    def schedule_payment(self, timestamp: int, account_id: str, amount: int, delay: int) -> str:
+        self._process_scheduled(timestamp)
+        if account_id not in self.accounts:
+            return ""
+        self.payment_counter += 1
+        payment_id = f"payment{self.payment_counter}"
+        due_time = timestamp + delay
+        heapq.heappush(self.scheduled, (due_time, self.payment_counter, payment_id, account_id, amount))
+        return payment_id
+
+    def cancel_payment(self, timestamp: int, account_id: str, payment_id: str) -> bool:
+        self._process_scheduled(timestamp)
+        if payment_id in self.cancelled or payment_id in self.executed:
+            return False
+        for entry in self.scheduled:
+            if entry[2] == payment_id and entry[3] == account_id:
+                self.cancelled.add(payment_id)
+                return True
+        return False
+
+    def merge_accounts(self, timestamp: int, account_id1: str, account_id2: str) -> bool:
+        self._process_scheduled(timestamp)
+        if account_id1 not in self.accounts or account_id2 not in self.accounts:
+            return False
+        if account_id1 == account_id2:
+            return False
+
+        # Move money
+        self.accounts[account_id1] += self.accounts[account_id2]
+        # Merge spending history
+        self.outgoing[account_id1] += self.outgoing[account_id2]
+
+        # Record final snapshot for the account being deleted
+        self._record_balance(account_id2, timestamp)
+        self.merged_at[account_id2] = timestamp
+
+        # Move pending payments from acc2 to acc1
+        new_scheduled = []
+        for entry in self.scheduled:
+            due_time, order, payment_id, acct, amount = entry
+            # If the payment belongs to the deleted account, move it to the new one
+            if acct == account_id2 and payment_id not in self.cancelled:
+                new_scheduled.append((due_time, order, payment_id, account_id1, amount))
+            else:
+                new_scheduled.append(entry)
+
+        # Rebuild the heap with the updated payments
+        self.scheduled = new_scheduled
+        heapq.heapify(self.scheduled)
+
+        # Delete the old account
+        del self.accounts[account_id2]
+        del self.outgoing[account_id2]
+
+        # Record new balance for surviving account
+        self._record_balance(account_id1, timestamp)
+        return True
+
+    def get_balance(self, timestamp: int, account_id: str, time_at: int) -> int:
+        self._process_scheduled(timestamp)
+
+        # 1. Did account ever exist?
+        if account_id not in self.balance_history:
+            return -1
+
+        # 2. Was it created yet?
+        if account_id in self.created_at and self.created_at[account_id] > time_at:
+            return -1
+
+        # 3. Was it already deleted (merged) at that time?
+        if account_id in self.merged_at and self.merged_at[account_id] <= time_at:
+            return -1
+
+        # 4. Find the balance using Binary Search
+        history = self.balance_history[account_id]
+        lo, hi = 0, len(history) - 1
+        result = -1
+
+        while lo <= hi:
+            mid = (lo + hi) // 2
+            if history[mid][0] <= time_at:
+                result = history[mid][1]
+                lo = mid + 1
+            else:
+                hi = mid - 1
+        return result
+
+Big O Analysis:
+
+MethodTimeSpace
+merge_accountsO(P)O(1)
+get_balanceO(log H)O(1)
+
+P = number of pending payments, H = size of account history.
+
+Interview Questions
+
+During the interview, the interviewer might ask these questions:
+
+Why use a Min-Heap for payments?
+
+It lets us grab the "soonest" payment instantly. If we used a normal list, we would have to search the whole list every time.
+
+Why use Binary Search for history?
+
+If an account has 10,000 history entries, checking them one by one is slow. Binary Search is very fast (O(log H)).
+
+How do you handle canceling payments?
+
+Deleting from the middle of a Heap is slow. Instead, we use a "Lazy" approach: we keep it in the Heap but add its ID to a cancelled set. When the Heap pops it out later, we see it's in the set and ignore it.
+
+Big O Analysis
+
+MethodTimeSpace
+create_accountO(1)O(1)
+depositO(1)O(1)
+transferO(1)O(1)
+top_spendersO(A log A)O(A)
+schedule_paymentO(log P)O(1)
+cancel_paymentO(P)O(1)
+merge_accountsO(P)O(1)
+get_balanceO(log H)O(1)
+
+Candidate-Report Notes
+
+Level 2 is the time sink for Java candidates. A PriorityQueue with a custom Comparator is the cleanest implementation but takes more lines than the Python sorted(items, key=...) equivalent. Pre-write a min-heap template if you are using Java.
+
+Level 3 is easiest with a single sorted structure (heap keyed on fire-time) shared across all accounts plus a paymentId -> account reverse map for cancellation. Avoid per-account schedulers — they balloon at Level 4 when accounts merge.
+
+Level 4 looks scary but reduces to: re-key every outstanding payment id and every leaderboard counter from B to A. If your Level 2 stored cumulative spend in a single Map<accountId, long>, the merge is a one-liner; if you stored per-transaction lists it is much more work.
+
+Hidden test counts are small (~10 per level) and the grader is generous on partial credit. Several candidates report passing the loop with only 3 of 4 levels completed.
+
+Alternate canonical variant — Cloud Compute Credits
+
+The same four-level object-design family now appears with workspaces and compute credits instead of bank accounts and money. Timestamps are unique, arrive in strictly increasing order, and range from 1 to 1,000,000,000 milliseconds.
+
+Level 1: implement createWorkspace(timestamp, workspaceId), topUp(timestamp, workspaceId, amount), and transferCredits(timestamp, sourceWorkspaceId, targetWorkspaceId, amount). New workspaces start at zero. A transfer fails when either workspace is missing, the IDs match, or the source lacks credits; a successful transfer returns the source's remaining balance.
+
+Level 2: implement topConsumers(timestamp, n). Rank every active workspace by total outgoing credits descending, then by workspace ID ascending. Outgoing transfers count; incoming transfers and top-ups do not. Return entries as workspaceId(totalOutgoing), including zero-outgoing workspaces when needed to fill the result.
+
+Level 3: implement consume(timestamp, workspaceId, amount) and getChargeStatus(timestamp, workspaceId, chargeId). Each successful consumption creates the next global ID (charge1, charge2, ...), contributes to outgoing credits, and schedules a rebate of floor(amount * 2%) exactly 86,400,000 milliseconds later. Process every rebate due at or before a new operation's timestamp before executing that operation. Charge status is IN_PROGRESS before crediting and REBATE_RECEIVED afterward; reject unknown charges or charges owned by another workspace.
+
+Level 4: implement mergeWorkspaces(timestamp, workspaceId1, workspaceId2) and getCredits(timestamp, workspaceId, timeAt). A merge absorbs the second workspace's balance, outgoing total, charge history, and pending rebates into the first, then removes the second from active operations. Pending rebates must follow the surviving workspace. Historical queries return the balance after the latest operation at or before timeAt, remain valid for a merged-away workspace before its merge timestamp, and return empty before creation or at/after that workspace's merge. The surviving workspace's pre-merge history must not include the absorbed balance retroactively.
+
+This variant replaces scheduled outgoing payments with delayed incoming rebates. Clarify which Level 3 rotation is active before coding; the leaderboard and merge/history scaffolding are shared, but the time-ordered event semantics differ.
+
+Preparation
+
+Time-box Level 1 to ≤15 minutes so you have 55 minutes for the harder three. Most of Level 1 is boilerplate; pre-memorize the data-structure choice (Map of accountId → account object holding balance + spend + a list of scheduled paymentIds).
+
+Drill the Level 2 "top-N by counter" pattern in your interview language until it is muscle memory.
+
+Practice the level-3 scheduled-payment pattern with a heap of (fireTime, paymentId, accountId, amount) tuples and a cancelled set. Solve it once cleanly, then re-solve it adding Level 4's merge on top.
+
+Re-solve the Cloud Compute Credits rotation with a heap of (rebateTime, chargeId, workspaceId, rebateAmount) tuples plus charge-owner and charge-status maps. Before every public operation, drain due rebates; explicitly test a rebate due at the operation timestamp and an amount whose 2% rebate must be rounded down.
+
+Extend that implementation through a merge: redirect pending rebates and charge ownership, combine outgoing totals, and append the merge-time balance changes without rewriting older snapshots. Test historical queries before creation, immediately before the merge, at the merge timestamp, and afterward.
+
+Treat the level-4 merge as a rename / re-pointer exercise, not a rewrite — every data structure should already be keyed by account-id, so merging is updating those keys.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

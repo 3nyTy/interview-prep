@@ -1,0 +1,71 @@
+===H1===
+Customer Request PR Review
+===URL===
+https://www.1point3acres.com/interview/problems/company/jpmorgan/customer-request-pr-review
+===BODY===
+JPMorgan Chase
+Coding·60 minFree preview
+Customer Request PR Review
+Review a production-style customer-request class or PR and identify engineering issues before coding a small algorithm. The recurring critique areas are hard-coded values, single-responsibility violations, global variables, thread safety, low-level concurrency primitives such as `volatile`, and general maintainability.
+SWE
+code-review
+code-reading
+refactoring
+concurrency
+testing
+medium
+Frequency
+High
+Last asked
+2026-07-10
+Stage
+onsite-coding
+Requirements
+
+Read an existing customer-request / service class or PR as if a teammate asked for review before merging.
+
+Leave practical review comments, not just style nits.
+
+Be ready for lightweight syntax and coding-standard issues as well as class-structure critique.
+
+Recurring issues to look for:
+
+hard-coded values and environment-specific constants
+
+too many responsibilities in one class or method
+
+shared mutable global state
+
+thread-safety holes and unclear ownership of mutable variables
+
+low-level concurrency primitives where a standard library abstraction would be safer
+
+external-request handling that lacks timeout, retry, or failure-path clarity
+
+Be ready to discuss each comment aloud: what can break, how severe it is, and what safer implementation you would suggest.
+
+Notes
+
+volatile has appeared as a specific discussion point. The stronger answer is not just "volatile is bad"; explain when visibility differs from atomicity, and suggest higher-level concurrency utilities or synchronization where appropriate.
+
+A recent version emphasized syntax, coding conventions, and class structure more than deep defects.
+
+This round rewards engineering taste. Prioritize correctness, reliability, testability, and maintainability before formatting preferences.
+
+Often paired with a simple algorithm in the same 45-60 minute slot, so keep the review concise enough to leave coding time.
+
+One recent Super Day allowed only 10-15 minutes for a long PR containing many issues before moving directly to a wordy coding prompt. Prioritize the highest-impact findings and explain them crisply.
+
+Preparation
+
+Practice reviewing a 50-100 line Java service class and write comments under four headings: correctness, concurrency, maintainability, and observability.
+
+Be able to explain volatile, atomic classes, locks, immutable data, and executor / queue abstractions in plain English.
+
+Rehearse a review answer format: identify the issue, state the risk, propose a fix, and name the test that would catch it.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

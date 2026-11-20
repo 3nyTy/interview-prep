@@ -1,0 +1,69 @@
+===H1===
+ML System Design: Dynamic K in Retrieval Stage
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/dynamic-k-retrieval-ml-system-design
+===BODY===
+ByteDance / TikTok
+System Design·60 minMembers
+ML System Design: Dynamic K in Retrieval Stage
+Open-ended ML system design for a senior / staff MLE round: in a recommendation stack, design a model or system to dynamically determine `K` — the number of candidates passed from retrieval to ranking — per request, rather than using a static cap.
+MLE
+RS
+mlsd
+retrieval
+ranking
+recommendation
+calibration
+open-ended
+hard
+Frequency
+Single report
+Last asked
+2026-01-28
+Stage
+onsite-system-design · onsite-research
+Requirements
+
+In a recommendation system's retrieval stage, the candidate-set size K (items passed to ranking) is typically a static hyper-parameter. Design a system or model that makes K dynamic per request, rather than a fixed number.
+
+Open prompt — the interviewer expects you to drive the framing. Topics to cover:
+
+Goal metric: how do you measure that the chosen K is "right"? E.g. the fraction of items selected from retrieval that survive into the top-N of ranking (recall@N at downstream).
+
+Model output: should the model directly predict K, or predict per-item probability of being selected by ranking and then derive K?
+
+Features: query features (intent uncertainty, user state), session features (engagement signal so far), retrieval-stage signals (candidate diversity, top-score margin), system features (current ranking-stage budget).
+
+Trade-offs: dynamic-K saves compute on confident queries and spends compute on ambiguous queries; cost is increased system complexity and risk of cascading metric regressions.
+
+Notes
+
+Approach 1: regress K directly. Hard because there is no clean ground-truth label for "optimal K".
+
+Approach 2 (preferred): predict per-candidate selection probability P(survive → top-N) and threshold. K becomes the count above a threshold, which itself is a tunable. This pushes the hard problem onto threshold calibration — easier because thresholds can be A/B-tuned online.
+
+Approach 3: jointly train retrieval + ranking with a learned routing layer that emits both the candidate set and a confidence-weighted budget. Harder to deploy but tightest integration.
+
+Calibration matters: if the per-candidate probability is poorly calibrated, the threshold-derived K will swing wildly. Plan for Platt / isotonic calibration on a holdout.
+
+System-level concern: dynamic K makes downstream latency variable. Cap with a hard K_max to bound worst-case latency for SLAs.
+
+Online learning loop: log (request_features, K_chosen, downstream_metric), retrain weekly; this is the right place to call out shadow-deployment and guardrail metrics.
+
+Preparation
+
+Drill recommendation-stack architecture (retrieval → ranking → re-ranking) from memory; know which stage owns which trade-off.
+
+Practice articulating goal metrics for retrieval — recall@N at the ranking output, precision-at-K within retrieval, hit rate at user-session level.
+
+Be ready to discuss probability calibration: Platt scaling, isotonic regression, temperature scaling for deep models.
+
+Have a fallback architecture if the interviewer pushes back on direct prediction — typically the threshold approach above.
+
+Prepare a one-paragraph A/B plan: bucket by user, compare CTR + latency + ranking-stage cost.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

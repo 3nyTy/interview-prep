@@ -1,0 +1,51 @@
+===H1===
+Dataset Validation (CSV with banned + stop words)
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/dataset-validation-csv
+===BODY===
+Stripe
+Coding·45 minMembers
+Dataset Validation (CSV with banned + stop words)
+Tech-screen string-processing round. Input is a multi-line CSV string. Part 1 validates non-empty fields, Part 2 filters banned words, Part 3 tokenizes specific columns and counts stop-word occurrences.
+SWE
+string
+easy
+Frequency
+Low
+Last asked
+2026-08-13
+Stage
+tech-screen · phone-screen
+Requirements
+
+Input is a single multi-line CSV string. Read it row by row (one report used Java's BufferedReader).
+
+Part 1: validate that each row has no empty string fields; report or drop invalid rows per the spec.
+
+Part 2: given a list of banned words, strip / mask them out of the affected text columns.
+
+Part 3: given a set of stop words, tokenize two designated columns and count total stop-word occurrences across those columns.
+
+Notes
+
+Prompt is reported as long and tricky to parse; reading-comprehension speed is the bottleneck.
+
+Interviewer in the source report was helpful and pulled out the requirements when asked.
+
+This is essentially a string-handling stress test — no real algorithms involved.
+
+Case sensitivity is not always specified consistently. Ask before coding, isolate normalization in a helper, and use the supplied tests as the final contract.
+
+Preparation
+
+Pre-write CSV-by-hand parsers in your language of choice (no pandas).
+
+Practice tokenizing with re.findall(r"\\w+", ...) and case-folding.
+
+Drill on writing 3-part prompts with shared input under 45 minutes — the time risk is reading, not coding.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

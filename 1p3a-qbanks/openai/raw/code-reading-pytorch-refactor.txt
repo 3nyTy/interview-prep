@@ -1,0 +1,48 @@
+===H1===
+Code Reading — 400-line PyTorch Refactor
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/code-reading-pytorch-refactor
+===BODY===
+OpenAI
+Coding·60 minMembers
+Code Reading — 400-line PyTorch Refactor
+A 400+ line PyTorch file is provided; complete 3 parts + 1 bonus. Lots of time/space complexity questions on the existing code. The codebase being modified is the noisy-annotator classifier seen elsewhere in the ML coding rounds.
+RE
+MLE
+code-reading
+pytorch
+Frequency
+Low
+Last asked
+2026-03-09
+Stage
+onsite-coding
+Overview
+
+A 400+ line PyTorch file; complete 3 parts + 1 bonus. The codebase being modified is the noisy-annotator classifier seen in the ML coding rounds — but the format here is code reading + refactoring, not from-scratch implementation.
+
+Examples
+
+"What's the time/space complexity of matrix A @ B?" — interviewers drill complexity questions on the existing code, not just the new code you add.
+
+A recurring stumble: candidates who've never thought past "matmul is O(n³)" get caught out — be ready for follow-ups on attention / conv / batched matmul as well.
+
+Notes
+
+Different from refactoring-style rounds: this round emphasizes understanding existing code + extending it, not bug fixing.
+
+The 400-line file is messy by design; you're judged on how quickly you orient and where you ask questions.
+
+Preparation
+
+Practice quickly reading other people's PyTorch — pick a handful of small-but-real codebases (a single-file GPT, a distributed-training scaffold, a trainer-loop framework) and force yourself to map the call graph in under 20 minutes
+
+Brush up on common op complexities (matmul / conv / attention) — both time and memory
+
+Drill: open an unfamiliar PyTorch repo, give yourself 10 min to explain the data flow
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

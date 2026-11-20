@@ -1,0 +1,1208 @@
+{
+  "company": "bloomberg",
+  "display_name": "Bloomberg",
+  "qbank_count": 34,
+  "questions_scraped": 34,
+  "site_total_count": 119,
+  "oj_count": 85,
+  "external_count": 0,
+  "description": "Bloomberg's loop is a coding-heavy gauntlet: three back-to-back technical rounds each pack two LeetCode-style problems with little hand-holding, plus an HR screen and an engineering manager round that anchors on a single deep project story. The coding bar emphasizes pristine communication — dry-running, edge cases, and complexity discussion are graded as heavily as the solution itself, and interviewers routinely push for second-best alternatives even after a working answer. New-grad and tech-screen verdicts often arrive within hours, while jump-shift onsites favor candidates who can explain past trade-offs without prompting.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/bloomberg",
+  "scraped_at": "2026-09-20",
+  "source": "1point3acres qbank (logged-in session)",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "merge-intervals",
+      "title": "Merge Intervals (LC 56)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-08-07",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "interval",
+        "sorting",
+        "array",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "interval",
+        "sorting",
+        "array",
+        "medium"
+      ],
+      "overview": "Given a collection of intervals, merge every overlapping group and return non-overlapping intervals covering the same ranges. This appeared in a 60-minute phone screen with an explicit dry-run requirement.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/merge-intervals"
+    },
+    {
+      "n": 2,
+      "slug": "duplicate-records-time-window",
+      "title": "Duplicate Records Within a Time Window",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-07-09",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "sliding-window",
+        "dedup",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "sliding-window",
+        "dedup",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Senior phone-screen stream-processing problem: given log records of `id, text, title, timestamp`, emit every record whose content repeats within a 60-second window, with an explicit follow-up to evict expired entries from the tracking structure so memory stays bounded by the window. Candidates often shorthand it as \"the LRU question\", but the real pattern is sliding-window deduplication.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/duplicate-records-time-window"
+    },
+    {
+      "n": 3,
+      "slug": "longest-palindromic-substring",
+      "title": "Longest Palindromic Substring",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-16",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "dp",
+        "two-pointer",
+        "palindromes",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "dp",
+        "two-pointer",
+        "palindromes",
+        "medium"
+      ],
+      "overview": "Find the longest palindromic substring of a string (LeetCode 5). A Bloomberg phone-screen problem asked alongside Validate BST. Expand-around-center is the expected baseline; the 'can you do better' push points at Manacher's O(n).",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/longest-palindromic-substring"
+    },
+    {
+      "n": 4,
+      "slug": "design-underground-system",
+      "title": "Design Underground System",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-16",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "oop-design",
+        "hashmap",
+        "design-implementation",
+        "data-structure",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "oop-design",
+        "hashmap",
+        "design-implementation",
+        "data-structure",
+        "medium"
+      ],
+      "overview": "A variant of Design Underground System (LeetCode 1396): track customer check-in/check-out events keyed by id and report average travel time between station pairs. An onsite coding round that explicitly grades communication during implementation; clarify the variant's twist before coding.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/design-underground-system"
+    },
+    {
+      "n": 5,
+      "slug": "validate-binary-search-tree",
+      "title": "Validate Binary Search Tree",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-16",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "bst",
+        "dfs",
+        "tree-traversal",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "bst",
+        "dfs",
+        "tree-traversal",
+        "medium"
+      ],
+      "overview": "Validate whether a binary tree is a binary search tree (LeetCode 98). A staple Bloomberg phone-screen problem, paired with Longest Palindromic Substring in the same round; the interviewer probes the bounds-based versus in-order approaches and the integer-overflow edge.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/validate-binary-search-tree"
+    },
+    {
+      "n": 6,
+      "slug": "active-users-sliding-window",
+      "title": "Active Users Sliding Window",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-05-03",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "streaming",
+        "sliding-window",
+        "hashmap",
+        "queue",
+        "tree",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "streaming",
+        "sliding-window",
+        "hashmap",
+        "queue",
+        "tree",
+        "medium"
+      ],
+      "overview": "Implement a request-log aggregator that supports adding `(timestamp, userId)` events and returning the number of distinct users active in the last five minutes. The main trap is duplicate users inside the window and whether timestamps are guaranteed to arrive in order.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/active-users-sliding-window"
+    },
+    {
+      "n": 7,
+      "slug": "find-tree-root-from-edges",
+      "title": "Find Tree Root from Edge List",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-02-25",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "graph",
+        "hashmap",
+        "set",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "graph",
+        "hashmap",
+        "set",
+        "easy"
+      ],
+      "overview": "Given an edge list `[node, [children]]` describing a tree of log nodes, find the root — the single node that is never anyone's child. The Bloomberg twist is that the input may include duplicates or noise; treat it as the warm-up before the harder bucketize-by-boundary follow-up.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/find-tree-root-from-edges"
+    },
+    {
+      "n": 8,
+      "slug": "round-robin-tournament-schedule",
+      "title": "Round-Robin Tournament Schedule",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-02-22",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "backtracking",
+        "recursion",
+        "math",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "backtracking",
+        "recursion",
+        "math",
+        "hard"
+      ],
+      "overview": "Given `n` teams, enumerate all valid round-robin schedules where each round pairs every team with a different opponent, every pair plays exactly once across all rounds, and each team plays every other team. Trickier when `n` is odd (a bye must be modeled).",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/round-robin-tournament-schedule"
+    },
+    {
+      "n": 9,
+      "slug": "gas-tank-grid-bfs",
+      "title": "Gas Tank Grid Reachability",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-31",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "bfs",
+        "grid",
+        "state-machine",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "bfs",
+        "grid",
+        "state-machine",
+        "hard"
+      ],
+      "overview": "Walk a 2-D grid from a start to a goal cell with a finite gas budget. Some cells are obstacles, some refuel you to a fixed capacity. Decide whether the goal is reachable. The trap is that gas adds a state dimension — a revisit at higher gas may unlock paths a first visit couldn't.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/gas-tank-grid-bfs"
+    },
+    {
+      "n": 10,
+      "slug": "candy-crush-1d",
+      "title": "Candy Crush 1D",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-22",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "stack",
+        "string-processing",
+        "simulation",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "stack",
+        "string-processing",
+        "simulation",
+        "medium"
+      ],
+      "overview": "One-dimensional Candy-Crush style elimination: collapse runs of three or more equal adjacent values until nothing more can collapse. The Bloomberg twist usually involves a slightly non-standard input format (per-character or per-(value, count) pairs) that makes the obvious LeetCode-style solution fail a test case.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/candy-crush-1d"
+    },
+    {
+      "n": 11,
+      "slug": "equal-character-frequency",
+      "title": "Equal Character Frequency (Remove-One Variant)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-21",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "hashmap",
+        "complexity-analysis",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "hashmap",
+        "complexity-analysis",
+        "medium"
+      ],
+      "overview": "Decide whether all characters in a string occur with the same frequency, then a follow-up: whether removing exactly one character can produce a string in which all surviving characters have equal frequency. The interviewer escalates by demanding better-than-naive time and space.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/equal-character-frequency"
+    },
+    {
+      "n": 12,
+      "slug": "meeting-rooms-ii",
+      "title": "Meeting Rooms II",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-17",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "heap",
+        "interval",
+        "sorting",
+        "sliding-window",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "heap",
+        "interval",
+        "sorting",
+        "sliding-window",
+        "medium"
+      ],
+      "overview": "Given a list of meeting time intervals, return the minimum number of conference rooms required. The canonical sweep / heap problem; Bloomberg likes it in phone screens because the cleanest solution involves either a min-heap of end times or a paired array sweep.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/meeting-rooms-ii"
+    },
+    {
+      "n": 13,
+      "slug": "decode-string",
+      "title": "Decode String",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-08",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "stack",
+        "string-processing",
+        "parsing",
+        "recursion",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "stack",
+        "string-processing",
+        "parsing",
+        "recursion",
+        "medium"
+      ],
+      "overview": "Decode a string encoded with the `k[encoded_string]` repetition rule, supporting arbitrary nesting and multi-digit counts. A staple Bloomberg phone-screen problem where the interviewer pushes for the clean stack-based solution and explicit complexity reasoning.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/decode-string"
+    },
+    {
+      "n": 14,
+      "slug": "todo-list-oop",
+      "title": "Todo List OOP Design",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-04",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "oop-design",
+        "hashmap",
+        "linked-list",
+        "data-structure",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "oop-design",
+        "hashmap",
+        "linked-list",
+        "data-structure",
+        "medium"
+      ],
+      "overview": "Design a small Todo-list service supporting `add`, `delete`, `get_todo` (pending only), and `get_all`, given a `check_todo(id)` predicate that tells you whether an entry is already done. Coding-flavored OOD round — pick data structures that make every operation cheap.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/todo-list-oop"
+    },
+    {
+      "n": 15,
+      "slug": "wordle-character-compare",
+      "title": "Wordle Character Compare",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-04",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "hashmap",
+        "simulation",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "hashmap",
+        "simulation",
+        "medium"
+      ],
+      "overview": "Given a guess and a target word of equal length, color each guess letter: green for correct letter and position, yellow for correct letter wrong position, gray otherwise — but obey Wordle's nuanced \"each target letter can be matched at most once\" rule.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/wordle-character-compare"
+    },
+    {
+      "n": 16,
+      "slug": "string-to-integer-atoi",
+      "title": "String to Integer (atoi)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-04",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string-processing",
+        "parsing",
+        "math",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string-processing",
+        "parsing",
+        "math",
+        "medium"
+      ],
+      "overview": "Implement a robust `atoi` that parses an optional sign, leading whitespace, and digit run, clamping to the 32-bit signed range. Bloomberg uses it as a phone-screen warm-up where overflow handling and a few targeted edge cases distinguish strong candidates.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/string-to-integer-atoi"
+    },
+    {
+      "n": 17,
+      "slug": "binary-tree-vertical-order-traversal",
+      "title": "Binary Tree Vertical Order Traversal",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-04",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "bfs",
+        "tree-traversal",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "bfs",
+        "tree-traversal",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Group binary-tree node values by their column index (left of root negative, right positive) and return columns left-to-right, with each column's values in top-to-bottom level order. Watch the tie-break rule for nodes at the same column and row.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/binary-tree-vertical-order-traversal"
+    },
+    {
+      "n": 18,
+      "slug": "trapping-rain-water",
+      "title": "Trapping Rain Water",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-11-24",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "two-pointer",
+        "array",
+        "monotonic-stack",
+        "dp",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "two-pointer",
+        "array",
+        "monotonic-stack",
+        "dp",
+        "hard"
+      ],
+      "overview": "Given an elevation map of non-negative bar heights, compute how much water can be trapped after raining. Bloomberg interviewers commonly insist on the two-pointer `O(1)`-space solution after a stack or DP answer.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/trapping-rain-water"
+    },
+    {
+      "n": 19,
+      "slug": "simplified-grep",
+      "title": "Simplified Grep",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-11-22",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string-processing",
+        "object-design",
+        "io",
+        "ambiguous-spec",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string-processing",
+        "object-design",
+        "io",
+        "ambiguous-spec",
+        "medium"
+      ],
+      "overview": "Implement a simplified `grep`: scan a file line by line and emit lines containing a target substring, with extensibility for additional flags (case-insensitive, invert match, line numbers). Graded for clean parsing and extensible code shape, not raw algorithm.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/simplified-grep"
+    },
+    {
+      "n": 20,
+      "slug": "friends-of-appropriate-ages",
+      "title": "Friends Of Appropriate Ages",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-11-22",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "hashmap",
+        "math",
+        "prefix-sum",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "hashmap",
+        "math",
+        "prefix-sum",
+        "medium"
+      ],
+      "overview": "Given an array of ages, count the number of valid friend requests under the rule that person A will request person B iff B's age is in `(0.5*A + 7, A]`. Bloomberg insists on the `O(σ^2)` bucket-frequency solution over the naive `O(n^2)`.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/friends-of-appropriate-ages"
+    },
+    {
+      "n": 21,
+      "slug": "shortest-path-with-k-wall-breaks",
+      "title": "Shortest Path in Grid with K Wall Breaks",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-08-07",
+      "stage": "onsite-coding · phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "bfs",
+        "grid",
+        "state-machine",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "bfs",
+        "grid",
+        "state-machine",
+        "hard"
+      ],
+      "overview": "Find the shortest path from the top-left to the bottom-right of a binary grid, allowed to eliminate at most `k` obstacle cells along the way. Standard BFS plus a `remaining-breaks` state dimension.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/shortest-path-with-k-wall-breaks"
+    },
+    {
+      "n": 22,
+      "slug": "lru-cache",
+      "title": "LRU Cache",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-07-28",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-structure",
+        "linked-list",
+        "hashmap",
+        "caching",
+        "concurrency",
+        "refactoring",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "linked-list",
+        "hashmap",
+        "caching",
+        "concurrency",
+        "refactoring",
+        "medium"
+      ],
+      "overview": "Implement a fixed-capacity LRU cache supporting `get` and `put` in O(1). Bloomberg asks it both as a standard cache implementation and as an OOP design discussion, with follow-ups around thread safety, persistence, eviction callbacks, TTL, and class boundaries. In the AI-role R2 phone screen, the implementation may be provided and the task becomes refactoring it behind a generic eviction-policy abstraction that can also accommodate LFU.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/lru-cache"
+    },
+    {
+      "n": 23,
+      "slug": "minimum-cost-flight-split",
+      "title": "Minimum Cost Flight Split",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-06-04",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "greedy",
+        "sorting",
+        "array",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "greedy",
+        "sorting",
+        "array",
+        "medium"
+      ],
+      "overview": "Schedule exactly half of `n` people to fly to San Francisco and the rest to New York, minimizing total travel cost. The follow-up changes the split to `k` people for one city and may require implementing the DP baseline rather than only the greedy shortcut.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/minimum-cost-flight-split"
+    },
+    {
+      "n": 24,
+      "slug": "subway-network-connectivity",
+      "title": "Subway / Network Connectivity",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-02-25",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "graph",
+        "union-find",
+        "bfs",
+        "dfs",
+        "testing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "graph",
+        "union-find",
+        "bfs",
+        "dfs",
+        "testing",
+        "medium"
+      ],
+      "overview": "Given a network of subway stations described as adjacency data, build a function that returns whether any two given stations are connected. Tests graph modeling, choice between BFS / DFS / Union-Find, and how to scale across many queries.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/subway-network-connectivity"
+    },
+    {
+      "n": 25,
+      "slug": "top-k-frequent-stock-tickers",
+      "title": "Top-K Frequent Tickers (Stock Leaderboard)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-01-26",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-structure",
+        "hashmap",
+        "heap",
+        "top-k",
+        "streaming",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "hashmap",
+        "heap",
+        "top-k",
+        "streaming",
+        "medium"
+      ],
+      "overview": "Design a data structure that supports inserting stock ticker symbols (or transactions), removing them, and returning the current top-K most-frequent tickers. Bloomberg's house variant: emphasizes API-rate awareness and explicit input / output formats rather than the textbook LeetCode \"return top K\" snapshot.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/top-k-frequent-stock-tickers"
+    },
+    {
+      "n": 26,
+      "slug": "flatten-multilevel-doubly-linked-list",
+      "title": "Flatten a Multilevel Doubly Linked List",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-01-22",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Free preview",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "linked-list",
+        "dfs",
+        "recursion",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "linked-list",
+        "dfs",
+        "recursion",
+        "medium"
+      ],
+      "overview": "Flatten a doubly linked list whose nodes carry an extra child pointer into a single-level doubly linked list, in-place. A long-running Bloomberg classic that appears in phone screens and onsite rounds alike.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/flatten-multilevel-doubly-linked-list"
+    },
+    {
+      "n": 27,
+      "slug": "lottery-system-insert-delete-getrandom",
+      "title": "Lottery System / Insert Delete GetRandom O(1)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-01-22",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-structure",
+        "hashmap",
+        "array",
+        "sampling",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "hashmap",
+        "array",
+        "sampling",
+        "medium"
+      ],
+      "overview": "Design a data structure for a lottery that supports adding a participant, removing a participant, and randomly picking a winner — all in O(1). Appears framed both as the classic LeetCode problem and as a product story about a raffle / random pick.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/lottery-system-insert-delete-getrandom"
+    },
+    {
+      "n": 28,
+      "slug": "word-search-grid",
+      "title": "Word Search in 2D Grid",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-01-01",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "dfs",
+        "backtracking",
+        "grid",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "dfs",
+        "backtracking",
+        "grid",
+        "medium"
+      ],
+      "overview": "Given an m×n board of characters and a target word, decide whether the word exists in the board as a path of horizontally or vertically adjacent cells, without reusing any cell. Bloomberg interviewers consistently push DFS over BFS here because BFS blows memory on long words.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/word-search-grid"
+    },
+    {
+      "n": 29,
+      "slug": "vwap-analytic-provider",
+      "title": "VWAP Analytic Provider",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-07-07",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "streaming",
+        "sharding",
+        "pubsub",
+        "websocket",
+        "ingestion",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "streaming",
+        "sharding",
+        "pubsub",
+        "websocket",
+        "ingestion",
+        "hard"
+      ],
+      "overview": "Team-loop system-design round: ingest trade ticks from 100 exchanges (100K–1M symbols each, ~100 ticks/sec per symbol, ~20 bytes per tick), maintain per-(symbol, window) VWAP in a sharded stateful engine, and serve ~100K screen users via push and ~1K enterprise users via API. Expected beats: per-exchange feed handlers normalizing to a canonical tick, symbol sharding with running sums, snapshot/changelog recovery, and a pub/sub → WebSocket / Redis / query-API delivery tier.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/vwap-analytic-provider"
+    },
+    {
+      "n": 30,
+      "slug": "holiday-service-latency-optimization",
+      "title": "Holiday Service Latency Optimization",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-07-07",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "caching",
+        "service-design",
+        "distributed-systems",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "caching",
+        "service-design",
+        "distributed-systems",
+        "medium"
+      ],
+      "overview": "Team-loop system-design round: a thin Holiday Service sits between a C++ client library and a lower-level data service owned by another team, exposing `getData(countryCode, year)` and reformatting dates. The round pivots on one follow-up — end-to-end requests take ~150 ms and clients want materially less — pushing the discussion into multi-tier caching, prefetch/sync, and what the client SDK can absorb.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/holiday-service-latency-optimization"
+    },
+    {
+      "n": 31,
+      "slug": "real-time-market-data-system",
+      "title": "Real-time Market Data System",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-16",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "distributed-systems",
+        "messaging",
+        "ingestion",
+        "dedup",
+        "streaming",
+        "scaling",
+        "storage",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "distributed-systems",
+        "messaging",
+        "ingestion",
+        "dedup",
+        "streaming",
+        "scaling",
+        "storage",
+        "hard"
+      ],
+      "overview": "Design Bloomberg's real-time market-data distribution: upstream exchanges → Loader servers → UDP fan-out of multiple copies → Processor servers that rebuild reliability (loss, duplicates, ordering) at the application layer, then dedup, store, and serve to connected subscribers. A domain-core onsite SD prompt.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/real-time-market-data-system"
+    },
+    {
+      "n": 32,
+      "slug": "streaming-social-media-mentions-aggregation",
+      "title": "Streaming Social-Media Mentions & Aggregation",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-02-22",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "streaming",
+        "kafka",
+        "ingestion",
+        "search",
+        "feed",
+        "notification",
+        "scaling",
+        "ambiguous-spec",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "streaming",
+        "kafka",
+        "ingestion",
+        "search",
+        "feed",
+        "notification",
+        "scaling",
+        "ambiguous-spec",
+        "hard"
+      ],
+      "overview": "Design a system that ingests a stream of social posts and news articles, extracts company / ticker mentions, supports windowed visualizations from minutes to days, lets users subscribe to entities and get notifications, and supports keyword search across the raw corpus at very high QPS. A wide-scope SD prompt typical of the open-ended Bloomberg onsite round.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/streaming-social-media-mentions-aggregation"
+    },
+    {
+      "n": 33,
+      "slug": "trade-processor-subscribe-unsubscribe",
+      "title": "Trade Processor with Subscribe / Unsubscribe",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-11-27",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "oop-design",
+        "design-implementation",
+        "pubsub",
+        "concurrency",
+        "ambiguous-spec",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "oop-design",
+        "design-implementation",
+        "pubsub",
+        "concurrency",
+        "ambiguous-spec",
+        "hard"
+      ],
+      "overview": "Implement a `TradeProcessor` that accepts incoming trades, lets clients subscribe to trades matching a filter with a callback, returns a handle for the subscription, and supports unsubscription. A coding-flavored design round where the prompt is deliberately under-specified — clarification is half the work.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/trade-processor-subscribe-unsubscribe"
+    },
+    {
+      "n": 34,
+      "slug": "behavioral-question-pool",
+      "title": "Behavioral Question Pool",
+      "category": "behavioral",
+      "duration": "45 min",
+      "frequency": "High",
+      "last_asked": "2026-06-16",
+      "stage": "recruiter-screen · phone-screen · onsite-bq · final-round",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "behavioral",
+        "star",
+        "why-company",
+        "deep-dive",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "behavioral",
+        "star",
+        "why-company",
+        "deep-dive",
+        "easy"
+      ],
+      "overview": "Bloomberg interleaves short behavioral prompts into every round — recruiter screen, each technical round (10–15 minutes at the top), HR round, and the EM final. The pool is small and recycled; preparing five strong STAR stories covers most prompts.",
+      "source_count": 8,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/bloomberg/behavioral-question-pool"
+    }
+  ]
+}

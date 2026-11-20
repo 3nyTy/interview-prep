@@ -1,0 +1,66 @@
+===H1===
+Robot Status Message Deduplication Window
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/robot-status-message-deduplication
+===BODY===
+Google
+Coding·45 minMembers
+Robot Status Message Deduplication Window
+Process timestamped robot messages and display a message only when it has not been displayed within the prior 10 seconds. Hidden arrivals do not refresh the last-displayed timestamp, and the exact 10-second boundary must be clarified.
+SWE
+hashmap
+simulation
+easy
+Frequency
+Low
+Last asked
+2026-09-10
+Stage
+onsite-coding
+Requirements
+
+Process a stream of (time, message) status events from a robot.
+
+If the same message was displayed within the past 10 seconds, hide the new event.
+
+Otherwise display it and update that message's last-displayed time.
+
+Track the last time each message was displayed, not the last time it was received. A hidden duplicate must not refresh the window.
+
+Clarify whether an event exactly 10 seconds after the prior display is allowed: the comparison may be > 10 or >= 10.
+
+Logger API variant
+
+Implement shouldPrintMessage(timestamp, message), returning true when the message has not been printed in the past 10 seconds and false otherwise.
+
+Handle timestamps arriving out of order, including timestamp 12 arriving before timestamp 10.
+
+Examples
+
+time=10, message="solar panel activated" -> show
+
+time=13, message="solar panel activated" -> hide
+
+time=21, message="solar panel activated" -> show
+
+The event at 21 compares against the display at 10, not the hidden arrival at 13.
+
+Notes
+
+The state transition occurs only on a displayed event. Updating on every receipt changes the semantics and can suppress a frequently repeated message forever.
+
+Resolve the exact-boundary rule before coding and make the comparison match that contract.
+
+For out-of-order arrival, clarify how the 10-second interval applies to late events and whether an earlier print decision can ever be revisited. These semantics are not specified by the logger variant; do not assume the chronological-stream contract resolves them.
+
+Preparation
+
+Implement the stream processor with per-message state, then trace repeated and interleaved messages by hand.
+
+Write tests for the first occurrence, an event just inside the window, exactly at the boundary, just outside it, and a hidden event followed by an allowed display.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

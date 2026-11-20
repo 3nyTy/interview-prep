@@ -1,0 +1,92 @@
+===H1===
+Multithreaded BankAccount Race-Condition Bug Hunt
+===URL===
+https://www.1point3acres.com/interview/problems/company/xai/multithreaded-bank-account-bug-hunt
+===BODY===
+xAI
+Coding·15 minFree preview
+Multithreaded BankAccount Race-Condition Bug Hunt
+Inside a 15-minute video screen, the interviewer pastes a small `BankAccount` class with a buggy `deposit` method and asks you to find and fix every concurrency issue. The base bug is a classic read-sleep-write race; the follow-up presses you to rewrite the class without modifying it in place (subclass / wrap), which is where most candidates stumble.
+SWE
+Infra Eng
+concurrency
+threading
+race-condition
+python
+easy
+Frequency
+Low
+Last asked
+2026-04-04
+Stage
+phone-screen · tech-screen
+Requirements
+
+Given a BankAccount and a driver that submits two concurrent deposits:
+
+class BankAccount:
+    def __init__(self, balance):
+        self.balance = balance
+
+    def deposit(self, amount):
+        new_balance = self.balance + amount   # read
+        time.sleep(0.1)                       # delay
+        self.balance = new_balance            # write
+
+account = BankAccount(0)
+with ThreadPoolExecutor(max_workers=2) as executor:
+    futures = [
+        executor.submit(account.deposit, 500),
+        executor.submit(account.deposit, 700),
+    ]
+
+You must:
+
+Identify every concurrency bug.
+
+Produce a thread-safe version.
+
+Do not modify the original BankAccount in place — the interviewer wants a wrapper / subclass that adds locking without touching the existing class. Copy-pasting the class body and editing it is rejected.
+
+Be ready to discuss how the answer changes in Go (no inheritance — embedding required) since some teams use Go in production.
+
+Examples
+
+The deterministic failure mode interviewers want you to articulate:
+
+Thread 1: read balance = 0, computes new = 500
+Thread 2: read balance = 0, computes new = 700
+Thread 1: writes 500
+Thread 2: writes 700
+final balance = 700  (expected 1200)
+
+Notes
+
+Bug #1 is the read-modify-write race created by the explicit sleep between read and write.
+
+Bug #2 is the absence of any synchronization primitive — even without the sleep, the assignment is not atomic across the read.
+
+The accepted fix is a subclass / decorator that wraps deposit in a threading.Lock. Reusing the parent's code via copy-paste is explicitly rejected ("don't reuse code"); use super().deposit(...) or a delegating wrapper.
+
+If the interviewer steers you toward Go, mention struct embedding plus an embedded sync.Mutex; flag that you cannot wrap deposit without re-declaring it on the embedding type.
+
+The interviewer typically gives almost no feedback during the round; treat silence as a cue to keep narrating, not a cue to second-guess your fix.
+
+Preparation
+
+Drill the read-sleep-write race by hand until you can name and fix it inside 90 seconds.
+
+Practice writing a class SafeAccount(BankAccount): wrapper that overrides deposit with a with self._lock: block delegating to super().deposit.
+
+Know the equivalent Go embedding pattern: type SafeAccount struct { *BankAccount; mu sync.Mutex } and why you must re-declare the method on the wrapper.
+
+Be able to explain why time.sleep widens the race window but is not the root cause — even without it, the operation is unsafe.
+
+The canonical guard pattern in Python is with self._lock: (context-manager form of Lock.acquire() / Lock.release()), which guarantees release on exception. Use threading.RLock instead when the wrapped method may re-enter itself (e.g. deposit calling another locked method on the same instance) — a plain Lock would deadlock the same thread on the second acquire.
+
+Whether Lock or RLock, hold the lock around the entire read-modify-write critical section, not just around the assignment — locking only the write still races with another thread's read.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

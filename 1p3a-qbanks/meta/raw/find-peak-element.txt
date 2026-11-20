@@ -1,0 +1,54 @@
+===H1===
+Find Peak Element
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/find-peak-element
+===BODY===
+Meta
+Coding·40 minMembers
+Find Peak Element
+LeetCode 162. Binary search for any peak in an array where `nums[i] != nums[i+1]`. Edge-handling at boundaries is the differentiator.
+SWE
+MLE
+Infra Eng
+binary-search
+array
+medium
+Frequency
+Medium
+Last asked
+2026-08-16
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Return the index of any peak (element greater than both neighbors; out-of-bounds neighbors treated as -inf).
+
+O(log n) binary search: if nums[mid] < nums[mid+1], search right half; else search left half (inclusive).
+
+2D variant follow-up: LeetCode 1901 — binary search on columns, scan column for max.
+
+Local-minimum variant: find a value smaller than its neighbors using an iterative approach. The interviewer may also ask you to minimize the number of conditional branches.
+
+Notes
+
+Common bug: handling the right boundary when mid + 1 is out of bounds.
+
+2D follow-up appears in onsite rounds, not phone screens.
+
+For the local-minimum variant, clarify whether endpoints are eligible, whether comparisons are strict, and whether adjacent equal values are allowed. A strict local minimum need not exist when duplicates are allowed.
+
+A boundary-search implementation can accidentally revisit the same region. State the shrinking invariant clearly, dry-run both endpoints, and handle equality according to the agreed contract.
+
+Preparation
+
+Write the 1D binary search in <8 min with the boundary invariant proved.
+
+Drill LeetCode 1901 if you're aiming for E5+.
+
+Rework the iterative local-minimum variant with as few branch cases as possible, then test both boundaries and a minimum in the middle.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

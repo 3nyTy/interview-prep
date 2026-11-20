@@ -1,0 +1,82 @@
+===H1===
+Palindrome Ancestor Path Queries
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/palindrome-ancestor-path-queries
+===BODY===
+Uber
+CodingMembers
+Palindrome Ancestor Path Queries
+Hierarchical data is stored as a tree of character-labeled nodes rooted at node 0. For each query node, count how many ancestors (including the node itself) form a path string whose characters can be rearranged into a palindrome.
+SWE
+tree
+dfs
+bitmask
+palindromes
+hashmap
+prefix-sum
+hard
+Frequency
+Single report
+Last asked
+2026-01-21
+Stage
+oa
+Palindrome Ancestor Path Queries
+
+A disk stores hierarchical data as an undirected tree with treeNodes nodes numbered from 0 to treeNodes - 1, rooted at node 0.
+
+You are given a string s of length treeNodes, where s[i] is the lowercase character stored at node i.
+
+The tree is described by two arrays treeFrom and treeTo, each of length treeNodes - 1, where treeFrom[i] and treeTo[i] are the endpoints of the ith undirected edge.
+
+You are also given an array queries. For each query node q, count how many nodes v on the path from q to the root (including q itself) have the property that the characters on the path from q to v can be rearranged into a palindrome.
+
+Return an array answer where answer[i] is the result for queries[i].
+
+A multiset of characters can be rearranged into a palindrome if and only if at most one character has an odd frequency.
+
+Examples
+
+Example 1:
+
+Input: treeNodes = 4, s = "zaaa", treeFrom = [0,0,1], treeTo = [1,2,3], queries = [3]
+
+Output: [3]
+
+Explanation:
+
+For query node 3, the valid ancestors are 3, 1, and 0 because the path strings are "a", "aa", and "aza".
+
+Example 2:
+
+Input: treeNodes = 5, s = "abaca", treeFrom = [0,0,1,1], treeTo = [1,2,3,4], queries = [3,4,2,0]
+
+Output: [1,2,2,1]
+
+Explanation:
+
+For 3, only "c" works. For 4, both "a" and "aba" work. For 2, both "a" and "aa" work. The root query always contributes at least itself.
+
+Constraints
+
+1 <= treeNodes <= 10^5
+
+s.length == treeNodes
+
+treeFrom.length == treeTo.length == treeNodes - 1
+
+1 <= queries.length <= 10^5
+
+0 <= treeFrom[i], treeTo[i] < treeNodes
+
+0 <= queries[i] < treeNodes
+
+s consists of lowercase English letters
+
+The edges form a valid tree rooted at node 0
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

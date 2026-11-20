@@ -1,0 +1,67 @@
+===H1===
+MLSD — Reels / Short Video Recommendation
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/mlsd-reels-short-video-recommendation
+===BODY===
+Meta
+System Design·45 minMembers
+MLSD — Reels / Short Video Recommendation
+Design the Reels short-video recommender. Four-stage retrieval → pre-rank → rank → re-rank scaffold is table stakes; differentiation is in features, metrics, and A/B-test design.
+MLE
+RS
+RE
+mlsd
+recommendation
+two-tower
+mmoe
+ab-testing
+hard
+Frequency
+Medium
+Last asked
+2026-06-09
+Stage
+onsite-system-design
+Requirements
+
+Functional: serve a personalized feed of short videos to each user; optimize for engagement (watch-time, completion, share).
+
+Four-stage scaffold (expected to be present from minute 1):
+
+Retrieval / candidate generation: Two-Tower model or ANN over embeddings; collaborative + content signals.
+
+Pre-rank: lightweight DCN-V2 / DLRM to cut from ~10k candidates to ~hundreds.
+
+Rank: heavy model — DCN-V2 + MMoE for multi-task (CTR, complete-rate, comment-rate, share-rate).
+
+Re-rank: business rules + diversity (MMR) + exploration (epsilon-greedy / Thompson sampling).
+
+Features: user (demographics, recent watch history), video (creator, topic, age, embeddings), interaction (cross features), context (time, device), social (GraphSAGE on friend graph).
+
+Metrics: online A/B (watch-time, daily-active, retention); offline (AUC, recall@k, NDCG); calibration.
+
+Bias mitigation: position bias via IPW; training/serving skew monitoring; feedback-loop dampening.
+
+Cold start: content-based fallback for new users/videos; explore bandits.
+
+Notes
+
+Reports note interviewers now care more about metric design, online + offline eval, and feature engineering than about novel architecture. Lead with metrics, not models.
+
+One candidate's session focused entirely on A/B test design and feature collection — be ready for that emphasis.
+
+Preparation
+
+Memorize the 4-stage diagram so you can draw and annotate it in 3 minutes.
+
+Prep a metric tree: north-star (DAU retention) → proxy (watch-time, completion) → model objective (CTR, MMoE heads) → guardrails (sessions, complaints).
+
+Drill A/B-test design: hypothesis, randomization unit, MDE / sample-size, segment cuts, novelty effect.
+
+Practice the position-bias + IPW pitch.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

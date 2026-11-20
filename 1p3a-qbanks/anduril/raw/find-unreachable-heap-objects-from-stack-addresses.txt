@@ -1,0 +1,74 @@
+URL: https://www.1point3acres.com/interview/problems/de2532f4-133e-527d-888e-20ebbb0cf406
+Captured: 2026-09-21
+
+Toggle Sidebar
+Popular Questions
+Details
+Search companies, questions, guides…⌘KInterview Copilot中
+Find Unreachable Heap Objects from Stack Addresses
+Related Discussion
+anduril
+Problem: Find Unreachable Heap Objects from Stack Addresses
+
+You are given a list of addresses stored on the stack, stack_addresses, and a list of heap objects, heap_objects. Each heap object only has one field, its address:
+
+class HeapObject:
+    def __init__(self, address: int):
+        self.address = address
+
+Implement:
+
+def dead_objects(stack_addresses: List[int], heap_objects: List[HeapObject]) -> List[HeapObject]:
+
+Return all heap objects that are not directly reachable from the stack. In other words, if a heap object's address is not contained in stack_addresses, then it is a dead object.
+
+Assumptions
+
+Addresses in heap_objects are unique.
+
+The result should preserve the original order of heap_objects.
+
+stack_addresses may contain addresses that do not correspond to any heap object.
+
+Input Format
+
+For testing, use the following stdin format:
+
+n m
+s1 s2 ... sn
+h1
+h2
+...
+hm
+
+Where:
+
+n is the number of stack addresses.
+
+m is the number of heap objects.
+
+The second line contains n integers representing stack_addresses. If n = 0, this line may be empty.
+
+The next m lines each contain one integer representing a heap object's address.
+
+Output Format
+
+Print the addresses of all dead objects in the original heap_objects order, separated by spaces. If there are no dead objects, print an empty line.
+
+Constraints
+
+0 <= n, m <= 10^5
+
+Addresses are 32-bit signed integers.
+
+Example
+Unlock to view complete problem details
+and practice with sample input/output
+Unlock with Membership
+Was this article helpful?
+Python 3Java12px14px16px18px20px22px24px
+View Test Cases & Run Code requires membership
+Unlock with Membership
+Standard Input
+RunHistory
+Execution Result:

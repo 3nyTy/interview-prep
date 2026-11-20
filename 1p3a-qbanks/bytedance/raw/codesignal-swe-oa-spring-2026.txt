@@ -1,0 +1,86 @@
+===H1===
+CodeSignal SWE OA (Spring 2026 Bank)
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/codesignal-swe-oa-spring-2026
+===BODY===
+ByteDance / TikTok
+Coding·70 minMembers
+CodeSignal SWE OA (Spring 2026 Bank)
+TikTok's Spring 2026 SWE intern OA on CodeSignal: 4 problems covering memory allocator simulation, alternating-parity zigzag counting, charging-station relay, and constrained text justification.
+SWE
+simulation
+sliding-window
+greedy
+string-processing
+codesignal
+oa
+hard
+Frequency
+Low
+Last asked
+2026-03-17
+Stage
+oa
+Requirements
+
+Four-problem CodeSignal bank reported on consecutive SWE / SDE intern OAs during winter 2025 and spring 2026. Sub-problems below; each is roughly 15-20 minutes inside the 70-minute window.
+
+Q1 — Memory Allocator
+
+Given a binary memory array (0 = free, 1 = occupied) with 8-byte alignment, implement two operations:
+
+alloc x: find the leftmost slot whose start index is a multiple of 8 with at least x consecutive free cells. Mark them occupied with a fresh integer ID (auto-incrementing) and return the start index. Return -1 if no slot fits.
+
+erase id: free every cell currently tagged with id, return the count cleared.
+
+Q2 — Zigzag (Alternating-Parity) Subarrays
+
+Given an integer array, count every contiguous subarray whose adjacent elements have differing parity (odd/even alternating). Single elements count as length-1 zigzag sequences.
+
+Q3 — Drone Relay to Target
+
+Starting at position 0 toward integer target. At certain positions you may drop a package onto a drone that flies it forward exactly 10 units. You walk to the next available relay point, pay the cost equal to the distance walked, then jump forward via the drone. Sum the total walking distance until you reach or pass target.
+
+Q4 — Two-Direction Justified Newspaper Layout
+
+Given paragraphs, each with a left-or-right alignment flag, plus a max line width width, lay out the words greedily to fill each line. Pad short lines on the indicated side with spaces. Wrap the whole layout in a * border and return the rendered page.
+
+Earlier (Dec 2025) OA Variant
+
+The same slot earlier in the cycle reported these four:
+
+Triplet counting in a string with sliding window / two-pointer
+
+Min-jump on an integer array, max jump size 10, return total steps to reach target
+
+Round-robin packaging across centers with per-index capacity arrays; return the final center filled
+
+Sawtooth construction from an array
+
+Notes
+
+All four spring problems are simulation-heavy: write helpers carefully (index alignment, parity counter, layout buffer) and test each in isolation before assembling.
+
+Q2's zigzag count has a O(n) running-streak trick: maintain cur as the current alternating run length; on each step add cur to the total. Avoid the O(n²) enumerate-all-substrings trap.
+
+Q3 is greedy: from the current position, find the next reachable relay point in sorted order, charge the walking distance, then jump 10 units forward; repeat.
+
+Q4 is two-passes: greedy word-packing per line, then per-line padding with the alignment flag.
+
+CodeSignal grades on hidden test cases, so over-cover your edge cases: empty array, single element, target already at zero, alignment flag that flips per paragraph.
+
+Preparation
+
+Drill simulation patterns: maintain explicit state, write a tick() per step, log intermediate state for visual debugging.
+
+For Q2, internalize the streak-accumulator pattern — it appears in many "count substrings with property X" problems.
+
+For Q4, write a pack_words(words, width) helper once and reuse it; the alignment-padding logic is a thin shell over a working packer.
+
+Practice tracing each problem by hand on a 5-7 element input before coding — CodeSignal punishes silent off-by-ones harshly.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

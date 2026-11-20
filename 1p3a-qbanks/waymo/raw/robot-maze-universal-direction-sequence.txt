@@ -1,0 +1,66 @@
+===H1===
+Universal Direction Sequence for an Unknown-Position Robot in a Maze
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/robot-maze-universal-direction-sequence
+===BODY===
+Waymo
+Coding·45 minMembers
+Universal Direction Sequence for an Unknown-Position Robot in a Maze
+Onsite DSA from an ex-Google interviewer. A 2-D maze contains walls, empty cells, and a single exit `E`. A robot moves up / down / left / right but stays in place when it hits a wall. Without knowing the robot's starting cell, produce a *single fixed* sequence of moves that lands the robot on `E` regardless of where it started. Solution exists by assumption.
+SWE
+bfs
+grid
+state-machine
+algorithm-design
+hard
+Frequency
+Single report
+Last asked
+2026-05-13
+Stage
+onsite-coding
+Requirements
+
+Input: a 2-D grid with walls (#), empty cells (.), and a single exit E. E is reachable from every empty cell.
+
+A robot moves one step per command (up / down / left / right). If the next cell is a wall or out-of-bounds, the robot stays in place; otherwise it moves.
+
+Output: a single sequence of commands such that, regardless of which empty cell the robot starts in, executing the full sequence ends at E.
+
+The robot does not see the maze and the candidate does not learn its starting position; the same fixed sequence must work for all starts.
+
+Notes
+
+Key reframing: track the set of possible robot positions instead of a single robot. Start with current = {all empty cells}. After each command, current shrinks (some positions stay put, others advance, and walls collapse multiple positions onto one cell). The sequence is complete when current = {E}.
+
+This is a BFS in 'state space' where each state is a frozen set of cells. Edges are the four commands. The action space per state is 4; the state count is bounded by 2^(grid cells) in the worst case but in practice the set shrinks fast and the BFS terminates in a few hundred steps for moderate mazes.
+
+Implementation:
+
+Compute next_after(direction): a function that maps a position p to the position the robot would land in after one step in direction (p itself if blocked).
+
+BFS over states. Start state = frozenset(empty_cells). For each direction, compute next_state = frozenset(next_after(direction, p) for p in current).
+
+Record the direction taken in the parent map; once next_state == {E}, reconstruct the sequence backwards.
+
+Optimization: drop dominated states aggressively. A state dominated by another visited state can be skipped — keeping the antichain bounds the explored set.
+
+Bound the sequence length by a hard cap (e.g. 4 · (rows · cols)²) to fail fast on pathological inputs and confirm with the interviewer before coding.
+
+The framing trick is what the candidate is graded on; raw BFS implementation is secondary.
+
+Preparation
+
+Drill 'state = set of possible positions' BFS on small puzzles: every traveler problem ('multiple robots respond to one input stream') and the classic 'gold coin one of 12' weighing puzzle share the structure.
+
+Implement next_after first as a pure function on positions; the BFS on frozenset[Position] is a thin wrapper.
+
+For practice, hand-execute a 3 × 3 maze with two starting positions and one exit, and convince yourself the same command sequence ends both runs at E.
+
+This style of problem — 'reduce to the meta-state graph' — appears in roughly one autonomy-flavored Waymo round per loop; rehearse the reframing aloud so you can pitch it in the first 5 minutes.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

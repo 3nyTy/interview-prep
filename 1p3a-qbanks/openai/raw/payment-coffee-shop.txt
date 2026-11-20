@@ -1,0 +1,117 @@
+===H1===
+Payment / Coffee-Shop Ordering (read the prompt!)
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/payment-coffee-shop
+===BODY===
+OpenAI
+System Design·60 minMembers
+Payment / Coffee-Shop Ordering (read the prompt!)
+'Payment' is the title, but the actual prompt is often a specific vertical — coffee-shop ordering, e-commerce checkout, etc. Read before you design; don't apply a generic payment template.
+SWE
+payment
+medium
+Frequency
+Very high
+Last asked
+2026-09-10
+Stage
+phone-screen · onsite-system-design
+Notes
+
+A common flame-out pattern: assuming this is the textbook Payment System prompt and dumping prepared content without re-reading the actual scope. Don't. Re-read the prompt verbatim and clarify scope first.
+
+One candidate worked through every standard payment write-up they could find, got end-of-loop feedback that they had "covered almost everything," and was still rejected — mid-loop signal does not predict the outcome; aim for crisp coverage, not just coverage.
+
+Prepare both: a generic Payment template + a coffee/e-commerce checkout variant.
+
+Canonical payment-system skeleton
+
+A current phone-screen variant narrows the scope to the merchant-to-payment-provider path and explicitly excludes broader user-behavior modeling. Keep the design on authorization/capture, idempotency, PSP callbacks, merchant ledgering, and reconciliation instead of drifting into generic product analytics.
+
+Components: payment service (orchestrator), payment executor talking to one or more PSPs (Stripe / Braintree / Adyen), wallet service holding merchant balances, ledger service appending immutable double-entry records, plus an external settlement pipeline that ingests nightly PSP files for reconciliation.
+
+Idempotency: client-supplied idempotency key on every charge request; the payment service stores (key → payment_id, terminal_status) and short-circuits retries. Without this, network retries silently double-charge.
+
+Async PSP outcomes: PSP authorize/capture is asynchronous and may resolve via webhook minutes later. Pattern: write PENDING to the ledger immediately, expose pending/success/failed status via polling or push, and update on the webhook. Webhook handlers must be themselves idempotent (replay-safe) because PSPs retry.
+
+Double-entry ledger: every payment event is two balanced ledger entries (e.g. debit user_funds 5.00 / credit merchant_payable 5.00); reconciliation against the PSP settlement file becomes a straight ledger diff.
+
+Target scale for the Stripe-style framing: ~10k TPS, zero data loss for transaction records, sub-second status reads.
+
+Coffee-shop hold + nightly-batch variant
+
+A frequent rotation models the in-person POS flow as a two-step hold then charge with a 10pm nightly batch settlement; surface these specifics out loud:
+
+Two-step lifecycle: client first calls hold(account, amount) → PSP authorizes and locks funds for a short window; later charge(hold_id, final_amount) finalizes (final amount may differ from the hold to support tips / partial fills). If no charge arrives before the hold expires, the authorization is released automatically.
+
+State machine: pending → authorized → captured → settled, plus terminal expired and failed. Database constraints (CHECK / triggers) should prevent skipping states.
+
+Nightly batch (10pm): group all captured (post-charge, pre-settle) rows by downstream PSP, emit one settlement file per PSP, transition to settling → settled only after the file is acked. The query that drives this is WHERE state='captured', so design the storage layout for it up front — a secondary index on state (LSI in DynamoDB or B-tree in SQL) is the standard answer and a frequent ding when omitted.
+
+Idempotency at every boundary: idempotency keys on hold, on charge, and on the batch itself (so a partially-failed batch retry doesn't double-settle). The settlement job must carry its own idempotency token; track batch status as submitted → settling → settled and cross-check against PSP settlement reports to catch missed or duplicate entries.
+
+Deep-dive format: API, DB schema, and reconciliation specifics
+
+Because the scoped problem is intentionally small, interviewers often go very deep rather than wide. Be prepared to write out:
+
+Reconciliation may be framed at the downstream bank / acquirer level, not only at the card-network or PSP level. Be explicit about which entity produces each settlement report and how reports are keyed.
+
+Sharding can become an interview decision point: transaction id gives even write distribution, merchant id keeps merchant statements and reconciliation local, and card-bank/acquirer keys only make sense if the prompt asks for bank-specific settlement workflows.
+
+Exact API endpoints with request/response shapes (not just "a POST endpoint").
+
+Full table schemas: column names, data types, primary/partition keys, sort keys, and all indexes.
+
+For DynamoDB: which attributes are the partition key and sort key, and why an LSI on state makes the nightly batch query efficient without a full table scan. For SQL: indexes on status and captured_at.
+
+Downstream processor resilience
+
+When the PSP or downstream bank is unreachable mid-flow, the standard answer covers three layers:
+
+Circuit Breaker: stop hammering a known-down processor; fail fast and surface a clear error.
+
+Retry with exponential backoff: for transient failures, retry with increasing delays to avoid thundering herd.
+
+Backup / fallback processor: route to an alternate PSP if the primary is degraded.
+
+Scale follow-up questions to expect
+
+Interviewers routinely add scaling constraints after the basic design is complete:
+
+10× traffic: database sharding (shard key choice — merchant_id vs transaction_id — and the trade-offs of each), connection pooling, caching idempotency-key lookups, and handling PSP API rate limits.
+
+Global launch: multi-region deployment, data residency laws (GDPR, PCI-DSS), cross-region latency for authorization, and region-local settlement pipelines.
+
+Common bad habits that sink candidates
+
+Proposing eventual consistency for financial records — money systems require strong consistency (ACID).
+
+Being vague about storage: "we'll use a database" without specifying which, why, and the schema.
+
+Ignoring idempotency entirely — this is the single most common fatal gap.
+
+Hand-waving batch details: "we'll find the captured rows and send them" without addressing indexing, grouping by processor, and partial-failure handling.
+
+Payment-processor / tap-to-pay variant
+
+A recurring framing is a card-style payment processor with a hard low-latency requirement on the authorization path. The design debate candidates run into: keep the confirmation path synchronous so "tap to pay" stays fast, and push only the batch/settlement work onto an async queue. Routing the confirmation response through a message bus (e.g. Kafka) to make it async reintroduces queueing latency under load and undermines the latency target — be ready to defend which parts of the flow must stay synchronous and which can be deferred. Model the lifecycle as an explicit state machine (authorized → captured → settled) regardless of which vertical the prompt picks.
+
+Preparation
+
+Drill the canonical payment / coffee-shop ordering write-up: order placement, inventory + price service, payment authorization vs capture, idempotency keys, async fulfillment
+
+On the call, first thing: clarify scope (POS? P2P payment? merchant payment?) and ask clarifying questions such as "Can we approve partial payments?" and "How long does a hold last?"
+
+Practice articulating the idempotency-key + webhook-replay story end-to-end; this is the single most-drilled probe in payment SD
+
+Be able to sketch the two-entry ledger row for a single charge and walk through how the nightly PSP settlement file reconciles against it
+
+When discussing DB choices, always name trade-offs explicitly: "I'm choosing DynamoDB because X, but the downside is Y" — vague assertions are a red flag to interviewers
+
+Practice writing out a real table schema (column names, types, indexes) for the transactions table, not just a conceptual description
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

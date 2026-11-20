@@ -1,0 +1,79 @@
+===H1===
+Performance Modeling — Matmul Arithmetic Intensity
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/performance-engineer-modeling
+===BODY===
+Anthropic
+Other·60 minMembers
+Performance Modeling — Matmul Arithmetic Intensity
+An onsite round for the Performance Engineer track: estimate wall-clock time for matrix multiplications of varying `(m, k, n)` on a given A100 40 GB GPU, then extend to a 72-layer pipeline alternating between two matmul patterns and reason about pipeline/tensor parallelism.
+Perf Eng
+MLE
+gpu
+a100
+matmul
+arithmetic-intensity
+performance-modeling
+ml-knowledge
+hard
+Frequency
+Low
+Last asked
+2025-12-11
+Stage
+onsite-research · tech-screen
+Requirements
+
+Provided: A100 40 GB spec sheet (FLOP/s, memory bandwidth, VRAM) and an Excel sheet with (m, k, n) columns.
+
+Part 1 — Single matmul cost
+
+For each (m, k, n), derive:
+
+FLOPs needed: 2 * m * k * n.
+
+Arithmetic intensity: FLOPs / bytes_moved.
+
+Bound regime: compute-bound (high intensity) vs. memory-bound (low intensity).
+
+Predicted time: max(FLOPs / peak_FLOPS, bytes / bandwidth).
+
+Part 2 — 72-layer pipeline
+
+Each layer is one of two types:
+
+Type 1 alternates between m*n, n*k, m*k.
+
+Type 2 alternates between m*k, k*n, m*n.
+
+Compute compute time, data transfer time, and check whether activations + weights fit in 40 GB.
+
+Part 3 — Parallelism follow-up
+
+Pipeline Parallelism across 2 GPUs vs. Tensor Parallelism — end-to-end latency, memory usage on each GPU, and the trade.
+
+Whether one input activation + one output activation + the layer weight all fit in VRAM simultaneously.
+
+Notes
+
+The round is run open-doc in Google Sheets / Colab. Bring a clean roofline-model template — half the candidates lose time recreating it on the fly.
+
+The interviewer specifically watches for whether you call out the bound regime before doing arithmetic. Compute-bound and memory-bound work in opposite directions when scaling (m, k, n).
+
+Expect partial-credit on the parallelism follow-up: stating tradeoffs correctly is more valuable than committing to a single "right" architecture.
+
+Preparation
+
+Memorize the A100 numbers: ~312 TFLOPS BF16, ~1.5 TB/s HBM bandwidth, 40 GB VRAM.
+
+Practice deriving arithmetic intensity for matmuls in your head for several (m, k, n).
+
+Re-read a roofline-model primer; sketch the diagram (peak FLOPS ceiling, bandwidth-bound slope) once a day for a week before the interview.
+
+For the parallelism follow-up, have a one-paragraph answer ready comparing pipeline vs. tensor parallelism on (latency, throughput, memory, communication overhead).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

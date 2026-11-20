@@ -1,0 +1,78 @@
+===H1===
+Subway / Network Connectivity
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/subway-network-connectivity
+===BODY===
+Bloomberg
+Coding·60 minMembers
+Subway / Network Connectivity
+Given a network of subway stations described as adjacency data, build a function that returns whether any two given stations are connected. Tests graph modeling, choice between BFS / DFS / Union-Find, and how to scale across many queries.
+SWE
+graph
+union-find
+bfs
+dfs
+testing
+medium
+Frequency
+Low
+Last asked
+2026-02-25
+Stage
+onsite-coding
+Requirements
+
+Given a description of the New York subway as a set of stations and the directed or undirected links between them, implement:
+
+boolean areConnected(String stationA, String stationB)
+
+Clarify with the interviewer:
+
+Are the connections directed (one-way platforms) or undirected? Default: undirected.
+
+Is the function called once per network, or many times? Many — that drives the data-structure choice.
+
+Is the network static or do stations / links get added at runtime?
+
+Follow-ups:
+
+Optimize for many queries on a static graph. Pre-compute connected components once with union-find or DFS; areConnected is then an O(1) component-id comparison.
+
+Add dynamic edges (addLink(a, b)): union-find with path compression handles this in O(α(n)) amortized; precomputed components do not.
+
+Add weighted edges (travel time) and return the shortest path. Now you need Dijkstra, not just connectivity.
+
+Provide the path itself, not just a boolean. Discuss BFS with parent pointers.
+
+Examples
+
+stations = ['A', 'B', 'C', 'D', 'E']
+links    = [('A','B'), ('B','C'), ('D','E')]
+
+areConnected('A', 'C') -> true
+areConnected('A', 'D') -> false
+areConnected('D', 'E') -> true
+
+Notes
+
+For a single ad-hoc query, BFS or DFS from the source until you find the target is O(V + E) and simple. Suitable when the interviewer hasn't mentioned multiple queries.
+
+For the standard "many queries" follow-up, union-find with union-by-rank and path compression is the canonical answer. Component representative comparison is then O(α(n)) per query, effectively O(1).
+
+The candidate is expected to also author the test cases. Build a small disconnected network (two islands) and verify the negative case explicitly.
+
+A common interviewer probe: "what if the graph has 10 million nodes and updates every hour?" Walk through batch re-computation vs incremental union-find.
+
+Preparation
+
+Implement union-find with both union-by-rank and path compression once from scratch. This is the single most reused graph primitive in Bloomberg's onsite pool.
+
+Be ready to switch between adjacency-list BFS, adjacency-list DFS, and union-find solutions on demand and to argue which fits each follow-up.
+
+Practice writing two negative test cases unprompted — the interviewer treats this as a graded signal.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

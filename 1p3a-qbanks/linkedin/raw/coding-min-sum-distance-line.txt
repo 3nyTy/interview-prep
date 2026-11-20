@@ -1,0 +1,74 @@
+===H1===
+Minimum Sum-of-Distances Meeting Point on a Line
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-min-sum-distance-line
+===BODY===
+LinkedIn
+Coding·55 minMembers
+Minimum Sum-of-Distances Meeting Point on a Line
+Given a 1-D array of points, find the point that minimizes the sum of absolute distances to every other point. The answer is the median; the interview signal is the proof, not the code. Follow-ups extend to L2 distance with k chosen positions (much harder) and to streaming median maintenance.
+MLE
+SWE
+RS
+math
+quickselect
+sorting
+math-reasoning
+medium
+Frequency
+Medium
+Last asked
+2026-02-17
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Given an integer array points, return a coordinate x that minimizes sum(|p - x|) for p in points.
+
+The expected solution: x is the median of points, computable in O(N) via quickselect (std::nth_element, numpy.partition) or in O(N log N) via sort.
+
+The round is graded on three signals:
+
+Identifying the median answer quickly and not chasing a wrong O(N log N) ternary search.
+
+Proving medianness by considering, for any candidate x, swapping to x + δ — the contribution from points to the left of x increases by δ × (count_left) and from points to the right decreases by δ × (count_right). The optimum is where the two counts balance — i.e. the median.
+
+Implementing quickselect cleanly. Many candidates default to sorting; interviewers often ask for O(N).
+
+Follow-ups reported:
+
+L2 variant with K routers. Place K routers on integer positions from N houses to minimize sum of squared distances. The structure changes completely — it becomes a K-means / DP-on-sorted-positions problem with O(N²K) DP; quickselect no longer applies. Interviewers grade the candidate's ability to recognize the structural change rather than to solve it under time pressure.
+
+2-D extension. The 1-D median trick decomposes coordinate-wise only for L1 distance. For L2 (geometric median), there is no closed form; iterate via Weiszfeld.
+
+Streaming median. Maintain the median online — two-heap (max-heap of lower half, min-heap of upper half), O(log N) per insert.
+
+Examples
+
+points = [1, 2, 3, 1000]
+median = 2 (or 3 — both minimize)
+sum_distances = |1-2| + |2-2| + |3-2| + |1000-2| = 1000
+
+Notes
+
+The most common red flag in this round is jumping to sort-then-pick without articulating why median, then being unable to defend the answer when the interviewer asks "why not the mean?". The mean minimizes squared distance, not absolute distance.
+
+Quickselect with three-way partitioning (Dutch national flag) handles duplicate values gracefully — implement that variant rather than two-way Lomuto.
+
+For the L2-with-K-routers follow-up, even partial progress (sort the houses, observe convexity within a router's assignment) earns credit.
+
+Preparation
+
+Write the median-balance proof on paper several times until it flows verbally in < 60 seconds.
+
+Implement quickselect from scratch (three-way partition); time yourself at < 8 minutes.
+
+Drill the two-heap streaming median — it shows up as a separate question family but pairs naturally with this one in deep-dive discussions.
+
+For the K-router L2 follow-up, sketch the DP recurrence on paper: dp[i][k] = min over split j of dp[j][k-1] + cost(j+1, i).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,101 @@
+===H1===
+Design TTL Cache
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/design-ttl-cache
+===BODY===
+Apple
+System DesignMembers
+Design TTL Cache
+Design a cache where every entry has a time-to-live (TTL): it is readable for a fixed window after insertion, then disappears.
+SWE
+system-design
+backend
+Frequency
+Single report
+Last asked
+2026-01-02
+Stage
+phone-screen · onsite-system-design
+Design a cache where every entry has a time-to-live (TTL): it is readable for a fixed window after insertion, then disappears.
+
+Implement the TTLCache class:
+
+TTLCache() Initializes an empty cache.
+
+void put(int currentTime, String key, int value, int ttl) Stores key -> value with an expiry time of currentTime + ttl. If key already exists, the entry (and its TTL) is refreshed with the new value and new expiry.
+
+int get(int currentTime, String key) Returns the value for key if it is present and not yet expired at currentTime. Otherwise returns -1.
+
+int size(int currentTime) Returns the number of entries that are still alive at currentTime.
+
+Expiry semantics (this is the part the interviewer will press on):
+
+An entry is alive at time t iff t < expiry.
+
+At t == expiry the entry is already expired (it lived for exactly ttl units, from putTime up to but not including putTime + ttl).
+
+You may assume currentTime values passed in across calls are non-decreasing.
+
+Design constraints:
+
+put and get should be O(1) average.
+
+get must not return expired values — if the key is present but expired, return -1 (and you may remove it then, or defer deletion to size).
+
+size must return an accurate count at currentTime, so expired entries must actually be removed before it answers.
+
+Examples
+
+Example 1:
+
+Input: ["TTLCache","put","get","get"] [[],[1,"a",100,5],[2,"a"],[7,"a"]]
+
+Output: [null,null,100,-1]
+
+Explanation:
+
+Example 2:
+
+Input: ["TTLCache","put","put","size","put","get","size"] [[],[1,"a",10,3],[2,"b",20,10],[3],[5,"a",30,5],[6,"a"],[7]]
+
+Output: [null,null,null,2,null,30,2]
+
+Explanation:
+
+At t=3, a (expiry=4) and b (expiry=12) are both alive → size=2. put at t=5 refreshes "a" to value=30, new expiry=10. get at t=6 sees the new value. At t=7, a (10>7) and b (12>7) still alive → size=2.
+
+Example 3:
+
+Input: ["TTLCache","put","put","size","get","size"] [[],[1,"a",100,2],[1,"b",200,5],[4],[4,"a"],[10]]
+
+Output: [null,null,null,1,-1,0]
+
+Explanation:
+
+"a" (expiry=3) is expired by t=4; size(4) sweeps it away and returns 1 (only "b" left). get(4,"a") confirms it is gone. By t=10, "b" (expiry=6) is also expired → size=0.
+
+Example 4:
+
+Input: ["TTLCache","put","get","put","get","get"] [[],[1,"k",7,4],[4,"k"],[4,"k",9,3],[5,"k"],[7,"k"]]
+
+Output: [null,null,7,null,9,-1]
+
+Explanation:
+
+Constraints
+
+At most 10^5 total method calls
+
+0 <= currentTime <= 10^9; successive currentTime values are non-decreasing
+
+1 <= key.length <= 20 (lowercase letters and digits)
+
+0 <= value <= 10^9
+
+1 <= ttl <= 10^6
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,55 @@
+===H1===
+Piano Hand Movement Grouping
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/piano-hand-movement-grouping
+===BODY===
+Google
+Coding·45 minMembers
+Piano Hand Movement Grouping
+Given a sequence of integer piano-key positions and a maximum hand span k, compute the minimum number of hand lifts needed to play the sequence. Another version asks to print each group of notes playable from one hand position.
+SWE
+array
+simulation
+sliding-window
+medium
+Frequency
+Low
+Last asked
+2026-07-14
+Stage
+onsite-coding
+Requirements
+
+Input: an integer array of piano key positions, with positions starting at 1.
+
+A hand placement covers a contiguous range whose leftmost and rightmost keys differ by at most k.
+
+Play the notes in sequence and return the minimum number of times the hand must be lifted and repositioned.
+
+Another version omits an explicit k: return how many times the hand moves, then print the previous hand-position group whenever a move occurs and print the final group at the end.
+
+Examples
+
+With notes = [1, 3, 5, 7, 9, 11] and k = 4, the stated output is 2.
+
+Earlier examples use [1,2,3,4,5] -> 0 and [5,9,1] -> 1, without stating the reach parameter.
+
+Notes
+
+Clarify whether a placement is fixed until the hand lifts, whether the covered interval may slide without counting as a lift, and whether the initial placement counts. These details materially change the answer.
+
+The six-note example's explanation says a placement at 7 covers keys 7–11 but still counts another lift for 9 and 11. Treat that as an ambiguity to resolve before coding rather than silently assuming the output convention.
+
+Maintain the feasible placement interval for the current group. The follow-up printout should reuse the same grouping state instead of duplicating the movement logic.
+
+Preparation
+
+Practice turning the physical reach rule into an explicit interval invariant before writing code.
+
+Implement a one-pass grouping scan, then extend it to emit group boundaries without changing the core state transition.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

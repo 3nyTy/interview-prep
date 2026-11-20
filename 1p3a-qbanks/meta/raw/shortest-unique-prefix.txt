@@ -1,0 +1,46 @@
+===H1===
+Shortest Unique Prefix
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/shortest-unique-prefix
+===BODY===
+Meta
+CodingMembers
+Shortest Unique Prefix
+For each word in a list, return the shortest prefix that uniquely distinguishes it from every other word, preserving the original input order. Solved with a Trie tracking per-node pass counts. The variant seen guaranteed that no word is a prefix of another, which drops one class of edge cases.
+SWE
+trie
+string
+medium
+Frequency
+Single report
+Last asked
+2026-06-18
+Stage
+phone-screen
+Requirements
+
+Input: a list of words.
+
+For each word, return the shortest prefix that is unique among all words — i.e. no other word in the list shares that prefix. Return the prefixes in the original input order.
+
+The variant seen guarantees that no word is a prefix of another word, which removes one class of edge cases (every word is guaranteed to have a unique prefix).
+
+Notes
+
+Trie approach: insert every word while incrementing a pass counter at each node; for each word, walk down from the root and stop at the first node whose pass count is 1 — the path so far is the shortest unique prefix.
+
+The "no word is a prefix of another" guarantee is what keeps the boundary handling simple: you never hit the case where a fully-contained word has no distinguishing prefix. Worth confirming this assumption with the interviewer before coding.
+
+Single coding problem for the whole screen, so clean code and a clear complexity statement (O(total characters) build and query) matter more than raw speed.
+
+Preparation
+
+Implement a Trie with per-node pass counts and the unique-prefix walk cold.
+
+Practice the harder variant where a word can be a prefix of another — then a contained word has no unique prefix and you must decide whether to return the full word or signal none.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

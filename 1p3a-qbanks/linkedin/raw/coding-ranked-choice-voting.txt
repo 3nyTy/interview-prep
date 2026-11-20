@@ -1,0 +1,72 @@
+===H1===
+Ranked-Choice Voting (Instant Runoff)
+===URL===
+https://www.1point3acres.com/interview/problems/company/linkedin/coding-ranked-choice-voting
+===BODY===
+LinkedIn
+Coding·55 minMembers
+Ranked-Choice Voting (Instant Runoff)
+Implement instant-runoff voting: each voter submits a preference ranking; in each round, the lowest-vote candidate is eliminated and that candidate's votes redistribute to their next-preferred remaining candidate. Return the candidate that first crosses 50%. Pure simulation with care needed on tie-breaking and ballot iteration pointers.
+SWE
+simulation
+hashmap
+algorithm
+medium
+Frequency
+Single report
+Last asked
+2025-11-12
+Stage
+onsite-coding
+Requirements
+
+def instant_runoff(preferences: list[list[str]]) -> str:
+    # preferences[v] is voter v's full ranked list of candidates.
+    # Run instant-runoff: each round, tally first-preferences over remaining
+    # candidates. If any candidate has > 50% of ballots cast, return it.
+    # Otherwise, eliminate the candidate with the fewest first-preferences,
+    # advance ballots that listed them first to their next-preferred remaining
+    # candidate, and repeat.
+
+Two implementation tactics:
+
+Per-round full retally — O(R × V × K) where R is rounds, V voters, K ranking length. Simple and correct.
+
+Incremental retally with per-ballot pointers — keep a next_pref_index[v] cursor and a votes[candidate] counter; when a candidate is eliminated, walk only the ballots currently pointing at them and advance to the next non-eliminated candidate. O((V + R²) × K) amortized.
+
+Examples
+
+candidates: A, B, C
+preferences = [
+  [A, B, C],
+  [A, C, B],
+  [B, A, C],
+  [B, A, C],
+  [C, B, A],
+]
+
+Round 1: A=2, B=2, C=1 (no >50%; eliminate C)
+  Voter 5 (had C first) now reads B as next preference.
+Round 2: A=2, B=3 -> B wins
+
+Notes
+
+Specify the tiebreaker for "lowest-vote candidate" — alphabetical, first encountered, all simultaneously dropped — and ask the interviewer rather than guess.
+
+"More than 50%" vs "at least 50%" matters when only two candidates remain with a tie at the original vote count; clarify upfront.
+
+The reported delivery of this question was rough (in-person whiteboard with language-mismatch friction). The algorithmic difficulty is moderate; clarifying the spec and explaining the data structure are the load-bearing skills.
+
+Preparation
+
+Pre-write the per-voter ballot iterator with a position cursor; the boilerplate burns time under pressure.
+
+Practice stating the elimination invariant aloud before coding.
+
+Cover the two edge cases: all ballots exhausted before any candidate hits 50% (return whoever has plurality), and an exact 50/50 split.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

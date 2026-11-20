@@ -1,0 +1,1649 @@
+{
+  "company": "oracle",
+  "display_name": "Oracle",
+  "qbank_count": 47,
+  "questions_scraped": 47,
+  "site_total_count": 110,
+  "oj_count": 63,
+  "external_count": 0,
+  "description": "Oracle's loops split along two clear axes: OCI (Cloud Infrastructure) runs a fairly standard LC + system-design loop with heavy Indian interviewer rotation, while OHAI (Oracle Health, the post-Cerner business unit) leans into OOD/class-design problems built around healthcare scenarios. Coding bars are mostly easy-to-medium, but interviewer variance and post-loop down-leveling / ghosting are unusually common — the loop result often determines the eventual level, not just the yes/no.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/oracle",
+  "scraped_at": "2026-09-20",
+  "source": "1point3acres qbank (logged-in session)",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "token-expiration-service",
+      "title": "Token Expiration Service",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-09-03",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "ttl",
+        "api-design"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "ttl",
+        "api-design"
+      ],
+      "overview": "Implement a service that generates and renews token expiration times and counts tokens that remain unexpired at a supplied time.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/token-expiration-service"
+    },
+    {
+      "n": 2,
+      "slug": "accounts-merge-lc721",
+      "title": "Accounts Merge (LC 721)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-28",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "graph",
+        "union-find",
+        "sorting",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "graph",
+        "union-find",
+        "sorting",
+        "medium"
+      ],
+      "overview": "Implement the original LC 721 Accounts Merge prompt: merge account records that share an email address and return each person's name with the sorted set of emails in the connected group.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/accounts-merge-lc721"
+    },
+    {
+      "n": 3,
+      "slug": "swap-two-values-without-temp",
+      "title": "Two-Value Exchange Warm-Up",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-10",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "math",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "math",
+        "easy"
+      ],
+      "overview": "Start with a = 30 and b = 40, then swap their values without using a third variable.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/swap-two-values-without-temp"
+    },
+    {
+      "n": 4,
+      "slug": "run-length-string-compression",
+      "title": "Run-Length String Compression",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-10",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "compression",
+        "string-processing",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "compression",
+        "string-processing",
+        "easy"
+      ],
+      "overview": "Compress contiguous runs in a string from left to right: emit a character alone when its run length is one, otherwise emit the character followed by its count.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/run-length-string-compression"
+    },
+    {
+      "n": 5,
+      "slug": "rest-api-medical-records-by-age",
+      "title": "REST API: Medical Records by Age",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-07-31",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "api-integration",
+        "http",
+        "json",
+        "ambiguous-spec",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "api-integration",
+        "http",
+        "json",
+        "ambiguous-spec",
+        "medium"
+      ],
+      "overview": "Implement `getRecordsByAgeGroup` to retrieve every page from a JSON mock medical-records API, calculate each patient's age when a record was created, filter by an inclusive age range and a blood-pressure-difference threshold, and return matching record IDs in sorted order. The prompt conflicts on both the subtraction order and comparison direction for the pressure predicate, so clarify that condition before coding.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/rest-api-medical-records-by-age"
+    },
+    {
+      "n": 6,
+      "slug": "sort-array-by-parity-min-swaps",
+      "title": "Sort Array by Parity — Minimum Swaps",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-04-14",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "two-pointer",
+        "array",
+        "greedy",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "two-pointer",
+        "array",
+        "greedy",
+        "medium"
+      ],
+      "overview": "Rearrange an integer array so every even precedes every odd using arbitrary swaps, and return the minimum number of swaps. A two-pointer sweep from both ends gives the optimal count.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/sort-array-by-parity-min-swaps"
+    },
+    {
+      "n": 7,
+      "slug": "monotone-increasing-digits",
+      "title": "Monotone Increasing Digits (LC 738)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-04-14",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "greedy",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "greedy",
+        "medium"
+      ],
+      "overview": "Return the largest number not exceeding n whose digits are monotonically non-decreasing. The greedy fix is to find the first descending pair, drop that digit by one, and fill the rest with nines.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/monotone-increasing-digits"
+    },
+    {
+      "n": 8,
+      "slug": "hospital-appointment-booking-api",
+      "title": "Hospital Appointment Booking API",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-02-04",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "design",
+        "data-structure",
+        "concurrency",
+        "mini-project",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "design",
+        "data-structure",
+        "concurrency",
+        "mini-project",
+        "medium"
+      ],
+      "overview": "Design and implement an appointment-booking REST API for a hospital with 1,000 doctors, each working 9 AM–5 PM in 15-minute slots. The API books the first available slot for a given doctor on a given date and must maintain state across calls. Asked as a coding-design hybrid round in an OCI virtual onsite.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/hospital-appointment-booking-api"
+    },
+    {
+      "n": 9,
+      "slug": "simplified-redis-kv-store",
+      "title": "Simplified Redis-Like KV / List Store",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-02-04",
+      "stage": "phone-screen · tech-screen",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "data-structure",
+        "in-memory-database",
+        "design",
+        "mini-project",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "in-memory-database",
+        "design",
+        "mini-project",
+        "medium"
+      ],
+      "overview": "Implement a simplified Redis-like data structure in Go supporting strings, lists, and partial list-removal semantics. Asked as the screening (pre-VO) coding problem for an OCI loop. Expiration was an explicit deferred follow-up.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/simplified-redis-kv-store"
+    },
+    {
+      "n": 10,
+      "slug": "apply-operations-command-pattern",
+      "title": "Apply List of Operations (Command Pattern)",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-02-03",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "oop-design",
+        "design",
+        "object-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "oop-design",
+        "design",
+        "object-design",
+        "medium"
+      ],
+      "overview": "Given a list of operations and an initial state, apply all operations to derive the final state. Recognising and using the Command pattern is the explicit signal. Follow-up: identify cases where operations can be applied out of order or merged. Oracle Health AI IC4 onsite, second technical round.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/apply-operations-command-pattern"
+    },
+    {
+      "n": 11,
+      "slug": "code-reading-cli-tool-refactor",
+      "title": "Code Reading — CLI Tool Feature Audit",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-02-03",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "code-reading",
+        "refactoring",
+        "design-review",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "code-reading",
+        "refactoring",
+        "design-review",
+        "medium"
+      ],
+      "overview": "Read an existing CLI-tool codebase against a written requirements list; identify missing features and propose optimisations. Asked as the first technical round in an Oracle Health AI IC4 onsite — not a traditional LeetCode round.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/code-reading-cli-tool-refactor"
+    },
+    {
+      "n": 12,
+      "slug": "ml-coding-mha-sparse-matmul",
+      "title": "ML Coding — Handwritten MHA and Sparse Matmul",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-22",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RS"
+      ],
+      "tags": [
+        "pytorch",
+        "numpy",
+        "transformer",
+        "attention",
+        "linear-algebra",
+        "ml-knowledge",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "rs"
+      ],
+      "tags_slug": [
+        "pytorch",
+        "numpy",
+        "transformer",
+        "attention",
+        "linear-algebra",
+        "ml-knowledge",
+        "medium"
+      ],
+      "overview": "Two ML-coding problems in a 90-minute phone screen for Oracle's AI org: (1) hand-implement multi-head attention from scratch; (2) hand-implement sparse matrix multiplication. Both straightforward; the candidate flagged a mismatch between the senior-principal interviewer's title and demonstrated knowledge.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/ml-coding-mha-sparse-matmul"
+    },
+    {
+      "n": 13,
+      "slug": "container-with-most-water",
+      "title": "Container With Most Water (LC 11)",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-06",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "two-pointer",
+        "greedy",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "two-pointer",
+        "greedy",
+        "medium"
+      ],
+      "overview": "Find the maximum-area container formed by two vertical lines from a non-negative integer array — explicit LeetCode 11. Asked verbatim in an OCI phone screen, paired with behavioural questions about approaching unfamiliar problems.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/container-with-most-water"
+    },
+    {
+      "n": 14,
+      "slug": "first-unique-login-tracker",
+      "title": "First-Login Only-Once User Tracker (O(1) Worst-Case)",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2025-12-01",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "linked-list",
+        "hashmap",
+        "design",
+        "data-structure",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "linked-list",
+        "hashmap",
+        "design",
+        "data-structure",
+        "medium"
+      ],
+      "overview": "Design a structure that records user logins and, on demand, returns the earliest-logged-in user whose login count is exactly one. Both operations must be O(1) worst-case. Asked as the coding portion of a difficult OCI phone screen where the interviewer iteratively rewrote the prompt.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/first-unique-login-tracker"
+    },
+    {
+      "n": 15,
+      "slug": "anagram-phrase-replacement",
+      "title": "Anagram Word Replacement in Phrases",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2025-11-21",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "hashmap",
+        "hashing",
+        "sliding-window",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "hashmap",
+        "hashing",
+        "sliding-window",
+        "medium"
+      ],
+      "overview": "Given a list of phrases and a list of allowed replacement words, find for each phrase a starting position where some contiguous substring (or a word within the phrase) is an anagram of any allowed word. Return all such positions. Asked on HackerRank in an Oracle Health phone screen; hidden test case timed out.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/anagram-phrase-replacement"
+    },
+    {
+      "n": 16,
+      "slug": "merge-k-sorted-key-value-lists",
+      "title": "Merge K Sorted (Key, Value) Lists with Later Override",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2025-11-20",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "heap",
+        "linked-list",
+        "merge",
+        "top-k",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "heap",
+        "linked-list",
+        "merge",
+        "top-k",
+        "medium"
+      ],
+      "overview": "Merge `k` linked lists, each holding `(key, value)` pairs sorted ascending by key. On key collision across lists, the later list (higher index) overrides the earlier list. Return one sorted output list. Asked in an OCI Consultant Engineer phone screen.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/merge-k-sorted-key-value-lists"
+    },
+    {
+      "n": 17,
+      "slug": "course-scheduler-simplified",
+      "title": "Course Scheduler — Print Path (Simplified)",
+      "category": "coding",
+      "duration": "20 min",
+      "frequency": "Single report",
+      "last_asked": "2025-11-19",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "graph",
+        "topological-sort",
+        "tree",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "graph",
+        "topological-sort",
+        "tree",
+        "easy"
+      ],
+      "overview": "A simplified course-scheduler variant: no multi-prerequisite courses, and the answer is the explicit ordered path of courses (not just a count). Asked as the 20-minute coding portion of an Oracle Health phone screen, paired with a job-scheduler design in the same round.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/course-scheduler-simplified"
+    },
+    {
+      "n": 18,
+      "slug": "valid-poker-straight",
+      "title": "Valid 5-Card Poker Straight",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-10-22",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "set",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "set",
+        "easy"
+      ],
+      "overview": "Given five cards drawn from a standard deck, determine whether they form a straight (five consecutive ranks). J/Q/K must be mapped to 11/12/13; Ace can play as either 1 or 14. Asked as a single 40-minute coding problem inside an Oracle Health phone screen heavy on behavioural questions.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/valid-poker-straight"
+    },
+    {
+      "n": 19,
+      "slug": "ood-file-management-system",
+      "title": "OOD — File Management System",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2025-09-16",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "oop-design",
+        "filesystem",
+        "hashmap",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "oop-design",
+        "filesystem",
+        "hashmap",
+        "easy"
+      ],
+      "overview": "Implement a simplified in-memory file-management system on HackerRank, with a starter HashMap of folder-name to file-list provided. Required operations: `checkIfFolderExists`, `createFolder`, `createFile`. Edge-case handling matters more than algorithmic depth.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/ood-file-management-system"
+    },
+    {
+      "n": 20,
+      "slug": "trie-autocomplete",
+      "title": "Trie-Based Autocomplete",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2025-09-15",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "trie",
+        "dfs",
+        "string",
+        "data-structure",
+        "design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "trie",
+        "dfs",
+        "string",
+        "data-structure",
+        "design",
+        "medium"
+      ],
+      "overview": "Build an autocomplete service: given a prefix and a dictionary, return all strings that match the prefix. The interviewer pushes hard on maintainability — Trie and Solution classes must be separated, and the dictionary must initialise once in the constructor. Follow-up: rank results by past-query frequency.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/trie-autocomplete"
+    },
+    {
+      "n": 21,
+      "slug": "ood-treatment-scheduler",
+      "title": "OOD — Treatment Frequency Scheduler",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2025-09-15",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "oop-design",
+        "object-design",
+        "scheduling",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "oop-design",
+        "object-design",
+        "scheduling",
+        "medium"
+      ],
+      "overview": "Design classes that schedule patient treatments at varying frequencies within a date range, then enumerate every required treatment instance. Asked as the OHAI phone-screen problem with explicit allowance to write pseudo-code or comments for date arithmetic syntax.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/ood-treatment-scheduler"
+    },
+    {
+      "n": 22,
+      "slug": "set-matrix-zeros-inplace",
+      "title": "Set Matrix Zeros (in-place)",
+      "category": "coding",
+      "duration": "30 min",
+      "frequency": "Single report",
+      "last_asked": "2025-09-11",
+      "stage": "phone-screen",
+      "access": "Free preview",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "array",
+        "grid",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "array",
+        "grid",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Given a 2D integer matrix, set every cell sharing a row or column with a zero to zero, in place. Asked as the coding portion of an OCI IC4 phone screen with two follow-ups: handle ragged (non-rectangular) input, and generalise to char[][] with an arbitrary marker value.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/set-matrix-zeros-inplace"
+    },
+    {
+      "n": 23,
+      "slug": "min-sum-after-k-halvings",
+      "title": "Minimum Sum After K Halvings (Max-Heap)",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2025-08-06",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "SWE"
+      ],
+      "tags": [
+        "heap",
+        "greedy",
+        "array",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "swe"
+      ],
+      "tags_slug": [
+        "heap",
+        "greedy",
+        "array",
+        "medium"
+      ],
+      "overview": "Given a non-negative integer array and an integer `k`, repeatedly pick one element and replace it with `ceil(element / 2)`. After at most `k` operations, minimise the remaining sum. Asked as the third VO round in an Oracle Health AI loop; the reporting candidate hit hidden-test-case timeouts and suspected the zero-handling edge case.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/min-sum-after-k-halvings"
+    },
+    {
+      "n": 24,
+      "slug": "binary-search-rightmost-duplicate",
+      "title": "Binary Search — Rightmost Index of Duplicate",
+      "category": "coding",
+      "duration": "30 min",
+      "frequency": "Single report",
+      "last_asked": "2025-07-07",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "array",
+        "binary-search",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "array",
+        "binary-search",
+        "easy"
+      ],
+      "overview": "In a sorted array with duplicate values, find the rightmost (last) occurrence index of a target value using binary search. Asked as the coding portion of an OCI IC4 phone screen after a 30-minute resume walk-through.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/binary-search-rightmost-duplicate"
+    },
+    {
+      "n": 25,
+      "slug": "simplify-parentheses-expression",
+      "title": "Simplify Expression by Removing Parentheses",
+      "category": "coding",
+      "duration": "30 min",
+      "frequency": "Single report",
+      "last_asked": "2025-06-10",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "stack",
+        "parsing",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "stack",
+        "parsing",
+        "medium"
+      ],
+      "overview": "Given an arithmetic expression containing variables, `+`, `-`, and parentheses, return an equivalent expression with all parentheses removed and signs propagated. Asked in the Oracle Labs AI/ML SDE3 onsite as one of two coding problems.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/simplify-parentheses-expression"
+    },
+    {
+      "n": 26,
+      "slug": "ood-patient-temperature-classes",
+      "title": "OOD — Body-Temperature Measurement Classes",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2025-01-15",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "oop-design",
+        "object-design",
+        "ambiguous-spec",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "oop-design",
+        "object-design",
+        "ambiguous-spec",
+        "medium"
+      ],
+      "overview": "Design Java classes for storing and reasoning about patient body-temperature readings. The interviewer drives the requirements iteratively: measurement methods, unit handling, and method-specific fever thresholds emerge as the discussion deepens. No algorithm is required.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/ood-patient-temperature-classes"
+    },
+    {
+      "n": 27,
+      "slug": "spiral-matrix-lc54",
+      "title": "Spiral Matrix (LC 54)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "—",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "grid",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "grid",
+        "medium"
+      ],
+      "overview": "Traverse a rectangular matrix in clockwise spiral order. The onsite exercise included a test-case walkthrough and complexity analysis.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/spiral-matrix-lc54"
+    },
+    {
+      "n": 28,
+      "slug": "lru-cache-with-expiration",
+      "title": "LRU Cache with Expiration (LC 146 + TTL)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-09-03",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "hashmap",
+        "linked-list",
+        "ttl",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "hashmap",
+        "linked-list",
+        "ttl",
+        "medium"
+      ],
+      "overview": "Implement an O(1) LRU cache with a hash map plus doubly linked list, then extend it with per-entry expiration so expired keys read as absent.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/lru-cache-with-expiration"
+    },
+    {
+      "n": 29,
+      "slug": "number-of-islands",
+      "title": "Number of Islands (LC 200)",
+      "category": "coding",
+      "duration": "30 min",
+      "frequency": "Low",
+      "last_asked": "2026-08-28",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "dfs",
+        "graph",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "dfs",
+        "graph",
+        "medium"
+      ],
+      "overview": "Count distinct islands in a 2D grid, then extend the traversal to track the maximum height within each connected island. State the time and space complexity after implementation.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/number-of-islands"
+    },
+    {
+      "n": 30,
+      "slug": "time-based-key-value-store-lc981",
+      "title": "Time-Based Key-Value Store (LC 981)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low · New",
+      "last_asked": "2026-08-28",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "hashmap",
+        "binary-search",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "hashmap",
+        "binary-search",
+        "medium"
+      ],
+      "overview": "Implement the LC 981 time-based key-value store: record values for keys at timestamps and retrieve the value associated with the latest timestamp not greater than the query time. A recent IC4 screen used the prompt on HackerRank without requiring code execution.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/time-based-key-value-store-lc981"
+    },
+    {
+      "n": 31,
+      "slug": "single-transaction-stock-profit",
+      "title": "Best Time to Buy and Sell Stock — Single Transaction",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-08-19",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "easy"
+      ],
+      "overview": "Given prices ordered over time, choose one buy followed by one sell to maximize profit. Only a single transaction is allowed.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/single-transaction-stock-profit"
+    },
+    {
+      "n": 32,
+      "slug": "course-prerequisites-task-count",
+      "title": "Maximum Completable Tasks with Prerequisites (Topological)",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Low",
+      "last_asked": "2026-08-11",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "graph",
+        "topological-sort",
+        "bfs",
+        "dfs",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "graph",
+        "topological-sort",
+        "bfs",
+        "dfs",
+        "medium"
+      ],
+      "overview": "Given tasks and prerequisite dependencies, return the maximum number of completable tasks when cycles make some tasks impossible. A later onsite used the ordered-output form as an LC 210 package-deployment reskin, so confirm whether the required result is a count or a deployment order.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/course-prerequisites-task-count"
+    },
+    {
+      "n": 33,
+      "slug": "decode-string-lc394",
+      "title": "Decode String (k[encoded])",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Low",
+      "last_asked": "2026-08-11",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "stack",
+        "recursion",
+        "compression",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "stack",
+        "recursion",
+        "compression",
+        "medium"
+      ],
+      "overview": "Decode a string of the form `k[encoded_string]`, where the bracketed segment repeats exactly `k` times and nesting is allowed. It has appeared as the LC 394 prompt in both an Oracle Health phone screen and a later onsite, where mandatory brackets and live approach changes were central traps.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/decode-string-lc394"
+    },
+    {
+      "n": 34,
+      "slug": "same-nary-tree-comparison",
+      "title": "Same N-ary Tree Comparison",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-04-14",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "recursion",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "recursion",
+        "easy"
+      ],
+      "overview": "Decide whether two N-ary trees are identical in structure and values. The recursive solution is quick; the bar raiser's follow-up asks for an iterative version.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/same-nary-tree-comparison"
+    },
+    {
+      "n": 35,
+      "slug": "log-parser-multiline",
+      "title": "Log Parser with Multi-Line Follow-up",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Low",
+      "last_asked": "2025-08-06",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "string",
+        "parsing",
+        "string-processing",
+        "state-machine",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "string",
+        "parsing",
+        "string-processing",
+        "state-machine",
+        "medium"
+      ],
+      "overview": "Parse a stream of log lines of the form `<unix_timestamp> <LEVEL> <message>` into a structured format and validate well-formedness. The recurring follow-up extends each log entry to span multiple physical lines until the next timestamp-prefixed line starts a new entry.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/log-parser-multiline"
+    },
+    {
+      "n": 36,
+      "slug": "system-design-gpu-health-repair",
+      "title": "System Design — GPU Health and Repair",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-09-03",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "gpu",
+        "metrics",
+        "scaling",
+        "distributed-systems"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "gpu",
+        "metrics",
+        "scaling",
+        "distributed-systems"
+      ],
+      "overview": "Design GPU health monitoring and repair triggering for 100,000 hosts. Explain GPU-specific signal collection, aggregate events into a host dashboard with pseudocode, and handle failed repair workflows.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/system-design-gpu-health-repair"
+    },
+    {
+      "n": 37,
+      "slug": "system-design-healthcare-data-ingestion-pipeline",
+      "title": "System Design — Healthcare Data Ingestion Pipeline",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-19",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "ingestion",
+        "messaging",
+        "storage",
+        "scaling",
+        "distributed-systems",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "ingestion",
+        "messaging",
+        "storage",
+        "scaling",
+        "distributed-systems",
+        "medium"
+      ],
+      "overview": "Design a healthcare data-ingestion pipeline that efficiently handles millions of records. Cover ingestion, queue or message-broker selection, storage, processing, fault tolerance, scalability, monitoring and alerting, and the handling of failed or unprocessed records.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/system-design-healthcare-data-ingestion-pipeline"
+    },
+    {
+      "n": 38,
+      "slug": "system-design-video-upload-search",
+      "title": "System Design — Video Upload + Search with LLM",
+      "category": "system-design",
+      "duration": "30 min",
+      "frequency": "Single report",
+      "last_asked": "2026-02-13",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng",
+        "MLE"
+      ],
+      "tags": [
+        "system-design",
+        "storage",
+        "ingestion",
+        "retrieval",
+        "rag",
+        "mlsd",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng",
+        "mle"
+      ],
+      "tags_slug": [
+        "system-design",
+        "storage",
+        "ingestion",
+        "retrieval",
+        "rag",
+        "mlsd",
+        "medium"
+      ],
+      "overview": "Design a video-upload + search system with an LLM / embeddings layer for semantic retrieval. The interviewer compressed the design into 30 minutes and drilled hard on video upload internals (chunking, presigned URLs, encoding) when the candidate steered toward the search side. OCI phone-screen.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/system-design-video-upload-search"
+    },
+    {
+      "n": 39,
+      "slug": "system-design-event-ingestion-topk",
+      "title": "System Design — Event Ingestion + Top-K Aggregation",
+      "category": "system-design",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2025-01-15",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "system-design",
+        "streaming",
+        "top-k",
+        "scaling",
+        "distributed-systems",
+        "ingestion",
+        "kafka",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "system-design",
+        "streaming",
+        "top-k",
+        "scaling",
+        "distributed-systems",
+        "ingestion",
+        "kafka",
+        "medium"
+      ],
+      "overview": "An originally-single-server event-reporting system must scale to a much higher request volume, and must additionally compute top-K aggregations across the event stream. OHAI onsite SD round with a heavy emphasis on the scale-up narrative.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/system-design-event-ingestion-topk"
+    },
+    {
+      "n": 40,
+      "slug": "system-design-rate-limiter",
+      "title": "System Design — Rate Limiter",
+      "category": "system-design",
+      "duration": "45 min",
+      "frequency": "Low",
+      "last_asked": "2026-08-19",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "system-design",
+        "rate-limiting",
+        "throttling",
+        "caching",
+        "distributed-systems",
+        "redis",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "system-design",
+        "rate-limiting",
+        "throttling",
+        "caching",
+        "distributed-systems",
+        "redis",
+        "medium"
+      ],
+      "overview": "Design a rate limiter and compare the available algorithmic approaches. Cover caching, distributed implementation, scalability, and the trade-offs that determine which design to choose.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/system-design-rate-limiter"
+    },
+    {
+      "n": 41,
+      "slug": "system-design-vm-health-monitoring",
+      "title": "System Design — VM Health Monitoring at 1M Scale",
+      "category": "system-design",
+      "duration": "45 min",
+      "frequency": "Low",
+      "last_asked": "2026-08-11",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "system-design",
+        "distributed-systems",
+        "presence",
+        "scaling",
+        "infra",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "system-design",
+        "distributed-systems",
+        "presence",
+        "scaling",
+        "infra",
+        "medium"
+      ],
+      "overview": "Design centralized health monitoring for roughly one million VMs or edge devices. Compare pull-based pings with pushed heartbeats, identify each bottleneck, and justify a hybrid in which push is primary and pull verifies missed health signals.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/system-design-vm-health-monitoring"
+    },
+    {
+      "n": 42,
+      "slug": "behavioral-bq-bar-raiser",
+      "title": "Behavioral & Bar Raiser BQ Set",
+      "category": "behavioral",
+      "duration": "45 min",
+      "frequency": "Very high",
+      "last_asked": "2026-09-03",
+      "stage": "phone-screen · onsite-bq · final-round",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE",
+        "Infra Eng",
+        "All"
+      ],
+      "tags": [
+        "behavioral",
+        "bq",
+        "leadership",
+        "ownership",
+        "ambiguity",
+        "conflict",
+        "mentorship",
+        "deep-dive"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "infra-eng",
+        "all-roles"
+      ],
+      "tags_slug": [
+        "behavioral",
+        "bq",
+        "leadership",
+        "ownership",
+        "ambiguity",
+        "conflict",
+        "mentorship",
+        "deep-dive"
+      ],
+      "overview": "Oracle weighs behavioural rounds heavily — both as standalone bar-raiser / hiring-manager interviews and as 5-15 minute BQ openers folded into nearly every technical round. The recurring question bank is small enough to drill cold, and the bar raiser (\"Bartender\" / BT in OHAI) intentionally applies BQ-pressure follow-ups.",
+      "source_count": 22,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/behavioral-bq-bar-raiser"
+    },
+    {
+      "n": 43,
+      "slug": "verbal-java-cs-fundamentals",
+      "title": "Verbal Java / CS-Fundamentals Quiz",
+      "category": "other",
+      "duration": "30 min",
+      "frequency": "High",
+      "last_asked": "2026-08-19",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "cs-fundamentals",
+        "verbal",
+        "networking",
+        "operating-systems",
+        "domain-knowledge"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "cs-fundamentals",
+        "verbal",
+        "networking",
+        "operating-systems",
+        "domain-knowledge"
+      ],
+      "overview": "Verbal trivia rounds appear frequently inside Oracle coding screens. Common items include abstract class vs interface, HashMap collision handling, immutable objects, public-API concerns, networking fundamentals, and how to write unit tests and explain their benefits.",
+      "source_count": 8,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/verbal-java-cs-fundamentals"
+    },
+    {
+      "n": 44,
+      "slug": "resume-project-deep-dive",
+      "title": "Resume / Project Deep Dive (HM or Tech Screen Opener)",
+      "category": "other",
+      "duration": null,
+      "frequency": "Medium",
+      "last_asked": "—",
+      "stage": "phone-screen · onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "All"
+      ],
+      "tags": [
+        "deep-dive",
+        "ownership"
+      ],
+      "roles_slug": [
+        "all-roles"
+      ],
+      "tags_slug": [
+        "deep-dive",
+        "ownership"
+      ],
+      "overview": "Prepare two or three projects for a resume-led deep dive covering technical challenges, architecture choices, ownership, customer communication, on-call work, and questions about the team's business architecture.",
+      "source_count": 7,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/resume-project-deep-dive"
+    },
+    {
+      "n": 45,
+      "slug": "data-center-camera-access-incident-response",
+      "title": "Data-Center Camera Access Incident Response",
+      "category": "other",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-11",
+      "stage": "onsite-deep-dive",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "Infra Eng"
+      ],
+      "tags": [
+        "security",
+        "infra",
+        "domain-knowledge"
+      ],
+      "roles_slug": [
+        "swe",
+        "infra-eng"
+      ],
+      "tags_slug": [
+        "security",
+        "infra",
+        "domain-knowledge"
+      ],
+      "overview": "A data-center security-camera password or access failure has occurred. Explain the response within the first hour, within 24 hours, and within one week.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/data-center-camera-access-incident-response"
+    },
+    {
+      "n": 46,
+      "slug": "evaluate-subjective-agent-outputs",
+      "title": "Evaluate Subjective, Nondeterministic Agent Outputs",
+      "category": "other",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-07-18",
+      "stage": "tech-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "llm-agent",
+        "evaluation",
+        "ml-knowledge",
+        "deep-dive"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "llm-agent",
+        "evaluation",
+        "ml-knowledge",
+        "deep-dive"
+      ],
+      "overview": "Design an evaluation approach for an agent whose outputs are subjective and nondeterministic. The interviewer challenges LLM-as-judge and user-feedback proposals with evaluator overconfidence, missing feedback, and developer bias, then asks how online user signals can close the gap.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/evaluate-subjective-agent-outputs"
+    },
+    {
+      "n": 47,
+      "slug": "code-review-verbal",
+      "title": "Code Review Round (Verbal)",
+      "category": "other",
+      "duration": "20 min",
+      "frequency": "Single report",
+      "last_asked": "2025-10-24",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "code-review",
+        "design-review",
+        "verbal",
+        "deep-dive",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "code-review",
+        "design-review",
+        "verbal",
+        "deep-dive",
+        "medium"
+      ],
+      "overview": "An OCI phone screen that combines 20 minutes of verbal code review (read and critique a pre-written code sample) with a free-choice system-design discussion. A non-traditional screen format — the candidate picks the SD topic from their own past work.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/oracle/code-review-verbal"
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+===H1===
+Rank Vehicles for OTA Peer-to-Peer Seeding
+===URL===
+https://www.1point3acres.com/interview/problems/company/tesla/ota-p2p-vehicle-seeding-rank
+===BODY===
+Tesla
+Coding·45 minFree preview
+Rank Vehicles for OTA Peer-to-Peer Seeding
+Implement `rank_vehicles` for a Tesla OTA update network. Vehicles share unique 10MB chunks over WiFi; rank vehicles by historical direct and indirect contribution to peer-to-peer distribution so cellular seed downloads can be minimized.
+SWE
+graph
+hashmap
+dedup
+medium
+Frequency
+Single report
+Last asked
+2025-07-24
+Stage
+phone-screen
+Requirements
+
+Tesla ships over-the-air software updates every few weeks, and cellular data is costly.
+
+Assume vehicles can share update data with other vehicles over WiFi in unique 10MB chunks.
+
+The server receives callbacks whenever one vehicle completes sending a chunk to another vehicle.
+
+Implement rank_vehicles, returning all vehicles prioritized by importance for cellular seeding.
+
+For this version, importance is measured by historical contribution to the peer-to-peer network:
+
+all direct sends;
+
+all indirect sends.
+
+Examples
+
+Vehicles: A, B, C, D
+
+Chunks: 1, 2, 3, 4
+
+Transfers:
+
+Server sends chunks [1, 2] to A, and chunks [3, 4] to C
+A sends [1, 2] to B
+A sends [1] to C
+C sends [4] to D
+C sends [3] to B
+B sends [3] to D
+D sends [3] to A
+
+Expected contributions:
+
+A: 30MB
+B: 20MB
+C: 40MB
+D: 10MB
+rank_vehicles -> [C, A, B, D]
+
+Notes
+
+The key ambiguity is indirect contribution. Model chunk provenance as a graph or ownership chain: when a vehicle sends a chunk it previously received, credit can flow back through the path that enabled that send.
+
+Track unique chunks to avoid double-counting the same vehicle-to-vehicle contribution.
+
+A practical model stores, for each (vehicle, chunk), the set or count of upstream contributors that enabled the vehicle to possess that chunk. On transfer, direct sender gets one chunk of credit and upstream contributors can receive indirect credit based on the chosen rule.
+
+A good clarification question is whether cycles, such as D sending chunk 3 back to A, should create additional indirect credit or be ignored once a chunk is already known by a receiver.
+
+Preparation
+
+Simulate the provided example event by event and verify each 10MB credit update before coding ranking.
+
+Implement a conservative version that ignores transfers where the receiver already has the chunk; then add a toggle for whether indirect credit propagates to all ancestors or only the immediate provenance path.
+
+Prepare cycle and duplicate tests: repeated send of same chunk, server-origin chunk, unknown sender chunk, and tie-breaking in rank_vehicles.
+
+Was this article helpful?
+Comments
+Sign in to join the discussionLogin / Sign up
+Loading...

@@ -1,0 +1,50 @@
+===H1===
+Split Array: Left Sum Greater
+===URL===
+https://www.1point3acres.com/interview/problems/company/jpmorgan/split-array-left-sum-greater
+===BODY===
+JPMorgan Chase
+Coding·60 minMembers
+Split Array: Left Sum Greater
+Given an integer array, count how many split positions divide it into a left sublist and a right sublist such that the left sum is greater than the right sum.
+SWE
+RS
+array
+prefix-sum
+oa
+easy
+Frequency
+Single report
+Last asked
+2025-09-05
+Stage
+oa
+Requirements
+
+Input: an integer array.
+
+Choose a split position that creates a non-empty left sublist and a non-empty right sublist.
+
+Count the splits where sum(left) > sum(right).
+
+Return the count.
+
+Notes
+
+Compute total sum once, then sweep split positions while maintaining left_sum.
+
+At split after index i, right_sum = total - left_sum.
+
+Negative numbers change intuition but not the algorithm; do not rely on monotonicity unless constraints guarantee non-negative values.
+
+Preparation
+
+Implement the O(n) prefix sweep.
+
+Test arrays with negative numbers, all positive numbers, length two, and no valid split.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

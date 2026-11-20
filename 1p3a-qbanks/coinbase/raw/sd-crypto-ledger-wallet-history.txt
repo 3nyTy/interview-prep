@@ -1,0 +1,61 @@
+===H1===
+System Design — Crypto Ledger & Wallet Transaction History
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/sd-crypto-ledger-wallet-history
+===BODY===
+Coinbase
+System Design·60 minMembers
+System Design — Crypto Ledger & Wallet Transaction History
+Design a crypto-asset ledger that tracks every transaction across chains and supports a 'wallet history' query: given a wallet address, return all transactions touching it, paginated. Recent and unusual variant of the SD round — driven by a single candidate report; details on scale and durability targets are thin.
+SWE
+storage
+data-modeling
+sharding
+ingestion
+scaling
+medium
+Frequency
+Single report
+Last asked
+2026-05-06
+Stage
+onsite-system-design
+Requirements
+
+Reported elements:
+
+Track multi-chain transactions in a single ledger surface.
+
+Support per-wallet history queries (likely paginated, ordered by time).
+
+Reasonable freshness — recent transactions should appear within seconds.
+
+The interviewer noted the prompt mirrors an early internal Coinbase project. Scale / consistency requirements were not fully specified in the candidate report.
+
+Notes
+
+Append-only event ledger as the source of truth: one record per transaction, partitioned by chain or by a hash of (chain, txHash) for write distribution.
+
+Per-wallet query is the hard part — naive indexing by wallet address creates hot partitions for whale addresses. Common patterns: write-fanout into a (walletAddress, timestamp) secondary index at ingest time; pre-shard the wallet-history table by wallet_prefix to spread hot keys.
+
+Cursor-based pagination on (timestamp, txId) is the natural shape — same trade-off discussion as the Transaction Filter + Pagination coding round.
+
+Ingestion from on-chain sources varies per chain (Ethereum vs Bitcoin vs L2s have very different finality and reorg behavior). Decide whether the ledger waits for N confirmations before inserting, or inserts speculatively and rolls back on reorg (the former is simpler and matches what most exchanges actually do for accounting purposes).
+
+Reorg handling is the highest-signal follow-up if it comes up — clarify which chains your design treats as having probabilistic finality, and what "a reorg invalidated this transaction" means downstream (mark as REVERTED, do not delete; show in history with a clear status).
+
+Cost model matters: this is an analytics-flavored storage system. Cold older data is a candidate for tiered storage; recent (≤ 30 days) stays in hot online storage to keep wallet-history queries fast.
+
+Preparation
+
+This round was reported only once recently. Treat it as a generic "design a per-entity append-only ledger with a hot per-entity index" problem and the standard prep transfers cleanly.
+
+Have a 60-second answer on chain-reorg handling — if you cannot articulate that some chains finalize probabilistically and what that means for a ledger, the interviewer will read you as outside their domain.
+
+Drill the per-entity hot-shard problem (whale wallets); the right answer is to write to multiple physical partitions per hot key and merge on read.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

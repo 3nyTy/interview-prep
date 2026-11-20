@@ -1,0 +1,53 @@
+===H1===
+Implement Max Pooling with Argmax Coordinates
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/max-pooling-with-argmax-coordinates
+===BODY===
+Waymo
+CodingMembers
+Implement Max Pooling with Argmax Coordinates
+Implement max pooling over an input tensor. The follow-up requires returning the coordinates of each selected maximum together with the pooled values.
+SWE
+MLE
+array
+grid
+cnn
+computer-vision
+medium
+Frequency
+Single report
+Last asked
+2026-07-02
+Stage
+phone-screen
+Requirements
+
+Implement max pooling over an input tensor or matrix.
+
+Produce the maximum value for each pooling window.
+
+Follow-up: return the coordinate of each maximum together with its value.
+
+Clarify the window shape, stride, padding behavior, tensor layout, and tie-breaking rule for equal maxima before implementation.
+
+Notes
+
+Treat output-shape calculation and boundary handling as part of the contract; write them down before the nested loops.
+
+The coordinate follow-up requires a deterministic tie rule when a window contains the same maximum more than once.
+
+Keep value selection and coordinate tracking in one pass so the two outputs cannot diverge.
+
+Preparation
+
+Implement 2-D max pooling from scratch for both non-overlapping and overlapping windows.
+
+Add coordinate output and test ties, partial boundary windows, negative-only inputs, and different stride values.
+
+Practice translating between common channel-first and channel-last tensor layouts without changing the pooling semantics.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

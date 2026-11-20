@@ -1,0 +1,82 @@
+===H1===
+ML System Design: Search & Ranking
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/ml-system-design-search-and-ranking
+===BODY===
+Pinterest
+System Design·60 minMembers
+ML System Design: Search & Ranking
+Family of design prompts: Pin search, Pin ranking, home-feed retrieval, search input suggestions. Interviewers expect a candidate-generation → ranking stage architecture with explicit embedding sourcing, loss choice (pair-wise vs point-wise), offline metrics, and candidate-pool sizing math.
+MLE
+mlsd
+ml-infra
+retrieval
+ranking
+two-tower
+recommendation
+ann
+search
+hard
+Frequency
+Medium
+Last asked
+2026-04-13
+Stage
+onsite-system-design
+Requirements
+
+Design one of:
+
+A search engine for Pins (the most common framing): candidate generation, ranking, query understanding, personalization.
+
+Pin ranking / home feed: surface relevant pins to a user in real time, responsive to engagement.
+
+Search input suggestions / typeahead: low-latency query autocompletion with personalization signal.
+
+A recommender system end-to-end: data storage, candidate generation, ranking model serving.
+
+The interviewer typically asks for explicit answers to:
+
+How do you efficiently generate candidates?
+
+What models do you use? What is the loss function — pair-wise, point-wise, list-wise?
+
+What features do you use, and how are they constructed?
+
+What is the offline metric? What is the online metric?
+
+How many candidates pass to the ranker? Justify the number.
+
+Where is the data stored? How are models served?
+
+For a 60GB GPU, how do you compute the batch size for serving?
+
+Notes
+
+The standard reference architecture: two-tower retrieval (user tower, item tower; dot-product similarity) for candidate generation, plus a heavier ranker (DLRM / DCN / MMoE) for the top-N candidates. Pinterest's published PinSAGE / PinnerSAGE family is the relevant embedding work; describe the graph-aware embedding training without citing the papers by name.
+
+Candidate-count math: candidate pool is sized as inference_complexity_per_item × items_per_inference_batch × number_of_instances against the per-request latency budget. The interviewer's stated correct number is "a few thousands" — be ready to derive it from a stated 100ms latency budget and a stated 1ms per-item ranker inference.
+
+Batch size for 60GB GPU: model weights + activation memory + intermediate buffers must fit. Standard decomposition — weights are fixed per checkpoint; activations scale linearly with batch size; KV / intermediate buffers depend on the architecture. Derive max batch as (60GB - weights - KV) / activation-per-sample. Acceptable to leave specific numbers symbolic.
+
+Pinterest's production embedding stack is built around a random-walk Graph Convolutional Network on the bipartite Pin-board graph (Pins on one side, boards on the other; engagement edges between them). The graph operates at billions of nodes and tens of billions of edges. Two design choices to know cold: (a) importance-based neighborhood sampling — node neighborhoods for the convolution are picked by simulating random walks from the source and taking the top-visited neighbors, not by a uniform K-hop expansion; (b) MapReduce inference decomposes the bottom-up aggregation into map (project all nodes once), join (route to parent), reduce (aggregate) — this eliminates the redundant computation a naive per-node localized convolution would do, and lets inference run over the full graph in hours on a few-hundred-instance cluster.
+
+The embedding-training-data question is the most common rejection driver. Be explicit about positive pairs (co-engaged pins, user-pin engagement), negative sampling (in-batch negatives, hard negatives from search misses), and label noise handling.
+
+Pair-wise vs point-wise loss choice: pair-wise (BPR, RankNet) for the ranking stage when you have implicit feedback; point-wise (cross-entropy on click) for the retrieval stage when calibrated probabilities matter. The interviewer expects an opinion, not a survey.
+
+Preparation
+
+Whiteboard the two-tower + heavy ranker stack from memory once before the interview, including data sources for each stage.
+
+Practice deriving the candidate-pool number from latency budgets out loud — this is the single most-asked quant question in the round.
+
+Pre-rehearse a 2-minute story on negative sampling in embedding training. Concrete numbers and a named sampling strategy land better than a survey of options.
+
+Drill the 60GB GPU batch-size derivation symbolically: B_max = (M_gpu - M_weights - M_overhead) / M_activation_per_sample. Acknowledge the architecture-specific KV-cache term for transformer-style models.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

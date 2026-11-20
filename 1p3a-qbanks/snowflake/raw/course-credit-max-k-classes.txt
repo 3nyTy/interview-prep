@@ -1,0 +1,132 @@
+===H1===
+Max Credits with K Classes (Interval-Style)
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/course-credit-max-k-classes
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Max Credits with K Classes (Interval-Style)
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+·
+45 min
+Members
+Max Credits with K Classes (Interval-Style)
+
+Given a list of classes, each with `(start_time, end_time, credit)`, and a cap `K` on the number of classes that may be taken, return the maximum total credit achievable subject to no overlapping classes.
+
+SWE
+dp
+interval
+binary-search
+sorting
+scheduling
+medium
+Frequency
+Low
+Last asked
+2026-06-07
+Stage
+phone-screen
+Requirements
+Input: list of classes, each with a start time, end time, and credit value.
+Constraint: at most K classes may be selected.
+Constraint: selected classes must not overlap in time.
+Output: maximum sum of credits.
+This is explicitly NOT LC 207 / 210 (course schedule). The graph is irrelevant; the structure is interval scheduling with a count cap.
+Notes
+Sort the classes by end_time. Run weighted-interval-scheduling DP with one extra dimension for "classes taken so far":
+dp[i][j] = max credit considering the first i classes with at most j selected.
+Transition: dp[i][j] = max(dp[i-1][j], credit[i] + dp[p(i)][j-1]) where p(i) is the largest index < i whose class ends before class i starts (binary-searched on the sorted-by-end list).
+Time: O(N log N + N × K). Space: O(N × K), or O(N) per row if rolled.
+Without the K cap, this is the canonical LC 1235 (Maximum Profit in Job Scheduling).
+Edge cases: K = 0 (zero credit), K ≥ N (drop the K constraint), all classes overlap (pick the single max-credit class), classes that exactly touch at endpoints (clarify whether end_time == start_time counts as overlap).
+Greedy by credit-per-time-unit does not work — counterexamples are easy to construct.
+Preparation
+Implement the 2-D DP with binary-search predecessor.
+Drill the predecessor lookup using bisect_right on the end-time array.
+Be ready to drop to the 1-D LC 1235 version if the interviewer removes the K cap mid-round.
+LeetCode-style event-value variant
+The externalized shape is events[i] = [startDay, endDay, value] and k, returning the maximum value from attending at most k non-overlapping events.
+Sort by end day, binary-search the predecessor event ending before the current start day, and run the same dp[i][j] = max(skip, take) recurrence.
+If the prompt drops values and asks for the maximum number of events attended, it becomes the greedy min-heap-by-end-day variant rather than this weighted DP.
+This exact shape has been handed over as LC 1751 (Maximum Number of Events You Can Attend II) verbatim, including the inclusive-end-day rule that two events cannot share a boundary day. Treat that boundary constraint as canonical, and expect the k-cap weighted DP — not the unbounded LC 1235 — to be the intended solution.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Preparation
+LeetCode-style event-value variant
+Related discussions · 2
+🔑雪花phone screen
+🔑2026.6 SnowFlake sde面经
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Meeting Rooms II
+Single report
+interval
+sorting
+medium
++1
+Merge Intervals
+Single report
+interval
+sorting
+medium
++1
+Maximum Number of Events That Can Be Attended
+Single report
+sorting
+medium
+greedy
++1
+RecordCollection Sort Colors
+Single report
+sorting
+medium
+array
++1
+Min Coins to Pay with Change Allowed
+Single report
+dp
+medium
+greedy
++1
+Code editor

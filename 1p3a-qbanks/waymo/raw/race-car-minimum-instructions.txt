@@ -1,0 +1,50 @@
+===H1===
+Race Car: Minimum Instructions to Reach a Target
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/race-car-minimum-instructions
+===BODY===
+Waymo
+CodingMembers
+Race Car: Minimum Instructions to Reach a Target
+The phone screen used LeetCode 818, Race Car, in its standard form: find the minimum instruction count needed for a car with position and signed speed to reach a target.
+SWE
+dp
+shortest-path
+hard
+Frequency
+Single report
+Last asked
+2026-07-06
+Stage
+phone-screen
+Requirements
+
+The car starts at position 0 with speed +1.
+
+Instruction A moves the car by its current speed and then doubles that speed.
+
+Instruction R leaves the position unchanged and reverses the direction, resetting the speed magnitude to 1.
+
+Given a target position, return the minimum number of instructions needed to reach it.
+
+Notes
+
+This is LeetCode 818, Race Car, in its standard form.
+
+Define the reachable state and search bounds explicitly; an unbounded position-speed space is not directly implementable.
+
+Be prepared to justify why the chosen recurrence or traversal returns the global minimum rather than merely a valid instruction sequence.
+
+Preparation
+
+Derive the state transitions and stopping bounds on paper before implementing them.
+
+Implement both a shortest-state-search version and a memoized recurrence, then compare their state counts on increasing targets.
+
+Rehearse the overshoot-and-reverse cases, which are the key correctness test for the model.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

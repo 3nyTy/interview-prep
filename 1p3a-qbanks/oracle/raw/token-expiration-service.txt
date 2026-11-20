@@ -1,0 +1,47 @@
+===H1===
+Token Expiration Service
+===URL===
+https://www.1point3acres.com/interview/problems/company/oracle/token-expiration-service
+===BODY===
+Oracle
+CodingMembers
+Token Expiration Service
+Implement a service that generates and renews token expiration times and counts tokens that remain unexpired at a supplied time.
+SWE
+ttl
+api-design
+Frequency
+Single report
+Last asked
+2026-09-03
+Stage
+phone-screen
+Requirements
+
+Implement generate(token_id, time) to create a token with expiration set to time.
+
+Implement renew(token_id, time) to refresh the token expiration to time.
+
+Implement count(time) to return the number of tokens that are unexpired at the supplied time.
+
+Notes
+
+The exact expiration-boundary rule, treatment of missing or already-expired tokens during renewal, and ordering constraints on calls are unspecified; clarify them before coding.
+
+A baseline implementation stores one expiration value per token ID in a hash map. Once the renewal policy is agreed, generate and renew update that entry in expected O(1) time; count scans the stored values in O(n) time and uses O(n) storage for n retained token IDs. If expiration is exclusive, count values greater than the query time; if inclusive, use greater than or equal instead.
+
+Do not delete expired entries during count unless query times are nondecreasing and the renewal contract permits deletion. A later query for an earlier time can otherwise lose tokens. Supporting historical state across intervening updates additionally requires versioned records; a single map only represents the latest state.
+
+A related authentication-manager practice model supplies an operation time and a fixed TTL, computes expiration as their sum, and ignores renewal of absent or expired tokens. Those rules are not established by this interface, which currently describes direct expiration assignment; clarify that distinction before implementing renewal.
+
+Preparation
+
+In 15 minutes, implement the map baseline with an explicit expiration predicate; test count immediately before, at, and after an expiry under both boundary conventions.
+
+Write a contract table for duplicate generation, missing-token renewal, expired-token renewal, and decreasing query times. Trace a short operation sequence for each chosen policy without assuming a fixed TTL.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

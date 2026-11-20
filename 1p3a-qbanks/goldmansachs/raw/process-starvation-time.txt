@@ -1,0 +1,53 @@
+===H1===
+Process Starvation Time
+===URL===
+https://www.1point3acres.com/interview/problems/company/goldmansachs/process-starvation-time
+===BODY===
+Goldman Sachs
+Coding·180 minMembers
+Process Starvation Time
+Given process priorities executed from right to left, compute each process's starvation time: how long it waits after the earliest lower-priority process to its right starts running.
+SWE
+RS
+array
+monotonic-stack
+medium
+Frequency
+Low
+Last asked
+2025-09-22
+Stage
+oa
+Requirements
+
+Input: integer array priorities, where process i has priority priorities[i].
+
+CPU execution order is reverse index order: n-1, n-2, ..., 0.
+
+Each process takes exactly one unit of time.
+
+Process i experiences starvation if some process j > i has lower priority: priorities[j] < priorities[i].
+
+Its starvation period begins when the earliest lower-priority process starts executing and ends when process i executes.
+
+For every process, return its starvation time.
+
+Notes
+
+The prompt can be restated as: for each index i, find the largest index j > i such that priorities[j] < priorities[i]; the waiting time follows from the reverse execution schedule.
+
+A monotonic stack or segment/tree-index structure can answer the nearest / farthest lower-priority-to-the-right queries faster than a quadratic scan.
+
+Edge cases: equal priority is not lower priority; a process with no lower-priority process to the right has starvation time 0.
+
+Preparation
+
+First implement the O(n²) scan to pin down the exact time formula, then replace the scan with a monotonic-stack or indexed lookup.
+
+Test with strictly increasing, strictly decreasing, and all-equal priority arrays.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

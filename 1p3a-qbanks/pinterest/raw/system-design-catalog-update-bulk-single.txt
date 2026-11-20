@@ -1,0 +1,62 @@
+===H1===
+System Design: Bulk + Single Catalog Update
+===URL===
+https://www.1point3acres.com/interview/problems/company/pinterest/system-design-catalog-update-bulk-single
+===BODY===
+Pinterest
+System Design·60 minMembers
+System Design: Bulk + Single Catalog Update
+Design the merchant catalog update pipeline — merchants push product updates either one-at-a-time (single API call) or in bulk (CSV upload, hundreds of thousands of rows). The bulk path goes async via S3 + worker pool; the single path is a synchronous API. The interviewer wants both modes designed coherently with one downstream.
+SWE
+MLE
+backend
+ingestion
+async
+storage
+etl
+ads
+scaling
+medium
+Frequency
+Low
+Last asked
+2026-08-18
+Stage
+onsite-system-design
+Requirements
+
+Merchants update their product catalog through two interfaces:
+
+Single update — synchronous PUT /products/{id} with a latency budget of a few hundred milliseconds.
+
+Bulk update — asynchronous CSV upload, potentially hundreds of thousands of rows, returning a job id.
+
+Design the two write paths, their shared downstream store, partial-failure handling, retries, idempotency, concurrency control, and bulk-job progress reporting.
+
+Notes
+
+Bulk path: upload through a presigned object-store URL → create a job id → enqueue bulk-job-ready → workers validate rows and write batches to the catalog store.
+
+A retry identity must describe the operation, not only the product. For a single call, use a client-generated request_id; for bulk rows, use (merchant_id, job_id, row_number) or a stable row operation id. Replaying the same operation becomes a no-op, while a later legitimate update to the same product receives a new key.
+
+Idempotency and write ordering are separate. Protect the product record with an expected version, sequence number, or conditional write so an older bulk retry cannot overwrite a newer single update. Define whether last-write-wins is acceptable before choosing the rule.
+
+Store per-row success or error status and expose GET /bulk-jobs/{job_id} with aggregate progress plus a downloadable failure file. One invalid row should not fail the entire job.
+
+Bound worker concurrency by downstream write capacity. Webhook completion callbacks need retry with backoff, a dead-letter path, and signed payloads.
+
+Preparation
+
+Draw the synchronous and asynchronous paths into one versioned catalog store.
+
+Write concrete keys for a single request, two retries of that request, a later update to the same product, and two rows in one bulk job; verify only the true retry deduplicates.
+
+Walk an out-of-order race between a bulk row and a newer single update using conditional writes.
+
+Rehearse per-row failure reporting and job-progress calculation.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,56 @@
+===H1===
+CPU Architecture and Simulator Design Deep Dive
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/cpu-architecture-simulator-deep-dive
+===BODY===
+Google
+OtherMembers
+CPU Architecture and Simulator Design Deep Dive
+A virtual English-language CPU Architect loop combines an assembly-code test, a broad microarchitecture oral, and C++ simulator design. Core topics include branch prediction, MOESI, caches, MSHRs, VIPT, TLB/page walks, ROB behavior, simulation models, and simulator optimization.
+Perf Eng
+cpu-architecture
+cpp
+cs-fundamentals
+technical-deep-dive
+hard
+Frequency
+Single report
+Last asked
+2026-07-24
+Stage
+onsite-deep-dive
+Requirements
+
+The virtual English-language loop uses three technical rounds followed by a behavioral conversation with the hiring manager.
+
+Complete an assembly-code test.
+
+Explain modern CPU microarchitecture topics, including branch prediction, MOESI coherence, caches, MSHRs, VIPT, TLBs, page walks, and reorder buffers.
+
+Compare simulator time-advancement strategies (cycle-stepped vs. event-driven) separately from fidelity levels (cycle-accurate vs. cycle-approximate).
+
+Explain how to optimize a simulator without losing the fidelity required by its use case.
+
+Be ready to design a branch-predictor simulator module and justify its interfaces, state, update timing, and accuracy/performance trade-offs.
+
+Notes
+
+The questioning is difficult but interactive; hints are available when the reasoning is headed in a productive direction.
+
+Superficial definitions are insufficient. Each mechanism should connect to pipeline behavior, correctness, or measurable performance impact.
+
+Preparation
+
+Draw a modern out-of-order pipeline from memory and trace a branch miss, cache miss, TLB miss, and coherence transition through it.
+
+Implement a small branch-predictor simulator in C++ with deterministic traces and accuracy metrics.
+
+Build a two-axis comparison: cycle-stepped versus event-driven scheduling on one axis, cycle-accurate versus cycle-approximate fidelity on the other; evaluate speed, event ordering, debugging complexity, and accuracy.
+
+Practice reading short assembly sequences and explaining dependencies, stalls, speculation, and memory effects aloud.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,56 @@
+===H1===
+Snake Case to Camel Case with Repository-Wide Refactor
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/snake-case-repository-refactor
+===BODY===
+Google
+Coding·45 minMembers
+Snake Case to Camel Case with Repository-Wide Refactor
+Convert a valid snake_case identifier to camelCase, then design a safe repository-wide migration for variables and function names without changing third-party symbols, public interfaces, or the tests' ability to detect regressions.
+SWE
+string
+refactoring
+medium
+Frequency
+Single report
+Last asked
+2026-07-14
+Stage
+tech-screen
+Requirements
+
+Implement a conversion from a valid snake_case identifier to camelCase.
+
+The base input is guaranteed valid: no leading underscore, trailing underscore, or doubled separator.
+
+Example: foo_bar -> fooBar.
+
+Extend the discussion to a repository too large for manual review: replace snake-case variables and functions across the codebase.
+
+Explain how to verify that the repository still works after the automated rewrite, including when test-package identifiers are rewritten too.
+
+Preserve third-party functions and public interfaces; explain how the migration distinguishes symbols that may change from contracts that must remain stable.
+
+Examples
+
+foo_bar -> fooBar
+
+Notes
+
+The implementation is intentionally short. Most of the round is spent on scoping a safe refactor, validation strategy, symbol ownership, and compatibility boundaries.
+
+Clarify whether names appear only as parsed identifiers or may also occur in strings, generated code, configuration, reflection, and serialized data.
+
+A text replacement is not enough to distinguish local symbols from external APIs or public contracts.
+
+Preparation
+
+Implement the identifier conversion and enumerate edge cases before expanding scope.
+
+Rehearse a migration plan covering symbol-aware rewriting, build and test validation, staged rollout, compatibility shims, and rollback.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

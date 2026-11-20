@@ -1,0 +1,61 @@
+===H1===
+Count Set Bits in an Integer Array
+===URL===
+https://www.1point3acres.com/interview/problems/company/akunacapital/count-set-bits-in-integer-array
+===BODY===
+Akuna Capital
+CodingMembers
+Count Set Bits in an Integer Array
+Implement a low-level function such as `uint64_t count_bits(int* arr, uint64_t size)` that returns the total number of set bits across an integer array.
+SWE
+Infra Eng
+bit-manipulation
+array
+performance-modeling
+easy
+Frequency
+Single report
+Last asked
+2026-01-23
+Stage
+onsite-coding
+Requirements
+
+Implement a function shaped like:
+
+uint64_t count_bits(int* arr, uint64_t size);
+
+Return the total number of set bits across the size integers in arr.
+
+Clarify:
+
+Whether int should be interpreted as signed two's-complement bits or cast to an unsigned type.
+
+Whether the platform width is fixed at 32 bits per int.
+
+Whether null pointer with size zero is allowed.
+
+Notes
+
+The clean answer uses the compiler intrinsic when available: std::popcount in C++20 for unsigned integers, or compiler builtins such as __builtin_popcount. A portable fallback is Kernighan's loop:
+
+while (x) {
+  x &= x - 1;
+  ++count;
+}
+
+For performance discussion, mention vectorization and processing wider machine words when the input representation allows it. Do not ignore signedness: cast each element to a fixed unsigned type before counting if the prompt cares about raw bit patterns.
+
+Preparation
+
+Write both intrinsic and fallback versions in C++.
+
+Test zero, all ones, negative values if signed input is allowed, and a large array.
+
+Practice the one-line proof for x &= x - 1: it clears the lowest set bit.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

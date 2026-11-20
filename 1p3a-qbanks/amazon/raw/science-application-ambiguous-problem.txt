@@ -1,0 +1,75 @@
+===H1===
+Science Application (Ambiguous Problem)
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/science-application-ambiguous-problem
+===BODY===
+Amazon
+Other·60 minMembers
+Science Application (Ambiguous Problem)
+Applied Scientist round explicitly designed around an under-defined business problem. The interviewer states a vague problem, and the candidate must clarify goals, propose a plan, and reason through tradeoffs aloud.
+RS
+MLE
+deep-dive
+ml-knowledge
+behavioral
+Frequency
+Low
+Last asked
+2026-04-29
+Stage
+onsite-research
+Requirements
+
+The interviewer states a stripped-down business prompt and waits.
+
+Drive the conversation: clarify stakeholders, define success metrics, articulate hypotheses, propose a plan, name the risks, decide on an evaluation strategy.
+
+Score the candidate on whether they treat the ambiguity as a feature, not a bug.
+
+Examples
+
+The official module description (Amazon Science Application module):
+
+A critical skill for this role is dealing with ambiguous and ill-defined problems; we often work with the business stakeholders to clarify and set the appropriate goals. This module aims to test your ability to work with ambiguity and problem-solve. The interviewer will assess your ability to productively discuss a problem and walk through what you would do and why. The stated problem will be slightly understated / vague / undefined in the beginning.
+
+Topic areas seen in recent loops: search / ranking / experimentation, brand-safety scoring, generation-quality assessment.
+
+Notes
+
+The behavior the interviewer is looking for is the clarification flow, not the final answer. Spend the first 5-10 minutes asking, not answering.
+
+A clean structure: define the customer → define success → propose 2-3 approaches → pick one with tradeoffs → describe how you'd validate.
+
+NLP-background candidates do better on prompts in that domain; if you don't have the background, be upfront and lean on the structured problem-solving framing.
+
+The interviewer is scoring the clarification flow, not the final answer. Spend the first 5–10 minutes asking before proposing — silence after the prompt is a feature, not a stall.
+
+A reusable five-step playbook that fits any prompt: Customer (who is the user, what decision are they making) → Success (one primary metric, one guardrail metric, how you'd measure both) → Hypotheses (2–3 plausible mechanisms, each falsifiable) → Plan (smallest experiment that distinguishes them, data needed, baseline) → Validation (offline metric, online A/B, what would make you roll back).
+
+Common ambiguity axes to probe before answering: who exactly is the customer, what's the current baseline, what's the cost of a false positive vs false negative, what's the timeline / budget, what data already exists.
+
+Anti-pattern: jumping to model architecture ("I'd use a transformer encoder…") before the metric is defined. The interviewer's mental rubric explicitly rewards staying in problem-framing mode longer than feels comfortable.
+
+For NLP-adjacent prompts (search ranking, brand safety, generation-quality scoring), have one concrete reference experiment per area you can pull as a worked example.
+
+Preparation
+
+Practice the under-specified prompt: have a friend hand you 1-sentence problem statements and force yourself to ask 5 questions before answering.
+
+Build a 5-step playbook (customer / success / hypotheses / plan / validation) you can deploy on any prompt.
+
+Re-read the official module description; the interviewer's mental rubric is a paraphrase of that paragraph.
+
+Drill ladder: (1) have a friend hand you one-sentence problem statements ("improve search relevance", "detect unsafe generations", "reduce returns") and force yourself to ask 5 clarifying questions before saying anything else; (2) for each, run the five-step playbook out loud in under 10 minutes; (3) record yourself and check whether you defined the metric before the model.
+
+Pre-build a metric library: for ranking (NDCG, MRR, CTR, conversion), for classification under imbalance (precision@k, PR-AUC, calibration), for generation (win-rate, harm rate, human eval cost) — knowing the right metric vocabulary lets you skip 5 minutes of fumbling.
+
+Re-read the official module description once a week leading up to the interview; the interviewer's rubric is a paraphrase of that paragraph, and matching the vocabulary helps.
+
+Prep two genuine ambiguous-problem stories from your past work: one where you nailed the framing and one where you got it wrong and recovered — Amazon's bar-raiser style loves the second kind.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

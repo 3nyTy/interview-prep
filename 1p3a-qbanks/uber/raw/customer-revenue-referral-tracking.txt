@@ -1,0 +1,79 @@
+===H1===
+Customer Revenue and Referral Tracking
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/customer-revenue-referral-tracking
+===BODY===
+Uber
+CodingMembers
+Customer Revenue and Referral Tracking
+Design a data structure that tracks customer revenue and referral credit. New customers can be inserted directly or via a referral that also credits the referrer, and a query returns up to K qualifying customers with the smallest total revenue at or above a threshold.
+SWE
+data-structure
+oop-design
+top-k
+heap
+sorting
+medium
+Frequency
+Single report
+Last asked
+2026-03-22
+Stage
+onsite-coding
+Customer Revenue and Referral Tracking
+
+Design a data structure that tracks customer revenue and referral credit.
+
+Implement the CustomerRevenueTracker class:
+
+CustomerRevenueTracker() Initializes the tracker.
+
+int insertNewCustomer(int revenue) Inserts a new customer with the next available customer ID, starting from 0. The new customer begins with total revenue revenue.
+
+int insertNewCustomerWithReferral(int revenue, int referrerId) Inserts a new customer with the next available customer ID. The new customer begins with total revenue revenue, and the referrer's total revenue also increases by revenue.
+
+int[] getLowestK(int k, int minTotalRevenue) Returns up to k customer IDs whose total revenue is at least minTotalRevenue, choosing the customers with the smallest total revenue first.
+
+In this practice version, revenue values are integers. Order the returned customer IDs by increasing (totalRevenue, customerId). This deterministic ordering is only for the practice runner; the original interview prompt may describe the result as a set.
+
+The original interview prompt may also present the referral form as an overloaded insertNewCustomer(revenue, referrerId). This practice runner exposes it as insertNewCustomerWithReferral(...) so all supported languages can be evaluated consistently.
+
+Examples
+
+Example 1:
+
+Input: ["CustomerRevenueTracker","insertNewCustomer","insertNewCustomerWithReferral","insertNewCustomerWithReferral","getLowestK","getLowestK"] [[],[10],[30,0],[50,1],[1,45],[2,45]]
+
+Output: [null,0,1,2,[2],[2,1]]
+
+Explanation:
+
+Customer 0 starts at 10, then gains 30 from customer 1, so total revenue becomes 40. Customer 1 starts at 30, then gains 50 from customer 2, so total revenue becomes 80. Customer 2 has total revenue 50. The qualifying customers for threshold 45 are (2, 50) and (1, 80), so the lowest one is [2] and the lowest two are [2, 1].
+
+Example 2:
+
+Input: ["CustomerRevenueTracker","insertNewCustomer","insertNewCustomer","getLowestK","insertNewCustomerWithReferral","getLowestK"] [[],[20],[20],[2,20],[5,0],[2,20]]
+
+Output: [null,0,1,[0,1],2,[1,0]]
+
+Explanation:
+
+Before the referral, customers 0 and 1 both have total revenue 20, so the smaller ID comes first. After inserting customer 2 with referral to 0, totals become 25, 20, and 5, so the qualifying customers are [1, 0].
+
+Constraints
+
+0 <= revenue <= 10^9
+
+0 <= minTotalRevenue <= 10^9
+
+1 <= k <= 10^4
+
+A referral call always uses an existing referrerId.
+
+At most 10^4 total calls will be made to insertNewCustomer, insertNewCustomerWithReferral, and getLowestK.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

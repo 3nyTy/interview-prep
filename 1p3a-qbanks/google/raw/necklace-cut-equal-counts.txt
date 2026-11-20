@@ -1,0 +1,56 @@
+===H1===
+Necklace Cut into Two Halves with Equal D/R Counts
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/necklace-cut-equal-counts
+===BODY===
+Google
+Coding·45 minMembers
+Necklace Cut into Two Halves with Equal D/R Counts
+Onsite coding round 4 for an L4 AI/ML loop: given a circular string of `D` and `R` with equal counts of each, find a way to make at most 2 cuts to produce two pieces such that each piece has the same number of `D`s and the same number of `R`s.
+SWE
+MLE
+string
+two-pointer
+math-reasoning
+hard
+Frequency
+Single report
+Last asked
+2026-05-03
+Stage
+onsite-coding
+Requirements
+
+Input: a circular string s over alphabet {D, R} with |D| == |R|.
+
+Output: a pair of cut positions (or report that one cut suffices) such that splitting at those positions produces two pieces with equal letter counts.
+
+At most 2 cuts are needed under the constraint; the candidate must derive that bound.
+
+Examples
+
+s = "DRDR"    → cut between index 1 and 2: "DR" + "DR".
+s = "DDRR"    → 1-cut not balanced ("DD" vs "RR"); rotate, two cuts at offsets 1 and 3:
+               pieces "DR" and "DR".
+
+Notes
+
+Why 2 cuts always suffice: think of a running balance cnt(D) - cnt(R); over the full string it returns to 0. Any prefix splits the necklace into two arcs whose imbalances sum to 0; if the imbalance at some prefix is already 0, one cut suffices, otherwise a sliding window of length n/2 proves a 2-cut works.
+
+Sliding-window approach: fix one cut at index i, look for j such that the window [i, j) has half the Ds and half the Rs. As i advances, j moves monotonically.
+
+Don't get distracted by the necklace framing; once unwrapped onto a line of length 2n and constrained to half-length windows, the problem is standard.
+
+Verbalize the 2-cut bound out loud before coding — interviewers ask why.
+
+Preparation
+
+Practice the running-balance technique on +1/-1 arrays (the contiguous-array and subarray-sums-divisible-by-k families).
+
+Drill sliding-window-on-circular-array unrolling (duplicate the string s+s and use a window of length n).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

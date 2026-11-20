@@ -1,0 +1,96 @@
+===H1===
+Design Hit Counter
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/design-hit-counter
+===BODY===
+Apple
+CodingMembers
+Design Hit Counter
+Design a hit counter which counts the number of hits received in the past 5 minutes (that is, the past 300 seconds).
+SWE
+data-structure
+queue
+ring-buffer
+sliding-window
+medium
+Frequency
+Single report
+Last asked
+2026-08-05
+Stage
+phone-screen
+Design a hit counter which counts the number of hits received in the past 5 minutes (that is, the past 300 seconds).
+
+Implement the HitCounter class:
+
+HitCounter() Initializes the object of the hit counter system.
+
+void hit(int timestamp) Records a hit that happened at timestamp (in seconds). Several hits may happen at the same timestamp.
+
+int getHits(int timestamp) Returns the number of hits in the past 5 minutes from timestamp.
+
+You may assume that calls are made in chronological order, so timestamp is monotonically increasing.
+
+Examples
+
+Example 1:
+
+Input: ["HitCounter","hit","hit","hit","getHits","hit","getHits","getHits"] [[],[1],[2],[3],[4],[300],[300],[301]]
+
+Output: [null,null,null,null,3,null,4,3]
+
+Explanation:
+
+HitCounter hitCounter = new HitCounter(); hitCounter.hit(1); hitCounter.hit(2); hitCounter.hit(3); hitCounter.getHits(4); // return 3 hitCounter.hit(300); hitCounter.getHits(300); // return 4 hitCounter.getHits(301); // return 3
+
+Example 2:
+
+Input: ["HitCounter","hit","hit","hit","getHits","getHits"] [[],[1],[1],[1],[1],[300]]
+
+Output: [null,null,null,null,3,3]
+
+Explanation:
+
+Multiple hits in the same second share the same bucket, but all of them still count within the 300-second window.
+
+Constraints
+
+1 <= timestamp <= 2 * 10^9
+
+timestamp values are passed in non-decreasing order.
+
+At most 300 calls will be made to hit and getHits.
+
+Company Notes
+
+Apple-Specific Notes
+
+In the Apple phone screen, the API is usually described as increment() and getValue() (no timestamp argument — it reads wall-clock time). Once you start coding, parameterize the timestamp as in the LeetCode formulation so the solution is testable; the interviewer will accept this.
+
+The 5-minute expiration window is the same as the LeetCode 300-second window.
+
+Follow-up: High-Throughput increment()
+
+Question: What if increment() is called hundreds of millions of times? The per-hit bookkeeping becomes too expensive.
+
+Expected direction (rate limiter / token bucket):
+
+Don't record every hit individually. Instead, cap the rate at which hits are admitted into the counter using a token bucket or leaky bucket.
+
+Admitted hits update the bucket array as usual; excess hits are dropped (or counted into a coarse overflow bucket).
+
+Alternative: batch hits with an atomic counter per second and flush into the bucket array once per second, turning N increments into one update.
+
+Discussion points:
+
+Accuracy vs. throughput trade-off — sampling / rate-limiting loses precision but keeps the counter cheap under load.
+
+If exact counts are required, shard the counter across threads/cores and aggregate on read (getValue) instead of on write.
+
+At extreme scale, move the counter out of process: a distributed counter backed by Redis INCR with TTL, or a stream aggregator (Kafka + Flink).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

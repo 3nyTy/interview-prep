@@ -1,0 +1,106 @@
+===H1===
+Topological Sort with Secondary Ordering
+===URL===
+https://www.1point3acres.com/interview/problems/company/roblox/topological-sort-with-ordering
+===BODY===
+Roblox
+Coding·45 minMembers
+Topological Sort with Secondary Ordering
+Given dependency declarations where each row starts with a component and the remaining entries are prerequisites, return a valid build order. The current canonical Roblox variant requires components that become buildable at the same level to be emitted in declaration order, and returns `["Error"]` for missing dependencies or cycles.
+SWE
+MLE
+topological-sort
+heap
+graph
+scheduling
+complexity-analysis
+medium
+Frequency
+Medium
+Last asked
+2026-06-29
+Stage
+phone-screen · onsite-coding
+Requirements
+
+You are given a list of dependency declarations. Each declaration is a list of strings:
+
+The first element is a component.
+
+The remaining elements are components it depends on; those dependencies must be built before the component.
+
+Return a valid build order as a list of component names. A component can appear in the output only after all of its dependencies have appeared.
+
+When several components become buildable at the same time, output them in the order their declarations appear in the input. This level-order tie-breaker matters: do not use arbitrary hash-map order.
+
+Return ["Error"] if either condition is true:
+
+A component is listed as a dependency but never appears as the first element of any declaration.
+
+The dependency graph contains a cycle.
+
+A common function shape is:
+
+from typing import List
+
+def build_order(declarations: List[List[str]]) -> List[str]:
+    pass
+
+Examples
+
+build_order([["head"], ["torso"], ["leg"]])
+# ["head", "torso", "leg"]
+
+build_order([["head", "leg"], ["leg", "head"]])
+# ["Error"]
+
+The second example is a cycle: head depends on leg, and leg depends on head.
+
+build_order([["head"], ["leg", "torso"]])
+# ["Error"]
+
+The third example has a missing dependency: torso is required by leg but is never declared as a component.
+
+build_order([["hair", "head"], ["torso"], ["leg", "torso"], ["head"]])
+# ["torso", "head", "hair", "leg"]
+
+In the last example, torso and head start with no dependencies. Declaration order emits torso before head. After head is built, hair becomes buildable; after torso is built, leg becomes buildable.
+
+An older spelling of the same family uses Roblox-avatar terms:
+
+build_order([["Hair", "Head"], ["Hat", "Hair"], ["Head"]])
+# ["Head", "Hair", "Hat"]
+
+Notes
+
+Build edges from dependency to dependent component. For ["hair", "head"], the edge is head -> hair, not hair -> head.
+
+Validate missing dependencies before returning a partial topological order. A dependency-only string should not be silently added as a standalone component unless the interviewer explicitly allows implicit declarations.
+
+Use Kahn's algorithm by levels. At each wave, collect all currently zero-indegree declared components, emit them by declaration index, then unlock the next wave.
+
+Some older variants phrase the tie-breaker as first appearance anywhere in the input or smallest ID. Clarify the rule before coding; the current component-declaration variant uses declaration order among simultaneously buildable components.
+
+Returning ["Error"] as a list, not a string, is part of the contract.
+
+Alternate tie-breaker — target-row order
+
+Among simultaneously buildable components, one reported variant breaks ties by the row index of each component's own declaration (the order the target items are listed), rather than by first appearance anywhere in the input. This diverges from the declaration/level-order rule only when a dependency-only string becomes buildable alongside a later-declared component. Clarify which the interviewer wants; for target-row order, key the ready-heap on (declaration_row_index, first_seen_index) and fall back to first-seen for dependency-only strings.
+
+Numeric course-scheduler follow-up
+
+A common follow-up swaps the string names for integer course IDs (Course Schedule II) and asks for the smallest available ID at each step. It is the same topological structure — only the heap key changes to the numeric ID. Keep the two concerns separate: the dependency constraint (prerequisites emitted first) is independent of the tie-breaker (smallest ID among currently zero-indegree nodes).
+
+Preparation
+
+Write the graph construction twice: once with the correct dependency -> component edge direction, once as a small failing test to catch the reversed-edge bug.
+
+Drill three tests before submitting: independent components, missing dependency, and two-node cycle.
+
+Practice the level-order version separately from the heap-priority version; they differ exactly when multiple nodes are available at once.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

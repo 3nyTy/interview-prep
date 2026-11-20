@@ -1,0 +1,125 @@
+===H1===
+ACL Service for Another Service
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/acl-service-design
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+ACL Service for Another Service
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+System Design
+·
+60 min
+Members
+ACL Service for Another Service
+
+Design a service that performs ACL-style authorization checks on behalf of another service: given (subject, resource, action) decide allow / deny.
+
+SWE
+distributed-systems
+access-control
+caching
+throttling
+medium
+Frequency
+Single report
+Last asked
+2025-12-27
+Stage
+onsite-system-design
+Requirements
+The ACL service is invoked synchronously by another service before every privileged action.
+Input: (subject_id, resource_id, action). Output: allow | deny plus an optional reason for audit logging.
+ACL rules support direct grants (subject → resource → action) and group / role indirection (subject ∈ group ∈ role → resource → action).
+Latency budget: low single-digit milliseconds at p99, because every privileged call in the caller's request path waits on this check.
+Throughput: scales with the caller's QPS.
+Notes
+Two-layer storage:
+Source of truth: durable relational store (Postgres / Spanner) for rule definitions and group / role membership. Updated through an admin API at low volume.
+Read cache: in-process or sidecar cache (Redis / local LRU) for compiled rules keyed by (subject_id, resource_id). Hit rate is the dominant latency driver.
+Compilation: when a subject's group memberships change, invalidate that subject's compiled cache entries; recompile lazily on next read. For role / group hierarchy, flatten the closure at compile time so the hot path is a single hashmap lookup.
+Negative caching: cache deny results with the same key, so repeated unauthorized calls don't repeatedly hit the source of truth.
+Invalidation: publish change events from the admin write path to a pub/sub channel; cache subscribers evict affected keys. Accept a small staleness window (single seconds) in exchange for the latency gain.
+Audit: log every check (allow and deny) to an append-only audit log, sampled or full depending on retention budget. Audit log writes must not block the response.
+Failure modes: if the cache is down, fall back to the source of truth with a circuit breaker that returns deny after N consecutive failures (fail-closed is the safer default for an authorization service).
+Preparation
+Sketch the request-path diagram (caller → ACL service → cache → source of truth) and the write-path diagram (admin → SOT → pubsub → cache eviction) separately. Both fit on one whiteboard half each.
+Drill the fail-closed vs fail-open discussion — authorization services should fail closed; be ready to defend that explicitly.
+Prepare the trade-off between flattening role / group closures at compile time (faster reads, slower invalidation) vs walking the hierarchy on every read (slower reads, instant invalidation).
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Preparation
+Related discussions · 1
+🔑Snowflake 店面两轮挂经
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Service Failure Forensics
+Single report
+distributed-systems
+medium
+graph
++2
+Frontend Grid: Robot Eats Candies
+Single report
+medium
+frontend
+bfs
++2
+Grep With Context Lines
+Single report
+medium
+string-processing
+parsing
++1
+Top-K Search Terms (Per-User Deduped)
+Single report
+medium
+hashmap
+set
++2
+Recipe as Contiguous Ingredient Subsequence
+Single report
+medium
+string
+hashing
++4
+Code editor

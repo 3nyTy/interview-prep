@@ -1,0 +1,64 @@
+===H1===
+Reconstruct Itinerary
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/reconstruct-itinerary
+===BODY===
+Apple
+CodingMembers
+Reconstruct Itinerary
+You are given a list of airline tickets where tickets[i] = [fromi, toi] represent the departure and the arrival airports of one flight. Reconstruct the itinerary in order and return it.
+SWE
+medium
+graph
+dfs
+Frequency
+Single report
+Last asked
+2026-05-27
+Stage
+phone-screen
+You are given a list of airline tickets where tickets[i] = [from_i, to_i] represent the departure and the arrival airports of one flight. Reconstruct the itinerary in order and return it.
+
+All of the tickets belong to a man who departs from "JFK", thus, the itinerary must begin with "JFK". If there are multiple valid itineraries, you should return the itinerary that has the smallest lexical order when read as a single string.
+
+For example, the itinerary ["JFK", "LGA"] has a smaller lexical order than ["JFK", "LGB"].
+
+You may assume all tickets form at least one valid itinerary. You must use all the tickets once and only once.
+
+Examples
+
+Example 1:
+
+Input: tickets = [["MUC","LHR"],["JFK","MUC"],["SFO","SJC"],["LHR","SFO"]]
+
+Output: ["JFK","MUC","LHR","SFO","SJC"]
+
+Example 2:
+
+Input: tickets = [["JFK","SFO"],["JFK","ATL"],["SFO","ATL"],["ATL","JFK"],["ATL","SFO"]]
+
+Output: ["JFK","ATL","JFK","SFO","ATL","SFO"]
+
+Explanation:
+
+The itinerary ["JFK","ATL","JFK","SFO","ATL","SFO"] has a smaller lexical order than ["JFK","SFO","ATL","JFK","ATL","SFO"].
+
+Constraints
+
+1 <= tickets.length <= 300
+
+tickets[i].length == 2
+
+from_i.length == 3
+
+to_i.length == 3
+
+from_i and to_i consist of uppercase English letters.
+
+from_i != to_i
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,129 @@
+===H1===
+Design an RPC Abstraction Layer
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/rpc-abstraction-layer
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Design an RPC Abstraction Layer
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+System Design
+Members
+Design an RPC Abstraction Layer
+
+Design an RPC-style abstraction over hand-written REST calls so application code invokes a local-looking method (e.g. exampleService.processSomething(...)) instead of building HTTP requests by hand. A strong answer covers client/server stubs, marshalling, binding / service discovery, transport hiding, retries with idempotency and duplicate filtering, and interface versioning.
+
+SWE
+rpc
+distributed-systems
+idempotency
+versioning
+medium
+Frequency
+Single report · New
+Last asked
+2026-05-08
+Stage
+onsite-system-design
+
+A company has many backend services that today are invoked through hand-written REST calls. Every call site repeats the same boilerplate: build the HTTP request, serialize the inputs, set headers, send the request to an app server, handle the response and error cases, and invoke the client library for the target service. Because each caller has to know the REST implementation and every service-specific integration, the pattern no longer scales.
+
+Design an abstraction layer so that application code can call a normal-looking interface such as:
+
+exampleService.processSomething([some, data]);
+
+
+instead of constructing a POST request by hand. No specific performance, availability, throughput, or latency targets were given — clarify those up front. The central design problem is how to hide remote-call details behind a stable service interface while still handling serialization, routing / binding, retries, duplicate handling, errors, and versioning.
+
+What this problem is testing
+
+The task is to recognize and design an RPC-style abstraction on top of remote services: the caller thinks in terms of invoking a local-looking method, while a client stub or runtime translates that call into a network request and returns the result as if the procedure had executed locally.
+
+What a strong answer covers
+Client-facing interfaces / generated stubs — a stable method-call surface (hand-written or code-generated) that hides transport from callers.
+Marshalling / unmarshalling — serialize request arguments and deserialize responses; choose and version the wire format.
+Binding / service discovery — map a (service, method) name to a concrete network endpoint, and let endpoints move without touching call sites.
+Transport hidden from callers — REST, gRPC, or another protocol can back the stub without changing application code.
+Reliability semantics — timeouts, retries, idempotency keys, and duplicate filtering so a retried call is safe.
+Interface evolution — backward / forward compatibility as services add or change methods (field defaults, deprecation, version negotiation).
+Notes
+The client-stub / server-stub split is the crux: the client stub marshals and sends; the server stub unmarshals, dispatches to the real handler, and marshals the reply. Application callers should never see HTTP.
+Retries make at-least-once delivery the default, so idempotency (dedup keys, idempotent handlers) is what makes the abstraction safe to hide behind a plain method call.
+Versioning and binding are the two pieces most candidates forget: without a discovery / binding step the "stable interface" leaks endpoints, and without a compatibility story every schema change breaks callers.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+What this problem is testing
+What a strong answer covers
+Notes
+Related discussions · 1
+📋雪花店面 coding和sd（奇怪的问题）
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Service Failure Forensics
+Single report
+distributed-systems
+medium
+graph
++2
+Frontend Grid: Robot Eats Candies
+Single report
+medium
+frontend
+bfs
++2
+Grep With Context Lines
+Single report
+medium
+string-processing
+parsing
++1
+Top-K Search Terms (Per-User Deduped)
+Single report
+medium
+hashmap
+set
++2
+Recipe as Contiguous Ingredient Subsequence
+Single report
+medium
+string
+hashing
++4
+Code editor

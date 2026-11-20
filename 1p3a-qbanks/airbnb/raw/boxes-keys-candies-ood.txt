@@ -1,0 +1,55 @@
+===H1===
+Boxes, Keys & Candies (OOD)
+===URL===
+https://www.1point3acres.com/interview/problems/company/airbnb/boxes-keys-candies-ood
+===BODY===
+Airbnb
+Coding·45 minMembers
+Boxes, Keys & Candies (OOD)
+Starting from one open box in a house, explore nested boxes. Each box may hold candies, keys, and child boxes; a box opens only if it is open initially or you hold its key. Count the maximum candies collectable. The interviewer pushes hard on the object model (a Box class).
+SWE
+bfs
+object-design
+simulation
+medium
+Frequency
+Single report
+Last asked
+2026-06-02
+Stage
+phone-screen · tech-screen
+Requirements
+
+You start with one or more initially-open boxes (some boxes need no key).
+
+Each box contains: some number of candies, zero or more keys (each key opens a specific box), and zero or more child boxes.
+
+A box can be opened only if it is open initially or you have collected its key.
+
+Return the total number of candies collectable, exploring reachable boxes until no more can be opened.
+
+Model the domain explicitly — the interviewer expects a Box class and clean separation between the data model and the traversal. Clarify the box / key relationships before writing code.
+
+Notes
+
+This is a reachability traversal: keep a queue of openable boxes; opening a box yields candies, keys (which may unlock previously-seen-but-locked boxes), and child boxes (which may themselves be locked). Re-scan locked boxes whenever a new key arrives.
+
+Not every box has a corresponding key, and some boxes are open from the start — clarify which boxes are initially open.
+
+The grading weight is on the object design, not the algorithm. Spend the first few minutes on the Box model and the open / locked state machine before writing the traversal.
+
+Edge cases: a key for a box not yet seen; a box that contains its own key; cycles in the box graph; unreachable locked boxes left at the end.
+
+Preparation
+
+Write the Box class plus a BFS that interleaves "newly openable from keys" and "newly discovered children" in one pass.
+
+Drill the case where a key unlocks a box seen earlier — track a set of found_keys and a set of seen_but_locked boxes.
+
+Pre-script clarifying questions about initially-open boxes and the key-to-box mapping; asking before coding is rewarded.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

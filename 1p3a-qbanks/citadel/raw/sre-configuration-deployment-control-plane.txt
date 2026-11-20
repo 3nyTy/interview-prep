@@ -1,0 +1,62 @@
+===H1===
+Fleet Configuration and Deployment Control Plane
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/sre-configuration-deployment-control-plane
+===BODY===
+Citadel / Citadel Securities
+System Design·60 minMembers
+Fleet Configuration and Deployment Control Plane
+Design a system for safely changing configuration and deploying 200+ services across multiple data centers and cloud regions, with rollback support. The starting point mixes checked-in property files, hand-managed environment variables, a directly edited shared NFS mount, and SSH-driven deployment scripts.
+Infra Eng
+distributed-systems
+cloud
+sre
+Frequency
+Single report
+Last asked
+2026-08-05
+Stage
+tech-screen
+Requirements
+
+Support a fleet of more than 200 services deployed across multiple data centers and cloud regions.
+
+Give engineers a safe workflow for changing service configuration.
+
+Deploy services at fleet scale without requiring operators to SSH into individual hosts and run scripts.
+
+Provide rollback capability for unsuccessful configuration changes or deployments.
+
+Replace or migrate the fragmented starting state: checked-in property files, manually set environment variables, and a shared NFS mount edited directly by operators.
+
+Make the system-of-record, rollout, and rollback semantics explicit, including how the new workflow coexists with the legacy configuration channels during migration.
+
+Notes
+
+This is a verbal design exercise delivered by screen share after five short Python tasks in the same one-hour SRE first round.
+
+The prompt anchors the design in the operational failure surface of the current process: multiple configuration sources and host-by-host SSH deployment.
+
+Canonical design skeleton
+
+Store desired configuration and deployment state as versioned, reviewable releases in one durable system of record. Validate configuration schemas and artifact compatibility before a release can enter rollout.
+
+Have a control plane compute rollout plans while per-environment agents reconcile toward the selected release. Reconciliation must be idempotent, and agents should keep serving the last known-good state when the control plane is temporarily unavailable.
+
+Roll out through bounded stages such as canary, region, and fleet. Each stage has health gates that pause progression on failure rather than allowing an unhealthy version to spread.
+
+Treat the service artifact and its compatible configuration version as one release tuple. Rollback selects the previous known-good tuple and lets the same reconciliation path converge the fleet backward, avoiding a separate emergency mutation path.
+
+Migrate each legacy channel through an adapter with explicit precedence. Shadow-read and diff old versus new values first, move services gradually, then disable direct writes to the retired channel so the system cannot drift back to multiple authorities.
+
+Preparation
+
+Draw the configuration-change and deployment paths end to end, mapping each legacy input channel to the proposed controlled workflow and narrating how a rollback is initiated.
+
+Rehearse a partial multi-region rollout failure and explain how configuration state and deployed service versions return to a known-good combination.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

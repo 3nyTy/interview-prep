@@ -1,0 +1,59 @@
+===H1===
+Multi-Exchange BBO / NBBO Class
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/multi-exchange-nbbo-class
+===BODY===
+Citadel / Citadel Securities
+Coding·40 minMembers
+Multi-Exchange BBO / NBBO Class
+Citsec SWE phone-screen prompt that walks the candidate through a stripped-down market-data class. Ingest a stream of orders tagged with exchange id, price, quantity, and order type; expose per-exchange best bid / best ask and the consolidated NBBO across all exchanges.
+SWE
+data-structure
+trading
+oop-design
+medium
+Frequency
+Single report
+Last asked
+2026-01-29
+Stage
+phone-screen
+Requirements
+
+Input is a list of orders: data = [(exchange_id, price, quantity, order_type), ...] where order_type is bid or ask.
+
+Design a class with two methods:
+
+get_exchange_bbo(exchange_id) -> (best_bid, best_ask) — the best (highest) bid and best (lowest) ask currently resting on that single exchange.
+
+get_nbbo() -> (best_bid, best_ask) — the national best bid and offer aggregated across every exchange seen.
+
+The interviewer probes throughput assumptions (high update rate, frequent query) but does not formalize them; clarify before choosing data structures.
+
+Notes
+
+Naive design: per (exchange_id, side) keep a sorted container of (price, quantity); per-exchange BBO is the head, NBBO is the max-bid / min-ask across all exchange heads.
+
+For frequent queries and frequent updates, the cleanest baseline is per-exchange std::map<price, quantity> (sorted by price) plus an overarching cache of (exchange -> top_bid, top_ask) to make NBBO an O(E) scan rather than re-scanning every level.
+
+Quantity bookkeeping matters: orders may decrement quantity to zero, at which point that price level must be erased to keep the head pointer accurate. Several candidates lose points by skipping the empty-level cleanup.
+
+Order-type clarification is required up front: the prompt does not distinguish new-order vs replace vs cancel; assume the simplest model (each tuple is a resting order, cumulative quantity per price) and state the assumption out loud.
+
+Interviewer behavior: this loop reportedly pushes hard on the thinking process — no extended silence allowed. Narrate the design decisions even before writing them.
+
+Preparation
+
+Implement an in-memory L2 order book once from scratch (per-side sorted map of price levels with aggregated quantity) so the BBO extraction is automatic muscle memory.
+
+Practice giving the NBBO talk track in 30 seconds: best bid across exchanges is the per-exchange max of bid heads, best ask is the per-exchange min of ask heads; cache top-of-book per exchange to keep query cost linear in exchange count instead of total levels.
+
+Rehearse defending the quantity-zero erase step — it is the most common follow-up.
+
+Bring a one-paragraph mental model of what NBBO means in US equity microstructure (Reg NMS, consolidated tape) so the domain framing question is not a surprise.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

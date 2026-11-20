@@ -1,0 +1,57 @@
+===H1===
+Onsite System Design: App User Behavior Data Platform
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/onsite-sd-app-user-behavior-data-platform
+===BODY===
+Uber
+System Design·60 minMembers
+Onsite System Design: App User Behavior Data Platform
+Design a system to analyze Uber App user behavior data and process raw events into downstream-ready data for models and business systems. The key is not just collecting clicks, but building pipelines for sessionization, funnel analysis, feature generation, quality checks, and schema evolution.
+SWE
+data-engineering
+feature-engineering
+analytics-dashboard
+ingestion
+schema-design
+medium
+Frequency
+Single report
+Last asked
+2026-06-17
+Stage
+onsite-system-design
+Requirements
+
+Collect app behavior events such as clicks, sessions, conversions, refunds, ratings, and order-completion outcomes.
+
+Support funnel analysis that links user actions across the full journey, not isolated click counters.
+
+Produce processed data assets usable by downstream models, analytics dashboards, and business systems.
+
+Support both historical queries and fresher pipeline outputs where needed.
+
+Define event APIs, schemas, data model, ingestion path, cleaning, aggregation, storage, and serving surfaces.
+
+Handle schema evolution, event-tracking quality, late / duplicate events, and data-quality monitoring.
+
+Notes
+
+The prompt starts deliberately broad; the interviewer may answer clarification questions with little direction. Drive the round by proposing concrete user-behavior examples and asking which downstream consumer matters most.
+
+A strong answer moves beyond a generic analytics dashboard into data processing for model users: sessionization, funnel features, offline / realtime pipelines, and reusable feature tables.
+
+The interviewer signaled that simply describing collection and dashboarding is only the starting point.
+
+Preparation
+
+Prepare a canonical event schema with user id, session id, event name, entity ids, timestamp, client metadata, and version.
+
+Practice a dual-path architecture: streaming aggregation for fresh signals plus batch backfill for correctness.
+
+Drill data-quality checks: duplicate events, missing IDs, schema version mismatches, late arrivals, and metric reconciliation.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,50 @@
+===H1===
+Round Price to Nearest Valid Tick
+===URL===
+https://www.1point3acres.com/interview/problems/company/akunacapital/round-price-to-nearest-tick
+===BODY===
+Akuna Capital
+CodingMembers
+Round Price to Nearest Valid Tick
+Given price bands (each with a lower bound, upper bound, and tick width), snap an input price to the nearest valid tick. If the price is below the minimum, return the minimum; within a band, return low + n*width minimizing |price - (low + n*width)|. Inputs are doubles and prices may be negative.
+SWE
+Infra Eng
+math
+simulation
+trading
+medium
+Frequency
+Low
+Last asked
+2025-09-22
+Stage
+oa
+Requirements
+
+Instruments have valid price levels defined by bands. Each band provides a lower bound, an upper bound, and a tick width. Given a raw price, adjust it to the correct tick:
+
+If the price is below the minimum price, return the minimum price.
+
+If the price falls inside a band [low, high], return the value low + n * width that minimizes abs(price - (low + n * width)).
+
+Most values are doubles, and prices may be negative, so handle the data carefully.
+
+Examples
+
+lowerBound = 20, upperBound = 40, width = 2, price = 21.2  ->  22
+
+Notes
+
+Within a band, the nearest tick index is n = round((price - low) / width), clamped so low + n*width stays within [low, high]. Find the band that contains the price first; the prompts are wordy and provide several bands plus widths. Watch floating-point comparisons (use a tolerance) and the negative-price and below-minimum edge cases, which are where most candidates lose time.
+
+Preparation
+
+Implement band lookup plus the round((price-low)/width) snap and verify the 21.2 -> 22 case.
+
+Test prices below the minimum, exactly on a tick, halfway between ticks, and negative.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

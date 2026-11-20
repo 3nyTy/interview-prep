@@ -1,0 +1,58 @@
+===H1===
+Gate Entry / Exit Time Resolution with Tie-Break Rules
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/gate-entry-exit-scheduler
+===BODY===
+Google
+Coding·45 minMembers
+Gate Entry / Exit Time Resolution with Tie-Break Rules
+Onsite coding round 2: given an array indexed by person id, each containing `(timestamp, action ∈ {enter, exit})`, return per-person the actual time they passed through the gate after applying tie-break rules between simultaneous enters and exits.
+SWE
+simulation
+algorithm
+medium
+Frequency
+Single report
+Last asked
+2026-05-04
+Stage
+onsite-coding
+Requirements
+
+Input: sorted array requests[i] = (timestamp, action) where i identifies a person and action ∈ {enter, exit}.
+
+Output: array of the same length where result[i] is the actual time person i cleared the gate.
+
+Only one person can pass per time unit; when multiple people share a timestamp, resolve by these rules:
+
+If the previous moment was an enter, the enter side wins this tie.
+
+If the previous moment was an exit, the exit side wins this tie.
+
+If the previous moment had no activity, the exit side wins.
+
+Within the winning side, the lower person id goes first; the loser shifts to the next available tick and re-arbitrates.
+
+Notes
+
+The clean implementation uses two queues (pending enters, pending exits) plus a prev_state variable; at each tick peek both queues, apply the four rules, advance, and update prev_state.
+
+A naive tick-by-tick simulation walks every integer time unit from min to max timestamp; the expected optimization is to jump directly to the next event timestamp in the input, dropping complexity to O(n).
+
+The optimization has to carry the "prior moment" state across empty gaps correctly (a 100-tick gap still counts as prev_state = none).
+
+Walk through one or two examples on the whiteboard before coding — interviewers in this family prefer candidates who fully verbalize the precedence rules before writing.
+
+Preparation
+
+Translate the four priority rules into an explicit state machine (prev_state ∈ {enter, exit, none}) before writing any code.
+
+Practice scheduling problems that pair a per-tick simulation with an event-driven optimization (CPU scheduler, traffic light, calendar conflict resolver).
+
+Stress-test corner cases: same timestamp containing both an enter and an exit for the same person, all-enters or all-exits batches, and very large gaps between two events.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

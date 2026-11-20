@@ -1,0 +1,64 @@
+===H1===
+Frequency-Priority Error Code Sort
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/frequency-priority-error-code-sort
+===BODY===
+Amazon
+Coding·30 minMembers
+Frequency-Priority Error Code Sort
+Sort an integer array of error codes by ascending frequency (rare codes first); break ties by smaller numeric value. Output is the original list re-ordered (duplicates preserved).
+SWE
+array
+hashmap
+easy
+Frequency
+Single report
+Last asked
+2026-03-23
+Stage
+oa
+Requirements
+
+Input: integer array of error codes (duplicates allowed).
+
+Output: same multiset re-ordered so that less-frequent codes come first; on equal frequency, smaller numeric value first.
+
+Output must include every element (duplicates preserved).
+
+Examples
+
+codes = [3, 1, 1, 2, 2, 3, 3]
+# frequencies: 1=2, 2=2, 3=3
+# rare-first, value-tiebreak: 1,1,2,2,3,3,3
+
+Notes
+
+Standard Counter plus sort(key=lambda v: (freq[v], v)) solves it in O(n log n).
+
+This is LC 1636 (Sort Array by Increasing Frequency) almost verbatim; mention the LC reference if the interviewer wants to test recognition.
+
+Watch for stability across duplicates — the requested order is fully determined by (freq, value), so stability is automatic.
+
+Reference comparator: sorted(nums, key=lambda v: (freq[v], v)). Two-key sort lands the comparator cleanly without writing a custom __lt__.
+
+If frequencies are bounded (freq <= n), an O(n) bucket-of-buckets pass beats the comparator sort — bucket-by-freq, sort each bucket's values, then flatten.
+
+Common pitfall: sorting on (freq, -value) when the prompt actually wants ascending-value tiebreak. Re-read the tiebreak rule aloud before coding.
+
+Preparation
+
+Solve LC 1636 to lock in the comparator shape.
+
+Practice the comparator under three tie-break rules (frequency asc + value asc, frequency desc + value asc, etc.) so you can pivot if the interviewer flips a sign.
+
+Be ready to discuss the O(n) bucket-sort alternative when frequencies are bounded.
+
+Drill the comparator under all four sign combinations (freq asc / desc × value asc / desc) on the same input until you can flip the sign in 10 seconds without re-deriving.
+
+Write the bucket-sort alternative once end-to-end; the data-engineering follow-up ("what if n is 10^9 but values are bounded?") expects you to volunteer it.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

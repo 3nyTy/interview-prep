@@ -1,0 +1,377 @@
+===H1===
+Mining Block — Fee-Maximizing Transactions
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/mining-block-knapsack
+===BODY===
+Coinbase
+Coding·60 minMembers
+Mining Block — Fee-Maximizing Transactions
+A two-part onsite coding round. Part 1 selects a fee-maximizing subset of independent transactions to fit a fixed block size; Part 2 adds parent-child dependencies between transactions. The trap: the canonical DP / 0-1 knapsack is not what the interviewer wants — 'production-realistic' greedy by fee/size + DFS over dependency bundles is the signal.
+SWE
+greedy
+dfs
+tree
+sorting
+ambiguous-spec
+medium
+Frequency
+Medium
+Last asked
+2026-05-05
+Stage
+onsite-coding
+Mining Block
+
+Understanding the Problem
+
+In blockchain systems, miners pick transactions to put into a block. A block has a specific size limit (capacity). Each transaction has a specific size and a fee.
+
+Your goal is to fill the block with transactions to get the highest total fee without going over the size limit.
+
+We will solve this in two steps:
+
+Part 1: Transactions are independent (no relationships).
+
+Part 2: Transactions have dependencies (parents and children).
+
+Part 1: No Dependencies
+
+Requirements
+
+You have a list of N transactions. Each has an id, size, and fee. You also have a block_size limit.
+
+You need to pick transactions so that:
+
+The sum of their sizes is less than or equal to block_size.
+
+The sum of their fees is as high as possible.
+
+Note: We need a fast, practical solution. In real life, transaction pools are huge. We prefer a "Greedy" approach (fast and good enough) over "Dynamic Programming" (perfect but slow).
+
+class Transaction:
+    def __init__(self, id: str, size: int, fee: int):
+        self.id = id
+        self.size = size
+        self.fee = fee
+
+def mine_block(transactions: list[Transaction], block_size: int) -> list[str]:
+    """
+    Select transactions to include in a block to maximize total fee.
+
+    Args:
+        transactions: List of available transactions
+        block_size: Maximum total size the block can hold
+
+    Returns:
+        List of transaction IDs selected for the block
+
+    Approach:
+        Use a greedy strategy — sort by fee/size ratio (descending),
+        then greedily pick transactions that fit.
+    """
+    pass
+
+Example Scenario
+
+transactions = [
+    Transaction("tx1", 30, 60),   # ratio: 2.0
+    Transaction("tx2", 50, 200),  # ratio: 4.0
+    Transaction("tx3", 40, 100),  # ratio: 2.5
+    Transaction("tx4", 20, 30),   # ratio: 1.5
+    Transaction("tx5", 10, 50),   # ratio: 5.0
+]
+block_size = 100
+
+result = mine_block(transactions, block_size)
+# Sorted by ratio: tx5(5.0), tx2(4.0), tx3(2.5), tx1(2.0), tx4(1.5)
+# Pick tx5 (size 10) -> space left: 90
+# Pick tx2 (size 50) -> space left: 40
+# Pick tx3 (size 40) -> space left: 0
+# result: ["tx5", "tx2", "tx3"], total fee: 350
+
+Strategy: Why use Greedy?
+
+You could use "0/1 Knapsack" Dynamic Programming (DP) to get the mathematically perfect answer. However, DP is slow. Its complexity is O(N × block_size).
+
+In real blockchain systems:
+
+There are thousands of transactions.
+
+Block sizes can be huge (like 4MB).
+
+Speed is critical.
+
+A Greedy approach runs in O(N log N) time. This is much faster. It sorts items by their "value density" (fee divided by size). This usually gives a result very close to the optimal one.
+
+Part 1 Solution Code
+
+class Transaction:
+    def __init__(self, id: str, size: int, fee: int):
+        self.id = id
+        self.size = size
+        self.fee = fee
+
+def mine_block(transactions: list[Transaction], block_size: int) -> list[str]:
+    # Sort by fee density (fee/size) in descending order
+    sorted_txs = sorted(transactions, key=lambda tx: tx.fee / tx.size, reverse=True)
+
+    selected = []
+    remaining = block_size
+
+    for tx in sorted_txs:
+        if tx.size <= remaining:
+            selected.append(tx.id)
+            remaining -= tx.size
+
+    return selected
+
+Complexity Analysis:
+
+MetricValue
+TimeO(N log N) for sorting
+SpaceO(N) to store the list
+
+Part 2: Handling Dependencies
+
+New Constraint
+
+Interviewer: "Now, some transactions have a parent. You cannot mine a child transaction unless you also mine its parent. A parent can have many children, but a child only has one parent."
+
+The transactions now look like trees. If you want a specific node, you must take the whole path from the root down to that node.
+
+class Transaction:
+    def __init__(self, id: str, size: int, fee: int, parent_id: str | None = None):
+        self.id = id
+        self.size = size
+        self.fee = fee
+        self.parent_id = parent_id
+
+def mine_block_with_deps(transactions: list[Transaction], block_size: int) -> list[str]:
+    """
+    Select transactions to maximize fee, respecting parent dependencies.
+
+    Rules:
+        - A child can only be included if its parent is also included
+        - Each child has at most one parent, but a parent can have multiple children
+        - Evaluate ancestor chains as groups using combined fee/size ratio
+
+    Args:
+        transactions: List of available transactions (some with parent_id)
+        block_size: Maximum total size the block can hold
+
+    Returns:
+        List of transaction IDs selected for the block
+    """
+    pass
+
+Dependency Example
+
+Tree structure:
+    tx1 (size=30, fee=10)
+    ├── tx2 (size=20, fee=80)
+    │   ├── tx3 (size=10, fee=50)
+    │   └── tx4 (size=10, fee=40)
+    └── tx5 (size=20, fee=20)
+
+tx6 (size=15, fee=90)   # independent, no parent
+
+block_size = 100
+
+To get tx3, you must also take tx1 and tx2. We treat {tx1, tx2, tx3} as a group.
+
+Group {tx1, tx2, tx3}:
+
+Total Size: 30 + 20 + 10 = 60
+
+Total Fee: 10 + 80 + 50 = 140
+
+Ratio: 140 / 60 = 2.33
+
+Group {tx1, tx2, tx4}:
+
+Total Size: 60
+
+Total Fee: 10 + 80 + 40 = 130
+
+Ratio: 130 / 60 = 2.17
+
+Important: Once you decide to add tx3, the ancestors (tx1 and tx2) are in the block. Later, if you want tx4, you only pay for tx4 itself (size 10), because tx1 and tx2 are already paid for.
+
+Solution Logic
+
+We need to check which "chain" of transactions gives the best value right now.
+
+Look at every transaction.
+
+Calculate the cost of its entire ancestor chain (excluding ones already picked).
+
+Calculate the combined fee/size ratio for that chain.
+
+Pick the chain with the best ratio.
+
+Repeat the process. (We must repeat because picking a chain makes other children cheaper, changing their ratios).
+
+Part 2 Solution Code
+
+class Transaction:
+    def __init__(self, id: str, size: int, fee: int, parent_id: str | None = None):
+        self.id = id
+        self.size = size
+        self.fee = fee
+        self.parent_id = parent_id
+
+def mine_block_with_deps(transactions: list[Transaction], block_size: int) -> list[str]:
+    tx_map = {tx.id: tx for tx in transactions}
+
+    included = set()  # Track which transactions are already in the block
+    selected = []
+    remaining = block_size
+
+    def get_ancestor_chain(tx_id):
+        """Get the chain of ancestors that are NOT yet included in the block."""
+        chain = []
+        current = tx_id
+        while current and current not in included:
+            chain.append(current)
+            current = tx_map[current].parent_id
+        chain.reverse()  # Root-first order
+        return chain
+
+    def get_chain_cost(chain):
+        """Compute total size and fee for a chain of transactions."""
+        total_size = sum(tx_map[tid].size for tid in chain)
+        total_fee = sum(tx_map[tid].fee for tid in chain)
+        return total_size, total_fee
+
+    # Iteratively select the best chain until block is full
+    while True:
+        best_ratio = -1
+        best_chain = None
+
+        # Evaluate every transaction as a potential chain endpoint
+        for tx in transactions:
+            if tx.id in included:
+                continue
+            chain = get_ancestor_chain(tx.id)
+            if not chain:
+                continue
+            total_size, total_fee = get_chain_cost(chain)
+            if total_size > remaining or total_size == 0:
+                continue
+            ratio = total_fee / total_size
+            if ratio > best_ratio:
+                best_ratio = ratio
+                best_chain = chain
+
+        if best_chain is None:
+            break
+
+        # Add the best chain to the block
+        for tid in best_chain:
+            included.add(tid)
+            selected.append(tid)
+            remaining -= tx_map[tid].size
+
+    return selected
+
+Step-by-Step Execution
+
+transactions = [
+    Transaction("tx1", 30, 10),               # root
+    Transaction("tx2", 20, 80, "tx1"),         # child of tx1
+    Transaction("tx3", 10, 50, "tx2"),         # child of tx2
+    Transaction("tx4", 10, 40, "tx2"),         # child of tx2
+    Transaction("tx5", 20, 20, "tx1"),         # child of tx1
+    Transaction("tx6", 15, 90),                # independent root
+]
+block_size = 100
+
+Iteration 1: Check all chains.
+
+tx3 chain (includes tx1, tx2): Ratio 2.33
+
+tx6 chain (just tx6): Ratio 6.00
+
+Action: Pick tx6. Remaining space: 85.
+
+Iteration 2: Check remaining.
+
+tx3 chain (includes tx1, tx2): Ratio 2.33
+
+tx2 chain (includes tx1): Ratio 1.80
+
+Action: Pick tx3 chain (adds tx1, tx2, tx3). Remaining space: 25.
+
+Iteration 3: Check remaining (tx1 and tx2 are now free).
+
+tx4: Costs only 10 size. Ratio 4.0.
+
+tx5: Costs only 20 size. Ratio 1.0.
+
+Action: Pick tx4. Remaining space: 15.
+
+Iteration 4: Check remaining.
+
+tx5: Size 20. Does not fit in 15.
+
+Action: Stop.
+
+Result: ["tx6", "tx1", "tx2", "tx3", "tx4"].
+
+Complexity Analysis:
+
+MetricValue
+TimeO(N² × D) total, where D is tree depth
+SpaceO(N) for maps and sets
+
+In practice, tree depth D is small, so this is efficient enough.
+
+Interview Discussion Points
+
+Why Greedy over DP?
+DP is too slow for large inputs. Greedy is fast and practical for production systems requiring low latency.
+
+What if block_size is small?
+If the block size is very small (e.g., 100), DP becomes possible. The interviewer might use a small number to see if you notice this, but Greedy is still the standard "scalable" answer.
+
+Optimization:
+We can make the dependency solution faster using a Priority Queue. When we pick a group, we only need to update the ratios for the descendants of that group, not everyone.
+
+Conflicts:
+Real blockchains also deal with conflicts (like double-spending). This adds another layer of validation logic.
+
+Big-O Complexity
+
+PartApproachTimeSpace
+Part 1Greedy by fee densityO(N log N)O(N)
+Part 2Iterative greedy with ancestor chainsO(N² × D)O(N)
+
+N = total transactions, D = maximum tree depth.
+
+Candidate-Report Notes
+
+Interviewers explicitly reject DP / 0-1 knapsack for Part 1. They want the "production miner" answer: sort transactions by fee / size descending, take greedily while capacity remains. Be ready to explain why you would not chase optimality — real miners run this in tight latency budgets and approximate solutions are deployed in practice.
+
+This is one of the loop's most contentious rounds. Multiple candidates report 30-minute arguments where the interviewer is unfamiliar with knapsack theory and rejects correct counterexamples. Do not die on this hill: state the optimality gap once, switch to greedy, and move on.
+
+For Part 2, the right shape is: enumerate every root-to-node path in each dependency tree as a candidate bundle (a chain 1 → 1+2 → 1+2+3 → ... gives three bundles per path). DFS to enumerate, computing totalSize / totalFee per bundle. Then sort all bundles by fee/size and apply the same greedy as Part 1, taking care that bundles you select don't double-count nodes.
+
+You do not need to consider picking a child without its parent (the dependency forbids it) or picking only the parent and then later adding the child as a separate selection — bundle-level greedy subsumes both.
+
+Vocabulary you can borrow: this prompt is a thinly-disguised Bitcoin block-template selection. The real-world algorithm computes an ancestor feerate (sum of fees / sum of sizes for a transaction plus all its unconfirmed ancestors) and selects packages in descending ancestor-feerate order. Saying "this is the ancestor-package greedy used in Bitcoin Core, and the global optimum is NP-hard once dependencies are in play" is exactly the production-leaning framing this round rewards. The 1–4 MB Bitcoin block limit is the analogue of the prompt's blockSize=100.
+
+There are no provided test cases. Spend 2–3 minutes constructing your own (e.g. one bundle dominates the budget, one bundle marginally exceeds it forcing a switch to two smaller bundles) and run them in your head — this is the single most-cited reason candidates pass when the interviewer pushes back.
+
+Preparation
+
+Drill the "greedy by ratio" pattern with two-line reasoning: "sorted by fee/size, take while capacity remains; this is suboptimal but matches the production heuristic." Make it muscle memory so you can land it in 3 minutes and spend the rest on dependencies.
+
+For Part 2, pre-write the recursive bundle-enumeration helper on a tree (one DFS that yields (cumulativeSize, cumulativeFee, nodesInBundle) at each node). Practice on a small forest by hand until you can sketch it in 10 minutes.
+
+Build a mental checklist of "when the interviewer pushes back on my correct answer, what's the fallback I land on without losing time?" Mining-block is the round where this skill is most directly tested.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

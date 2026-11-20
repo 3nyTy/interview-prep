@@ -1,0 +1,81 @@
+===H1===
+Design an Analytics Metrics Dashboard for ChatGPT / LLM Service
+===URL===
+https://www.1point3acres.com/interview/problems/company/salesforce/analytics-dashboard-llm-product
+===BODY===
+Salesforce
+System Design·45 minMembers
+Design an Analytics Metrics Dashboard for ChatGPT / LLM Service
+Salesforce backend SD prompt asked in onsite VOs and tech-screens: design an analytics dashboard that pulls metrics from an existing LLM service ("ChatGPT-like"). Interviewers explicitly de-scope frontend UI and model design — the round is about the back-end data pipeline that aggregates raw events into queryable metrics (DAU, latency percentiles, error rates, token counts).
+SWE
+system-design
+analytics-dashboard
+streaming
+data-engineering
+data-modeling
+scaling
+llm
+medium
+Frequency
+Low
+Last asked
+2026-03-10
+Stage
+onsite-system-design
+Requirements
+
+Inputs (clarify with interviewer): the LLM service emits a stream of per-request events with at minimum (timestamp, user_id, request_id, latency_ms, tokens_in, tokens_out, status, model_version). Use a "chatgpt-class" — assume 10⁵-10⁶ events/sec at peak.
+
+Outputs: a dashboard that supports queries like:
+
+DAU / MAU over rolling windows.
+
+p50 / p95 / p99 latency per model, per minute / hour / day.
+
+Token-count totals and per-user rollups for cost / quota.
+
+Error-rate breakdown by status code or error type.
+
+Ad-hoc time-range queries ("last 24h"), and longer historical (last 90 days).
+
+Explicitly out of scope: the LLM service itself, the dashboard's frontend UI.
+
+Common interviewer drill-downs: how to compute percentiles incrementally; how to bound storage cost as event volume grows; how to backfill a missed window.
+
+Notes
+
+The canonical architecture is a three-tier pipeline:
+
+Ingestion: an append-only log (Kafka / Pub-Sub) that the LLM service writes raw events to. Decouples producer from consumer.
+
+Stream-processing aggregation: Flink / Spark Streaming / a custom consumer that maintains rolling-window aggregates per (metric, model, minute). Writes to a columnar / time-series store.
+
+Serving layer: a time-series DB (Druid / Pinot / ClickHouse / InfluxDB) or pre-aggregated tables in a warehouse (Snowflake / BigQuery) that the dashboard queries. Cache the hottest queries in Redis with short TTLs.
+
+Percentile handling is the most-asked technical follow-up. Streaming percentiles need an approximate sketch — t-digest or HDR histogram is the canonical answer. Discuss the trade-off: exact percentiles need to retain raw latencies (expensive at 10⁶/sec); t-digest gives bounded memory with a small accuracy bound (typically ε < 1% at the tails).
+
+DAU / MAU: a HyperLogLog sketch per (day, model) gives counts with bounded memory; merge across days for MAU.
+
+Storage tiering: keep minute-granularity for the last 24h, hour-granularity for the last 90 days, day-granularity beyond. Compaction / downsampling job runs nightly. Often the question Salesforce candidates miss.
+
+Backfill / late events: pipelines must accept events with event_time skewed from processing_time. Use watermarks (event_time + grace period) and allow late-arrival corrections to the most recent minute window.
+
+Idempotency: a re-emitted event must not double-count. Either the producer sends a unique event_id and the consumer dedups within a TTL window, or use an exactly-once sink.
+
+Hot-path / cold-path split: serve last-hour queries from in-memory aggregates; serve historical queries from the columnar store. Dashboard router decides based on time range.
+
+Preparation
+
+Drill the three-tier diagram (ingestion → stream agg → serving) so it lands in 3 minutes flat.
+
+Memorise the percentile sketches: t-digest (latency), HyperLogLog (uniques), count-min sketch (heavy hitters). Be able to state memory bound and error bound for each.
+
+Have a concrete plan for one query each (DAU, p99 latency, daily token cost per user) — walk through which tier serves it and how.
+
+Be ready for the deep-dive: how do you migrate to a new model version mid-stream? Add a model_version partition key to aggregates and run dual aggregation during the rollout; deprecate the old key after the migration window.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

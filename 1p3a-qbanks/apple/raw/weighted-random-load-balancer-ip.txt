@@ -1,0 +1,252 @@
+===H1===
+Weighted Random Load Balancer IP
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/weighted-random-load-balancer-ip
+===BODY===
+Apple
+Coding·45 minMembers
+Weighted Random Load Balancer IP
+Given a list of load-balancer IPs, return a random IP uniformly; then extend to weighted probability where higher-weight IPs are chosen more often.
+SWE
+Infra Eng
+sampling
+prefix-sum
+binary-search
+medium
+Frequency
+Low
+Last asked
+2026-07-13
+Stage
+phone-screen
+Problem Overview
+
+You are building the request-routing layer of a load balancer. Given a list of backend server IP addresses, you need to pick one for each incoming request according to a specified probability distribution.
+
+This is a two-part question. Part 1 asks for uniform selection; Part 2 (the follow-up) asks for weighted selection — and is the part the interviewer is really testing.
+
+Part 1: Uniform Random IP
+
+Problem Statement
+
+Given a list of IP strings, write a function that returns a random IP such that every IP has equal probability of being selected.
+
+import random
+from typing import List
+
+def pick_random(ips: List[str]) -> str:
+    """
+    Return one IP from `ips`, uniformly at random.
+    Each IP is returned with probability 1 / len(ips).
+    """
+    pass
+
+Example
+
+ips = ["10.0.0.1", "10.0.0.2", "10.0.0.3"]
+pick_random(ips)
+# Each call returns one of the three IPs with probability 1/3.
+
+Solution
+
+Generate a uniform random index in [0, n - 1] and return the IP at that slot. Because every index is equally likely, every IP is equally likely.
+
+import random
+from typing import List
+
+def pick_random(ips: List[str]) -> str:
+    if not ips:
+        raise ValueError("ips must be non-empty")
+    return ips[random.randrange(len(ips))]
+    # Or equivalently: return random.choice(ips)
+
+Complexity:
+
+Time: O(1) per call
+
+Space: O(1) extra
+
+Why this is correct
+
+random.randrange(n) returns each integer in {0, 1, …, n − 1} with probability exactly 1/n. The mapping i → ips[i] is one-to-one over slots, so the probability of returning the IP at any particular slot is also 1/n. If the input list contains duplicate IP strings, the probability of returning a given value is k/n, where k is the number of occurrences.
+
+What the interviewer is watching for
+
+Don't overcomplicate it. You don't need to shuffle the list, sample without replacement, or seed anything.
+
+random.choice(ips) is a perfectly acceptable answer. Be ready to explain how you'd build it from random.random() if asked: random.random() returns a float in [0, 1), so int(random.random() * n) yields a uniform integer in [0, n).
+
+Off-by-one trap: random.randint(a, b) in Python is inclusive on both ends, so random.randint(0, n) can return n and crash your indexing. Use random.randrange(n) (exclusive upper bound) or random.randint(0, n - 1).
+
+Part 2: Weighted Random IP (Follow-Up)
+
+Problem Statement
+
+Now each IP has a positive integer weight. IPs with higher weight should be selected proportionally more often: IP i must be returned with probability weights[i] / sum(weights).
+
+import random
+from typing import List
+
+def pick_weighted(ips: List[str], weights: List[int]) -> str:
+    """
+    Return one IP from `ips`, where IP i is selected with probability
+    weights[i] / sum(weights).
+    Preconditions: len(ips) == len(weights) > 0 and weights[i] >= 1.
+    """
+    pass
+
+Example
+
+ips     = ["10.0.0.1", "10.0.0.2", "10.0.0.3"]
+weights = [1,          2,          7]
+
+# "10.0.0.1" is selected ~10% of the time
+# "10.0.0.2" is selected ~20% of the time
+# "10.0.0.3" is selected ~70% of the time
+
+Approach: Prefix Sum + Random Draw
+
+Core idea. Lay the weights end-to-end on a number line:
+
+IP:      10.0.0.1 | 10.0.0.2 |      10.0.0.3
+weight:      1         2              7
+range:     [1,1]     [2,3]           [4,10]
+
+Draw a uniform random integer r in [1, total] (here total = 10). Whichever interval r lands in is the chosen IP. By construction IP i's interval has width weights[i], so the probability of landing there is weights[i] / total — exactly the target distribution.
+
+To implement:
+
+Compute prefix[i] = weights[0] + weights[1] + … + weights[i].
+
+Draw r uniformly in [1, total].
+
+Find the smallest i with prefix[i] >= r.
+
+Solution (function form)
+
+Direct translation of the problem statement — a standalone function. Linear scan through the prefix is fine for a single call:
+
+import random
+from typing import List
+
+def pick_weighted(ips: List[str], weights: List[int]) -> str:
+    total = sum(weights)
+    r = random.randint(1, total)  # inclusive on both ends, yielding [1, total]
+    running = 0
+    for ip, w in zip(ips, weights):
+        running += w
+        if running >= r:
+            return ip
+    # Unreachable: weights are positive and r <= total.
+    raise RuntimeError("pick_weighted failed to select")
+
+Complexity: O(n) time per call, O(1) extra space.
+
+Solution (class form, amortized)
+
+If pick() is called many times — which is exactly the load-balancer use case — preprocess the prefix once and binary-search it on every pick:
+
+import random
+import bisect
+from typing import List
+
+class WeightedPicker:
+    def __init__(self, ips: List[str], weights: List[int]):
+        if len(ips) != len(weights) or not ips:
+            raise ValueError("ips and weights must be non-empty and the same length")
+        if any(w <= 0 for w in weights):
+            raise ValueError("weights must be positive")
+
+        self.ips = ips
+        # prefix[i] = weights[0] + weights[1] + ... + weights[i]
+        self.prefix: List[int] = []
+        running = 0
+        for w in weights:
+            running += w
+            self.prefix.append(running)
+        self.total = running
+
+    def pick(self) -> str:
+        r = random.randint(1, self.total)           # [1, total]
+        idx = bisect.bisect_left(self.prefix, r)    # leftmost i with prefix[i] >= r
+        return self.ips[idx]
+
+Complexity: O(n) to construct. O(log n) per pick().
+
+Why binary search is correct
+
+The prefix array is strictly increasing because every weight is positive. Think of the integers {1, 2, …, total} as partitioned into disjoint intervals (prefix[i−1], prefix[i]] (with the convention prefix[−1] = 0). Every r in [1, total] lies in exactly one such interval.
+
+bisect.bisect_left(prefix, r) returns the leftmost index i for which prefix[i] >= r, which is precisely the interval containing r. Because the interval for IP i has width weights[i] and r is uniform over [1, total], IP i is chosen with probability weights[i] / total.
+
+Quick check with weights = [1, 2, 7], prefix = [1, 3, 10]:
+
+rbisect_left(prefix, r)Selected IP
+1010.0.0.1
+2, 3110.0.0.2
+4–10210.0.0.3
+
+Counts line up with the target 1/2/7 split.
+
+Test Cases
+
+Both routines are randomized. Test them in two layers: correctness on degenerate cases (deterministic), and distribution via Monte Carlo sampling.
+
+import random
+from collections import Counter
+
+# --- Correctness: degenerate cases ---
+
+# Single IP always returns that IP.
+assert pick_random(["a"]) == "a"
+assert pick_weighted(["a"], [5]) == "a"
+
+# Dominant weight: "b" should overwhelmingly dominate "a".
+random.seed(1)
+counts = Counter(pick_weighted(["a", "b"], [1, 1000]) for _ in range(1000))
+# Expected "a" ≈ 1, "b" ≈ 999. Leave generous slack.
+assert counts["b"] >= 990
+
+# --- Distribution: Monte Carlo ---
+
+random.seed(0)
+ips     = ["x", "y", "z"]
+weights = [1, 2, 7]
+picker  = WeightedPicker(ips, weights)
+N = 100_000
+counts = Counter(picker.pick() for _ in range(N))
+
+# Expected ratios: 10%, 20%, 70%. Tolerance of ±1% is comfortably wider than
+# the ~0.1% standard error at N = 100_000.
+assert abs(counts["x"] / N - 0.10) < 0.01
+assert abs(counts["y"] / N - 0.20) < 0.01
+assert abs(counts["z"] / N - 0.70) < 0.01
+
+Key Insight
+
+Weighted sampling is the prefix-sum + binary-search pattern. Once you see the number-line picture (interval widths = weights, uniform dart = random draw), both the construction and the correctness argument fall out immediately. This is the same algorithm behind LeetCode 528 (Random Pick with Weight) and is the standard approach for weighted sampling when weights are static.
+
+Follow-Up Discussion
+
+The interviewer may press on any of these:
+
+What if weights change frequently? Rebuilding the prefix on every update is O(n). A Fenwick tree (BIT) keyed on weights supports point updates and prefix-sum queries in O(log n), and you can binary-search the BIT in O(log n) for the same per-pick cost.
+
+What if weights are floats (e.g., traffic ratios)? The algorithm still works: draw r = random.uniform(0, total) and bisect_left the float prefix array. Floating-point rounding at bucket boundaries is negligible for realistic weights. If exact proportions matter, scale to integers first.
+
+What if you need O(1) picks? Use Vose's alias method: O(n) preprocessing, O(1) per pick. More code, but strictly faster in the hot path.
+
+Why not "repeat each IP weights[i] times and pick uniformly"? Memory blows up with sum(weights). Fine for tiny weights; unusable if one IP has weight 10^9.
+
+Production realism. Real load balancers layer in health checks, sticky sessions, and connection draining — but the underlying distribution primitive is exactly this.
+
+Notes
+
+Alternate canonical variant — random country weighted by population
+
+The same question also runs with a geography skin: given a list of countries and their populations, return a random country where each country's selection probability is proportional to its population. The expected walkthrough is identical to the load-balancer form — build the cumulative-weights (prefix-sum) array, draw a uniform random number across the total weight, and binary-search the prefix array to map the draw back to a country. Interviewers ask for the complexity bounds explicitly: O(N) to build the prefix array and O(log N) per lookup.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

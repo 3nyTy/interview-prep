@@ -1,0 +1,59 @@
+===H1===
+Sparse Matrix Left- and Right-Multiply Vector
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/sparse-matrix-vector-multiply
+===BODY===
+Waymo
+Coding·45 minMembers
+Sparse Matrix Left- and Right-Multiply Vector
+Onsite coding: implement a sparse matrix class supporting both left- and right-multiplication by a dense vector. The round grades on choosing the right sparse representation (COO / CSR / dict-of-dicts) and explaining the complexity asymmetry between the two multiply directions.
+SWE
+MLE
+array
+data-structure
+linear-algebra
+performance-modeling
+medium
+Frequency
+Single report
+Last asked
+2025-09-29
+Stage
+onsite-coding
+Requirements
+
+Implement SparseMatrix storing only non-zero entries.
+
+Support both M · v (right-multiply by column vector) and vᵀ · M (left-multiply by row vector).
+
+Operate in time proportional to the number of non-zeros, not the dense O(rows · cols).
+
+Notes
+
+Three reasonable representations to consider out loud:
+
+CSR (Compressed Sparse Row): (values, col_index, row_ptr). Right-multiply M·v walks rows contiguously in O(nnz). Left-multiply is awkward because column access is non-local.
+
+CSC (Compressed Sparse Column): mirror of CSR, columns contiguous. Optimal for left-multiply. Right-multiply is the awkward direction.
+
+COO (list of (r, c, val)): symmetric in both directions, easy to construct, but iteration cost is O(nnz) per call without indexing.
+
+The expected answer for both directions in O(nnz): store both CSR and CSC (or store COO and lazy-build the alternate index). Mention the memory overhead trade-off out loud.
+
+For very sparse matrices, a Map<row, Map<col, val>> is fine and easier to write; flag that it loses cache friendliness vs CSR.
+
+Edge cases: dimension mismatch, dense vector with zeros, integer overflow on large dot products. Confirm dimension conventions early.
+
+Preparation
+
+Implement CSR and CSC matmul from scratch; rehearse the row_ptr walk until it's automatic.
+
+Pre-write helper functions for transposing a sparse matrix between CSR and CSC; you'll need them as a follow-up.
+
+Be ready to discuss the SpMV access pattern in cache terms — interviewers in this round drill into why CSR is fast on right-multiply but slow on left-multiply.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

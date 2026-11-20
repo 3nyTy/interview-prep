@@ -1,0 +1,90 @@
+===H1===
+In-Memory SQL Engine
+===URL===
+https://www.1point3acres.com/interview/problems/company/microsoft/in-memory-sql-engine
+===BODY===
+Microsoft
+Coding·60 minMembers
+In-Memory SQL Engine
+Build a single-table in-memory database supporting SELECT, WHERE, and ORDER BY in 4-5 escalating follow-ups. CSV string is the initialization input; you write the parser too.
+MLE
+SWE
+data-structure
+parsing
+hard
+sql
+in-memory-database
+state-machine
+Frequency
+Medium
+Last asked
+2026-05-28
+Stage
+onsite-coding
+Requirements
+
+Implement a small class that takes a CSV string at construction time and answers a series of query calls. The interviewer drives 4 follow-ups in a single 60-minute round.
+
+Part 1 — Construction + SELECT
+
+db = InMemoryDB(csv_string)
+db.select(["col_a", "col_b"])  # rows, in insertion order
+
+The CSV header line names columns; subsequent lines are rows. Strings, quoted fields, and escaped commas must round-trip — interviewers explicitly seed inputs with embedded commas, doubled-quote escaping (e.g. fields containing literal quotes), and trailing-whitespace columns. Hand-roll the CSV parser; using a library is rejected.
+
+Part 2 — WHERE
+
+Add equality and comparison predicates:
+
+db.select(cols, where=[("age", ">", 18), ("city", "==", "NYC")])
+
+Predicates are conjunctive (AND). Comparisons on numeric-looking strings should coerce; type mismatch raises.
+
+Part 3 — ORDER BY
+
+db.select(cols, where=..., order_by=[("age", "DESC"), ("name", "ASC")])
+
+Composite sort key, stable on ties.
+
+Part 4 — Aggregations (reported only in the longer variant)
+
+SUM, COUNT, AVG, MIN, MAX over a column with optional GROUP BY.
+
+Part 5 — Update / Insert / Delete (occasional, by some interviewers)
+
+Insert single row, update by WHERE, delete by WHERE. Recompute any derived ordering on demand.
+
+Examples
+
+A representative initialization + projected, filtered query:
+
+Key,location,weather,temperature,data
+1,"Sunnyvale","sunny",100,"datetimestamp"
+
+Quoted cells ("Sunnyvale", "sunny") stay strings; an unquoted numeric cell (100) is parsed to int at load time.
+
+select(["location","temperature"], where=[("temperature", ">", 50)]) returns only the projected columns of the rows matching every (< / > / ==) filter.
+
+Notes
+
+Parse-time typing is part of the spec in some variants: unquoted numeric cells load as int and quoted cells stay str, so type coercion only matters on cross-type comparisons. The reported failure mode for every candidate who shipped this is running out of time on the CSV parser. The interviewer's CSV inputs are intentionally adversarial (quoted-quote escaping, embedded commas, optional whitespace trimming) and consume 15-20 minutes if you start from scratch in the room. Hand-rolling a stateful single-pass parser — IN_FIELD / IN_QUOTED_FIELD / AFTER_CLOSING_QUOTE — is faster than regex and far easier to debug under pressure.
+
+Beyond parsing, the system shape is straightforward: store rows as a list[dict], predicates as small lambdas, sort with functools.cmp_to_key for stable multi-key ordering. The select method is a four-line pipeline: filter → sort → project → return.
+
+The same prompt family appears across other major AI labs — pattern-match it as the "OpenAI in-memory DB problem with a CSV-input twist". Recruiters for MAI Copilot explicitly recommend rehearsing that bank of problems before the loop.
+
+Preparation
+
+Pre-write and memorize a 30-line CSV state-machine parser. Practice it on "a,\"b,c\",d" and "\"he said \"\"hi\"\"\"" until you can type it without thinking.
+
+Implement the full SELECT / WHERE / ORDER BY pipeline once end-to-end on paper before the loop; time yourself at 25 minutes for the full skeleton.
+
+For the aggregation variant, hold a single dict of column → running_state per group and finalize once at the end — don't materialize groups.
+
+Budget time: 15 min parser, 10 min Part 1, 10 min Part 2, 10 min Part 3, 15 min for whatever comes next.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

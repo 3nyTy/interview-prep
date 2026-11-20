@@ -1,0 +1,83 @@
+===H1===
+File Backup System
+===URL===
+https://www.1point3acres.com/interview/problems/company/netflix/file-backup-system
+===BODY===
+File Backup System
+
+<https://www.1point3acres.com/interview/problems/company/netflix/file-backup-system>
+
+Netflix
+System Design
+
+60 min
+Members
+File Backup System
+
+Design a source?destination file backup that mirrors directory structure, supports full + incremental runs, resumes after crashes, and verifies integrity  anchored on a durable manifest as source of truth and stage-then-commit (.tmp+rename / multipart-complete) for atomic writes.
+
+SWE
+Infra Eng
+distributed-systems
+storage
+idempotency
+checkpointing
+scaling
+persistence
+hard
+Frequency
+Single report
+Last asked
+2026-05-01
+Stage
+phone-screen  onsite-system-design
+
+Design a system that backs up files from a source location to a destination location. The destination must end up with the same directory structure as the source. The system must scale to large file sets and tolerate failures (worker crashes, network errors, partial writes) without corrupting the backup.
+
+The prompt arrives intentionally vague: "design a system to backup files." It is easy to mistake this for an OOD question  it is tempting to start sketching Backup, File, Folder classes. Treat the filesystem primitives (listDir, stat, readFile, writeFile, mkdir, rename) as given and focus on how the backup itself works, how the destination ends up structurally identical to the source, how you scale it, and how you handle failure  pivot to a system-design walkthrough rather than OOD.
+
+Phase 1: Requirements
+Functional Requirements
+Back up a source tree to a destination. Given a source path (a directory subtree or volume) and a destination path (another filesystem, S3 bucket, remote NAS, etc.), copy every file across.
+Mirror the directory structure. A user listing the destination should see the same paths, names, and hierarchy as the source. Permissions and timestamps preserved where possible.
+Support full and incremental backups. A first run does a full copy; subsequent runs only copy what changed since the last successful backup.
+Resume after failure. If a backup is interrupted (process crash, network drop, source unavailable), the next run picks up where the last one left off rather than restarting from scratch.
+Verify integrity. After a backup completes, the system can confirm that the destination contents match the source (typically via checksums recorded in a manifest).
+Out of Scope (Mention and Defer)
+
+Restore (the inverse pipeline), encryption at rest, multi-tenant access control, deletion semantics on the destination ("if a source file is gone, do we delete from destination?" is a policy question  most backup systems keep historical files and rely on retention windows), versioning of backed-up files, point-in-time restore.
+
+The interviewer cares less about your full feature list than about whether you scope cleanly. Calling these out as "out of scope for the phone screen, happy to discuss" is a strong signal  it shows you saw them coming.
+
+Non-Functional Requirements
+Scale: 100M to 10B files; tens of terabytes to petabytes total. Individual files range from KB-sized configs to GB-sized media.
+Reliability: a backup eventually succeeds. Transient errors (network blips, throttling) must not abort the whole job.
+Resumability: progress survives worker crashes. A 10-hour backup that fails at hour 9 must not start over from hour 0.
+Throughput: complete the backup within a defined window (e.g., nightly). For Netflix-scale, this drives parallelism hard.
+Consistency: each backup represents a coherent point-in-time snapshot of the source, not a smear of moments while files were changing underfoot.
+Correctness: never produce a file at the destination that is partially written or silently truncated.
+Assume These Primitives Exist
+
+The interviewer explicitly hands you the filesystem layer. Treat it as given:
+
+listDir(path)         -> [DirEntry]   # one level, names + types
+stat(path)            -> { size, mtime, mode, isDir, isSymlink }
+readFile(path, off, n) -> bytes
+writeFile(path, bytes, mode)
+mkdir(path, mode)
+rename(src, dst)        # atomic on a single filesystem
+
+Your job is to build the backup logic on top of these  not to design POSIX.
+
+Capacity Sanity Check
+Metric	Assumption
+Files	1B
+Avg file size	200 KB (heavy long tail toward GB-scale media)
+Total bytes	1B * 200 KB  200 TB
+Daily change rate	~5% of files: 50M files/day, ~10 TB delta
+Backup window	8 hours (overnight)
+Required throughput	10 TB / 8 h  350 MB/sec sustained
+
+Two takeaways from the math: (1) you must parallelize  a single worker hitting a few hundred MB/s won't finish in time once you account for many small files domi
+
+---

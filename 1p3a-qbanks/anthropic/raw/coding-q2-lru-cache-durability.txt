@@ -1,0 +1,104 @@
+===H1===
+Coding Q2 — In-Memory Cache: Bug-Fix + Durability
+===URL===
+https://www.1point3acres.com/interview/problems/company/anthropic/coding-q2-lru-cache-durability
+===BODY===
+Anthropic
+Coding·55 minMembers
+Coding Q2 — In-Memory Cache: Bug-Fix + Durability
+A pre-written `LRU` class wrapping a generic callable is provided. Part 1: find the bug in `generate_key` (it doesn't correctly hash `*args/**kwargs`). Part 2: extend the cache to survive process crashes by persisting state and recovering on restart.
+SWE
+MLE
+caching
+persistence
+python
+kwargs
+medium
+Frequency
+High
+Last asked
+2026-06-04
+Stage
+phone-screen · onsite-coding
+Requirements
+
+You are handed a skeleton similar to:
+
+class LRU:
+    def generate_key(self, *args, **kwargs):
+        # provided — has a bug; needs to produce a hashable, order-stable key
+        ...
+
+    def call(self, func, *args, **kwargs):
+        # provided — looks up generate_key(...), calls func on miss, evicts LRU
+        ...
+
+Part 1 — Bug hunt
+
+Fix generate_key so that:
+
+It accepts arbitrary positional and keyword arguments.
+
+It returns a value that is hashable and stable (same args → same key, regardless of kwarg insertion order).
+
+Typical fix: key = (args, tuple(sorted(kwargs.items()))) after ensuring inner values are themselves hashable (recurse into lists/dicts or repr them).
+
+Part 2 — Durable cache
+
+Make the cache survive a process crash:
+
+Persist every set to disk before returning from call.
+
+On startup, replay the persisted log to reconstruct the in-memory state.
+
+The reference approach is a write-ahead log (append (key, value, timestamp) to a file), with optional periodic snapshotting + log truncation.
+
+Discuss durability vs. throughput tradeoffs: fsync per write vs. group commit, and what "no data loss" actually means.
+
+Follow-ups
+
+CPU-bound vs IO-bound classification of the system as a whole.
+
+Eviction policy interaction with persistence (don't write evictions to the log if they're recoverable from misses; do write them if you want bounded recovery state).
+
+Multi-process safety — file locks, or a single writer with a queue.
+
+Notes
+
+The interviewer expects fluency with Python's *args / **kwargs semantics and with functools.lru_cache (the public model the prompt mimics). Skim the CPython source for inspiration if needed.
+
+A common stumble: implementing the LRU eviction from scratch and running out of time before reaching durability. The eviction structure (OrderedDict.move_to_end or doubly-linked list + dict) should be muscle memory.
+
+Multiple candidates report needing hints on the hashing fix. Practice it on lists, dicts, and nested structures before the round.
+
+Canonical durability spec: persisted state must (a) recover after a crash to the exact in-memory cache contents and (b) preserve LRU ordering so the next eviction matches what would have happened without the crash. A WAL alone is insufficient if the replay loses recency; either append a touch record on every get hit or include access timestamps in the snapshot.
+
+Append-only log specifics
+
+A stricter rotation pins the persistence constraint explicitly: a single write must not scale linearly with cache size, which rules out dumping the whole dict on every access — an append-only log is required. Append one {key, value} record on every access (hit and miss). On recovery, replay records in order: each key's last occurrence fixes its LRU→MRU position and its value is the last one written.
+
+Three corners that fail candidates here:
+
+On replay you must call move_to_end explicitly for an already-seen key — reassigning an existing OrderedDict key does not change its order, so skipping this silently degrades the cache to FIFO.
+
+Tuple cache keys must be converted to a list before JSON serialization and back to tuple() on read.
+
+The final log line may be truncated by a crash mid-write and must be tolerated (skip the malformed tail).
+
+Bonus: mention log compaction (periodic snapshot + truncate), and note the hit path can append the key alone since the value is already known — saving I/O.
+
+One reported skeleton builds the key as (func_name, json.dumps(args), json.dumps(kwargs, sort_keys=True)) where func_name is guaranteed unique; sort_keys is the part candidates miss, since f(a=1, b=2) and f(b=2, a=1) must collapse to the same key.
+
+Preparation
+
+Write generate_key correctly for at least four input shapes: positional only, kwargs only, mixed, and kwargs whose values are themselves dicts or lists.
+
+Implement WAL-backed persistence in under 20 minutes: open file in append-binary, write (json or pickle).dumps(record) plus newline, fsync, and on startup iterate to rebuild.
+
+Be able to discuss snapshot+truncate strategy and how it interacts with the LRU bound.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

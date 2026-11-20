@@ -1,0 +1,61 @@
+===H1===
+Merge Intervals
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/merge-intervals
+===BODY===
+ByteDance / TikTok
+CodingMembers
+Merge Intervals
+The canonical LeetCode 56 prompt: merge every overlapping interval and return the non-overlapping intervals that cover the same ranges.
+SWE
+array
+interval
+sorting
+medium
+Frequency
+Medium · New
+Last asked
+2026-08-25
+Stage
+phone-screen
+Requirements
+
+Given an array of intervals where each interval is [start, end], merge all overlapping intervals.
+
+Return the resulting non-overlapping intervals covering the same ranges.
+
+Preserve closed-interval overlap semantics: intervals that touch at an endpoint merge.
+
+Minority variant: one QA-platform screen explicitly guaranteed sorted input and excluded the empty-array case — clarify both assumptions before coding.
+
+Examples
+
+Input: intervals = [[1,3],[2,6],[8,10],[15,18]]
+Output: [[1,6],[8,10],[15,18]]
+
+Input: intervals = [[1,4],[4,5]]
+Output: [[1,5]]
+
+Notes
+
+The prompt was identified as LC 56 without an additional twist.
+
+The screen began with a resume discussion and technical-challenge follow-ups, followed by roughly 25 minutes for coding.
+
+A newer screen used this as the first of two coding tasks. Finishing it quickly led directly to a transactional database-update exercise, so budget time for a possible second prompt even when the first task is familiar.
+
+In the QA-platform variant, coding consumed 26 minutes of a 60-minute interview. The evaluation emphasized executable hand-written code, correct loop-variable semantics, nested intervals, and preserving the previously merged boundary.
+
+Preparation
+
+Implement the sort-and-scan solution from a blank editor and explain the overlap invariant before writing code.
+
+Drill touching endpoints, nested intervals, a single interval, and input presented in reverse order.
+
+State the time and space costs, including whether the output array is counted as auxiliary space.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

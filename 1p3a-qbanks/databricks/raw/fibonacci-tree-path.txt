@@ -1,0 +1,535 @@
+===H1===
+Fibonacci Tree Path
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/fibonacci-tree-path
+===BODY===
+Databricks
+Coding·55 minMembers
+Fibonacci Tree Path
+Given a Fibonacci tree order `k` and two preorder node labels `a` and `b`, return the path between those nodes without constructing the exponentially large tree.
+SWE
+tree
+recursion
+math
+medium
+Frequency
+Medium
+Last asked
+2026-07-07
+Stage
+phone-screen · onsite-coding
+Problem Summary
+
+You are given a k-th order Fibonacci tree. The tree is described by a list of node values in a pre-order traversal. You need to find the path between two specific nodes.
+
+The main challenge is that the tree is very large. You must solve this without actually building the tree in memory. Instead, you must use math to calculate where the nodes are located.
+
+This problem tests if you can:
+
+Understand how Fibonacci trees are built.
+
+Use tree traversal algorithms.
+
+Optimize code so you do not waste memory.
+
+Find the Lowest Common Ancestor (LCA).
+
+Problem Details
+
+A k-th order Fibonacci tree is built using a recursive rule:
+
+Order 0: An empty tree (0 nodes).
+
+Order 1: A single node (1 node).
+
+Order k (where k ≥ 2): A tree that has:
+
+A root node.
+
+A left subtree which is an order (k-1) Fibonacci tree.
+
+A right subtree which is an order (k-2) Fibonacci tree.
+
+The number of nodes follows this rule: T(k) = 1 + T(k-1) + T(k-2).
+
+T(1) = 1
+
+T(2) = 2
+
+T(3) = 4
+
+T(4) = 7
+
+T(5) = 12
+
+Formula: A tree of order k has exactly F(k+2) - 1 nodes. Here, F is the standard Fibonacci sequence (0, 1, 1, 2, 3, 5, 8...).
+
+Inputs:
+
+k: The order of the tree.
+
+start: The value of the starting node.
+
+end: The value of the ending node.
+Note: Node values are integers based on their position in a pre-order traversal (1-indexed).
+
+Goal:
+
+Return a list of integers representing the path from start to end.
+
+Example Cases
+
+Tree Structure for k=4 (7 nodes):
+Pre-order values: 1, 2, 3, 4, 5, 6, 7
+
+              1
+            /   \
+          2       6
+         / \     /
+        3   5   7
+       /
+      4
+
+Note: The left side has 4 nodes (values 2-5). The right side has 2 nodes (values 6-7).
+
+Example 1:
+
+Input: k = 4, start = 4, end = 7
+
+Output: [4, 3, 2, 1, 6, 7]
+
+Logic: The path goes up to the root (1), then down to the target.
+
+Example 2:
+
+Input: k = 4, start = 3, end = 5
+
+Output: [3, 2, 5]
+
+Logic: They meet at node 2 (the LCA).
+
+Example 3:
+
+Input: k = 4, start = 2, end = 5
+
+Output: [2, 5]
+
+Logic: Node 2 is the parent of node 5.
+
+Constraints & Limits
+
+1 <= k <= 45
+
+If k is 45, the tree has about 2.97 billion nodes.
+
+Node values start and end are valid numbers inside the tree.
+
+Node values are unique.
+
+Approach 1: Brute Force (Build the Tree)
+
+The Logic
+
+This is the simple, naive way to solve it:
+
+Build the whole tree in memory using the pre-order values.
+
+Use DFS (Depth-First Search) to find the path from the root to the start node.
+
+Use DFS to find the path from the root to the end node.
+
+Compare the two paths to find the Lowest Common Ancestor (LCA) and combine them.
+
+Time Complexity
+
+Build tree: O(n), where n is the number of nodes.
+
+Find paths: O(n).
+
+Total: O(n).
+
+Problem: If k=45, n is 3 billion. This is too slow.
+
+Space Complexity
+
+O(n) because you store every node.
+
+Code Implementation
+
+class TreeNode:
+    def __init__(self, val):
+        self.val = val
+        self.left = None
+        self.right = None
+
+class Solution:
+    def __init__(self):
+        # Calculate Fibonacci numbers ahead of time: F(0)=0, F(1)=1...
+        self.fib = [0, 1]
+        for i in range(2, 48):
+            self.fib.append(self.fib[i-1] + self.fib[i-2])
+
+    def build_fibonacci_tree(self, k, start_val=1):
+        """Build k-th order Fibonacci tree with pre-order values."""
+        if k == 0:
+            return None
+        if k == 1:
+            return TreeNode(start_val)
+
+        root = TreeNode(start_val)
+        # Left subtree is order (k-1), which has T(k-1) = F(k+1) - 1 nodes
+        left_size = self.fib[k+1] - 1
+        root.left = self.build_fibonacci_tree(k - 1, start_val + 1)
+        # Right subtree starts after all left subtree nodes
+        root.right = self.build_fibonacci_tree(k - 2, start_val + 1 + left_size)
+
+        return root
+
+    def find_path(self, root, target, path):
+        """DFS to find path from root to target."""
+        if not root:
+            return False
+
+        path.append(root.val)
+
+        if root.val == target:
+            return True
+
+        if self.find_path(root.left, target, path) or \
+           self.find_path(root.right, target, path):
+            return True
+
+        path.pop()
+        return False
+
+    def get_path(self, k, start, end):
+        """Find path between start and end nodes."""
+        root = self.build_fibonacci_tree(k)
+
+        path1, path2 = [], []
+        self.find_path(root, start, path1)
+        self.find_path(root, end, path2)
+
+        # Find LCA by comparing paths
+        lca_index = 0
+        for i in range(min(len(path1), len(path2))):
+            if path1[i] == path2[i]:
+                lca_index = i
+            else:
+                break
+
+        # Build result path: start -> LCA -> end
+        result = path1[lca_index:][::-1] + path2[lca_index+1:]
+        return result
+
+# Test
+sol = Solution()
+print(sol.get_path(4, 4, 7))  # [4, 3, 2, 1, 6, 7]
+print(sol.get_path(4, 3, 5))  # [3, 2, 5]
+
+Why this fails
+
+Too slow: It cannot handle k larger than 30.
+
+Out of Memory: Storing 3 billion nodes is impossible on standard machines.
+
+Approach 2: Optimal Solution (Math Calculation)
+
+The Insight
+
+We do not need to build the tree. We can calculate the path using math rules:
+
+Root is always 1 (in pre-order).
+
+For a tree of order k starting at 1:
+
+The left subtree has F(k+1) - 1 nodes.
+
+The node values for the left side are [2, F(k+1)].
+
+The node values for the right side are [F(k+1) + 1, F(k+2) - 1].
+
+We check if our target node is in the left or right range.
+
+We move down the tree recursively until we hit the target.
+
+We do this for both start and end nodes, then combine the paths.
+
+Time Complexity
+
+Find path to node: O(k).
+
+Since k is roughly log n (where n is total nodes), this is O(log n).
+
+For k=45, this takes about 45 steps. This is very fast.
+
+Space Complexity
+
+O(k) to store the path.
+
+Code Implementation
+
+class OptimalSolution:
+    def __init__(self):
+        # Precompute Fibonacci numbers up to F(47) (needed for k=45: T(45) = F(47) - 1)
+        self.fib = [0, 1]
+        for i in range(2, 48):
+            self.fib.append(self.fib[i-1] + self.fib[i-2])
+
+    def get_path_to_node(self, k, target):
+        """
+        Calculate path from root (node 1) to target node.
+        Time: O(k), Space: O(k)
+        """
+        if k == 0:
+            return []
+        if k == 1:
+            return [1]
+
+        path = []
+        current_root = 1
+        current_k = k
+
+        while current_root != target:
+            path.append(current_root)
+
+            # Left subtree is order (current_k-1), has T(current_k-1) = F(current_k+1) - 1 nodes
+            left_size = self.fib[current_k + 1] - 1
+            left_end = current_root + left_size
+
+            if target <= left_end:
+                # Target is in left subtree
+                current_root += 1
+                current_k -= 1
+            else:
+                # Target is in right subtree
+                current_root = left_end + 1
+                current_k -= 2
+
+        path.append(target)
+        return path
+
+    def get_path(self, k, start, end):
+        """
+        Find path between start and end nodes.
+        Time: O(k), Space: O(k)
+        """
+        # Get paths from root to both nodes
+        path_to_start = self.get_path_to_node(k, start)
+        path_to_end = self.get_path_to_node(k, end)
+
+        # Find LCA (last common node in both paths)
+        lca_index = 0
+        for i in range(min(len(path_to_start), len(path_to_end))):
+            if path_to_start[i] == path_to_end[i]:
+                lca_index = i
+            else:
+                break
+
+        # Build final path: start -> ... -> LCA -> ... -> end
+        # Reverse path from start to LCA, then add path from LCA to end
+        result = path_to_start[lca_index:][::-1]  # Start to LCA (reversed)
+        result.extend(path_to_end[lca_index + 1:])  # LCA to End (skip LCA)
+
+        return result
+
+# Test cases
+sol = OptimalSolution()
+
+print(sol.get_path(4, 4, 7))
+# Output: [4, 3, 2, 1, 6, 7]
+
+print(sol.get_path(4, 3, 5))
+# Output: [3, 2, 5]
+
+print(sol.get_path(4, 2, 5))
+# Output: [2, 5]
+
+print(sol.get_path(5, 3, 10))
+# T(5) = 12 nodes
+# Output: [3, 2, 1, 9, 10]
+
+Follow-Up 1: In-Order Traversal
+
+Question: What if the node values are based on in-order traversal (Left, Root, Right)?
+
+The Change
+
+The math for the ranges changes:
+
+Left subtree: Values [1, F(k+1) - 1]
+
+Root: Value F(k+1)
+
+Right subtree: Values [F(k+1) + 1, F(k+2) - 1]
+
+Modified Code Logic
+
+def get_path_to_node_inorder(self, k, target):
+    """Calculate path for in-order traversal."""
+    if k == 0:
+        return []
+    if k == 1:
+        return [1]
+
+    path = []
+    current_root_offset = 0  # Offset in current subtree
+    current_k = k
+
+    while current_k > 0:
+        # Left subtree (order k-1) has T(k-1) = F(k+1) - 1 nodes
+        left_size = self.fib[current_k + 1] - 1
+        root_value = current_root_offset + left_size + 1
+
+        if target == root_value:
+            path.append(target)
+            break
+        elif target < root_value:
+            # Target in left subtree
+            path.append(root_value)
+            current_k -= 1
+        else:
+            # Target in right subtree
+            path.append(root_value)
+            current_root_offset = root_value
+            current_k -= 2
+
+    return path
+
+Follow-Up 2: Post-Order Traversal
+
+Question: What if the node values are based on post-order traversal (Left, Right, Root)?
+
+The Change
+
+In post-order, the root is always the last node.
+
+Left subtree: Values [1, F(k+1) - 1]
+
+Right subtree: Values [F(k+1), F(k+2) - 2]
+
+Root: Value F(k+2) - 1
+
+Modified Code Logic
+
+def get_path_to_node_postorder(self, k, target):
+    """Calculate path for post-order traversal."""
+    if k == 0:
+        return []
+    if k == 1:
+        return [1]
+
+    path = []
+    offset = 0  # value offset of the current subtree within the full numbering
+    current_k = k
+
+    while current_k > 0:
+        # Left subtree (order k-1) has F(k+1) - 1 nodes; right (order k-2) has F(k) - 1
+        left_size = self.fib[current_k + 1] - 1
+        right_size = self.fib[current_k] - 1
+        # In post-order the root is the LAST value of its subtree
+        root_value = offset + left_size + right_size + 1
+        path.append(root_value)
+
+        if target == root_value:
+            break
+        elif target <= offset + left_size:
+            # Target in left subtree (values start at offset + 1)
+            current_k -= 1
+        else:
+            # Target in right subtree (shifted past the whole left subtree)
+            offset += left_size
+            current_k -= 2
+
+    return path
+
+Follow-Up 3: Level-Order Traversal
+
+Question: What if nodes are numbered by level-order (BFS)?
+
+Answer: This is much harder. Level-order does not group subtrees together nicely. Nodes at the same level can belong to different branches. You cannot use a simple formula like in the previous approaches. You would likely need to build the tree, which loses the optimization.
+
+Follow-Up 4: k-ary Trees
+
+Question: What if the tree has k children instead of 2?
+
+Answer: The logic is the same. You just need to check which of the k segments the target falls into. You would calculate the size of each of the k subtrees and see where the target fits.
+
+Similar Problems
+
+LeetCode 2096: Step-By-Step Directions From a Binary Tree Node to Another.
+
+Similarity: Both require finding an LCA and building a path up and down.
+
+Difference: LeetCode 2096 gives you the actual tree. This problem forces you to imagine the tree using math.
+
+Common Pitfalls
+
+Building the full tree: This is the most common mistake. It crashes for large k.
+
+Off-by-one errors: Calculating the exact range of the left/right subtrees is tricky.
+
+Forgetting to reverse: The path from start to the LCA goes up, so you must reverse the list of nodes.
+
+Integer Overflow: Fibonacci numbers get huge. In some languages (like C++ or Java), you must use 64-bit integers (long long). Python handles this automatically.
+
+Why is it O(log n)?
+
+The time complexity is O(k). But is that efficient? Yes.
+The number of nodes n grows exponentially with k (similar to $1.618^k$).
+This means that k is proportional to the logarithm of n.
+Therefore, O(k) = O(log n).
+
+Special Cases
+
+k = 1: The tree has only 1 node. The path is just [1].
+
+Start == End: The path is just [start].
+
+Parent to Child: The path goes straight down.
+
+Max k (45): The solution must handle numbers up to 3 billion.
+
+Key Takeaways
+
+Math beats Brute Force: If the data structure follows a strict mathematical rule, try to calculate positions instead of building the structure.
+
+Pre-order properties: In pre-order, the Root is first, then all Left nodes, then all Right nodes. This makes range checking easy.
+
+Recursive reduction: Every step reduces the problem size significantly (by shrinking k), leading to logarithmic time complexity.
+
+LCA Strategy: Finding a path between two nodes often means: Path(Start → Root) + Path(End → Root), then merge them.
+
+Real-World Uses
+
+Fibonacci Heaps: A data structure used to speed up graph algorithms like Dijkstra’s.
+
+Tree Compression: Saving space by describing a tree with a formula instead of storing every pointer.
+
+File Systems: Some systems use hierarchical indexing that grows like Fibonacci trees.
+
+Quick Summary
+
+ApproachTimeSpaceBuild Tree?Notes
+Brute ForceO(n)O(n)YesToo slow for large inputs
+Math CalculationO(log n)O(log n)NoOptimal Solution ✅
+
+TraversalRoot PositionLeft RangeRight Range
+Pre-orderFirst (1)[2, F(k+1)][F(k+1)+1, End]
+In-orderMiddle F(k+1)[1, F(k+1)-1][F(k+1)+1, End]
+Post-orderLast F(k+2)-1[1, F(k+1)-1][F(k+1), F(k+2)-2]
+
+2026 Output Variant
+
+Another tech-screen variant asks for the shortest path as direction tokens rather than node values: move upward with Up, then descend through Left / Right. The core work is unchanged: derive each node's root-to-node route from preorder ranges, find the LCA, then translate the first leg into Up steps and the second leg into child directions.
+
+Candidates who start with a generic LCA plan should quickly explain why explicitly building the tree is too expensive; the stronger signal is discovering the fixed value pattern and computing subtree ranges directly.
+
+Clarification Depth on Recent Screens
+
+Recent screens spend heavily on clarification before any code is written: expect to justify why the shortest path between the two labels runs through their LCA, why root-to-node routes derived from preorder ranges are shortest, and to derive the left / right subtree index ranges on a diagram. The bar is a quick, bug-free implementation with a clear explanation plus the follow-up — candidates who stall in clarification run out of coding time, and code that fails a test case is treated as a miss even when the approach is explained correctly. If you recognize the prompt, do not feign unfamiliarity: explain the structure and start writing early.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

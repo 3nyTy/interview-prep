@@ -1,0 +1,72 @@
+===H1===
+Website Activity Analytics: Unique Users + Session Time
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/website-activity-analytics-unique-users-session-time
+===BODY===
+Google
+Coding·60 minMembers
+Website Activity Analytics: Unique Users + Session Time
+Given website action records with `user_id`, timestamp, and activity, compute per-activity unique-user counts and average time spent on the site per user in seconds. The screen paired this Python task with a lighter SQL section and emphasized edge-case discussion over perfect final code.
+DS
+python
+hashmap
+data-analysis
+sql
+medium
+Frequency
+Single report
+Last asked
+2026-06-26
+Stage
+phone-screen
+Requirements
+
+Input is a collection of user-activity records. Each record contains:
+
+user_id: numeric user identifier
+
+timestamp: timestamp string such as 2024-07-26 10:00:00
+
+activity: action name such as login, view, purchase, or logout
+
+Implement two analytics tasks:
+
+Return a mapping from each activity type to the number of unique users who performed that activity.
+
+Calculate the average time spent on the website per user in seconds.
+
+Clarify session semantics before coding. The prompt uses login/logout-style events, but the exact treatment of users without an explicit logout, multiple sessions per user, and out-of-order records must be agreed with the interviewer.
+
+Examples
+
+user_activity = [
+    {'user_id': 1, 'timestamp': '2024-07-26 10:00:00', 'activity': 'login'},
+    {'user_id': 2, 'timestamp': '2024-07-26 10:05:00', 'activity': 'login'},
+    {'user_id': 1, 'timestamp': '2024-07-26 10:10:00', 'activity': 'view'},
+    {'user_id': 1, 'timestamp': '2024-07-26 10:15:00', 'activity': 'purchase'},
+    {'user_id': 2, 'timestamp': '2024-07-26 10:20:00', 'activity': 'view'},
+    {'user_id': 3, 'timestamp': '2024-07-26 10:25:00', 'activity': 'login'},
+    {'user_id': 1, 'timestamp': '2024-07-26 10:30:00', 'activity': 'logout'},
+]
+
+Notes
+
+SQL in the same screen was described as simple and covered joins / aggregation style work, but the exact SQL prompt did not leak.
+
+The interviewer accepted a strong draft when all edge cases were discussed, even though the final code did not cover every case.
+
+Spend time up front on timestamp parsing, ordering, repeated login/logout events, and users with missing terminal actions.
+
+Preparation
+
+Practice writing small Python analytics functions in a plain document without IDE help.
+
+Drill grouping records by user and by activity with dictionaries / sets.
+
+Rehearse explaining incomplete edge-case handling and dry-running a small event stream.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

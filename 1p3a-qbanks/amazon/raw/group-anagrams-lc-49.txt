@@ -1,0 +1,47 @@
+===H1===
+Group Anagrams (LC 49)
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/group-anagrams-lc-49
+===BODY===
+Amazon
+CodingMembers
+Group Anagrams (LC 49)
+Group strings that are anagrams. Start with a hashmap keyed by a canonical form, then replace per-string sorting with a fixed character-frequency signature in the optimization follow-up.
+SWE
+string
+hashmap
+bucket-sort
+medium
+Frequency
+Single report
+Last asked
+2026-08-14
+Stage
+onsite-coding
+Requirements
+
+Given a collection of strings, group strings that are anagrams of one another.
+
+Use a hashmap from a canonical string signature to the strings sharing that signature.
+
+Follow-up: improve on sorting every string by using a fixed character-frequency bucket / signature as the key.
+
+Notes
+
+Clarify the character set before choosing the signature width; a fixed lowercase-English alphabet and arbitrary Unicode require different representations.
+
+State whether group order and within-group order matter.
+
+The optimization changes canonicalization from per-string sorting to one scan over the characters.
+
+Preparation
+
+Implement both sorted-key and frequency-signature versions and compare their costs in terms of string length and alphabet size.
+
+Test empty strings, duplicate strings, single-character strings, and inputs whose groups appear in different orders.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

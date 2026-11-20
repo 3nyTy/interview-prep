@@ -1,0 +1,52 @@
+===H1===
+Number of Islands II (Dynamic Union-Find)
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/number-of-islands-ii
+===BODY===
+Uber
+Coding·60 minMembers
+Number of Islands II (Dynamic Union-Find)
+Onsite coding round. Land cells are added to a water grid one at a time; after each addition return the current number of 4-directionally connected islands. A dynamic union-find problem (LC 305).
+SWE
+union-find
+grid
+medium
+Frequency
+Low
+Last asked
+2026-06-08
+Stage
+onsite-coding · phone-screen
+Requirements
+
+You start with an m x n grid of water. You are given a sequence of positions, each turning one water cell into land.
+
+After each add-land operation, return the current number of islands (4-directionally connected groups of land).
+
+Return the list of island counts, one per operation.
+
+Examples
+
+m = 3, n = 3
+positions = [[0,0],[0,1],[1,2],[2,1]]
+output    = [1, 1, 2, 3]
+
+Notes
+
+Standard dynamic-connectivity problem: maintain a union-find over land cells. On each add-land, increment the island count, then union with each of the up-to-4 already-land neighbors, decrementing the count on every successful merge.
+
+Use union by rank / size + path compression; map (r, c) to a 1-D id r * n + c. Guard against re-adding a cell that is already land (treat as a no-op).
+
+Asked as a clean union-find round; one loop paired it with writing your own test cases and a separate tree-print helper.
+
+Preparation
+
+Implement union-find with path compression and union-by-size, then the incremental island-count update.
+
+Test duplicate positions and lands added in separate corners that later merge into a single island.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

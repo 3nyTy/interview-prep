@@ -1,0 +1,51 @@
+===H1===
+Sort Target String by Custom Order
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/custom-sort-string-by-order
+===BODY===
+Waymo
+Coding·45 minMembers
+Sort Target String by Custom Order
+Onsite coding: given a `target` string and an `order` string, return a permutation of `target` so that characters that appear in `order` are emitted in `order`'s sequence. Characters not in `order` may go anywhere. Equivalent to LeetCode 791 (Custom Sort String).
+SWE
+string
+sorting
+hashmap
+easy
+Frequency
+Single report
+Last asked
+2026-01-23
+Stage
+onsite-coding
+Requirements
+
+Inputs: target (the string whose characters need to be rearranged), order (a permutation defining a custom alphabet ordering).
+
+Output: any permutation of target such that for any two characters x, y both present in order, x appears before y in the output iff x appears before y in order.
+
+Characters in target that are not present in order may appear anywhere in the result.
+
+Notes
+
+Standard solution: counter over target, walk order left to right, emit counter[c] copies of each c, then append the remaining characters (those not in order) in any order. Complexity O(|target| + |order|).
+
+Implement carefully when target may contain repeats not present in order — they go in a separate 'leftover' pass.
+
+An equivalent solution sorts target with a key that maps each character to its position in order (or len(order) for absent characters). Slightly slower (O(|target| log |target|)) and only worth mentioning as a baseline.
+
+Common micro-bug: forgetting to zero out the counter entries that have already been consumed, then double-emitting in the leftover pass.
+
+Preparation
+
+Practice writing the counter + walk solution in under 8 minutes.
+
+Stretch follow-up: rank characters in target by their order index and report the resulting permutation's longest-increasing-subsequence — common L5 add-on probe.
+
+For an interview where order is large and target is small, flip the algorithm: index order into pos[char], then sort target characters by pos.get(c, len(order)).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

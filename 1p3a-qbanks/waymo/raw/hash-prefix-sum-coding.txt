@@ -1,0 +1,55 @@
+===H1===
+Hashmap + Prefix Sum Subarray Round
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/hash-prefix-sum-coding
+===BODY===
+Waymo
+Coding·45 minMembers
+Hashmap + Prefix Sum Subarray Round
+Phone screen: classic hashmap + prefix-sum pattern over an integer array (subarray sum / count-of-subarrays variants). Standard implementation; round graded on clean handling of the empty-prefix case and clear complexity discussion.
+SWE
+hashmap
+prefix-sum
+array
+easy
+Frequency
+Single report
+Last asked
+2026-05-13
+Stage
+phone-screen
+Requirements
+
+Input: an integer array (potentially with negative values), plus a target depending on the asked variant (subarray sum equal to k, count of subarrays summing to k, longest such subarray, etc.).
+
+Output: the requested boolean / count / index depending on variant.
+
+Standard contract follows LeetCode 560 / 525 / 974 family.
+
+Notes
+
+Maintain prefix = sum(nums[0..i]) while walking the array. The number of subarrays ending at i with sum k equals the number of past prefix sums equal to prefix − k.
+
+Use a hashmap prefix_count: Map<long, int> initialized with {0: 1} to handle subarrays that start at index 0.
+
+Negative values are allowed — this is the pattern's key edge over the sliding-window 'subarray with positive sum' template.
+
+Complexity O(n) time and O(n) space.
+
+Variants: longest subarray with sum k (store the earliest prefix index per sum, not the count); count of subarrays divisible by k (key by prefix % k, handle negative remainders).
+
+Common micro-bugs: forgetting the {0: 1} seed, off-by-one when storing 'earliest index', integer overflow for large prefixes.
+
+Preparation
+
+Drill LC 560, 525, 974 in one sit-down so the prefix-sum + hashmap idiom is automatic.
+
+Practice each variant's pivot (count vs longest vs divisible) — interviewers swap them mid-round.
+
+Be able to walk through the {0: 1} seed verbally; the interviewer in this round explicitly asked the candidate to explain that line.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

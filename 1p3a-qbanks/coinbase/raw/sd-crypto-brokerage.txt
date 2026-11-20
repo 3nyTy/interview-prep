@@ -1,0 +1,439 @@
+===H1===
+System Design — Crypto Brokerage / Trading Platform
+===URL===
+https://www.1point3acres.com/interview/problems/company/coinbase/sd-crypto-brokerage
+===BODY===
+Coinbase
+System Design·60 minMembers
+System Design — Crypto Brokerage / Trading Platform
+Design the trading flow of a crypto brokerage: a user submits a buy/sell order, the platform routes it to one or more matching venues, balances and positions update atomically, and the user sees confirmation in seconds. Discussion centers on order lifecycle (state machine), idempotency under network retries, balance accounting, and integration with third-party matching engines.
+SWE
+trading
+messaging
+idempotency
+transactions
+concurrency
+scaling
+kafka
+medium
+Frequency
+Low
+Last asked
+2026-08-12
+Stage
+onsite-system-design
+System Design: Crypto Exchange Order System
+
+Goal: Design an order system for a crypto broker like Coinbase. This system sends user buy/sell orders to other exchanges (like Binance or Kraken). It must find the best price and handle the order lifecycle asynchronously. Note that external exchange APIs are often slow or async.
+
+Step 1: What We Need to Build
+
+Basic Features
+
+Users can buy and sell crypto at market price.
+
+The system must check prices from many exchanges and pick the best one.
+
+The system must track the order status (pending → submitted → filled/failed).
+
+The system must handle errors like timeouts or partial fills without losing money.
+
+Users can see their order history and status in real-time.
+
+Note: We will focus only on market orders to keep the design clear.
+
+System Goals
+
+GoalTargetWhy it matters
+ConsistencyNo double orders, no lost ordersMoney is involved. Mistakes are not allowed.
+Availability99.9% uptimeCrypto trading never stops.
+LatencyGet prices < 500ms, place orders < 1sOld prices lead to bad deals.
+Fault ToleranceHandle broken exchangesThird-party exchanges often fail. We must survive this.
+Scalability10M users, handle huge spikesCrypto traffic is very "bursty" (sudden spikes).
+
+Important: Even if an exchange API looks synchronous (instant), the actual trade happens asynchronously. An order goes from "submitted" to "filled" over time. We must design for this.
+
+Scale Numbers
+
+MetricValue
+Total users10M
+Daily orders (normal)50K
+Orders per second (TPS)~0.6 TPS (Average)
+Peak TPS (market crash)1,000+ TPS (Design for this spike)
+Storage per year~18 GB
+
+Traffic spikes are the main challenge. A Bitcoin crash can increase traffic by 1000x in minutes. The system must not crash or lose orders during these times.
+
+Step 2: Database Design
+
+Core Data Tables
+
+Order
+├── id: UUID (PK)
+├── user_id: UUID (FK)
+├── symbol: VARCHAR (e.g., "BTC-USD")
+├── side: ENUM (buy, sell)
+├── type: ENUM (market)
+├── quantity: DECIMAL
+├── status: ENUM (pending, price_quoted, submitted, partially_filled, filled, failed, cancelled, timed_out)
+├── exchange_id: VARCHAR (which exchange we used)
+├── exchange_order_id: VARCHAR (ID on the external exchange)
+├── idempotency_key: VARCHAR (UNIQUE with user_id to prevent duplicates)
+├── quoted_price: DECIMAL
+├── filled_price: DECIMAL (Average price of fills)
+├── filled_quantity: DECIMAL
+├── failure_reason: VARCHAR
+├── retry_count: INTEGER (default 0)
+├── max_retries: INTEGER (default 3)
+├── reserved_amount: DECIMAL (Money locked for the trade)
+├── created_at: TIMESTAMP
+├── updated_at: TIMESTAMP
+└── expires_at: TIMESTAMP
+
+PriceQuote
+├── id: UUID (PK)
+├── order_id: UUID (FK)
+├── exchange_id: VARCHAR
+├── symbol: VARCHAR
+├── bid_price: DECIMAL
+├── ask_price: DECIMAL
+├── quoted_at: TIMESTAMP
+└── expires_at: TIMESTAMP
+
+Exchange
+├── id: VARCHAR (PK) (e.g., "binance", "kraken")
+├── name: VARCHAR
+├── status: ENUM (active, degraded, offline)
+├── priority: INTEGER
+├── rate_limit_per_sec: INTEGER
+└── updated_at: TIMESTAMP
+
+OrderEvent (Audit Log)
+├── id: UUID (PK)
+├── order_id: UUID (FK)
+├── event_type: ENUM (created, quoted, submitted, partially_filled, filled, failed, cancelled, timed_out)
+├── payload: JSONB
+└── created_at: TIMESTAMP
+
+Order Status Changes
+
+Key steps:
+
+pending → price_quoted: We ask exchanges for prices and pick the best one.
+
+price_quoted → submitted: We send the order to the exchange. This is async (we get an "received" message, not a "filled" message).
+
+submitted → filled/failed: The exchange tells us the result later via a webhook.
+
+submitted → timed_out: The exchange did not reply in time.
+
+timed_out → filled: We checked the exchange, and it turns out the order did fill.
+
+timed_out → price_quoted: We checked, and the order did not fill. We cancel it and try a different exchange.
+
+The "Timed Out" Danger:
+If an order times out, it might still be active on the exchange. You must query the exchange to check the status before you try again. If you don't check, you might accidentally buy twice (Double Execution).
+
+Step 3: API Definitions
+
+User APIs (REST)
+
+# Place a new order
+POST /api/orders
+Request:
+{
+  "symbol": "BTC-USD",
+  "side": "buy",
+  "type": "market",
+  "quantity": 0.5,
+  "idempotency_key": "01HP9Y6D8M0Y0Q4XKZ6S1Y3R4W"
+}
+Response:
+{
+  "order_id": "ord_456",
+  "status": "pending",
+  "created_at": "2024-02-15T10:00:00Z"
+}
+
+# Get order status
+GET /api/orders/{order_id}
+Response:
+{
+  "order_id": "ord_456",
+  "status": "filled",
+  "symbol": "BTC-USD",
+  "side": "buy",
+  "quantity": 0.5,
+  "filled_price": 51234.50,
+  "exchange_id": "binance",
+  "created_at": "2024-02-15T10:00:00Z",
+  "updated_at": "2024-02-15T10:00:03Z"
+}
+
+# Get order history
+GET /api/orders?limit=50&cursor={cursor}
+
+Real-Time Updates (WebSocket)
+
+# Client listens for updates
+WS /ws/orders
+
+# Server sends update
+{
+  "type": "order_update",
+  "order_id": "ord_456",
+  "status": "filled",
+  "filled_price": 51234.50,
+  "timestamp": "2024-02-15T10:00:03Z"
+}
+
+Internal Exchange APIs (Async)
+
+# Request price (async — answer comes via callback)
+POST /internal/exchanges/{exchange_id}/quote
+Request:
+{
+  "symbol": "BTC-USD",
+  "side": "buy",
+  "quantity": 0.5,
+  "callback_url": "https://our-system/internal/callbacks/quote"
+}
+
+# Submit order (async — result comes via webhook)
+POST /internal/exchanges/{exchange_id}/orders
+Request:
+{
+  "symbol": "BTC-USD",
+  "side": "buy",
+  "type": "market",
+  "quantity": 0.5,
+  "idempotency_key": "ord_456_ex_binance_v1",
+  "callback_url": "https://our-system/internal/callbacks/order"
+}
+
+# Check status manually (for timeouts)
+GET /internal/exchanges/{exchange_id}/orders/{exchange_order_id}
+
+Step 4: System Architecture
+
+What Each Part Does
+
+API Servers
+
+Receive user orders.
+
+Check the idempotency_key to stop duplicates.
+
+Lock funds: Reserve the user's money so they can't spend it twice.
+
+Put the order in a Queue and tell the user "Pending".
+
+Order Engine
+
+The main brain. It moves the order through steps.
+
+Reads from the Queue.
+
+Processes updates from exchanges (filled, failed).
+
+Saves every step to OrderEvent for safety.
+
+Sends updates to WebSockets.
+
+Price Router
+
+Asks all active exchanges for prices at the same time.
+
+Picks the best price.
+
+If a quote expires (takes too long), it asks again.
+
+Exchange Adapters
+
+Translators. They convert our standard format into the specific format for Binance, Kraken, etc.
+
+Handle rate limits (don't send too many requests too fast).
+
+Timeout Monitor
+
+Watches for orders stuck in "submitted" for too long (e.g., 30s).
+
+Checks the exchange status to see what happened.
+
+Reconciliation Job
+
+Runs every 5 minutes.
+
+Compares our database with the exchange's database.
+
+Fixes errors, like orders that filled but never sent a webhook.
+
+Fixing Stuck Orders (Timeout Recovery)
+
+Rule: Never blindly retry a timed-out order.
+Always check the order status on the exchange first. If you don't check, you might buy the same crypto twice.
+
+Preventing Duplicate Orders (Idempotency)
+
+We use three layers of protection:
+
+Client Key: The App sends a unique key. The API rejects if it sees the key twice.
+
+Engine Lock: We use Redis to lock the order ID so two workers don't process it at the same time.
+
+Exchange Key: We send a unique key to the external exchange. If they see the key twice, they won't create a new order.
+
+-- Ensure one order per key per user
+CREATE UNIQUE INDEX uq_orders_user_idempotency
+ON orders (user_id, idempotency_key);
+
+INSERT INTO orders (user_id, idempotency_key, symbol, side, quantity, status)
+VALUES (
+  '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+  '01HP9Y6D8M0Y0Q4XKZ6S1Y3R4W',
+  'BTC-USD',
+  'buy',
+  0.5,
+  'pending'
+)
+ON CONFLICT (user_id, idempotency_key) DO NOTHING
+RETURNING id, status;
+
+Step 5: Scaling and Hard Problems
+
+Meeting Our Goals
+
+StrategyHow It Helps
+3-Layer IdempotencyPrevents duplicate orders.
+Persistent QueueIf servers crash, orders stay in the queue (no data loss).
+Timeout MonitorFinds silent failures and fixes them.
+Reconciliation JobFinal safety check for missing money/orders.
+
+Handling Traffic Bursts
+
+Problem: A market crash causes 1000x more orders in minutes.
+
+Solutions:
+
+Queue as a Buffer: API servers accept orders fast and put them in a queue. The Order Engine processes them at a safe speed.
+
+Auto-scaling: If the queue gets long, we automatically add more Order Engine workers.
+
+Rate Limiting: We limit how fast we send orders to Binance so they don't block us.
+
+Backpressure: If the queue is full, we tell the user "System Busy" (HTTP 429) immediately, rather than accepting the order and failing later.
+
+Where Things Might Slow Down
+
+Getting Prices: Asking 3 exchanges for every order is slow.
+
+Fix: Stream prices via WebSocket into a Redis cache. Read from Redis instead of asking the exchange every time.
+
+Database Writes: 1,000 orders/sec = 4,000 DB writes/sec.
+
+Fix: Use a Write-Ahead Log (like Kafka) or batch writes together.
+
+Design Choices
+
+Sync vs Async Order Placement
+
+Sync (Wait for result): Easy for clients, but bad for performance. Blocks connections.
+
+Async (Return "Pending"): Harder for clients (need WebSockets), but handles spikes much better. We choose Async.
+
+Single vs Multi-Exchange
+
+Single: Simple.
+
+Multi: Better prices for users. Harder to build. We choose Multi.
+
+What If Things Break?
+
+FailureHow We Fix It
+API Server crashesThe user retries. The database prevents duplicates.
+Order Engine crashesThe Timeout Monitor finds the stuck order and finishes it.
+Exchange webhook lostThe Reconciliation Job finds the fill and updates our DB.
+Exchange goes downWe stop sending orders there and use a different exchange.
+Database goes downWe stop accepting new orders (fail safe).
+
+Final Review Checklist
+
+Requirements
+
+  Does it handle "Buy/Sell" and "Best Price"?
+
+  Did we plan for Async execution?
+
+  Did we handle the high traffic spikes?
+
+Data Model
+
+  Are entities (Order, Quote, Exchange) defined?
+
+  Is the state machine clear (especially timeouts)?
+
+  Is idempotency_key included?
+
+API & Design
+
+  REST for actions, WebSocket for updates?
+
+  Are internal adapters Async?
+
+  Does the diagram show Queue, Engine, and Adapters?
+
+  Is the "Timeout Monitor" included?
+
+Scaling
+
+  Did we use Queues to handle bursts?
+
+  Did we discuss Rate Limits?
+
+  Did we verify "What happens if X fails?"
+
+Summary of Main Ideas
+
+Everything is Async: Don't wait for answers. Design a system that handles delays.
+
+Check Before Retrying: Never retry a timed-out order without checking if it filled first.
+
+Stop Duplicates: Use Idempotency at the Client, Engine, and Exchange levels.
+
+Handle Spikes: Use Queues to absorb sudden traffic bursts.
+
+Plan for Failure: Use Monitors and Reconciliation jobs to catch errors when things break.
+
+Candidate-Report Notes
+
+Clarify brokerage vs exchange in the first minute. This prompt is a brokerage: Coinbase accepts the order, routes it to one or more matching venues (its own exchange and/or third parties), and reports fills back to the user. It is not a matching engine itself. Mixing the two costs design time and earns "didn't scope the problem" feedback.
+
+Order state machine: PENDING → SUBMITTED → (PARTIALLY_FILLED)* → FILLED | CANCELLED | REJECTED. Make every state transition the result of an idempotent event; replays land in the same terminal state.
+
+Idempotency keys at the API: client-generated UUID per intent; server dedupes by (userId, idempotencyKey). This is the single most common follow-up.
+
+Order routing layer is a separate service from order management. The router decides venue allocation (Coinbase exchange vs external) given price, latency, and inventory constraints; the order management service holds the state machine.
+
+Wallet ledger as the source of truth for balances — append-only events, current balance materialized via projection. Reservation pattern: on order submission, hold the funds (move from available to held); on fill, debit held and credit the asset side; on cancel, release held. This makes double-spend mechanically impossible.
+
+External venue integration is the most ambiguous part — clarify whether each venue exposes REST/WebSocket, what their settlement guarantees are, and how Coinbase reconciles internal records against venue confirmations (the answer is a daily reconciliation job + alerting on drift).
+
+Failure modes: venue connectivity drops mid-order (cancel + retry vs hold + re-confirm; depends on whether the venue accepted the order id); duplicate fills from a venue (rely on venue-side order id + idempotent ingest); user-side retry storm (rate-limit at API gateway, return cached idempotent response).
+
+Realtime updates to the user go through the same fanout channel as the Explore page — the trading dashboard is a more privileged subscription room on the same WebSocket connection.
+
+Preparation
+
+Be fluent on the wallet-ledger reservation pattern (available → held → settled). It is the highest-leverage drawing of the round.
+
+Pre-rehearse the idempotency-key flow end-to-end — API call, dedupe lookup, write path, response-replay on duplicate.
+
+Prepare to talk through what a smart-order-router does even at a sketch level: "I'd choose venue by best-price-with-headroom for liquidity, fall back to internal book if external rejects, and retry once with exponential backoff."
+
+Be ready to defend why the wallet service does not call the matching engine directly (separation of concerns + ability to dry-run / simulate).
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

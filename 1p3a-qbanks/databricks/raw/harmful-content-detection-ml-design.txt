@@ -1,0 +1,71 @@
+===H1===
+Harmful Content Detection ML Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/databricks/harmful-content-detection-ml-design
+===BODY===
+Databricks
+System Design·60 minMembers
+Harmful Content Detection ML Design
+Design an ML system to detect harmful LLM content. The LLM-focused form is broader than social-media moderation and expects both classical integrity considerations and LLM-specific concerns across data, evaluation, deployment, and policy trade-offs.
+MLE
+mlsd
+moderation
+ai-safety
+evaluation
+medium
+Frequency
+Low
+Last asked
+2026-08-11
+Stage
+onsite-system-design
+Problem Statement
+
+Design a machine learning system to detect harmful content on a large-scale platform. Harmful content includes categories such as hate speech, harassment, violence, sexual content, self-harm, spam, and misinformation. The system must classify user-generated content (text, images, or video) and route it for downstream actions such as automatic removal, demotion, or human review.
+
+Key Design Considerations
+
+This problem combines both ML system design and traditional system design elements. You should be prepared to discuss not only the ML components but also the infrastructure required to support content moderation at scale, where both false positives (over-removal of legitimate content) and false negatives (missed harmful content) carry real costs.
+
+Interview Structure
+
+During the interview, expect to cover both ML-specific topics and system architecture:
+
+ML System Design
+
+Data Processing: How would you collect, label, and preprocess multi-modal content data? How do you handle noisy or inconsistent labels from human annotators?
+
+Model Design: Which models are suitable for text vs. image vs. video classification? How do you handle multi-label classification across harm categories? How do you handle class imbalance, since harmful content is rare?
+
+Evaluation Metrics: What metrics would you use given the cost asymmetry between false positives and false negatives? How do you evaluate per-category performance?
+
+Deployment: How would you deploy the model for both real-time (e.g. live chat, comments) and batch (e.g. uploaded videos) inference?
+
+Post-Deployment: How do you handle adversarial users who evolve their tactics? How do you monitor for model drift and policy changes?
+
+System Architecture
+
+Beyond the ML components, expect questions on traditional system design:
+
+Scalability: How would you scale to billions of pieces of content per day?
+
+Reliability: How would you ensure the moderation pipeline does not block content publishing?
+
+Throughput and Latency: How would you handle real-time inference for chat/comments while also processing long-form video offline?
+
+Human-in-the-Loop: How does the ML system integrate with human reviewers for ambiguous cases and label feedback?
+
+System Diagram: Be prepared to draw the entire system architecture showing different components including ingestion, feature stores, model serving, review queues, and policy enforcement.
+
+Notes
+
+For the ML portion, standard preparation applies: data collection and labeling strategy, model selection across modalities, evaluation metrics under heavy class imbalance, deployment strategies for both online and offline content, and handling adversarial drift after deployment.
+
+What makes this question unique is the policy and human-in-the-loop dimension. Candidates were expected to discuss not only the model itself but also how its predictions feed into a moderation pipeline (auto-action thresholds vs. human review queues), how labeling feedback closes the loop, and how the system stays aligned with evolving content policy. Questions about scalability, reliability, and the trade-off between precision and recall across harm categories were central to the discussion.
+
+The LLM-focused form is distinct from the social-media moderation version: cover both classical integrity concerns and issues specific to LLM inputs and outputs. Confirm the target surface and policy boundary before selecting data, metrics, and serving architecture.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

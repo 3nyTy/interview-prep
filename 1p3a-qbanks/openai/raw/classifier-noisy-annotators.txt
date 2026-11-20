@@ -1,0 +1,54 @@
+===H1===
+Classifier with Noisy Annotators
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/classifier-noisy-annotators
+===BODY===
+OpenAI
+Coding·60 minMembers
+Classifier with Noisy Annotators
+A classifier trains on data labeled by multiple human annotators, but some annotators are noisy. Task: identify the bad annotators, exclude their labels, check whether the classifier improves.
+MLE
+RS
+RE
+ml-knowledge
+data-cleaning
+medium
+Frequency
+High
+Last asked
+2026-07-17
+Stage
+tech-screen
+Requirements
+
+Input: an annotation matrix (each sample labeled by multiple annotators)
+
+Output: flag bad annotators, filter their labels, re-evaluate the classifier
+
+The canonical setup is consistent across candidates: find bad annotators → exclude → check classifier improvement
+
+Examples
+
+One round-2 variant: a 400+ line PyTorch file using this classifier is handed over for code reading + refactoring (3 parts + 1 bonus). The technical content is the same — only the format differs.
+
+Notes
+
+Real-world thinking applies: majority vote, agreement rate, agreement with final label, Dawid-Skene.
+
+No need for fancy methods — simple agreement statistics are enough; what matters is code organization + communication.
+
+Important follow-up: "you can't drop too much data because input dimensionality is high" — handle the bias-variance tradeoff in your filtering.
+
+Preparation
+
+Have ready: annotator agreement matrix, Cohen's kappa, majority vote, weighted voting
+
+Read Dawid-Skene EM algorithm — even a sentence-level explanation impresses
+
+Write a clean pipeline: filter_bad_annotators → resample → retrain → evaluate
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

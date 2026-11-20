@@ -1,0 +1,80 @@
+===H1===
+Phone Screen: Number of Islands (Plain and Streaming)
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/phone-screen-number-of-islands
+===BODY===
+Uber
+Coding·60 minMembers
+Phone Screen: Number of Islands (Plain and Streaming)
+Very common phone-screen prompt, equivalent to LeetCode 200. Some loops dress it up as a virus-spread / infected-zone variant (LC 994 style) or extend it into a streaming Number of Islands II (LC 305) with union-find.
+SWE
+MLE
+graph
+bfs
+dfs
+union-find
+medium
+Frequency
+Medium
+Last asked
+2026-04-09
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input: 2D grid of '1' (land) and '0' (water) cells; cells are string literals '0' / '1'.
+
+Output: the number of islands — connected components of land cells, joined 4-directionally (horizontally or vertically adjacent). You may assume the grid edges are surrounded by water.
+
+Constraints: 1 <= grid.length, grid[i].length <= 100.
+
+def num_islands(grid: list[list[str]]) -> int: ...
+    # Returns the count of 4-connected land components.
+    # An island is a maximal group of horizontally/vertically adjacent '1' cells.
+
+Common variants:
+
+Rotten oranges / virus spread (LC 994 wording) — BFS layer count instead of component count.
+
+Streaming islands (LC 305) — process a stream of addLand operations and return the current island count after each (see Alternate canonical variant below).
+
+Notes
+
+DFS / BFS for the plain version is O(R · C).
+
+For the streaming follow-up: union-find with path compression. Each addLand is O(α(R · C)) amortized.
+
+Common follow-up: "What if the grid is too large to hold in memory?" Discuss sparse representation (only store land cells in a hash set) and externalised union-find.
+
+For the senior phone-screen variant, expect a follow-up like "return the maximum island size after each addLand" — same union-find but track component size on union.
+
+Some interviewers explicitly ask for union-find on the plain LC 200 to test data-structure breadth; have it ready even if DFS solved the base problem.
+
+Alternate canonical variant — streaming (Number of Islands II)
+
+Start from an empty m x n grid filled entirely with water. Each addLand operation turns one cell into land; after every operation, report the current island count.
+
+def num_islands2(m: int, n: int, positions: list[list[int]]) -> list[int]: ...
+    # positions[i] = [ri, ci] turns cell (ri, ci) into land on the i-th op.
+    # Returns answer where answer[i] = number of 4-connected land islands AFTER the i-th addLand.
+    # len(answer) == len(positions); each entry is the count immediately after that op (not a final total).
+
+Return semantics: produce one count per operation, in order — the live island count after applying that single addLand. A single new land cell starts as +1; unioning it with k already-distinct neighboring islands nets 1 - k to the running count (one op can merge several islands into one and drop the count).
+
+Constraints: 1 <= m, n <= 10^4, 1 <= m * n <= 10^4, 0 <= positions.length <= 10^4, 0 <= ri < m, 0 <= ci < n. Note positions may be empty (returns []), and the same cell may appear more than once (re-adding existing land leaves the count unchanged).
+
+Approach: union-find keyed by flattened index r * n + c. On each op mark the cell land (+1 to count), then for each of the up-to-4 already-land neighbors, union and decrement the count once per successful merge of distinct components.
+
+Preparation
+
+Drill LC 200, LC 305, and LC 994 in one session — they share the same backbone.
+
+Implement union-find with parent, rank, and size arrays from memory.
+
+Pre-script the "track the maximum island size after each addLand" follow-up; this has been the deciding twist in multiple senior loops.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

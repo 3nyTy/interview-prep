@@ -1,0 +1,57 @@
+===H1===
+Tree Diameter / Longest Path
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/tree-diameter
+===BODY===
+Meta
+Coding·40 minMembers
+Tree Diameter / Longest Path
+LeetCode 543 / 1245. Longest path between any two nodes in a tree. DFS returns the deepest descendant chain; at each node, the diameter candidate is the sum of the two longest child chains.
+SWE
+MLE
+Infra Eng
+tree
+dfs
+tree-traversal
+medium
+Frequency
+Low
+Last asked
+2026-04-02
+Stage
+phone-screen · onsite-coding
+Requirements
+
+Input: binary tree (LC 543) or general N-ary tree (LC 1245).
+
+Output: number of edges on the longest path between any two nodes.
+
+Single DFS: at each node return 1 + max(child_depths); meanwhile update a global best with sum_of_top_two_child_depths.
+
+Examples
+
+LC 543: tree [1,2,3,4,5] → 3 (path 4→2→1→3 or 5→2→1→3).
+
+N-ary tree variant: same logic but track the top-two child chain depths per node.
+
+Notes
+
+Common bug: returning the diameter from the DFS instead of the depth — the recurrence needs depth, the answer is a global.
+
+N-ary variant: maintain best_first and best_second while iterating children to avoid an O(k log k) sort.
+
+A different problem class: "longest monotonic path in BST" (sorted values along the path) — has the same DFS shape but with directional invariants.
+
+Preparation
+
+Write LC 543 from memory in under 8 min.
+
+Drill the N-ary variant (LC 1245) — Meta's preferred follow-up.
+
+Be ready for the "longest monotonic path in BST" twist as a third variant.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,60 @@
+===H1===
+Single-Producer Multi-Consumer Ring Buffer
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/single-producer-multi-consumer-ring-buffer
+===BODY===
+Citadel / Citadel Securities
+Coding·60 minMembers
+Single-Producer Multi-Consumer Ring Buffer
+Citsec C++ SWE phone screen with a senior Chinese engineer: 30 minutes of resume drilling followed by a quick OOD — design a single-producer, multi-consumer ring buffer over a fixed-capacity circular array. Reference framing is a circular-deque interface in the spirit of LC 641, generalized to concurrent consumers.
+SWE
+data-structure
+concurrency
+threading
+oop-design
+hard
+Frequency
+Single report
+Last asked
+2026-03-08
+Stage
+phone-screen
+Requirements
+
+Design a fixed-capacity ring buffer (circular array) with the following semantics:
+
+Exactly one producer thread pushes elements with push(item). On overflow, behavior must be specified by the candidate (drop oldest / drop newest / block / signal).
+
+Multiple consumer threads each call pop() -> item independently. Each consumer gets its own logical read cursor; popped items are consumed exclusively by that consumer (no broadcast unless explicitly redesigned).
+
+Capacity is fixed at construction.
+
+The interviewer accepts simple single-process scaffolding (mutex + condition variables) but pushes for the lock-free / atomic argument once the basic version is in place.
+
+Notes
+
+Storage layout: contiguous array of size N, plus a head index (next write) and per-consumer tail indices (next read). Head wraps modulo N. For multi-consumer, the simplest model is a shared tail pointer with each pop atomically advancing it; broadcast semantics require per-consumer cursors and a different memory layout.
+
+Concurrency baseline: one std::mutex guarding head + tails + array; consumers wait on a std::condition_variable when empty, producer wakes them on push. Correct but coarse.
+
+Lock-free pattern: producer uses a relaxed-store on the head, consumers use atomic fetch-add on the shared tail. The relevant memory orders are release on the producer's store of the new head and acquire on the consumer's load. False sharing between head and tail is mitigated by padding them to separate cache lines.
+
+Capacity-and-wraparound edge case: distinguishing full from empty requires either reserving one slot, tracking a separate count, or using sequence numbers per slot (Vyukov-style MPMC). Pick one and state it.
+
+LC 641 reference: same circular-array data structure, single-threaded, no consumer abstraction. The Citsec ask layers concurrency and multi-consumer cursors on top.
+
+Preparation
+
+Implement an SPSC (single-producer single-consumer) ring buffer in C++ first using atomic head / tail with memory_order_acquire / release; this is the foundational pattern. Add MPMC variants only after SPSC is solid.
+
+Read up on the standard SPSC / SPMC / MPMC ring-buffer taxonomy and be able to name each model's primary contention point (head, tail, slot sequence).
+
+Practice articulating false sharing: head and tail on the same cache line cause inter-CPU coherence traffic on every push / pop; pad them to 64-byte boundaries.
+
+Be ready to argue why the simple mutex version is O(1) per op but throughput-bounded by the lock, and why the lock-free version trades implementation complexity for lower contention.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

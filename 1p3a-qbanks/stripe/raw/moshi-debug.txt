@@ -1,0 +1,112 @@
+===H1===
+Debug: Moshi JSON Library
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/moshi-debug
+===BODY===
+Stripe
+Coding·60 minMembers
+Debug: Moshi JSON Library
+A live debugging round on an unfamiliar codebase: you are given a deliberately broken version of the Java JSON library Moshi and must use its test suite to locate and fix the planted bugs while narrating your reasoning.
+SWE
+medium
+debugging
+code-reading
+java
+json
+testing
+Frequency
+Low
+Last asked
+2026-08-18
+Stage
+onsite-coding
+The Task
+
+This is a debugging exercise on a codebase you have not seen before. You are given a version of the Java library Moshi that has bugs hidden inside on purpose. You must use the included tests and your debugging skills to find and fix these bugs.
+
+This round checks whether you can:
+
+Work with code you have not seen before.
+
+Understand unfamiliar, non-trivial code quickly.
+
+Use tooling to localize errors.
+
+Explain your steps clearly as you work.
+
+Interview Details
+
+Time: ~45-60 minutes
+
+Setup: Download the code, work on your own machine, and share your screen.
+
+Language: Java
+
+Process: The interviewer watches you work; think out loud and explain your reasoning.
+
+About Moshi
+
+Moshi is a JSON library for Android and Java by Square. It parses JSON and is meant to replace Gson with better performance and Kotlin support. Key features:
+
+Type-Safe Parsing: Safely converts JSON into Java/Kotlin objects.
+
+Streaming API: Uses very little memory when reading large JSON files.
+
+Custom Adapters: Add your own rules for specific types.
+
+Annotation Support: @Json matches fields, @JsonQualifier handles special cases.
+
+Null Safety: Strict about null values and missing data.
+
+Code Example:
+
+Moshi moshi = new Moshi.Builder().build();
+JsonAdapter<User> adapter = moshi.adapter(User.class);
+
+// Convert JSON string into a Java object
+User user = adapter.fromJson("{\"name\":\"John\",\"age\":30}");
+
+// Convert Java object back into a JSON string
+String json = adapter.toJson(user);
+
+You do not need prior Moshi knowledge. The code ships with many tests that reveal what is wrong.
+
+How to Start
+
+The bugged codebase is distributed as a downloadable archive (a Google Drive link is provided at the start of the session).
+
+Download the code and go to the debug-moshi folder.
+
+Build the project: ./gradlew build
+
+Run the tests: ./gradlew test
+
+Look at which tests fail and start investigating.
+
+Tips for Debugging
+
+Run all tests to see exactly what is broken:
+
+./gradlew test
+
+Focus on one failure at a time to make the output easier to read:
+
+./gradlew test --tests "ClassName.testMethodName"
+
+Read the test to see what behavior it expects.
+
+Follow the code from input to the point of failure.
+
+Use the debugger — set breakpoints in the parsing logic (e.g. Right-click the test → Debug in IntelliJ IDEA, or Debug As → JUnit Test in Eclipse).
+
+Search by keyword to find the code responsible for handling the data.
+
+Notes
+
+Fixing the failing test is only the first step. Expect follow-ups about how the relevant files and classes connect, so build a dependency map while tracing the execution path rather than focusing on one method in isolation.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

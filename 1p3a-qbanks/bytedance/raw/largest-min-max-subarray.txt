@@ -1,0 +1,56 @@
+===H1===
+Contiguous Subarray with Largest Min + Max
+===URL===
+https://www.1point3acres.com/interview/problems/company/bytedance/largest-min-max-subarray
+===BODY===
+ByteDance / TikTok
+Coding·30 minMembers
+Contiguous Subarray with Largest Min + Max
+A custom 30-minute coding question: given a positive integer array, find a contiguous subarray (length ≥ 2) maximizing `min + max`, return the sum.
+SWE
+array
+two-pointer
+math
+medium
+Frequency
+Single report
+Last asked
+2025-11-26
+Stage
+phone-screen
+Requirements
+
+Given an array of n positive integers, find a contiguous subarray containing more than one number with the largest min + max. Return that sum.
+
+def largestMinMaxSum(nums: List[int]) -> int: ...
+
+Example:
+
+Input:  [5, 12, 9, 6, 4]
+Output: 21   (subarray [12, 9], min=9 max=12, 9+12=21)
+
+Notes
+
+The trick is to realize that for any subarray of length ≥ 2, the answer reduces to picking any pair of indices (i, j) with i < j and computing min(nums[i..j]) + max(nums[i..j]). The largest sum is achieved by adjacent pairs: max(nums[i] + nums[i+1]) for all i.
+
+Why adjacency works: extending a subarray can only decrease min (never increase it) and increase max by at most as much as a fresh single new max. Pair-wise adjacent gives both min + max simultaneously without loss.
+
+Linear O(n) scan suffices; no need for a sliding window or segment tree.
+
+Common trap: candidates jump to two pointers or sliding window because of "contiguous subarray," but the structure of the cost function (min + max) makes the answer purely local.
+
+Be careful to clarify the "length ≥ 2" requirement up front — single-element subarrays trivially give 2 * nums[i] and change the answer.
+
+Preparation
+
+Practice noticing when "contiguous subarray" problems collapse to adjacent pairs — this is a recurring trick across interviews.
+
+Drill the one-pass scan; be able to write it in under 5 minutes with explicit tracking of both elements.
+
+Be ready to argue the correctness reduction crisply: "extending never helps, so two-element subarrays are sufficient."
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

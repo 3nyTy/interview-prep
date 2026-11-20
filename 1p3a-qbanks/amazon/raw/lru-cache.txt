@@ -1,0 +1,67 @@
+===H1===
+LRU Cache (LC 146)
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/lru-cache
+===BODY===
+Amazon
+Coding·30 minMembers
+LRU Cache (LC 146)
+Implement an LRU cache with O(1) get/put. A perennial Amazon onsite/phone-screen coding round; interviewers usually want to see a doubly-linked list plus hashmap rather than a deque trick.
+SWE
+hashmap
+data-structure
+medium
+Frequency
+Medium
+Last asked
+2026-08-17
+Stage
+onsite-coding · phone-screen
+Requirements
+
+Implement LRUCache(capacity) with get(key) and put(key, value), both in O(1) amortized time.
+
+On capacity overflow, evict the least-recently-used key.
+
+Touching a key with get counts as a use.
+
+Examples
+
+cache = LRUCache(2)
+cache.put(1, 1)        # cache = {1=1}
+cache.put(2, 2)        # cache = {1=1, 2=2}
+cache.get(1)           # returns 1, cache = {2=2, 1=1}
+cache.put(3, 3)        # evicts key 2, cache = {1=1, 3=3}
+cache.get(2)           # returns -1
+
+Notes
+
+Interviewers have been observed steering candidates toward the doubly-linked-list + hashmap solution; if they hint at a node class, follow their lead rather than reaching for OrderedDict/LinkedHashMap.
+
+Amazon code generally is not executed during the interview, so explain the data-structure choice and complexity before writing. Walk through pointer rewiring out loud.
+
+The same LRU mindset has shown up in disguised problems — e.g., "return the median over the last N comments," which is solved by an LRU-style ring buffer plus an order-statistic structure.
+
+The invariant set worth stating out loud before coding: every node lives in exactly one place in the doubly-linked list, the hashmap maps key to that node pointer, and head / tail sentinels remove all if prev is None branching. Most bugs come from forgetting to detach the node before re-inserting at head, or from updating the hashmap before unlinking.
+
+Complexity guarantee is O(1) amortized average, not worst case — interviewers occasionally probe whether you understand the difference (hash collisions degrade lookup). Stating this proactively reads well.
+
+On put of an existing key, the standard bug is to insert a new node instead of updating the existing node's value in place and moving it to head. Walk through the update path explicitly.
+
+Preparation
+
+Drill the canonical doubly-linked-list + hashmap implementation until you can write it in under 12 minutes with no scratch work.
+
+Practice the variant where the interviewer wants peek, expire(ttl), or thread-safe access — these are common follow-ups.
+
+Internalize the eviction invariant: head of list = most recent, tail = next victim; every get and put must move or insert at head.
+
+Layered drill order: (1) write get + put with OrderedDict / LinkedHashMap in 3 minutes as a warmup; (2) re-implement with raw hashmap + custom doubly-linked-list with head/tail sentinels in 12 minutes; (3) add peek, evict_if_idle(ttl), and a thread-safety discussion as standalone follow-up rehearsals.
+
+Drill the eviction edge cases on paper: capacity=1, repeated put on the same key, alternating get/put cycles. These are where pointer-rewiring bugs surface.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

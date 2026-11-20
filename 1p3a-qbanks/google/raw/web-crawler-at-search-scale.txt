@@ -1,0 +1,56 @@
+===H1===
+Web Crawler at Search Scale
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/web-crawler-at-search-scale
+===BODY===
+Google
+System Design·45 minMembers
+Web Crawler at Search Scale
+Design a periodic crawler for tens of billions of pages feeding a search index, without JavaScript rendering. Deep dives cover a two-level URL frontier, robots.txt caching, exact and near-duplicate detection, crawler traps, host-based sharding, checkpoint recovery, and a 24-hour full-recrawl target.
+SWE
+web-crawler
+distributed-systems
+scaling
+dedup
+hard
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-system-design
+Requirements
+
+Crawl tens of billions of pages, revisit them periodically, and deliver parsed content to a search index. JavaScript rendering is out of scope.
+
+Close the loop as URL frontier → fetcher → parser → deduplication → storage, with newly extracted URLs fed back into the frontier.
+
+Balance priority with host politeness. Use front queues by priority and back queues by host so requests to one host are serialized and spaced while high-priority URLs still advance quickly. Define a robots.txt cache policy.
+
+Deduplicate both URLs and content. URL-level membership can combine hashing with a Bloom filter; content-level detection must handle the same page appearing at multiple URLs, using checksums for exact matches and a near-duplicate signal such as SimHash.
+
+Detect crawler traps such as infinite calendar pages and dynamically generated URL spaces by limiting per-domain depth and volume and recognizing pathological URL patterns.
+
+Distribute work by consistently hashing hosts to crawler nodes so one node owns each host's politeness state. Persist frontier checkpoints and recover ownership after node failure.
+
+Follow-up: identify the bottleneck when the entire site corpus must be recrawled within 24 hours; bandwidth and DNS resolution become primary constraints, motivating capacity planning and a dedicated DNS cache.
+
+Notes
+
+The key design decision is treating the frontier as a scheduler with two competing objectives, not a FIFO queue. A Bloom-filter false positive can skip a page entirely, so the error budget and an exact fallback for important domains must be explicit.
+
+Treat robots policy as host-level state keyed by scheme, host, and port, with an explicit expiration plus last-good and failure behavior. Keep that cache under the same ownership boundary as politeness state. For recrawls, conditional requests using validators such as ETag or Last-Modified can reduce bandwidth when the origin supports them.
+
+Preparation
+
+Draw the complete crawl loop and annotate where state must persist for restart.
+
+Work through a two-level frontier scheduler with three priority classes and several hosts, including robots.txt delays.
+
+Calculate the bandwidth and fetch-rate budget for a 24-hour recrawl, then explain how DNS caching, sharding, and backpressure interact.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

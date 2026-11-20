@@ -1,0 +1,52 @@
+===H1===
+Run-Length Encoded String: Find by Index and Range Max
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/run-length-encoding-find-by-index
+===BODY===
+Waymo
+Coding·45 minMembers
+Run-Length Encoded String: Find by Index and Range Max
+Phone screen with two parts: (1) given an RLE-encoded string like `B1A2E3C1` (decodes to `BAAEEEC`), implement `char Find(int p)` returning the character at original index `p`. (2) Given the same encoding plus a sorted assumption, implement `FindByValue(target, left, right)` returning the maximum character strictly greater than `target` in `[left, right]`.
+SWE
+compression
+binary-search
+prefix-sum
+string-processing
+medium
+Frequency
+Single report
+Last asked
+2026-01-23
+Stage
+phone-screen
+Requirements
+
+Encoding: a string of alternating <char><run-length> segments. Example: {B, A, A, E, E, E, C} encodes as B1A2E3C1.
+
+Part 1: char Find(int p) returns the character at decoded index p (0-indexed) without materializing the decoded string.
+
+Part 2: assume the decoded sequence is sorted. Implement char FindByValue(char target, int left, int right) — return the largest character within decoded range [left, right] that exceeds target, or a sentinel if none exists.
+
+Notes
+
+Pre-compute a prefix-sum array cum[i] = sum(run_length[0..i]). Find(p) is then a binary search on cum for the smallest index i with cum[i] > p, returning char[i]. Complexity O(log K) per query for K runs.
+
+For part 2, leverage the sorted assumption: in a sorted decoded sequence, the maximum on [left, right] is the character at decoded index right. Run Find(right). The 'strictly greater than target' filter just adds an if c > target: return c else: return None post-check.
+
+If the interviewer drops the sorted assumption, fall back to a segment tree over runs storing per-segment max — O(log K) per query at the cost of O(K) precompute.
+
+Edge cases: query out of bounds (p >= decoded length), empty range (left > right), runs with length zero (treat as no-ops during preprocessing).
+
+Preparation
+
+Implement RLE encode / decode in both directions from memory in 10 minutes.
+
+Drill the prefix-sum + binary search pattern; this is the same shape as the canonical 'pick a weighted random index' interview problem.
+
+For the segment-tree fallback, prepare a 25-line iterative segment tree supporting point-update and range-max queries — comes up often enough to be worth memorizing.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

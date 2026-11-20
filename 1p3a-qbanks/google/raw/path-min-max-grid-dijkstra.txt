@@ -1,0 +1,77 @@
+===H1===
+Path Minimizing the Maximum Cell (Swim in Rising Water)
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/path-min-max-grid-dijkstra
+===BODY===
+Google
+Coding·45 minMembers
+Path Minimizing the Maximum Cell (Swim in Rising Water)
+A bottleneck-path family: minimize the maximum value encountered on a grid path, then generalize the same reasoning to a weighted graph whose edges carry safety values and an admissibility threshold.
+SWE
+graph
+heap
+algorithm
+medium
+Frequency
+Low
+Last asked
+2026-07-08
+Stage
+onsite-coding
+Requirements
+
+Grid variant
+
+Input is a grid of heights and start/end cells; movement is through four-neighbors.
+
+Cost of a path is the maximum cell value along it.
+
+Return the minimum possible path cost.
+
+Weighted-graph safety variant
+
+Input is a graph whose edges carry safety values, a start node, an end node, and a safety threshold.
+
+Find the lowest safety value required by any valid start-to-end path while every traversed edge remains under the supplied threshold.
+
+Return -1 when no admissible path exists.
+
+Clarify whether the threshold comparison is strict or inclusive before coding.
+
+Follow-up: Network Delay Time variant
+
+In a directed graph with edge weights, return the maximum shortest-path distance from a source to all nodes, or -1 if any node is unreachable.
+
+Examples
+
+Grid:
+[ 0  1  2  3  4 ]
+[24 23 22 21  5 ]
+[12 13 14 15 16 ]
+[11 17 18 19 20 ]
+[10  9  8  7  6 ]
+Start=(0,0), End=(4,0) in (row, col) — the bottom-left cell with value 10. Answer: 16 (the path's max cell is 16).
+
+Notes
+
+The clean solution is a Dijkstra variant: priority queue keyed on the running maximum, relax with new = max(dist[cur], height[nxt]). The same skeleton handles the safety variant with edge values in place of cell heights, plus the admissibility filter.
+
+Also mentionable: binary-search the answer + BFS/DFS reachability check — but Dijkstra is the cleaner one-pass solution.
+
+The grid prompt minimizes a maximum rather than a sum. Be ready to justify why Dijkstra still works: the path cost is monotone as a path grows, so extending a settled vertex never lowers its committed cost.
+
+The safety version preserves the bottleneck-path shape but changes cells to weighted edges and adds an explicit admissibility threshold.
+
+For the plain shortest-path follow-up, do standard Dijkstra with a min-heap; skip stale priority-queue entries (if curDist != dist[u]: continue) and account for unreachable nodes.
+
+Preparation
+
+Drill the grid and weighted-graph variants back to back, stating the path-cost invariant before implementation.
+
+Practice proving correctness for a monotone max-along-path objective and test source-equals-target, disconnected graphs, and values exactly at the threshold.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,151 @@
+===H1===
+Design Circular Queue
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/design-circular-queue
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Design Circular Queue
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+Members
+Design Circular Queue
+
+Design your implementation of the circular queue.
+
+SWE
+queue
+array
+data-structure
+medium
+Frequency
+Single report
+Last asked
+2026-01-22
+Stage
+phone-screen · onsite-coding
+Design Circular Queue
+Problem Overview
+
+Your goal is to build a circular queue. This is a linear data structure that follows the FIFO (First In First Out) rule. Unlike a standard queue, the last position in a circular queue connects back to the first position to form a ring.
+
+Task Requirements
+
+You need to implement the MyCircularQueue class with the following methods:
+
+MyCircularQueue(k): Sets up the object and defines the size of the queue as k.
+boolean enQueue(int value): Adds an item to the queue. Returns true if the item was added successfully.
+boolean deQueue(): Removes an item from the queue. Returns true if the item was removed successfully.
+int Front(): Returns the item at the front of the queue. If the queue is empty, it returns -1.
+int Rear(): Returns the last item in the queue. If the queue is empty, it returns -1.
+boolean isEmpty(): Checks if the queue contains no items.
+boolean isFull(): Checks if the queue has no space left.
+Usage Scenarios
+
+Case 1
+
+Input: ["MyCircularQueue","enQueue","enQueue","enQueue","enQueue","Rear","isFull","deQueue","enQueue","Rear"] [[3],[1],[2],[3],[4],[],[],[],[4],[]]
+
+Output: [null,true,true,true,false,3,true,true,true,4]
+
+Walkthrough:
+
+new MyCircularQueue(3): Create a queue with size 3.
+enQueue(1): Returns True.
+enQueue(2): Returns True.
+enQueue(3): Returns True.
+enQueue(4): Returns False (The queue is full).
+Rear(): Returns 3.
+isFull(): Returns True.
+deQueue(): Returns True.
+enQueue(4): Returns True.
+Rear(): Returns 4.
+
+Case 2
+
+Input: ["MyCircularQueue","enQueue","deQueue","deQueue","enQueue","enQueue","enQueue","Rear","isFull","Front"] [[2],[1],[],[],[2],[3],[4],[],[],[]]
+
+Output: [null,true,true,false,true,true,false,3,true,2]
+
+System Limitations
+The size k will be between 1 and 1000.
+The value inserted will be between 0 and 1000.
+There will be a maximum of 3000 calls to enQueue, deQueue, Front, Rear, isEmpty, and isFull combined.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Design Circular Queue
+Problem Overview
+Task Requirements
+Usage Scenarios
+System Limitations
+Related discussions · 0
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Serialize and Deserialize Dictionary Trie
+Single report
+data-structure
+medium
+trie
++2
+RecordCollection Sort Colors
+Single report
+array
+medium
+two-pointer
++1
+Forest Parent Array Delete Node
+Single report
+array
+medium
+tree
++1
+Filter System with Dynamic Blacklist
+Single report
+data-structure
+medium
+oop-design
++3
+Frontend Grid: Robot Eats Candies
+Single report
+medium
+frontend
+bfs
++2
+Code editor

@@ -1,0 +1,56 @@
+===H1===
+Attention Implementation + Flash / Linear Attention Follow-ups
+===URL===
+https://www.1point3acres.com/interview/problems/company/meta/attention-implementation-and-follow-ups
+===BODY===
+Meta
+Coding·45 minMembers
+Attention Implementation + Flash / Linear Attention Follow-ups
+Implement the standard attention computation in code, analyze its time and space complexity, then answer oral follow-ups on FlashAttention and linear attention. This appears in a Meta Superintelligence / MLE-style loop alongside research-design and ML-foundations rounds.
+MLE
+RS
+attention
+transformer
+pytorch
+numpy
+complexity-analysis
+medium
+Frequency
+Single report
+Last asked
+2026-06-30
+Stage
+onsite-coding
+Requirements
+
+Write code for the standard attention block used in Transformers.
+
+Be explicit about tensor shapes for queries, keys, and values.
+
+Compute attention scores, apply the normalization step, and combine with values.
+
+State time and memory complexity.
+
+Follow-ups: explain what FlashAttention changes, why it is called "flash", and what linear attention is trying to approximate or replace.
+
+Notes
+
+The round is a coding round, not just an ML oral. Expect to write the attention code first, then defend complexity and implementation details.
+
+The follow-ups test whether you understand memory traffic and kernel-level efficiency, not just the high-level Transformer equation.
+
+Keep the implementation simple unless the interviewer asks for batching, masking, or multi-head factoring; over-building can burn the time needed for the follow-up discussion.
+
+Preparation
+
+Write a minimal NumPy or PyTorch attention function from memory, including shape comments.
+
+Rehearse the complexity derivation for sequence length, hidden size, and number of heads.
+
+Prepare a concise explanation of FlashAttention in terms of tiling / IO-aware computation, and a separate explanation of linear attention as reducing the quadratic sequence interaction cost.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

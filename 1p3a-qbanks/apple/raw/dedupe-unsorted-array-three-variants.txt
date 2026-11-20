@@ -1,0 +1,209 @@
+===H1===
+Dedupe Unsorted Array (Three Variants)
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/dedupe-unsorted-array-three-variants
+===BODY===
+Apple
+CodingMembers
+Dedupe Unsorted Array (Three Variants)
+You are given a method that takes in an array of unsorted integers and you must return the deduped array. The interviewer runs it as three progressively tighter variants, using each one to gauge a different skill:.
+SWE
+medium
+dedup
+array
+hashmap
+Frequency
+Single report
+Last asked
+2026-02-09
+Stage
+phone-screen
+Problem Overview
+
+You are given a method that takes in an array of unsorted integers and you must return the deduped array. The interviewer runs it as three progressively tighter variants, using each one to gauge a different skill:
+
+Variant 1 (ice breaker). Return the deduped array. No constraints.
+
+Variant 2. Same, but the output must preserve the original order of first occurrence.
+
+Variant 3. Same as Variant 1, but no additional data structures (no HashSet, no HashMap, no auxiliary List). You also may not call a built-in sort. If you want to sort, write the sort yourself.
+
+The signature looks like:
+
+// Java
+int[] dedupe(int[] nums);
+
+# Python
+def dedupe(nums: list[int]) -> list[int]: ...
+
+The warning from recent candidates: the interviewer takes the "no additional data structures" constraint literally. A HashSet<Integer> will be rejected on Variant 3. Pushing back ("but it's O(n)") burns time. Accept the constraint and show you can solve it anyway.
+
+Clarify Before Coding
+
+Can I return a new array, or must the input be modified in place? Returning a new array is almost always acceptable; the constraint is on auxiliary structures, not the output.
+
+Is the returned length known up front? Usually no. In Java, the common pattern is to compact in place and return a prefix length, or copy out to a tightly sized array at the end.
+
+Value range? If bounded and small (for example 0..1000), Variant 3 has a cheap escape hatch: a counting array. Worth asking, but in the reported session the interviewer expected the candidate to treat values as unbounded.
+
+Negatives allowed? Changes whether counting-array tricks apply.
+
+How big is the input? If n is small, O(n²) is fine. If large, the Variant 3 answer should be the sort-based O(n log n) path.
+
+Variant 1: Return the Deduped Array (Ice Breaker)
+
+No constraints. The canonical answer uses a hash set.
+
+int[] dedupe(int[] nums) {
+    Set<Integer> seen = new HashSet<>();
+    for (int v : nums) seen.add(v);
+
+    int[] out = new int[seen.size()];
+    int i = 0;
+    for (int v : seen) out[i++] = v;
+    return out;
+}
+
+Complexity:
+
+Time: O(n) average (hash set insert is amortized O(1)).
+
+Space: O(n) for the set and the output.
+
+Note that HashSet iteration order is undefined in Java, so this does not preserve input order. That sets up Variant 2.
+
+Variant 2: Preserve Order of First Occurrence
+
+Same asymptotic cost, but you need to emit each value the first time you see it and skip the rest.
+
+int[] dedupeInOrder(int[] nums) {
+    Set<Integer> seen = new HashSet<>();
+    int[] buf = new int[nums.length];
+    int w = 0;
+    for (int v : nums) {
+        if (seen.add(v)) {          // add returns true iff v was new
+            buf[w++] = v;
+        }
+    }
+    return Arrays.copyOf(buf, w);
+}
+
+Complexity:
+
+Time: O(n) average.
+
+Space: O(n) for the set and the write buffer.
+
+A LinkedHashSet<Integer> collapses this into one line (return new ArrayList<>(new LinkedHashSet<>(list))). Mentioning it shows you know the standard library, but writing the two-pointer version is a safer demonstration of the algorithm.
+
+Variant 3: No Auxiliary Data Structures, No Built-In Sort
+
+This is the variant that breaks candidates. You cannot lean on a hash set, and you cannot call Arrays.sort. The grader wants to see that you can still hit sub-quadratic time by writing a sort yourself.
+
+The O(n²) Answer (Acceptable Floor)
+
+For each position, scan the prefix for an earlier occurrence. If none exists, copy it into the output.
+
+int[] dedupeNoAux(int[] nums) {
+    int[] out = new int[nums.length];
+    int w = 0;
+    for (int i = 0; i < nums.length; i++) {
+        boolean dup = false;
+        for (int j = 0; j < i; j++) {
+            if (nums[j] == nums[i]) { dup = true; break; }
+        }
+        if (!dup) out[w++] = nums[i];
+    }
+    return Arrays.copyOf(out, w);
+}
+
+Complexity: O(n²) time, O(k) space for the output where k is the number of distinct values. No auxiliary structures beyond the output array itself.
+
+State this as the floor, then immediately offer the sort-based O(n log n) approach. The interviewer is watching for exactly that progression.
+
+The O(n log n) Answer: Sort In Place, Then Compact
+
+Sort the array in place, which groups duplicates together, then sweep with two pointers and keep the first of each run.
+
+You cannot call Arrays.sort, so write an in-place heap sort. Heap sort is the right pick here because it is truly O(n log n) worst case, in-place, and does not require auxiliary memory the way merge sort does. Quicksort is on the banned list in some versions of this question, and bubble sort was banned by name in the reported session.
+
+int[] dedupeNoAux(int[] nums) {
+    int[] a = nums.clone();         // caller may not want their input mutated
+    heapSort(a);                    // O(n log n), in place
+
+    // Two-pointer compaction on the sorted array.
+    int w = 0;
+    for (int r = 0; r < a.length; r++) {
+        if (w == 0 || a[r] != a[w - 1]) {
+            a[w++] = a[r];
+        }
+    }
+    return Arrays.copyOf(a, w);
+}
+
+void heapSort(int[] a) {
+    int n = a.length;
+    // Build a max-heap from the bottom up.
+    for (int i = (n >>> 1) - 1; i >= 0; i--) siftDown(a, i, n);
+    // Repeatedly swap the max to the end and restore the heap on the prefix.
+    for (int end = n - 1; end > 0; end--) {
+        int tmp = a[0]; a[0] = a[end]; a[end] = tmp;
+        siftDown(a, 0, end);
+    }
+}
+
+void siftDown(int[] a, int i, int end) {
+    while (true) {
+        int l = 2 * i + 1, r = 2 * i + 2, big = i;
+        if (l < end && a[l] > a[big]) big = l;
+        if (r < end && a[r] > a[big]) big = r;
+        if (big == i) return;
+        int tmp = a[i]; a[i] = a[big]; a[big] = tmp;
+        i = big;
+    }
+}
+
+Complexity:
+
+Time: O(n log n) for the sort plus O(n) for the sweep.
+
+Space: O(1) auxiliary beyond the clone of the input and the output copy. No hash set, no list, no recursion stack (heap sort is iterative here).
+
+The output is sorted as a side effect. If the caller needs the original order, Variant 3 cannot be answered this way without auxiliary structures, and you should say so out loud.
+
+Alternative: Counting Array (Only If Values Are Bounded)
+
+If you established during clarification that values live in a small range like 0..K, a fixed-size int[K+1] counter is arguably "not an auxiliary data structure" in the same sense, it is a flat array. Ask the interviewer before relying on it; the strict reading is that any extra allocation counts.
+
+int[] dedupeBoundedValues(int[] nums, int K) {
+    boolean[] seen = new boolean[K + 1];
+    int[] out = new int[K + 1];
+    int w = 0;
+    for (int v : nums) {
+        if (!seen[v]) { seen[v] = true; out[w++] = v; }
+    }
+    return Arrays.copyOf(out, w);
+}
+
+Complexity: O(n + K) time, O(K) space.
+
+The Conversation, Not Just the Code
+
+The Variant 3 loop is how this question is graded. A clean run looks like:
+
+Offer the hash set. When it is rejected, do not argue.
+
+Give the O(n²) two-loop answer in under a minute so there is a working solution on the board.
+
+Propose sorting. When told to write the sort yourself, pick heap sort and explain why (in-place, worst-case O(n log n), no banned pedigree).
+
+Finish with the two-pointer compaction.
+
+Close by naming the trade-off: the output is sorted. If the caller needs the original order and you cannot use auxiliary memory, you cannot do better than O(n²).
+
+Getting stuck on step 1 is what tanks the feedback. Move to the O(n²) floor quickly and the rest of the time is yours.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

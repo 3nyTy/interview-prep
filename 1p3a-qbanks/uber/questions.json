@@ -1,0 +1,3478 @@
+{
+  "company": "uber",
+  "display_name": "Uber",
+  "qbank_count": 102,
+  "questions_scraped": 102,
+  "site_total_count": 418,
+  "oj_count": 238,
+  "external_count": 78,
+  "description": "Uber's loop leans heavily on Uber Eats and rider/driver marketplace problems — Cart pricing, geo heatmaps, surge, and restaurant recommendation surface in nearly every onsite at L5+. Coding rounds are mostly tagged LeetCode patterns, but Hack2Hire OAs ship a small rotating set of original problems that rarely appear elsewhere. Coding bar is the gate; system design quality drives leveling between L5a / L5b / Senior / Staff.",
+  "company_url": "https://www.1point3acres.com/interview/problems/company/uber",
+  "scraped_at": "2026-09-20",
+  "source": "1point3acres qbank (logged-in session)",
+  "note": "Question block only. The site's answer body is not included here; the untouched page is kept verbatim in raw/<slug>.txt.",
+  "questions": [
+    {
+      "n": 1,
+      "slug": "oa-jump-game-prime",
+      "title": "OA: Jump Game with Prime-3 Steps",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "High",
+      "last_asked": "2026-06-01",
+      "stage": "oa",
+      "access": "Free preview",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "dp",
+        "array",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "dp",
+        "array",
+        "hard"
+      ],
+      "overview": "One of two problems in the 90-min Hack2Hire OA. Variant of LeetCode 1696 (Jump Game VI). From index 0 of an integer array, at each step you may jump +1 or jump +k where k is a prime ending in digit 3 (3, 13, 23, 43, 53, 73, 83, …). Maximize the sum of values landed on, finishing at index n−1.",
+      "source_count": 8,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/oa-jump-game-prime"
+    },
+    {
+      "n": 2,
+      "slug": "phone-screen-robot-position-by-blocker-distance",
+      "title": "Phone Screen: Find Robot Position from Blocker Distances",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-08-29",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "array",
+        "simulation",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "array",
+        "simulation",
+        "medium"
+      ],
+      "overview": "Recurring phone-screen prompt. A 2D grid contains robots `O`, empty cells `E`, and blockers `X`. Given a query `[left, top, bottom, right]` of distances to the nearest blocker (with the grid boundary counted as a blocker), find every robot whose surroundings match the query.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/phone-screen-robot-position-by-blocker-distance"
+    },
+    {
+      "n": 3,
+      "slug": "phone-screen-meeting-scheduler-rooms",
+      "title": "Phone Screen / Onsite: Meeting Room Scheduler",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-08-16",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-structure",
+        "interval",
+        "oop-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "interval",
+        "oop-design",
+        "medium"
+      ],
+      "overview": "High-frequency OOD coding round. Given a fixed list of rooms, implement `bookMeeting(start, end)` that returns an available room id (or sentinel) and records the booking. Follow-ups include removing bookings and querying the last `N` scheduled meetings.",
+      "source_count": 7,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/phone-screen-meeting-scheduler-rooms"
+    },
+    {
+      "n": 4,
+      "slug": "onsite-ood-parking-lot",
+      "title": "Onsite OOD: Multi-Level Parking Lot",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-28",
+      "stage": "onsite-coding · phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "oop-design",
+        "data-structure",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "oop-design",
+        "data-structure",
+        "medium"
+      ],
+      "overview": "High-frequency onsite OOD round. Design a parking-lot system supporting multiple vehicle types (motorcycle, car, optionally bus) and multiple slot types with size constraints. Implement `park`, `unpark`, and availability queries.",
+      "source_count": 6,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/onsite-ood-parking-lot"
+    },
+    {
+      "n": 5,
+      "slug": "phone-screen-longest-stable-subarray",
+      "title": "Phone Screen: Longest Subarray with Bounded Diff",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-17",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "two-pointer",
+        "array",
+        "data-structure",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "two-pointer",
+        "array",
+        "data-structure",
+        "medium"
+      ],
+      "overview": "Recurring phone-screen / onsite prompt, equivalent to LeetCode 1438 (Longest Continuous Subarray With Absolute Diff ≤ Limit). Two-pointer plus a monotonic deque or a multiset for min / max tracking.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/phone-screen-longest-stable-subarray"
+    },
+    {
+      "n": 6,
+      "slug": "phone-screen-first-unique-visitor",
+      "title": "Phone Screen: First Customer Who Visited Only Once",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-07-01",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-structure",
+        "hashmap",
+        "oop-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "hashmap",
+        "oop-design",
+        "medium"
+      ],
+      "overview": "Recurring phone-screen OOD prompt. A website receives a stream of `visit(customer_id)` events. Support two operations: `visit(id)` (record a visit) and `firstUniqueVisitor()` (return the earliest customer who has visited exactly once so far). Both should be efficient.",
+      "source_count": 6,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/phone-screen-first-unique-visitor"
+    },
+    {
+      "n": 7,
+      "slug": "phone-screen-rate-limiter",
+      "title": "Phone Screen: Rate Limiter (Coding + Trade-offs)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-06-26",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-structure",
+        "system-design",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "system-design",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Phone-screen / onsite coding prompt. Implement a rate limiter, with variants ranging from per-user windowed request counting to an explicitly thread-safe token bucket. Follow-ups cover custom rules, atomic token distribution, and lock contention.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/phone-screen-rate-limiter"
+    },
+    {
+      "n": 8,
+      "slug": "oa-splash-zone-union-find",
+      "title": "OA: Splash Zone / Balls Connection",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Medium",
+      "last_asked": "2026-06-04",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "union-find",
+        "graph",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "union-find",
+        "graph",
+        "hard"
+      ],
+      "overview": "Hack2Hire OA problem (companion to Pipeline Throughput). Balls live on a 2D grid; two balls connect if they share a row or column and their Manhattan-along-the-axis distance is ≤ `d`. Connections cascade transitively into clusters. Counting clusters yields the minimum number of triggers to vacuum the board.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/oa-splash-zone-union-find"
+    },
+    {
+      "n": 9,
+      "slug": "oa-pipeline-throughput",
+      "title": "OA: Maximize Pipeline Throughput",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Medium",
+      "last_asked": "2026-06-04",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "algorithm",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "algorithm",
+        "medium"
+      ],
+      "overview": "Hack2Hire OA problem. A pipeline runs services in series, so the end-to-end throughput equals the minimum throughput across all services. Each service `i` starts at throughput `t[i]` and can be scaled `x` times to reach `t[i] * (1 + x)` at total spend `x * cost[i]`. Given a global `budget`, maximize the achievable pipeline throughput.",
+      "source_count": 6,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/oa-pipeline-throughput"
+    },
+    {
+      "n": 10,
+      "slug": "phone-screen-convex-function-min",
+      "title": "Phone Screen: Minimize a Convex Function",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-05-13",
+      "stage": "phone-screen · tech-screen",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "SWE"
+      ],
+      "tags": [
+        "math-reasoning",
+        "algorithm",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "swe"
+      ],
+      "tags_slug": [
+        "math-reasoning",
+        "algorithm",
+        "medium"
+      ],
+      "overview": "Recurring Uber phone-screen problem, especially for MLE / Senior MLE candidates. Given a black-box convex function `F(x)` defined on `[a, b]`, write a routine that finds the minimum by repeatedly probing `F`. Ternary search or analytic gradient-sign binary search both work.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/phone-screen-convex-function-min"
+    },
+    {
+      "n": 11,
+      "slug": "onsite-ood-eats-cart-pricing-engine",
+      "title": "Onsite OOD / Coding: Uber Eats Cart & Pricing Engine",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-05-12",
+      "stage": "onsite-coding · onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "EM"
+      ],
+      "tags": [
+        "oop-design",
+        "system-design",
+        "scaling",
+        "idempotency",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe",
+        "em"
+      ],
+      "tags_slug": [
+        "oop-design",
+        "system-design",
+        "scaling",
+        "idempotency",
+        "hard"
+      ],
+      "overview": "Recurring Senior / L5+ onsite OOD round (also appears as a system-design prompt depending on team). Design the core classes and interfaces for Uber Eats's cart + pricing engine: item customizations, surge pricing, promos / BOGO, membership benefits, and a receipt breakdown.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/onsite-ood-eats-cart-pricing-engine"
+    },
+    {
+      "n": 12,
+      "slug": "phone-screen-word-search-straight-line",
+      "title": "Phone Screen: Word Search on Straight 8-Direction Lines",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-05-12",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "string",
+        "dfs",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "string",
+        "dfs",
+        "medium"
+      ],
+      "overview": "Recurring phone-screen prompt. Given a 2D character grid and a target word, decide whether the word appears along any single straight line in 8 directions (up/down/left/right + 4 diagonals). No turns allowed. Follow-ups extend to turning paths and skip-letter matching.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/phone-screen-word-search-straight-line"
+    },
+    {
+      "n": 13,
+      "slug": "mle-onsite-ml-coding-from-scratch",
+      "title": "MLE Onsite: ML Coding from Scratch (Regression / Markov / Facility)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-04-15",
+      "stage": "onsite-coding · phone-screen",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RS"
+      ],
+      "tags": [
+        "pytorch",
+        "numpy",
+        "ml-knowledge",
+        "linear-algebra",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle",
+        "rs"
+      ],
+      "tags_slug": [
+        "pytorch",
+        "numpy",
+        "ml-knowledge",
+        "linear-algebra",
+        "medium"
+      ],
+      "overview": "MLE-specific onsite coding round. Implement a small ML primitive from scratch in Python / NumPy without using framework helpers. Recurring prompts: linear & logistic regression, a markov-chain text generator, and k-medoids facility-location for shuttle pickup with L1 distance.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/mle-onsite-ml-coding-from-scratch"
+    },
+    {
+      "n": 14,
+      "slug": "phone-screen-number-of-islands",
+      "title": "Phone Screen: Number of Islands (Plain and Streaming)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-04-09",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "graph",
+        "bfs",
+        "dfs",
+        "union-find",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "graph",
+        "bfs",
+        "dfs",
+        "union-find",
+        "medium"
+      ],
+      "overview": "Very common phone-screen prompt, equivalent to LeetCode 200. Some loops dress it up as a virus-spread / infected-zone variant (LC 994 style) or extend it into a streaming Number of Islands II (LC 305) with union-find.",
+      "source_count": 5,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/phone-screen-number-of-islands"
+    },
+    {
+      "n": 15,
+      "slug": "phone-screen-topological-dependency-order",
+      "title": "Phone Screen: Service Dependency Topological Order",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2025-12-01",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "graph",
+        "topological-sort",
+        "dfs",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "graph",
+        "topological-sort",
+        "dfs",
+        "medium"
+      ],
+      "overview": "Phone-screen prompt, equivalent to LeetCode 207 / 210 (Course Schedule). Given a service dependency graph (initially acyclic), return a build order for a given target service. Follow-up handles cycles.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/phone-screen-topological-dependency-order"
+    },
+    {
+      "n": 16,
+      "slug": "onsite-k-closest-points",
+      "title": "Onsite Coding: K Closest Points",
+      "category": "coding",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-08-16",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "heap",
+        "quickselect",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "heap",
+        "quickselect",
+        "medium"
+      ],
+      "overview": "The base prompt is LC 973: return the K points closest to the origin, with K much smaller than N. The round asks for both a bounded max-heap solution and a written quickselect partition, then extends the problem to an arbitrary rider location, tens of millions of moving points, and road-network distance.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/onsite-k-closest-points"
+    },
+    {
+      "n": 17,
+      "slug": "phone-screen-ood-filesystem-navigation",
+      "title": "Phone Screen OOD: Filesystem Navigation",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-11",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "filesystem",
+        "oop-design",
+        "dfs",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "filesystem",
+        "oop-design",
+        "dfs",
+        "hard"
+      ],
+      "overview": "Implement `mkdir(String name)`, `pwd()`, and `cd(String path)` over an in-memory directory tree. `cd` must resolve absolute and relative paths containing `.`, `..`, and a wildcard that may span multiple directory levels, changing the current directory on success and returning an error otherwise.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/phone-screen-ood-filesystem-navigation"
+    },
+    {
+      "n": 18,
+      "slug": "onsite-coding-minesweeper-lc-529",
+      "title": "Onsite Coding: Minesweeper (LC 529)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-08-10",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "grid",
+        "bfs",
+        "simulation",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "grid",
+        "bfs",
+        "simulation",
+        "medium"
+      ],
+      "overview": "An onsite coding round used the canonical LC 529 Minesweeper update task after a simpler undisclosed warm-up. Given a board and a click, update the board according to the mine and reveal rules.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/onsite-coding-minesweeper-lc-529"
+    },
+    {
+      "n": 19,
+      "slug": "ood-counter-class",
+      "title": "OOD Counter Class",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-07-17",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "oop-design",
+        "data-structure",
+        "hashmap",
+        "queue",
+        "ttl",
+        "streaming",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "oop-design",
+        "data-structure",
+        "hashmap",
+        "queue",
+        "ttl",
+        "streaming",
+        "medium"
+      ],
+      "overview": "Design an expiring counter that tracks how many unexpired copies of each element are currently stored, supporting per-element and total counts under a sliding expiration window. A common follow-up asks how to scale to roughly one million inputs per second by batching counts into per-second aggregates.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/ood-counter-class"
+    },
+    {
+      "n": 20,
+      "slug": "word-search",
+      "title": "Word Search",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-07-01",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "grid",
+        "backtracking",
+        "dfs",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "grid",
+        "backtracking",
+        "dfs",
+        "medium"
+      ],
+      "overview": "Given a 2-D grid of characters and a target string, determine whether the word can be formed by a path through horizontally or vertically adjacent cells, where no cell is reused.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/word-search"
+    },
+    {
+      "n": 21,
+      "slug": "spatial-quadtree-range-query",
+      "title": "Spatial Quadtree: Insert and Range Query",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-06-26",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "location",
+        "oop-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "location",
+        "oop-design",
+        "medium"
+      ],
+      "overview": "Design and implement a quadtree for latitude/longitude points. Support inserting a point with associated data and querying all points inside a rectangular range, then discuss overlapping points and tree balance.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/spatial-quadtree-range-query"
+    },
+    {
+      "n": 22,
+      "slug": "compare-two-structs-or-classes",
+      "title": "Compare Two Structs / Classes for Equality",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-23",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "object-design",
+        "testing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "object-design",
+        "testing",
+        "medium"
+      ],
+      "overview": "Onsite coding prompt: write a simple implementation to compare two structs / classes and decide whether they are identical. The source gives only the high-level task, so clarify field traversal, nested objects, arrays, nulls, and custom equality rules before coding.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/compare-two-structs-or-classes"
+    },
+    {
+      "n": 23,
+      "slug": "serialize-deserialize-binary-tree-nary-followup",
+      "title": "Serialize / Deserialize Binary Tree with N-ary Follow-up",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-17",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "parsing",
+        "dfs",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "parsing",
+        "dfs",
+        "medium"
+      ],
+      "overview": "Senior tech phone-screen prompt. Implement serialization and deserialization for a binary tree, then extend the scheme to an N-ary tree. The interviewer asks the candidate to invent test cases and run code.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/serialize-deserialize-binary-tree-nary-followup"
+    },
+    {
+      "n": 24,
+      "slug": "rotate-image-in-place",
+      "title": "Rotate Image In Place",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-16",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "grid",
+        "array",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "grid",
+        "array",
+        "medium"
+      ],
+      "overview": "Phone-screen prompt equivalent to Rotate Image. Given an `n x n` matrix representing an image, rotate it 90 degrees clockwise in place without allocating another matrix.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/rotate-image-in-place"
+    },
+    {
+      "n": 25,
+      "slug": "median-of-two-sorted-arrays",
+      "title": "Median of Two Sorted Arrays",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-16",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "binary-search",
+        "array",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "binary-search",
+        "array",
+        "hard"
+      ],
+      "overview": "Onsite problem-solving prompt equivalent to Median of Two Sorted Arrays. Given two sorted arrays of lengths `m` and `n`, return the median of the combined sorted order in `O(log(m+n))` time.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/median-of-two-sorted-arrays"
+    },
+    {
+      "n": 26,
+      "slug": "word-break",
+      "title": "Word Break",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-16",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "dp",
+        "string",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "dp",
+        "string",
+        "medium"
+      ],
+      "overview": "Onsite coding prompt equivalent to Word Break. Given a string `s` and dictionary `wordDict`, determine whether `s` can be segmented into a sequence of dictionary words.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/word-break"
+    },
+    {
+      "n": 27,
+      "slug": "sliding-window-maximum",
+      "title": "Sliding Window Maximum",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-16",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "sliding-window",
+        "queue",
+        "array",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "sliding-window",
+        "queue",
+        "array",
+        "hard"
+      ],
+      "overview": "Onsite coding prompt equivalent to Sliding Window Maximum. Given `nums` and window size `k`, return the maximum value in every contiguous window of length `k`.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/sliding-window-maximum"
+    },
+    {
+      "n": 28,
+      "slug": "social-network-snapshot",
+      "title": "Versioned Social Network with Snapshots",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-14",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "design",
+        "snapshot",
+        "versioning",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "design",
+        "snapshot",
+        "versioning",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Design a social network whose follow graph supports point-in-time snapshots: follow / unfollow apply to the current version, createSnapshot freezes a version, and isFollowing queries any historical snapshot. A snapshot/MVCC problem.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/social-network-snapshot"
+    },
+    {
+      "n": 29,
+      "slug": "bingo-card-generator",
+      "title": "OOD: Random Bingo Card Generator",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-06",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "oop-design",
+        "simulation",
+        "sampling",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "oop-design",
+        "simulation",
+        "sampling",
+        "medium"
+      ],
+      "overview": "Onsite OOD coding round. Generate a random 3x9 Bingo board where each row has exactly 5 numbers and 4 blanks, each column is constrained to a decade range (1-10, 11-20, ...), and cells are filled probabilistically while keeping the row/column constraints feasible.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/bingo-card-generator"
+    },
+    {
+      "n": 30,
+      "slug": "leftmost-column-with-a-one",
+      "title": "Leftmost Column with At Least a One",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-06-04",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "grid",
+        "binary-search",
+        "two-pointer",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "grid",
+        "binary-search",
+        "two-pointer",
+        "medium"
+      ],
+      "overview": "Given a binary matrix where every row is sorted in non-decreasing order, return the index of the leftmost column that contains at least one 1, or -1 if no such column exists.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/leftmost-column-with-a-one"
+    },
+    {
+      "n": 31,
+      "slug": "last-click-attribution",
+      "title": "Last-Click Attribution Tracker",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-05-29",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "design",
+        "hashmap",
+        "binary-search",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "design",
+        "hashmap",
+        "binary-search",
+        "medium"
+      ],
+      "overview": "Phone-screen design-coding round. Build an in-memory attribution tracker: record click and conversion events, and for each conversion attribute it to the same user's most recent click inside a fixed conversion window. Implement the API and write your own tests.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/last-click-attribution"
+    },
+    {
+      "n": 32,
+      "slug": "matrix-fill-nearest-letter",
+      "title": "Fill Dashes with Nearest Letter",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-05-29",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "bfs",
+        "grid",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "bfs",
+        "grid",
+        "medium"
+      ],
+      "overview": "L4 backend phone screen. In a matrix of dashes and letters, replace every '-' with an orthogonally adjacent letter at distance 1; the follow-up requires breaking ties by the alphabetically smallest letter. A Walls-and-Gates multi-source BFS.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/matrix-fill-nearest-letter"
+    },
+    {
+      "n": 33,
+      "slug": "max-points-grid-queries",
+      "title": "Maximum Number of Points from Grid Queries",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-05-29",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "grid",
+        "heap",
+        "bfs",
+        "sorting",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "grid",
+        "heap",
+        "bfs",
+        "sorting",
+        "hard"
+      ],
+      "overview": "Given an integer matrix and an array of query values, count for each query how many cells are reachable from the top-left moving in four directions through cells whose value is strictly less than the query.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/max-points-grid-queries"
+    },
+    {
+      "n": 34,
+      "slug": "earliest-time-connect-all-riders",
+      "title": "Earliest Time to Connect All Riders",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-05-22",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "union-find",
+        "graph",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "union-find",
+        "graph",
+        "medium"
+      ],
+      "overview": "Given timestamped ride logs where each entry links two riders, find the earliest timestamp at which every rider that appears anywhere in the logs belongs to a single connected component. Return \"-1\" if full connection never happens. A union-find / connected-component problem in the LeetCode 1101 family.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/earliest-time-connect-all-riders"
+    },
+    {
+      "n": 35,
+      "slug": "exam-room-seat-assignment",
+      "title": "Seat Assignment / Exam Room",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-05-15",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "heap",
+        "greedy",
+        "simulation",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "heap",
+        "greedy",
+        "simulation",
+        "medium"
+      ],
+      "overview": "Onsite coding round. Implement a class that seats people one at a time in a row of n seats, each time choosing the seat that maximizes the distance to the nearest occupied seat. Seats are never vacated. Confirmed expected output for n=10: 0, then 9, then 4 or 5.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/exam-room-seat-assignment"
+    },
+    {
+      "n": 36,
+      "slug": "merge-step-functions",
+      "title": "Merge Step Functions of (timestamp, value) Pairs",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-05-13",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "two-pointer",
+        "merge",
+        "divide-and-conquer",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "two-pointer",
+        "merge",
+        "divide-and-conquer",
+        "medium"
+      ],
+      "overview": "Given two step functions over time, each encoded as sorted [timestamp, value] checkpoints, return the checkpoints of their pointwise sum. The follow-up extends the merge to k functions via divide-and-conquer.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/merge-step-functions"
+    },
+    {
+      "n": 37,
+      "slug": "rotting-oranges",
+      "title": "Rotting Oranges",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-04-13",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "bfs",
+        "grid",
+        "simulation",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "bfs",
+        "grid",
+        "simulation",
+        "medium"
+      ],
+      "overview": "Given an m x n grid of empty cells, fresh oranges, and rotten oranges, return the minimum number of minutes for all fresh oranges to rot, where each minute rot spreads to the four-directionally adjacent fresh oranges. Return -1 if some fresh orange can never rot.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/rotting-oranges"
+    },
+    {
+      "n": 38,
+      "slug": "exclusive-time-of-functions",
+      "title": "Exclusive Time of Functions",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-04-05",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "stack",
+        "simulation",
+        "parsing",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "stack",
+        "simulation",
+        "parsing",
+        "medium"
+      ],
+      "overview": "On a single-threaded CPU, given execution logs for n functions, compute the exclusive time spent in each function, excluding time spent in nested child calls.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/exclusive-time-of-functions"
+    },
+    {
+      "n": 39,
+      "slug": "number-of-ways-to-wear-hats",
+      "title": "Number of Ways to Wear Different Hats to Each Other",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-04-01",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "dp",
+        "state-compression-dp",
+        "bitmask",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "dp",
+        "state-compression-dp",
+        "bitmask",
+        "hard"
+      ],
+      "overview": "Given n people and 40 hat types where each person lists the hats they are willing to wear, count the assignments in which every person gets exactly one liked hat and no two people share a hat, modulo 10^9 + 7.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/number-of-ways-to-wear-hats"
+    },
+    {
+      "n": 40,
+      "slug": "minimum-knight-moves",
+      "title": "Minimum Knight Moves",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-03-28",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "bfs",
+        "graph",
+        "math",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "bfs",
+        "graph",
+        "math",
+        "medium"
+      ],
+      "overview": "On an infinite chess board with a knight starting at [0, 0], return the minimum number of moves needed to reach a target square [x, y]. The answer is guaranteed to exist.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/minimum-knight-moves"
+    },
+    {
+      "n": 41,
+      "slug": "toy-order-completion-analysis",
+      "title": "Toy Order Completion Analysis",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-03-24",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "data-analysis",
+        "pandas",
+        "python",
+        "metrics",
+        "troubleshooting",
+        "easy"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "data-analysis",
+        "pandas",
+        "python",
+        "metrics",
+        "troubleshooting",
+        "easy"
+      ],
+      "overview": "A lightweight analytics exercise on a toy orders dataset: compute a simple slice metric (e.g. completion rate for a given city and order type), define the numerator/denominator precisely, handle edge cases, then reason through a short root-cause case study for why the metric might be low.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/toy-order-completion-analysis"
+    },
+    {
+      "n": 42,
+      "slug": "active-couriers-timeline",
+      "title": "Active Couriers Timeline",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-03-23",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "interval",
+        "interval-aggregation",
+        "sorting",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "interval",
+        "interval-aggregation",
+        "sorting",
+        "medium"
+      ],
+      "overview": "Given a set of courier working intervals [start, end) that may overlap, return the timeline broken into segments [segmentStart, segmentEnd, activeCount], creating a new segment only when the number of active couriers changes and emitting only segments where the active count is positive.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/active-couriers-timeline"
+    },
+    {
+      "n": 43,
+      "slug": "count-palindrome-paths-tree",
+      "title": "Count Paths That Can Form a Palindrome in a Tree",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-03-22",
+      "stage": "oa · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "bitmask",
+        "bit-manipulation",
+        "hashmap",
+        "dfs",
+        "palindromes",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "bitmask",
+        "bit-manipulation",
+        "hashmap",
+        "dfs",
+        "palindromes",
+        "hard"
+      ],
+      "overview": "Given a tree where each edge carries a lowercase character, count the unordered pairs of distinct nodes whose path edge-characters can be rearranged into a palindrome. The path is palindrome-formable when at most one character has an odd count, which maps to a 26-bit parity bitmask combined over root-to-node paths.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/count-palindrome-paths-tree"
+    },
+    {
+      "n": 44,
+      "slug": "edge-length-limited-paths",
+      "title": "Checking Existence of Edge Length Limited Paths",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-03-22",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "graph",
+        "union-find",
+        "sorting",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "graph",
+        "union-find",
+        "sorting",
+        "medium"
+      ],
+      "overview": "Given an undirected weighted graph defined by edgeList, answer for each query whether a path exists between two nodes using only edges strictly shorter than a given limit. Efficient solutions sort edges and queries by weight and process them offline with union-find.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/edge-length-limited-paths"
+    },
+    {
+      "n": 45,
+      "slug": "customer-revenue-referral-tracking",
+      "title": "Customer Revenue and Referral Tracking",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-03-22",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-structure",
+        "oop-design",
+        "top-k",
+        "heap",
+        "sorting",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "oop-design",
+        "top-k",
+        "heap",
+        "sorting",
+        "medium"
+      ],
+      "overview": "Design a data structure that tracks customer revenue and referral credit. New customers can be inserted directly or via a referral that also credits the referrer, and a query returns up to K qualifying customers with the smallest total revenue at or above a threshold.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/customer-revenue-referral-tracking"
+    },
+    {
+      "n": 46,
+      "slug": "vertical-order-traversal-bt",
+      "title": "Vertical Order Traversal of a Binary Tree",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-03-21",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "tree-traversal",
+        "bfs",
+        "sorting",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "tree-traversal",
+        "bfs",
+        "sorting",
+        "hard"
+      ],
+      "overview": "Given the root of a binary tree, sort its nodes by column from left to right. Nodes in the same column are ordered top to bottom by row, with ties on the same row and column broken by node value.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/vertical-order-traversal-bt"
+    },
+    {
+      "n": 47,
+      "slug": "time-based-key-value-store",
+      "title": "Time Based Key-Value Store",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-03-20",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-structure",
+        "hashmap",
+        "binary-search",
+        "in-memory-database",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "hashmap",
+        "binary-search",
+        "in-memory-database",
+        "medium"
+      ],
+      "overview": "Design a time-based key-value data structure that supports storing multiple values for the same key at different timestamps, where a lookup returns the value tied to the largest timestamp at or before a queried time.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/time-based-key-value-store"
+    },
+    {
+      "n": 48,
+      "slug": "shortest-word-distance",
+      "title": "Shortest Word Distance",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-03-13",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "two-pointer",
+        "string",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "two-pointer",
+        "string",
+        "easy"
+      ],
+      "overview": "Given an array of strings and two distinct words that both appear in it, return the minimum index distance between any occurrence of the two words.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/shortest-word-distance"
+    },
+    {
+      "n": 49,
+      "slug": "zero-array-transformation",
+      "title": "Zero Array Transformation",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-03-08",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "prefix-sum",
+        "greedy",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "prefix-sum",
+        "greedy",
+        "medium"
+      ],
+      "overview": "Given an integer array nums and a list of range queries [li, ri, vali], decide whether nums can be reduced entirely to zeros, where each query lets you subtract any amount between 0 and vali from every index in its range.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/zero-array-transformation"
+    },
+    {
+      "n": 50,
+      "slug": "lowest-common-ancestor-bt",
+      "title": "Lowest Common Ancestor of a Binary Tree",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-02-26",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "dfs",
+        "recursion",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "dfs",
+        "recursion",
+        "medium"
+      ],
+      "overview": "Given the root of a binary tree and two nodes p and q, return their lowest common ancestor.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/lowest-common-ancestor-bt"
+    },
+    {
+      "n": 51,
+      "slug": "shortest-bridge",
+      "title": "Shortest Bridge",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-02-21",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "bfs",
+        "dfs",
+        "grid",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "bfs",
+        "dfs",
+        "grid",
+        "medium"
+      ],
+      "overview": "Given a binary grid with exactly two islands (1 = land, 0 = water), return the minimum number of 0s that must be flipped to connect the two islands.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/shortest-bridge"
+    },
+    {
+      "n": 52,
+      "slug": "word-search-ii",
+      "title": "Word Search II",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-02-19",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "trie",
+        "dfs",
+        "backtracking",
+        "grid",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "trie",
+        "dfs",
+        "backtracking",
+        "grid",
+        "hard"
+      ],
+      "overview": "Given a 2-D grid of characters and a list of words, return every word that can be formed by a path of horizontally or vertically adjacent cells without reusing a cell. Efficient solutions build a trie over the words and DFS the grid against it.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/word-search-ii"
+    },
+    {
+      "n": 53,
+      "slug": "evaluate-division",
+      "title": "Evaluate Division",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-02-15",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "graph",
+        "dfs",
+        "union-find",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "graph",
+        "dfs",
+        "union-find",
+        "medium"
+      ],
+      "overview": "You are given equations such as A / B = k, represented by equations[i] = [A, B] and values[i] = k. For each query [C, D], return the value of C / D if it can be derived from the given equations, or -1.0 otherwise.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/evaluate-division"
+    },
+    {
+      "n": 54,
+      "slug": "nary-tree-level-order-traversal",
+      "title": "N-ary Tree Level Order Traversal",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-02-12",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "tree-traversal",
+        "bfs",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "tree-traversal",
+        "bfs",
+        "medium"
+      ],
+      "overview": "Given an N-ary tree serialized in level-order form with -1 separators between sibling groups (e.g. [1,-1,3,2,4,-1,5,6]), return its level-order traversal as a list of value levels.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/nary-tree-level-order-traversal"
+    },
+    {
+      "n": 55,
+      "slug": "cheapest-flights-within-k-stops",
+      "title": "Cheapest Flights Within K Stops",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-01-28",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "graph",
+        "bellman-ford",
+        "dijkstra",
+        "bfs",
+        "shortest-path",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "graph",
+        "bellman-ford",
+        "dijkstra",
+        "bfs",
+        "shortest-path",
+        "medium"
+      ],
+      "overview": "There are n cities connected by directed flights with prices. Given a source, destination, and a stop budget k, return the cheapest price from src to dst using at most k stops, or -1 if no such route exists.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/cheapest-flights-within-k-stops"
+    },
+    {
+      "n": 56,
+      "slug": "hit-counter-design",
+      "title": "Design Hit Counter",
+      "category": "coding",
+      "duration": "5 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-25",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-structure",
+        "queue",
+        "streaming",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-structure",
+        "queue",
+        "streaming",
+        "medium"
+      ],
+      "overview": "Design a hit counter that counts the number of hits received in the past 5 minutes (300 seconds), with hits arriving in chronological order.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/hit-counter-design"
+    },
+    {
+      "n": 57,
+      "slug": "k-shuttle-pickup-locations",
+      "title": "K Shuttle Pickup Locations",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-01-24",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "clustering",
+        "k-median",
+        "greedy",
+        "math",
+        "optimization",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "clustering",
+        "k-median",
+        "greedy",
+        "math",
+        "optimization",
+        "medium"
+      ],
+      "overview": "Given the coordinates of N people, choose K shuttle pickup locations so the total L1 distance from each person to their nearest pickup location is minimized. This is the k-median objective under Manhattan distance, where the best center of a fixed cluster is the coordinate-wise median.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/k-shuttle-pickup-locations"
+    },
+    {
+      "n": 58,
+      "slug": "sqrt-x",
+      "title": "Sqrt(x)",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-01-22",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "binary-search",
+        "math",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "binary-search",
+        "math",
+        "easy"
+      ],
+      "overview": "Given a non-negative integer x, return the square root of x rounded down to the nearest integer, without using any built-in exponent function or operator. The result must be non-negative.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/sqrt-x"
+    },
+    {
+      "n": 59,
+      "slug": "palindrome-ancestor-path-queries",
+      "title": "Palindrome Ancestor Path Queries",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-01-21",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "dfs",
+        "bitmask",
+        "palindromes",
+        "hashmap",
+        "prefix-sum",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "dfs",
+        "bitmask",
+        "palindromes",
+        "hashmap",
+        "prefix-sum",
+        "hard"
+      ],
+      "overview": "Hierarchical data is stored as a tree of character-labeled nodes rooted at node 0. For each query node, count how many ancestors (including the node itself) form a path string whose characters can be rearranged into a palindrome.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/palindrome-ancestor-path-queries"
+    },
+    {
+      "n": 60,
+      "slug": "bt-longest-consecutive-sequence-ii",
+      "title": "Binary Tree Longest Consecutive Sequence II",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-01-11",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "tree",
+        "dfs",
+        "tree-traversal",
+        "recursion",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "tree",
+        "dfs",
+        "tree-traversal",
+        "recursion",
+        "medium"
+      ],
+      "overview": "Given the root of a binary tree, return the length of the longest consecutive path, where adjacent node values differ by one. The path may be increasing or decreasing and can pass through a node in the child-parent-child direction.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/bt-longest-consecutive-sequence-ii"
+    },
+    {
+      "n": 61,
+      "slug": "top-k-frequent-elements",
+      "title": "Top K Frequent Elements",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-01-10",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "top-k",
+        "heap",
+        "hashmap",
+        "bucket-sort",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "top-k",
+        "heap",
+        "hashmap",
+        "bucket-sort",
+        "medium"
+      ],
+      "overview": "Given an integer array nums and an integer k, return the k most frequent elements within the array. The answer is guaranteed unique and may be returned in any order.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/top-k-frequent-elements"
+    },
+    {
+      "n": 62,
+      "slug": "interval-list-intersections",
+      "title": "Interval List Intersections",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-01-09",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "interval",
+        "two-pointer",
+        "array",
+        "streaming",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "interval",
+        "two-pointer",
+        "array",
+        "streaming",
+        "medium"
+      ],
+      "overview": "Given two lists of closed intervals, each sorted by start time and pairwise disjoint within a list, return every intersection between the two lists using a two-pointer sweep. A follow-up asks how to handle input lists too large to fit in memory.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/interval-list-intersections"
+    },
+    {
+      "n": 63,
+      "slug": "my-calendar-i",
+      "title": "My Calendar I",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-01-09",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "interval",
+        "data-structure",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "interval",
+        "data-structure",
+        "medium"
+      ],
+      "overview": "Implement a calendar that stores booked half-open intervals [start, end), accepting a new event only if it does not overlap any existing booking.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/my-calendar-i"
+    },
+    {
+      "n": 64,
+      "slug": "making-a-large-island",
+      "title": "Making a Large Island",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-01-07",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "grid",
+        "dfs",
+        "union-find",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "grid",
+        "dfs",
+        "union-find",
+        "hard"
+      ],
+      "overview": "Given an n x n binary matrix, you may flip at most one 0 to 1. Return the size of the largest 4-directionally connected island of 1s achievable after the flip.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/making-a-large-island"
+    },
+    {
+      "n": 65,
+      "slug": "number-of-ways-to-earn-points",
+      "title": "Number of Ways to Earn Points",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-01-05",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "dp",
+        "math",
+        "medium"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "dp",
+        "math",
+        "medium"
+      ],
+      "overview": "Given several question types in an exam, each offering a fixed count of questions worth a fixed number of marks, count the number of distinct ways to score exactly a target number of points. Answers are returned modulo 10^9 + 7.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/number-of-ways-to-earn-points"
+    },
+    {
+      "n": 66,
+      "slug": "isomorphic-strings",
+      "title": "Isomorphic Strings",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-01-03",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "hashmap",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "hashmap",
+        "easy"
+      ],
+      "overview": "Given two strings s and t, determine whether they are isomorphic via a one-to-one character mapping that preserves order.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/isomorphic-strings"
+    },
+    {
+      "n": 67,
+      "slug": "oa-codesignal-multi-mission-routing",
+      "title": "OA: Round-Trip Mission Schedule",
+      "category": "coding",
+      "duration": "70 min",
+      "frequency": "Single report",
+      "last_asked": "2025-07-10",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "two-pointer",
+        "simulation",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "two-pointer",
+        "simulation",
+        "easy"
+      ],
+      "overview": "Legacy CodeSignal SDE2 OA problem. Two locations A and B have fixed departure timetables. Each mission is a round trip A→B→A, departing only at the next available departure on each side; each leg takes 100 time units. Given a mission count, return the earliest completion time.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/oa-codesignal-multi-mission-routing"
+    },
+    {
+      "n": 68,
+      "slug": "number-of-islands-ii",
+      "title": "Number of Islands II (Dynamic Union-Find)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-06-08",
+      "stage": "onsite-coding · phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "union-find",
+        "grid",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "union-find",
+        "grid",
+        "medium"
+      ],
+      "overview": "Onsite coding round. Land cells are added to a water grid one at a time; after each addition return the current number of 4-directionally connected islands. A dynamic union-find problem (LC 305).",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/number-of-islands-ii"
+    },
+    {
+      "n": 69,
+      "slug": "phone-screen-expression-calculator",
+      "title": "Phone Screen: Nested Add/Sub Expression Evaluator",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-06-08",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "string",
+        "recursion",
+        "data-structure",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "string",
+        "recursion",
+        "data-structure",
+        "medium"
+      ],
+      "overview": "Recurring senior phone-screen prompt, also seen at the Hack2Hire problem set. Given a string expression using `add(a, b)` and `sub(a, b)` that can be nested arbitrarily, evaluate it. The interviewer states only 2–3 input/output examples; you must clarify the grammar and parser yourself.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/phone-screen-expression-calculator"
+    },
+    {
+      "n": 70,
+      "slug": "phone-screen-bus-routes",
+      "title": "Phone Screen: Bus Routes (LC 815)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-06-08",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "graph",
+        "bfs",
+        "hashmap",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "graph",
+        "bfs",
+        "hashmap",
+        "hard"
+      ],
+      "overview": "Onsite coding prompt, verbatim LeetCode 815 (Bus Routes). Given bus routes, find the minimum number of buses to travel between two stops. BFS on a stop-to-routes adjacency.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/phone-screen-bus-routes"
+    },
+    {
+      "n": 71,
+      "slug": "construct-quad-tree",
+      "title": "Construct Quad Tree",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-06-06",
+      "stage": "oa · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "recursion",
+        "grid",
+        "tree",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "recursion",
+        "grid",
+        "tree",
+        "medium"
+      ],
+      "overview": "Given an n x n binary matrix where n is a power of 2, build and return the root of a quad tree representing the matrix. A region that is uniform becomes a leaf; otherwise it splits into four children for its quadrants.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/construct-quad-tree"
+    },
+    {
+      "n": 72,
+      "slug": "oa-min-edge-reversals",
+      "title": "OA: Minimum Edge Reversals from Every Root",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Low",
+      "last_asked": "2026-05-31",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "graph",
+        "dfs",
+        "tree",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "graph",
+        "dfs",
+        "tree",
+        "hard"
+      ],
+      "overview": "Hack2Hire OA problem, equivalent to LeetCode 2858 / 1466 variant. Given an acyclic directed graph with `n` nodes and `n − 1` edges, for each node `r` compute the minimum number of edge reversals so that every node has a directed path to `r`.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/oa-min-edge-reversals"
+    },
+    {
+      "n": 73,
+      "slug": "phone-screen-tennis-rounds",
+      "title": "Phone Screen: Tennis Rounds — Print Round Winners",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-05-23",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "simulation",
+        "array",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "simulation",
+        "array",
+        "easy"
+      ],
+      "overview": "Phone-screen prompt. Given a list of player rankings, simulate a single-elimination tournament. In each round, adjacent pairs play and the higher-ranked one wins. Print the surviving list after every round.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/phone-screen-tennis-rounds"
+    },
+    {
+      "n": 74,
+      "slug": "vo-ai-assisted-debug-round",
+      "title": "VO: AI-Assisted Coding / Debug Round (HackerRank IDE + AI)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-05-08",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "ai-tools",
+        "code-reading",
+        "debugging",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "ai-tools",
+        "code-reading",
+        "debugging",
+        "medium"
+      ],
+      "overview": "New 2026 onsite round shape. Uses a HackerRank-hosted IDE that closely resembles Cursor, with an in-browser AI coding assistant available. The interviewer hands over a small full-stack app with a bug (e.g. transaction handling) and grades your ability to debug using AI as a teammate.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/vo-ai-assisted-debug-round"
+    },
+    {
+      "n": 75,
+      "slug": "kth-smallest-element-bst",
+      "title": "Kth Smallest Element in a BST",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-04-13",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "medium",
+        "bst",
+        "tree",
+        "tree-traversal",
+        "recursion"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "medium",
+        "bst",
+        "tree",
+        "tree-traversal",
+        "recursion"
+      ],
+      "overview": "Given the root of a binary search tree and an integer k, return the kth smallest value (1-indexed) in the tree.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/kth-smallest-element-bst"
+    },
+    {
+      "n": 76,
+      "slug": "oa-final-prices-monotonic-stack",
+      "title": "OA: Final Prices with Special Discount (Sum + Unsold Indices)",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Low",
+      "last_asked": "2026-04-01",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "medium",
+        "algorithm"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "medium",
+        "algorithm"
+      ],
+      "overview": "Hack2Hire OA problem, extension of LeetCode 1475. For each index `i`, the discount equals the first later price `prices[j] ≤ prices[i]`. Items with no qualifying `j` sell at full price. Output the total final sum and the 0-based ascending indices of items sold at full price.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/oa-final-prices-monotonic-stack"
+    },
+    {
+      "n": 77,
+      "slug": "oa-shortest-subarray-k-distinct",
+      "title": "OA: Shortest Subarray with At Least K Distinct",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Low",
+      "last_asked": "2026-04-01",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "two-pointer",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "two-pointer",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Hack2Hire OA problem. Given an array `arr` and integer `k`, find the length of the shortest contiguous subarray that contains at least `k` distinct integers. Return `−1` if no such subarray exists.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/oa-shortest-subarray-k-distinct"
+    },
+    {
+      "n": 78,
+      "slug": "oa-min-ops-to-zero-power-of-two",
+      "title": "OA: Minimum Operations to Reduce N to 0 (±2^i)",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Low",
+      "last_asked": "2026-04-01",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "bit-manipulation",
+        "greedy",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "bit-manipulation",
+        "greedy",
+        "medium"
+      ],
+      "overview": "Hack2Hire OA problem, equivalent to LeetCode 2571. Given a positive integer `n`, on each operation set `n = n ± 2^i` for some non-negative integer `i`. Return the minimum number of operations needed to reach 0.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/oa-min-ops-to-zero-power-of-two"
+    },
+    {
+      "n": 79,
+      "slug": "phone-screen-squares-of-sorted",
+      "title": "Phone Screen: Squares of a Sorted Array",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-03-21",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE"
+      ],
+      "tags": [
+        "two-pointer",
+        "array",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle"
+      ],
+      "tags_slug": [
+        "two-pointer",
+        "array",
+        "easy"
+      ],
+      "overview": "Recurring warm-up phone-screen prompt, equivalent to LeetCode 977. Given a sorted integer array (negative values possible), return an array of the squares in non-decreasing order. The Senior MLE variant of the round adds a follow-up on the K-th smallest square.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/phone-screen-squares-of-sorted"
+    },
+    {
+      "n": 80,
+      "slug": "letter-combinations-phone-number",
+      "title": "Letter Combinations of a Phone Number",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-03-15",
+      "stage": "onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "medium",
+        "backtracking",
+        "recursion",
+        "string"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "medium",
+        "backtracking",
+        "recursion",
+        "string"
+      ],
+      "overview": "Given a string of digits from 2 to 9, return every possible letter combination it could represent using the classic phone keypad mapping. A standard backtracking exercise with follow-ups on recursion structure versus iterative generation.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/letter-combinations-phone-number"
+    },
+    {
+      "n": 81,
+      "slug": "best-time-buy-sell-stock",
+      "title": "Best Time to Buy and Sell Stock",
+      "category": "coding",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-03-06",
+      "stage": "phone-screen",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "greedy",
+        "dp",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "greedy",
+        "dp",
+        "easy"
+      ],
+      "overview": "Given an array of daily prices, choose one day to buy and a later day to sell to maximize profit, returning 0 if no profitable transaction exists. Used as a phone-screen warm-up, with follow-ups exploring multiple solution approaches.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/best-time-buy-sell-stock"
+    },
+    {
+      "n": 82,
+      "slug": "phone-screen-alien-dictionary",
+      "title": "Phone Screen: Alien Dictionary (LC 269)",
+      "category": "coding",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-03-04",
+      "stage": "phone-screen · onsite-coding",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "graph",
+        "topological-sort",
+        "string",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "graph",
+        "topological-sort",
+        "string",
+        "hard"
+      ],
+      "overview": "Phone-screen / onsite coding prompt, verbatim LeetCode 269. Given words sorted by an alien lexicographical order, recover any valid character order. Topological sort on adjacent-word constraints.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/phone-screen-alien-dictionary"
+    },
+    {
+      "n": 83,
+      "slug": "oa-prefix-sum-budget-purchase",
+      "title": "OA: Maximum Items by Budget with Prefix Sums",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Low",
+      "last_asked": "2026-02-11",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "two-pointer",
+        "easy"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "two-pointer",
+        "easy"
+      ],
+      "overview": "Hack2Hire OA problem. Stalls have non-decreasing prices. For each query `(pos, amount)`, starting from stall `pos`, buy at most one item per stall while moving right; maximize the number of items bought without exceeding `amount`.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/oa-prefix-sum-budget-purchase"
+    },
+    {
+      "n": 84,
+      "slug": "oa-permutation-prefix-balanced",
+      "title": "OA: Permutation Prefix Balanced (1..k Subarray Check)",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Low",
+      "last_asked": "2026-02-02",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "array",
+        "hashmap",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "array",
+        "hashmap",
+        "medium"
+      ],
+      "overview": "Hack2Hire OA problem. Given a permutation `p` of `1..n` and each `k` in `1..n`, decide whether `1..k` appears as a contiguous subarray somewhere in `p`. Return a binary string of length `n` (1 = balanced, 0 = not).",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/oa-permutation-prefix-balanced"
+    },
+    {
+      "n": 85,
+      "slug": "oa-stairs-elevator-energy-tradeoff",
+      "title": "OA: Stairs vs Elevator Energy Trade-off",
+      "category": "coding",
+      "duration": "90 min",
+      "frequency": "Low",
+      "last_asked": "2026-02-02",
+      "stage": "oa",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "algorithm",
+        "simulation",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "algorithm",
+        "simulation",
+        "medium"
+      ],
+      "overview": "Hack2Hire OA problem. Climb `n` floors using one elevator segment first (collects `e1` energy and costs `t1` time per floor) and then stairs (consumes `e2` per floor, time = `ceil(c / current_energy)`). Find the split that minimizes the absolute difference between elevator-time and stair-time. Energy must stay non-negative on stairs.",
+      "source_count": 3,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/oa-stairs-elevator-energy-tradeoff"
+    },
+    {
+      "n": 86,
+      "slug": "onsite-sd-driver-location-heatmap",
+      "title": "Onsite System Design: Driver Location Heatmap",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-05-15",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "system-design",
+        "storage",
+        "scaling",
+        "streaming",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "system-design",
+        "storage",
+        "scaling",
+        "streaming",
+        "hard"
+      ],
+      "overview": "The single most-asked Uber system design prompt. Design a service that ingests live driver locations and serves city-scale heatmap queries (and/or pushes real-time location to riders). Recruiters often pre-flag this prompt during the screen.",
+      "source_count": 6,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/onsite-sd-driver-location-heatmap"
+    },
+    {
+      "n": 87,
+      "slug": "onsite-sd-top-k-popular-items",
+      "title": "Onsite System Design: Top-K Popular Items (Restaurant / Search)",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-03-24",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "system-design",
+        "streaming",
+        "scaling",
+        "storage",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "system-design",
+        "streaming",
+        "scaling",
+        "storage",
+        "hard"
+      ],
+      "overview": "Recurring onsite SD prompt. Design a service that returns the top-K most-popular items (food items per restaurant, restaurants per city, search queries) over a rolling window. Variants ask for offline batch, near-realtime, or per-restaurant slicing.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/onsite-sd-top-k-popular-items"
+    },
+    {
+      "n": 88,
+      "slug": "mle-onsite-ml-system-design",
+      "title": "MLE Onsite: ML System Design (Recommendation / Feed Ranking / ETA)",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Medium",
+      "last_asked": "2026-03-09",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "RS"
+      ],
+      "tags": [
+        "system-design",
+        "rag",
+        "retrieval",
+        "ml-knowledge",
+        "scaling",
+        "hard"
+      ],
+      "roles_slug": [
+        "mle",
+        "rs"
+      ],
+      "tags_slug": [
+        "system-design",
+        "rag",
+        "retrieval",
+        "ml-knowledge",
+        "scaling",
+        "hard"
+      ],
+      "overview": "MLE / Applied Scientist onsite SD round. Design an ML-powered system end-to-end: feature pipeline, model training, online serving, evaluation, and A/B framework. Recurring prompts: Uber Eats restaurant recommendation, feed ranking, ETA prediction, driver-rider matching.",
+      "source_count": 4,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/mle-onsite-ml-system-design"
+    },
+    {
+      "n": 89,
+      "slug": "onsite-sd-nearby-driver-proximity-service",
+      "title": "Onsite System Design: Nearby Driver Proximity Service",
+      "category": "system-design",
+      "duration": "45 min",
+      "frequency": "Single report",
+      "last_asked": "2026-08-16",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "geohash",
+        "streaming",
+        "scaling",
+        "hard"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "geohash",
+        "streaming",
+        "scaling",
+        "hard"
+      ],
+      "overview": "Design a proximity service that ingests frequently changing driver locations and returns eligible drivers within a rider's search radius. The round compares uniform grids, quadtrees, and Geohash/S2; then probes boundary cells, four-second update cadence, city partitioning, driver-state filtering, and map-result debouncing.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/onsite-sd-nearby-driver-proximity-service"
+    },
+    {
+      "n": 90,
+      "slug": "stock-price-alert-design",
+      "title": "Design a Stock Price Alert Notification System",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-07-28",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "system-design",
+        "notification",
+        "messaging",
+        "kafka",
+        "streaming",
+        "idempotency",
+        "sharding",
+        "state-machine"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "system-design",
+        "notification",
+        "messaging",
+        "kafka",
+        "streaming",
+        "idempotency",
+        "sharding",
+        "state-machine"
+      ],
+      "overview": "Design a stock-price alert system that ingests live quotes and delivers notifications without scanning every subscription on each update. One rotation uses absolute threshold crossings; a newer canonical variant triggers on an X% move over one user-selected rolling time unit, then removes the subscription after its first trigger or after one inactive month.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/stock-price-alert-design"
+    },
+    {
+      "n": 91,
+      "slug": "onsite-sd-app-user-behavior-data-platform",
+      "title": "Onsite System Design: App User Behavior Data Platform",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-06-17",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "data-engineering",
+        "feature-engineering",
+        "analytics-dashboard",
+        "ingestion",
+        "schema-design",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "data-engineering",
+        "feature-engineering",
+        "analytics-dashboard",
+        "ingestion",
+        "schema-design",
+        "medium"
+      ],
+      "overview": "Design a system to analyze Uber App user behavior data and process raw events into downstream-ready data for models and business systems. The key is not just collecting clicks, but building pipelines for sessionization, funnel analysis, feature generation, quality checks, and schema evolution.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/onsite-sd-app-user-behavior-data-platform"
+    },
+    {
+      "n": 92,
+      "slug": "fraud-detection-design",
+      "title": "Fraud Detection",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-05-09",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "mlsd",
+        "integrity",
+        "payment",
+        "system-design"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "mlsd",
+        "integrity",
+        "payment",
+        "system-design"
+      ],
+      "overview": "Design a machine learning system to detect fraudulent transactions for a payments platform, covering both the ML pipeline and the surrounding production architecture.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/fraud-detection-design"
+    },
+    {
+      "n": 93,
+      "slug": "onsite-sd-puzzle-scoring",
+      "title": "Onsite System Design: Daily Puzzle / Submission Scoring",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-04-30",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "system-design",
+        "storage",
+        "idempotency",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "system-design",
+        "storage",
+        "idempotency",
+        "medium"
+      ],
+      "overview": "Onsite system design variant. Design a daily-puzzle product where users submit one answer per day, see their score and a leaderboard, and the system handles puzzle scheduling. Effectively a smaller-scale LeetCode-clone design.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/onsite-sd-puzzle-scoring"
+    },
+    {
+      "n": 94,
+      "slug": "online-shopping-cart-design",
+      "title": "Design an Online Shopping Cart",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-02-14",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "system-design",
+        "schema-design",
+        "concurrency",
+        "idempotency",
+        "caching",
+        "sharding",
+        "redis",
+        "kafka",
+        "data-modeling",
+        "streaming"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "system-design",
+        "schema-design",
+        "concurrency",
+        "idempotency",
+        "caching",
+        "sharding",
+        "redis",
+        "kafka",
+        "data-modeling",
+        "streaming"
+      ],
+      "overview": "Design an online shopping cart system for a marketplace-style product, with the key constraint of one active cart per merchant per user. The core difficulty lies in modeling per-merchant carts, handling concurrent updates from multiple devices, choosing the right database and indexes, and deciding whether to snapshot product price and metadata inside the cart. A reported follow-up extends the problem with a streaming-analytics requirement to rank highest average-rated products over arbitrary time windows.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/online-shopping-cart-design"
+    },
+    {
+      "n": 95,
+      "slug": "pickup-area-driver-queue-design",
+      "title": "Design a Pickup Area Driver Queue",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-01-29",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "system-design",
+        "geofence",
+        "location",
+        "streaming",
+        "kafka",
+        "redis",
+        "idempotency",
+        "state-machine",
+        "scaling"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "system-design",
+        "geofence",
+        "location",
+        "streaming",
+        "kafka",
+        "redis",
+        "idempotency",
+        "state-machine",
+        "scaling"
+      ],
+      "overview": "Design an internal pickup area driver queue service that maintains, in real time, an ordered queue of eligible drivers for each geofenced pickup zone (such as an airport staging lot). The core challenge is real-time geofence membership and ordered state management: deciding when a driver is in an area, keeping queue order stable under continuous movement and noisy events, and serving fast queue reads.",
+      "source_count": 0,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/pickup-area-driver-queue-design"
+    },
+    {
+      "n": 96,
+      "slug": "onsite-sd-rider-driver-matching",
+      "title": "Onsite System Design: Rider-Driver Matching",
+      "category": "system-design",
+      "duration": "60 min",
+      "frequency": "Low",
+      "last_asked": "2026-06-26",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "location",
+        "geohash",
+        "scaling",
+        "distributed-systems",
+        "medium"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "location",
+        "geohash",
+        "scaling",
+        "distributed-systems",
+        "medium"
+      ],
+      "overview": "Design Uber's rider-driver matching system. The round emphasizes million-scale driver location updates, low-latency geospatial search, scalable service decomposition, availability under network partitions, and consistency around match state.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/onsite-sd-rider-driver-matching"
+    },
+    {
+      "n": 97,
+      "slug": "messenger-design",
+      "title": "Design Messenger",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-06-21",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "system-design",
+        "chat",
+        "messaging",
+        "websocket",
+        "kafka",
+        "redis",
+        "presence",
+        "idempotency",
+        "read-receipts"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "system-design",
+        "chat",
+        "messaging",
+        "websocket",
+        "kafka",
+        "redis",
+        "presence",
+        "idempotency",
+        "read-receipts"
+      ],
+      "overview": "Design a Messenger-like 1-to-1 chat system similar to Facebook Messenger or WhatsApp, supporting near-real-time delivery, conversation history, offline delivery, and message status (accepted / delivered / read). A common follow-up pushes on whether Redis can really handle the routing throughput and on the exact checkmark semantics.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/messenger-design"
+    },
+    {
+      "n": 98,
+      "slug": "uber-eats-search",
+      "title": "Uber Eats Search",
+      "category": "system-design",
+      "duration": null,
+      "frequency": "Low",
+      "last_asked": "2026-03-06",
+      "stage": "onsite-system-design",
+      "access": "Members",
+      "roles": [
+        "MLE"
+      ],
+      "tags": [
+        "mlsd",
+        "search",
+        "retrieval",
+        "ranking",
+        "recommendation",
+        "ann",
+        "location",
+        "geohash",
+        "feature-engineering",
+        "ab-testing",
+        "two-tower"
+      ],
+      "roles_slug": [
+        "mle"
+      ],
+      "tags_slug": [
+        "mlsd",
+        "search",
+        "retrieval",
+        "ranking",
+        "recommendation",
+        "ann",
+        "location",
+        "geohash",
+        "feature-engineering",
+        "ab-testing",
+        "two-tower"
+      ],
+      "overview": "Design the Uber Eats search system for a Machine Learning Engineer onsite: a geo-aware restaurant and menu-item search that combines query understanding, hybrid candidate retrieval, hard marketplace filtering, and personalized ML ranking under a tight latency budget. The core challenge is connecting retrieval, ranking, online serving, feedback logging, and offline training into one coherent loop optimized toward completed orders.",
+      "source_count": 2,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/uber-eats-search"
+    },
+    {
+      "n": 99,
+      "slug": "onsite-bq-hm-deep-dive",
+      "title": "Onsite BQ + Hiring Manager + Project Deep-Dive",
+      "category": "behavioral",
+      "duration": "75 min",
+      "frequency": "Very high",
+      "last_asked": "2026-08-16",
+      "stage": "onsite-bq · onsite-deep-dive · final-round",
+      "access": "Members",
+      "roles": [
+        "SWE",
+        "MLE",
+        "EM"
+      ],
+      "tags": [
+        "behavioral",
+        "deep-dive",
+        "presentation"
+      ],
+      "roles_slug": [
+        "swe",
+        "mle",
+        "em"
+      ],
+      "tags_slug": [
+        "behavioral",
+        "deep-dive",
+        "presentation"
+      ],
+      "overview": "Standard onsite HM round. 60–75 min. The first half is usually a project deep-dive (candidate may bring slides); the second half is structured BQ on collaboration, conflict, mentorship, and cross-functional influence.",
+      "source_count": 16,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/onsite-bq-hm-deep-dive"
+    },
+    {
+      "n": 100,
+      "slug": "bar-raiser-architecture-and-values",
+      "title": "Bar Raiser: Architecture, Influence, and Values",
+      "category": "behavioral",
+      "duration": null,
+      "frequency": "Single report",
+      "last_asked": "2026-06-26",
+      "stage": "onsite-bq",
+      "access": "Members",
+      "roles": [
+        "SWE"
+      ],
+      "tags": [
+        "behavioral",
+        "culture-fit",
+        "leadership"
+      ],
+      "roles_slug": [
+        "swe"
+      ],
+      "tags_slug": [
+        "behavioral",
+        "culture-fit",
+        "leadership"
+      ],
+      "overview": "A senior behavioral and architecture deep-dive round covering a complex system you designed, technical trade-offs, conflict and standards-setting, and examples tied to customer focus or ownership.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/bar-raiser-architecture-and-values"
+    },
+    {
+      "n": 101,
+      "slug": "staff-bps-scope-architecture",
+      "title": "Staff (BPS) Round: Scope & Impact + Architecture",
+      "category": "behavioral",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2025-12-11",
+      "stage": "onsite-bq · onsite-deep-dive · final-round",
+      "access": "Members",
+      "roles": [
+        "MLE",
+        "SWE"
+      ],
+      "tags": [
+        "behavioral",
+        "deep-dive",
+        "presentation"
+      ],
+      "roles_slug": [
+        "mle",
+        "swe"
+      ],
+      "tags_slug": [
+        "behavioral",
+        "deep-dive",
+        "presentation"
+      ],
+      "overview": "Staff-level (L6) BPS loop replaces some standard rounds with two named segments: **Scope & Impact** (org-level decision radius) and **Architecture** (full-project architectural walkthrough). Coding is reduced or skipped; the depth of the architectural narrative is the deciding signal.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/staff-bps-scope-architecture"
+    },
+    {
+      "n": 102,
+      "slug": "scientist-experiment-design",
+      "title": "Scientist Onsite: Experiment Design (Switchback + CI Interpretation)",
+      "category": "other",
+      "duration": "60 min",
+      "frequency": "Single report",
+      "last_asked": "2026-01-13",
+      "stage": "onsite-deep-dive · onsite-research",
+      "access": "Members",
+      "roles": [
+        "RS",
+        "DS",
+        "MLE"
+      ],
+      "tags": [
+        "ml-knowledge",
+        "math-reasoning",
+        "probability",
+        "deep-dive"
+      ],
+      "roles_slug": [
+        "rs",
+        "ds",
+        "mle"
+      ],
+      "tags_slug": [
+        "ml-knowledge",
+        "math-reasoning",
+        "probability",
+        "deep-dive"
+      ],
+      "overview": "Scientist II onsite round. Reasoning prompt rather than coding. Pick a metric (e.g. ETA vs session conversion), design an experiment to measure causal effect on Uber's marketplace, including rollout strategy, treatment design, guardrails, and confidence-interval interpretation.",
+      "source_count": 1,
+      "has_answer_on_site": true,
+      "url": "https://www.1point3acres.com/interview/problems/company/uber/scientist-experiment-design"
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+===H1===
+Union of Sorted Interval Lists
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/sorted-interval-list-union
+===BODY===
+Google
+Coding·45 minMembers
+Union of Sorted Interval Lists
+Reverse of LC 986: given two individually sorted, internally non-overlapping interval lists, return their union. Follow-ups extend to K lists with a heap, inputs too large for memory, and lists that may overlap internally.
+SWE
+interval
+two-pointer
+heap
+streaming
+medium
+Frequency
+Single report
+Last asked
+2026-08-16
+Stage
+onsite-coding
+Requirements
+
+Input: two interval lists. Each list is sorted by start time and contains no internal overlaps.
+
+Output: the union of both lists as merged, non-overlapping intervals.
+
+Use two pointers: repeatedly take the interval with the smaller start and merge it into the last output interval when they overlap.
+
+Follow-up: for K sorted lists, keep each list's current interval in a min-heap keyed by start time; process N total intervals in O(N log K).
+
+Follow-up: when the lists do not fit in memory and can only be read incrementally, retain one current interval per list and fetch its successor after consuming it.
+
+Follow-up: when an input list can overlap internally, sort all intervals by start time and run the standard merge scan.
+
+Notes
+
+The round intentionally layers one constraint at a time. Keep the base invariant explicit—every interval before the current pointer has already been absorbed into a canonical output prefix—so the streaming and K-way versions remain easy to justify.
+
+Agree on endpoint semantics before coding: touching closed intervals merge, while touching half-open intervals do not overlap. For K streaming inputs, the heap plus one current interval per input uses O(K) working memory, excluding the output.
+
+Preparation
+
+Code the two-list merge without special-casing more than an empty result and a non-overlapping next interval.
+
+Generalize the implementation to K iterators using a heap, then explain the memory bound.
+
+Rehearse how the invariant changes when individual inputs are not internally disjoint.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

@@ -1,0 +1,81 @@
+===H1===
+Construct Quad Tree
+===URL===
+https://www.1point3acres.com/interview/problems/company/uber/construct-quad-tree
+===BODY===
+Uber
+CodingMembers
+Construct Quad Tree
+Given an n x n binary matrix where n is a power of 2, build and return the root of a quad tree representing the matrix. A region that is uniform becomes a leaf; otherwise it splits into four children for its quadrants.
+SWE
+recursion
+grid
+tree
+medium
+Frequency
+Low
+Last asked
+2026-06-06
+Stage
+oa · onsite-coding
+Construct Quad Tree
+
+You are given an n x n binary matrix grid, where n is a power of 2. Build and return the root of a quad tree that represents the matrix.
+
+Each node represents a square region:
+
+If every value in the region is the same, the node is a leaf.
+
+Otherwise, the node is an internal node with exactly four children for the top-left, top-right, bottom-left, and bottom-right quadrants.
+
+Each returned node should expose the fields val, isLeaf, topLeft, topRight, bottomLeft, and bottomRight.
+
+For this practice environment, use val = false for every non-leaf node so the returned structure is deterministic across languages.
+
+Examples
+
+Example 1:
+
+Input: grid = [[0,1],[1,0]]
+
+Output: {"val":false,"isLeaf":false,"topLeft":{"val":false,"isLeaf":true,"topLeft":null,"topRight":null,"bottomLeft":null,"bottomRight":null},"topRight":{"val":true,"isLeaf":true,"topLeft":null,"topRight":null,"bottomLeft":null,"bottomRight":null},"bottomLeft":{"val":true,"isLeaf":true,"topLeft":null,"topRight":null,"bottomLeft":null,"bottomRight":null},"bottomRight":{"val":false,"isLeaf":true,"topLeft":null,"topRight":null,"bottomLeft":null,"bottomRight":null}}
+
+Explanation:
+
+The full grid is not uniform, so the root is an internal node with four leaf children.
+
+Example 2:
+
+Input: grid = [[1,1],[1,1]]
+
+Output: {"val":true,"isLeaf":true,"topLeft":null,"topRight":null,"bottomLeft":null,"bottomRight":null}
+
+Explanation:
+
+All cells match, so the answer is a single leaf node.
+
+Constraints
+
+n == grid.length == grid[i].length
+
+1 <= n <= 64
+
+n is a power of 2
+
+grid[i][j] is either 0 or 1
+
+Notes
+
+Some rounds drop the binary restriction: the grid can hold arbitrary integers (not just 0/1), and you implement the node data structure yourself rather than using a provided class. A region is a leaf only when every value in it is identical; otherwise it splits into four quadrants.
+
+A common follow-up is the reverse construction: given a quad-tree node, rebuild the original 2-D array — recurse into the four children, and for a leaf paint its whole region with val.
+
+Build top-down: check whether the current square is uniform; if so emit a leaf, otherwise recurse into the four n/2 x n/2 quadrants. A prefix-sum (or memoized uniformity check) avoids re-scanning each region.
+
+Confirming that the side length is a power of two is the key clarifying question — it guarantees clean halving down to 1x1 cells.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

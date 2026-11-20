@@ -1,0 +1,60 @@
+===H1===
+Process Raw CSV for Downstream Consumers
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/csv-parser-open-ended
+===BODY===
+Waymo
+Coding·45 minFree preview
+Process Raw CSV for Downstream Consumers
+Open-ended phone screen prompt: given a raw CSV string, design a parser that produces a representation other engineering teams can consume. The interviewer refuses to pin down the downstream contract — clarifying the consumer use case, proposing multiple output shapes, and handling corrupted rows is the entire interview.
+SWE
+parsing
+string-processing
+ambiguous-spec
+data-engineering
+medium
+Frequency
+Low
+Last asked
+2026-04-22
+Stage
+phone-screen
+Requirements
+
+Input: a single string containing CSV-formatted data, e.g. "col1,col2,col3,col4\nvalue1,value2,value3,value4\n".
+
+Output: a representation that 'other engineering teams can consume.' The interviewer explicitly refuses to specify the downstream contract — proposing a candidate API is part of the round.
+
+Initial pass may assume clean data.
+
+Follow-up: handle corrupted rows. The header is correct, but the row payload may have (1) missing fields, (2) extra fields, (3) wrong types. The solution must remain generic, so the type case cannot be assumed away.
+
+Notes
+
+The round is graded almost entirely on clarification and trade-off discussion. Common candidate outputs and the trade-offs to surface explicitly:
+
+Column-major dict ({col: [values...]}) — analytics-friendly, cheap to slice columns, expensive to filter by row.
+
+Row-major list of dicts — natural for streaming consumers, easy to attach per-row validity flags.
+
+Pandas-like DataFrame — most ergonomic for analysts but requires the consumer to take pandas as a dependency.
+
+For the corruption follow-up, the cleanest published solution is row-major with a per-row {is_valid, errors[]} metadata field. Downstream consumers can then filter on is_valid rather than re-running validation.
+
+Drive the interviewer toward concrete consumers ('data science notebook? streaming ingestion? configuration loader?'). The interviewer often refuses to answer directly but will react to the proposal — silence is a graded signal.
+
+Do not over-engineer for arbitrary CSV quirks (quoted commas, embedded newlines, Unicode normalization) unless the interviewer explicitly raises them; surface them as known-but-deferred so the trade-off is on record.
+
+Preparation
+
+Write three CSV parser variants ahead of time (column-major dict, row-major list, row-major with validity metadata) and be able to switch between them in under 5 minutes each.
+
+Drill the explicit clarification questions: 'who consumes this?', 'is the column set fixed?', 'do we re-emit corrupted rows or drop them?', 'streaming or batch?'. Bring a printed checklist if needed.
+
+Practice narrating trade-offs aloud while typing — silence in the first 10 minutes is the most common failure mode for this prompt.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

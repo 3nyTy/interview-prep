@@ -1,0 +1,59 @@
+===H1===
+Image Sharing with Content Deduplication
+===URL===
+https://www.1point3acres.com/interview/problems/company/openai/image-sharing-content-deduplication
+===BODY===
+OpenAI
+System DesignMembers
+Image Sharing with Content Deduplication
+Design an image storage and sharing service with upload, view/download, and delete operations. Identical content should be stored once using a SHA-256 identity, with careful handling of concurrent uploads, metadata/blob consistency, failure recovery, and deletion lifecycle.
+SWE
+storage
+deduplication
+bandwidth
+medium
+Frequency
+Low
+Last asked
+2026-08-22
+Stage
+phone-screen · onsite-system-design
+Requirements
+
+Users upload images and later view or download them by user-facing identity.
+
+Support image deletion.
+
+Store only one blob when multiple users upload identical image content.
+
+Use a SHA-256 hash as the content identity and decide where and when it is computed and persisted.
+
+Separate image metadata from object storage while keeping their lifecycles coordinated.
+
+Handle large-file uploads, concurrent uploads of the same content, interrupted upload paths, and reliability failures.
+
+Define what happens to the shared blob when one user's metadata is deleted while other users still reference the same content.
+
+Notes
+
+The round rewards requirement clarification, storage abstraction, consistency, and failure handling more than a memorized architecture.
+
+Walk through upload and delete as multi-step operations; explicitly identify the states in which metadata exists without a durable blob, or a blob exists without a committed owner reference.
+
+Treat same-hash handling and blob lifecycle as linked decisions rather than isolated optimizations.
+
+For concurrent uploads targeting the same content-derived object key, use an atomic create-if-absent write. Exactly one writer commits the blob; losers reuse the committed object after verifying success, while conflicts with deletion or multipart completion follow an explicit retry path.
+
+Preparation
+
+Rehearse upload, concurrent duplicate upload, failed upload, and last-reference deletion as four separate sequence diagrams.
+
+Practice explaining the consistency boundary between metadata and object storage, including how the system recovers from a partial failure.
+
+Write a short race table for two same-hash uploads and for upload-versus-delete, including the retry or cleanup action for each losing operation.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

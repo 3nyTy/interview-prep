@@ -1,0 +1,53 @@
+===H1===
+Candy (LC 135)
+===URL===
+https://www.1point3acres.com/interview/problems/company/citadel/candy-lc-135
+===BODY===
+Citadel / Citadel Securities
+CodingMembers
+Candy (LC 135)
+Citadel phone-screen opener using the standard LC 135 Candy problem. The candidate explained the approach without writing code, then moved to a data-stream OOD problem; the interviewer emphasized candidate-led trade-off discussion throughout the screen.
+SWE
+array
+greedy
+Frequency
+Single report
+Last asked
+2026-08-08
+Stage
+phone-screen
+Requirements
+
+Solve the standard LC 135 Candy problem:
+
+Children stand in a line, and each child has an integer rating.
+
+Give every child at least one candy.
+
+A child with a higher rating than an adjacent child must receive more candies than that neighbor.
+
+Return the minimum total number of candies needed to satisfy the rules.
+
+Notes
+
+This phone screen accepted a verbal explanation for the opening problem and moved to the second task without requiring code.
+
+The interviewer emphasized candidate ownership twice: surface trade-offs independently, state assumptions, and drive the discussion rather than waiting for a sequence of prompts.
+
+The canonical greedy uses two directional passes: initialize every child with one candy, scan left-to-right to satisfy higher-than-left ratings, then scan right-to-left and take max(current, right + 1) whenever a rating is higher than its right neighbor. The max preserves the constraint established by the first pass; summing the final assignments yields the minimum total in O(n) time and O(n) space.
+
+Be explicit about how equal ratings, monotonic stretches, and local peaks or valleys interact with the two neighbor constraints.
+
+Preparation
+
+Rehearse a concise verbal plan that states the invariant, explains why both adjacent-neighbor constraints hold, and gives time and space complexity before any implementation.
+
+Walk through the single-child, all-equal, strictly increasing, strictly decreasing, and peak-or-valley cases until the correctness explanation is automatic.
+
+Practice comparing reasonable implementation strategies without interviewer prompting; this screen rewards proactive trade-off discussion.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

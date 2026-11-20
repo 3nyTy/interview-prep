@@ -1,0 +1,66 @@
+===H1===
+System Design: Elevator Operation Logic
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/sd-elevator-operation-logic
+===BODY===
+Waymo
+System Design·60 minMembers
+System Design: Elevator Operation Logic
+Onsite system design: design the operation logic for a building's elevator system, scaling from single-car scheduling to multi-car coordination and tall-building zone partitioning (sky lobby).
+SWE
+scheduling
+system-design
+concurrency
+object-design
+medium
+Frequency
+Single report
+Last asked
+2026-04-24
+Stage
+onsite-system-design
+Requirements
+
+Single-car scheduling: model up / down requests, current car position and direction, and pick the next stop.
+
+Multi-car coordination: assign incoming requests to one of N cars to minimize wait time.
+
+Tall building follow-up: partition into low / mid / high zones with an inter-zone sky lobby; design the assignment logic so a passenger in zone A bound for zone C is routed via the sky lobby.
+
+Notes
+
+Single car. Three classic algorithms with explicit trade-offs:
+
+FCFS: each request is served in arrival order. Simple, awful average wait time.
+
+SCAN / 'elevator algorithm': maintain a direction; service all requests in the current direction before reversing. Strong fairness, no starvation, used as the default.
+
+LOOK: variant of SCAN that reverses as soon as no further requests exist in the current direction. Slightly better average wait, same fairness.
+
+Multi-car assignment. Compute a per-car cost for each request (function of current direction, distance to the requested floor, queued stops). Assign the request to argmin car. Tie-break on least-loaded car for load balancing. Real systems re-evaluate assignments periodically (every 1–5 seconds) because new requests change the optimum.
+
+Modeling requests. Hall calls (request at a floor, direction known) vs car calls (destination floor pressed inside a car). The optimizer treats these differently: hall calls can be reassigned among cars; car calls are committed.
+
+Tall-building zoning. Partition floors into zones with dedicated express cars serving zone boundaries. The sky lobby acts as a transfer floor: 'zone A → sky lobby → zone C' becomes two scheduled hops. Surface the trade-offs: zone partitioning loses flexibility (a car serving zone A can't help zone B), but reduces average travel distance and crowd density per car.
+
+Edge cases. Fire / emergency mode (override to ground floor), VIP mode (commandeer a car), overload sensors (refuse new pickups), maintenance lockout. Mention without diving deep.
+
+Performance metrics. Average wait time, longest wait time (fairness), average ride time, throughput at peak hour, energy consumption. Industry benchmarks: peak-hour up-traffic of 12% of building population in 5 minutes is a standard target.
+
+Tie-back to leveling at Waymo: the round is graded on whether the candidate drives the algorithm choice with justification and only zooms into multi-car coordination once the single-car baseline is on the board.
+
+Preparation
+
+Memorize the SCAN / LOOK / FCFS taxonomy and be able to recite the average-wait-time argument for each.
+
+Pre-stage the multi-car cost function: cost(car, request) = distance + direction_penalty + queue_length.
+
+For the sky lobby follow-up, sketch a 30-floor building partition (e.g. 1–10 / 10–20 / 20–30) before the round and rehearse why the transfer floor sits at 10 and 20 specifically.
+
+Reserve 5 minutes for monitoring / observability — call out wait-time SLIs and the dashboards an operator would watch.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

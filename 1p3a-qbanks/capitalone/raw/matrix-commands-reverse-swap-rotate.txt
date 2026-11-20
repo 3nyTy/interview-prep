@@ -1,0 +1,64 @@
+===H1===
+Matrix Commands: Reverse / Swap / Rotate
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/matrix-commands-reverse-swap-rotate
+===BODY===
+Capital One
+Coding·70 minMembers
+Matrix Commands: Reverse / Swap / Rotate
+Execute a sequence of in-place matrix commands — `reverseRow r`, `swap r1 r2`, `rotate` (90° clockwise) — and return the final matrix. Tests parsing discipline and 2-D index manipulation more than algorithmic depth.
+SWE
+MLE
+grid
+array
+simulation
+oa
+codesignal
+easy
+Frequency
+Low
+Last asked
+2026-01-19
+Stage
+oa
+Requirements
+
+Input: an n x m integer matrix and a list of command strings.
+
+Supported commands:
+
+reverseRow r — reverse the elements of row index r.
+
+swap r1 r2 — swap rows r1 and r2.
+
+rotate — rotate the matrix 90 degrees clockwise. After a rotate, dimensions become m x n and subsequent row indices reference the rotated shape.
+
+Return the final matrix after all commands have been applied in order.
+
+Examples
+
+A 2 x 3 matrix [[1,2,3],[4,5,6]] after ["reverseRow 0", "rotate"] becomes [[4,3],[5,2],[6,1]].
+
+Notes
+
+Two clean implementation paths: (a) maintain the matrix as a list-of-lists and recompute n, m after each rotate; (b) maintain logical row/column indices plus a rotation counter mod 4 and a row-reversal bitmap, applying the actual transformation lazily at the end. Path (a) is what to write under time pressure; path (b) is the follow-up answer if the interviewer asks about extending the command set to millions of operations.
+
+Command parsing is where most candidates lose time. Split on whitespace, then match on the first token before parsing the integers — do not try to regex the whole line.
+
+90° clockwise rotation is M' = transpose(M) then reverse each row, or equivalently M'[i][j] = M[n-1-j][i]. Pick whichever is muscle memory; do not compose them in the wrong order under time pressure.
+
+After a rotate the row indices in any subsequent reverseRow r or swap r1 r2 refer to the rotated shape; failing to update the bounds is the typical bug.
+
+Preparation
+
+Build a unit-test harness with three matrices (square, wider-than-tall, taller-than-wide) and run all three through the same command sequence to catch dimension bugs.
+
+Memorise both rotation formulas and write them out from scratch in under a minute; this saves real time during the live attempt.
+
+Add rotateCCW and transpose as additional commands while practising — Capital One has been observed extending the prompt during the round when the candidate finishes early.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

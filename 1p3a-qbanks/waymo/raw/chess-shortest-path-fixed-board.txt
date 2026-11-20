@@ -1,0 +1,59 @@
+===H1===
+Chess Piece Shortest Path on a Fixed Board
+===URL===
+https://www.1point3acres.com/interview/problems/company/waymo/chess-shortest-path-fixed-board
+===BODY===
+Waymo
+Coding·45 minMembers
+Chess Piece Shortest Path on a Fixed Board
+Phone screen: find the shortest path of moves for a chess piece between two squares on a fixed-size board. Candidate defines the move set, function signature, and test cases. Solution is plain BFS with two follow-ups: blocked squares, then an infinite-board variant.
+SWE
+bfs
+grid
+graph
+medium
+Frequency
+Single report
+Last asked
+2026-04-08
+Stage
+phone-screen
+Requirements
+
+Implement a function that returns the minimum number of moves for a chess piece to travel from a source square to a target square on a fixed-size board.
+
+Candidate defines the move set (knight-style L-jumps reported most often), input / output format, and at least one custom test case.
+
+Implement main and any required helpers — there is no LC-style skeleton.
+
+Follow-ups: (1) board contains blocked squares, (2) board is infinite.
+
+Notes
+
+BFS from the source over reachable squares is the canonical solution. Each layer corresponds to one move; the first time the target is popped is the answer. Complexity O(V + E) where V = rows × cols.
+
+DFS is the wrong choice for shortest-path on an unweighted move graph — it explores deeply before broadly and pays exponential search cost.
+
+The blocked-squares follow-up is a 2-line change: filter neighbors against an is_blocked(square) predicate.
+
+Infinite-board follow-up:
+
+For a knight, the answer is bounded; precompute via a small symmetry argument (closed-form exists for (dx, dy) distance ≥ 5).
+
+For an interviewer expecting BFS, bound exploration with a max-distance heuristic and explain why the BFS frontier still terminates given the target's coordinates.
+
+Be explicit about the chosen piece — interviewers occasionally swap king / rook / queen movement to probe whether the candidate's BFS code generalizes over move-generator functions.
+
+Preparation
+
+Practice writing BFS shortest-path on a grid including the visited set, the queue layer counter, and target-on-pop termination — without copying from a reference.
+
+Implement main, the input parser, and a deterministic test case from scratch a few times; getting tripped up by syntax (e.g. accidentally declaring outer classes static in Java) is a recurring time sink.
+
+Pre-write a knight-move neighbor generator and an is_in_bounds(r, c) helper as muscle memory.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

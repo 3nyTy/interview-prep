@@ -1,0 +1,118 @@
+===H1===
+Single Query Type, Max Revenue in K Minutes
+===URL===
+https://www.1point3acres.com/interview/problems/company/snowflake/single-query-max-revenue
+===BODY===
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Snowflake Interview Questions
+Single Query Type, Max Revenue in K Minutes
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Snowflake
+Coding
+·
+45 min
+Members
+Single Query Type, Max Revenue in K Minutes
+
+A virtual warehouse can execute one of `n` query types. Each query type has a per-run revenue and per-run duration. Pick a single query type and run it as many times as fits in `k` minutes; return the chosen type and the maximum total revenue.
+
+SWE
+math
+greedy
+easy
+Frequency
+Single report
+Last asked
+2026-01-17
+Stage
+phone-screen
+Requirements
+Input: n query types, each with (duration_i, revenue_i). Time budget: k minutes.
+Only one query type may be selected; that type runs back-to-back, integer count of times.
+Output: the selected query type index and the maximum total revenue achievable.
+Ties between query types are broken arbitrarily unless specified.
+Notes
+For each candidate type i, the number of runs fitting in k minutes is floor(k / duration_i), and the total revenue is floor(k / duration_i) * revenue_i.
+One linear scan over the types, track the maximum revenue and the corresponding type. O(n).
+This is not the knapsack variant — the single-type constraint collapses the search space dramatically.
+Edge cases: duration_i > k (zero runs, zero revenue for that type), duration_i == 0 (degenerate; clarify), multiple types tied on max revenue (return any).
+Common stumbling: candidates immediately reach for unbounded-knapsack DP and over-complicate the round. Read the constraint that only one type may be chosen.
+Preparation
+Implement the linear scan in under 5 minutes; spend the rest of the round on follow-ups the interviewer raises (allowing multiple types, partial runs, etc.).
+Be ready to articulate why this is not a knapsack — the single-type constraint is what makes the linear scan optimal.
+Was this article helpful?
+Comments
+Post
+Anonymous
+Posting as coolanimesh14
+No comments yet. Be the first!
+Table of Contents
+Requirements
+Notes
+Preparation
+Related discussions · 1
+🔑snowflake timeline + code 面经
+Related questions
+
+Other Snowflake questions sharing tags with this one
+
+Happy Number
+Single report
+math
+easy
+hashmap
++2
+Calculate Amount Paid in Taxes
+Low
+math
+easy
+array
++1
+Min Coins to Pay with Change Allowed
+Single report
+greedy
+math
+dp
++1
+Reach Target via Add / Double / Halve
+Single report
+math
+greedy
+bfs
++2
+Pre-order Traversal Skipping Marked Nodes
+Single report
+easy
+tree
+dfs
++2
+Code editor

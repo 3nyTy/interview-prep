@@ -1,0 +1,66 @@
+===H1===
+Top K Closest Pairs in a Sorted Array
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/top-k-closest-pairs-in-sorted-array
+===BODY===
+Apple
+CodingMembers
+Top K Closest Pairs in a Sorted Array
+Given a sorted array, return the K pairs of values with the smallest absolute differences. The disclosed example uses [1, 2, 4, 7, 11, 16] and asks for the two closest pairs.
+SWE
+array
+top-k
+sorting
+medium
+Frequency
+Single report
+Last asked
+2026-08-05
+Stage
+onsite-coding
+Requirements
+
+Input is a sorted array of numbers and an integer K.
+
+A pair's distance is |a - b|.
+
+Return the K value pairs with the smallest distances.
+
+Before coding, clarify whether one array element may participate in multiple returned pairs, whether duplicate values are possible, how ties are ordered, and what to return when fewer than K pairs exist.
+
+State the time and space complexity of the implementation.
+
+Examples
+
+Given:
+
+array = [1, 2, 4, 7, 11, 16]
+K = 2
+
+Return:
+
+[(1, 2), (2, 4)]
+
+The corresponding distances are 1 and 2.
+
+Notes
+
+The prompt does not specify tie-breaking, pair reuse, duplicate-value semantics, or the exact output contract. Clarify those points before coding instead of silently choosing a convention.
+
+Under the common contract where every unordered index pair is eligible and an index may appear in multiple results, fix a left index i: the candidates (i, i + 1), (i, i + 2), ... have nondecreasing gaps because the array is sorted. Seed a min-heap with (a[i + 1] - a[i], i, i + 1) for every valid i. Each time a pair (i, j) is removed, emit it and add (i, j + 1) if that pair exists. Stop after K removals or when the heap is empty. Including indices in the heap key makes tie behavior deterministic once the output convention is agreed. This k-way merge takes O(n + K log n) time and O(n) auxiliary space.
+
+If only adjacent pairs are eligible, select from the n - 1 adjacent gaps instead. If returned pairs must be index-disjoint, clarify the optimization objective before coding: that is a different matching problem, so the reusable-pair heap should not be applied unchanged.
+
+Preparation
+
+Implement the reusable-pair heap and compare it with an O(n^2 log n) brute-force oracle on random sorted arrays. Include duplicates, fewer than two values, K = 0, and K larger than the number of possible pairs.
+
+Write a one-minute contract checklist covering index reuse, duplicate values, tie order, value pairs versus index pairs, and out-of-range K.
+
+Derive the monotone-sequence invariant and the O(n + K log n) time / O(n) space bounds without notes.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

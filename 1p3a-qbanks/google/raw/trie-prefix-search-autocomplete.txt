@@ -1,0 +1,55 @@
+===H1===
+Trie Prefix Search / Autocomplete
+===URL===
+https://www.1point3acres.com/interview/problems/company/google/trie-prefix-search-autocomplete
+===BODY===
+Google
+Coding·40 minMembers
+Trie Prefix Search / Autocomplete
+LeetCode 208 + 1268. Build a trie from a dictionary and return all words sharing a query prefix. Standard Google onsite coding.
+SWE
+trie
+tree
+dfs
+medium
+Frequency
+Medium
+Last asked
+2026-07-02
+Stage
+tech-screen · onsite-coding
+Requirements
+
+Build a trie from a dictionary / array of words.
+
+Support searchPrefix(prefix) -> list[str]: return all words that start with the query prefix, lexicographically sorted unless ranking is specified.
+
+Some interviewers phrase the query as "a few letters" or "substring"; clarify whether they truly mean arbitrary substring search or the standard prefix/autocomplete contract before coding.
+
+Common follow-ups: deletion, fuzzy match (one-character edit), autocompletion ranking by frequency, and returning only the best K completions.
+
+Examples
+
+Dict ["apple","app","apricot","banana"], prefix "ap" → ["app","apple","apricot"].
+
+Notes
+
+Standard implementation: each trie node has a children map and an is_end flag.
+
+Two collection patterns at the prefix: (a) DFS from the prefix node and collect all word-end nodes, (b) store the top-K candidates at every node during insert (Google-preferred for autocomplete).
+
+The standard sorted-suggestions follow-up wants 3 suggestions per prefix-length — handle with sorted children or per-node sorted lists.
+
+Preparation
+
+Write the trie class from memory in under 12 min.
+
+Drill the DFS-collect and the sorted-per-node variants; know which is faster in which scenario.
+
+For frequency-ranking, practice the design-autocomplete variant (per-node top-K updated on insert) as a stretch goal.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

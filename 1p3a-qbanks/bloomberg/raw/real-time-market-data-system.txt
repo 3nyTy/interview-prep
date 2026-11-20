@@ -1,0 +1,79 @@
+===H1===
+Real-time Market Data System
+===URL===
+https://www.1point3acres.com/interview/problems/company/bloomberg/real-time-market-data-system
+===BODY===
+Bloomberg
+System Design·60 minMembers
+Real-time Market Data System
+Design Bloomberg's real-time market-data distribution: upstream exchanges → Loader servers → UDP fan-out of multiple copies → Processor servers that rebuild reliability (loss, duplicates, ordering) at the application layer, then dedup, store, and serve to connected subscribers. A domain-core onsite SD prompt.
+SWE
+distributed-systems
+messaging
+ingestion
+dedup
+streaming
+scaling
+storage
+hard
+Frequency
+Single report
+Last asked
+2026-06-16
+Stage
+onsite-system-design
+Requirements
+
+Design a real-time market-data distribution system.
+
+Functional requirements:
+
+Multiple upstream exchanges (e.g. NASDAQ, NIFTY, S&P 500) send market-data messages to Loader servers.
+
+Each Loader fans out several copies of every message over UDP to a set of Processor servers.
+
+Every Processor must receive the data from all Loaders, not just one.
+
+Processors must cope with the realities of UDP: packet loss, duplicate delivery, and out-of-order arrival.
+
+After processing and deduplication, persist the data and serve it to connected actors / users.
+
+Non-functional / scale anchors:
+
+High-throughput, low-latency feeds — reason out loud about per-exchange message rates and message sizes.
+
+UDP is chosen for speed, so reliability must be rebuilt at the application layer rather than relied on from the transport.
+
+Decision points to drive:
+
+Loss detection and recovery without TCP: per-Loader sequence numbers, gap detection, an out-of-band retransmit-request channel, and leaning on the redundant copies.
+
+Deduplication across the multiple copies one Loader sends and across multiple Loaders: dedup by (loader_id, sequence_number) with idempotent apply.
+
+Ordering: per-stream sequence numbers feeding a bounded reorder buffer.
+
+Storage and serving for downstream actors: in-memory ring buffer for hot/recent data, durable store for history, pub/sub fan-out to subscribers.
+
+Notes
+
+The redundancy (multiple copies plus multiple Loaders) is itself the gap-recovery mechanism: a Processor reconstructs a complete stream by merging the duplicate copies and filling a gap from whichever copy arrived, deduping on (loader_id, sequence_number).
+
+A bounded reorder buffer trades a small, fixed latency budget for in-order delivery; on a missing sequence beyond the buffer window, request a retransmit or drop it and log the gap rather than stalling the stream.
+
+UDP has no back-pressure, so a slow Processor simply drops — sizing the receive buffers and the reorder window is part of the design, not an afterthought.
+
+This is a Bloomberg-domain prompt (market-data distribution is their core business); the interviewer expects reasoning about real exchange feeds and redundant transport, not a generic message-queue diagram.
+
+Preparation
+
+Drill the "reliability over UDP" pattern end to end: per-source sequence numbers, gap detection, bounded reorder buffer, dedup set, retransmit channel — and be able to draw it as one diagram.
+
+Prepare concrete numbers for market-data feeds (messages/sec per exchange, bytes/message) to anchor the buffer-sizing arithmetic.
+
+Practice the fan-out half: how Processors serve many downstream actors via pub/sub with a snapshot-plus-incremental-update model.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

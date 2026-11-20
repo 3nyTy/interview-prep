@@ -1,0 +1,62 @@
+===H1===
+Domain Score Accumulation (Reverse Trie)
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/domain-score-trie
+===BODY===
+Amazon
+CodingMembers
+Domain Score Accumulation (Reverse Trie)
+Coding round. Each domain (at any level) carries a score; the score of a leaf hostname is the sum of scores along its suffix hierarchy (e.g. `mail.domain.com = score(mail.domain.com) + score(domain.com) + score(com)`). Build a reverse trie keyed on the dotted labels read right-to-left and DFS / backtrack to accumulate each leaf's full hostname and summed score. Interviewers may insist the score live in a separate map rather than inside the trie node.
+SWE
+trie
+dfs
+backtracking
+string
+medium
+Frequency
+Single report
+Last asked
+2026-06-26
+Stage
+phone-screen
+Requirements
+
+Each domain string maps to an integer score. Domains are hierarchical by dot-separated labels (com, domain.com, mail.domain.com).
+
+The score of any leaf hostname is the sum of the scores of every domain on its suffix chain, from the full hostname up to the top-level label.
+
+Output the accumulated score for each leaf domain.
+
+Examples
+
+com                    20
+domain.com             10
+mail.domain.com         5
+test.com               10
+user.test.com          30
+contact.user.test.com  -5
+
+mail.domain.com        = 5  + 10 + 20 = 35
+contact.user.test.com  = -5 + 30 + 10 + 20 = 55
+
+Notes
+
+Build the trie on labels read right-to-left (com is the root child, then domain, then mail), so each path from root to a node spells a domain by its suffix hierarchy. Accumulate the running score down the path; a leaf node emits joined_labels plus the path sum.
+
+Scores can be negative — do not assume monotonic growth down the tree.
+
+A reported interviewer constraint: keep the per-domain score in a separate structure keyed by the node rather than as a field on the trie node itself. Ask up front where the score should live; reworking this mid-round is what cost one candidate the dry-run time.
+
+A flat hashmap (hostname → score) with suffix walking also works, but the interviewer here specifically steered toward the trie + DFS framing.
+
+Preparation
+
+Implement the reverse trie: split on ., insert reversed, store score in a side map, then DFS reconstructing the dotted hostname and summing along the path.
+
+Practice both layouts (score-in-node vs score-in-side-map) so an interviewer steering you to the second one does not cost you rewrite time.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

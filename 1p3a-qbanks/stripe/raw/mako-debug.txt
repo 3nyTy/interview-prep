@@ -1,0 +1,130 @@
+===H1===
+Mako Debug (Bug Bash)
+===URL===
+https://www.1point3acres.com/interview/problems/company/stripe/mako-debug
+===BODY===
+Stripe
+Coding·60 minFree preview
+Mako Debug (Bug Bash)
+Onsite debug round on the open-source Python Mako template engine. Candidates clone the repo, run failing tests, and locate/fix 2-3 bugs using an IDE debugger. Heavy emphasis on debugger fluency — print-based debugging usually loses signal.
+SWE
+MLE
+debugging
+code-reading
+hard
+Frequency
+High
+Last asked
+2026-06-30
+Stage
+onsite-coding
+Requirements
+
+You are given a local checkout of Mako (a Python templating library) — a debug-mako folder containing a version of the engine with hidden bugs. There are 3 broken tests; you must find, explain, and fix each one using the test suite.
+
+The round is timeboxed at 45–60 minutes: you download the code, work on your own machine, and share your screen while the interviewer watches. You must narrate your reasoning out loud the entire time — explaining your thoughts clearly is an explicitly graded dimension alongside finding the bugs.
+
+Mako's documentation is open during the round; the codebase is unfamiliar to most candidates so setting breakpoints, stepping, and reading the call graph is the core skill.
+
+Setup (Step 1 of the round — practice this before the interview):
+
+Open the debug-mako folder.
+
+Install deps: pip install -r bugsquash-requirements.txt.
+
+Run the full suite to see the big picture: python -m pytest test/ -v.
+
+Re-run a single failing test for clearer output, e.g. python -m pytest test/test_lookup.py::TestClass::test_name -v, then trace from entry point to the failure.
+
+Bugs commonly reported (different threads report different subsets):
+
+Missing check on whether a path argument is a folder vs a file before processing.
+
+A missing visit_* function so AST args are never written through to output.
+
+A ControlLine check that only filters comments where it should filter comments-only lines.
+
+A tag missing / template-compiler stretch bug in the last 10 minutes.
+
+Notes
+
+Multiple reports say signal is graded on debugger usage, not edits. Use a real IDE (PyCharm / VS Code) with breakpoints. One candidate's Python install was incompatible with the provided Mako repo and they fell back to print debugging — they were rejected even though they discussed fixes verbally.
+
+Interviewer usually provides almost no help during this round, by design.
+
+2/3 bugs solved is widely reported as a passing bar; one report had the interviewer stop them after bug 2 saying "good enough."
+
+Some candidates report the interviewer pressing them on whether their fix is the right fix vs a fix that makes the test pass — be ready to argue the change.
+
+Mako is the canonical open-source Python templating library maintained by the SQLAlchemy project. The codebase ships a standard pyproject.toml / tox.ini layout, so pip install -e .[testing] followed by pytest reproduces the round's test runner locally. The 1.3.x release stream is current; older 1.1.x clones can mask bugs that no longer exist in main, so pin the version the interviewer hands you.
+
+The starter checkout is typically delivered as a downloadable archive (e.g. a Google Drive link) rather than a live repo clone — download, unzip, then cd debug-mako before installing.
+
+Mako template constructs the bugs touch
+
+Mako compiles templates into Python for speed, so a planted bug usually breaks one of these surface constructs at a specific pipeline stage. Knowing what each construct should produce tells you what the failing test is really asserting:
+
+Embedded Python — <% ... %> runs arbitrary statements inside the template.
+
+Variable interpolation — ${variable} substitutes a value into the output (interpolation bugs surface in the AST visitor / codegen path).
+
+Template inheritance — <%inherit file="base.html"/> lets templates share a layout.
+
+Reusable components — <%def name="greeting(name)">…</%def> defines callable functions inside a template.
+
+Control flow — line-prefixed % for item in items: / % endfor and % if …: map to Python loops/conditionals (the ControlLine comment-filter bug lives here).
+
+Module layout to orient in fast
+
+The bugs sit across the standard Mako source tree; knowing the responsibility split saves time when a failing test points you at one stage of the pipeline:
+
+mako/
+├── template.py    # Main render entry point
+├── lexer.py       # Tokenizes template source
+├── codegen.py     # Turns parsed templates into Python code
+├── ast.py         # AST node definitions
+├── _ast_util.py   # AST mutation helpers
+├── lookup.py      # Finds/loads template files (folder-vs-file checks live here)
+├── parsetree.py   # Parse-tree node definitions (ControlLine etc.)
+├── pygen.py       # Generates Python source
+├── pyparser.py    # Parses Python expressions
+├── runtime.py     # Helpers used while the template runs
+├── filters.py     # Output filter functions
+├── cache.py       # Template caching system
+├── exceptions.py  # Custom error classes
+├── cmd.py         # Command-line entry points
+├── compat.py      # Python-version compatibility shims
+├── util.py        # General helpers
+
+test/
+├── test_template.py, test_lexer.py, test_lookup.py, test_ast.py, ...
+
+The reported bugs cluster in lookup.py (path folder-vs-file), the AST visitor code (ast.py / _ast_util.py, the missing visit_*), and parsetree.py / codegen.py (the ControlLine comment filter and the compiler stretch bug).
+
+Bug taxonomy to scan for
+
+Most planted bugs fall into a few shapes; pattern-matching against them speeds up the hunt:
+
+Wrong conditions — an if whose logic is inverted or off-by-one versus what it should test.
+
+Missing edge cases — code that breaks on unexpected input (e.g. a folder passed where a file is assumed).
+
+AST / parse-tree issues — a node not created, or a visitor method that never writes its node through.
+
+String / syntax errors — mishandled template text or token boundaries.
+
+Preparation
+
+Clone the official Mako repo and step through the AST / visitor code with a debugger before the interview; the mako/ast.py and mako/codegen.py modules are where most reported bugs live.
+
+Pre-install the same Python version + Mako repo locally, confirm pytest runs all tests, and confirm your IDE can hit breakpoints inside Mako's internals.
+
+Drill on reading unfamiliar Python by exploring an open-source library you've never touched: set a goal like "explain how requests.Session sends a redirect," trace it with a debugger.
+
+During the round, narrate your hypothesis before each step; interviewers want to hear the reasoning chain, not just the eventual diff.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

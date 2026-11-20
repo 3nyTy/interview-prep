@@ -1,0 +1,43 @@
+===H1===
+Timestamped Key-Value Store
+===URL===
+https://www.1point3acres.com/interview/problems/company/amazon/timestamped-key-value-store
+===BODY===
+Amazon
+CodingMembers
+Timestamped Key-Value Store
+Implement a store whose writes receive a timestamp, key, and value, and whose reads return the value at the largest timestamp for a key.
+SWE
+hashmap
+data-structure
+Frequency
+Single report
+Last asked
+2026-09-05
+Stage
+phone-screen
+Requirements
+
+Implement an object with a set operation accepting an external timestamp, a key, and a value.
+
+Implement get(key) to return the value associated with the maximum timestamp for that key.
+
+Notes
+
+Asked in a Resilient Hub phone screen after Ownership and challenge questions.
+
+Tie handling, missing-key behavior, and timestamp arrival order are unspecified; clarify them before coding.
+
+Keep a map from each key to its greatest timestamp and associated value. On set, replace the pair only when the incoming timestamp is greater; equal timestamps follow the agreed tie rule. Older writes must not overwrite newer values. Get returns the stored value using the agreed missing-key behavior. With a hash map, set and get take expected O(1) time and space is O(K) for K keys; historical versions are unnecessary for this read contract.
+
+Preparation
+
+Implement the map in 10 minutes and test writes that arrive out of timestamp order.
+
+Choose explicit tie and missing-key rules, then test equal timestamps and independent keys.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

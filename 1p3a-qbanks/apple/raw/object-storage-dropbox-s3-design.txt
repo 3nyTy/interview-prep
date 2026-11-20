@@ -1,0 +1,399 @@
+===H1===
+Object Storage / Dropbox / S3 Design
+===URL===
+https://www.1point3acres.com/interview/problems/company/apple/object-storage-dropbox-s3-design
+===BODY===
+Apple
+System Design·60 minMembers
+Object Storage / Dropbox / S3 Design
+A recurring storage-system design family covering Dropbox-style file sync, S3-style object storage, and storage-team fundamentals.
+SWE
+Infra Eng
+storage
+filesystem
+distributed-systems
+scaling
+medium
+Frequency
+Medium
+Last asked
+2026-08-05
+Stage
+phone-screen · onsite-system-design
+Problem Statement
+
+Design Dropbox: a file hosting and synchronization service. A user installs a client on their laptop, drops a file into a magic folder, and that file shows up on every other device tied to the same account within seconds. The system also supports sharing, version history, and concurrent offline edits.
+
+Focus the design on file-sync mechanics, block-level deduplication, and consistency for shared folders across devices.
+
+Phase 1: Requirements
+
+Functional Requirements
+
+Upload and download files up to several GB in size from desktop, mobile, or web clients.
+
+Sync across a user's devices within seconds of any change.
+
+Share files and folders with other users at read or read-write permission levels.
+
+Version history for a configured retention window so users can restore previous revisions.
+
+Concurrent offline edits preserve both versions through "conflicted copy" files when they collide.
+
+On a phone screen, keep the functional list to four or five bullets. Apple's object-storage team cares most about the bulk data path: upload, download, and sync. Lead there and mention sharing and version history as scope you can stretch into if time allows.
+
+Non-Functional Requirements
+
+Durability: 99.999999999% ("11 nines"). Losing customer files is not recoverable reputation-wise.
+
+Sync latency: p95 under 5 seconds from "saved on device A" to "visible on device B" for files under a few MB.
+
+Scale: hundreds of millions of users, hundreds of PB of stored bytes, millions of metadata ops per second.
+
+Availability: 99.99% on metadata and notification paths; 99.9% on the bulk transfer path.
+
+Bandwidth efficiency: a small edit to a large file must not re-upload the full file.
+
+The two properties that shape the whole design are block-level deduplication and incremental sync. Lead with those early: they are what lets you ship a 1 GB file after a 10 KB edit without uploading 1 GB, and an Apple interviewer will pull on that thread fast.
+
+Capacity Estimation
+
+Order-of-magnitude numbers that justify the architecture:
+
+MetricAssumption
+Total users500M, 100M DAU
+New/modified files per DAU per day50
+Daily change events5B, ~60K/sec average, ~500K/sec peak
+Average file size500 KB median, 10 MB mean (heavy tail from photos/videos)
+Daily new bytes, pre-dedup~2.5 PB/day at the median; ~50 PB/day is a loose upper bound if every event were an average-size file
+After block dedup + compression2x to 4x reduction depending on workload mix (media dedupes less, documents more)
+Metadata request ratedominated by idle sync clients (delta polls, cursor checks), not commit rate
+
+Note the asymmetry out loud. Metadata request rate is driven by idle sync clients (every online device polls or listens for changes). Byte throughput is driven only by real edits. The two planes scale on different shapes, not just different magnitudes, and that is why metadata and block storage are scaled, partitioned, and operated independently. Treat the numbers above as order-of-magnitude anchors, not forecasts.
+
+Phase 2: Data Model
+
+Core Entities
+
+User
+├── user_id
+├── email
+└── created_at
+
+Device
+├── device_id
+├── user_id
+├── platform              desktop | ios | android | web
+└── last_seen_at
+
+Namespace                  a root folder (personal or shared)
+├── namespace_id
+├── owner_user_id
+└── shared                 boolean
+
+File
+├── file_id
+├── namespace_id
+├── parent_path
+├── name
+├── current_revision_id
+└── is_deleted
+
+FileRevision
+├── revision_id
+├── file_id
+├── size_bytes
+├── content_hash          SHA-256 of full file
+├── block_manifest        ordered list of block hashes
+├── modified_by_device_id
+└── created_at
+
+Block                      content-addressed, globally deduped
+├── block_hash            SHA-256 of block bytes, PK
+├── size_bytes
+├── storage_ref           pointer into blob store
+└── refcount              number of revisions referring to this block
+
+Share
+├── share_id
+├── namespace_id
+├── path
+├── shared_with_user_id
+└── permission            read | write
+
+SyncCursor                 PK is (device_id, namespace_id)
+├── device_id
+├── namespace_id
+└── last_delta_seq        monotonic per-namespace change counter
+
+Storage Choices
+
+DataStoreWhy
+File and namespace metadataSharded SQL (by user/namespace)Strongly consistent per user; small rows; join-friendly
+Per-namespace change logAppend-only log (Kafka or a log-structured table)Monotonic sequence drives sync cursors
+Block bytesContent-addressed blob store (S3-like)Immutable by key, horizontally infinite, cheap
+Hot/popular blocksCDN edge cacheShared links and re-downloads served near users
+Device push stateIn-memory notification gatewayMillions of idle WebSocket connections
+
+The metadata/blob split is the central architectural choice. Metadata is transactional and relational and sharded by user. Block bytes are immutable and global. They scale on completely different curves.
+
+Block Size
+
+4 MB is the typical Dropbox choice. Smaller blocks (256 KB) give finer dedup but more metadata rows per file. Larger blocks (16 MB) cheapen metadata but waste bandwidth on small edits. 4 MB balances office-document and media workloads.
+
+Phase 3: API Design
+
+Upload: Missing-Blocks Check, then Commit
+
+POST /v1/blocks/missing
+Body: { "block_hashes": ["sha256:aaa...", "sha256:bbb...", "sha256:ccc..."] }
+Response: { "missing": ["sha256:ccc..."] }
+
+PUT /v1/blocks/sha256:ccc...
+Body: <raw block bytes>
+Response: 201 Created
+
+POST /v1/files/commit_batch
+Body:
+{
+  "namespace_id": 123,
+  "path": "/projects/report.docx",
+  "block_manifest": ["sha256:aaa...", "sha256:bbb...", "sha256:ccc..."],
+  "size_bytes": 9500000,
+  "parent_revision_id": "rev-abc",
+  "client_modified_at": "2026-04-21T12:00:00Z"
+}
+
+Content-addressed blocks plus a separate "missing check" API are the core of bandwidth efficiency. An unchanged block is referenced by hash, not re-uploaded. The same mechanism dedupes across users when the same file is shared: everyone sends the same hash.
+
+Download
+
+GET /v1/files/{file_id}?revision_id=...
+Response: { "block_manifest": [...], "size_bytes": ... }
+
+GET /v1/blocks/{block_hash}
+Response: raw bytes, served from CDN when possible (blocks are immutable by hash)
+
+Sync Delta and Push
+
+POST /v1/sync/list_delta
+Body: { "namespace_id": 123, "cursor": "seq:9817234" }
+Response:
+{
+  "changes": [
+    { "type": "add",    "path": "/a.txt", "revision_id": "..." },
+    { "type": "modify", "path": "/b.txt", "revision_id": "..." },
+    { "type": "delete", "path": "/old/c.txt" }
+  ],
+  "cursor": "seq:9817301"
+}
+
+WS /v1/sync/listen?cursor=...
+Server pushes: { "namespace_id": 123, "latest_seq": 9817301 }
+
+Do not push file contents over the WebSocket. The notification carries only a cursor ("namespace 123 is now at sequence 9_817_301"). The client decides what to fetch. This keeps the push channel cheap and lets the block plane scale independently.
+
+Sharing
+
+POST /v1/sharing/invite
+Body: { "path": "/projects/report.docx", "invitee_email": "a@b.com", "permission": "write" }
+
+Phase 4: High-Level Design
+
+Architecture
+
+Write Flow (Desktop Sync Engine)
+
+Local watcher detects a changed file. The sync engine splits the file into 4 MB blocks and hashes each with SHA-256.
+
+Engine computes the diff against the previous revision: a list of block hashes, some known, some new.
+
+Engine calls blocks/missing and uploads only the missing ones via PUT /v1/blocks/{hash}, running 4 to 8 in parallel.
+
+After all new blocks are durable, engine calls files/commit_batch with the full manifest and the parent revision ID (optimistic concurrency).
+
+Metadata service writes a new FileRevision, updates the pointer on File, bumps the per-namespace DeltaLog sequence, and enqueues refcount deltas for each referenced hash (see GC section on why refcount updates are batched rather than transactional).
+
+Metadata service publishes a notification (namespace + new seq) to the notification gateway.
+
+Read + Push Flow
+
+Every online device holds an idle WebSocket connection to the notification gateway, registered with its last-known cursor per namespace.
+
+When DeltaLog ticks, the gateway pushes a small "new seq available" message to every subscriber of that namespace.
+
+Client calls sync/list_delta with its cursor and receives only changed paths.
+
+For each changed path, client fetches the blocks it does not already have via GET /v1/blocks/{hash}, served by the CDN when possible. Blocks are immutable by hash, so CDN entries can carry very long TTLs and evict purely on capacity, not on invalidation.
+
+Client reassembles the file, persists it, and advances its cursor.
+
+Conflict Resolution
+
+Dropbox uses optimistic concurrency with conflicted copies:
+
+Every commit carries parent_revision_id. If that is no longer current server-side, the commit fails with a conflict.
+
+The losing client re-commits its local revision under a derived name such as report (Alice's conflicted copy 2026-04-21).docx. The server materializes this as a real entry in the namespace (new File row, new FileRevision, new DeltaLog sequence), so every device converges to seeing both files.
+
+Both users see both versions in their normal sync views and merge manually. Nothing is lost.
+
+Do not reach for CRDTs or OT on this problem. Dropbox files are opaque bytes (Word docs, photos, zip archives). Character-level merging only applies to a collaborative editor like Docs. For an opaque-file sync service, "last writer wins plus conflicted copy" is the correct model.
+
+Sharing a Large Folder Is O(1)
+
+Because all existing revisions already reference content-addressed blocks, sharing a 50 GB folder with a coworker costs a single Share row write: no bytes re-upload, no new refcounts, no per-file work. This is a nice moment in the interview to highlight why the content-addressed block design is the right primitive for this product.
+
+Phase 5: Scaling and Trade-offs
+
+Scaling Each Layer
+
+LayerBottleneckFix
+Metadata DBPer-user write hot keysShard by user; within a shard, partition by namespace. Throttle abusive clients per user
+DeltaLogSingle writer per namespaceAppend-only log per namespace. Very large shared folders get explicit fan-out caps
+Notification gatewayMillions of idle TCP connectionsEdge gateways close to users, each holding ~1M connections. Pub/sub bus carries new-seq events
+Block serviceUpload throughputStateless, horizontally scale. Route by block-hash prefix to distribute load
+Block storeStorage cost, tail latency on large GETsMulti-region replication for hot blocks, erasure coding for cold, CDN for popular blocks
+CDNCache-miss storm on viral shareTwo-tier cache (edge + origin shield) to absorb thundering herd
+
+Reducing Sync Latency
+
+Parallel block uploads (4 to 8 at a time) saturate most consumer links.
+
+Nearest-region upload routing via DNS or a signed upload-host endpoint. Blocks are durably persisted in at least one region before commit; cross-region replication for locality and DR happens asynchronously afterwards.
+
+Fast-path push. Notification gateway is fed directly from the metadata commit path through a pub/sub bus. Server-side hop from commit to push is sub-millisecond; per-device delivery is bounded by each subscriber's WebSocket RTT.
+
+Decouple block path from metadata path. A slow block upload must not delay another user's delta list. Independent service pools and separate SLOs.
+
+The interviewer will often ask "what is the end-to-end latency budget from save to peer seeing the change?" Break it down explicitly: one missing-blocks check, N parallel block PUTs, one commit, one push, one delta list, N parallel block GETs. Anything beyond that is wasted round-trips.
+
+Block Garbage Collection
+
+Because blocks are deduped, a block lives as long as any revision references it. Reference-count carefully:
+
+On commit, enqueue increments for every hash in the manifest. Hot templates (empty-file hash, common boilerplate) would otherwise drive heavy write amplification, so refcount deltas are batched and applied asynchronously rather than transactionally with the metadata commit.
+
+On revision deletion (user deletes a file or version-history retention expires), enqueue decrements for each referenced hash.
+
+A background sweeper deletes blocks with refcount = 0 older than a grace period.
+
+The manifest set is the source of truth. A periodic full recount over the manifest table reconciles incremental refcounts and catches drift. Incremental refcount is an advisory index, not the ground truth.
+
+Getting refcount wrong is how you lose customer data. Always decrement after the deletion is durable, always use a grace period, and always run a periodic full recount from the manifest as a safety net.
+
+Trade-offs Worth Naming
+
+Metadata consistency: strong within region, async replication across regions. Cross-region strong consistency is too expensive for sync latency.
+
+Conflict model: last-writer-wins plus conflicted copy. CRDTs are the wrong tool for opaque files.
+
+Sync delivery: WebSocket push with client polling as fallback when the gateway is unreachable.
+
+Dedup scope: global across users for the storage win. Authorization stays per-user through signed block tokens tied to a specific manifest. The known side channel is the dedup confirmation oracle (an attacker who has a file can probe blocks/missing to learn if anyone stores it). Mitigate with proof-of-possession on dedup hits, or scope dedup per-namespace for sensitive tiers.
+
+Block size: 4 MB. Bigger hurts small edits; smaller bloats metadata.
+
+Availability and Fault Tolerance
+
+Metadata plane fails independently of the block plane. If block storage is degraded, the client still gets its list of changes; only the bytes lag.
+
+Notification gateway outage degrades gracefully to client-side polling every few seconds.
+
+Block store uses multi-AZ erasure coding + checksums + background scrubbers to hit 11-nines durability.
+
+Deep Dives
+
+Why content-addressed blocks?
+
+Storing a file as a single opaque object means a 10 KB edit on a 1 GB file forces a full re-upload and a full new copy. Content-addressed blocks give you:
+
+Delta uploads. Only changed blocks move.
+
+Cross-user dedup. Duplicate content (forwarded attachments, shared templates) costs one copy fleet-wide.
+
+Range reads. Preview the first page of a 500 MB PDF without downloading all 500 MB.
+
+The price is more metadata rows and more small GETs. For this workload, that price is well worth paying.
+
+Why WebSocket push instead of polling?
+
+At 500K peak commits per second globally, a naive 5-second poll from 100M DAU would swamp metadata with tens of millions of "is there anything new" calls per second, the vast majority returning empty. WebSocket keeps idle clients cheap: one TCP connection plus an entry in a subscription map. The server only does work when there actually is a change.
+
+Why shard metadata by namespace, not by file?
+
+Each commit must atomically write a new FileRevision, bump the per-namespace DeltaLog sequence, and enqueue refcount deltas. If metadata for one namespace is scattered across shards, every commit becomes a distributed transaction. Sharding by namespace (or by user, with shared namespaces treated as their own shard-owners) keeps the commit path single-shard and cursor semantics clean.
+
+Common Pitfalls
+
+Treating the notification channel as the data channel. Push carries cursors, not bytes. Sending file content over WebSocket couples delivery to connection health and blocks the block plane from scaling independently.
+
+Sharding metadata globally instead of per-namespace. Every commit becomes a cross-shard transaction, and cursor semantics break. Shard by namespace (or by user with shared namespaces as their own shards) so the commit path stays single-shard.
+
+Forgetting block garbage collection. Refcounting is easy to implement wrong and silent to break. Always include a background periodic recount from manifests.
+
+Hand-waving conflict resolution. This is a favorite probe. Be specific: optimistic concurrency via parent_revision_id, conflicted-copy files on failure, no server-side merging of opaque bytes.
+
+Promising real-time collaborative editing. That is Google Docs, not Dropbox. For file sync, "seconds, not millis, with last-writer-wins" is the correct promise.
+
+Interview Checklist
+
+Requirements
+
+  Stated upload, download, sync, share, versioning as the core functional set
+
+  Named 11-nines durability and 5-second sync latency as the pivotal NFRs
+
+  Back-of-envelope: PB/day ingest, and the insight that metadata request rate is driven by idle clients while byte throughput is driven by real edits
+
+Data Model
+
+  User, Namespace, File, FileRevision, Block (content-addressed), Share, SyncCursor
+
+  Explained metadata/blob separation
+
+API Design
+
+  blocks/missing + block PUT + commit_batch for upload
+
+  Cursor-based sync/list_delta + WebSocket push
+
+  Sharing invite endpoint
+
+High-Level Design
+
+  Drew metadata plane, block plane, notification gateway, CDN
+
+  Walked through write flow, read flow, conflict resolution
+
+  Showed how sharing a 50 GB folder is a single metadata write, because existing revisions already reference the content-addressed blocks
+
+Scaling and Trade-offs
+
+  Per-layer bottleneck + fix
+
+  Sync-latency reduction techniques
+
+  Block refcount GC and its failure modes
+
+  Explicit trade-offs on consistency, conflicts, block size
+
+Summary
+
+ConcernDecision
+Storage modelContent-addressed blocks (SHA-256), 4 MB default
+MetadataSharded SQL by user/namespace, strongly consistent per shard
+Sync mechanismMonotonic per-namespace delta log + WebSocket push + delta list
+Upload path"Missing blocks?" check, parallel block PUTs, commit with parent revision for optimistic concurrency
+Download pathManifest fetch, parallel block GETs, CDN-accelerated
+Conflict modelLast-writer-wins with conflicted-copy files
+SharingShare rows on namespaces; existing revisions already reference the blocks, so granting access is a single metadata write and costs no bytes
+DurabilityMulti-AZ erasure coding + checksums + scrub/repair
+Global strategyStrong consistency in-region, async cross-region replication
+
+The defining properties of this design: metadata and bytes scale independently, blocks are content-addressed and globally deduped, and the push channel carries cursors not data. Everything else follows from those three choices.
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...

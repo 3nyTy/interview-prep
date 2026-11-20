@@ -1,0 +1,88 @@
+===H1===
+Online Banking Application (System Design)
+===URL===
+https://www.1point3acres.com/interview/problems/company/capitalone/online-banking-application
+===BODY===
+Capital One
+System Design·60 minMembers
+Online Banking Application (System Design)
+The default Power Day system design prompt. Design Capital One's online banking app — multi-account types (Checking, Savings, Mortgage, Auto Loan), money movement (deposit, withdraw, transfer, Zelle), statistics (daily / weekly / monthly), and the third-party / fraud / auth integration surface.
+SWE
+system-design
+payment
+transactions
+idempotency
+schema-design
+persistence
+distributed-systems
+Frequency
+Medium
+Last asked
+2026-01-17
+Stage
+onsite-system-design
+Requirements
+
+Customer-facing features:
+
+Open / close accounts of multiple types: 360 Checking, 360 Savings, Mortgage, Auto Loan.
+
+User authentication and per-account authorisation (joint accounts, beneficiary access).
+
+Deposit and withdraw operations against an account.
+
+Transfer between two Capital One accounts (intra-bank).
+
+External money movement: Zelle, ACH, wire — discuss at least one.
+
+Per-account statistics: daily / weekly / monthly totals and balances.
+
+Cross-cutting:
+
+Fraud detection on outbound transactions (accept / hold / decline).
+
+Authorisation pipeline (auth → capture for card-flavored variants).
+
+Audit and regulatory reporting.
+
+Senior variants extend with cross-region replication, multi-currency exchange, and reconciliation flows.
+
+Notes
+
+Data model is the load-bearing decision in this round. The canonical split is:
+
+accounts (account id, type, owner, status, current balance — a cached materialised view of the ledger).
+
+ledger / transactions (append-only entries with double-entry pairs: every transfer writes two rows, one debit and one credit). The ledger is the source of truth; accounts.balance is recomputable from it.
+
+users, auth, account_authorizations (separate join table for joint / shared access).
+
+Money movement must be exactly-once and atomic. The canonical pattern is: write a single ledger entry pair inside one transaction, then update the materialised balances; reads of the balance go through a small cache. Avoid two-phase commit across services — use a transactional outbox in the same database, then publish to downstream (fraud, notifications) via change-data-capture.
+
+Idempotency: every client request carries a client-generated idempotency key; the ledger insert is unique on that key. Retries collapse to a single ledger entry. This is the single most important property to call out in this round.
+
+Fraud is async, not inline. The standard skeleton is: synchronous transaction write goes through with a PENDING_REVIEW status if the fraud score crosses a threshold; an async worker reads the outbox, calls the fraud service, and either promotes to COMPLETED or moves to DECLINED. Calling fraud inline blocks the user response and creates a brittle synchronous dependency.
+
+Statistics (daily / weekly / monthly totals) are derived. For the typical scale, an OLAP rollup table updated nightly from the ledger is sufficient; for senior loops, mention CDC-driven streaming aggregation into a column store.
+
+For Zelle, the relevant detail is that Zelle is a separate clearing network — the design has a Zelle adapter service that translates Capital One ledger entries into Zelle settlement messages and reconciles asynchronously. Do not try to design Zelle as if it were intra-bank.
+
+For the senior cross-region variant: every region has its own ledger shard partitioned by account id; cross-region transfers go through a coordination service using saga semantics (debit-src locally, message dst region, credit-dst on receipt, compensate on failure). Strong consistency within a region; eventual across regions with reconciliation jobs.
+
+Common failure modes in this round: jumping straight to microservices before discussing the ledger model; making fraud synchronous; missing idempotency on transfer; treating account balance as authoritative instead of derived; designing Zelle as an internal feature.
+
+Preparation
+
+Practise the ledger-first walk: data model → idempotent write path → balance materialisation → async fraud → statistics rollup. The 45-minute version of this round runs about 8-10 minutes per stage with light interviewer questions in between.
+
+Prepare the fraud-async story explicitly — pending status, outbox, threshold-based promotion. Most candidates handwave this and lose points.
+
+For the senior variant, drill the saga pattern on a cross-region transfer; specifically the compensation path (debit succeeded, credit failed → write a reversing entry, do not just "undo").
+
+Memorise the canonical money-movement contract: "transfer is committed when both ledger entries are durable in one transaction; everything downstream is async". Repeating this sentence twice during the round signals depth.
+
+Was this article helpful?
+Comments
+Post
+Posting as coolanimesh14
+Loading...
