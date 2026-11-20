@@ -1,0 +1,339 @@
+Dependency Version Check
+Coding
+Phone, Onsite
+Machine Learning Engineer
+Reported Apr, 2026
+Medium Frequency
+Problem Overview
+You are building a system to identify the earliest version of a software dependency that supports a specific feature. The problem involves version parsing, binary search optimization, and adapting to edge cases discovered through test data analysis. This question tests your ability to handle version comparison, optimize API calls under rate-limiting constraints, and refine assumptions based on observed patterns.
+
+Part 1: Find Earliest Supporting Version
+Problem Statement
+You are given a list of dependency versions (e.g., ["103.003.02", "103.003.03", "203.003.02"]). Each version may or may not support a specific feature. You have access to an API isSupported(version: str) -> bool that checks if a version supports the feature.
+
+Task: Find the earliest version that supports the current feature. 
+
+Requirements
+Version format: {major}.{minor}.{patch} (e.g., "103.003.02" has major=103, minor=3, patch=2)
+Versions are provided in lexicographic order but not necessarily chronological order
+You need to properly parse and compare versions
+Handle edge cases where versions may not follow strict incrementing patterns
+Example
+versions = ["1.0.1", "1.0.2", "1.1.0", "2.0.0", "2.0.1"]
+
+# Assume isSupported() returns:
+# "1.0.1" -> False
+# "1.0.2" -> False
+# "1.1.0" -> True
+# "2.0.0" -> True
+# "2.0.1" -> True
+
+# Expected output: "1.1.0" (earliest supporting version)
+
+Initial Implementation Approach
+def parse_version(version: str) -> tuple:
+    """
+    Parse version string into comparable tuple.
+    "103.003.02" -> (103, 3, 2)
+    """
+    parts = version.split('.')
+    return tuple(int(part) for part in parts)
+
+def find_earliest_supported_version(versions: list[str]) -> str | None:
+    """
+    Find earliest version that supports the feature.
+    Local time: O(N log N) for sorting
+    API calls: O(K), worst-case O(N), where K is the number of versions
+        checked before the first supporting version in chronological order.
+    """
+    # Sort versions chronologically
+    sorted_versions = sorted(versions, key=parse_version)
+
+    for version in sorted_versions:
+        if isSupported(version):
+            return version
+
+    return None  # No supporting version found
+
+Test Your Understanding
+# Test case 1: Simple linear support
+versions1 = ["1.0.0", "1.0.1", "1.0.2"]
+# 1.0.0 -> False, 1.0.1 -> True, 1.0.2 -> True
+# Expected: "1.0.1"
+
+# Test case 2: Non-contiguous support
+versions2 = ["1.0.0", "1.0.1", "1.0.2", "1.0.3"]
+# 1.0.0 -> False, 1.0.1 -> False, 1.0.2 -> True, 1.0.3 -> True
+# Expected: "1.0.2"
+
+Part 2: Handle Non-Monotonic Support Patterns
+The Hidden Requirement
+After running several test cases, you discover that version support is NOT monotonic. A version may support a feature while the next version does not!
+
+Example of Non-Monotonic Support
+versions = ["103.003.02", "103.003.03", "103.003.04"]
+
+# Actual behavior:
+# "103.003.02" -> True   ✓ supports
+# "103.003.03" -> False  ✗ does not support
+# "103.003.04" -> True   ✓ supports again
+
+Why? Versions may:
+
+Introduce regressions
+Have feature flags toggled differently
+Represent different release branches
+Updated Requirements
+Support is NOT guaranteed to be monotonic (can regress)
+However, there's a guarantee: If a version supports a feature, eventually some later version will also support it
+You must find the absolute earliest supporting version, even if later versions don't support it
+Revised Implementation
+def find_earliest_with_regressions(versions: list[str]) -> str | None:
+    """
+    Find earliest supporting version when support can regress.
+    Local time: O(N log N) for sorting
+    API calls: O(K), worst-case O(N), where K is the number of versions
+        checked before the first supporting version in chronological order.
+    """
+    sorted_versions = sorted(versions, key=parse_version)
+
+    for version in sorted_versions:
+        if isSupported(version):
+            return version
+
+    return None
+
+Once the versions are sorted chronologically, the first supported version you encounter is the absolute earliest supported version. Non-monotonicity means you cannot use a later False result to eliminate a whole range, so binary search is invalid. It does not mean you must continue checking versions after you already found the first True. 
+
+The full sort is still needed because the input order is lexicographic and may not match chronological version order. Sorting is local work and does not consume isSupported() API calls.
+
+The "eventually some later version will also support it" guarantee does not change this baseline algorithm. It may help in follow-up discussions about structure, but it does not require checking past the earliest True.
+
+If your Part 1 solution already used a sorted linear scan, the hidden requirement does not change the correctness of the implementation. It changes which optimizations are safe: binary search is no longer valid unless the interviewer gives you a stronger monotonicity guarantee. 
+
+Key Insights from Test Data
+You need to analyze test cases by printing results and observing patterns. For example:
+
+def analyze_pattern(versions: list[str]) -> None:
+    """Print support pattern to discover hidden rules"""
+    sorted_versions = sorted(versions, key=parse_version)
+
+    print("Version          | Supported")
+    print("-" * 35)
+    for v in sorted_versions:
+        supported = isSupported(v)
+        print(f"{v:15} | {supported}")
+
+Discover and confirm assumptions with the interviewer:
+
+Can support regress within patch versions?
+Can support regress within minor versions?
+What patterns exist across major versions?
+Part 3: Optimized Solution with API Rate Limiting
+New Constraint: API Rate Limiting
+The interviewer reveals: The isSupported() API is rate-limited. You cannot make O(N) calls. 
+
+Your task: Find the earliest supporting version with sub-linear API calls (better than O(N)).
+
+Key Discussion: Is Support Monotonic?
+After the rate-limiting constraint is introduced, the natural optimization is binary search. But binary search requires a monotonic predicate — and Part 2 showed that support can regress.
+
+This is a critical discussion point with the interviewer. Ask whether the non-monotonicity from Part 2 still applies. The answer determines the approach: 
+
+Monotonic → Approach A (flat binary search) — this is the most common interview path
+Non-monotonic with group-level structure → Approach B (hierarchical search)
+Fully non-monotonic with no exploitable structure → linear scan is unavoidable in the worst case; discuss this tradeoff with the interviewer
+Approach A: Flat Binary Search (Monotonic Support)
+The interviewer may clarify that support is monotonic when versions are properly sorted — once a version supports the feature, all later versions also support it. Part 2's regressions were an edge case or no longer apply.
+
+With monotonic support, a standard binary search across all sorted versions is optimal:
+
+def find_earliest_optimized(versions: list[str]) -> str | None:
+    """
+    Find earliest supporting version using O(log N) API calls.
+    Requires: support is monotonic across sorted versions.
+    """
+    sorted_versions = sorted(versions, key=parse_version)
+
+    left, right = 0, len(sorted_versions) - 1
+    result = None
+
+    while left <= right:
+        mid = (left + right) // 2
+        if isSupported(sorted_versions[mid]):
+            result = sorted_versions[mid]
+            right = mid - 1  # Keep searching left for earlier version
+        else:
+            left = mid + 1
+
+    return result
+
+API Calls: O(log N) — one call per binary search step. 
+
+Why not a hierarchical binary search by major/minor/patch? If support is monotonic at every level of the version hierarchy, it's monotonic globally — a flat 1D binary search is simpler and achieves the same O(log N) calls. There's no benefit to searching each level separately.
+
+Approach B: Group-Level Binary Search (Non-Monotonic Support)
+If the interviewer keeps Part 2's non-monotonic behavior, a flat binary search is invalid — a regression means isSupported(mid) == False doesn't guarantee all earlier versions are also unsupported.
+
+Ask about group-level structure. The interviewer may reveal a pattern you can discover by printing the support status of the latest version in each major group: 
+
+Major 1 latest (1.6.1):  False
+Major 2 latest (2.1.1):  True
+Major 3 latest (3.0.1):  True   ← monotonic from here
+
+If this holds, two properties let you binary search on group representatives:
+
+Representative: If any version in a major group supports the feature, then the latest version in that group also supports it. This lets you use the latest as a proxy — if the latest is False, you can safely skip the entire group.
+Monotonic: The latest-per-major sequence is monotonic — once True, all later groups' latest versions are also True.
+The same properties hold for minor groups within a major. Without the representative property, the algorithm would incorrectly skip groups that contain early supporting versions whose latest happens to be unsupported.
+
+Strategy: Binary search on group representatives + linear scan within the target group. 
+
+Find the latest version in each major group → binary search these representatives
+Within the target major, find the latest version in each minor group → binary search these
+Within the target minor, linear scan through patches (patches can regress per Part 2, so binary search is not valid here)
+from collections import defaultdict
+
+
+def find_earliest_group_search(versions: list[str]) -> str | None:
+    """
+    Find earliest supporting version when support is non-monotonic
+    but the latest version per group is monotonic.
+
+    API calls: O(log M + log Mi + P)
+        M  = distinct major versions
+        Mi = distinct minors in the target major
+        P  = patches in the target minor group
+    """
+    parsed = [(parse_version(v), v) for v in versions]
+    parsed.sort()
+
+    # --- Major-level binary search ---
+    major_groups = defaultdict(list)
+    for vt, vs in parsed:
+        major_groups[vt[0]].append((vt, vs))
+
+    sorted_majors = sorted(major_groups.keys())
+    latest_per_major = [major_groups[m][-1] for m in sorted_majors]
+
+    major_idx = _binary_search_first_true(
+        len(latest_per_major),
+        lambda i: isSupported(latest_per_major[i][1]),
+    )
+    if major_idx is None:
+        return None
+
+    # --- Minor-level binary search within target major ---
+    target_major = sorted_majors[major_idx]
+    minor_groups = defaultdict(list)
+    for vt, vs in major_groups[target_major]:
+        minor_groups[vt[1]].append((vt, vs))
+
+    sorted_minors = sorted(minor_groups.keys())
+    latest_per_minor = [minor_groups[m][-1] for m in sorted_minors]
+
+    minor_idx = _binary_search_first_true(
+        len(latest_per_minor),
+        lambda i: isSupported(latest_per_minor[i][1]),
+    )
+    if minor_idx is None:
+        return None
+
+    # --- Linear scan within target minor (patches can regress) ---
+    target_minor = sorted_minors[minor_idx]
+    for _vt, vs in minor_groups[target_minor]:
+        if isSupported(vs):
+            return vs
+
+    return None
+
+
+def _binary_search_first_true(n: int, predicate) -> int | None:
+    """Find the smallest index in [0, n) where predicate returns True."""
+    left, right = 0, n - 1
+    result = None
+    while left <= right:
+        mid = (left + right) // 2
+        if predicate(mid):
+            result = mid
+            right = mid - 1
+        else:
+            left = mid + 1
+    return result
+
+Important: The final step uses a linear scan, not binary search, because Part 2 showed patches can regress. If you binary search at every level (major, minor, and patch), you're implicitly assuming global monotonicity — in which case the flat binary search from Approach A is simpler.
+
+Complexity Analysis
+Approach	Assumption	API Calls
+Flat binary search (A)	Support is globally monotonic	O(log N)
+Group-level search (B)	Only latest-per-group is monotonic	O(log M + log Mi + P)
+Time: O(N log N) for sorting + O(N) for grouping + search cost above
+Space: O(N) for storing grouped versions
+In most interviews, Approach A is the expected answer. Approach B demonstrates deeper analysis and is worth discussing if the interviewer specifically pushes on non-monotonicity with a rate-limiting constraint.
+
+Example Walkthrough (Flat Binary Search)
+versions = [
+    "1.5.0", "1.5.1", "1.5.2",
+    "1.6.0", "1.6.1",
+    "2.0.0", "2.0.1", "2.0.2",
+    "2.1.0", "2.1.1",
+    "3.0.0", "3.0.1"
+]
+
+# Support pattern (monotonic):
+# 1.5.0 → False, ..., 1.6.1 → False
+# 2.0.0 → False, ..., 2.0.2 → False
+# 2.1.0 → True,  2.1.1 → True
+# 3.0.0 → True,  3.0.1 → True
+
+# Binary search on 12 sorted versions:
+# Check index 5  ("2.0.0") → False → search right
+# Check index 8  ("2.1.0") → True  → record, search left
+# Check index 6  ("2.0.1") → False → search right
+# Check index 7  ("2.0.2") → False → done
+# Result: "2.1.0"
+# Total API calls: 4 (vs 12 for linear scan)
+
+Edge Cases and Testing
+Test Cases
+def test_monotonic_support():
+    """Simple case where support is monotonic"""
+    versions = ["1.0.0", "1.0.1", "1.0.2", "2.0.0"]
+    # 1.0.0, 1.0.1 -> False
+    # 1.0.2, 2.0.0 -> True
+    # Expected: "1.0.2"
+
+def test_non_monotonic_support():
+    """Support regresses then returns"""
+    versions = ["1.0.0", "1.0.1", "1.0.2", "1.0.3"]
+    # 1.0.0 -> False
+    # 1.0.1 -> True
+    # 1.0.2 -> False (regression!)
+    # 1.0.3 -> True
+    # Expected: "1.0.1" (earliest)
+
+def test_sparse_versions():
+    """Large gaps between version numbers"""
+    versions = ["1.0.0", "5.0.0", "10.0.0"]
+    # 1.0.0 -> False
+    # 5.0.0 -> True
+    # Expected: "5.0.0"
+
+def test_all_unsupported():
+    """No version supports the feature"""
+    versions = ["1.0.0", "2.0.0", "3.0.0"]
+    # All -> False
+    # Expected: None
+
+def test_complex_version_numbers():
+    """Version numbers with leading zeros"""
+    versions = ["103.003.02", "103.003.03", "103.010.01"]
+    # Ensure parsing handles leading zeros correctly
+
+Follow-up Questions
+What if versions don't follow semantic versioning? (e.g., "v2.1-beta", "2.1rc1")
+How would you cache API results to avoid redundant calls?
+What if the API can fail or timeout? How would you handle retries?
+Can you parallelize API calls to reduce wall-clock time?
+How would you extend this to find all supporting versions, not just the earliest?
+What if there are millions of versions? Would you need to change your approach?

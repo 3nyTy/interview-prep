@@ -1,0 +1,372 @@
+Social Network with Snapshots
+Coding
+Phone, Onsite
+Software Engineer, Machine Learning Engineer
+Reported Jun, 2026
+Medium Frequency
+Problem Overview
+Design and implement a social network that supports user management, follow relationships, and point-in-time snapshots. The system allows users to follow each other, capture the state of the network at any moment, and query historical snapshots for relationship data and friend recommendations.
+
+You'll build this incrementally across three parts, with each part adding new functionality.
+
+Part 1: Users, Follows & Snapshots
+Problem Statement
+Implement a SocialNetwork class that manages users, follow relationships, and immutable snapshots. Each snapshot captures the current state of all follow relationships at the time it was created. 
+
+class SocialNetwork:
+    def __init__(self):
+        """Initialize an empty social network."""
+        pass
+
+    def add_user(self, user_id: str) -> None:
+        """
+        Add a user to the network.
+
+        Args:
+            user_id: Unique identifier for the user (e.g., "A", "Alice")
+
+        Raises:
+            ValueError: If the user already exists.
+        """
+        pass
+
+    def follow(self, follower: str, followee: str) -> None:
+        """
+        Make `follower` follow `followee`.
+
+        Args:
+            follower: The user who wants to follow
+            followee: The user to be followed
+
+        Raises:
+            ValueError: If either user does not exist.
+
+        Notes:
+            - A user cannot follow themselves.
+            - If the follow relationship already exists, this is a no-op.
+        """
+        pass
+
+    def create_snapshot(self) -> 'Snapshot':
+        """
+        Create an immutable snapshot of the current state of the network.
+
+        Returns:
+            A Snapshot object capturing all current follow relationships.
+
+        Notes:
+            - Future changes to the network must NOT affect existing snapshots.
+        """
+        pass
+
+
+class Snapshot:
+    def is_following(self, follower: str, followee: str) -> bool:
+        """
+        Check if `follower` is following `followee` in this snapshot.
+
+        Returns:
+            True if the follow relationship exists, False otherwise.
+        """
+        pass
+
+Example Usage
+network = SocialNetwork()
+
+network.add_user("A")
+network.add_user("B")
+network.add_user("C")
+
+network.follow("A", "B")
+network.follow("B", "C")
+
+snapshot1 = network.create_snapshot()
+
+assert snapshot1.is_following("A", "B") == True
+assert snapshot1.is_following("B", "C") == True
+assert snapshot1.is_following("A", "C") == False   # A does not follow C
+assert snapshot1.is_following("B", "A") == False   # B does not follow A (not mutual)
+
+# New follows after snapshot1 should NOT appear in snapshot1
+network.follow("A", "C")
+assert snapshot1.is_following("A", "C") == False   # snapshot1 is immutable
+
+snapshot2 = network.create_snapshot()
+assert snapshot2.is_following("A", "C") == True    # snapshot2 has the new follow
+
+Part 1 Solution
+class Snapshot:
+    def __init__(self, follows: dict[str, set[str]]):
+        # Deep copy ensures immutability
+        self._follows = {user: set(followees) for user, followees in follows.items()}
+
+    def is_following(self, follower: str, followee: str) -> bool:
+        return followee in self._follows.get(follower, set())
+
+
+class SocialNetwork:
+    def __init__(self):
+        self.users = set()
+        self.follows = {}  # user -> set of users they follow
+
+    def add_user(self, user_id: str) -> None:
+        if user_id in self.users:
+            raise ValueError(f"User '{user_id}' already exists.")
+        self.users.add(user_id)
+        self.follows[user_id] = set()
+
+    def follow(self, follower: str, followee: str) -> None:
+        if follower not in self.users or followee not in self.users:
+            raise ValueError("Both users must exist.")
+        if follower == followee:
+            return
+        self.follows[follower].add(followee)
+
+    def create_snapshot(self) -> Snapshot:
+        return Snapshot(self.follows)
+
+Complexity Analysis:
+
+Method	Time	Space
+add_user	O(1)	O(1)
+follow	O(1)	O(1)
+create_snapshot	O(U + E)	O(U + E)
+is_following	O(1)	O(1)
+Where U = number of users, E = total follow edges.
+
+Key Design Point: The snapshot must deep-copy the follow data so that mutations to the live network don't corrupt historical snapshots. The Snapshot constructor copies each user's follower set to guarantee immutability. 
+
+Part 2: Followers & Following Lists
+Problem Statement
+Interviewer: "Now extend the snapshot to return the full list of followers and followees for a user."
+
+Add these methods to the Snapshot class:
+
+class Snapshot:
+    # ... (Part 1 methods) ...
+
+    def get_following(self, user_id: str) -> list[str]:
+        """
+        Get all users that `user_id` is following in this snapshot.
+
+        Args:
+            user_id: The user to query
+
+        Returns:
+            A list of user IDs that this user follows.
+            Returns an empty list if the user has no followees.
+        """
+        pass
+
+    def get_followers(self, user_id: str) -> list[str]:
+        """
+        Get all users that follow `user_id` in this snapshot.
+
+        Args:
+            user_id: The user to query
+
+        Returns:
+            A list of user IDs that follow this user.
+            Returns an empty list if the user has no followers.
+        """
+        pass
+
+Example Usage
+network = SocialNetwork()
+
+network.add_user("A")
+network.add_user("B")
+network.add_user("C")
+network.add_user("D")
+
+network.follow("A", "B")
+network.follow("A", "C")
+network.follow("B", "C")
+network.follow("D", "A")
+
+snapshot = network.create_snapshot()
+
+print(snapshot.get_following("A"))    # ["B", "C"]
+print(snapshot.get_following("B"))    # ["C"]
+print(snapshot.get_following("C"))    # []
+
+print(snapshot.get_followers("C"))    # ["A", "B"]
+print(snapshot.get_followers("A"))    # ["D"]
+print(snapshot.get_followers("D"))    # []
+
+Part 2 Solution
+class Snapshot:
+    def __init__(self, follows: dict[str, set[str]]):
+        self._follows = {user: set(followees) for user, followees in follows.items()}
+        # Build reverse index for efficient follower lookups
+        self._followers = {}
+        for user, followees in self._follows.items():
+            for followee in followees:
+                if followee not in self._followers:
+                    self._followers[followee] = set()
+                self._followers[followee].add(user)
+
+    def is_following(self, follower: str, followee: str) -> bool:
+        return followee in self._follows.get(follower, set())
+
+    def get_following(self, user_id: str) -> list[str]:
+        return list(self._follows.get(user_id, set()))
+
+    def get_followers(self, user_id: str) -> list[str]:
+        return list(self._followers.get(user_id, set()))
+
+Complexity Analysis: 
+
+Method	Time	Space
+Snapshot.__init__	O(U + E)	O(U + E)
+get_following	O(F)	O(F)
+get_followers	O(F)	O(F)
+Where F = number of followees/followers for the queried user.
+
+Design Decision: We build a reverse index (_followers) at snapshot creation time. This trades O(E) extra space for O(F) follower lookups instead of scanning all edges each time. This is the right trade-off since snapshots are immutable and will be queried multiple times.
+
+Part 3: Follow Recommendations
+Problem Statement
+Interviewer: "Now let's recommend users to follow. Given a user, suggest people they might want to follow based on mutual connections." 
+
+Add this method to the Snapshot class:
+
+class Snapshot:
+    # ... (Parts 1-2 methods) ...
+
+    def recommend(self, user_id: str, k: int) -> list[str]:
+        """
+        Recommend top K users for `user_id` to follow.
+
+        The recommendation algorithm:
+        1. Look at all users that `user_id` currently follows.
+        2. For each of those users, look at who THEY follow.
+        3. Count how many of user_id's followees follow each candidate.
+        4. Exclude users that `user_id` already follows and user_id themselves.
+        5. Return the top K candidates sorted by count (descending).
+           If counts are tied, any order among tied candidates is acceptable.
+
+        Args:
+            user_id: The user to generate recommendations for
+            k: Maximum number of recommendations to return
+
+        Returns:
+            A list of up to K user IDs, sorted by recommendation strength.
+        """
+        pass
+
+Example Usage
+network = SocialNetwork()
+
+for user in ["A", "B", "C", "D", "E", "F"]:
+    network.add_user(user)
+
+network.follow("A", "B")    # A follows B
+network.follow("A", "C")    # A follows C
+network.follow("B", "D")    # B follows D
+network.follow("B", "E")    # B follows E
+network.follow("C", "D")    # C follows D
+network.follow("C", "F")    # C follows F
+
+snapshot = network.create_snapshot()
+
+print(snapshot.recommend("A", 2))   # ["D", "E"] or ["D", "F"]
+# Explanation:
+# A follows B and C.
+#   B follows: D, E
+#   C follows: D, F
+# Candidate counts (excluding A, B, C):
+#   D: 2 (followed by both B and C)
+#   E: 1 (followed by B only)
+#   F: 1 (followed by C only)
+# Top 2: D (count=2), then E or F (count=1, either is acceptable)
+
+print(snapshot.recommend("A", 10))  # ["D", "E", "F"] or ["D", "F", "E"]
+# All 3 candidates returned, D first (highest count)
+
+Part 3 Solution
+from collections import Counter
+import heapq
+
+class Snapshot:
+    # ... (Parts 1-2 code) ...
+
+    def recommend(self, user_id: str, k: int) -> list[str]:
+        following = self._follows.get(user_id, set())
+        candidate_counts = Counter()
+
+        for followee in following:
+            # Look at who each of user's followees follows
+            for candidate in self._follows.get(followee, set()):
+                # Exclude self and already-followed users
+                if candidate != user_id and candidate not in following:
+                    candidate_counts[candidate] += 1
+
+        # Return top K by count
+        return [user for user, count in candidate_counts.most_common(k)]
+
+Alternative: Min-heap approach (optimal for large candidate sets)
+
+def recommend(self, user_id: str, k: int) -> list[str]:
+    following = self._follows.get(user_id, set())
+    candidate_counts = Counter()
+
+    for followee in following:
+        for candidate in self._follows.get(followee, set()):
+            if candidate != user_id and candidate not in following:
+                candidate_counts[candidate] += 1
+
+    # Use a min-heap to efficiently find top K
+    min_heap = []
+    for candidate, count in candidate_counts.items():
+        if len(min_heap) < k:
+            heapq.heappush(min_heap, (count, candidate))
+        elif count > min_heap[0][0]:
+            heapq.heapreplace(min_heap, (count, candidate))
+
+    # Sort by count descending
+    result = [(candidate, count) for count, candidate in min_heap]
+    result.sort(key=lambda x: x[1], reverse=True)
+    return [candidate for candidate, count in result]
+
+Complexity Analysis: 
+
+Approach	Time	Space
+Counter	O(F × G + C log C)	O(C)
+Min-heap	O(F × G + C log K)	O(C + K)
+Where F = number of users that user_id follows, G = average followees per followed user, C = number of unique candidates.
+
+Why Counter.most_common(k) works: Internally, most_common(k) uses heapq.nlargest, which runs in O(C + K log C) time — efficient when K is small relative to C.
+
+Follow-Up Discussion Topics
+Discussed in Interviews
+Snapshot immutability: How do you ensure snapshots aren't affected by later mutations? 
+
+Deep copying the adjacency data at snapshot time is the simplest approach
+For large networks, consider copy-on-write or persistent data structures to avoid full copies
+Version-stamped edges (each edge tagged with a creation timestamp) allow snapshotting without copying
+Scaling snapshots: What if the network has millions of users?
+
+Full copies become expensive — use structural sharing (e.g., persistent hash tries)
+Store only deltas between snapshots to save space
+Use a time-series approach where each edge has [created_at, deleted_at] ranges
+Recommendation improvements:
+
+Weight recommendations by recency or interaction frequency
+Use graph algorithms like Jaccard similarity or Adamic-Adar index
+Consider second-degree connections (friends of friends of friends)
+Filter out users who have been previously dismissed
+Concurrency: How would you handle concurrent follows and snapshot reads? 
+
+Use read-write locks: multiple readers (snapshot queries) but exclusive writes (follows)
+Snapshots provide natural isolation — readers use immutable snapshots while writers modify the live graph
+Complexity Summary
+Method	Time	Space
+add_user	O(1)	O(1)
+follow	O(1)	O(1)
+create_snapshot	O(U + E)	O(U + E)
+is_following	O(1)	O(1)
+get_following	O(F)	O(F)
+get_followers	O(F)	O(F)
+recommend	O(F × G + C log K)	O(C)
+Where U = users, E = edges, F = followees/followers of the queried user, G = average followees per user, C = candidate count, K = top-K parameter.

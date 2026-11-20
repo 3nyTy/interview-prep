@@ -1,0 +1,208 @@
+================================================================================
+ANTHROPIC — STAFF SOFTWARE ENGINEER — CODING ROUND
+Question: "Tokenize" / "Longest-Match Tokenizer"
+Sources: DarkInterview + 1point3acres (reported Apr–May 2026)
+Frequency: HIGH (DarkInterview) / MEDIUM (1p3a) | Stage: phone-screen + onsite-coding
+Roles: SWE / MLE | Tags: string-processing, greedy, trie, dynamic-programming, medium
+================================================================================
+
+--------------------------------------------------------------------------------
+PROMPT 1 (DarkInterview) — 3 parts: read code, review a fix, implement
+--------------------------------------------------------------------------------
+Tokenize (Python)
+Coding | Phone, Onsite | Software Engineer | Reported Apr, 2026 | High Frequency
+
+PART 1: Code Reading and Understanding
+You are given two functions: tokenize and detokenize. Your task is to:
+- Read and understand what the code is doing
+- Identify problems with this tokenization approach
+
+def tokenize(text: str, vocab: dict):
+    tokens = []
+    key = ""
+    for i in range(len(text)):
+        key += text[i]
+        if key in vocab:
+            tokens.append(vocab[key])
+            key = ""
+    return tokens
+
+def detokenize(tokens, vocab: dict):
+    text = ""
+    reversed_vocab = {value: key for key, value in vocab.items()}
+    for token in tokens:
+        text += reversed_vocab[token]
+    return text
+
+Example usage:
+vocab = { "a": 1, "b": 2, "cd": 3 }
+tokens = tokenize("acdebe", vocab)
+result = detokenize(tokens, vocab)
+
+Your Task
+- Explain what this code does and how it works
+- Identify what problems exist with this implementation
+- Discuss when and why this approach would fail
+Key Points to Consider
+- How does the algorithm decide what to tokenize?
+- What happens if a character in the text is not covered by any key in vocab?
+- What happens to the key variable if no match is ever found?
+- Is this a greedy or optimal approach?
+
+PART 2: Code Review
+A modified version where another engineer attempted to fix the problem:
+
+def tokenize(text: str, vocab: dict):
+    tokens = []
+    key = ""
+    for i in range(len(text)):
+        key += text[i]
+        if key in vocab:
+            tokens.append(vocab[key])
+            key = ""
+    # NEW: Handle remaining unmatched characters
+    if key:
+        tokens.append(vocab.get("UNK", -1))
+    return tokens
+
+vocab = { "a": 1, "b": 2, "cd": 3, "UNK": -1 }  # NEW: Added UNK token
+
+The changes made:
+- Added logic after the for loop to handle the case when key is not empty
+- Added "UNK": -1 to the vocabulary to represent unknown tokens
+Your Task: Perform a code review on this change.
+Points to Consider
+- What is the purpose of UNK? Expected behavior of this change?
+- Does this fix actually solve the problem? Why or why not?
+- What edge cases might still fail? Conceptual or implementation issues?
+Example Edge Cases to Think About
+- What if the text is "xabc" where "x" is not in vocab?
+- What if the text literally contains the string "UNK"? How to distinguish an
+  unknown char replaced by UNK vs the literal string "UNK" in the original text?
+- Does the matching strategy always produce optimal results?
+
+PART 3: Implementation
+Implement your own tokenize that properly handles characters not covered by vocab.
+Requirements
+- Handle unknown characters gracefully.
+- Maintain correctness (tokenize + detokenize still work).
+- Use UNK token (e.g., UNK: -1) for unknown/unmatched characters.
+- Note on round-trip limitations: if original text contains literal "UNK", it
+  cannot be distinguished from unknown chars after tokenization -> perfect round
+  trip is not always possible.
+Key Challenges
+- When should you decide a character sequence cannot be matched?
+- How to detect you're building a key that will never match anything in vocab?
+- Should you check if any vocab key starts with the current key being built?
+- Balance trying to match longer sequences vs giving up early?
+Note for Candidate
+- NLP background: tokenization converts text into discrete tokens mapped to ids.
+- UNK = "UNKNOWN" sentinel for text not in vocab.
+- Greedy matching: original uses greedy first-match (first valid match while
+  building chars one at a time).
+- You may need to check if the current key is a PREFIX of any vocab key to decide
+  whether to keep building or give up.
+
+Example Solution Approach (prompt's own sketch — add an else/prefix check):
+def tokenize(text, vocab):
+    tokens = []; key = ""
+    for i in range(len(text)):
+        key += text[i]
+        if key in vocab:
+            tokens.append(vocab[key]); key = ""
+        else:
+            if not any(k.startswith(key) for k in vocab.keys()):
+                tokens.append(vocab.get("UNK", -1)); key = ""
+    if key:
+        tokens.append(vocab.get("UNK", -1))
+    return tokens
+(NOTE: this sketch STILL isn't longest-match — it's first-match with a prefix
+ escape hatch; it can also emit UNK for a multi-char run rather than per char.
+ The robust answer is the position+cursor longest-match in Tokenizer.java.)
+
+Additional Discussion Topics (verbal)
+1. Tokenization strategies & trade-offs
+   - Character-level (large vocab? no — small vocab, long sequences),
+     word-level (huge vocab, OOV problem), subword (BPE/WordPiece/SentencePiece —
+     balances vocab size vs sequence length), greedy vs optimal segmentation,
+     byte-level (UTF-8 bytes; no UNK needed but longer sequences).
+2. Algorithm complexity
+   - Naive: O(n × m × k) (n text len, m avg key len, k vocab size). The
+     any(k.startswith(key)) scan is expensive. Trie -> O(n × m). Trade-off:
+     trie build cost vs repeated tokenization calls.
+3. Ambiguity / optimal tokenization
+   - vocab={"ab":1,"abc":2,"c":3}, text="abc": greedy(first)->[ab,c] (2),
+     optimal->[abc] (1). Use DP for min #tokens, or Viterbi for most-likely
+     segmentation with LM scores. Speed vs optimality.
+4. Handling UNK in practice
+   - Subword tokenization reduces UNK; character fallback; specialized UNKs
+     (numbers, proper nouns); UNK hurts model perf so minimize; BPE represents
+     any text without UNK.
+
+--------------------------------------------------------------------------------
+PROMPT 2 (1point3acres) — "Longest-Match Tokenizer"
+--------------------------------------------------------------------------------
+Coding Q6 — Longest-Match Tokenizer
+Given a vocab mapping tokens->ids (plus sentinel UNK), implement a longest-match
+tokenizer over a text string. Base = two nested loops; optimizations & follow-ups
+(consecutive UNK merging, vocab-length bound, trie acceleration) drive the score.
+SWE / MLE | string-processing, greedy, trie, python, medium
+Frequency: High | Last asked: 2026-05-28 | Stage: phone-screen · onsite-coding
+
+Requirements
+vocab = {"app": 1, "apple": 2, "UNK": -1}
+tokenize("apple", vocab)         # -> [2]
+tokenize("bbb", vocab)           # -> [-1, -1, -1]
+tokenize("appbbbapp", vocab)     # -> [1, -1, -1, -1, 1] base ; -> [1, -1, 1] after dedup
+
+Iterations the interviewer walks you through
+- Base longest-match: at each position scan the longest prefix of remaining text
+  in vocab; emit its id and advance. If none, emit vocab["UNK"] and advance 1 char.
+- Bound by max vocab length: precompute max_len = max(len(w) for w in vocab if w
+  != "UNK") and shrink the inner loop (don't scan to len(text)).
+- Collapse consecutive UNKs: runs of -1 fold into a single -1 (post-process or
+  in-loop).
+- Discussion — trie acceleration: build a trie from vocab so the inner loop walks
+  down the trie until it can't advance. Textbook answer; interviewer usually
+  accepts the bounded two-loop as long as you MENTION trie as the asymptotic win.
+
+Follow-ups
+- Large vocab + short text (trie wins) vs small vocab + long text (bounded loop
+  competitive).
+- Streaming variant: tokenize as bytes arrive without rescanning.
+- Parallelize across many strings (embarrassingly parallel; subtlety = balancing
+  batch sizes).
+
+Notes
+- Several candidates passed WITHOUT building a trie. Interviewer cares more about
+  correctness of longest-match semantics + UNK-merge behavior.
+- Be proactive: write your own tests, run them, iterate. "Run tests, observe
+  output, refine" is explicitly part of the grading signal.
+- Be careful with the UNK sentinel — it lives in vocab dict and should NEVER
+  participate in matching.
+- One rotation opens as a BUG-HUNT: harness ships paired tokenize+detokenize where
+  tokenize greedily emits the SHORTEST match (extends key until it hits vocab once,
+  then resets) instead of longest. Phase 1: identify why it fails on vocab={"a":1,
+  "ab":2}+text="ab" (emits [1,?] and chokes / drops). Phase 2: rewrite to
+  longest-match with bounded loop. Phase 3: UNK/trie follow-ups.
+
+Preparation
+- Write the bounded two-loop tokenizer cold in under 10 minutes.
+- Drill the UNK-collapse follow-up both as post-process and in-loop bookkeeping.
+- Pre-write a 30-line trie + tokenize so it's ready if the interviewer escalates.
+- Test adversarial inputs: empty string, vocab containing only UNK, vocab where
+  one token is a prefix of another (app / apple).
+
+================================================================================
+SOLUTION: see Tokenizer.java (same directory) — verified on Corretto 21.
+  PART 1  tokenizeV1   : original first/shortest-match — DEMO of data-loss bugs
+                         ("acdebe" -> [1,3] -> detok "acd", tail dropped).
+  PART 2  tokenizeV2   : the UNK "fix" — DEMO still broken ("acdebe" -> [1,3,-1],
+                         "ebe" collapses to one UNK; "xab" -> [-1]).
+  PART 3a tokenizeLongest      : longest-match, bounded by maxLen, per-char UNK,
+                                 sentinel excluded from matching.  [primary answer]
+  PART 3b tokenizeLongestDedup : 3a + collapse consecutive UNK runs.
+  PART 3c tokenizeTrie         : trie-accelerated longest match, O(n·L).
+  PART 3d tokenizeOptimal      : DP segmentation minimising UNKs-then-tokens
+                                 (lexicographic cost) — beats greedy.
+================================================================================

@@ -1,0 +1,786 @@
+Chat Bot System Refactoring
+Coding
+Phone, Onsite
+Software Engineer, Frontend Engineer, Mobile Engineer
+Reported May, 2026
+High Frequency
+Problem Overview
+You are given a legacy chat service codebase that supports various bots (AwayBot, MeetBot, TacoBot) triggered by slash commands. The current implementation has all bot logic tightly coupled in a single function with global state. Your task is to refactor the code to make it extensible, maintainable, and easy to add new bots in the future.
+
+This is a code refactoring problem that tests your ability to:
+
+Identify code smells and design issues
+Apply object-oriented design principles
+Create clean abstractions and interfaces
+Handle state management and dependencies between components
+Write testable code
+Part 1: Understanding the Legacy Code
+Current Implementation
+Here's the legacy code that needs refactoring: 
+
+aways: dict[str, str] = {}
+tacos: dict[str, int] = {}
+messages = []
+
+def sendMessage(name: str, msg: str) -> None:
+    messages.append(name + ": " + msg)
+
+    # AwayBot logic
+    for away, away_msg in aways.items():
+        if away in msg:
+            messages.append(f"AwayBot: {away} is away: {away_msg}")
+
+    # MeetBot logic
+    if msg[1:5] == "meet":
+        messages.append(
+            "MeetBot: Google Meet with @"
+            + name
+            + ", and "
+            + msg[6:]
+            + " starting at https://meet.google.com/abc-def-123"
+        )
+        aways[name] = "@" + name + " may be in a meeting right now"
+        aways[msg[7:]] = "@" + msg[7:] + " may be in a meeting right now"
+
+    # TacoBot logic
+    if msg[1:9] == "givetaco":
+        num_tacos = len(msg.split(" ")[1])
+        who = msg.split(" ")[2]
+        if who[1:] not in tacos:
+            tacos[who[1:]] = 0
+        tacos[who[1:]] += num_tacos
+        messages.append(
+            "TacoBot: @"
+            + name
+            + " gave @"
+            + who
+            + " "
+            + str(num_tacos)
+            + " 🌮's. "
+            + who
+            + f" now have {tacos[who[1:]]} 🌮s."
+        )
+
+    # Away status logic
+    if msg[1:5] == "away":
+        aways[name] = msg[6:]
+
+Test Cases to Pass
+sendMessage(name="Alice", msg="Hello")
+sendMessage(name="Bob", msg="Hi")
+sendMessage(name="Alice", msg="Nice job on your presentations")
+sendMessage(name="Cindy", msg="/givetaco 🌮🌮 @justin")
+sendMessage(name="Alice", msg="Bob let's meet")
+sendMessage(name="Bob", msg="/meet Alice")
+sendMessage(name="David", msg="/away out for lunch")
+sendMessage(name="Emily", msg="Anyone around?")
+sendMessage(name="Frank", msg="/meet David")
+
+assert messages == [
+    "Alice: Hello",
+    "Bob: Hi",
+    "Alice: Nice job on your presentations",
+    "Cindy: /givetaco 🌮🌮 @justin",
+    "TacoBot: @Cindy gave @@justin 2 🌮's. @justin now have 2 🌮s.",
+    "Alice: Bob let's meet",
+    "Bob: /meet Alice",
+    "MeetBot: Google Meet with @Bob, and Alice starting at https://meet.google.com/abc-def-123",
+    "David: /away out for lunch",
+    "Emily: Anyone around?",
+    "Frank: /meet David",
+    "AwayBot: David is away: out for lunch",
+    "MeetBot: Google Meet with @Frank, and David starting at https://meet.google.com/abc-def-123"
+]
+
+Bot Behavior Specification
+AwayBot:
+
+Triggers when someone mentions a user who is away
+Notifies the channel with the away message
+Away status is set via /away <message> command
+MeetBot:
+
+Triggers on /meet <username> command
+Creates a Google Meet link and announces it
+Sets both participants' away status to "may be in a meeting right now"
+TacoBot: 
+
+Triggers on /givetaco <tacos> <@username> command
+Counts the number of taco emojis given
+Tracks total tacos per user
+Announces the gift and new total
+Problems with Current Code
+Identify issues before refactoring:
+
+Tight coupling: All bot logic is in one function
+Global state: aways and tacos are global variables
+Hard to extend: Adding a new bot requires modifying core function
+No separation of concerns: Parsing, validation, and business logic mixed together
+Hard to test: Individual bot logic cannot be tested in isolation
+No input validation: Assumes well-formed commands
+Poor readability: String slicing makes intent unclear
+State dependencies: Bots can't easily communicate or depend on each other
+Part 2: Initial Refactoring with IBotService Interface
+Requirements
+Design an interface called IBotService (or similar) with at least:
+
+shouldActivate(name: str, msg: str) -> bool: Determines if the bot should respond to this message
+execute(name: str, msg: str) -> list[str]: Executes the bot logic and returns response messages
+Refactor the code to: 
+
+Create separate bot classes implementing this interface
+Register bots in a chat room/channel
+Iterate through bots when a message arrives
+Execute active bots and collect their responses
+Sample Solution Structure
+from abc import ABC, abstractmethod
+from typing import List
+
+class IBotService(ABC):
+    """Interface for chat bots"""
+
+    @abstractmethod
+    def should_activate(self, name: str, msg: str) -> bool:
+        """Check if this bot should respond to the message"""
+        pass
+
+    @abstractmethod
+    def execute(self, name: str, msg: str) -> List[str]:
+        """Execute bot logic and return response messages"""
+        pass
+
+
+class ChatRoom:
+    def __init__(self):
+        self.bots: List[IBotService] = []
+        self.messages: List[str] = []
+
+    def register_bot(self, bot: IBotService):
+        """Register a bot with the chat room"""
+        self.bots.append(bot)
+
+    def send_message(self, name: str, msg: str):
+        """Process a message through all registered bots"""
+        # Add the user's message
+        self.messages.append(f"{name}: {msg}")
+
+        # Check each bot
+        for bot in self.bots:
+            if bot.should_activate(name, msg):
+                bot_responses = bot.execute(name, msg)
+                self.messages.extend(bot_responses)
+
+
+class MeetBot(IBotService):
+    def __init__(self, away_bot=None):
+        self.away_bot = away_bot  # Dependency injection for cross-bot communication
+
+    def should_activate(self, name: str, msg: str) -> bool:
+        return msg.startswith("/meet ")
+
+    def execute(self, name: str, msg: str) -> List[str]:
+        # Parse the command
+        parts = msg.split(" ", 1)
+        if len(parts) < 2:
+            return []
+
+        other_user = parts[1]
+
+        # Generate meeting link
+        response = f"MeetBot: Google Meet with @{name}, and {other_user} starting at https://meet.google.com/abc-def-123"
+
+        # Update away status through AwayBot
+        if self.away_bot:
+            self.away_bot.set_away(name, f"@{name} may be in a meeting right now")
+            self.away_bot.set_away(other_user, f"@{other_user} may be in a meeting right now")
+
+        return [response]
+
+
+class TacoBot(IBotService):
+    def __init__(self):
+        self.taco_counts: dict[str, int] = {}
+
+    def should_activate(self, name: str, msg: str) -> bool:
+        return msg.startswith("/givetaco ")
+
+    def execute(self, name: str, msg: str) -> List[str]:
+        # Parse: /givetaco 🌮🌮 @username
+        parts = msg.split(" ")
+        if len(parts) < 3:
+            return []
+
+        taco_string = parts[1]
+        recipient = parts[2]
+
+        # Count tacos and normalize username
+        num_tacos = len(taco_string)
+        username = recipient.lstrip("@")
+
+        # Update count
+        if username not in self.taco_counts:
+            self.taco_counts[username] = 0
+        self.taco_counts[username] += num_tacos
+
+        # Format response
+        response = f"TacoBot: @{name} gave @{recipient} {num_tacos} 🌮's. {recipient} now have {self.taco_counts[username]} 🌮s."
+
+        return [response]
+
+
+class AwayBot(IBotService):
+    def __init__(self):
+        self.away_statuses: dict[str, str] = {}
+
+    def should_activate(self, name: str, msg: str) -> bool:
+        # Check if setting away status
+        if msg.startswith("/away "):
+            return True
+
+        # Check if message mentions someone who is away
+        for away_user in self.away_statuses:
+            if away_user in msg:
+                return True
+
+        return False
+
+    def execute(self, name: str, msg: str) -> List[str]:
+        responses = []
+
+        # Handle /away command
+        if msg.startswith("/away "):
+            away_message = msg[6:]  # Everything after "/away "
+            self.set_away(name, away_message)
+            return []  # /away command doesn't produce a message
+
+        # Check for mentions of away users
+        for away_user, away_msg in self.away_statuses.items():
+            if away_user in msg:
+                responses.append(f"AwayBot: {away_user} is away: {away_msg}")
+
+        return responses
+
+    def set_away(self, username: str, message: str):
+        """Public method for other bots to set away status"""
+        self.away_statuses[username] = message
+
+
+# Usage
+chat_room = ChatRoom()
+
+# Create bots with dependencies
+away_bot = AwayBot()
+meet_bot = MeetBot(away_bot=away_bot)
+taco_bot = TacoBot()
+
+# Register bots
+chat_room.register_bot(away_bot)
+chat_room.register_bot(meet_bot)
+chat_room.register_bot(taco_bot)
+
+# Send messages
+chat_room.send_message("Alice", "Hello")
+chat_room.send_message("Cindy", "/givetaco 🌮🌮 @justin")
+# ... etc
+
+Key Design Decisions
+Dependency Injection: MeetBot receives AwayBot reference to update away statuses
+Encapsulation: Each bot manages its own state (tacos, away messages)
+Single Responsibility: Each class has one clear purpose
+Open/Closed Principle: Can add new bots without modifying existing code
+Testability: Each bot can be unit tested independently
+Part 3: Event-Driven Architecture (Follow-up)
+The interviewer may point out that dependency injection doesn't scale when bots have complex interdependencies. They'll hint that bots should broadcast events and subscribe to events from other bots.
+
+Requirements
+Refactor to use an event-driven architecture where:
+
+Bots can publish events
+Bots can subscribe to events from other bots
+No direct dependencies between bot instances
+Events flow through a central message bus
+Event-Based Solution
+from abc import ABC, abstractmethod
+from typing import List, Callable, Dict
+from dataclasses import dataclass
+
+@dataclass
+class Event:
+    """Base class for events"""
+    event_type: str
+    data: dict
+
+class EventBus:
+    """Central event bus for bot communication"""
+
+    def __init__(self):
+        self.subscribers: Dict[str, List[Callable]] = {}
+
+    def subscribe(self, event_type: str, handler: Callable[[Event], None]):
+        """Subscribe to an event type"""
+        if event_type not in self.subscribers:
+            self.subscribers[event_type] = []
+        self.subscribers[event_type].append(handler)
+
+    def publish(self, event: Event):
+        """Publish an event to all subscribers"""
+        if event.event_type in self.subscribers:
+            for handler in self.subscribers[event.event_type]:
+                handler(event)
+
+
+class IBotService(ABC):
+    """Interface for chat bots"""
+
+    def __init__(self, event_bus: EventBus):
+        self.event_bus = event_bus
+        self.setup_subscriptions()
+
+    def setup_subscriptions(self):
+        """Override to subscribe to events"""
+        pass
+
+    @abstractmethod
+    def should_activate(self, name: str, msg: str) -> bool:
+        pass
+
+    @abstractmethod
+    def execute(self, name: str, msg: str) -> List[str]:
+        pass
+
+
+class AwayBot(IBotService):
+    def __init__(self, event_bus: EventBus):
+        self.away_statuses: dict[str, str] = {}
+        super().__init__(event_bus)
+
+    def setup_subscriptions(self):
+        # Subscribe to meeting events to set away status
+        self.event_bus.subscribe("user_meeting_started", self.handle_meeting_started)
+
+    def handle_meeting_started(self, event: Event):
+        """Handle when a user starts a meeting"""
+        username = event.data["username"]
+        self.away_statuses[username] = f"@{username} may be in a meeting right now"
+
+    def should_activate(self, name: str, msg: str) -> bool:
+        if msg.startswith("/away "):
+            return True
+
+        for away_user in self.away_statuses:
+            if away_user in msg:
+                return True
+
+        return False
+
+    def execute(self, name: str, msg: str) -> List[str]:
+        responses = []
+
+        if msg.startswith("/away "):
+            away_message = msg[6:]
+            self.away_statuses[name] = away_message
+
+            # Publish event
+            self.event_bus.publish(Event(
+                event_type="user_away_status_changed",
+                data={"username": name, "message": away_message}
+            ))
+            return []
+
+        for away_user, away_msg in self.away_statuses.items():
+            if away_user in msg:
+                responses.append(f"AwayBot: {away_user} is away: {away_msg}")
+
+        return responses
+
+
+class MeetBot(IBotService):
+    def setup_subscriptions(self):
+        # MeetBot doesn't need to subscribe to events in this example
+        pass
+
+    def should_activate(self, name: str, msg: str) -> bool:
+        return msg.startswith("/meet ")
+
+    def execute(self, name: str, msg: str) -> List[str]:
+        parts = msg.split(" ", 1)
+        if len(parts) < 2:
+            return []
+
+        other_user = parts[1]
+
+        # Publish events for both participants
+        self.event_bus.publish(Event(
+            event_type="user_meeting_started",
+            data={"username": name}
+        ))
+        self.event_bus.publish(Event(
+            event_type="user_meeting_started",
+            data={"username": other_user}
+        ))
+
+        response = f"MeetBot: Google Meet with @{name}, and {other_user} starting at https://meet.google.com/abc-def-123"
+        return [response]
+
+
+class TacoBot(IBotService):
+    def __init__(self, event_bus: EventBus):
+        self.taco_counts: dict[str, int] = {}
+        super().__init__(event_bus)
+
+    def setup_subscriptions(self):
+        pass  # TacoBot doesn't subscribe to events
+
+    def should_activate(self, name: str, msg: str) -> bool:
+        return msg.startswith("/givetaco ")
+
+    def execute(self, name: str, msg: str) -> List[str]:
+        parts = msg.split(" ")
+        if len(parts) < 3:
+            return []
+
+        taco_string = parts[1]
+        recipient = parts[2]
+        num_tacos = len(taco_string)
+        username = recipient.lstrip("@")
+
+        if username not in self.taco_counts:
+            self.taco_counts[username] = 0
+        self.taco_counts[username] += num_tacos
+
+        # Publish event
+        self.event_bus.publish(Event(
+            event_type="tacos_given",
+            data={
+                "giver": name,
+                "recipient": username,
+                "count": num_tacos,
+                "total": self.taco_counts[username]
+            }
+        ))
+
+        response = f"TacoBot: @{name} gave @{recipient} {num_tacos} 🌮's. {recipient} now have {self.taco_counts[username]} 🌮s."
+        return [response]
+
+
+class ChatRoom:
+    def __init__(self):
+        self.event_bus = EventBus()
+        self.bots: List[IBotService] = []
+        self.messages: List[str] = []
+
+    def register_bot(self, bot: IBotService):
+        self.bots.append(bot)
+
+    def send_message(self, name: str, msg: str):
+        self.messages.append(f"{name}: {msg}")
+
+        for bot in self.bots:
+            if bot.should_activate(name, msg):
+                bot_responses = bot.execute(name, msg)
+                self.messages.extend(bot_responses)
+
+
+# Usage
+chat_room = ChatRoom()
+
+# Create bots with shared event bus
+away_bot = AwayBot(chat_room.event_bus)
+meet_bot = MeetBot(chat_room.event_bus)
+taco_bot = TacoBot(chat_room.event_bus)
+
+# Register bots
+chat_room.register_bot(away_bot)
+chat_room.register_bot(meet_bot)
+chat_room.register_bot(taco_bot)
+
+Benefits of Event-Driven Architecture
+Loose Coupling: Bots don't need references to each other
+Scalability: Easy to add new bots that react to existing events
+Flexibility: Events can have multiple subscribers
+Testability: Can mock the event bus for testing
+Observability: Events provide a natural audit trail
+Part 4: Writing Test Cases
+The interviewer may ask you to write test cases for your refactored code. 
+
+Unit Tests for Individual Bots
+import unittest
+
+class TestTacoBot(unittest.TestCase):
+    def setUp(self):
+        self.event_bus = EventBus()
+        self.taco_bot = TacoBot(self.event_bus)
+
+    def test_should_activate_on_givetaco_command(self):
+        self.assertTrue(self.taco_bot.should_activate("Alice", "/givetaco 🌮🌮 @bob"))
+        self.assertFalse(self.taco_bot.should_activate("Alice", "Hello"))
+
+    def test_execute_gives_tacos(self):
+        responses = self.taco_bot.execute("Alice", "/givetaco 🌮🌮🌮 @bob")
+
+        self.assertEqual(len(responses), 1)
+        self.assertIn("3 🌮's", responses[0])
+        self.assertIn("now have 3 🌮s", responses[0])
+
+    def test_accumulates_tacos(self):
+        self.taco_bot.execute("Alice", "/givetaco 🌮🌮 @bob")
+        responses = self.taco_bot.execute("Charlie", "/givetaco 🌮 @bob")
+
+        self.assertIn("now have 3 🌮s", responses[0])
+
+
+class TestMeetBot(unittest.TestCase):
+    def setUp(self):
+        self.event_bus = EventBus()
+        self.meet_bot = MeetBot(self.event_bus)
+
+        # Track published events
+        self.published_events = []
+        self.event_bus.subscribe("user_meeting_started", lambda e: self.published_events.append(e))
+
+    def test_creates_meeting_link(self):
+        responses = self.meet_bot.execute("Alice", "/meet Bob")
+
+        self.assertEqual(len(responses), 1)
+        self.assertIn("Google Meet with @Alice, and Bob", responses[0])
+        self.assertIn("https://meet.google.com", responses[0])
+
+    def test_publishes_meeting_events(self):
+        self.meet_bot.execute("Alice", "/meet Bob")
+
+        self.assertEqual(len(self.published_events), 2)
+        self.assertEqual(self.published_events[0].data["username"], "Alice")
+        self.assertEqual(self.published_events[1].data["username"], "Bob")
+
+
+class TestAwayBot(unittest.TestCase):
+    def setUp(self):
+        self.event_bus = EventBus()
+        self.away_bot = AwayBot(self.event_bus)
+
+    def test_set_away_status(self):
+        responses = self.away_bot.execute("David", "/away out for lunch")
+
+        # /away doesn't produce output
+        self.assertEqual(len(responses), 0)
+        self.assertIn("David", self.away_bot.away_statuses)
+
+    def test_notify_when_away_user_mentioned(self):
+        self.away_bot.execute("David", "/away out for lunch")
+        responses = self.away_bot.execute("Alice", "Hey David, are you around?")
+
+        self.assertEqual(len(responses), 1)
+        self.assertIn("David is away", responses[0])
+
+    def test_handles_meeting_started_event(self):
+        event = Event(
+            event_type="user_meeting_started",
+            data={"username": "Alice"}
+        )
+        self.away_bot.handle_meeting_started(event)
+
+        self.assertIn("Alice", self.away_bot.away_statuses)
+        self.assertIn("may be in a meeting", self.away_bot.away_statuses["Alice"])
+
+Integration Tests
+class TestChatRoomIntegration(unittest.TestCase):
+    def setUp(self):
+        self.chat_room = ChatRoom()
+
+        away_bot = AwayBot(self.chat_room.event_bus)
+        meet_bot = MeetBot(self.chat_room.event_bus)
+        taco_bot = TacoBot(self.chat_room.event_bus)
+
+        self.chat_room.register_bot(away_bot)
+        self.chat_room.register_bot(meet_bot)
+        self.chat_room.register_bot(taco_bot)
+
+    def test_full_conversation_flow(self):
+        self.chat_room.send_message("Alice", "Hello")
+        self.chat_room.send_message("Bob", "/meet Alice")
+        self.chat_room.send_message("Charlie", "Hey Bob")
+
+        messages = self.chat_room.messages
+
+        # Check user messages
+        self.assertIn("Alice: Hello", messages)
+        self.assertIn("Bob: /meet Alice", messages)
+
+        # Check MeetBot response
+        self.assertTrue(any("MeetBot" in msg and "Google Meet" in msg for msg in messages))
+
+        # Check AwayBot response (Bob is in a meeting)
+        self.assertTrue(any("AwayBot" in msg and "Bob is away" in msg for msg in messages))
+
+Part 5: Additional Extensions (Potential Follow-ups)
+Extension 1: Command Validation
+Add input validation to handle malformed commands gracefully:
+
+class Command:
+    """Value object for parsed commands"""
+
+    def __init__(self, raw_msg: str):
+        self.raw_msg = raw_msg
+        self.is_command = raw_msg.startswith("/")
+
+        if self.is_command:
+            parts = raw_msg[1:].split(" ", 1)
+            self.command_name = parts[0]
+            self.args = parts[1] if len(parts) > 1 else ""
+        else:
+            self.command_name = None
+            self.args = None
+
+    def validate_format(self, expected_arg_count: int) -> bool:
+        """Validate command has expected number of arguments"""
+        if not self.is_command:
+            return False
+
+        arg_parts = self.args.split() if self.args else []
+        return len(arg_parts) >= expected_arg_count
+
+
+class TacoBot(IBotService):
+    def execute(self, name: str, msg: str) -> List[str]:
+        cmd = Command(msg)
+
+        if not cmd.validate_format(2):
+            return ["TacoBot: Invalid command. Usage: /givetaco <tacos> <@username>"]
+
+        # ... rest of logic
+
+Extension 2: Bot Priority/Ordering
+Some bots should run before others (e.g., AwayBot after MeetBot):
+
+class IBotService(ABC):
+    @property
+    @abstractmethod
+    def priority(self) -> int:
+        """Lower numbers run first"""
+        pass
+
+class ChatRoom:
+    def send_message(self, name: str, msg: str):
+        self.messages.append(f"{name}: {msg}")
+
+        # Sort bots by priority
+        sorted_bots = sorted(self.bots, key=lambda b: b.priority)
+
+        for bot in sorted_bots:
+            if bot.should_activate(name, msg):
+                bot_responses = bot.execute(name, msg)
+                self.messages.extend(bot_responses)
+
+Extension 3: Async Event Processing
+For production systems with I/O operations: 
+
+import asyncio
+
+class AsyncEventBus:
+    async def publish(self, event: Event):
+        """Publish event asynchronously"""
+        if event.event_type in self.subscribers:
+            await asyncio.gather(*[
+                handler(event) for handler in self.subscribers[event.event_type]
+            ])
+
+class IBotService(ABC):
+    @abstractmethod
+    async def execute(self, name: str, msg: str) -> List[str]:
+        """Execute bot logic asynchronously"""
+        pass
+
+Extension 4: Middleware Pipeline
+Add request/response middleware for logging, analytics, rate limiting:
+
+class Middleware(ABC):
+    @abstractmethod
+    def process_message(self, name: str, msg: str, next_handler):
+        pass
+
+class LoggingMiddleware(Middleware):
+    def process_message(self, name: str, msg: str, next_handler):
+        print(f"[LOG] {name}: {msg}")
+        return next_handler(name, msg)
+
+class RateLimitMiddleware(Middleware):
+    def __init__(self):
+        self.message_counts = {}
+
+    def process_message(self, name: str, msg: str, next_handler):
+        # Implement rate limiting logic
+        if self.is_rate_limited(name):
+            return ["Rate limit exceeded. Please wait."]
+        return next_handler(name, msg)
+
+Common Mistakes and Edge Cases
+Common Mistakes
+Breaking existing tests: Ensure all original test cases still pass
+Losing message order: Bots should maintain the correct message sequence
+Double-counting mentions: AwayBot should only notify once per message even if mentioned multiple times
+String parsing bugs: Handle edge cases like /meet without arguments
+State leakage: Ensure bot state doesn't leak between test runs
+Edge Cases to Consider
+Empty commands: /meet without a username
+Self-mentions: User mentions themselves while away
+Multiple mentions: Message mentions multiple away users
+Unicode handling: Taco emojis vs regular text in /givetaco
+Case sensitivity: Should commands be case-insensitive?
+Whitespace: Extra spaces in commands
+Bot conflicts: Two bots trying to respond to the same message
+Example Edge Case Tests
+def test_empty_meet_command():
+    """Should handle /meet without username"""
+    responses = meet_bot.execute("Alice", "/meet")
+    assert len(responses) == 0  # or return error message
+
+def test_multiple_away_mentions():
+    """Should notify for each away user mentioned"""
+    away_bot.execute("Alice", "/away lunch")
+    away_bot.execute("Bob", "/away meeting")
+
+    responses = away_bot.execute("Charlie", "Hey Alice and Bob")
+    assert len(responses) == 2
+
+def test_self_mention_while_away():
+    """User mentions themselves while away"""
+    away_bot.execute("Alice", "/away brb")
+    responses = away_bot.execute("Bob", "Alice told me Alice is away")
+
+    # Should only notify once, not twice
+    assert len(responses) == 1
+
+Discussion Points for Interviewer
+Design Trade-offs
+Event Bus vs Dependency Injection:
+
+Events: More flexible, but harder to debug
+DI: Simpler, but doesn't scale with many dependencies
+Global State vs Encapsulation: 
+
+Original code uses global state (bad)
+Refactored code encapsulates state in bot instances (good)
+Alternative: Store state in database/cache for persistence
+Synchronous vs Asynchronous:
+
+Current: Synchronous (simpler, easier to test)
+Production: Might need async for I/O operations
+Command Parsing:
+
+String slicing: Fast but error-prone
+Regex: More flexible but slower
+Parser library: Most robust but overkill for simple commands
+Scalability Considerations
+Performance: What if there are 100+ bots? 
+
+Use indexing/filtering to avoid checking every bot
+Consider bot activation patterns (command prefix, regex, AI classification)
+State Management: What if user data doesn't fit in memory?
+
+Move to Redis/database
+Implement state interface with multiple backends
+Multi-channel Support: How to support multiple chat rooms?
+
+Channel ID in events
+Separate bot instances per channel
+Shared bot logic with channel-specific state

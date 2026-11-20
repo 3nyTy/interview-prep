@@ -1,0 +1,75 @@
+In-Memory Sparse Table Database with Filtering and Projection
+Related Discussion
+valon
+
+Implement an in-memory sparse (schemaless) table database. A table has a predefined set of column names and types, while every stored row may omit any subset of those columns.
+
+Read JSON Lines from standard input. For every select command, print one JSON array.
+
+Commands
+Create a table
+{"op":"create","table":"users","schema":{"id":"int","name":"string","age":"int","active":"bool"}}
+
+The allowed types are int, string, and bool.
+
+Insert a row
+{"op":"insert","table":"users","row":{"id":1,"name":"Alice","active":true}}
+
+Rows may omit schema columns. Reject unknown columns and values whose types do not match the schema. In particular, Python bool must not be accepted as an int.
+
+Select with filtering and projection
+{
+  "op":"select",
+  "table":"users",
+  "filter":{"column":"active","op":"eq","value":true},
+  "projection":{"id":"user_id","name":"display_name","age":"age"}
+}
+
+filter is optional. Only eq is required.
+A row missing the filter column does not match.
+Validate filter columns, filter value types, and projected source columns.
+projection maps source columns to output names. If a matching row lacks a projected source column, emit null for that output field.
+Preserve insertion order.
+
+Successful non-select commands print {"ok":true}. Errors print {"error":"..."}.
+
+Constraints: at most 100,000 commands and rows per table, and 100 columns per schema. A linear scan per query is acceptable.
+
+Example
+Input
+{"op":"create","table":"users","schema":{"id":"int","name":"string","age":"int","active":"bool"}}
+{"op":"insert","table":"users","row":{"id":1,"name":"Alice","active":true}}
+{"op":"insert","table":"users","row":{"id":2,"name":"Bob","age":30,"active":false}}
+{"op":"select","table":"users","filter":{"column":"active","op":"eq","value":true},"projection":{"id":"user_id","name":"display_name","age":"age"}}
+Output
+{"ok":true}
+{"ok":true}
+{"ok":true}
+[{"user_id":1,"display_name":"Alice","age":null}]
+Was this article helpful?
+Python 3
+Java
+12px
+14px
+16px
+18px
+20px
+22px
+24px
+1
+2
+3
+4
+5
+6
+7
+def solution():
+    # Read data from standard input
+    # Write your code here
+    pass
+if __name__ == "__main__":
+    solution()
+Standard Input
+Run
+History
+Execution Result:

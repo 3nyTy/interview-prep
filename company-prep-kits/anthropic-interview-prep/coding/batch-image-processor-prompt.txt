@@ -1,0 +1,205 @@
+================================================================================
+Anthropic — Staff Software Engineer — Coding Round
+Question: "Batch Image Processor" / "Image Processing Pipeline"
+Frequency: HIGH.  Stage: phone-screen + onsite-coding.  Last asked: 2026-05-30.
+Solution: BatchImageProcessor.java (this directory)
+================================================================================
+
+This question shows up under two slightly different write-ups (same problem).
+Both are reproduced verbatim below.
+
+================================================================================
+PROMPT 1 — from the DarkInterview website
+================================================================================
+
+Batch Image Processor
+Coding
+Phone, Onsite
+Software Engineer
+Reported Jun, 2026
+High Frequency
+
+Overview
+In this coding exercise, you will build a batch image processing system. You are
+given a set of images and transformation specifications in JSON format. Your task
+is to apply these transformations to each image and save the results to an output
+directory.
+
+This is a practical coding challenge that tests your ability to:
+- Quickly research and use unfamiliar libraries - You are expected to search
+  documentation during the interview
+- Parse and apply configuration from JSON files
+- Handle file I/O operations efficiently
+- Optimize for performance with parallel processing
+
+Interview Format Notes
+- Documentation search is allowed and expected - The interviewer wants to see how
+  you research and learn new APIs quickly
+- You may use any resources except AI-generated answers
+- Common library choices: Pillow (PIL) or scikit-image - consider familiarizing
+  yourself with one beforehand
+- The interview involves testing on small images first, then optimizing for large
+  images within a time target
+
+Problem Setup
+You are provided with four directories:
+
+project/
+├── small_images/      # Small test images for development
+│   ├── image1.png
+│   ├── image2.jpg
+│   └── ...
+├── large_images/      # Large images for performance testing
+│   ├── photo1.png
+│   ├── photo2.jpg
+│   └── ...
+├── transformations/   # JSON files defining transformations
+│   ├── transform1.json
+│   ├── transform2.json
+│   └── ...
+└── output/            # Directory to save processed images
+
+Helper utilities are provided to:
+- List all files in each directory
+- Generate output file paths based on input image and transformation file
+
+Transformation Specifications
+Each JSON file in the transformations/ directory contains a list of transformations
+to apply sequentially. There are six types of transformations:
+
+Transformations Without Parameters
+  grayscale         Convert image to grayscale
+  flip_horizontal   Flip image horizontally (mirror)
+  flip_vertical     Flip image vertically
+
+Transformations With Parameters
+  scale   factor (float)   Scale image by the given factor (0.5 = half, 2.0 = double)
+  blur    radius (int)     Apply Gaussian blur with the specified radius
+  rotate  angle (float)    Rotate image by the specified angle in degrees
+
+Example Transformation JSON
+{
+  "transformations": [
+    { "type": "grayscale" },
+    { "type": "scale", "factor": 0.5 },
+    { "type": "rotate", "angle": 90 }
+  ]
+}
+
+This configuration would:
+- Convert the image to grayscale
+- Scale it to 50% of its original size
+- Rotate it 90 degrees counter-clockwise
+
+Requirements
+
+Part 1: Basic Implementation
+- Choose an image processing library (Pillow / scikit-image / OpenCV).
+- Implement transformation functions - Create functions for each of the six types.
+- Process images with transformations:
+    For each transformation JSON file
+    For each image in the source directory
+    Apply all transformations in the JSON file sequentially to the image
+    Save the result to the output directory using the provided path utility
+- Test with small images - Verify correctness using small_images/ before large.
+
+Part 2: Performance Optimization
+After verifying correctness with small images, process the large_images/ directory.
+You must complete processing within a target time limit (provided in the interview).
+Key considerations:
+- Image processing is CPU-intensive
+- Each image can be processed independently
+- Consider parallelization strategies
+
+Interface
+def process_images(
+    image_dir: str,
+    transformation_dir: str,
+    output_dir: str,
+    get_output_path: Callable[[str, str], str]
+) -> None:
+    """
+    Process all images with all transformation configurations.
+    Args:
+        image_dir: Path to directory containing source images
+        transformation_dir: Path to directory containing transformation JSON files
+        output_dir: Path to directory for saving processed images
+        get_output_path: Utility that generates output path
+                         given (image_path, transform_json_path)
+    """
+    pass
+
+[The DarkInterview write-up then provides a sample Pillow solution: sequential
+ apply_transformation/apply_all + a ProcessPoolExecutor version, and a follow-up
+ discussion: threading vs multiprocessing (GIL), memory management for huge
+ images, error handling for production, and scaling to millions of images via
+ message queues / GPU acceleration.]
+
+================================================================================
+PROMPT 2 — from the 1point3acres website
+================================================================================
+
+Coding Q1 — Image Processing Pipeline
+Apply a sequence of image transformations (grayscale, flip, scale, blur, rotate)
+to a directory of images using a Python imaging library, then optimize with
+multiprocessing/multithreading for a target wall-clock budget.
+Tags: SWE / MLE / Infra Eng, concurrency, multiprocessing, pillow, python, medium.
+Frequency: High.  Last asked: 2026-05-30.  Stage: phone-screen / onsite-coding.
+
+Requirements
+You are given four folders and their absolute paths up front:
+- small_images/    — used for the correctness pass.
+- big_images/      — used for the performance pass.
+- transformations/ — JSON files describing transformation sequences.
+- out/             — write outputs here.
+
+Canonical function signature:
+def process_images(
+    image_dir: str,
+    transformation_dir: str,
+    output_dir: str,
+    get_output_path: Callable[[str, str], str],  # (image_name, json_name) -> abs path
+) -> None: ...
+    # For each (image, transformations.json) pair: load image, apply the
+    # listed transformations in order, write to get_output_path(...).
+    # No return value — outputs are observed by the grader on disk.
+
+Each transformations JSON: {"transformations": [{"type": ..., <param>: ...}, …]}.
+Six transformation types:
+- No-parameter: grayscale, flip_horizontally (a.k.a. flip_horizontal),
+                flip_vertically (a.k.a. flip_vertical).
+- Parameterised: scale (factor: float), blur (radius: int), rotate (angle: float).
+The supplied get_output_path (sometimes util.get_output_path) supplies output paths.
+
+Phases
+- Correctness pass: apply transformations on small_images/; match expected outputs.
+- Performance pass: same pipeline on big_images/ under a wall-clock target. Naive
+  sequential implementations always miss the target; introduce ProcessPoolExecutor
+  (preferred — image transforms are CPU-bound) or ThreadPoolExecutor (acceptable;
+  some interviewers explicitly want to see threads).
+- Follow-ups: thread vs. process tradeoffs, sharing pre-decoded images across
+  workers, distributing across multiple machines, dealing with images that don't
+  fit in memory.
+
+Notes
+- pillow (PIL) is the most common choice; scikit-image works too.
+- A common rewrite during the round: STOP re-reading the same source image inside
+  each worker. Split the pipeline so the DECODE HAPPENS ONCE and only the transform
+  list runs per (image, json) pair in parallel.
+- One sibling variant adds TPS / throughput estimation as a follow-up — quantify
+  FPS achieved, identify the bottleneck (CPU, memory bandwidth, disk IO).
+- For the multi-process path, beware of PICKLING COST: passing decoded PIL images
+  across process boundaries can dominate wall-clock unless you pass paths and
+  decode inside the worker.
+- Searching online is allowed and expected; AI assistants are forbidden. Some
+  rotations name the folders large_images/ and output/ (instead of big_images/
+  and out/); the helper util exposes both the listing and the output-path builder.
+
+Preparation
+- Write a sequential transform pipeline against pillow from scratch in <10 minutes.
+- Build a ProcessPoolExecutor wrapper mapping (image_path, transformation_json)
+  pairs to workers; return when all complete.
+- Internalize the thread-vs-process answer: PIL releases the GIL inside its C code
+  in some cases (threads can help), but most candidates argue for processes due to
+  predictable CPU parallelism.
+- Cross-train the web-crawler sibling prompt in parallel (same recruiter blurb).

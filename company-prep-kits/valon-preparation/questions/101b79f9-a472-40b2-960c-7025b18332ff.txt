@@ -1,0 +1,90 @@
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Details
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+In-Memory SQL Database: Filter Rows by Column Conditions
+Related Discussion
+valon
+Problem: Build an In-Memory SQL Database (Filtering)
+
+Based on the previous in-memory table, extend querying with a WHERE-like filter.
+
+Functionality
+Support filter(condition) to return rows matching the condition (you may combine it with select, e.g., query(select_cols, condition)).
+Condition (common simplified version)
+A condition is of the form: column_name = value (equality only).
+If the column does not exist, return an empty result or raise an error (clarify with the interviewer).
+Output
+Return all matching rows (either full rows or projected rows, but be explicit).
+Constraints
+In-memory only.
+Preserve insertion order in results.
+Example
+Columns: ["id","name","city"]
+Rows:
+{id:1,name:"a",city:"sf"}
+{id:2,name:"b",city:"ny"}
+Condition: city = "sf"
+Output: only the first row
+Example
+Input
+cols: id,name,city
+rows: (1,a,sf);(2,b,ny)
+query: select name where city=sf
+Output
+a
+Was this article helpful?
+Python 3
+Java
+12px
+14px
+16px
+18px
+20px
+22px
+24px
+1
+2
+3
+4
+5
+6
+7
+def solution():
+    # Read data from standard input
+    # Write your code here
+    pass
+if __name__ == "__main__":
+    solution()
+Standard Input
+Run
+History
+Execution Result:

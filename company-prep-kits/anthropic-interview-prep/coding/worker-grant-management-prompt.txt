@@ -1,0 +1,88 @@
+OA — Worker / Employee Grant Management
+Recent OA variant present on the worker/employee scheduling theme. Track employees clocking in and out, apply promotions taking effect on the next office entry, and aggregate granted bonuses across overlapping work sessions.
+
+SWE
+MLE
+oa
+codesignal
+oop
+interval
+payroll
+medium
+Frequency
+Low · New
+Last asked
+2026-05-10
+Stage
+oa
+
+Requirements
+
+Level 1 — Office sessions
+Track employees clocking in and out; compute total time in the office.
+
+def add_employee(self, name: str, position: str, hourly_salary: int) -> None: ...
+    # Register an employee with a base hourly rate.
+
+def clock_in(self, employee_id: str, timestamp: int) -> None: ...
+def clock_out(self, employee_id: str, timestamp: int) -> None: ...
+    # Sessions are (clock_in_ts, clock_out_ts) intervals.
+    # Repeated clock_in without a preceding clock_out is undefined in some rotations
+    # and a no-op in others — confirm against the visible sample.
+
+Level 2 — Time tracking + leaderboard
+def get_total_work_time(self, employee_id: str) -> int: ...
+    # Sum of completed session durations.
+
+def top_k_workers(self, k: int) -> list[str]: ...
+    # Top k employees by total office time, descending.
+    # Tiebreaker: see the prompt — typically by employee_id or name ascending.
+
+Level 3 — Promotions (deferred activation)
+def set_promotion(self, employee_id: str, new_position: str, new_hourly_salary: int) -> None: ...
+    # The new title and rate take effect at the employee's NEXT clock_in,
+    # not at the timestamp of this call. Maintain a "pending promotion" slot
+    # per employee; consume it on the next clock_in event.
+
+def calculate_pay(self, employee_id: str, start: int, end: int) -> int: ...
+    # Total earnings in [start, end].
+    # Only counts time the employee was clocked in.
+    # If a promotion took effect mid-window, segments before / after use
+    # different rates. Recent simplification observed in some rotations:
+    # the promotion-activation event must fall outside the window for the
+    # window to be paid at a single rate; this removes the segmentation case.
+
+Level 4 — Bonus / double-pay periods
+def set_double_pay(self, start: int, end: int) -> None: ...
+    # During [start, end] EVERY employee earns 2× their normal rate.
+    # Bonus periods may overlap each other; merge overlapping intervals
+    # before applying the multiplier (don't 4× from double-overlap).
+calculate_pay from L3 is extended: for any session intersecting a bonus window, the overlapping segment is paid at 2× the rate active during that segment (apply promotion first, then the multiplier). Non-overlapping segments stay at the base / promoted rate.
+
+Examples
+# Promotion takes effect on the NEXT clock_in, not at set_promotion timestamp
+clock_in("e1", 100)
+clock_out("e1", 200)               # session1: rate = $10/hr → paid at $10
+set_promotion("e1", "Senior", 20)  # pending — does NOT apply yet
+clock_in("e1", 300)                # consumes pending → rate now $20
+clock_out("e1", 400)               # session2: paid at $20
+
+set_double_pay(350, 450)
+# calculate_pay("e1", 0, 500):
+#   session1 [100, 200) at $10 — no overlap → 100 ticks × $10
+#   session2 [300, 400):
+#     [300, 350) at $20 → 50 ticks × $20
+#     [350, 400) at $20 × 2 → 50 ticks × $40
+
+Notes
+The promotion apply on next clock_in semantics is the single biggest trip. Maintain a per-employee pending_promotion field rather than retroactively rewriting history.
+Pre-sort events per employee and use a running pointer for window aggregations; do not try to share a global timeline across all employees.
+For L4, merge overlapping bonus windows before computing. A naive "for each bonus, multiply overlap" approach double-counts overlapping bonuses.
+Many candidates score full marks on this OA but still get rejected — confirm via recruiter whether your role still has open headcount before assuming pass = next round.
+Older variants exposed a separate get_total_grant(start, end) returning total bonus payout in [start, end] with non-overlapping guarantees. The current shape keeps the bonus periods themselves potentially overlapping, so the merge step matters.
+
+Preparation
+Build an Employee aggregate that owns its event log (sessions, promotion events) and exposes per-method queries; do not try to share a global timeline.
+Pre-write a bisect-based range-sum scaffold so L4 is mechanical: events sorted by ts, two pointers for [start, end].
+Drill the interval-arithmetic edge cases cold: clock_in then clock_in (idempotent or error?), clock_out without clock_in, session straddling the window boundary, bonus window strictly inside a session, two bonus windows partially overlapping each other.
+Time-box: L1+L2 ≤ 25 min, L3 ≤ 25 min, L4 ≤ 30 min, leaving 10 min for the bug-fix margin on the bonus-overlap case.

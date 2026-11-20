@@ -1,0 +1,97 @@
+==============================================================================
+Anthropic - Software Engineer - Online Assessment (CodeSignal)
+Title: Banking System (4-level, progressive)
+Frequency: Medium. Reported Jan 2026 (cashback variant) / last asked 2026-06-15
+           (Fellow two-step variant). Stage: OA.
+Sources: DarkInterview (Prompt 1) + 1point3acres (Prompt 2)
+Solutions in this folder:
+   BankingSystem.java          -> PRIMARY: cashback / top_spenders variant (verified)
+   BankingSystemTwoStep.java   -> SECONDARY: transfer/transfer_accept Fellow variant (verified)
+==============================================================================
+
+------------------------------------------------------------------------------
+PROMPT 1 (DarkInterview) - cashback / top_spenders variant  [FULLY SPECIFIED]
+------------------------------------------------------------------------------
+In-memory banking system, 4 progressive levels. Subsequent levels unlock when
+the current one is solved; you always have data for current + previous levels.
+
+LEVEL 1 - Basic Account Operations
+  create_account(timestamp, account_id) -> bool
+    True if created; False if account_id already exists.
+  deposit(timestamp, account_id, amount) -> int | None
+    Returns balance after deposit; None if account doesn't exist.
+  transfer(timestamp, source_id, target_id, amount) -> int | None
+    Returns source's new balance; None if: source/target missing,
+    source == target, or insufficient funds.
+
+LEVEL 2 - Top Spenders
+  top_spenders(timestamp, n) -> list[str]
+    Top n accounts by total OUTGOING (transferred out + paid/withdrawn).
+    Sort: outgoing desc, then account_id asc. If fewer than n accounts, return
+    all. Format: ["id1(total1)", "id2(total2)", ...]  (no space in parens).
+    Cashback (L3) must NOT count toward outgoing.
+
+LEVEL 3 - Scheduled Payments with Cashback
+  pay(timestamp, account_id, amount) -> str | None
+    Withdraws amount. 2% cashback = floor(amount * 0.02), refunded 24h later
+    (24*60*60*1000 = 86_400_000 ms), processed at timestamp + 86_400_000, only
+    if the account still exists. Returns "payment1", "payment2", ...; None if
+    account missing or insufficient funds. Withdrawal counts toward top_spenders.
+  get_payment_status(timestamp, account_id, payment) -> str | None
+    "IN_PROGRESS" (cashback pending) or "CASHBACK_RECEIVED".
+    None if account missing, payment missing, or payment belongs to another id.
+
+LEVEL 4 - Account Merging and Historical Balances
+  merge_accounts(timestamp, account_id_1, account_id_2) -> bool
+    Merge id2 INTO id1; id2 removed. False if id1 == id2 or either missing.
+    - id2's pending cashbacks still process but refund id1.
+    - id2's payment statuses become queryable via id1.
+    - id2's balance added to id1; outgoing tallies combine.
+  get_balance(timestamp, account_id, time_at) -> int | None
+    Balance of account_id at time_at (reflecting any op processed AT time_at).
+    None if account didn't exist at time_at.
+  EDGE CASES:
+    - After merge, account_id_2 can be re-created; the new account starts at 0
+      with NO inherited history; the OLD pre-merge history stays queryable for
+      time_at < merge_ts.
+    - Merged at T: queries time_at < T -> historical balance; time_at >= T ->
+      None (unless recreated).
+  CONSTRAINTS: timestamps in ms, unique, strictly increasing; amounts positive
+  integers; account ids valid strings.
+
+------------------------------------------------------------------------------
+PROMPT 2 (1point3acres) - two variants
+------------------------------------------------------------------------------
+(A) AI Safety Fellow OA variant -> BankingSystemTwoStep.java
+  L1-2: create_account, deposit, withdraw, transfer (atomic).
+  L3 - two-step transfer: transfer(from,to,amount) HOLDS funds (sender's
+       available balance drops, recipient unchanged); transfer_accept(transfer_id)
+       finalizes. Expiry semantics VARY: an unaccepted transfer that expires must
+       release the held funds; a later deposit on the source reclaims a still-
+       pending transfer. Model hold -> (accept | expire) -> reclaim explicitly;
+       the timeout-then-deposit interaction is a frequently-failed edge.
+  L4 - merge_account(from, into): collapse two accounts, preserving the union of
+       pending transfers + history. Trip-up: a merged account can be RECREATED
+       later under the same id; the new account must NOT inherit merged-away
+       history -> use generation-keyed history: entries keyed by
+       (account_id, generation), generation increments on recreate-after-merge.
+  NOTE: this was the fall-2025 Fellow OA; Anthropic rotates OAs -- confirm with
+  recruiter. A plain dict[account_id] = history FAILS the merge-then-recreate
+  hidden cases.
+
+(B) Alternate canonical variant = exactly Prompt 1 (cashback / top_spenders).
+  Confirmed signatures match Prompt 1. floor(amount*0.02); 86_400_000 ms delay;
+  event-queue/sorted-by-due-time list of pending cashbacks processed on every
+  command (cheap, timestamps monotonic). Post-merge recreate = same generational
+  trap. top_spenders tally is per-account; after merge id1 absorbs id2's tally.
+  Memorize the format exactly: "id1(spent)" no inner space, ", " between entries.
+
+PREP NOTES:
+  - Ledger aggregate: every mutation appends an immutable entry; queries fold
+    over filtered slices.
+  - Two-step transfer = state machine PENDING -> ACCEPTED | EXPIRED.
+  - Drill merge-and-recreate with a synthetic test before submission (single
+    most-failed corner across both rotations).
+  - Cashback: due_at = pay_ts + 86_400_000, sorted list, process all due on every
+    command. Don't try to "schedule" -- the harness drives the clock.
+==============================================================================

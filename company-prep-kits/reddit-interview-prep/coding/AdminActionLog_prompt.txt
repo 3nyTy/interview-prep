@@ -1,0 +1,72 @@
+Reddit — Staff Software Engineer — Coding Interview (sample question)
+
+Admin Action Log: Order & Permission
+Parse chronological moderator action logs, track active moderators by most-recent
+promotion time, answer whether one moderator can remove another by seniority, and
+return the current ranking. The newer version scopes the state by community and
+adds a demote operation that moves a moderator down exactly one rank.
+
+Requirements
+Initialize a moderator system from a chronological list of log entries. Each entry
+has the shape:
+
+    <targetUser>,<action>,<actorUser>,<timestamp>
+
+where targetUser is the user whose moderator status changes, action is added or
+removed, actorUser performed the action, and timestamp is an integer-like string.
+The entries are sorted by increasing timestamp. Older variants use add / delete
+naming; clarify the exact literals before coding.
+
+Implement ModSystem(List<String> logs) and expose:
+
+  boolean canRemoveMod(String targetUser, String actorUser)
+    Return true only when both users are currently moderators, actorUser != targetUser,
+    and actorUser has higher moderator level than targetUser. Among active moderators,
+    the user whose most recent moderator-add event happened earlier has the higher level.
+
+  List<String> getModRanking()
+    Return the active moderators from highest level to lowest level.
+
+Follow-ups
+  Community scope. Add a community dimension so moderator status, seniority, and ranking
+    are tracked per community. The natural state key becomes (community, user), and
+    getModRanking / canRemoveMod operate inside one community.
+  Demotion. Add void demote(String community, String user). Demoting a moderator moves
+    that user down exactly one position in the current community ranking. If the user is
+    already the lowest-ranked moderator, or is not currently a moderator in that community,
+    the call is a no-op.
+  Scale to millions of log entries. Discuss memory and pre-processing trade-offs:
+    streaming parse vs in-memory split, sharding by community, indexed lookup for
+    canRemoveMod so it is O(1) per call after a one-time O(N) build.
+
+Notes
+  The base version works with two maps: user -> most-recent-add-timestamp for seniority
+    and ranking, plus user -> active-bool for current membership. Build both in one pass
+    over the log.
+  The ranking direction is easy to reverse by mistake: earlier most-recent add means
+    higher level; later add means lower level.
+  If a moderator is removed and later added again, the most recent add timestamp resets
+    seniority in the canonical version. Confirm this explicitly if the interviewer leaves
+    it ambiguous.
+  For community scope, extend every state map to (community, user) -> state and keep a
+    per-community active ranking. Sharding by community-id is the obvious horizontal-scaling answer.
+  The demotion follow-up pushes beyond sorting: a doubly linked list per community makes
+    one-position demotion O(1) once you have user -> node. An array/list is simpler but
+    demotion is O(N) because the user has to be located and swapped.
+  The new version is described as a seven-part prompt; finishing the first three parts is
+    enough for a strong screen. Time-box the base parser and permission check before
+    optimizing the demotion data structure.
+  Edge cases: log out of timestamp order, remove of a user who was never added, actor not
+    currently a moderator, target equals actor, duplicate add events, and demoting the tail
+    moderator. Clarify whether invalid log entries are ignored or raise.
+
+Preparation
+  Practice writing a streaming parser for delimited log strings. Decide between split("\n")
+    for simplicity and a manual pointer scan for memory-sensitive input.
+  Drill the state model: active membership, seniority timestamp, and ordered ranking are
+    related but separate concerns. Keep them in separate structures rather than recomputing
+    everything per query.
+  Implement the community-scoped version once, then add demotion with a doubly linked list
+    plus user -> node. This is the follow-up that changes the data-structure choice.
+  Rehearse the scale answer out loud: community shard key, O(unique moderators per shard)
+    memory, streaming log replay, and O(1) permission checks from the precomputed rank index.

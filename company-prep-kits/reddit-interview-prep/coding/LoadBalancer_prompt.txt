@@ -1,0 +1,42 @@
+Reddit — Staff Software Engineer — Coding Interview (sample question)
+
+Load Balancer Debugging & Extension
+Debug and extend a provided load-balancer codebase across four parts: repair failed health
+checks, diagnose excess latency, add a circuit breaker for unhealthy servers, and replace
+round-robin routing with least-request-latency selection.
+
+Requirements
+Work in a provided load-balancer codebase and complete four sequential parts:
+
+Part 1 — Health-check failure. The load balancer receives repeated HTTP 500 responses. Trace
+the failure to mismatched hostname and port names in the health-check path, then correct the
+configuration or lookup so healthy hosts are no longer marked unhealthy.
+
+Part 2 — Latency diagnosis. Service latency is above expectations. Find the server path
+containing an excessive sleep and instrument request latency so the slow path can be identified
+from measurements rather than guesswork.
+
+Part 3 — Circuit breaker. Implement protection that prevents the load balancer from sending
+requests to servers already considered unhealthy.
+
+Part 4 — Routing policy. Replace the existing round-robin policy with a policy that selects the
+server with the lowest observed request latency.
+
+Exact class names, method signatures, and test cases are supplied by the interview codebase and
+should be confirmed before editing.
+
+Notes
+- Root-cause analysis and decision justification carry more weight than raw implementation
+  speed. Narrate what evidence rules hypotheses in or out before changing the code.
+- Part 2 is intentionally straightforward at the code level; the evaluation signal is the
+  debugging method and the latency instrumentation.
+- Keep fault detection, request admission, and backend selection as separate responsibilities so
+  later parts do not require rewriting earlier fixes.
+
+Preparation
+- Rehearse reading a small unfamiliar backend codebase: locate the request path, health-check
+  path, backend registry, and routing policy before making changes.
+- Build a minimal load-balancer prototype with pluggable routing, health state, request-latency
+  measurement, and a circuit-breaker gate.
+- Practice explaining each debugging step aloud, including the observation, hypothesis,
+  instrumentation, result, and resulting code change.

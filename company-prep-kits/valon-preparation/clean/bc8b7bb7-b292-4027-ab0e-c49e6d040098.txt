@@ -1,0 +1,60 @@
+In-Memory SQL Database: Insert and Select by Column Names
+Related Discussion
+valon
+Problem: Build an In-Memory SQL Database (Insert + Select)
+
+Implement a simplified in-memory database for a single table that supports inserting rows and selecting specific columns.
+
+Data Model
+A table is defined by a list of column names (string).
+Each row is a mapping from column name to value (values can be treated as strings).
+Operations to Support (this part)
+Create Table: initialize the table schema with a list of column names.
+Insert: insert one row, where values are provided by column name (e.g., col=value).
+Select: return results by a list of requested column names.
+SELECT specifies which columns to project.
+If a requested column is missing in the row, return an empty string or NULL (align with the interviewer).
+I/O Expectations (interview style)
+You may expose a class with methods; stdin/stdout is not required.
+select(columns) should return a 2D list/array where each row is a list of values for the selected columns.
+Constraints
+All data must be stored in memory.
+Preserve insertion order unless later requirements add sorting.
+Example
+Columns: ["id","name","age"]
+Insert: {"id":"1","name":"alice","age":"20"}
+select(["name","id"]) returns [["alice","1"]]
+Example
+Input
+create: id,name,age
+insert: id=1,name=alice,age=20
+select: name,id
+Output
+alice,1
+Was this article helpful?
+Python 3
+Java
+12px
+14px
+16px
+18px
+20px
+22px
+24px
+1
+2
+3
+4
+5
+6
+7
+def solution():
+    # Read data from standard input
+    # Write your code here
+    pass
+if __name__ == "__main__":
+    solution()
+Standard Input
+Run
+History
+Execution Result:

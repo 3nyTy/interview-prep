@@ -1,0 +1,185 @@
+================================================================================
+ANTHROPIC — STAFF SOFTWARE ENGINEER — CODING ROUND
+Question: "Web Crawler" (LeetCode 1242 "Web Crawler Multithreaded" style)
+Sources: DarkInterview + 1point3acres (reported Apr–May 2026)
+Frequency: HIGH | Stage: phone-screen + onsite-coding | Roles: SWE / MLE / Infra Eng
+Tags: concurrency, threading, async, bfs, medium
+================================================================================
+
+--------------------------------------------------------------------------------
+PROMPT 1 (DarkInterview)
+--------------------------------------------------------------------------------
+Web Crawler
+Coding
+Phone, Onsite
+Software Engineer
+Reported Apr, 2026
+High Frequency
+
+Basic Problem
+You are given:
+- A starting URL startUrl
+- An interface HtmlParser that can fetch all URLs from a given web page
+
+Implement a web crawler that returns all URLs reachable from startUrl that share
+the same hostname as startUrl. The order of URLs in the result does not matter.
+
+Below is the interface for HtmlParser:
+interface HtmlParser {
+    // Returns all URLs from a given page URL.
+    public List<String> getUrls(String url);
+}
+
+Your function will be called like List<String> crawl(String startUrl, HtmlParser htmlParser).
+
+Requirements — Your crawler should:
+- Start from startUrl.
+- Use HtmlParser.getUrls(url) to obtain all links from a page.
+- Avoid duplicates — never crawl the same URL twice.
+- Restrict scope — only follow URLs whose hostname matches that of startUrl.
+- Assume all URLs use the http protocol and do not include a port.
+
+Note for Candidate
+- URL Fragments: Consider how to handle URL fragments (e.g.,
+  http://example.com/page#section1). Same URL or different? Clarify with interviewer.
+- URL Normalization: Assume URL normalization is NOT required for the basic problem.
+
+Follow-up: Multithreaded/Concurrent Implementation (Important!!)
+After implementing the basic single-threaded version, implement a multithreaded or
+concurrent version of the web crawler to improve performance.
+Requirements
+- Parallelize the crawling — multiple URLs should be fetched concurrently
+- Thread safety — no race conditions on shared data (visited set, result list)
+- Avoid duplicates — even with multiple threads, each URL crawled only once
+- Maintain hostname restriction — only crawl URLs with matching hostnames
+Note for Candidate
+- Use a thread pool to control the total number of threads.
+- Do NOT create unbounded threads (e.g., one thread per URL).
+- A thread pool limits concurrency and prevents resource exhaustion.
+- Common approach: fixed-size thread pool (e.g., 10-20 threads) with a task queue.
+
+[The DarkInterview write-up then provides a full JavaScript reference solution:
+ a custom async ThreadPool class (maxConcurrency, queue, runningTasks,
+ waitForFinish), a getProcessedUrlObject() helper that strips the URL hash
+ fragment for normalization, and an async crawl(startUrl, htmlParser,
+ maxConcurrency=10) that seeds visited+result with the start URL and fires
+ pool.execute(() => crawlUrl(nextUrl)) for each new same-host unvisited URL,
+ then awaits pool.waitForFinish(). Key design decisions called out: custom
+ ThreadPool for bounded concurrency; hash-fragment normalization; Set for
+ visited (JS single-threaded event loop => no races); error handling that logs
+ without crashing; concurrency cap to avoid overwhelming servers.]
+
+Additional Discussion Topics (verbal — interviewer does not expect code)
+1. Concurrency Models: Threads vs Processes
+   - Threads: lightweight, shared memory, low overhead, good for I/O-bound work
+     like crawling.
+   - Processes: heavyweight, isolated memory, better for CPU-bound, avoid Python GIL.
+   - Trade-offs: memory, communication overhead, fault isolation.
+   - For crawling: threads preferred (I/O-bound + shared state).
+
+2. Distributed Crawling System (millions of seed URLs, one machine can't cope)
+   - URL distribution: consistent hashing by hostname/domain; central
+     coordinator/queue; each machine owns specific domains.
+   - Coordination/dedupe: shared distributed cache (Redis/Memcached); central URL
+     frontier/queue; partition by URL hash.
+   - Load balancing; fault tolerance (machine failures + retries).
+
+3. Politeness Policy and Rate Limiting (crawler too aggressive)
+   - robots.txt compliance (crawl delays, disallowed paths).
+   - Rate limit per domain (req/sec per hostname); per-domain request queues;
+     delay between requests to same domain (1-2 s).
+   - Adaptive throttling (slow down on slow responses / errors).
+   - Distributed rate limiting across machines; off-peak scheduling.
+
+4. Duplicate Content Detection (different URLs -> same/similar content)
+   - Content fingerprinting: hash page content (MD5/SHA-256) for exact dupes;
+     Simhash for near-duplicates.
+   - URL normalization: canonicalize (strip tracking params, sort query params);
+     follow HTML canonical tags.
+   - Content similarity: shingling/n-grams, Jaccard similarity.
+   - Trade-offs: storage vs compute; false positives vs negatives; fetch vs skip.
+
+--------------------------------------------------------------------------------
+PROMPT 2 (1point3acres) — same question, follow-up emphasis
+--------------------------------------------------------------------------------
+Coding Q1 — Concurrent Web Crawler
+Implement a same-domain web crawler given a pre-supplied htmlParser.getUrls(url)
+helper. Starts as a single-threaded BFS; the bulk of the round is the follow-up
+to parallelize it (threads, processes, or async) and reason about scaling across
+machines.
+SWE / MLE / Infra Eng | concurrency, threading, async, bfs, python, medium
+Frequency: High | Last asked: 2026-05-03 | Stage: phone-screen · onsite-coding
+
+Requirements
+Implement crawl(startUrl: str, htmlParser: HtmlParser) -> list[str]:
+- Visit every URL reachable from startUrl whose hostname matches
+  urlparse(startUrl).hostname.
+- Deduplicate visited URLs.
+- Environment provides htmlParser.getUrls(url) -> list[str] (LeetCode 1242-style).
+- Must compile/run inside CodeSignal; tests pass when returned set size is below a
+  target threshold (often < 100).
+
+Then, in order, the follow-ups:
+- Concurrent version. Add multithreading (typically
+  concurrent.futures.ThreadPoolExecutor with a thread-safe visited set and a work
+  queue). Some interviewers ask for an asyncio implementation instead — pick
+  whichever you told the recruiter you'd use.
+- CPU-bound vs IO-bound. Justify threads vs processes vs asyncio. Expected answer:
+  crawling is IO-bound, so threads or async beat processes; parsing-heavy variants
+  push toward processes.
+- Distributed crawler. Shard hostnames across N machines, dedupe across them
+  (Redis / central queue), throttle per-host, resume after a worker dies. Verbal.
+- Coroutine semantics sometimes asked: difference between asyncio.gather,
+  asyncio.as_completed, and a manual semaphore-bounded pool.
+
+Examples (typical reference solution)
+from urllib.parse import urlparse
+from collections import deque
+def crawl(startUrl, htmlParser):
+    host = urlparse(startUrl).hostname
+    seen = {startUrl}
+    q = deque([startUrl])
+    while q:
+        u = q.popleft()
+        for v in htmlParser.getUrls(u):
+            if v in seen: continue
+            if urlparse(v).hostname == host:
+                seen.add(v); q.append(v)
+    return list(seen)
+
+Notes
+- Replit (through mid-2025) replaced by CodeSignal. IDE shows no linter errors
+  before run; expect a few minutes fixing imports on first run.
+- No deduction for using Google/library docs, but they watch how you decide
+  between ThreadPoolExecutor and asyncio — pick one and defend it.
+- Common stumble: writing a custom async HTML parser instead of staying with the
+  supplied getUrls API. PNG/codec edge cases are NOT part of the spec.
+- The Q1 prompt blurb is shared with an image-processing variant; recruiter
+  usually doesn't tell you which you'll get.
+- Two clarifying questions worth asking before coding: (1) how to treat URL
+  fragments (#section vs #section2 — same page or different?) and (2) whether URL
+  normalization is in scope. Assume "all links use http, no port numbers" unless
+  told otherwise. Supplied interface is List<String> getUrls(String url) (Java);
+  Python harness mirrors it as htmlParser.getUrls(url) -> list[str].
+
+Preparation
+- Write single-threaded BFS from scratch, then add a ThreadPoolExecutor wrapper
+  with a Lock-guarded visited set in under 15 minutes.
+- Practice an asyncio rewrite: asyncio.Semaphore, asyncio.gather, awaiting the
+  parser as if it were async.
+- Whiteboard multi-machine sharding: central queue (Redis/SQS), consistent hashing
+  on hostname, dedupe in shared Bloom filter or Redis set, per-host rate limiting
+  via token buckets.
+- Cross-train the image-processing sibling prompt in parallel.
+
+================================================================================
+SOLUTION: see WebCrawler.java (same directory) — verified on Corretto 21.
+  Part 1  crawl()             : single-threaded BFS.
+  Part 2  crawlConcurrent()   : fixed thread pool + ConcurrentHashMap.newKeySet()
+                                visited set + AtomicInteger pending-counter +
+                                CountDownLatch termination.  [the key follow-up]
+          crawlConcurrentCF() : CompletableFuture variant (allOf composition
+                                replaces the manual counter/latch).
+  Self-test proves: correct set, each in-scope URL fetched EXACTLY once (race-free
+  dedup), out-of-scope hosts never fetched, concurrent faster than single-threaded.
+================================================================================

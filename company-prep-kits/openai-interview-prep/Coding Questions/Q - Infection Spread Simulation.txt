@@ -1,0 +1,751 @@
+Infection Spread Simulation
+Coding
+Phone, Onsite
+Software Engineer, Machine Learning Engineer
+Reported May, 2026
+High Frequency
+Note: This is a multi-part progressive interview question with 5 levels of increasing complexity. Each subsequent level builds upon the previous one, with additional constraints or requirements. The total time limit for all 5 levels is 60 minutes.
+
+Problem Overview
+You are given an n × m grid representing a population. Each cell in the grid represents a person who is either healthy (0) or infected (1).
+
+The infection spreads according to the following rule: 
+
+A healthy person becomes infected if at least N of their neighbors are infected.
+Neighbors are defined as the 4 adjacent cells (up, down, left, right) — no diagonals.
+
+Assume 1 <= N <= 4 unless the interviewer says otherwise. If N > 4, no healthy cell can ever become infected under the 4-neighbor rule.
+
+At the base level, your task is to determine how many time steps it will take for all people in the grid to become infected, or return -1 if not everyone will be infected. Later levels keep the same infection-spread rule but change the state transitions or optimization objective. 
+
+This problem is similar to LeetCode 289: Game of Life, but with a focus on infection spread dynamics rather than birth/death rules.
+
+In the current version of this question, the threshold N is part of the core problem from the start. A healthy cell becomes infected only when at least N of its 4-directional neighbors were infected at the beginning of the current time step.
+
+Level 1: Threshold-Based Infection Spread
+Problem Statement
+Given an n × m grid and an infection threshold N, simulate the infection spread and return the number of time steps until all cells are infected. 
+
+At each time step, all infections happen simultaneously — meaning the state of all cells is evaluated based on the previous time step, not the current one being computed.
+
+Function Signature
+def time_to_full_infection(grid: list[list[int]], N: int) -> int:
+    """
+    Args:
+        grid: An n×m grid where 0 = healthy and 1 = infected
+        N: Minimum number of infected neighbors required for a healthy cell to become infected
+
+    Returns:
+        The number of time steps until all cells are infected,
+        or -1 if not all cells will become infected.
+    """
+    pass
+
+Examples
+Example 1:
+
+Input:
+grid = [
+    [0, 0, 0],
+    [0, 1, 0],
+    [0, 0, 0]
+]
+N = 1
+
+Output: 2
+
+Explanation:
+- Initial state: Only center cell is infected
+- After step 1: Center's 4 neighbors become infected
+  [0, 1, 0]
+  [1, 1, 1]
+  [0, 1, 0]
+- After step 2: Remaining corners become infected
+  [1, 1, 1]
+  [1, 1, 1]
+  [1, 1, 1]
+
+Example 2: 
+
+Input:
+grid = [
+    [1, 1],
+    [1, 0]
+]
+N = 2
+
+Output: 1
+
+Explanation:
+- Initial: Only the bottom-right cell is healthy
+- After step 1: It has 2 infected neighbors, so it becomes infected
+  [1, 1]
+  [1, 1]
+
+Example 3:
+
+Input:
+grid = [
+    [1, 0, 0],
+    [0, 0, 0],
+    [0, 0, 1]
+]
+N = 1
+
+Output: 2
+
+Explanation:
+- With N = 1, the infection spreads in waves from both corners
+- After step 2, all cells are infected
+
+Example 4:
+
+Input:
+grid = [
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0]
+]
+N = 1
+
+Output: -1
+
+Explanation:
+- No initially infected cells, so infection cannot spread.
+
+Example 5: 
+
+Input:
+grid = [
+    [1, 1, 1],
+    [1, 1, 1],
+    [1, 1, 1]
+]
+N = 2
+
+Output: 0
+
+Explanation:
+- All cells are already infected.
+
+Approach: Synchronous Simulation
+Because N can be greater than 1, we need to simulate each step from a snapshot of the previous grid. A cell that becomes infected during the current step cannot help infect another cell until the next step.
+
+from typing import List
+
+
+def time_to_full_infection(grid: List[List[int]], N: int) -> int:
+    if not grid or not grid[0]:
+        return -1
+
+    n, m = len(grid), len(grid[0])
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+    healthy_count = sum(
+        1 for i in range(n) for j in range(m) if grid[i][j] == 0
+    )
+    infected_count = n * m - healthy_count
+
+    if healthy_count == 0:
+        return 0
+    if infected_count == 0:
+        return -1
+
+    time_step = 0
+
+    while healthy_count > 0:
+        new_infections = []
+
+        # Evaluate every healthy cell against the previous state.
+        for i in range(n):
+            for j in range(m):
+                if grid[i][j] != 0:
+                    continue
+
+                infected_neighbors = 0
+                for dr, dc in directions:
+                    ni, nj = i + dr, j + dc
+                    if 0 <= ni < n and 0 <= nj < m and grid[ni][nj] == 1:
+                        infected_neighbors += 1
+
+                if infected_neighbors >= N:
+                    new_infections.append((i, j))
+
+        # If no new infections and still healthy cells remain, impossible
+        if not new_infections:
+            return -1
+
+        # Apply infections (simultaneous update)
+        for i, j in new_infections:
+            grid[i][j] = 1
+            healthy_count -= 1
+
+        time_step += 1
+
+    return time_step
+
+Optimization Note
+For the special case N = 1, multi-source BFS is valid and runs in O(n × m), because every healthy cell needs only one infected neighbor to flip. For general N, plain BFS is not sufficient unless it is adapted to preserve step boundaries and track how many infected neighbors each healthy cell has accumulated from the previous wave.
+
+One possible optimized general solution is to maintain, for each healthy cell, the number of infected neighbors it has in the current step. When cells become infected, they contribute to their neighbors' counts for the next step. The key requirement is still the same: updates must happen in layers so same-step infections do not cascade immediately. 
+
+Complexity Analysis
+Time Complexity: O((n × m)²) — in worst case, we scan entire grid each step
+Space Complexity: O(n × m) — for storing new infections
+Level 2: Immune Cells
+Problem Statement
+Building upon Level 1, keep the same threshold infection rule using N, but now some cells in the grid are immune to infection (e.g., vaccinated or naturally resistant). Immune cells:
+
+Cannot be infected — they remain in their immune state permanently
+Do not spread infection — they act as blockers in the grid
+Are represented by the value 2 in the grid
+How does this affect your approach to the problem?
+
+Key Considerations
+Blocked Neighbors: Immune cells do not count as infected neighbors and cannot become infected
+Reachability Check: Some healthy cells may remain healthy forever if they never reach the threshold
+Edge Cases:
+All non-immune cells already infected → return 0
+Healthy cells completely surrounded by immune cells → return -1
+Approach
+Use the same synchronous simulation from Level 1, but only count cells with value 1 as infected neighbors. Immune cells are skipped when counting healthy cells and never change state. 
+
+def time_to_full_infection_with_immunity(grid: List[List[int]], N: int) -> int:
+    """
+    Grid values:
+    - 0: Healthy
+    - 1: Infected
+    - 2: Immune (cannot be infected, does not spread)
+    """
+    if not grid or not grid[0]:
+        return -1
+
+    n, m = len(grid), len(grid[0])
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    healthy_count = sum(
+        1 for i in range(n) for j in range(m) if grid[i][j] == 0
+    )
+    infected_count = sum(
+        1 for i in range(n) for j in range(m) if grid[i][j] == 1
+    )
+
+    if healthy_count == 0:
+        return 0  # All non-immune cells are already infected
+    if infected_count == 0:
+        return -1  # No infection source
+
+    time_step = 0
+
+    while healthy_count > 0:
+        new_infections = []
+
+        for i in range(n):
+            for j in range(m):
+                if grid[i][j] != 0:
+                    continue
+
+                infected_neighbors = 0
+                for dr, dc in directions:
+                    ni, nj = i + dr, j + dc
+                    if 0 <= ni < n and 0 <= nj < m and grid[ni][nj] == 1:
+                        infected_neighbors += 1
+
+                if infected_neighbors >= N:
+                    new_infections.append((i, j))
+
+        if not new_infections:
+            return -1
+
+        for i, j in new_infections:
+            grid[i][j] = 1
+            healthy_count -= 1
+
+        time_step += 1
+
+    return time_step
+
+Level 3: Infection Recovery to Immunity
+Problem Statement
+After being infected for D days, cells become immune. Once a cell becomes immune:
+
+It can no longer spread infection
+It cannot be re-infected
+Any cells that start as immune (2) from Level 2 remain immune permanently and still act as blockers
+Assume D >= 1.
+
+The threshold infection rule from previous levels still applies: a healthy cell becomes infected only if at least N active infected neighbors are present in the start-of-day snapshot. 
+
+After enough time, the grid will reach a stable state where all cells are either immune or healthy (with no active infections remaining).
+
+Question: How many days does it take to reach this stable state?
+
+Key Considerations
+State Tracking: Each cell can be in one of three states: healthy, infected (with infection age), or immune
+Time-Based Transitions:
+Healthy → Infected (when at least N neighbors are infected)
+Infected (age ≥ D) → Immune
+Termination Condition: No active infections remain (all cells are either healthy or immune)
+Wave Propagation: Infection spreads in threshold-based waves, but waves can die out as cells become immune
+Simultaneous Daily Update: Cells that reach age D still spread on that day; transitions to immune happen at end-of-day
+Approach
+We need to track the age of each infection and simulate day-by-day: 
+
+def time_to_stable_state(grid: List[List[int]], N: int, D: int) -> int:
+    """
+    Grid values:
+    - 0: Healthy
+    - 1: Initially infected (day 0)
+    - 2: Initially immune (cannot be infected, does not spread)
+    
+    N: Minimum number of infected neighbors required for a healthy cell to become infected
+    D: Days until infected becomes immune
+    
+    Returns: Days until stable state (no active infections)
+    """
+    if not grid or not grid[0]:
+        return 0
+
+    n, m = len(grid), len(grid[0])
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+    # Store infection day for each cell:
+    # None = healthy, -1 = immune, 0+ = day the cell became infected
+    infection_day = [[None] * m for _ in range(n)]
+    
+    # Initialize: find initially infected cells (infected on day 0)
+    active_infections = set()
+    for i in range(n):
+        for j in range(m):
+            if grid[i][j] == 1:
+                infection_day[i][j] = 0
+                active_infections.add((i, j))
+            elif grid[i][j] == 2:
+                infection_day[i][j] = -1
+
+    if not active_infections:
+        return 0  # No infections, already stable
+
+    current_day = 0
+
+    while active_infections:
+        current_day += 1
+        new_infections = set()
+        new_immune = set()
+        infected_today = set(active_infections)  # Start-of-day active-infection snapshot
+
+        # Step 1: Determine which cells will transition today
+        for (i, j) in infected_today:
+            if infection_day[i][j] is not None and infection_day[i][j] >= 0:
+                days_infected = current_day - infection_day[i][j]
+                if days_infected >= D:
+                    new_immune.add((i, j))
+
+        # Step 2: Determine new infections from the start-of-day active-infection snapshot.
+        # Cells that will transition at end-of-day still count as infected today.
+        for i in range(n):
+            for j in range(m):
+                if infection_day[i][j] is not None:
+                    continue
+
+                infected_neighbors = 0
+                for dr, dc in directions:
+                    ni, nj = i + dr, j + dc
+                    if 0 <= ni < n and 0 <= nj < m and (ni, nj) in infected_today:
+                        infected_neighbors += 1
+
+                if infected_neighbors >= N:
+                    infection_day[i][j] = current_day
+                    new_infections.add((i, j))
+
+        # Step 3: Apply immunity transitions at end-of-day
+        for (i, j) in new_immune:
+            infection_day[i][j] = -1  # Mark as immune
+            active_infections.discard((i, j))
+
+        active_infections.update(new_infections)
+
+    return current_day
+
+Complexity Analysis
+Time Complexity: O(days × n × m) where days depends on D and grid size
+Space Complexity: O(n × m) for tracking infection state
+Level 4: Death Parameter
+Problem Statement
+Building upon Level 3, introduce a death mechanic. An infected cell will die instead of becoming immune if it has at least K infected neighbors at the time it would transition. Dead cells:
+
+Cannot spread infection — they are permanently removed from the simulation
+Cannot be re-infected — they act as empty/dead space in the grid
+Are distinct from immune cells
+Any cells that start as immune (2) from earlier levels remain immune permanently and continue to block spread.
+
+The infection-spread threshold N still applies before death or immunity transitions are committed for the day. Only currently active infected cells count toward both the spread threshold N and the death threshold K. 
+
+You are given an additional parameter K (the death threshold). When an infected cell has been infected for D days and is about to transition:
+
+If it currently has ≥ K infected neighbors, it dies
+Otherwise, it becomes immune
+Daily updates are simultaneous: spread and transition decisions use the start-of-day active-infection state, then transitions are applied at end-of-day
+Assume 1 <= K <= 4 unless the interviewer says otherwise.
+
+Return a tuple: (days_to_stable_state, number_of_dead_cells) — the number of days until the grid reaches a stable state (no active infections) and the total count of cells that died. 
+
+Key Considerations
+Dual Transition Logic: At the transition point (after D days infected), the cell's fate depends on its current neighborhood
+Order of Operations: On each day:
+Take a start-of-day snapshot of all active infected cells
+Determine which snapshot cells transition (infected for ≥ D days)
+For each transitioning cell, check infected-neighbor count in that same snapshot
+Scan healthy cells and infect those with at least N infected neighbors in the snapshot
+Apply death/immunity transitions at end-of-day
+Dead Cells as Barriers: Dead cells block infection spread, similar to immune cells
+No Same-Day Cascades: Because decisions use a snapshot, same-day transitions do not affect other same-day transition decisions
+Approach
+def time_to_stable_with_death(
+    grid: List[List[int]], N: int, D: int, K: int
+) -> tuple[int, int]:
+    """
+    Grid values:
+    - 0: Healthy
+    - 1: Initially infected (day 0)
+    - 2: Initially immune (cannot be infected, does not spread)
+
+    N: Minimum number of infected neighbors required for a healthy cell to become infected
+    D: Days until infected transitions (to immune or dead)
+    K: If infected cell has >= K infected neighbors at transition, it dies
+
+    Returns: (days_to_stable_state, number_of_dead_cells)
+    """
+    if not grid or not grid[0]:
+        return (0, 0)
+
+    n, m = len(grid), len(grid[0])
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+    # Cell states: None = healthy, int >= 0 = infection day, 'immune', 'dead'
+    state = [[None] * m for _ in range(n)]
+    active_infections = set()
+    dead_count = 0
+
+    for i in range(n):
+        for j in range(m):
+            if grid[i][j] == 1:
+                state[i][j] = 0  # Infected on day 0
+                active_infections.add((i, j))
+            elif grid[i][j] == 2:
+                state[i][j] = 'immune'
+
+    if not active_infections:
+        return (0, 0)
+
+    current_day = 0
+
+    while active_infections:
+        current_day += 1
+
+        infected_today = set(active_infections)  # Start-of-day active-infection snapshot
+
+        # Step 1: Determine which cells transition today
+        transitioning = set()
+        for (i, j) in infected_today:
+            if isinstance(state[i][j], int) and state[i][j] >= 0:
+                if current_day - state[i][j] >= D:
+                    transitioning.add((i, j))
+
+        # Step 2: For each transitioning cell, decide death vs immunity
+        new_dead = set()
+        new_immune = set()
+
+        for (i, j) in transitioning:
+            # Count infected neighbors from the start-of-day active-infection snapshot
+            infected_neighbors = 0
+            for dr, dc in directions:
+                ni, nj = i + dr, j + dc
+                if 0 <= ni < n and 0 <= nj < m:
+                    if (ni, nj) in infected_today:
+                        infected_neighbors += 1
+
+            if infected_neighbors >= K:
+                new_dead.add((i, j))
+            else:
+                new_immune.add((i, j))
+
+        # Step 3: Determine new infections from the start-of-day active-infection snapshot.
+        # Cells that transition at end-of-day still count as infected today.
+        new_infections = set()
+        for i in range(n):
+            for j in range(m):
+                if state[i][j] is not None:
+                    continue
+
+                infected_neighbors = 0
+                for dr, dc in directions:
+                    ni, nj = i + dr, j + dc
+                    if 0 <= ni < n and 0 <= nj < m and (ni, nj) in infected_today:
+                        infected_neighbors += 1
+
+                if infected_neighbors >= N:
+                    state[i][j] = current_day
+                    new_infections.add((i, j))
+
+        # Step 4: Apply transitions at end-of-day
+        for (i, j) in new_dead:
+            state[i][j] = 'dead'
+            active_infections.discard((i, j))
+            dead_count += 1
+
+        for (i, j) in new_immune:
+            state[i][j] = 'immune'
+            active_infections.discard((i, j))
+
+        # Step 5: Add new infections for the next day
+        active_infections.update(new_infections)
+
+    return (current_day, dead_count)
+
+Complexity Analysis
+Time Complexity: O(days × n × m) — similar to Level 3, with additional neighbor counting at transitions
+Space Complexity: O(n × m) for tracking cell states
+Level 5: Optimal Row/Column Burn (Firebreak)
+Problem Statement
+Building upon Level 4, a farmer now has the option to burn an entire row or column of plants before the infection begins spreading. Burning a row or column destroys all plants in it — burned cells act like dead cells (they cannot be infected and do not spread infection).
+
+The farmer wants to choose the optimal single row or column to burn such that the minimum number of cells die from infection (not counting the burned cells themselves as deaths).
+
+The simulation after the burn still uses the same parameters N, D, and K. 
+
+Return the optimal row or column to burn and the resulting death count. If multiple burns achieve the same minimum death count, returning any one of them is acceptable.
+
+Key Considerations
+Brute Force Feasibility: Try burning each possible row and each possible column, simulate the full infection for each, and pick the option with fewest deaths
+Firebreak Strategy: Burning a row/column creates a barrier that can split the grid, potentially isolating infection sources
+Trade-offs: Burning a row/column destroys healthy plants but may save more by preventing infection spread
+Edge Cases:
+If all infected cells are in one region, a well-placed burn can completely isolate the infection
+Burning a row vs column may have very different outcomes depending on grid shape
+Approach
+For each possible row and column, simulate the full infection spread from Level 4 and track the death count:
+
+import copy
+
+def optimal_burn(
+    grid: List[List[int]], N: int, D: int, K: int
+) -> tuple[str, int, int]:
+    """
+    Grid values:
+    - 0: Healthy (.)
+    - 1: Infected (x)
+    - 2: Immune blocker
+
+    N: Minimum number of infected neighbors required for a healthy cell to become infected
+    D: Days until infected transitions
+    K: Death threshold for infected neighbors
+
+    Returns: (burn_type, burn_index, min_deaths)
+        burn_type: 'row' or 'col'
+        burn_index: 0-indexed row or column to burn
+        min_deaths: minimum deaths from infection after burning
+    """
+    if not grid or not grid[0]:
+        return ('row', 0, 0)
+
+    n, m = len(grid), len(grid[0])
+    best = (None, None, float('inf'))
+
+    # Try burning each row
+    for r in range(n):
+        test_grid = copy.deepcopy(grid)
+        # Burn row r: mark all cells as dead/burned (-1)
+        for j in range(m):
+            test_grid[r][j] = -1  # Burned
+
+        _, deaths = simulate_with_burn(test_grid, N, D, K)
+        if deaths < best[2]:
+            best = ('row', r, deaths)
+
+    # Try burning each column
+    for c in range(m):
+        test_grid = copy.deepcopy(grid)
+        # Burn column c
+        for i in range(n):
+            test_grid[i][c] = -1  # Burned
+
+        _, deaths = simulate_with_burn(test_grid, N, D, K)
+        if deaths < best[2]:
+            best = ('col', c, deaths)
+
+    return best
+
+
+def simulate_with_burn(
+    grid: List[List[int]], N: int, D: int, K: int
+) -> tuple[int, int]:
+    """
+    Simulate infection with burned cells (value -1) acting as permanent barriers.
+    Same as Level 4 logic, but skip burned cells.
+    """
+    n, m = len(grid), len(grid[0])
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+    state = [[None] * m for _ in range(n)]
+    active_infections = set()
+    dead_count = 0
+
+    for i in range(n):
+        for j in range(m):
+            if grid[i][j] == 1:
+                state[i][j] = 0
+                active_infections.add((i, j))
+            elif grid[i][j] == 2:
+                state[i][j] = 'immune'
+            elif grid[i][j] == -1:
+                state[i][j] = 'burned'
+
+    if not active_infections:
+        return (0, 0)
+
+    current_day = 0
+
+    while active_infections:
+        current_day += 1
+
+        infected_today = set(active_infections)  # Start-of-day active-infection snapshot
+
+        # Determine transitions
+        transitioning = set()
+        for (i, j) in infected_today:
+            if isinstance(state[i][j], int) and state[i][j] >= 0:
+                if current_day - state[i][j] >= D:
+                    transitioning.add((i, j))
+
+        new_dead = set()
+        new_immune = set()
+
+        for (i, j) in transitioning:
+            infected_neighbors = 0
+            for dr, dc in directions:
+                ni, nj = i + dr, j + dc
+                if 0 <= ni < n and 0 <= nj < m:
+                    if (ni, nj) in infected_today:
+                        infected_neighbors += 1
+
+            if infected_neighbors >= K:
+                new_dead.add((i, j))
+            else:
+                new_immune.add((i, j))
+
+        # Determine new infections from the start-of-day active-infection snapshot, then transition
+        new_infections = set()
+        for i in range(n):
+            for j in range(m):
+                if state[i][j] is not None:
+                    continue
+
+                infected_neighbors = 0
+                for dr, dc in directions:
+                    ni, nj = i + dr, j + dc
+                    if 0 <= ni < n and 0 <= nj < m and (ni, nj) in infected_today:
+                        infected_neighbors += 1
+
+                if infected_neighbors >= N:
+                    state[i][j] = current_day
+                    new_infections.add((i, j))
+
+        for (i, j) in new_dead:
+            state[i][j] = 'dead'
+            active_infections.discard((i, j))
+            dead_count += 1
+
+        for (i, j) in new_immune:
+            state[i][j] = 'immune'
+            active_infections.discard((i, j))
+
+        active_infections.update(new_infections)
+
+    return (current_day, dead_count)
+
+Complexity Analysis
+Time Complexity: O((n + m) × days × n × m) — simulate for each of the n rows + m columns
+Space Complexity: O(n × m) per simulation for grid copies and state tracking
+Optimization Ideas
+For a 60-minute interview, the brute force approach above is likely sufficient. However, potential optimizations include: 
+
+Early termination: If burning a row/column results in 0 deaths, stop searching
+Heuristic pruning: Prioritize burning rows/columns that pass through or near infection clusters
+Connected components analysis: After burning, analyze if infection sources become isolated
+Test Cases
+# Level 1 Tests
+# Test 1: Basic center infection
+assert time_to_full_infection([[0, 0, 0], [0, 1, 0], [0, 0, 0]], N=1) == 2
+
+# Test 2: Threshold of 2 can still infect when enough neighbors exist
+assert time_to_full_infection([[1, 1], [1, 0]], N=2) == 1
+
+# Test 3: Threshold of 2 can stall even with infected cells present
+assert time_to_full_infection([[1, 0, 0], [0, 0, 0], [0, 0, 1]], N=2) == -1
+
+# Test 4: No infection source
+assert time_to_full_infection([[0, 0], [0, 0]], N=1) == -1
+
+# Test 5: Already fully infected
+assert time_to_full_infection([[1, 1], [1, 1]], N=2) == 0
+
+# Test 6: Single cell
+assert time_to_full_infection([[1]], N=1) == 0
+assert time_to_full_infection([[0]], N=1) == -1
+
+# Test 7: Linear spread with N = 1
+assert time_to_full_infection([[1, 0, 0, 0, 0]], N=1) == 4
+
+# Test 8: Larger grid with N = 1
+grid = [
+    [0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0],
+    [0, 0, 1, 0, 0],
+    [0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0]
+]
+assert time_to_full_infection(grid, N=1) == 4
+
+# Level 2 Tests
+# Test 9: Immune cells forming a full vertical wall
+grid = [
+    [1, 2, 0],
+    [0, 2, 0],
+    [0, 2, 0]
+]
+assert time_to_full_infection_with_immunity(grid, N=1) == -1  # Right column unreachable
+
+# Test 10: Immune cells with path around the wall
+grid = [
+    [1, 0, 0],
+    [2, 2, 0],
+    [0, 0, 0]
+]
+# Infection spreads right from (0,0) along top row, then down the right side, then left along bottom
+assert time_to_full_infection_with_immunity(grid, N=1) == 6
+
+# Level 3 Tests
+# Test 11: Level 3 respects immune walls from Level 2
+grid = [
+    [1, 0, 0],
+    [2, 2, 0],
+    [0, 0, 0]
+]
+assert time_to_stable_state(grid, N=1, D=2) == 8
+
+# Level 4 Tests
+# Test 12: Death with high neighbor threshold (no deaths expected)
+grid = [[0, 1, 0], [0, 0, 0], [0, 0, 0]]
+days, deaths = time_to_stable_with_death(grid, N=1, D=2, K=4)
+assert deaths == 0  # Cells rarely have 4 infected neighbors
+
+# Test 13: Death with low neighbor threshold
+grid = [[1, 1], [1, 1]]
+days, deaths = time_to_stable_with_death(grid, N=1, D=1, K=2)
+assert deaths > 0  # Center-adjacent cells have multiple infected neighbors
+
+# Test 14: Transitioning cells still spread on the transition day
+grid = [[1, 0]]
+days, deaths = time_to_stable_with_death(grid, N=1, D=1, K=4)
+assert days == 2
+assert deaths == 0

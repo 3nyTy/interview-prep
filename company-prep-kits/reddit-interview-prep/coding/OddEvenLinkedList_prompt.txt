@@ -1,0 +1,34 @@
+Reddit — Staff Software Engineer, Coding Interview (sample question)
+
+Odd Even Linked List
+Given the head of a singly linked list, group all odd-indexed nodes together
+followed by the even-indexed nodes (1-based, first node is odd), preserving
+relative order within each group, and return the reordered list. This is the
+LeetCode 328 family, solvable in one pass with O(n) time and O(1) space by
+splicing the odd and even chains.
+
+Odd Even Linked List
+Given the head of a singly linked list, group all nodes at odd indices together
+followed by the nodes at even indices, and return the reordered list.
+
+The first node is considered odd, the second node is even, and so on. Preserve
+the relative order within both groups.
+
+Examples
+Example 1:
+Input:  head = [1,2,3,4,5]
+Output: [1,3,5,2,4]
+
+Example 2:
+Input:  head = [2,1,3,5,6,4,7]
+Output: [2,3,6,7,1,5,4]
+
+Constraints
+0 <= number of nodes <= 10^4
+-10^6 <= Node.val <= 10^6
+
+------------------------------------------------------------------------------
+Anticipated follow-ups covered in the solution (OddEvenLinkedList.java):
+  Part 1: group by INDEX parity (the asked problem) — weave two chains in place.
+  Part 2: group by NODE VALUE parity (odd values then even) — dummy-head buckets.
+  Part 3: generalize to K buckets by (index-1) % k — array of dummy heads/tails.

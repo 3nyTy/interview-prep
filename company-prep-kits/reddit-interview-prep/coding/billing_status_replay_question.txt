@@ -1,0 +1,163 @@
+Billing Status Replay (OOD)
+===========================
+
+Rebuild one billing-state object per advertiser by replaying a transaction log in increasing
+timestamp order, breaking ties by transaction id. Model a BillingStatus class that ingests
+transactions and grows through three layers: additive aggregation over known monetary columns,
+overwrite transactions that replace a column instead of adding to it, and stack-based
+undo_last / redo_last commands. The main OOD discussion is whether to store only deltas or
+reversible before/after snapshots so that overwrite and undo/redo stay correct together.
+
+Problem Overview
+----------------
+We accidentally dropped the database that stored the current billing state for advertisers. The
+old transaction logs still exist, so the task is to replay those transactions and rebuild one
+BillingStatus object per user.
+
+This interview is usually framed as an object-oriented coding problem. The core idea is to model
+a single account as a BillingStatus class that can ingest transactions over time, then build a
+dictionary like:
+
+    { user_id: BillingStatus(...), user_id_2: BillingStatus(...) }
+
+The interviewer typically adds three layers:
+  1. Basic additive aggregation
+  2. Overwrite transactions
+  3. undo_last and redo_last
+
+Assume:
+- replay order is increasing transaction_timestamp
+- if two transactions have the same timestamp, break ties by transaction_id for deterministic replay
+- monetary_columns is known in advance
+- missing monetary fields mean "no change" for that column
+- undo_last and redo_last only affect the history of the same user
+- overwrite, undo_last, and redo_last are control fields, not monetary columns
+- if a transaction uses undo_last or redo_last, treat it as a command row and ignore any monetary
+  fields on that same row
+- redo_last follows standard stack semantics: it reapplies the most recently undone regular txn
+- each transaction uses at most one of overwrite, undo_last, or redo_last as its behavioral option,
+  except that plain regular transactions may omit all of them
+
+Part 1: Rebuild Billing Statuses
+--------------------------------
+Implement a BillingStatus class with two starting monetary columns:
+    ad_delivery_pennies = 0
+    payment_pennies = 0
+Each transaction may contain one or more monetary columns. When ingesting a transaction, add the
+transaction values into the current billing status. Then implement a function that replays a
+collection of transactions and returns one BillingStatus per user.
+
+Example: monetary_columns = ("ad_delivery_pennies", "payment_pennies")
+Four user-1 transactions: ad 1000 @t1, ad 1000 @t2, payment 500 @t3, ad 1000 + payment 500 @t4.
+Expected: { 1: BillingStatus(ad_delivery_pennies=3000, payment_pennies=1000) }
+
+Part 1 Solution (Python reference)
+    class BillingStatus:
+        def __init__(self, monetary_columns):
+            self.monetary_columns = tuple(monetary_columns)
+            self.amounts = {column: 0 for column in self.monetary_columns}
+        def ingest(self, transaction_id, transaction):
+            for column in self.monetary_columns:
+                self.amounts[column] += transaction.get(column, 0)
+        def as_dict(self):
+            return dict(self.amounts)
+
+    def rebuild_billing_statuses(transactions, monetary_columns):
+        statuses = {}
+        ordered = sorted(transactions.items(),
+                         key=lambda item: (item[1]["transaction_timestamp"], item[0]))
+        for transaction_id, transaction in ordered:
+            user_id = transaction["user_id"]
+            status = statuses.setdefault(user_id, BillingStatus(monetary_columns))
+            status.ingest(transaction_id, transaction)
+        return statuses
+
+Complexity: sort O(n log n); replay O(n*c); space O(u*c).
+
+Part 2: Add Overwrite Transactions
+----------------------------------
+Support a control flag "overwrite": True. If overwrite is True, any monetary column present in
+that transaction should REPLACE the current value for that column instead of being added to it.
+overwrite only applies to columns present in the transaction; columns not mentioned remain
+unchanged.
+
+Example (11 transactions across users 1 and 2) expected:
+    { 1: BillingStatus(ad_delivery_pennies=1000, payment_pennies=600),
+      2: BillingStatus(ad_delivery_pennies=4000, payment_pennies=2600) }
+For user 1: ad+=1000, ad+=1000, payment+=500, OVERWRITE both to ad=1000/payment=500, payment+=100.
+For user 2 the overwrite only touches payment_pennies, so ad_delivery_pennies keeps accumulating.
+
+Part 2 Solution: replay loop does NOT change; only ingest changes:
+    def ingest(self, transaction_id, transaction):
+        overwrite = transaction.get("overwrite", False)
+        for column in self.monetary_columns:
+            if column not in transaction: continue
+            if overwrite: self.amounts[column] = transaction[column]
+            else:         self.amounts[column] += transaction[column]
+
+Part 3: Add undo_last And redo_last
+-----------------------------------
+Add two control flags "undo_last": True and "redo_last": True.
+- undo_last undoes the most recent regular transaction for the same user
+- redo_last reapplies the most recently undone regular transaction for the same user
+- if there is nothing to undo/redo, discard the operation
+- a regular transaction is one with no control flags, or one that only uses overwrite
+- undo_last/redo_last transactions are commands, not regular transactions
+- if a new regular transaction is applied after an undo, the redo history should be cleared
+- if a command row also contains monetary columns, ignore those monetary columns
+Standard editor-style semantics: undo pops the applied-history stack; redo pops the undone-history
+stack; any newly applied regular transaction invalidates redo history.
+
+Example: user 1: ad 1000 @t1, undo_last @t2, payment 500 @t3, ad 1000 + payment 500 @t4.
+Expected: { 1: BillingStatus(ad_delivery_pennies=1000, payment_pennies=1000) }
+
+Part 3 Solution (Python reference)
+    @dataclass
+    class ReplayRecord:
+        columns: tuple; before: dict; after: dict
+
+    class BillingStatus:
+        def __init__(self, monetary_columns):
+            self.monetary_columns = tuple(monetary_columns)
+            self.amounts = {c: 0 for c in self.monetary_columns}
+            self._applied = []; self._undone = []
+        def ingest(self, transaction_id, transaction):
+            if transaction.get("undo_last"): self._undo_last(); return
+            if transaction.get("redo_last"): self._redo_last(); return
+            touched = tuple(c for c in self.monetary_columns if c in transaction)
+            if not touched: return
+            overwrite = transaction.get("overwrite", False)
+            before = {c: self.amounts[c] for c in touched}
+            for c in touched:
+                v = transaction[c]
+                self.amounts[c] = v if overwrite else self.amounts[c] + v
+            after = {c: self.amounts[c] for c in touched}
+            self._applied.append(ReplayRecord(touched, before, after))
+            self._undone.clear()
+        def _undo_last(self):
+            if not self._applied: return
+            r = self._applied.pop()
+            for c in r.columns: self.amounts[c] = r.before[c]
+            self._undone.append(r)
+        def _redo_last(self):
+            if not self._undone: return
+            r = self._undone.pop()
+            for c in r.columns: self.amounts[c] = r.after[c]
+            self._applied.append(r)
+
+Why This Design Works
+- BillingStatus owns the mutable state for one user.
+- Each regular transaction stores the exact before and after values for the touched columns.
+- undo_last restores before; redo_last restores after.
+- overwrite works naturally because the history captures ABSOLUTE values, not only deltas.
+This is the main OOD discussion point: store only deltas, or reversible command history? Once
+overwrite exists, before/after snapshots for touched columns keep it simple and correct.
+
+Complexity: regular ingest O(c); undo/redo O(k<=c). Replay: sort O(n log n), replay O(n*c),
+space O(u*c + h) where h is per-user retained history.
+
+Common Follow-Ups
+- Idempotency: duplicate transaction IDs => keep a per-user or global seen_transaction_ids set.
+- Streaming ingestion: the same BillingStatus.ingest(...) API works for replay AND live traffic.
+- Checkpointing: for huge logs, periodically snapshot BillingStatus and replay only newer txns.
+- Auditability: in production store the command history, not just balances, to explain a balance.

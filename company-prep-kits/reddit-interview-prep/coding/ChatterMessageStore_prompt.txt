@@ -1,0 +1,129 @@
+Implement an In-Memory Chatter Message Store
+============================================
+
+(Reddit phone-screen variant of "Chat Message Merge". The older form HANDS you a
+`Chat.getChatMessages(id, windowSize)` API and asks you to merge windows — see
+ChatMessageMerger_prompt.txt. This form flips ownership: YOU implement the store,
+then the context read, then the merge, then the extensions.)
+
+Requirements
+------------
+Messages have a strictly increasing integer id and string content. Ids are
+increasing but NOT necessarily contiguous — gaps exist (deleted / never-synced
+messages). Build an in-memory store:
+
+class Message {
+    int id;
+    String content;
+}
+
+Part 1 — Batch loading
+  int loadBatch(List<Message> batch)
+  Messages arrive in batches. Batches may arrive out of order relative to each
+  other, may be unsorted internally, and may overlap batches already loaded.
+  Loading must be idempotent: re-loading the same batch changes nothing.
+  Returns the number of messages newly added.
+
+Part 2 — Context read
+  List<Message> getContext(int targetId, int k)
+  Return the target message plus up to k messages on either side, sorted by id
+  ascending. The canonical ask is k = 2 ("two messages on either side"), so at
+  most 5 messages come back. Fewer near the ends of the conversation. Empty list
+  if targetId is not in the store.
+
+Part 3 — Merge multiple neighborhoods
+  List<Message> mergeNeighborhoods(List<Integer> targetIds, int k)
+  Merge the neighborhoods of several targets into ONE sorted, de-duplicated list.
+  Each message appears at most once. Input ids may be unsorted and duplicated.
+
+Part 4 — Caching
+  getContext is called repeatedly for the same targets. Put a cache in front of
+  it. Discuss key choice and invalidation.
+
+Part 5 — Edits with retained version history
+  Messages become editable and old content must be preserved, not overwritten.
+  Support reading a message as it looked at a past timestamp.
+
+Examples
+--------
+Store holds ids: 10, 11, 13, 17, 18, 19, 25, 26, 30   (note the gaps)
+
+  getContext(17, 2) -> [11, 13, 17, 18, 19]
+  NOT [15, 16, 17, 18, 19] — "two on either side" means the two nearest messages
+  that EXIST, not id ± 2.
+
+  getContext(10, 2) -> [10, 11, 13]            (no left neighbours)
+  getContext(14, 2) -> []                      (id not present)
+
+  mergeNeighborhoods([13, 18], 2) -> [10, 11, 13, 17, 18, 19, 25]
+    context(13,2) = [10,11,13,17,18]
+    context(18,2) = [13,17,18,19,25]
+    the two neighborhoods overlap and collapse into one contiguous run
+
+Notes
+-----
+- THE TRAP: ids are increasing but not contiguous, so the k neighbours must be
+  found by ADJACENCY IN THE ORDERED STORE, never by id arithmetic (targetId ± k).
+  Say this out loud before writing code — it is the correctness point being tested.
+  Arithmetic is only safe if the interviewer guarantees dense contiguous ids, and
+  you should ask rather than assume.
+
+- Structure choice, and why (commit and justify — do not list options):
+    TreeMap<Integer,Message>  — O(log n) insert, and lowerKey/higherKey walk the
+      k neighbours directly. Correct under out-of-order batches, which is the
+      stated ingest model. THIS IS THE ANSWER.
+    sorted ArrayList + binarySearch — O(1) index arithmetic for ±k (faster reads)
+      but O(n) insert per out-of-order message. Only right if the store is built
+      once and then frozen; say so if you pick it.
+    HashMap<Integer,Message> alone — CANNOT answer getContext at all: a hash map
+      has no order, so it cannot find "the previous existing id". Naming this
+      rules out the obvious wrong answer.
+
+- Part 3 has two levels, and the second is the one that separates senior from staff:
+    (a) Watermark sweep — sort the target ids, call getContext in order, skip any
+        message whose id <= the largest id already emitted. O(1) extra state, no
+        hash set, no heap. Works because sorted targets means overlap can only
+        appear as a PREFIX of a later neighborhood. Identical trick to the
+        windowed-API version of this problem.
+    (b) Interval union on the ordered index — because you OWN the store, you can
+        resolve each target to its neighborhood's [loKey, hiKey], merge the
+        overlapping intervals first, then emit each merged interval once with a
+        single subMap walk. Every surviving message is touched exactly once,
+        with zero fetch-then-discard. The windowed-API version cannot do this;
+        owning the store is what buys it.
+
+- Complexity: load O(b log n) per batch of b. getContext O(k log n). Merge (a)
+  O(t log t + t*k*log n); merge (b) O(t log t + t*k*log n + R) but with no
+  duplicate emission, where t = number of targets and R = size of the result.
+
+- Part 4 key choice: the cache key must include k. A ±2 neighborhood is not a
+  ±5 neighborhood, so keying on targetId alone silently returns a window of the
+  wrong width.
+
+- Part 4 invalidation: use a GENERATION COUNTER bumped on mutation, not per-entry
+  eviction. Inserting one message changes the neighborhood of up to 2k+1 already
+  cached targets, and you cannot cheaply enumerate which — so bump the generation
+  and drop the cache wholesale. Cheap because loads are batched and rare relative
+  to reads.
+
+- Part 5, the sharp distinction: an edit changes CONTENT but never the id, so the
+  ORDERING INDEX is untouched. Track two counters:
+    orderGeneration   — bumped by loadBatch only; invalidates cached id lists.
+    contentGeneration — bumped by edits too; invalidates cached materialized
+                        messages.
+  A cache of ids survives an edit. A cache of message objects does not.
+
+- Part 5 mechanics: keep an append-only List<MessageVersion> per message, sorted
+  by editedAt. edit() is O(1) append and rejects out-of-order timestamps.
+  latest() is O(1). asOf(t) is O(log v) binary search for the rightmost version
+  with editedAt <= t, and returns null if the message did not yet exist at t.
+  De-duplicate the Part-3 merge by message ID, never by version — versioning is
+  orthogonal to the merge.
+
+- Real system: two tables, messages(message_id, current_version, ...) and
+  message_versions(message_id, version, content, edited_at, editor_id, ...).
+  Old content is never overwritten, so audit and rollback stay possible.
+
+- Edge cases to state unprompted: empty store; targetId absent; k = 0; k larger
+  than the store; duplicate and unsorted target ids; a batch that is entirely
+  duplicates (added == 0, generation must NOT move); single-message store.

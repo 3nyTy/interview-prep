@@ -1,0 +1,109 @@
+Moderator List Hierarchy
+========================
+
+Parse newline-delimited, comma-separated action logs to model a Reddit-style
+moderator hierarchy, where each moderator's effective access timestamp determines
+their rank and a moderator may remove only those ranked below them. Track active
+moderators with (nested) dictionaries and answer can_remove_mod and get_mod_list
+queries by replaying the log. The round grows in three parts: a single mod list,
+then independent per-community lists, then a demote action that reassigns a
+moderator's effective timestamp and reorders the list.
+
+Core rule
+---------
+A moderator can remove another moderator only if they are ABOVE that moderator in
+the current mod list. Higher in the list = earlier effective access timestamp.
+
+Log fields (Part 1): target, action, actor, timestamp
+  target    : the moderator receiving the action
+  action    : add or remove (Parts 1-2); plus demote (Part 3)
+  actor     : the moderator who performed the action
+  timestamp : integer timestamp, increasing over time
+
+Assumptions
+  - Logs already sorted by timestamp.
+  - Part 1: timestamps unique. Parts 2-3: timestamps unique WITHIN each community.
+  - Every logged action is valid.
+  - SYSTEM may appear as an actor to seed the first moderator, but SYSTEM is not
+    part of the returned mod list unless explicitly added.
+  - If a removed moderator is added again later, they get a NEW access timestamp.
+
+Each part asks for: constructor(logs), can_remove_mod(...), get_mod_list(...).
+
+Part 1 — Single Moderator List
+------------------------------
+class ModList:
+    def __init__(self, logs: str)
+    def can_remove_mod(self, actor: str, target: str) -> bool
+    def get_mod_list(self) -> list[str]
+
+Rules:
+  - add => target active at timestamp; remove => target inactive.
+  - can_remove_mod(actor,target) True iff: both active, actor != target,
+    actor's timestamp < target's timestamp.
+  - get_mod_list() => active mods top-to-bottom (ascending timestamp).
+
+Example:
+  logs:
+    alice,add,SYSTEM,1
+    bob,add,alice,2
+    carol,add,alice,3
+    dave,add,bob,4
+    carol,remove,alice,5
+  can_remove_mod("alice","bob")  -> True
+  can_remove_mod("bob","alice")  -> False
+  can_remove_mod("bob","dave")   -> True
+  get_mod_list()                 -> ["alice","bob","dave"]
+
+Complexity: ctor O(n); can_remove O(1); get_mod_list O(m log m); space O(m).
+
+Part 2 — Add Community Support
+------------------------------
+Log line becomes: community, target, action, actor, timestamp
+class CommunityModList:
+    def __init__(self, logs: str)
+    def can_remove_mod(self, community, actor, target) -> bool
+    def get_mod_list(self, community) -> list[str]
+
+Rules: membership tracked independently per community; same username can appear in
+multiple communities with different timestamps; can_remove_mod scoped to community.
+
+Example:
+  logs:
+    python,alice,add,SYSTEM,1
+    python,bob,add,alice,2
+    python,carol,add,alice,3
+    datascience,maya,add,SYSTEM,4
+    datascience,bob,add,maya,5
+    python,carol,remove,alice,6
+  get_mod_list("python")                     -> ["alice","bob"]
+  get_mod_list("datascience")                -> ["maya","bob"]
+  can_remove_mod("python","alice","bob")     -> True
+  can_remove_mod("datascience","bob","maya") -> False
+
+Part 3 — Support Moderator Demotion
+-----------------------------------
+Third action: community, target, demote, actor, timestamp
+Demotion keeps the target active but sets their effective timestamp to the demotion
+timestamp, moving them DOWN in that community's list.
+class ReorderableCommunityModList:  (same three functions)
+
+Example:
+  logs:
+    python,alice,add,SYSTEM,1
+    python,bob,add,alice,2
+    python,carol,add,alice,3
+    python,bob,demote,alice,4
+  get_mod_list("python")                    -> ["alice","carol","bob"]
+  can_remove_mod("python","carol","bob")    -> True
+  can_remove_mod("python","bob","carol")    -> False
+
+The only real change: handle demote by overwriting the target's effective timestamp
+(only if currently active).
+
+Follow-Up Discussion
+--------------------
+  - How to support get_mod_list() in O(m) without sorting every time?
+  - How to validate invalid logs instead of assuming all actions are valid?
+  - What if timestamps are not unique?
+  - How to support querying historical mod-list state at a past timestamp?

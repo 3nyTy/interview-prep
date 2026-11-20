@@ -1,0 +1,283 @@
+Maximum-Score Grid Path with Limited Jumps
+Coding
+Phone, Onsite
+Software Engineer, Machine Learning Engineer
+Added Jul 2026 (user-supplied prompt; original report date and frequency unknown)
+Note: This is a multi-part progressive question with 4 parts of increasing complexity. Each part builds on the previous one. Parts 1-3 reuse one recurrence unchanged; Part 4 is the only part that changes the state.
+
+Problem Overview
+Given an integer grid, a top-row starting column, and a budget of at most K two-row jumps, maximize the score on a path to the bottom; then reconstruct an optimal path, count all optimal paths modulo 1e9+7, and incorporate adjacency-based bonuses.
+
+Requirements
+Input: an N x M integer grid board, a starting column p, and a jump budget K. Start at (0, p) and remain within the grid.
+From (i, j), move to (i+1, j-1), (i+1, j), (i+1, j+1), or use the special move (i+2, j). The special move may be used at most K times over the full path.
+The base score is the sum of all visited cell values.
+Part 1: return the maximum score obtainable when reaching the last row.
+Part 2: return one path that obtains the maximum score.
+Part 3: return the number of distinct maximum-score paths modulo 10^9 + 7.
+Part 4: incorporate two additional scoring rules: consecutive equal-valued cells add X, and three consecutively visited cells with strictly increasing values add Y.
+
+Examples
+board = [[1, 2, 3, 4], [5, 6, 1, 2], [7, 8, 9, 1], [3, 2, 5, 6]], p = 1, K = 1.
+
+One valid path is (0,1) -> (1,1) -> (2,2) -> (3,3).
+A valid path using the special jump is (0,1) -> (2,1) -> (3,2).
+
+Notes
+A two-row jump from row N-3 to the last row is valid; any move that would land outside the grid is invalid. For Part 4, the state must preserve enough recent path information to decide both the equal-pair and increasing-triple bonuses.
+
+Clarifying Questions To Ask Up Front
+These change the answer, and most of them are cheap to ask:
+1. Can cell values be NEGATIVE? (Assume yes. This is the single most important question — it kills every greedy/"always take the biggest neighbor" instinct and it is why the budget can be worth spending to SKIP a row.)
+2. Is the budget "at most K" or "exactly K"? (The prompt says at most. The optimum may leave the budget unused — see the worked example, where K=1 and the optimum uses zero jumps.)
+3. Does the path end the moment it reaches row N-1, or must it also land on a particular column? (Assume any column of the last row.)
+4. For Part 4, does "consecutive" mean consecutive in the PATH or adjacent in the GRID? (Path. This matters: with a two-row jump, (i,j) and (i+2,j) are consecutively visited but two rows apart, and the bonuses still apply across the jump.)
+5. For Part 4, do OVERLAPPING triples each pay? (Assume yes: a path visiting 1,2,3,4 pays Y twice.)
+6. Are X and Y guaranteed non-negative? (Assume yes; if they can be negative nothing breaks, since we are maximizing over the same state space.)
+7. Part 3: are two paths "distinct" as cell sequences or as move sequences? (They coincide here — see the note under Part 3 — but say so rather than assuming it silently.)
+
+The Core Model (state this before writing any code)
+Every legal move strictly increases the row index. So the grid is a DAG layered by row: no cycles, no revisiting a cell, no need for Dijkstra or Bellman-Ford even with negative values. A plain row-by-row DP is correct.
+The jump budget is NOT a constraint to bolt on afterwards - it is a DP DIMENSION.
+    State = (row, col, jumps still available)
+    Answer = state (0, p, K)
+Interviewers reportedly probe whether you reach for the third dimension yourself or have to be led to it.
+
+Direction: a BACKWARD (suffix) DP is the better choice for Parts 1-3, for two reasons:
+    (a) the answer is a SINGLE cell, best[0][p][K], rather than a max over the whole last row;
+    (b) reconstruction then walks FORWARD from the start, which is the order you want to emit a path in.
+
+Part 1: Maximum Score
+Problem Statement
+Return the maximum score obtainable on a legal path from (0, p) to any cell of the last row, using at most K two-row jumps.
+
+Recurrence
+best[i][j][k] = max score of the remainder of a path standing on (i, j) with k jumps still
+                available, INCLUDING board[i][j].
+
+best[N-1][j][k] = board[N-1][j]
+
+best[i][j][k]   = board[i][j] + max(
+                      best[i+1][j-1][k],     if j-1 >= 0
+                      best[i+1][j][k],
+                      best[i+1][j+1][k],     if j+1 <  M
+                      best[i+2][j][k-1]      if k >= 1 and i+2 <= N-1
+                  )
+
+Answer: best[0][p][K]
+
+Complexity
+Time O(N*M*K). Space O(N*M*K), reducible to O(M*K) with a 3-row rolling window (Part 1 only -
+Parts 2 and 3 need the full table). Mention the rolling window; do not implement it unless asked.
+
+Why No -Infinity Is Needed
+For any i <= N-2 the plain "down" move (i+1, j) is always in bounds, so every state has at least
+one successor and no dead state exists. Worth saying out loud: it proves you thought about
+reachability instead of just not handling it. (The moment a follow-up adds blocked cells or a
+required end column, dead states become real and the sentinel starts doing work.)
+
+Overflow
+The base score sums up to N cell values. A tall grid with large values overflows a 32-bit int -
+accumulate in a 64-bit type.
+
+Worked Example
+board = [[1, 2, 3, 4],
+         [5, 6, 1, 2],
+         [7, 8, 9, 1],
+         [3, 2, 5, 6]],  p = 1,  K = 1
+
+Answer: 23, via (0,1) -> (1,1) -> (2,2) -> (3,3) = 2 + 6 + 9 + 6, using ZERO jumps.
+The prompt's second sample path (0,1) -> (2,1) -> (3,2) = 2 + 8 + 5 = 15 is legal but not optimal.
+Note K=0 also gives 23 here: on this board the budget is worthless. Do not let that hide a bug -
+test a board where the jump is mandatory.
+
+Test Cases (all verified)
+board = [[5,5],[-100,-100],[5,5]], p=0    K=0 -> -90    K=1 -> 10       (jump is mandatory)
+board = [[1],[-50],[2]],           p=0    K=0 -> -47    K=1 -> 3        (row N-3 -> last row jump)
+board = [[0],[-1],[0],[-1],[0]],   p=0    K=0 -> -2     K=1 -> -1       K=2 -> 0    K=9 -> 0
+board = [[7,8,9]],                 p=1    K=0 -> 8                      (single row: start only)
+board = [[1,2],[3,4]],             p=0    K=5 -> 5                      (jump would overshoot)
+board = [[1],[2],[3]],             p=0    K=1 -> 6                      (jump not worth taking)
+board = [[1,0],[0,9],[9,0]],       p=0    K=0 -> 19                     (walls constrain diagonals)
+board = [[-5]],                    p=0    K=0 -> -5
+Invalid input: p < 0, p >= M, K < 0, ragged rows -> reject.
+Invariant worth asserting: the answer is NON-DECREASING in K.
+
+Part 2: Reconstruct One Optimal Path
+Problem Statement
+Return an actual path (sequence of cells) achieving the Part 1 maximum.
+
+Key Point
+Do NOT touch the score recurrence. Two ways to recover the path, and naming both is the
+differentiator:
+
+(a) Parent / choice tracking. Alongside best[i][j][k], record which successor attained the max in
+    choice[i][j][k] (one of LEFT / DOWN / RIGHT / JUMP). Then walk forward from (0, p, K),
+    decrementing k on a jump, until row N-1. O(N*M*K) extra memory, O(N) walk.
+    Use strict '>' when scanning successors so ties resolve to a fixed order -> deterministic output.
+
+(b) Re-derivation from the score table alone, ZERO extra memory. At (i, j, k) the remainder must
+    score exactly best[i][j][k] - board[i][j], so pick any successor whose best equals that target.
+    This is the better answer when memory is the binding constraint.
+
+Validating Your Own Output
+Write the checker; interviewers reportedly ask for it. A returned path must:
+    start at (0, p); end on row N-1; use only legal moves; use at most K jumps;
+    and have its cell values sum to the claimed score.
+
+Test Cases (all verified)
+spec board above, p=1, K=1  -> (0,1) -> (1,1) -> (2,2) -> (3,3),  score 23
+[[5,5],[-100,-100],[5,5]], p=0, K=1 -> (0,0) -> (2,0), score 10        (path really uses the jump)
+[[7,8,9]], p=1, K=3 -> (0,1), score 8                                  (single cell is a valid path)
+[[0],[-1],[0],[-1],[0]], p=0, K=2 -> (0,0) -> (2,0) -> (4,0), score 0  (spends exactly two jumps)
+
+Part 3: Count All Maximum-Score Paths mod 1e9+7
+Problem Statement
+Return how many distinct paths attain the maximum score, modulo 10^9 + 7.
+
+Recurrence
+Add a parallel table cnt[i][j][k] = number of max-score continuations from that state.
+cnt[N-1][j][k] = 1 (the empty continuation). Otherwise sum cnt over exactly the successors that
+ATTAIN the max. Scanning successors in one pass:
+
+    v >  bestNext  ->  bestNext = v;  ways  = cnt[succ]      OVERWRITE
+    v == bestNext  ->                 ways += cnt[succ]      ACCUMULATE
+
+THE bug in this problem is swapping those two: accumulating on "strictly better" inflates the
+count, overwriting on "equal" silently drops ties. Reduce mod 1e9+7 on every accumulation.
+
+Two Correctness Points To Volunteer
+1. Do NOT also sum over the budget dimension. The "at most k" state already contains every path
+   that uses fewer than k jumps; each path is generated by exactly one branch sequence in this
+   recurrence. Summing over k double counts.
+2. Distinct move sequence <=> distinct visited-cell sequence here, so there is no aliasing to
+   worry about. A jump (i,j)->(i+2,j) and the two-step (i,j)->(i+1,j)->(i+2,j) land on the same
+   cell but visit different cell sets, so they are genuinely different paths.
+
+Test Cases (all verified)
+spec board, p=1, K=1                  -> max 23, count 1          (unique optimum)
+[[1,1,1],[1,1,1],[1,1,1]], p=1, K=0   -> max 3,  count 7          (everything ties)
+[[1,1,1],[1,1,1],[1,1,1]], p=1, K=1   -> max 3,  count 7          (the jump path scores 2, excluded)
+[[1],[0],[1]], p=0, K=1               -> max 2,  count 2          <-- the important one:
+      the two optimal paths use DIFFERENT numbers of jumps
+      (0,0)->(1,0)->(2,0) = 1+0+1 = 2  (zero jumps)
+      (0,0)->(2,0)        = 1+1   = 2  (one jump)
+[[1],[0],[1]], p=0, K=0               -> max 2,  count 1
+[[0,0],[1,1]], p=0, K=3               -> max 1,  count 2
+[[5]], p=0, K=0 -> count 1;  [[7,8,9]], p=1, K=2 -> count 1
+8x3 all-zero grid, p=1, K=2           -> every path ties; count 1341 (matches brute force)
+
+Part 4: Adjacency Bonuses
+Problem Statement
+Add two scoring rules on top of the base sum, both over CONSECUTIVELY VISITED cells (path order,
+so they apply across a two-row jump too):
+    +X for every adjacent visited pair with EQUAL values
+    +Y for every three consecutively visited cells with STRICTLY increasing values
+Overlapping occurrences each pay: visiting 1,2,3,4 pays Y twice.
+
+Why The State Has To Grow
+The score is no longer a function of the current cell alone, so (row, col, k) stops being a Markov
+state - deciding the triple bonus needs the previous TWO values. The insight is that you do NOT
+have to store values (unbounded). The previous cell always sits at one of four fixed offsets from
+the current one, so store HOW YOU ARRIVED - a 5-valued tag:
+
+    START      no predecessor (row 0 only)
+    FROM_UL    predecessor at (i-1, j-1)
+    FROM_U     predecessor at (i-1, j)
+    FROM_UR    predecessor at (i-1, j+1)
+    FROM_JUMP  predecessor at (i-2, j)
+
+The tag pins the predecessor's POSITION, hence its value; the current cell supplies the second
+value. Equivalently: this is a DP over EDGES instead of nodes. Say it either way.
+
+Attribute each bonus ON THE TRANSITION into the third cell. That keeps every pattern counted
+exactly once and keeps the suffix value well defined:
+
+    S[i][j][k][t] = best score STRICTLY AFTER (i, j), given arrival tag t and k jumps left
+    S[N-1][j][k][t] = 0
+    S[i][j][k][t] = max over legal moves to w of (
+                        board[w]
+                      + X if board[i][j] == board[w]
+                      + Y if t != START and pred(t) < board[i][j] < board[w]
+                      + S[w][k'][tag(w)]
+                    )
+    answer = board[0][p] + S[0][p][K][START]
+
+Successor tags (the easy place to get confused):
+    move to (i+1, j-1)  ->  the successor arrived FROM_UR
+    move to (i+1, j)    ->  FROM_U
+    move to (i+1, j+1)  ->  FROM_UL
+    move to (i+2, j)    ->  FROM_JUMP
+
+Complexity: O(N*M*K*5) states, at most 4 transitions each.
+
+Test Cases (all verified)
+X=0, Y=0 must collapse EXACTLY to the Part 1 answer. Assert this - it is the cheapest regression
+test in the whole problem.
+spec board, p=1, K=1, X=0,  Y=100  -> 123     (path 2,6,9,6: only (2,6,9) qualifies, not (6,9,6);
+                                               no path on this board can earn two triples)
+spec board, p=1, K=1, X=50, Y=100  -> 123     (no two adjacent reachable cells share a value)
+[[1],[1],[2]], K=0, X=10, Y=100    -> 14      (base 4 + X; 1 < 1 is NOT strictly increasing)
+[[1],[2],[2]], K=0, X=10, Y=100    -> 15      (base 5 + X; 2 < 2 blocks the triple)
+[[1],[2],[3]], K=0, X=10, Y=100    -> 106     (base 6 + one triple)
+[[1],[2],[3],[4]], K=0, X=0, Y=100 -> 210     (base 10 + TWO overlapping triples)
+[[1],[99],[2],[3]], p=0, K=1, X=0, Y=100 -> 106   <-- the important one:
+      no jump  : 1,99,2,3 -> base 105, no triple                    = 105
+      jump 0->2: 1,2,3    -> base 6 + triple(1<2<3)                 = 106  (wins)
+      proves the bonus counts ACROSS a jump, and that a bonus can beat a higher base score
+[[1],[99],[2],[3]], p=0, K=0, X=0, Y=100 -> 105
+[[5,0],[5,6],[5,7]], p=0, K=0, X=0,   Y=0 -> 18   (5+6+7 wins)
+[[5,0],[5,6],[5,7]], p=0, K=0, X=100, Y=0 -> 215  (the flat 5,5,5 column wins: base 15 + 2X)
+[[9]], X=7, Y=7 -> 9        [[1],[1]], K=0, X=10, Y=100 -> 12
+
+Verification Strategy (do this if you have time; it is what makes the answer credible)
+Write an exponential brute-force enumerator - every legal path, scored straight off the problem
+statement - and fuzz the DP against it on small random boards (N <= 6, M <= 4, K <= 3). Two
+deliberate choices matter:
+    - Include NEGATIVE cell values, or you will never exercise the case where spending budget to
+      skip a row is correct.
+    - Use a TINY value range (e.g. -1..2) so ties and equal pairs are common. That is exactly where
+      the Part 3 overwrite-vs-accumulate bug and the Part 4 strictness bugs surface.
+The reference answer file fuzzes 400 boards (Part 1), 400 (Part 2, checking both reconstruction
+methods are legal AND optimal), 500 tie-heavy boards (Part 3, max and count), and 600 boards with
+random (X, Y) (Part 4) - 71 assertions total, all passing.
+
+Common Traps
+1. Treating the jump budget as anything other than a DP dimension.
+2. Assuming values are non-negative and reaching for a greedy or "always descend into the max
+   neighbor" rule.
+3. Forgetting that "at most K" lets the optimum use fewer jumps - and that a path using 0 jumps
+   and one using 2 jumps can tie, so Part 3 must count both without double counting.
+4. Letting the two-row jump overshoot: (i+2) is legal only when i+2 <= N-1. From row N-2 the jump
+   is illegal; from row N-3 onto the last row it is legal (the prompt calls this out explicitly).
+5. Part 3: accumulating counts on a strictly-better successor instead of overwriting.
+6. Part 4: reading "consecutive" as grid adjacency instead of path order, so the bonuses are
+   dropped across jumps.
+7. Part 4: using <= instead of < for the "strictly increasing" triple, or forgetting that the
+   equal-pair rule and the triple rule are mutually exclusive on the same window (a == b means
+   a < b is false).
+8. int overflow on the accumulated score.
+9. Recomputing the DP inside the reconstruction loop (turning an O(N*M*K) solve into O(N^2*M*K)).
+
+Follow-up Questions
+1. EXACTLY K jumps instead of at most K? Track jumps USED and require used == K at the end (or
+   subtract the at-most-(K-1) answer). Ask which reading is wanted; do not guess.
+2. Must end on a specific column? Backward DP handles it directly: seed only that cell of the last
+   row, leave the rest at -infinity. Dead states become real, so the sentinel now matters.
+3. Blocked cells? Seed them to -infinity; the "no dead states" argument no longer holds.
+4. Jumps of arbitrary length L, or a set of jump sizes? One extra term per size in the recurrence;
+   the state is unchanged. O(N*M*K*|moves|).
+5. Lexicographically smallest optimal path? Break Part 2's ties toward the smallest column and
+   prove it safe by induction on rows.
+6. Huge N with tiny K? The rolling window keeps score memory at O(M*K), but reconstruction then
+   needs Hirschberg-style divide-and-conquer or a recomputation pass.
+7. Bonuses depending on the last R visited values? The arrival tag generalizes to the last R-1
+   moves, i.e. 4^(R-1) tags - exponential in R. State that tradeoff honestly.
+8. Count paths for Part 4's bonus-augmented score? Same (i, j, k, tag) state with a parallel cnt
+   table; the overwrite-vs-accumulate rule is identical.
+
+Preparation
+Implement score maximization first, then add parent tracking without changing the score recurrence.
+Extend the state to count ties modulo 10^9 + 7 and test cases with several equal-score paths.
+Practice adding bonuses that depend on the previous one or two visited values while retaining the
+jump budget.

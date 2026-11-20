@@ -1,0 +1,212 @@
+================================================================================
+ANTHROPIC — Staff Software Engineer — Coding Interview (sample / reported)
+Question: "Distributed Mode and Median"
+Source: DarkInterview (Prompt 1) + 1point3acres (Prompt 2), reported May 2026
+Tags: distributed-systems, map-reduce, bandwidth, python, hard
+Frequency: High (phone + onsite)
+Solution file: DistributedModeMedian.java  (Java, runnable + self-verifying)
+================================================================================
+
+--------------------------------------------------------------------------------
+PROMPT 1 (DarkInterview website)
+--------------------------------------------------------------------------------
+Distributed Mode and Median
+Coding | Phone, Onsite | Software Engineer, Machine Learning Engineer
+Reported May, 2026 | High Frequency
+
+Basic Problem
+You are given:
+  - A very large dataset distributed across multiple machines (typically 10 workers)
+  - Pre-built interface functions: send(worker_id, data) and recv()
+  - Each machine has a portion of the dataset stored locally
+
+Implement a distributed system to find the mode (most frequent value) of the
+entire dataset.
+
+Critical Constraint: Data transmission speed is the system's bottleneck. You must
+avoid having all machines simultaneously send data to a single machine, as this
+creates severe reception delays.
+
+Interface you must use:
+  def send(worker_id, data): pass     # Send data to a specific worker
+  def recv(): pass                    # Receive data from any worker
+
+Problem Setup
+  Dataset characteristics:
+    - The dataset contains mostly unique integers
+    - One integer appears twice (duplicates) but on different machines
+    - All other values appear only once
+  Environment: Python
+  Worker count: 10 machines (configurable via WORKER_NUM)
+  Current worker ID: Available as worker_id
+
+Requirements
+  1. Use the provided interface — do not modify or reimplement send()/recv()
+  2. Avoid bottlenecks — distribute communication load evenly across all workers
+  3. Maximize parallelism — workers should send and receive simultaneously
+  4. Handle latency — account for both send and receive operation latency
+  5. Return the mode — the value that appears most frequently
+
+Note for Candidate
+  - Bandwidth management: the modulo-based distribution strategy is crucial to
+    avoid bottlenecks.
+  - Clarify ties with interviewer: any one? smallest/largest? all with max count?
+  - Top K vs Top 1: After repartitioning by key (Phase 2), sending only top 1
+    from each worker is sufficient to recover the global mode because each worker
+    holds complete counts for a disjoint key set. Without this repartition,
+    per-worker top-1 is NOT sufficient when the duplicated value is split across
+    machines. If the task requires K most frequent or deterministic tie-breaking,
+    send top K (or encode a tie-break rule).
+
+Detailed Implementation Strategy: Mode
+  Phase 1: Local Processing — each worker counts frequencies in its partition
+           (collections.Counter).
+  Phase 2: Distributed Shuffle (key innovation) — redistribute local counts to
+           target workers using modulo hashing target = key % num_workers. This
+           ensures all identical keys end up on the same worker, and all workers
+           send AND receive simultaneously (no bottleneck). Send buckets to all
+           other workers; receive num_workers-1 buckets; add own bucket locally.
+  Phase 3: Local Aggregation — aggregate received (key,count); take most_common(1).
+           Top-1 suffices: keys are partitioned by modulo, so each worker has the
+           complete final count for its keys; the global mode is the max of the
+           per-worker maxima.
+  Phase 4: Global Reduction — every worker sends its top-1 to worker 0; worker 0
+           computes the global mode. Deterministic tie-break: prefer smaller key
+           when counts equal. Only O(num_workers) values are sent here.
+  Note: for 100+ workers use a tree-based reduction (O(log W) rounds) to avoid a
+        single-receiver bottleneck in Phase 4.
+
+  Complexity:
+    Time: O(N/W + unique_keys/W) per worker.
+    Communication: Phase 2 O(unique_keys/W) per worker (the main cost);
+                   Phase 4 O(1) per worker.
+    Space: O(unique_keys/W) per worker.
+
+Follow-up: Finding the Median
+  Median requires global ordering. Use distributed quickselect that iteratively
+  narrows the median's location without sorting everything.
+  Phase 1-2: reuse mode phases to build a distributed histogram (each worker owns
+             a range of values); compute total_count collectively.
+  Phase 3: Distributed Quickselect — pick a pivot, count values < pivot (== and >)
+           distributed across workers, adjust search range; repeat (binary search
+           on the value domain).
+    total_less / total_equal decide:
+      target < total_less                  -> search lower half [low, pivot-1]
+      target < total_less + total_equal    -> found (pivot)
+      else                                 -> search upper half [pivot+1, high]
+  median_position = total_count // 2 (upper median by default, 0-indexed).
+  Complexity: O(log(max-min)) rounds × O(unique_keys/W) per round; O(1) data per
+              worker per round.
+
+  Alternative (Sorted Ranges): each worker sends sorted (value,count) to worker 0;
+  worker 0 merges and finds median. Simpler but bottlenecks worker 0 — use only
+  when unique values are few.
+
+Additional Discussion Topics (verbal)
+  1. Data skew after modulo shuffle -> better hashes (MurmurHash/CityHash),
+     multi-level hashing, dynamic load balancing, more workers; detect via load
+     reporting. Avoid Python's built-in hash() across processes (randomized).
+  2. Fault tolerance -> checkpoint after each phase, heartbeats, replication,
+     coordinator detects failed worker and reassigns/recomputes.
+  3. Different data sizes -> small: gather to one node; very large: tree reduction,
+     compression/RLE, approximate (Count-Min Sketch, HyperLogLog), sampling;
+     streaming: sliding windows, online algorithms (CMS with decay; two-heap median).
+  4. Communication optimization -> async/non-blocking I/O, pipelining, batching,
+     tree/ring/butterfly topologies, compression, delta encoding, caching.
+  5. Other statistics -> Top-K (local top-K + merge), percentiles (T-Digest/KLL),
+     variance (parallel/Welford), distinct count (HyperLogLog).
+  6. Production -> monitoring/observability, resource mgmt, data quality, security,
+     testing; deadlock prevention (interleave send/recv, non-blocking I/O, flow
+     control); empty-bucket optimization (needs metadata/termination signal);
+     hash selection; tree-based / hierarchical reduction for large clusters.
+  7. vs MapReduce/Spark -> same map/shuffle/reduce shape; custom solution is
+     specialized/faster, framework is general/fault-tolerant. Alternatives: Flink
+     (streaming), Dask, Ray, Presto/Trino.
+
+--------------------------------------------------------------------------------
+PROMPT 2 (1point3acres website)
+--------------------------------------------------------------------------------
+Coding Q4 — Distributed Mode / Median
+10 worker nodes hold disjoint shards of a large numeric dataset. Find the global
+mode (most common value) and global median using send/recv/barrier primitives
+with a fixed read bandwidth of 10 bytes/sec and inter-node bandwidth of 1 byte/sec.
+The grade is on iterative optimization, not the first solution.
+Tags: SWE, MLE, Infra Eng | distributed-systems, map-reduce, bandwidth, python, hard
+Last asked 2026-05-03 | phone-screen, onsite-coding
+
+Setup
+  10 nodes; each can read(n)->bytes from local data at 10 bytes/sec and
+  send(target, payload)/recv(source)/barrier() at 1 byte/sec between nodes.
+  Total dataset is large enough that copying everything to node 0 is the wrong answer.
+  Implement two passes: Mode (highest global count) and Median (global 50th pct).
+
+Mode strategies
+  - Naive: each node sends its full counter to node 0. Sometimes wins on small
+    alphabets because cross-node traffic is dominated by the counter, not the data.
+  - Stream-aggregate: each node sends top-k local values+counts; node 0 reconciles.
+    Argue why top-k of locals contains the global mode (it might not — call out the
+    false-negative case).
+  - Two-pass: locals send histograms keyed by hash buckets; node 0 picks the
+    dominant bucket and asks for refinements.
+
+Median strategies
+  - Quantile sketches (t-digest, KLL) — explain why you can't just merge sorted lists.
+  - Iterative bisection: broadcast guess g, each node returns count(x < g), halve the
+    search space, repeat. Cost ~ log(range) * 10 * (1 byte guess + a few bytes reply).
+  - Discuss precision-vs-bandwidth tradeoff explicitly.
+
+Follow-ups
+  - Skew (one node has 90% of data) -> work-stealing and re-sharding.
+  - Floats + exact median -> fall back to sort-merge with explicit bandwidth budget.
+  - Verify each strategy finishes inside a written-down bandwidth model.
+
+Notes
+  - The bar is iteration, not the first correct solution: stand something up, then squeeze.
+  - Read the problem twice; don't over-engineer for the wrong bottleneck (mind the
+    bandwidth numbers).
+  - Naive sometimes wins on toy graders — explain why and when it generalizes.
+  - Canonical Python harness exposes only send(worker_id, data) and recv() (blocking,
+    returns from any sender) plus worker_id and WORKER_NUM (typically 10). Mode-only
+    variant uses modulo-key reshuffle: hash v -> target = v % WORKER_NUM,
+    send(target, (v, local_count)); after a barrier each worker owns the global count
+    for its key-slice and forwards its single best (value, count) — Top-1 per worker is
+    enough because per-key counts are now complete.
+
+Preparation
+  - Single-node groupby/median in vanilla Python; streaming median = two heaps
+    (max-heap lower half, min-heap upper half, sizes differ by <=1).
+  - Practice quantile-bisection: broadcast guess, count-less-than reduce, update bounds.
+  - Default t-digest mental model for "what if the range is huge?".
+  - Rebuild the bandwidth-cost model on the doc; update it as you swap strategies.
+
+================================================================================
+MY APPROACH (see DistributedModeMedian.java for the full, verified solution)
+================================================================================
+  PART 1 MODE  (iteration story the graders reward):
+    (a) naive full-counter -> worker 0      : correct, but funnels O(U) into ONE node.
+    (b) local top-1 WITHOUT shuffle         : cheap but WRONG (false negative on a
+                                              mode split across machines).
+    (c) modulo-shuffle (key % W) + top-1     : THE ANSWER — balances fan-in across all
+                                              W receivers AND makes per-worker top-1
+                                              sufficient (key space partitioned ->
+                                              counts complete -> no key split).
+  PART 2 MEDIAN:
+    Reuse Phase 1-2 shuffle to build a distributed histogram, one fused all-reduce for
+    (total N, global min/max), then distributed quickselect = value-domain bisection:
+    broadcast pivot -> each worker returns (less, equal) for its slice -> shrink
+    [low,high]. O(log(max-min)) rounds, O(1) bytes/worker/round. Merging sorted lists
+    is rejected: it re-introduces the O(U)-into-one-node bottleneck.
+
+  KEY CORRECTNESS POINT the reference code omits: recv() returns from ANY sender, so a
+  fast worker's Phase-4 message can land in worker 0's inbox mid-Phase-2 -> out-of-order
+  / wrong-type read. Fix: barrier() at every phase boundary.
+
+  BANDWIDTH MODEL (Prompt 2): read 10 B/s, link 1 B/s => inter-node bytes ~10x costlier
+  AND a lone receiver serializes. Optimize the BUSIEST-RECEIVER byte load, not just the
+  total. Verified empirically: busiest receiver shuffle ~386 units vs naive ~3578 units
+  (~9x, scales ~Wx). Bisection median is a few bytes/worker/round.
+
+  TIE-BREAK (clarify): implemented "max count, ties -> smallest key" deterministically.
+  EVEN-N MEDIAN: upper median index = N/2 (0-indexed); lower = (N-1)/2; avg-of-middles
+  needs two selects. Verified vs single-machine brute force across 60 random trials +
+  canonical split-duplicate + skew + edge cases (single/all-equal/empty).

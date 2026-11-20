@@ -1,0 +1,41 @@
+Reddit — Staff Software Engineer, Coding Interview (sample question)
+
+Shortest Palindrome
+Given a string, prepend the fewest characters to the front to make it a
+palindrome and return the result. This is LeetCode 214: the linear-time
+approach finds the longest palindromic prefix via a KMP failure function
+(or rolling hash) over s + separator + reverse(s), then mirrors the remaining
+suffix onto the front, handling inputs up to 5 * 10^4 lowercase letters.
+
+Shortest Palindrome
+You are given a string s. You may add characters only to the front of the
+string.
+
+Return the shortest palindrome you can build this way.
+
+Examples
+Example 1:
+Input:  s = "aacecaaa"
+Output: aaacecaaa
+
+Example 2:
+Input:  s = "abcd"
+Output: dcbabcd
+
+Constraints
+0 <= s.length <= 5 * 10^4
+s consists of lowercase English letters.
+
+------------------------------------------------------------------------------
+Anticipated follow-ups covered in the solution (ShortestPalindrome.java):
+  Part 1: KMP failure function over s + '#' + reverse(s) -> longest palindromic
+          prefix L; answer = reverse(s[L..]) + s.  O(n) time, O(n) space.
+  Part 2: SAME problem via rolling (double) hash to find L. O(n) time, O(1)
+          extra space; identical wrapper. Collision trade-off vs KMP discussed.
+  Part 3: Generalize to add at FRONT or BACK, return the shorter. Reuses the
+          Part 1 primitive on both s and reverse(s) (longest pal suffix =
+          longest pal prefix of reverse(s)); pick fewer added chars, tie->front.
+
+Note (different problem, don't confuse): "minimum insertions ANYWHERE to make a
+palindrome" is LeetCode 1312 — an O(n^2) DP (n - longest palindromic
+subsequence), NOT this linear front-only problem.

@@ -1,0 +1,129 @@
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Details
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+In-Memory SQL Database with AND Filters
+Related Discussion
+valon
+Problem: In-Memory SQL Database
+
+Implement a simplified in-memory database that supports inserting rows and selecting requested columns. Tables do not need to be created in advance; a table is created automatically on its first insert.
+
+Each row is a key-value map:
+
+Every inserted row contains a unique primary-key column, id.
+Other columns may be absent. For example, a row may have email but no name.
+Inserting a row with an existing id into the same table replaces the entire old row.
+Rows are returned in the order in which their ids were first inserted. Replacing an existing id does not change its position.
+
+Support these operations:
+
+insert: insert or replace a row in a table.
+select: retrieve requested columns from a table, optionally with a WHERE clause.
+WHERE Clause
+
+A WHERE clause contains simple predicates joined only by AND. There is no OR, parentheses, or other SQL syntax.
+
+Each predicate has one of these forms:
+
+column = 'string literal'
+column > integer literal
+column < integer literal
+
+= performs string comparison.
+> and < perform integer comparison; the corresponding row value is guaranteed to be a valid integer string.
+A row is returned only if it satisfies every AND predicate.
+If a column used by a predicate is absent from a row, that row does not satisfy the predicate. If a requested output column is absent and no relevant predicate excludes the row, output null for that column.
+Input Format
+
+The first line contains an integer Q, the number of operations.
+
+Each of the next Q lines is a JSON object:
+
+Insert:
+{"op":"insert","table":"employees","row":{"id":"1","name":"John","email":"abc@gmail.com"}}
+
+Select:
+{"op":"select","table":"employees","columns":["name"]}
+
+
+or:
+
+{"op":"select","table":"employees","columns":["id","name"],"where":"name = 'John' AND id > 5"}
+
+Output Format
+
+For each select, print one JSON array. Each element is an object containing exactly the requested columns; missing columns must be printed as null.
+
+insert operations produce no output.
+
+Constraints
+1 <= Q <= 100,000
+Each row has at most 20 columns.
+Each WHERE clause has at most 20 predicates joined by AND.
+Table names, column names, and values contain only letters, digits, and underscores. String literals contain no single quotes.
+Example
+Input
+4
+{"op":"insert","table":"employees","row":{"id":"1","name":"John","email":"abc@gmail.com"}}
+{"op":"insert","table":"employees","row":{"id":"1","name":"Jessie","email":"qwe@com"}}
+{"op":"insert","table":"employees","row":{"id":"2","email":"cde@com"}}
+{"op":"select","table":"employees","columns":["name"]}
+
+Output
+[{"name":"Jessie"},{"name":null}]
+Was this article helpful?
+Python 3
+Java
+12px
+14px
+16px
+18px
+20px
+22px
+24px
+1
+2
+3
+4
+5
+6
+7
+def solution():
+    # Read data from standard input
+    # Write your code here
+    pass
+if __name__ == "__main__":
+    solution()
+Standard Input
+Run
+History
+Execution Result:

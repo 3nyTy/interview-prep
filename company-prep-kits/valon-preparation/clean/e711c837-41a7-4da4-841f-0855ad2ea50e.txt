@@ -1,0 +1,65 @@
+In-Memory SQL Database: Order By a Column
+Related Discussion
+valon
+Problem: Build an In-Memory SQL Database (Order By)
+
+Extend the in-memory table query to support sorting with ORDER BY column.
+
+Functionality
+
+Implement query(select_cols, where=None, order_by=None, ascending=True):
+
+select_cols: columns to return.
+where: optional equality filter.
+order_by: optional column name to sort by.
+ascending: sort direction (default ascending).
+Sorting Rules
+Sort by the values in the order_by column.
+If multiple rows have the same sort key, preserve insertion order (stable sort).
+Values may be compared as strings; if numeric sorting is required, describe parsing.
+Output
+Return the projected results after applying filter and ordering.
+Suggested Constraints
+Up to N = 1e5 rows.
+Up to M = 50 columns.
+Example
+Columns: ["id","name","score"]
+Rows:
+(1, alice, 90)
+(2, bob, 80)
+query(["name"], order_by="score", ascending=True) returns [["bob"],["alice"]]
+Example
+Input
+cols: id,name,score
+rows: (1,alice,90);(2,bob,80)
+query: select name order_by score asc
+Output
+bob
+alice
+Was this article helpful?
+Python 3
+Java
+12px
+14px
+16px
+18px
+20px
+22px
+24px
+1
+2
+3
+4
+5
+6
+7
+def solution():
+    # Read data from standard input
+    # Write your code here
+    pass
+if __name__ == "__main__":
+    solution()
+Standard Input
+Run
+History
+Execution Result:

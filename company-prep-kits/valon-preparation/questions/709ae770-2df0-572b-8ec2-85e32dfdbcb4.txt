@@ -1,0 +1,157 @@
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Details
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Design an In-Memory Database with SELECT, IN, and FILTER BY
+Related Discussion
+valon
+Problem: Design an In-Memory Database with Simple Queries
+
+Implement an in-memory query engine. The database contains exactly one table. The schema and all rows are provided at startup, and then you need to process multiple query statements.
+
+The engine should support three features:
+
+Basic SELECT: select and return one or more columns.
+WHERE <column> IN (...): only return rows whose column value is in the given set.
+FILTER BY <column> <op> <value>: further filter rows by a condition.
+Query Syntax
+
+Use the following simplified SQL syntax:
+
+SELECT <columns> FROM <table>
+SELECT <columns> FROM <table> WHERE <column> IN (<value1>,<value2>,...)
+SELECT <columns> FROM <table> FILTER BY <column> <op> <value>
+SELECT <columns> FROM <table> WHERE <column> IN (<value1>,<value2>,...) FILTER BY <column> <op> <value>
+
+
+Notes:
+
+<columns> can be one column name, multiple comma-separated column names, or *.
+<table> can be ignored because there is only one table.
+FILTER BY supports operators: =, !=, <, <=, >, >=.
+Input values do not contain spaces.
+Equality comparisons are exact string comparisons.
+For ordering comparisons, compare numerically if both sides can be converted to numbers; otherwise compare lexicographically.
+All column names in queries are guaranteed to exist.
+Input Format
+n m
+col1,col2,...,colm
+row1_col1,row1_col2,...,row1_colm
+...
+rown_col1,rown_col2,...,rown_colm
+q
+query_1
+...
+query_q
+
+
+Where:
+
+n is the number of rows.
+m is the number of columns.
+The second line contains the column names.
+The next n lines contain the rows.
+q is the number of queries.
+Output Format
+
+For each query, output one line:
+
+Within one result row, selected columns are joined by commas.
+Multiple matched rows are joined by semicolons ;.
+If no row matches, output EMPTY.
+Constraints
+1 <= n <= 10^4
+1 <= m <= 50
+1 <= q <= 10^4
+Column names, values, and query length are at most 200 characters
+
+Example
+
+Input:
+
+4 4
+id,name,age,city
+1,Alice,30,NY
+2,Bob,25,LA
+3,Carol,35,NY
+4,David,40,SF
+3
+SELECT name FROM users
+SELECT id,name FROM users WHERE city IN (NY,SF)
+SELECT name FROM users WHERE city IN (NY,LA) FILTER BY age > 30
+
+
+Output:
+
+Alice;Bob;Carol;David
+1,Alice;3,Carol;4,David
+Carol
+
+Example
+Input
+3 3
+id,name,age
+1,Alice,30
+2,Bob,25
+3,Carol,35
+2
+SELECT name FROM users
+SELECT id,name FROM users
+Output
+Alice;Bob;Carol
+1,Alice;2,Bob;3,Carol
+Was this article helpful?
+Python 3
+Java
+12px
+14px
+16px
+18px
+20px
+22px
+24px
+1
+2
+3
+4
+5
+6
+7
+def solution():
+    # Read data from standard input
+    # Write your code here
+    pass
+if __name__ == "__main__":
+    solution()
+Standard Input
+Run
+History
+Execution Result:

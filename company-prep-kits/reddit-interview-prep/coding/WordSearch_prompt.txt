@@ -1,0 +1,44 @@
+Reddit — Staff Software Engineer, Coding Interview
+Sample question (as provided)
+
+======================================================================
+Word Search
+======================================================================
+Determine whether a target string can be formed by a path through a 2-D
+character grid, moving only to horizontally or vertically adjacent cells
+and reusing no cell. Solved with grid DFS plus backtracking
+(LeetCode 79 family).
+
+Word Search
+Given a 2-D grid of characters `board` and a string `word`, return true if
+the word is present in the grid, otherwise return false.
+
+For the word to be present it must be possible to form it with a path in the
+board with horizontally or vertically neighboring cells. The same cell may
+not be used more than once in a word.
+
+Examples
+--------
+Example 1:
+Input:  board = [ ["A","B","C","D"], ["S","A","A","T"], ["A","C","A","E"] ],
+        word = "CAT"
+Output: true
+
+Example 2:
+Input:  board = [ ["A","B","C","D"], ["S","A","A","T"], ["A","C","A","E"] ],
+        word = "BAT"
+Output: false
+
+Constraints
+-----------
+1 <= board.length, board[i].length <= 5
+1 <= word.length <= 10
+board and word consist of only lowercase and uppercase English letters.
+
+======================================================================
+Anticipated follow-ups covered in WordSearch.java ("LeetCode 79 family")
+======================================================================
+Part 1: exist(board, word)          -> boolean        (the asked problem)
+Part 2: findWords(board, words)     -> List<String>   (Word Search II, Trie; LC 212)
+Part 3: findPath(board, word)       -> List<int[]>    (return the actual path)
+Part 4: existWithReuse(board, word) -> boolean        (cells reusable -> memoization/DP)

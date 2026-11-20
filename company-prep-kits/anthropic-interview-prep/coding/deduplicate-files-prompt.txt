@@ -1,0 +1,232 @@
+================================================================================
+ANTHROPIC — STAFF SOFTWARE ENGINEER — CODING ROUND
+Question: "Deduplicate Files"
+Sources: DarkInterview + 1point3acres (reported May–Jun 2026)
+Frequency: HIGH | Stage: phone-screen + onsite-coding | Roles: SWE / MLE / Infra Eng
+Tags: filesystem, hashing, medium
+================================================================================
+
+--------------------------------------------------------------------------------
+PROMPT 1 (DarkInterview)
+--------------------------------------------------------------------------------
+Deduplicate Files
+Coding
+Phone, Onsite
+Software Engineer, Machine Learning Engineer
+Reported May, 2026
+High Frequency
+
+Basic Problem
+Given a root folder/directory, find all duplicate files within it. Return groups
+of file paths where each group contains files with identical content.
+
+Example
+For a directory structure like:
+
+root/
+├── a/
+│   ├── f1.mp4
+│   └── f2.mp4
+└── b/
+    ├── f3.mp4
+    └── tmp/
+        └── f4.mp4
+
+Expected output format:
+
+[
+    ["a/f1.mp4", "a/f2.mp4"],           # Group 1: identical content
+    ["b/f3.mp4", "b/tmp/f4.mp4"]        # Group 2: identical content
+]
+
+Requirements
+- Traverse all files in the directory tree starting from the root folder
+- Group files by content — files with identical content should be in the same group
+- Return only duplicates — files that appear alone (no duplicates) should not be included
+- Handle nested directories — recursively search through subdirectories
+
+Basic Approach
+A straightforward solution:
+- Use os.walk() to traverse the directory tree
+- Compute a hash (e.g., MD5, SHA-256) of each file's full content
+- Group files by their hash value
+- Return groups with more than one file
+
+Interface
+def find_duplicate_files(root_path: str) -> List[List[str]]:
+    """
+    Find all duplicate files in the directory tree.
+    Args:
+        root_path: Root directory to search
+    Returns:
+        List of groups, where each group contains paths to duplicate files
+    """
+    pass
+
+Note for Candidate
+- You will need to manually create test files in the interview environment (e.g., Google Colab)
+- Consider edge cases: empty files, symbolic links, file permissions
+- Think about the time complexity: it depends on the total size of all files
+
+Optimized Approach
+The basic approach of hashing every file's complete content can be slow for large
+files. Consider a multi-stage filtering approach to avoid unnecessary full hashing:
+
+Three-Stage Filtering
+Stage 1 - File Size (Metadata):
+- Group files by size first
+- Files with different sizes cannot be duplicates
+- This is very fast (just metadata lookup, no I/O)
+
+Stage 2 - Partial Hash (First Chunk):
+- For files with the same size, read and hash only the first chunk (e.g., 1024 bytes)
+- Files with different partial hashes cannot be duplicates
+- Much faster than reading entire large files
+
+Stage 3 - Full Hash:
+- Only when size and partial hash match, compute the full content hash
+- This ensures correctness while minimizing expensive operations
+
+Time Complexity Analysis
+- Best case: Most files have unique sizes → O(number of files) for metadata only
+- Worst case: All files same size and same initial content → O(total file size) for full hashing
+- Average case: Significantly better than naive approach due to early filtering
+
+Example Implementation Structure
+def find_duplicate_files_optimized(root_path: str) -> List[List[str]]:
+    # Stage 1: Group by file size
+    size_groups = group_by_file_size(root_path)
+    # Stage 2: For each size group, compute partial hash
+    partial_hash_groups = {}
+    for files in size_groups.values():
+        if len(files) > 1:
+            group_by_partial_hash(files, partial_hash_groups)
+    # Stage 3: For each partial hash group, compute full hash
+    full_hash_groups = {}
+    for files in partial_hash_groups.values():
+        if len(files) > 1:
+            group_by_full_hash(files, full_hash_groups)
+    # Return only groups with duplicates
+    return [files for files in full_hash_groups.values() if len(files) > 1]
+
+Additional Discussion Topics (verbal — interviewer does not expect code)
+1. I/O Bound vs CPU Bound
+   - Determine bottleneck via profiling: CPU idle + high I/O wait => I/O bound;
+     high CPU utilization => CPU bound (hashing is the bottleneck).
+   - Usually I/O bound (disk read slower than hashing); with fast SSDs and small
+     files it can become CPU bound; boundary is blurry with SSDs.
+   - If I/O bound: async I/O, parallel reads, tune chunk size.
+     If CPU bound: faster hash (xxHash vs SHA-256), parallelize across cores.
+
+2. Hash Function Selection
+   - MD5: fast, cryptographically broken, acceptable collision rate for dedup.
+   - SHA-256: slower, very low collision probability, cryptographically secure.
+   - xxHash / CityHash: extremely fast non-cryptographic; good for dedup.
+   - Trade-offs: speed vs collision rate; cryptographic vs not (not required here).
+   - No perfect hash (pigeonhole). SHA-256 collision ≈ 2^-128 (never observed).
+   - Byte-by-byte verification after hash match = 100% certainty but doubles I/O;
+     overkill for SHA-256.
+
+3. Distributed System Implementation
+   - MapReduce: Map emits (file_hash, path) or (file_size, path); Shuffle groups
+     same hash/size; Reduce verifies and outputs duplicate groups.
+   - Partition by file size first to minimize cross-machine communication.
+   - DHT (Redis/Cassandra) with consistent hashing for hash -> [paths].
+   - Considerations: don't ship file content over network (hash locally); load
+     balancing; fault tolerance/retries.
+
+4. Continuous Monitoring System
+   - File system watcher: inotify (Linux) / FSEvents (macOS) for create/modify/delete.
+   - DB schema: hash_to_files (dup detection) + file_to_hash (handle deletions).
+   - On add: hash, check existence -> notify on dup, write both tables.
+     On delete: look up hash from file_to_hash, remove from both tables, notify others.
+   - Queue-based notifications (Kafka/RabbitMQ); process async; eventual consistency.
+
+5. Chunk Size Selection
+   - Factors: I/O throughput (larger chunks fewer ops, better HDD), early
+     differentiation, memory per file, align to disk sector (~4KB).
+   - Typical: 1KB-4KB quick check; 64KB-1MB for SSD sequential; adaptive by file size.
+   - Measure: profile different chunk sizes on representative data.
+
+--------------------------------------------------------------------------------
+PROMPT 2 (1point3acres) — same question, follow-up emphasis
+--------------------------------------------------------------------------------
+Coding Q2 — File Deduplication
+Walk a directory tree and group duplicate files. Two-layer dedup: first by file
+size, then by content hash. The base problem is short; the follow-ups about
+IO/CPU bounds, hash choice, and scale dominate the round.
+SWE / MLE / Infra Eng | filesystem, hashing, python, medium
+Frequency: High | Last asked: 2026-06-10 | Stage: phone-screen · onsite-coding
+
+Requirements
+The canonical signature:
+def find_duplicate_files(root_path: str) -> list[list[str]]: ...
+    # Walks root_path recursively and returns groups of paths whose file
+    # contents are byte-identical. Each inner list has length >= 2;
+    # files with no duplicate (singletons) are EXCLUDED from the result.
+
+- Walk the tree (os.walk is fine).
+- Bucket by os.path.getsize first; files with unique sizes are trivially unique.
+- Within each size bucket, the canonical optimisation is a 3-tier filter:
+  (1) size match, (2) hash of the first 1024 bytes to filter most false candidates
+  cheaply, (3) full-content hash to confirm. The mid-tier prefix-hash cuts the bytes
+  read for non-matching files of equal size by orders of magnitude.
+- Hash candidates within each size bucket (default SHA-256; MD5 acceptable but be
+  ready to defend the collision risk).
+- Group files sharing the same (size, full_hash) and return the groups.
+
+Edge cases the interviewer probes: empty files (all 0-byte files collide and form
+one group), symbolic links (resolve or skip?), and unreadable files (permission
+errors should not crash the walk).
+Candidates create their own test files in CodeSignal — make a small fixture with
+two duplicate pairs, one unique file, and one empty file.
+
+Follow-up tree
+- IO vs CPU bound. Hashing 1 GB files is IO-bound on a typical NVMe, CPU-bound on
+  slow disks; the answer is "measure, then choose." ThreadPoolExecutor (IO-bound)
+  vs ProcessPoolExecutor (CPU-bound); explain how you'd benchmark.
+- All files identical and huge. Every file lands in one bucket, so you must hash
+  all of them. Optimization: read+hash in chunks and short-circuit as soon as two
+  streams diverge.
+- Hash collisions. SHA-256 by default. For speed mention xxHash or Blake3. Discuss
+  real-world collision chance vs a verification re-read.
+- Distribute across machines. Shard by size bucket, send each shard to a worker,
+  dedupe locally, merge groups at the end. Watch stragglers when one bucket is huge.
+- Realtime detection. inotify / fsnotify for newly-written files; maintain a
+  (size, hash) index; check at write-completion.
+
+Notes
+- Interviewer often picks a Python idiom to grill on: pathlib vs os,
+  generator-vs-list, context-manager hygiene around file handles.
+- Pitfall: hashing the entire file when a length-prefix or first-block hash would
+  already separate buckets. State the optimization out loud — rewarded without
+  requiring implementation.
+- Q2 migrating: from late 2025 some Q2 rounds use the LRU-cache durability problem
+  instead. Prepare both.
+- Canonical output shape: list[list[str]] where each inner list is one duplicate
+  group (>=2 paths). Singletons excluded entirely. Walk with os.walk() rooted at
+  the provided path; do not assume a flat file list.
+
+No-helper rotation
+Recent phone-screen rotations ship only a main() stub — no directory-walking or
+file-reading helpers provided, so hand-writing os.walk + chunked reads from scratch
+is part of the timed work. Java and other non-Python candidates flag the unfamiliar
+standard-library surface (manual directory recursion, streamed hashing) as the main
+time sink; the problem statement is often only a few lines, so do not wait for a
+detailed spec. Looking up library docs is allowed; copying a code snippet the
+interviewer can see on screen-share is explicitly fine.
+
+Preparation
+- Practice a clean walk -> bucket -> hash -> group implementation under 15 minutes
+  including manual fixture creation.
+- Drill the streaming-hash variant: open both files, read in 1 MB chunks, abort the
+  comparison as soon as a chunk hash differs.
+- Be able to whiteboard the distributed answer with size-bucket sharding and a
+  final merge step.
+
+================================================================================
+SOLUTION: see DeduplicateFiles.java (same directory) — verified on Corretto 21.
+  Part 1: basic full-hash
+  Part 2: 3-stage filter (size -> partial 1KB hash -> full hash)  [expected answer]
+  Part 3: streaming lock-step byte-exact comparison (huge/identical follow-up)
+================================================================================

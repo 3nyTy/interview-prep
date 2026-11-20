@@ -1,0 +1,128 @@
+1P3A Interview
+Premium Version
+Toggle Sidebar
+Popular Questions
+Interview Experiences
+Software Engineer
+Data Scientist
+Product Manager
+Interview Guides
+Salary Database
+Job Market
+System Design
+Companies
+Discussion
+NEW
+Create a Post
+Share experience / ask question
+Followed Companies
+Bookmarks
+Reading History
+ByteByteGo 10% OFF
+Feature Tour
+Help & Support
+coolanimesh14
+Membership active
+Popular Questions
+Details
+Search companies, questions, guides…
+⌘
+K
+Interview Copilot
+中
+Design an In-Memory Flexible-Schema Database with Column-Based Query and Filters
+Related Discussion
+valon
+Problem: Design an In-Memory Flexible-Schema Database
+
+Implement an in-memory database with a flexible schema (similar to DynamoDB’s optional attribute model):
+
+Each record may contain any set of columns (attributes).
+During insertion, some columns may be missing (i.e., the attribute does not exist for that record).
+
+You need to support:
+
+1) Insert
+
+Provide an API to insert a record into the database.
+
+Each record is identified by a unique id (provided by the caller).
+The record payload is a set of column -> value pairs.
+Missing columns mean the attribute does not exist for that record.
+2) Query by Column Name
+
+Provide an API that, given a column name, returns all records (or record ids) that contain that column.
+
+Records missing that column must not be included.
+3) Follow-up: Query with Filters
+
+Enhance (2) to support filtering:
+
+Input: target_column (the column to query by), plus a filter condition filter_column and filter_value.
+Output: return all records that satisfy:
+The record contains target_column
+The record contains filter_column and its value equals filter_value
+
+Note: if a record is missing filter_column, it does not satisfy the filter.
+
+Requirements
+Clear data structure and API design.
+Reasonable time/space complexity (be ready to explain).
+Scale (for design guidance)
+Number of records N: 1 <= N <= 100000
+Columns per record K: 0 <= K <= 50
+Values can be treated as strings (or comparable scalar types).
+You must write your own tests
+
+Create at least 5 test cases covering:
+
+Different records with different columns
+Missing columns
+Query by column name only
+Query with filter enabled
+Queries that return no results
+Example tests (for reference)
+Insert:
+id=1: {"name":"alice", "age":"30"}
+id=2: {"name":"bob"}
+id=3: {"age":"30", "city":"SF"}
+Query column="name" => returns {1,2}
+Query column="city" => returns {3}
+Query target="name" + filter age=="30" => returns {1}
+Query target="city" + filter name=="alice" => returns {}
+Example
+Input
+INSERT 1 name=alice age=30
+INSERT 2 name=bob
+INSERT 3 age=30 city=SF
+QUERY_COL name
+
+Output
+1 2
+Was this article helpful?
+Python 3
+Java
+12px
+14px
+16px
+18px
+20px
+22px
+24px
+1
+2
+3
+4
+5
+6
+7
+def solution():
+    # Read data from standard input
+    # Write your code here
+    pass
+if __name__ == "__main__":
+    solution()
+Standard Input
+Run
+History
+Execution Result:

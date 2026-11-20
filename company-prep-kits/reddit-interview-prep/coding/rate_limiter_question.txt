@@ -1,0 +1,93 @@
+Rate Limiter (Open-Ended Coding)
+================================
+Implement a per-user rate limiter and walk through the design trade-offs interactively. The interviewer
+leaves the exact algorithm open - sliding window log, sliding window counter, token bucket, leaky bucket -
+and grades on the clarity of the picked algorithm plus correctness of the implementation.
+
+Requirements
+------------
+Implement a rate limiter with the interface:
+
+    class RateLimiter:
+        def __init__(self, max_requests: int, window_seconds: int): ...
+        def allow(self, user_id: str, now: int) -> bool: ...
+
+The surface is intentionally minimal. The interviewer expects the candidate to:
+- Clarify the semantics (per-user vs global, hard limit vs burst-allowing, what `now` units are, whether the
+  window is sliding or fixed).
+- Pick one algorithm and justify it.
+- Implement the picked algorithm cleanly, with the right data structure.
+- Discuss the time and space cost per call and per user.
+
+Follow-ups typically include:
+- Switching from in-process to distributed (Redis-backed) without changing the algorithm contract.
+- Adapting to a per-endpoint quota (multi-key extension).
+- Memory pressure: pruning idle users.
+
+Notes
+-----
+- The fast, defensible default for a 60-minute screen is the SLIDING WINDOW LOG: a deque per user storing
+  recent request timestamps; allow pops timestamps older than now - window, then returns whether the deque
+  length is under the limit. O(1) amortized per call, O(requests-in-window) memory per user.
+- The SLIDING WINDOW COUNTER trades a small accuracy loss for O(1) memory per user (two integer counters:
+  previous window and current window, with a fractional blend). Use this when the interviewer presses on
+  memory.
+- TOKEN BUCKET is the cleanest algorithm for burst-tolerant designs: maintain (tokens, last_refill_time)
+  per user; on each call, refill at a constant rate up to a cap, deduct one token if available. O(1) per
+  call, O(1) per user. Most production rate limiters use this shape.
+- LEAKY BUCKET is functionally similar to token bucket but is easier to reason about for fixed-throughput
+  scenarios - pick token bucket unless the interviewer explicitly steers toward leaky.
+- For the DISTRIBUTED follow-up, the canonical answer is Redis with atomic Lua (or ZADD for sliding window
+  log; INCR + EXPIRE for fixed window counter). The hard parts are time skew across nodes and the
+  failure-mode of the Redis call itself (fail-open vs fail-closed).
+- Common failure mode: the candidate picks sliding window log but forgets the popleft while-loop and gets
+  O(window) per call. Test that path explicitly.
+
+Alternate canonical variant - Logger (per-message cooldown)
+-----------------------------------------------------------
+A common closed-form phrasing keys the limiter on the message string instead of a user id, with a fixed
+10-second cooldown. A distinct message may be printed only if the same message has not been printed in the
+last 10 seconds:
+
+    class Logger:
+        def __init__(self) -> None: ...
+        def shouldPrintMessage(self, timestamp: int, message: str) -> bool: ...
+            # Returns True if `message` should be printed at `timestamp`, else False.
+            # True iff this message has NOT been printed in the last 10 seconds
+            # (i.e. no earlier accepted print at ts > timestamp - 10).
+            # On a True result, record `timestamp` so the message stays blocked
+            # until 10 seconds have elapsed.
+
+Semantics and traps:
+- The cooldown is per distinct message; each message string has its own independent 10-second window ("bar"
+  at t=8 does not reset "foo").
+- The boundary is exclusive-of-the-full-window: a message last printed at t is blocked through t+9 and
+  printable again at t+10 (last-print + 10 <= now).
+- A repeat at the same timestamp is blocked (0 < 10).
+- Timestamps arrive in non-decreasing order, so a single dict message -> last_printed_timestamp suffices:
+  allow = timestamp >= last.get(message, -inf) + 10; update last[message] only on a True result. O(1)/call.
+- Because timestamps are monotonic, no eviction is needed for correctness, but a bounded design would prune
+  entries older than now - 10 (or use a deque/ordered structure) to cap memory at O(distinct messages seen
+  in window).
+- Constraints seen in the closed form: 0 <= timestamp <= 10^9, 1 <= message.length <= 30 (lowercase
+  letters), up to 10^4 calls.
+
+Production follow-up on this variant mirrors the open-ended one: handling high throughput, adapting to a
+highly concurrent environment, and how you would test and deploy it.
+
+Examples
+--------
+For the per-message Logger variant: printing "foo" at t=1 returns True; "foo" again at t=3 returns False
+(still within the 10s window); "foo" at t=11 returns True (11 >= 1 + 10). An independent "bar" printed at
+t=2 tracks its own window.
+
+Preparation
+-----------
+- Implement all four algorithms (sliding window log, sliding window counter, token bucket, leaky bucket)
+  from scratch in 20 minutes total. Be able to explain the memory / accuracy / burst trade-offs of each.
+- Rehearse the distributed follow-up: "move state to Redis, use Lua for atomicity, accept eventual
+  consistency on per-shard counters." Know one Redis primitive per algorithm.
+- Pre-decide your default pick for the round (token bucket is a safe bet) and stick with it unless the
+  interviewer steers elsewhere. Switching algorithms mid-round burns 10 minutes.
+- Be ready for the concrete Logger phrasing too: a single message -> last_printed_timestamp dict with a
+  10-second exclusive cooldown, exploiting the non-decreasing-timestamp guarantee for O(1) calls.

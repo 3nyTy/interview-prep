@@ -1,0 +1,142 @@
+================================================================================
+Anthropic OA — "In-Memory Database" (4-Level CodeSignal / Online Assessment)
+High frequency. SWE / MLE / Infra. CodeSignal, ~90 min, gated 4 levels.
+Sources: DarkInterview (reported May 2026) + 1point3acres (last asked 2026-05-10).
+================================================================================
+
+OVERVIEW
+Implement a simplified in-memory database in 4 progressively-gated levels (each
+must pass before the next unlocks; you keep access to all earlier-level data):
+  Level 1: Basic record/field/value operations
+  Level 2: Display records based on filters (SCAN)
+  Level 3: TTL (time-to-live) auto-expiration
+  Level 4: Snapshot backup/restore  (one rotation)  OR  GET_WHEN look-back (other rotation)
+
+INPUT/OUTPUT
+- Input: a list of queries (array of string arrays), each [op, ts, args...].
+- Output: an array of strings, one result per query.
+- Each query calls exactly one operation.
+- Timestamps: stringified ms, unique, range [0, 1e9], STRICTLY INCREASING order.
+
+--------------------------------------------------------------------------------
+LEVEL 1 — Basic Operations
+--------------------------------------------------------------------------------
+Each record has a unique string key and several field(string)->value(int) pairs.
+
+SET <ts> <key> <field> <value>
+  Insert field-value into record key (create record if missing); overwrite if
+  field exists. Returns "".
+
+COMPARE_AND_SET <ts> <key> <field> <expectedValue> <newValue>   (older rotations)
+  Set field to newValue only if current value == expectedValue. If expected
+  mismatches, or key/field missing -> ignored. Returns "true" if updated else "false".
+
+COMPARE_AND_DELETE <ts> <key> <field> <expectedValue>           (older rotations)
+  Remove field only if current value == expectedValue. Returns "true"/"false".
+
+GET <ts> <key> <field>
+  Returns value as string, or "" if record/field missing.
+
+DELETE <ts> <key> <field>   (newer rotations, in place of compare-* ops)
+  Remove field from key. Returns "true" if removed, "false" if absent.
+
+Example:
+  [["SET","0","A","B","4"],["SET","1","A","C","6"],
+   ["COMPARE_AND_SET","2","A","B","4","9"],["COMPARE_AND_SET","3","A","C","4","9"],
+   ["COMPARE_AND_DELETE","4","A","C","6"],["GET","5","A","C"],["GET","6","A","B"]]
+  -> ["", "", "true", "false", "true", "", "9"]
+
+Test case:
+  [["SET","160000000","a","a","1"],["SET","160000001","a","A","2"],
+   ["GET","160000002","a","a"],["COMPARE_AND_DELETE","160000003","a","a","0"],
+   ["GET","160000004","a","a"],["COMPARE_AND_DELETE","160000005","a","a","1"],
+   ["GET","160000006","a","a"],["GET","160000007","a","A"],
+   ["COMPARE_AND_DELETE","160000008","a","A","2"],["SET","160000009","a","A","7"],
+   ["SET","160000010","a","A","9"],["GET","160000011","a","a"],["GET","160000012","a","A"]]
+  -> ["", "", "1", "false", "1", "true", "", "2", "true", "", "", "", "9"]
+
+--------------------------------------------------------------------------------
+LEVEL 2 — Filter-based Display
+--------------------------------------------------------------------------------
+SCAN <ts> <key>
+  Comma-separated "<field>(<value>), ..." of ALL fields, sorted lexicographically
+  by field name. "" if record missing/empty.
+
+SCAN_BY_PREFIX <ts> <key> <prefix>
+  Same format, restricted to fields starting with prefix; "" if none / record missing.
+
+Example:
+  [["SET","1","A","BC","1"],["SET","2","A","BD","2"],["SET","3","A","C","3"],
+   ["SCAN_BY_PREFIX","4","A","B"],["SCAN","5","A"],["SCAN_BY_PREFIX","6","B","B"]]
+  -> ["", "", "", "BC(1), BD(2)", "BC(1), BD(2), C(3)", ""]
+
+--------------------------------------------------------------------------------
+LEVEL 3 — TTL (Time-To-Live)
+--------------------------------------------------------------------------------
+SET_WITH_TTL <ts> <key> <field> <value> <ttl>   (also seen as SET_AT_WITH_TTL)
+  Field exists during [ts, ts+ttl). At EXACTLY ts+ttl it is dead/inaccessible.
+  Always replaces previous value AND previous expiry. Returns "".
+
+Semantics:
+  - Plain SET clears any TTL (field becomes non-expiring).
+  - A successful COMPARE_AND_SET preserves the field's current expiration (value only).
+  - GET / SCAN / SCAN_BY_PREFIX / COMPARE_AND_* all ignore expired fields.
+
+Example 1 (plain SET clears TTL):
+  [["SET_WITH_TTL","1","A","BC","1","9"],["SET_WITH_TTL","5","A","BC","2","10"],
+   ["SET","6","A","BC","3"],["SCAN_BY_PREFIX","14","A","B"],
+   ["SCAN_BY_PREFIX","15","A","B"],["SCAN_BY_PREFIX","100","A","B"]]
+  -> ["", "", "", "BC(3)", "BC(3)", "BC(3)"]
+
+Example 2:
+  [["SET","1","A","B","1"],["SET_WITH_TTL","2","X","Y","5","15"],["GET","3","X","Y"],
+   ["SET_WITH_TTL","4","A","D","2","10"],["SCAN","13","A"],["SCAN","14","A"],
+   ["SCAN","16","X"],["SCAN","17","X"],["COMPARE_AND_DELETE","20","X","Y","5"]]
+  -> ["", "", "5", "", "B(1), D(2)", "B(1)", "Y(5)", "", "false"]
+
+Boundary example (1point3acres):
+  [["SET_WITH_TTL","1","A","BC","1","9"],["SET_WITH_TTL","5","A","BC","2","10"],
+   ["SET","6","A","BD","3"],["SCAN_BY_PREFIX","14","A","B"],["SCAN_BY_PREFIX","15","A","B"]]
+  -> ["", "", "", "BC(2), BD(3)", "BD(3)"]
+  (At ts=14 BC alive: re-SET at 5 pushed expiry to 15. At ts=15 BC exactly expired.)
+
+--------------------------------------------------------------------------------
+LEVEL 4 — Time travel  (ONE of two rotations; never both in same OA)
+--------------------------------------------------------------------------------
+ROTATION A — Backup / Restore:
+  BACKUP <ts> <backup_at_timestamp>
+    Deep snapshot of all current records/fields. Returns count of VALID records
+    (a record with >=1 non-expired field at the snapshot point). backup_at_timestamp
+    is the snapshot id used by RESTORE (often equals ts). Pauses TTL countdown.
+  RESTORE <ts> <restore_at_timestamp>
+    Load the backup; if none at exactly restore_at, use the latest backup with
+    id <= restore_at (nearest earlier). TTL expirations are RECALCULATED relative to
+    the restore timestamp using REMAINING ttl from the chosen backup. Returns "".
+
+  Example (nearest backup + TTL recalculation):
+    [["SET_WITH_TTL","1","A","x","10","10"],["SET","2","B","y","20"],
+     ["BACKUP","5","5"],["SET","6","A","x","99"],["BACKUP","8","8"],
+     ["COMPARE_AND_DELETE","9","B","y","20"],["RESTORE","12","7"],
+     ["GET","13","A","x"],["GET","14","B","y"],["SCAN","19","A"]]
+    -> ["", "", "2", "", "2", "true", "", "10", "20", ""]
+    (No backup at 7 -> restore from backup at 5. A.x restored to 10 (not 99); remaining
+     TTL at backup was 6, so new expiry = 12+6 = 18; A.x gone by SCAN at 19.)
+
+ROTATION B — Look-back:
+  GET_WHEN <ts> <key> <field> <at_ts>
+    Value as of at_ts (at_ts == 0 => Level-1 GET semantics; at_ts <= ts guaranteed).
+    Data structure: append-only history per (key,field); binary-search by set_ts then
+    re-check expiry against at_ts.
+
+--------------------------------------------------------------------------------
+IMPORTANT NOTES / COMMON BUGS
+--------------------------------------------------------------------------------
+- TTL boundary [ts, ts+ttl): alive while query_ts < expiry, DEAD at exactly ts+ttl.
+- DELETE / COMPARE_AND_DELETE on an already-EXPIRED field must return "false".
+- RESTORE must store REMAINING TTL (delta), NOT absolute expiry — #1 most-failed case.
+- RESTORE deep-copies (shallow copy corrupts snapshot when live state mutates).
+- SCAN_BY_PREFIX sorts by FIELD NAME (not value); "" on no match / missing record.
+- 90-minute hard cap; implementation velocity matters more than algorithms.
+- Return-type details drift across rotations (string vs tuple vs None) — read the
+  harness signatures; confirm op names (SET_WITH_TTL vs SET_AT_WITH_TTL; BACKUP/RESTORE
+  vs GET_WHEN) before coding.

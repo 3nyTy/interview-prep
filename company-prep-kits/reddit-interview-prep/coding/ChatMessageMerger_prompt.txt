@@ -1,0 +1,103 @@
+Chat Message Merge with Windowed API
+=====================================
+
+Given a provided chat API that returns a window of messages centered on a target
+message id, implement a class that merges the context windows of an input list of
+message ids into a single sorted, de-duplicated message list, beating the naive
+O(M log M) bound.
+
+Requirements
+------------
+A chat application stores messages with strictly increasing integer ids and string
+content. Messages are immutable. The interviewer provides a read-only Message model
+and a Chat API:
+
+class Message {
+    int id;
+    String content;
+}
+
+class Chat {
+    /**
+     * Returns the message with the given id plus up to `windowSize` messages
+     * immediately before and after it, sorted by id ascending. Empty list if
+     * the id does not exist.
+     */
+    List<Message> getChatMessages(int id, int windowSize);
+}
+
+Implement ChatMessageMerger:
+  ChatMessageMerger(Chat chat, int windowSize)
+  List<Message> mergeMessages(List<Integer> ids)
+
+For each id in the input list, fetch its context window via getChatMessages, then
+merge all windows into a single sorted, de-duplicated list of messages.
+  - The returned list contains each message at most once.
+  - The returned list is sorted by message id ascending.
+  - Complexity bar: the solution must run in better than O(M log M), where M is the
+    total number of context messages returned across all API calls.
+
+A common concrete parametrization sets windowSize = 5: each call returns up to 5
+messages before the target, the target itself, and up to 5 after — so at most 11
+messages per window. Near the start or end of a conversation fewer than 11 come back.
+
+Follow-up — caching: a common extension asks what to do when getChatMessages is
+called too many times (it is an expensive backend call). Put a cache in front of the
+API and discuss key choice and invalidation.
+
+Examples
+--------
+With windowSize = 5 and ids = [1, 3, 5], the three windows overlap heavily and
+collapse into one contiguous ordered run:
+  mergeMessages([1, 3, 5]) -> messages with ids [0,1,2,3,4,5,6,7,8,9,10]
+
+Notes
+-----
+- The naive "collect everything into a set, then sort" is exactly O(M log M) — ruled out.
+- Each call already returns a sorted window. Aggregate problem = K-way merge of K sorted
+  lists; heap merge is O(M log K), better than O(M log M) when K << M.
+- Cleanest formulation: a single last_id watermark — no heap. Once both input ids AND
+  each window are sorted, overlap can only appear as a PREFIX of a later window, so one
+  "largest id already appended" watermark suffices: sort ids, fetch each window in order,
+  skip every message whose id <= last_id, else append and advance. O(1) extra state.
+- Dedup exploits strictly-increasing ids: skip any message id <= previously emitted.
+- API-cost tightening: sort ids, sweep with a pointer, only call when the next id is more
+  than windowSize past the previous window's max — collapses overlapping windows into a
+  minimal sequence of calls (interval cover).
+- Message-count complexity M/T (the bar) vs API-call complexity K (the follow-up).
+- windowSize = 5 -> each window <= 11 messages, so T <= 11k.
+- Edge cases: unsorted input ids, duplicate input ids, id that doesn't exist (empty),
+  windows spread far apart (non-overlapping).
+- Caching follow-up exploits immutability: cached windows never go stale; id-keyed cache.
+  Probing on key choice (single message id vs whole window) and memory bounds.
+
+Follow-up — editable messages with version history
+---------------------------------------------------
+Drop immutability: messages can be edited and history must be preserved (not overwritten).
+Separate (a) stable logical identity `id` (constant for life) from (b) immutable versions
+appended in chronological order.
+
+@dataclass(frozen=True)
+class MessageVersion:
+    version: int
+    content: str
+    edited_at: int   # timestamps non-decreasing across edits
+
+class VersionedMessage:
+    id: int
+    current_version: int
+    versions: list[MessageVersion]   # append-only, sorted by edited_at
+    def edit(self, new_content, edited_at) -> None: ...   # O(1) append; reject out-of-order
+    def latest(self) -> MessageVersion: ...               # O(1)
+    def as_of(self, timestamp) -> MessageVersion | None:  # O(log v) binary search
+        # rightmost version with edited_at <= timestamp; None if all edits are later
+
+getChatMessages(id, as_of=t) returns, per message, the version visible at snapshot t
+(or latest() if as_of omitted). Key points:
+  - Deduplicate the Part-1 merge by message_id, NOT by version number — the merge is
+    unchanged; versioning is orthogonal.
+  - as_of(t) = rightmost edited_at <= t (None if not yet existing); latest() O(1);
+    edit O(1) append rejecting out-of-order edited_at. Space O(v) per message.
+  - Old content never overwritten -> audit history + rollback stay possible.
+  - Real system = two tables: messages(message_id, current_version, ...) and
+    message_versions(message_id, version, content, edited_at, editor_id, ...).

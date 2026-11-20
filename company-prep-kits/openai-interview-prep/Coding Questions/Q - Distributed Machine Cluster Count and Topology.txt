@@ -1,0 +1,343 @@
+Distributed Machine Cluster Count and Topology
+Coding
+Phone, Onsite
+Software Engineer
+Reported Apr, 2026
+Medium Frequency
+Problem Overview
+You are given a tree structure where each node represents a machine in a distributed cluster. Each machine can only communicate with its parent and children through message passing. Your task is to implement a message-based system to discover information about the cluster structure.
+
+Given Interface
+Each machine has access to two methods:
+
+sendAsyncMessage(nodeId: str, message: str) - A black-box API that sends a message to another machine 
+
+You do not need to implement this function
+Assume it's provided and works correctly
+When a machine receives a message, its receiveMessage() is automatically invoked
+receiveMessage(fromNodeId: str, message: str) - You must implement this method
+
+fromNodeId: The ID of the machine that sent the message (or None/null if initiated externally)
+message: The message content (a string)
+Machine Properties
+Each machine (node) has:
+
+A unique nodeId
+A reference to its parent (or None/null if it's the root)
+A list of children (machine IDs it can communicate with)
+Important constraints: 
+
+Machines can only communicate with their direct parent or children
+No direct communication between siblings or distant relatives
+The root node has parent = None (or null in other languages)
+Leaf nodes have children = []
+Part 1: Count Total Machines
+Implement receiveMessage() to count the total number of machines in the cluster.
+
+Requirements
+The root node receives an initial message to trigger the counting process
+Each machine must coordinate with its children to count descendants
+Only the root node should print the final count
+Leaf nodes should respond immediately with their count
+You can design your own message format/protocol
+Implementation Strategy
+When a machine receives a count request from its parent (or null for root):
+
+If it's a leaf node: send "1" back to parent (or print if root)
+If it has children:
+Initialize count to 1 (itself)
+Forward request to all children
+Wait for responses
+When a machine receives a count response from a child: 
+
+Add child's count to running total
+Track which children have responded
+Once all children have responded:
+Send total to parent (or print if root)
+Example
+Tree structure:
+        Root (1)
+       /    \
+      2      3
+     / \      \
+    4   5      6
+
+Flow:
+1. Root receives: receiveMessage(null, "count")
+2. Root sends "count" to children [2, 3]
+3. Node 2 sends "count" to children [4, 5]
+4. Node 3 sends "count" to children [6]
+5. Nodes 4, 5, 6 (leaves) respond with "1"
+6. Node 2 receives responses, sums: 1+1+1=3, sends "3" to Root
+7. Node 3 receives response, sums: 1+1=2, sends "2" to Root
+8. Root receives responses, sums: 3+2+1=6, prints "6"
+
+Edge Cases to Handle
+Root node is a leaf (single machine): print "1" immediately
+Messages arriving out of order
+Distinguishing between "count request" and "count response"
+Part 2: Discover Cluster Topology
+Extend your receiveMessage() implementation to return the tree structure of the entire cluster.
+
+Requirements
+The root node receives an initial message to trigger topology discovery
+Each machine must gather its subtree structure from children
+Only the root node should print the final topology
+Represent the topology in any clear format, e.g.:
+"1(2(3[]))" means: node 1 has child 2, which has child 3 (a leaf with empty children [])
+"1(2,3)" if you choose to omit empty children markers for cleaner output
+Or use JSON-like structure: {"node": "1", "children": [{"node": "2", "children": []}, ...]}
+You can design your own message format/protocol for requests and responses
+Implementation Strategy
+Define new message types: "topology" (request) and "topologyResponse" (response)
+
+When receiving a "topology" request: 
+
+If leaf: send back {"node": nodeId, "children": []}
+If internal: forward to all children, wait for responses
+When receiving topology responses from children:
+
+Collect all child topology structures
+Once all children responded:
+Construct own topology: {"node": nodeId, "children": [child_topologies]}
+Send to parent (or print if root)
+Example Message Format
+You can encode messages as strings, for example:
+
+Request: "topology"
+Response: "topologyResponse|{nodeId}|{children_data}"
+Or use JSON strings for structured data: 
+
+{
+  "type": "topology_request",
+  "requestId": "req123"
+}
+
+Example Output
+For the tree structure from Part 1:
+
+1(2(4[],5[]),3(6[]))
+
+Or in JSON format:
+
+{
+  "node": "1",
+  "children": [
+    {
+      "node": "2",
+      "children": [
+        {"node": "4", "children": []},
+        {"node": "5", "children": []}
+      ]
+    },
+    {
+      "node": "3",
+      "children": [
+        {"node": "6", "children": []}
+      ]
+    }
+  ]
+}
+
+Part 3: Handle Message Failures (Follow-up Discussion)
+Interviewer will ask: "What if messages can fail and be retried? How do you ensure correctness and avoid duplicate counting?" 
+
+Key Considerations
+Idempotency: Ensure the same message received multiple times doesn't cause incorrect results
+Message deduplication: Track which messages have already been processed
+Request IDs: Add unique identifiers to distinguish different requests
+Solution Approach
+Add a Set to track processed messages:
+
+class Node:
+    def __init__(self, node_id, children, parent):
+        self.node_id = node_id
+        self.children = children
+        self.parent = parent
+        self.processed_requests = set()  # Track request IDs
+        self.pending_responses = {}
+
+    def receiveMessage(self, fromNodeId, message):
+        # Parse message to extract request_id
+        request_id = extract_request_id(message)
+
+        # Ignore duplicate requests
+        if request_id in self.processed_requests:
+            return
+
+        # Mark as processed
+        self.processed_requests.add(request_id)
+
+        # Continue with normal processing...
+
+Alternative Strategies
+Sequence numbers: Track the last processed sequence number from each sender
+Response caching: Store responses and resend if duplicate request arrives
+Timeout + retry: Implement timeout logic to detect failures
+Sample Implementation Reference
+Below is a reference implementation showing one approach to Part 1:
+
+from typing import List
+
+class Node:
+    def __init__(self, node_id: str, children: List[str], parent: str):
+        self.node_id = node_id
+        self.children = children  # List of child node IDs
+        self.parent = parent      # Parent node ID or None
+        self.total_count = 0
+        self.pending_children = []
+
+    def sendAsyncMessage(self, node_id: str, message: str):
+        """Black box API - already implemented"""
+        pass
+
+    def receiveMessage(self, fromNodeId: str, message: str):
+        """Main implementation - count machines"""
+
+        # Initial request to root (fromNodeId is None)
+        if fromNodeId is None:
+            if not self.children:
+                # Root is a leaf - print immediately
+                print("1")
+            else:
+                # Root has children - start count process
+                self.total_count = 1  # Count self
+                self.pending_children = self.children.copy()
+                for child in self.children:
+                    self.sendAsyncMessage(child, "COUNT_REQUEST")
+
+        # Request from parent to count
+        elif fromNodeId == self.parent:
+            if not self.children:
+                # Leaf node - respond with count of 1
+                self.sendAsyncMessage(self.parent, "1")
+            else:
+                # Internal node - forward to children
+                self.total_count = 1  # Count self
+                self.pending_children = self.children.copy()
+                for child in self.children:
+                    self.sendAsyncMessage(child, "COUNT_REQUEST")
+
+        # Response from child with count
+        elif fromNodeId in self.children:
+            # Ignore duplicate responses
+            if fromNodeId not in self.pending_children:
+                return
+
+            # Add child's count to total
+            child_count = int(message)
+            self.total_count += child_count
+            self.pending_children.remove(fromNodeId)
+
+            # All children responded
+            if not self.pending_children:
+                if self.parent is None:
+                    # Root node - print final result
+                    print(str(self.total_count))
+                else:
+                    # Internal node - send to parent
+                    self.sendAsyncMessage(self.parent, str(self.total_count))
+
+                # Reset state for potential future requests
+                self.total_count = 0
+
+Key Implementation Details
+State Management: Track total_count and pending_children to coordinate responses
+Message Types: Distinguish between requests ("COUNT_REQUEST") and responses (numeric strings)
+Edge Cases:
+Root node as leaf (no children)
+Leaf nodes respond immediately
+Duplicate responses (check if child is in pending_children)
+Reset State: Clear state after completing a request to allow future requests
+Sample Implementation for Part 2 (Topology)
+class Node:
+    def __init__(self, node_id: str, children: List[str], parent: str):
+        self.node_id = node_id
+        self.children = children
+        self.parent = parent
+        self.topology_responses = {}
+        self.pending_topology_children = []
+
+    def receiveMessage(self, fromNodeId: str, message: str):
+        # Handle topology requests
+        if message == "TOPOLOGY_REQUEST":
+            if fromNodeId is None or fromNodeId == self.parent:
+                if not self.children:
+                    # Leaf node
+                    response = f"TOPOLOGY|{self.node_id}|[]"
+                    if self.parent:
+                        self.sendAsyncMessage(self.parent, response)
+                    else:
+                        print(f"{self.node_id}")  # Root leaf
+                else:
+                    # Internal node - request from children
+                    self.pending_topology_children = self.children.copy()
+                    for child in self.children:
+                        self.sendAsyncMessage(child, "TOPOLOGY_REQUEST")
+
+        # Handle topology responses
+        elif message.startswith("TOPOLOGY|"):
+            parts = message.split("|", 2)
+            child_node_id = parts[1]
+            child_structure = parts[2]
+
+            if child_node_id in self.pending_topology_children:
+                self.topology_responses[child_node_id] = child_structure
+                self.pending_topology_children.remove(child_node_id)
+
+                # All children responded
+                if not self.pending_topology_children:
+                    # Build topology string
+                    children_str = ",".join([
+                        f"{child_id}{self.topology_responses[child_id]}"
+                        for child_id in self.children
+                    ])
+                    topology = f"{self.node_id}({children_str})"
+
+                    if self.parent is None:
+                        # Root - print result
+                        print(topology)
+                    else:
+                        # Send to parent
+                        response = f"TOPOLOGY|{self.node_id}|({children_str})"
+                        self.sendAsyncMessage(self.parent, response)
+
+                    # Reset state
+                    self.topology_responses = {}
+
+Testing Your Implementation
+Test Case 1: Simple Tree
+    1
+   / \
+  2   3
+
+Expected count: 3
+Expected topology: 1(2[],3[]) (based on sample implementation)
+Test Case 2: Unbalanced Tree
+    1
+   /
+  2
+ /
+3
+
+Expected count: 3
+Expected topology: 1(2(3[]))
+Test Case 3: Complete Tree
+        1
+      /   \
+     2     3
+    / \   / \
+   4   5 6   7
+
+Expected count: 7
+Expected topology: 1(2(4[],5[]),3(6[],7[]))
+Test Case 4: Single Node
+1
+
+Expected count: 1
+Expected topology: 1
+Notes and Clarifications
+No Threading Required: The problem focuses on message-based coordination logic, not actual async execution
+Message Format: You can define your own message protocol (string encoding, JSON, etc.)
+Error Handling: For Part 3, discuss idempotency strategies rather than implementing full retry logic
+State Management: Be careful about when to reset internal state between different requests

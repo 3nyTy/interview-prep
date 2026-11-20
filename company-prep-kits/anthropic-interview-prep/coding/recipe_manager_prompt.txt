@@ -1,0 +1,141 @@
+==============================================================================
+RECIPE MANAGER — 4-Level Online Assessment (CodeSignal style)
+Reported as an Anthropic OA (also seen as a generic SWE/MLE OA).
+Time limit: 90 minutes. 4 progressively-unlocked levels.
+Saved for interview prep. Two source write-ups of the SAME question follow.
+==============================================================================
+
+------------------------------------------------------------------------------
+PROMPT 1 — from DarkInterview
+------------------------------------------------------------------------------
+Recipe Manager (Online Assessment)
+
+Overview
+Implement an in-memory recipe management system. 4 levels of increasing complexity:
+  Level 1: Basic CRUD operations (create, read, update, delete)
+  Level 2: Search functionality and sorting by ingredient count
+  Level 3: User authentication and permission validation
+  Level 4: Version history and rollback capabilities
+Subsequent levels unlock when the current level is solved. You always have access
+to the data for the current and all previous levels.
+
+LEVEL 1: Basic CRUD
+  add_recipe(recipe_id: str, name: str, ingredients: list[str]) -> bool
+    Creates a new recipe. True on success. False if:
+      - a recipe with that id already exists, OR
+      - a recipe with that name already exists (case-insensitive).
+    Names must be unique case-insensitively ("Pasta Carbonara" blocks "pasta carbonara").
+  get_recipe(recipe_id: str) -> dict | None
+    Returns {id, name, ingredients} or None if missing.
+  update_recipe(recipe_id: str, name: str, ingredients: list[str]) -> bool
+    Updates name + ingredients. False if missing OR new name conflicts with a
+    DIFFERENT recipe (case-insensitive). A recipe may keep its own name (any casing).
+  delete_recipe(recipe_id: str) -> bool
+    True if deleted; False if missing.
+
+LEVEL 2: Search and Sorting
+  search_recipes(query: str) -> list[dict]
+    Names containing query (case-insensitive). Sort:
+      primary  = number of ingredients ascending
+      secondary = recipe id ascending (numeric if numeric strings)
+    Empty list if no match.
+  get_all_recipes() -> list[dict]
+    All recipes, same sort rules.
+
+LEVEL 3: User System
+  add_user(user_id: str, username: str) -> bool
+    True on success; False if user id already exists.
+  edit_recipe(user_id, recipe_id, name, ingredients) -> bool
+    Update, but only if user_id is valid. False if:
+      - user_id doesn't exist, OR recipe_id doesn't exist, OR
+      - new name conflicts with an existing recipe name (case-insensitive).
+    edit_recipe adds user validation on top of update logic.
+
+LEVEL 4: Version Control
+  edit_recipe (updated): instead of overwriting, APPENDS a new version to history.
+    Versions numbered sequentially (1, 2, 3, ...). Most recent = current. All prior
+    validation still applies.
+  get_recipe_history(recipe_id) -> list[dict] | None
+    Full version history oldest->newest; None if missing.
+  rollback_recipe(user_id, recipe_id, version) -> bool
+    Creates a NEW version that is a copy of the specified historical version.
+    Does NOT delete versions. False if:
+      - user_id doesn't exist, recipe_id doesn't exist, version doesn't exist, OR
+      - rollback would cause a name conflict (old version's name now matches ANOTHER
+        recipe's current name, case-insensitive).
+    Example: versions v1(Pasta), v2(Spaghetti), v3(Linguine); rollback(...,1) creates
+    v4 = copy of v1 -> v1,v2,v3,v4(Pasta).
+
+Important edge cases:
+  - Case-insensitive name handling: "PASTA"/"Pasta"/"pasta" are the same; store
+    original casing, compare lower-cased.
+  - Rollback name conflicts: check old version's name against OTHER recipes' current
+    names; a recipe can always roll back to its own previous version (no self-conflict).
+  - Version numbering: start at 1, each edit/rollback increments, never reused/reset.
+
+Constraints: ids are valid strings; names are non-empty; ingredient lists may be empty;
+all operations should have reasonable time complexity.
+
+------------------------------------------------------------------------------
+PROMPT 2 — from 1point3acres
+------------------------------------------------------------------------------
+OA — Recipe Manager (4-Level CodeSignal). 90 minutes.
+
+Level 1 — CRUD
+  add_recipe(recipe_id, name, ingredients) -> bool
+    True on creation. False if recipe_id taken OR name (case-insensitive) already used.
+    Store name verbatim — only the lookup is lower-cased.
+  get_recipe(recipe_id) -> dict | None  -> {"id","name","ingredients"} for current version.
+  update_recipe(recipe_id, name, ingredients) -> bool
+    False if missing OR new name (case-insensitive) belongs to a DIFFERENT recipe
+    (collision check excludes self).
+  delete_recipe(recipe_id) -> bool
+
+Level 2 — Search & sort
+  search_recipes(query) -> list[dict]
+    Substring match on name, case-insensitive.
+    Sort: len(ingredients) asc, then recipe_id asc (numeric if all-digits, else lexicographic).
+  get_all_recipes() -> list[dict]  -> same sort; empty list if empty store.
+
+Level 3 — User system
+  add_user(user_id, username) -> bool  -> False if user_id taken.
+  edit_recipe(user_id, recipe_id, name, ingredients) -> bool
+    Replaces update_recipe semantics with a user check. False if user invalid, recipe
+    missing, or new name belongs to a different recipe (case-insensitive, self excluded).
+    Some variants additionally require the user to own/be permitted on the recipe.
+
+Level 4 — Versioning + rollback
+  edit_recipe and update_recipe no longer overwrite; each call APPENDS a new version.
+  Versions 1-based, never reset, never reused.
+  get_recipe_history(recipe_id) -> list[dict] | None
+    [{"version":1,"name":...,"ingredients":[...]}, ...] oldest first; None if missing.
+  rollback_recipe(user_id, recipe_id, version) -> bool
+    Appends a copy of history[version-1] as the NEW newest version. Does NOT truncate.
+    False if user invalid, recipe missing, version out of range, OR if the old name
+    (at that version) is now used by a DIFFERENT current recipe. A recipe never
+    conflicts with its own earlier versions.
+
+Example:
+  add_recipe("r1","Pasta",["egg","flour"])             # v1 Pasta
+  edit_recipe("u1","r1","Spaghetti",["egg","flour"])   # v2 Spaghetti
+  edit_recipe("u1","r1","Carbonara",["egg","pork"])    # v3 Carbonara
+  rollback_recipe("u1","r1",1)                          # v4 = copy of v1 (Pasta)
+  get_recipe_history("r1") -> versions 1..4: Pasta, Spaghetti, Carbonara, Pasta
+
+Notes:
+  - 90-minute hard cap; finishing L1-L3 cleanly beats a buggy L4.
+  - Case-insensitivity enforced everywhere (add/update/edit/search AND rollback check).
+  - One Recipe with a versions list collapses edit + rollback into versions.append(...).
+    Keep a separate name_lower -> recipe_id map for O(1) uniqueness.
+  - Most common trip: rollback APPENDS, it does NOT truncate history back to target.
+  - Some rotations extend L3 with chef-ranking / order tracking instead of permissions.
+  - MLE candidates can get this same OA before the live LLM-prompting screen.
+
+==============================================================================
+NOTE ON THE ONE AMBIGUITY between the two sources:
+  DarkInterview's sample keeps update_recipe overwriting in L4 (only edit_recipe
+  versions). 1point3acres says BOTH update_recipe and edit_recipe append in L4.
+  The Java solution follows the 1point3acres (both-append) reading because it is
+  data-preserving and strictly safer if a hidden L4 test drives update_recipe; it is
+  centralized in one helper (commitVersion) so it can be flipped with a one-line change.
+==============================================================================

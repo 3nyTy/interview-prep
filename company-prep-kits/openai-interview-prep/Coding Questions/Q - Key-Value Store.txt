@@ -1,0 +1,498 @@
+Durable Key-Value Store Serialization
+Coding
+Phone, Onsite
+Software Engineer, Machine Learning Engineer
+Reported Apr, 2026
+High Frequency
+Problem Overview
+Implement a persistent key-value store that can serialize and deserialize data to/from a file system. You will be provided with a mock file system interface and utility functions for serializing primitive types. The challenge is to implement a custom serialization format for dictionaries that handles arbitrary string content without using built-in serialization libraries like JSON or pickle.
+
+Important Context:
+
+You are provided with a mock file system interface (not a real file system)
+Utility functions for serializing integers and strings to bytes are provided
+You cannot use JSON, pickle, or other built-in serialization libraries
+Keys and values can contain any characters including delimiters, newlines, special characters
+The serialization must be completely reversible
+Part 1: Basic Key-Value Store with Serialization
+Provided Interface
+The interviewer will provide a mock file system with the following interface: 
+
+class FileSystem:
+    def save_blob(self, data: bytes) -> None:
+        """Save bytes to the file system"""
+        pass
+
+    def get_blob(self) -> bytes:
+        """Retrieve bytes from the file system"""
+        pass
+
+# Provided utility functions
+def serialize_int(value: int) -> bytes:
+    """Convert integer to bytes"""
+    pass
+
+def deserialize_int(data: bytes) -> int:
+    """Convert bytes to integer"""
+    pass
+
+def serialize_str(value: str) -> bytes:
+    """Convert string to bytes"""
+    pass
+
+def deserialize_str(data: bytes) -> str:
+    """Convert bytes to string"""
+    pass
+
+Required Implementation
+Implement a KVStore class with the following methods:
+
+class KVStore:
+    def __init__(self, file_system: FileSystem):
+        """Initialize with a file system instance"""
+        pass
+
+    def put(self, key: str, value: str) -> None:
+        """Store a key-value pair in memory"""
+        pass
+
+    def get(self, key: str) -> str:
+        """Retrieve a value by key"""
+        pass
+
+    def shutdown(self) -> None:
+        """Serialize the entire KV store to the file system"""
+        pass
+
+    def restore(self) -> None:
+        """Deserialize the KV store from the file system"""
+        pass
+
+Example Usage
+fs = FileSystem()
+kv_store = KVStore(fs)
+
+# Store some data
+kv_store.put("name", "John:Doe")
+kv_store.put("city", "New,York")
+kv_store.put("key\nwith\nnewlines", "value=with=equals")
+
+# Persist to file system
+kv_store.shutdown()
+
+# Create a new instance and restore
+new_kv_store = KVStore(fs)
+new_kv_store.restore()
+
+# Should retrieve the exact same values
+assert new_kv_store.get("name") == "John:Doe"
+assert new_kv_store.get("city") == "New,York"
+assert new_kv_store.get("key\nwith\nnewlines") == "value=with=equals"
+
+Key Challenges
+Delimiter Conflict Problem: Simple delimiters like : or , fail when those characters appear in keys/values
+
+Example: "key:1": "val=ue" breaks format key:value
+Escaping Complexity: Escaping special characters (like \:) works but requires careful handling and increases complexity 
+
+Arbitrary Content: Keys and values can contain ANY characters including:
+
+Delimiters (:, ,, =)
+Newlines (\n)
+Special characters
+Quotes
+Even null bytes in some implementations
+Recommended Approach: Length-Prefixed Encoding
+The most robust solution is length-prefixed encoding, which eliminates delimiter conflicts entirely by storing the length before each data segment.
+
+Conceptual Format (for illustration): <length>:<data> 
+
+Example:
+
+String "a:b" (3 characters) → 3:a:b
+String "hello" (5 characters) → 5:hello
+For key-value pairs: <keyLen>:<keyData><valueLen>:<valueData>
+
+Example: 
+
+{"ab": "xyz"} → 2:ab3:xyz
+{"key:1": "val=ue"} → 5:key:16:val=ue
+Important Note: The examples above show the conceptual format using ASCII text for lengths (e.g., "5:"). However, in the actual implementation with the provided utility functions, serialize_int() will likely produce a fixed-width binary representation (e.g., 4 bytes for an integer), not ASCII text. This means the actual byte format will be binary, not human-readable text like shown above.
+
+This format is:
+
+Self-describing (length tells you exactly how many bytes to read)
+Unambiguous (no escaping needed)
+Used in real systems (Redis RESP protocol, netstrings, HTTP chunked encoding)
+Test Cases to Consider
+Empty dictionary
+Empty string keys and values
+Keys/values containing delimiters (:, ,, =)
+Keys/values containing newlines
+Unicode characters
+Very long strings
+Multiple key-value pairs
+Duplicate operations (multiple put/shutdown/restore cycles)
+Part 2: Chunked Persistence with Size Limits
+Follow-up: What if each file can only store a maximum of 1KB of data? How would you modify your implementation to handle KV stores that exceed this limit? 
+
+Requirements
+Each file can store at most 1KB (1024 bytes) of data
+The KV store user should not care about how many files are used
+Must support correct persistence and restoration
+Need to handle cases where serialized data exceeds 1KB
+Key Insights
+Metadata Tracking: Introduce a metadata file that stores information like total number of chunks
+Chunking Strategy: Split serialized data into fixed-size chunks
+Reassembly: Read metadata first to know how many chunks to retrieve
+Naming Convention: Use a consistent naming scheme (e.g., chunk_0, chunk_1, etc.)
+Design Considerations
+Important Questions to Discuss:
+
+Chunk Boundaries:
+
+Should you split on byte boundaries (simpler)?
+Or respect character boundaries to avoid corrupting multi-byte UTF-8 sequences?
+Metadata Storage: 
+
+Store total number of chunks
+Potentially store chunk sizes if variable
+Ensure atomic writes (metadata written last or first?)
+Edge Cases:
+
+Last chunk is likely smaller than 1KB
+What if metadata itself grows large?
+Handle empty KV stores
+File Naming:
+
+Use ordered naming: chunk_0, chunk_1, chunk_2, ...
+Separate metadata file: metadata or _meta
+Updated Interface
+You'll need to modify the FileSystem interface to support multiple files: 
+
+from typing import List
+
+class FileSystem:
+    def save_blob(self, filename: str, data: bytes) -> None:
+        """Save bytes to a specific file"""
+        pass
+
+    def get_blob(self, filename: str) -> bytes:
+        """Retrieve bytes from a specific file"""
+        pass
+
+    def list_files(self) -> List[str]:
+        """List all files (optional, for cleanup/debugging)"""
+        pass
+
+Example Approach
+Serialization:
+
+Serialize entire KV store to bytes (using Part 1 approach)
+Calculate total number of chunks needed: ceil(total_bytes / 1024)
+Write metadata file with chunk count
+Split data into 1KB chunks and save as separate files
+Deserialization:
+
+Read metadata file to get total chunk count
+Read each chunk file in order
+Concatenate all chunks
+Deserialize the complete byte array back to KV store
+Test Cases for Part 2
+KV store smaller than 1KB (single chunk)
+KV store exactly 1KB
+KV store slightly larger than 1KB (2 chunks)
+KV store requiring many chunks (e.g., 10KB → 10 chunks)
+Empty KV store
+Verifying chunk order is preserved
+Handling last chunk being smaller than 1KB
+Implementation Hints
+Part 1 Hints
+In-Memory Storage: Use a Python dictionary to store key-value pairs 
+
+Serialization Strategy:
+
+Iterate through dictionary items
+For each key-value pair:
+Convert key string to bytes using serialize_str(key)
+Get byte length and convert to bytes using serialize_int(len(key_bytes))
+Do the same for value
+Concatenate: key_len_bytes + key_bytes + value_len_bytes + value_bytes
+Concatenate all encoded pairs
+Deserialization Strategy:
+
+Use a position pointer to track parsing location
+Read fixed number of bytes (e.g., 4) for length integer using deserialize_int()
+Extract exactly that many bytes and convert using deserialize_str()
+Repeat for each key-value pair
+Helper Function: Create a read_length_and_data(data, position) helper that: 
+
+Reads fixed-width integer bytes (e.g., 4 bytes) and deserializes to get length
+Extracts that many bytes as data
+Converts bytes to string
+Returns data and new position
+Part 2 Hints
+Constants: Define CHUNK_SIZE = 1024
+Metadata Format: Use a simple format like <total_chunks> as integer
+Chunk Naming: Use f"chunk_{i}" for consistency
+Byte Handling: Work with bytes throughout, convert to/from strings only at boundaries
+Math: Calculate chunks with (len(data) + CHUNK_SIZE - 1) // CHUNK_SIZE
+Common Pitfalls
+Using JSON/Pickle: The interviewer explicitly wants you to implement custom serialization
+Delimiter Conflicts: Don't use simple delimiter-based formats
+String vs Bytes: Be careful with encoding/decoding between strings and bytes
+Off-by-One Errors: When parsing, ensure you advance the position correctly
+Empty Strings: Handle empty keys/values correctly (e.g., 0: for empty string)
+Metadata Timing: In Part 2, write metadata before or after chunks? Consider failure scenarios
+Sample Solution - Part 1
+Below is a reference implementation for Part 1:
+
+class KVStore:
+    def __init__(self, file_system):
+        self.fs = file_system
+        self.store = {}
+
+    def put(self, key: str, value: str) -> None:
+        """Store a key-value pair"""
+        self.store[key] = value
+
+    def get(self, key: str) -> str:
+        """Retrieve value by key"""
+        return self.store.get(key)
+
+    def shutdown(self) -> None:
+        """Serialize and save to file system"""
+        serialized_bytes = self._serialize()
+        self.fs.save_blob(serialized_bytes)
+
+    def restore(self) -> None:
+        """Load and deserialize from file system"""
+        data_bytes = self.fs.get_blob()
+        if data_bytes:
+            self.store = self._deserialize(data_bytes)
+
+    def _serialize(self) -> bytes:
+        """
+        Convert dictionary to bytes using length-prefixed format.
+        Format: <keyLen>:<key><valueLen>:<value> for each pair
+        """
+        if not self.store:
+            return b""
+
+        result = []
+        for key, value in self.store.items():
+            # Serialize key
+            key_bytes = serialize_str(key)
+            key_len_bytes = serialize_int(len(key_bytes))
+
+            # Serialize value
+            value_bytes = serialize_str(value)
+            value_len_bytes = serialize_int(len(value_bytes))
+
+            # Combine: len(key_bytes) + key_bytes + len(value_bytes) + value_bytes
+            result.append(key_len_bytes)
+            result.append(key_bytes)
+            result.append(value_len_bytes)
+            result.append(value_bytes)
+
+        return b"".join(result)
+
+    def _deserialize(self, data: bytes) -> dict:
+        """
+        Parse bytes back to dictionary using length-prefixed format.
+        """
+        store = {}
+        pos = 0
+
+        while pos < len(data):
+            # Read key length and key
+            key, pos = self._read_length_and_data(data, pos)
+
+            # Read value length and value
+            value, pos = self._read_length_and_data(data, pos)
+
+            store[key] = value
+
+        return store
+
+    def _read_length_and_data(self, data: bytes, pos: int) -> tuple:
+        """
+        Helper to read one length-prefixed segment.
+        Returns (data_string, new_position)
+        """
+        # Assuming serialize_int creates a fixed-width integer representation
+        # Adjust this based on actual implementation of serialize_int
+
+        # Read length (assuming 4 bytes for int)
+        length_bytes = data[pos:pos+4]
+        length = deserialize_int(length_bytes)
+        pos += 4
+
+        # Read data
+        data_bytes = data[pos:pos+length]
+        data_str = deserialize_str(data_bytes)
+        pos += length
+
+        return data_str, pos
+
+
+# Example usage
+if __name__ == "__main__":
+    fs = FileSystem()
+    kv = KVStore(fs)
+
+    # Test with challenging strings
+    kv.put("key:with:colons", "value,with,commas")
+    kv.put("key\nwith\nnewlines", "value=with=equals")
+    kv.put("", "empty key")
+    kv.put("empty value", "")
+
+    # Persist
+    kv.shutdown()
+
+    # Restore in new instance
+    kv2 = KVStore(fs)
+    kv2.restore()
+
+    # Verify
+    assert kv2.get("key:with:colons") == "value,with,commas"
+    assert kv2.get("key\nwith\nnewlines") == "value=with=equals"
+    assert kv2.get("") == "empty key"
+    assert kv2.get("empty value") == ""
+
+    print("All tests passed!")
+
+Sample Solution - Part 2
+Below is a reference implementation for Part 2 with chunking:
+
+class KVStoreChunked:
+    CHUNK_SIZE = 1024  # 1KB limit per file
+    METADATA_FILE = "_metadata"
+    CHUNK_PREFIX = "chunk_"
+
+    def __init__(self, file_system):
+        self.fs = file_system
+        self.store = {}
+
+    def put(self, key: str, value: str) -> None:
+        self.store[key] = value
+
+    def get(self, key: str) -> str:
+        return self.store.get(key)
+
+    def shutdown(self) -> None:
+        """Serialize and save to file system with chunking"""
+        serialized_bytes = self._serialize()
+
+        if not serialized_bytes:
+            # Handle empty store
+            metadata = serialize_int(0)  # 0 chunks
+            self.fs.save_blob(self.METADATA_FILE, metadata)
+            return
+
+        # Calculate number of chunks needed
+        total_chunks = (len(serialized_bytes) + self.CHUNK_SIZE - 1) // self.CHUNK_SIZE
+
+        # Save metadata first
+        metadata = serialize_int(total_chunks)
+        self.fs.save_blob(self.METADATA_FILE, metadata)
+
+        # Save chunks
+        for i in range(total_chunks):
+            start_idx = i * self.CHUNK_SIZE
+            end_idx = min(start_idx + self.CHUNK_SIZE, len(serialized_bytes))
+            chunk_data = serialized_bytes[start_idx:end_idx]
+
+            chunk_filename = f"{self.CHUNK_PREFIX}{i}"
+            self.fs.save_blob(chunk_filename, chunk_data)
+
+    def restore(self) -> None:
+        """Load and deserialize from file system with chunking"""
+        # Read metadata to get chunk count
+        metadata_bytes = self.fs.get_blob(self.METADATA_FILE)
+        total_chunks = deserialize_int(metadata_bytes)
+
+        if total_chunks == 0:
+            self.store = {}
+            return
+
+        # Read and concatenate all chunks
+        all_data = b""
+        for i in range(total_chunks):
+            chunk_filename = f"{self.CHUNK_PREFIX}{i}"
+            chunk_data = self.fs.get_blob(chunk_filename)
+            all_data += chunk_data
+
+        # Deserialize complete data
+        self.store = self._deserialize(all_data)
+
+    def _serialize(self) -> bytes:
+        """Same as Part 1"""
+        if not self.store:
+            return b""
+
+        result = []
+        for key, value in self.store.items():
+            key_bytes = serialize_str(key)
+            key_len_bytes = serialize_int(len(key_bytes))
+
+            value_bytes = serialize_str(value)
+            value_len_bytes = serialize_int(len(value_bytes))
+
+            result.append(key_len_bytes)
+            result.append(key_bytes)
+            result.append(value_len_bytes)
+            result.append(value_bytes)
+
+        return b"".join(result)
+
+    def _deserialize(self, data: bytes) -> dict:
+        """Same as Part 1"""
+        store = {}
+        pos = 0
+
+        while pos < len(data):
+            key, pos = self._read_length_and_data(data, pos)
+            value, pos = self._read_length_and_data(data, pos)
+            store[key] = value
+
+        return store
+
+    def _read_length_and_data(self, data: bytes, pos: int) -> tuple:
+        """Same as Part 1"""
+        length_bytes = data[pos:pos+4]
+        length = deserialize_int(length_bytes)
+        pos += 4
+
+        data_bytes = data[pos:pos+length]
+        data_str = deserialize_str(data_bytes)
+        pos += length
+
+        return data_str, pos
+
+
+# Example usage
+if __name__ == "__main__":
+    fs = FileSystem()
+    kv = KVStoreChunked(fs)
+
+    # Create a large KV store that will require multiple chunks
+    # Each entry: 4 (key_len) + ~86 (key) + 4 (val_len) + ~88 (value) ≈ 182 bytes
+    # 15 entries ≈ 2730 bytes → 3 chunks of 1024 bytes each
+    for i in range(15):
+        kv.put(f"key_{i}_" + "x" * 80, f"value_{i}_" + "y" * 80)
+
+    # Persist with chunking
+    kv.shutdown()
+
+    # Restore in new instance
+    kv2 = KVStoreChunked(fs)
+    kv2.restore()
+
+    # Verify all data restored correctly
+    for i in range(15):
+        expected_key = f"key_{i}_" + "x" * 80
+        expected_value = f"value_{i}_" + "y" * 80
+        assert kv2.get(expected_key) == expected_value
+
+    print("Chunked storage tests passed!")

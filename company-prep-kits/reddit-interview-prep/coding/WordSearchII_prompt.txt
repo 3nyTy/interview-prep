@@ -1,0 +1,41 @@
+Reddit — Staff Software Engineer — Coding Interview (sample question)
+
+Word Search II
+Given a 2-D character grid and a list of up to 30,000 words, return every word
+that can be traced along a path of horizontally or vertically adjacent cells,
+with no cell reused within a single word. This is the LeetCode 212 family: a
+naive per-word search blows up, so the intended solution builds a trie over the
+word list and runs a single grid DFS with backtracking, pruning branches that
+fall off the trie.
+
+Word Search II
+Given a 2-D grid of characters board and a list of strings words, return all
+words that are present in the grid.
+
+For a word to be present it must be possible to form the word with a path in the
+board with horizontally or vertically neighboring cells. The same cell may not
+be used more than once in a word.
+
+Examples
+
+Example 1:
+Input:  board = [ ["a","b","c","d"],
+                  ["s","a","a","t"],
+                  ["a","c","k","e"],
+                  ["a","c","d","n"] ],
+        words = ["bat","cat","back","backend","stack"]
+Output: ["cat","back","backend"]
+
+Example 2:
+Input:  board = [ ["x","o"],
+                  ["x","o"] ],
+        words = ["xoxo"]
+Output: []
+
+Constraints
+1 <= board.length, board[i].length <= 12
+board[i] consists only of lowercase English letters.
+1 <= words.length <= 30,000
+1 <= words[i].length <= 10
+words[i] consists only of lowercase English letters.
+All strings within words are distinct.

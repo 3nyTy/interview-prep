@@ -1,0 +1,164 @@
+================================================================================
+ANTHROPIC — STAFF SOFTWARE ENGINEER — CODING ROUND
+Question: "Bootloader" (boot-sequence loop detect + repair; AoC 2020 Day 8 flavor)
+Sources: DarkInterview + 1point3acres (reported Jun 2026)
+Frequency: NEW/LOW | Stage: phone-screen + onsite-coding | Roles: SWE
+Tags: simulation, cycle-detection, parsing, medium
+================================================================================
+
+--------------------------------------------------------------------------------
+PROMPT 1 (DarkInterview)
+--------------------------------------------------------------------------------
+Bootloader | Coding | Phone, Onsite | Software Engineer | Reported Jun, 2026 | New
+
+Overview
+You are given a file containing one bootloader instruction per line. Each
+instruction has an operation and an integer value:
+  plus +1
+  next 2
+  jump +3
+  plus +3
+  jump -1
+  plus +2
+
+The bootloader maintains:
+  - A program counter pc, initially 0
+  - A global accumulated value acc, initially 0
+The program runs until either:
+  - pc moves past the last instruction -> the program terminates
+  - pc reaches an instruction that has already been executed -> infinite loop
+
+The wording in this interview has been reported as easy to misread. The goal is
+NOT to sum every plus value in the file. You only return the accumulator reached
+by actually executing the program path.
+
+Instruction Semantics
+  plus value : Add value to acc, then move to the next line: pc += 1
+  next value : Ignore value and move to the next line: pc += 1
+  jump value : Move relative to the current line: pc += value
+All indices are zero-based. Successful termination = pc >= len(program). Inputs
+are assumed not to jump before the first instruction.
+
+PART 1: Detect the Loop
+Given a program that forms a loop, run the bootloader and find the loop. At
+minimum, detect the first instruction index that would be executed twice. If
+asked to return the full loop, return the sequence of instruction indices from
+the first time that repeated instruction was seen through the end of the visited
+trace.
+
+Example
+  0: plus +1
+  1: jump +2
+  2: plus +100
+  3: next +2
+  4: jump -2
+  5: plus +5
+Execution:
+  pc=0, acc=0  -> plus +1   -> pc=1, acc=1
+  pc=1, acc=1  -> jump +2   -> pc=3, acc=1
+  pc=3, acc=1  -> next +2   -> pc=4, acc=1
+  pc=4, acc=1  -> jump -2   -> pc=2, acc=1
+  pc=2, acc=1  -> plus +100 -> pc=3, acc=101
+Instruction 3 is about to run for the second time, so the loop is: [3, 4, 2]
+
+Solution: execute from pc=0, record every index before executing; if next pc was
+already recorded, it's looping. (Reference Python provided: parse_program,
+run_program returning (terminated, acc, repeated_pc, trace), find_loop slicing
+trace from trace.index(repeated_pc).)
+Complexity: Time O(n) (each instruction executed at most once); Space O(n).
+
+PART 2: Fix the Bad Instruction
+The program loops because exactly one instruction was written with the wrong
+operation:
+  - One jump should have been next, OR
+  - One next should have been jump
+Find the bad instruction, flip ONLY that instruction, rerun the program, and
+return the accumulator value from the corrected run.
+
+In some versions the interviewer describes this as the jump/next instruction
+associated with revisiting a line. A safe way to handle the ambiguity is to still
+validate the candidate by rerunning from the beginning after the flip. Do NOT
+assume the answer is the sum of all remaining plus instructions.
+
+For the example above, flipping instruction 3 from next +2 to jump +2 produces:
+  pc=0, acc=0 -> plus +1 -> pc=1, acc=1
+  pc=1, acc=1 -> jump +2 -> pc=3, acc=1
+  pc=3, acc=1 -> jump +2 -> pc=5, acc=1
+  pc=5, acc=1 -> plus +5 -> pc=6, acc=6
+The corrected program terminates, so the answer is 6.
+
+Clarifications to Make
+  - plus instructions are never the corrupted instruction.
+  - next may still have an integer value in the file. Ignored while op is next,
+    but it matters if the instruction is flipped to jump.
+  - Return the accumulator from the corrected execution path, not the sum of all
+    plus values.
+  - Brute-force repair is acceptable for small inputs: try flipping each jump or
+    next reached before the loop, then run the simulator from the start.
+
+Solution (builds on Part 1): run original; for each reached jump/next in the
+trace, temporarily flip it and rerun from the beginning; the flip that makes the
+program terminate is the bad instruction; return its accumulator. (Reference
+Python: flipped(), run_program_with_patch(program, patch_index), repair_program
+iterating trace.)
+Complexity: Time O(n^2) brute force (up to n candidates each rerun O(n)); Space O(n).
+
+--------------------------------------------------------------------------------
+PROMPT 2 (1point3acres) — same question, framing emphasis
+--------------------------------------------------------------------------------
+Coding — Bootloader Instruction Simulator (Fix the Loop)
+SWE coding prompt in phone + virtual-onsite loops. plus/next/jump instructions
+mutate an accumulator and program counter; first detect the loop, then identify
+or repair the single bad instruction that makes execution cycle.
+SWE | simulation, cycle-detection, parsing, python, medium
+Frequency: Low | Last asked: 2026-06-15 | Stage: phone-screen · onsite-coding
+
+Requirements
+Each line is "<op> <signed-int>":
+  plus <n> : add <n> to a global accumulated value, then advance to next line.
+  next <n> : skip to the next line (operand ignored for control flow).
+  jump <n> : jump to line current_index + n.
+Program halts when it runs past the last line OR revisits a line already executed
+(infinite loop). One line has its jump and next swapped, which forces the loop.
+Task:
+  - Run the program and detect the loop — the offending line is the FIRST line
+    that would be visited twice.
+  - Repair the run by flipping behavior on a revisited line: a jump that lands on
+    an already-visited line is treated as a next, and a next that would revisit is
+    treated as a jump.
+  - Return the accumulated value reached once the program halts without looping.
+Reported clarification: expected return = accumulated value at the point the
+(repaired) program terminates — NOT the sum of every plus operand. Partial
+progress is acceptable; interviewer wanted whatever value is reached w/o looping.
+
+Notes
+  - Hard part is reading comprehension, not algorithms: base mechanic is a
+    visited-set loop detector over a pc; the prompt's framing (which instruction
+    is "wrong", what to return) is confusing — clarify before coding.
+  - "An instruction is reversed" trips candidates into thinking every jump/next is
+    mislabeled; in practice exactly ONE line revisits — that revisit point is the
+    line to fix.
+  - Virtual-onsite variant: part 1 "find the loop", part 2 "one instruction is
+    wrong; find that instruction." Restate your interpretation before coding.
+  - Full follow-up set hasn't surfaced — candidates ran out of time on the base.
+
+Preparation
+  - Implement a pc simulator with a visited set that halts on first repeat (the
+    classic "find where the boot sequence loops" puzzle).
+  - Practice parsing "<op> <signed-int>" lines and dispatching on op.
+  - Clarify the return contract up front (terminal accumulator vs total) and
+    handle the repair rule (revisiting jump treated as next and vice versa) as a
+    small state tweak inside the loop.
+
+================================================================================
+SOLUTION: see Bootloader.java (same directory) — verified on Corretto 21.
+  PART 1  run() / findLoop() : visited-set simulator; first repeated index +
+                               full loop body (prompt example -> [3,4,2]).
+  PART 2  repair()           : brute force O(n^2) — flip each jump/next on the
+                               trace, rerun to validate, return acc of the run
+                               that terminates (example -> idx 3, acc 6).  [primary]
+          repairOptimal()    : O(n) — precompute reachesEnd[]/accFromEnd[] via a
+                               memoized DFS on the functional graph, then one walk.
+  Self-test asserts both agree on the prompt example (6), a classic 9-line
+  program (idx 7, acc 8), already-terminating + overshoot edge cases.
+================================================================================

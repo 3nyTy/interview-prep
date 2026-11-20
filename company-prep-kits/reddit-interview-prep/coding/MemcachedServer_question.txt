@@ -1,0 +1,59 @@
+Pseudo-Memcached Protocol Server
+=================================
+
+Implement a simplified memcached-style TCP key-value server supporting line-based
+`get` / `set` commands with byte-count-framed values and a multi-key `get` bonus.
+Reddit's "Backend Coding" round, which recruiters flag as distinct from the usual
+algorithmic coding screen.
+
+Requirements
+------------
+Implement a server for a simplified, memcached-like in-memory key-value store.
+Clients connect over TCP and issue line-based, ASCII, case-sensitive commands
+(each line terminated by \n). Valid keys match [A-Za-z0-9_-]; values may be
+arbitrary bytes. Anything in the standard library is allowed.
+
+Commands to support:
+
+get key_name — look up the key and return its value in the form:
+    VALUE key_name byte_count
+    <raw data of byte_count bytes>
+    END
+END\n terminates the response. If the key does not exist, send no VALUE line or
+data section — just END\n.
+
+set key_name byte_count — the client then sends byte_count bytes of data followed
+by a newline. Store the data under the key and respond with STORED\n.
+
+Bonus — multi-key get: extend get to accept multiple keys (get key_a key_b ...)
+and return all their values in one response (a VALUE/data block per existing key,
+then a single END).
+
+This is Reddit's "Backend Coding" round, which recruiters flag as different from
+the usual algorithmic coding screen — the focus is correct protocol handling and
+byte-accurate framing, not algorithmic complexity.
+
+Examples
+--------
+    >>> get does_not_exist\n
+    <<< END\n
+
+Notes
+-----
+- The protocol is byte-count framed, not delimiter-framed: after a set, read
+  exactly byte_count bytes (values may themselves contain newlines), then consume
+  the trailing newline. Reading line-by-line breaks on binary or multi-line values.
+- get on a missing key returns only END — no error, no VALUE line.
+- Keys are validated against [A-Za-z0-9_-]; commands are case-sensitive.
+- A correct solution typically wires a TCP socket server to a dict-backed store
+  plus a small command parser; the standard library is explicitly allowed, so no
+  third-party networking dependency is needed.
+
+Preparation
+-----------
+- Write a minimal TCP server in your target language from memory (socket /
+  socketserver in Python), then layer command parsing on top.
+- Drill byte-exact reads: read byte_count bytes precisely rather than readline,
+  and reproduce the VALUE key n\n<data>\nEND\n framing exactly.
+- Implement the multi-key get bonus so the response concatenates one block per
+  existing key before a single END.

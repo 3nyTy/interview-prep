@@ -1,0 +1,515 @@
+Problem Overview
+Design a GPU credit ledger that supports:
+
+adding credits with start and expiration windows
+subtracting usage at a timestamp
+querying balance at any timestamp
+This is intentionally close to resource accounting problems you can see in OpenAI-like environments (GPU budget grants, usage events, and late-arriving backfills).
+
+Key challenge: operations can arrive out of order.
+Example: subtract(..., t=30) can be called before add_credit(..., t=20), but get_balance(20) must still return the correct historical result. 
+
+Class Specification
+Implement a GPUCredit class with the following methods:
+
+class GPUCredit:
+    def __init__(self):
+        pass
+
+    def add_credit(self, credit_id: str, amount: int, timestamp: int, expiration: int) -> None:
+        """
+        Add a credit valid in [timestamp, timestamp + expiration] (inclusive).
+        """
+        pass
+
+    def subtract(self, amount: int, timestamp: int) -> None:
+        """
+        Subtract credit at timestamp, consuming soonest-expiring credit first.
+        Does not raise if insufficient credit for that timestamp.
+        """
+        pass
+
+    def get_balance(self, timestamp: int) -> int | None:
+        """
+        Return balance at timestamp, or None when:
+        - no credit window is active at that timestamp, or
+        - reconstructed balance is negative.
+        """
+        pass
+
+Important Requirements
+Out-of-order operations: must reconstruct by event time, not insertion order.
+Inclusive expiration: start=10, expiration=30 means valid during [10, 40].
+Usage priority: subtract from credits that expire soonest first.
+No exception on subtract: insufficient balance is allowed.
+Return None for invalid query result: no active credit window or negative balance.
+Single write event type per timestamp: assume caller does not send both add and subtract at the same timestamp.
+Repeated credit IDs: credit_id is metadata; two grants with the same credit_id are still separate grants.
+Input assumptions for interview: amounts and expiration are non-negative integers (invalid-input validation is optional and not the main signal).
+Examples
+Example 1: Basic credit
+gpu = GPUCredit()
+gpu.add_credit('microsoft', 10, 10, 30)  # valid [10, 40]
+
+gpu.get_balance(0)   # None
+gpu.get_balance(10)  # 10
+gpu.get_balance(40)  # 10
+gpu.get_balance(41)  # None
+
+Example 2: Subtraction
+gpu = GPUCredit()
+gpu.add_credit('amazon', 40, 10, 50)  # valid [10, 60]
+gpu.subtract(30, 30)
+
+gpu.get_balance(10)  # 40
+gpu.get_balance(30)  # 10
+gpu.get_balance(60)  # 10
+gpu.get_balance(61)  # None
+
+Example 3: Out of order
+gpu = GPUCredit()
+gpu.subtract(4, 30)
+gpu.add_credit('a', 4, 20, 30)  # valid [20, 50]
+
+gpu.get_balance(10)  # None
+gpu.get_balance(20)  # 4
+gpu.get_balance(30)  # 0
+gpu.get_balance(50)  # 0
+gpu.get_balance(51)  # None
+
+Example 4: Negative balance
+gpu = GPUCredit()
+gpu.add_credit('openai', 10, 10, 30)
+gpu.subtract(100, 20)
+
+gpu.get_balance(10)  # 10
+gpu.get_balance(20)  # None (negative)
+gpu.get_balance(30)  # None (still negative)
+
+Example 5: Repeated credit ID
+gpu = GPUCredit()
+gpu.add_credit('openai', 10, 10, 50)  # valid [10, 60]
+gpu.add_credit('openai', 10, 30, 50)  # valid [30, 80]
+gpu.subtract(15, 35)
+
+gpu.get_balance(10)  # 10
+gpu.get_balance(30)  # 20
+gpu.get_balance(35)  # 5
+gpu.get_balance(70)  # 5
+
+Code Solution 1: Replay + Sort (Clear Baseline)
+This is the easiest version to explain and debug in an interview.
+
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
+
+
+@dataclass(frozen=True)
+class CreditGrant:
+    credit_id: str
+    amount: int
+    start: int
+    end: int
+
+
+@dataclass(frozen=True)
+class SubtractEvent:
+    amount: int
+    timestamp: int
+
+
+class GPUCreditSimple:
+    def __init__(self) -> None:
+        self._credits: List[CreditGrant] = []
+        self._subtracts: List[SubtractEvent] = []
+
+    def add_credit(self, credit_id: str, amount: int, timestamp: int, expiration: int) -> None:
+        if amount < 0 or expiration < 0:
+            raise ValueError('amount and expiration must be non-negative')
+        self._credits.append(
+            CreditGrant(
+                credit_id=credit_id,
+                amount=amount,
+                start=timestamp,
+                end=timestamp + expiration,
+            )
+        )
+
+    def subtract(self, amount: int, timestamp: int) -> None:
+        if amount < 0:
+            raise ValueError('amount must be non-negative')
+        self._subtracts.append(SubtractEvent(amount=amount, timestamp=timestamp))
+
+    def get_balance(self, timestamp: int) -> Optional[int]:
+        # Event tuple: (time, priority, seq, kind, payload)
+        # Priority: expire=0, add=1, subtract=2
+        events: List[Tuple[int, int, int, str, object]] = []
+        seq = 0
+
+        for grant_key, grant in enumerate(self._credits):
+            if grant.start <= timestamp:
+                events.append((grant.start, 1, seq, 'add', (grant_key, grant)))
+                seq += 1
+            if grant.end + 1 <= timestamp:
+                events.append((grant.end + 1, 0, seq, 'expire', (grant_key, grant)))
+                seq += 1
+
+        for sub in self._subtracts:
+            if sub.timestamp <= timestamp:
+                events.append((sub.timestamp, 2, seq, 'subtract', sub))
+                seq += 1
+
+        events.sort(key=lambda x: (x[0], x[1], x[2]))
+
+        # grant_key -> [remaining_amount, end_timestamp]
+        active: Dict[int, List[int]] = {}
+        active_windows = 0
+        deficit = 0  # outstanding negative balance from underfunded subtracts
+
+        for now, _, _, kind, payload in events:
+            if kind == 'add':
+                grant_key, grant = payload  # type: ignore[misc]
+                if not isinstance(grant, CreditGrant):
+                    continue
+
+                active_windows += 1
+                amount = grant.amount
+
+                # New credits first offset any existing negative balance.
+                if deficit > 0:
+                    paid = min(deficit, amount)
+                    deficit -= paid
+                    amount -= paid
+
+                active[grant_key] = [amount, grant.end]
+
+            elif kind == 'expire':
+                grant_key, grant = payload  # type: ignore[misc]
+                if not isinstance(grant, CreditGrant):
+                    continue
+
+                active_windows -= 1
+                if grant_key in active:
+                    # Remove expired remainder, even if it is 0.
+                    del active[grant_key]
+
+            else:
+                sub = payload  # type: ignore[assignment]
+                if not isinstance(sub, SubtractEvent):
+                    continue
+
+                to_use = sub.amount
+
+                # Eligible pools at current time, sorted by earliest expiration.
+                pools: List[Tuple[int, int]] = []
+                for grant_key, (remaining, end) in active.items():
+                    if remaining > 0 and end >= now:
+                        pools.append((end, grant_key))
+                pools.sort()
+
+                for _, grant_key in pools:
+                    if to_use == 0:
+                        break
+                    remaining = active[grant_key][0]
+                    take = min(remaining, to_use)
+                    active[grant_key][0] -= take
+                    to_use -= take
+
+                # Not enough credits at that moment -> go negative.
+                if to_use > 0:
+                    deficit += to_use
+
+        if active_windows == 0:
+            return None
+
+        available = sum(remaining for remaining, _ in active.values())
+        balance = available - deficit
+        return balance if balance >= 0 else None
+
+Code Solution 2: Replay + Min-Heap (Better Follow-Up)
+Same replay model, but subtraction uses a min-heap by expiration time. 
+
+from dataclasses import dataclass
+from heapq import heappop, heappush
+from typing import Dict, List, Optional, Tuple
+
+
+@dataclass(frozen=True)
+class CreditGrant:
+    credit_id: str
+    amount: int
+    start: int
+    end: int
+
+
+@dataclass(frozen=True)
+class SubtractEvent:
+    amount: int
+    timestamp: int
+
+
+class GPUCredit:
+    def __init__(self) -> None:
+        self._credits: List[CreditGrant] = []
+        self._subtracts: List[SubtractEvent] = []
+
+    def add_credit(self, credit_id: str, amount: int, timestamp: int, expiration: int) -> None:
+        if amount < 0 or expiration < 0:
+            raise ValueError('amount and expiration must be non-negative')
+        self._credits.append(
+            CreditGrant(
+                credit_id=credit_id,
+                amount=amount,
+                start=timestamp,
+                end=timestamp + expiration,
+            )
+        )
+
+    def subtract(self, amount: int, timestamp: int) -> None:
+        if amount < 0:
+            raise ValueError('amount must be non-negative')
+        self._subtracts.append(SubtractEvent(amount=amount, timestamp=timestamp))
+
+    def get_balance(self, timestamp: int) -> Optional[int]:
+        events: List[Tuple[int, int, int, str, object]] = []
+        seq = 0
+
+        for grant_key, grant in enumerate(self._credits):
+            if grant.start <= timestamp:
+                events.append((grant.start, 1, seq, 'add', (grant_key, grant)))
+                seq += 1
+            if grant.end + 1 <= timestamp:
+                events.append((grant.end + 1, 0, seq, 'expire', (grant_key, grant)))
+                seq += 1
+
+        for sub in self._subtracts:
+            if sub.timestamp <= timestamp:
+                events.append((sub.timestamp, 2, seq, 'subtract', sub))
+                seq += 1
+
+        events.sort(key=lambda x: (x[0], x[1], x[2]))
+
+        remaining: Dict[int, int] = {}
+        total_available = 0
+        deficit = 0
+        active_windows = 0
+
+        # Min-heap of (end, grant_key). Stale entries are lazily discarded.
+        heap: List[Tuple[int, int]] = []
+
+        def prune(now: int) -> None:
+            while heap:
+                end, grant_key = heap[0]
+                if end < now or remaining.get(grant_key, 0) == 0:
+                    heappop(heap)
+                    continue
+                break
+
+        for now, _, _, kind, payload in events:
+            if kind == 'add':
+                grant_key, grant = payload  # type: ignore[misc]
+                if not isinstance(grant, CreditGrant):
+                    continue
+
+                active_windows += 1
+                amount = grant.amount
+
+                if deficit > 0:
+                    paid = min(deficit, amount)
+                    deficit -= paid
+                    amount -= paid
+
+                remaining[grant_key] = amount
+                if amount > 0:
+                    total_available += amount
+                    heappush(heap, (grant.end, grant_key))
+
+            elif kind == 'expire':
+                grant_key, grant = payload  # type: ignore[misc]
+                if not isinstance(grant, CreditGrant):
+                    continue
+
+                active_windows -= 1
+                rem = remaining.get(grant_key, 0)
+                if rem > 0:
+                    total_available -= rem
+                    remaining[grant_key] = 0
+
+            else:
+                sub = payload  # type: ignore[assignment]
+                if not isinstance(sub, SubtractEvent):
+                    continue
+
+                to_use = sub.amount
+                prune(now)
+
+                while to_use > 0:
+                    prune(now)
+                    if not heap:
+                        break
+
+                    end, grant_key = heappop(heap)
+                    rem = remaining.get(grant_key, 0)
+                    if rem == 0 or end < now:
+                        continue
+
+                    take = min(rem, to_use)
+                    rem -= take
+                    to_use -= take
+                    total_available -= take
+                    remaining[grant_key] = rem
+
+                    if rem > 0:
+                        heappush(heap, (end, grant_key))
+
+                if to_use > 0:
+                    deficit += to_use
+
+        if active_windows == 0:
+            return None
+
+        balance = total_available - deficit
+        return balance if balance >= 0 else None
+
+Complexity
+Approach	get_balance(t) Time	Space
+Replay + Sort pools (GPUCreditSimple)	O((C + S) log (C + S) + S * C log C) worst case	O(C + S)
+Replay + Min-Heap (GPUCredit)	O((C + S) log (C + S) + K log C) where K is replay heap ops	O(C + S)
+C: number of credit grants
+S: number of subtract events
+K: number of heap push/pop operations while replaying subtracts
+Sample Test Code
+def run_smoke_tests(cls):
+    # Basic
+    gpu = cls()
+    gpu.add_credit('a', 4, 20, 30)  # [20, 50]
+    assert gpu.get_balance(10) is None
+    assert gpu.get_balance(20) == 4
+    assert gpu.get_balance(50) == 4
+    assert gpu.get_balance(51) is None
+
+    # Earliest-expiration-first
+    gpu = cls()
+    gpu.add_credit('a', 4, 20, 40)  # [20, 60]
+    gpu.add_credit('b', 3, 30, 10)  # [30, 40]
+    gpu.subtract(2, 30)
+    assert gpu.get_balance(30) == 5
+    assert gpu.get_balance(40) == 5
+    assert gpu.get_balance(41) == 4
+
+    # Out of order
+    gpu = cls()
+    gpu.subtract(4, 30)
+    gpu.add_credit('a', 4, 20, 30)
+    assert gpu.get_balance(10) is None
+    assert gpu.get_balance(20) == 4
+    assert gpu.get_balance(30) == 0
+
+    # Negative balance
+    gpu = cls()
+    gpu.add_credit('a', 10, 10, 30)
+    gpu.subtract(100, 20)
+    assert gpu.get_balance(10) == 10
+    assert gpu.get_balance(20) is None
+
+    # Repeated credit ID
+    gpu = cls()
+    gpu.add_credit('openai', 10, 10, 50)
+    gpu.add_credit('openai', 10, 30, 50)
+    gpu.subtract(15, 35)
+    assert gpu.get_balance(10) == 10
+    assert gpu.get_balance(30) == 20
+    assert gpu.get_balance(35) == 5
+    assert gpu.get_balance(70) == 5
+
+
+run_smoke_tests(GPUCreditSimple)
+run_smoke_tests(GPUCredit)
+
+================================================================================
+ADDENDUM — reported-variant notes (added 2026-08-02 from candidate reports)
+================================================================================
+
+VARIANT LINEAGE: "GPU Credits" vs "GPU Credit 2"
+The simpler/earlier framing drops the id and uses an ABSOLUTE expiry:
+
+    create_grant(amount, expire_at)   # not (id, amount, timestamp, duration)
+    subtract(amount, at_time)
+    get_balance(at_time)
+
+"GPU Credit 2" (now the common form, and what the Class Specification above
+describes) adds two semantics on top:
+  1. drain from the EARLIEST-EXPIRING grant first, and
+  2. a subtract at at_time keeps affecting FUTURE balances — already-consumed
+     credit stays consumed. It is not a one-off deduction at that instant.
+The keyed form also makes `expiration` a DURATION (valid through
+timestamp + expiration, INCLUSIVE), and explicitly stresses OUT-OF-ORDER
+arrival: a subtract for t=30 may arrive before the add_credit that activates
+at t=20.
+
+FORMAT: the interviewer hands over ~6 test cases covering all scenarios UP
+FRONT, and there is typically no hidden follow-up test. Pass all 6 and the
+implementation portion is done. Reported: strong candidates finish in under
+30 minutes and spend the remaining time on the optimization discussion.
+
+*** CLARIFY BEFORE CODING — the zero-vs-None rule ***
+This is the silent failure interviewers probe. In the canonical keyed variant:
+  - balance exactly 0 (credits precisely cancel usage) -> return 0, NOT None
+  - only a genuinely NEGATIVE replayed balance (e.g. -90 from over-burn)
+    collapses to None
+  - None also applies when NO grant window is active at the queried timestamp
+A MINORITY earlier framing had zero ALSO collapse to None. Ask which one is
+wanted before writing code; guessing costs test cases.
+
+WORKED EXAMPLE — drain spanning 3 grants, partial on the last
+    gpu = GPUCredit()
+    gpu.add_credit('c1', 20, 10, 30)  # valid through 40 (dies first)
+    gpu.add_credit('c2', 20, 40, 30)  # valid through 70
+    gpu.add_credit('c3', 20, 20, 30)  # valid through 50
+    gpu.add_credit('c4', 20, 30, 30)  # valid through 60
+    gpu.subtract(45, 30)              # 20 from c1, 20 from c3, 5 from c4
+    assert gpu.get_balance(30) == 15  # c1 & c3 empty; c4 has 15 left
+    assert gpu.get_balance(55) == 35  # c4 has 15, c2 has 20; c1/c3 expired
+Note the grants are ADDED out of expiry order on purpose — insertion order is
+irrelevant, only expiry order governs the burn.
+
+TWO SOLVING STRATEGIES (do them in this order)
+  1. REPLAY FROM SCRATCH (default; interviewers often say not to worry about
+     speed). Record every event. On get_balance(t): filter to events at or
+     before t, sort by timestamp, replay add/subtract, ignoring grants already
+     expired at t. Get the logic right first.
+  2. INCREMENTAL WITH A MIN-HEAP (the optimization ask). Heap of active grants
+     keyed by expiration; each subtract pops the soonest-expiring. Use lazy
+     deletion for expired entries rather than removing from the middle. Cache
+     prior results so the same t is not recomputed. Python: heapq (or
+     sortedcontainers.SortedList); Java: PriorityQueue / TreeMap.
+
+EASY-TO-MISS CORRECTNESS TRAPS
+  * Off-by-one on expiry: a grant expiring at 40 is still valid AT 40 and gone
+    only at 41. timestamp + expiration is INCLUSIVE.
+  * Do NOT naively net: you cannot sum all adds and subtract all usage. WHEN
+    each subtract lands — and which grants were live at that moment — changes
+    every later balance.
+  * Order-independence: never assume add_credit precedes its matching
+    subtract.
+  * At most one event (add_credit or subtract) per timestamp, so no
+    tie-breaking is needed within a single tick.
+
+PRODUCTION FOLLOW-UP
+"How would credits be enforced in production?" An accepted framing is
+tier-aware RATE LIMITING layered on top of the credit ledger — the ledger is
+the accounting system of record; the limiter is the enforcement point.
+
+REPORTED SOFT SIGNAL
+A recurring pattern: the candidate writes correct code quickly but the
+INTERVIEWER spots a bug before the candidate does, and the round still ends
+positively. Communicating while debugging is weighted as heavily as the fix.
+Narrate the hypothesis, not just the correction.
+
+PREPARATION CHECKLIST
+  * Decide up front how you track each grant's REMAINING amount (not just its
+    original amount) — that is the field people forget.
+  * Have the heap API at your fingertips so you do not stall on syntax.
+  * Rehearse: subtract spanning multiple grants; already-expired grants;
+    grants sharing the same expiry; subtract before any add; query before the
+    first grant starts; query after all grants expire.

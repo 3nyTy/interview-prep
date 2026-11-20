@@ -1,0 +1,95 @@
+==============================================================================
+Anthropic - Software Engineer - Online Assessment (CodeSignal)
+Title: Task Management System (4-level, progressive)
+Frequency: Medium. Reported Apr 2026 (priority/quota) ; TTL/snapshot last asked
+           2026-05-27 (Low/New). Stage: OA. 90-min hard cap, progressive unlock.
+Sources: DarkInterview (Prompt 1) + 1point3acres (Prompt 2)
+Solutions in this folder:
+   TaskManagementSystem.java   -> PRIMARY: priority/quota variant (verified 43/43)
+   TaskManagerTtlSnapshot.java -> SECONDARY: TTL + time-travel snapshot (verified 17/17)
+==============================================================================
+
+NOTE: two 4-level shapes rotate under the same OA name. Read the harness
+signatures in the first 60 seconds and commit to the matching file.
+
+------------------------------------------------------------------------------
+PROMPT 1 (DarkInterview) - PRIORITY / QUOTA variant  [FULLY SPECIFIED]
+------------------------------------------------------------------------------
+General constraints: priority & quota are non-negative ints (>= 0); timestamps
+and finish_time are positive ints (seconds); timestamps strictly increase.
+
+LEVEL 1 - Basic Task Management
+  addTask(timestamp, name, priority) -> String
+    New task; returns "task_id_N" (N sequential from 1). Duplicate names allowed.
+  updateTask(timestamp, taskId, name, priority) -> boolean
+    Updates name+priority; false if taskId doesn't exist.
+  getTask(timestamp, taskId) -> Optional<String>
+    Compact JSON, NO spaces, fixed key order: '{"name":"...","priority":N}'.
+    Optional.empty() if missing. (Preserve whitespace inside name; no JSON lib needed.)
+
+LEVEL 2 - Search and Sorting
+  searchTasks(timestamp, nameFilter, maxResults) -> List<String>
+    Case-sensitive SUBSTRING match on name; up to maxResults ids.
+    Sort: priority desc, then creation order (numeric id) asc. [] if maxResults <= 0.
+  listTasksSorted(timestamp, limit) -> List<String>
+    All tasks, same sort key, up to limit. ([] if limit <= 0.)
+
+LEVEL 3 - Users, Quotas, Time-Based Assignments
+  addUser(timestamp, userId, quota) -> boolean    (false if user exists)
+    quota = max # of simultaneously ACTIVE assignments.
+  assignTask(timestamp, taskId, userId, finishTime) -> boolean
+    Assignment active over [timestamp, finishTime); auto-expires at finishTime.
+    False if task/user missing or active-count already == quota. Same task may be
+    assigned to the same user multiple times; each consumes one quota slot.
+  getUserTasks(timestamp, userId) -> List<String>
+    Active assignments (start <= ts < finish). Sort: finish asc, then start asc.
+    (Sort uses ASSIGN time, not task-creation time.)
+
+LEVEL 4 - Task Completion and Overdue Tracking
+  completeTask(timestamp, taskId, userId) -> boolean
+    Assignment must be active at ts. Frees the quota slot immediately. If the same
+    task is assigned to the user multiple times concurrently, completes ONLY the
+    EARLIEST (smallest start_time; unique since timestamps increase). False if
+    task/user missing or no active matching assignment.
+  getOverdueAssignments(timestamp, userId) -> List<String>
+    Task ids whose assignment finish_time <= ts AND was never completed. Each
+    assignment evaluated independently; a task id may appear multiple times.
+    Sort: finish asc, then start asc. [] if user missing / none overdue.
+
+  Complexity (reference): addTask/updateTask/getTask O(1); search/listSorted
+  O(T log T); assignTask O(A); getUserTasks/completeTask/getOverdue O(A log A).
+  T = #tasks, A = #assignments for a user.
+
+  (Prompt 1 ships a full reference solution in Python; this folder ports it to
+   optimal Java and verifies every worked example as unit assertions.)
+
+------------------------------------------------------------------------------
+PROMPT 2 (1point3acres) - TWO variants
+------------------------------------------------------------------------------
+(A) TTL + time-travel SNAPSHOT variant -> TaskManagerTtlSnapshot.java
+  L1-2: per-user CRUD - add_task(user, task_id, ...), update_task, complete_task,
+        get_task_list(user). Ledger-style; nothing tricky.
+  L3 - TTL auto-expiry: a task may carry an optional ttl; once now >= created_at +
+       ttl it behaves as deleted (gone from get_task_list, cannot be updated).
+       Filter at READ time via a deletion_at field; do NOT run an active reaper.
+  L4 - time-travel: get_task_list(user, at_timestamp) returns the list as of any
+       past moment, reconstructed on demand (no per-call snapshot storage).
+  Canonical design = event sourcing: dict[user] -> list[(t, kind, payload)];
+  at(user,T) folds events with t' <= T, skipping any whose t'+ttl <= T. The same
+  fold powers BOTH TTL and look-back. Pick this representation UP FRONT - a wrong
+  data-structure choice forces a level-3/4 rewrite under the 90-min cap.
+
+(B) Alternate canonical = exactly Prompt 1 (priority / quota). Confirmed harness
+    signatures match. Reminders: "task_id_{n}" literal string is part of the
+    contract (hidden tests compare it); get_task returns a STRING not a dict, no
+    spaces inside braces; quota counts CURRENTLY-active assignments (expired-but-
+    not-completed ones free their slot at finish_time but still surface in
+    get_overdue_assignments); a per-user list of Assignment(task_id,start,finish,
+    completed) scanned linearly passes within the 90-min window.
+
+PREP NOTES:
+  - Drill the event-sourced store: dict[user] -> list[(t,kind,payload)]; at(user,t)
+    folds t' <= t and skips t'+ttl <= t. Pre-write replay(events, until_t).
+  - Write Level 1 in <= 15 min with abstractions clean enough that L3/L4 don't force
+    a refactor. Read the harness first 60s to pick the variant.
+==============================================================================

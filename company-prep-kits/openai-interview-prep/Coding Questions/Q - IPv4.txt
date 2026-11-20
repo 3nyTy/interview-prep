@@ -1,0 +1,276 @@
+IPv4 Address Iterator with CIDR Support
+Coding
+Phone, Onsite
+Software Engineer, Machine Learning Engineer
+Reported Apr, 2026
+High Frequency
+Problem Overview
+You need to implement an IPv4 iterator class in Python that can iterate through IP addresses. The problem progressively adds complexity through multiple parts, starting with forward iteration, then reverse iteration, and finally adding CIDR notation support.
+
+Part 1: Forward Iterator
+Implement an IPV4Iterator class with __init__ and __next__ methods that iterates forward through IPv4 addresses starting from a given IP.
+
+Requirements
+Initialize with a starting IPv4 address string (e.g., "255.255.255.250")
+Implement Python iterator protocol (__iter__ and __next__)
+Iterate from the starting IP through to 255.255.255.255
+Raise StopIteration when reaching the last valid IPv4 address
+Example
+ip = IPV4Iterator("255.255.255.250")
+for i in ip:
+    print(i)
+
+# Output:
+# 255.255.255.250
+# 255.255.255.251
+# 255.255.255.252
+# 255.255.255.253
+# 255.255.255.254
+# 255.255.255.255
+
+Edge Cases to Consider
+Starting from 0.0.0.0
+Starting from 255.255.255.255 (immediately raise StopIteration)
+Handling octets that roll over (e.g., 192.168.0.255 → 192.168.1.0)
+Invalid IP addresses (optional: validate input)
+Sample Implementation Approach
+class IPV4Iterator:
+    def __init__(self, start_ip: str):
+        self.current = self._ip_to_int(start_ip)
+        self.max_ip = (256 ** 4) - 1  # 255.255.255.255 as integer
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.current > self.max_ip:
+            raise StopIteration
+
+        result = self._int_to_ip(self.current)
+        self.current += 1
+        return result
+
+    def _ip_to_int(self, ip: str) -> int:
+        """Convert IP string to 32-bit integer"""
+        octets = [int(octet) for octet in ip.split('.')]
+        return (octets[0] << 24) + (octets[1] << 16) + (octets[2] << 8) + octets[3]
+
+    def _int_to_ip(self, num: int) -> str:
+        """Convert 32-bit integer to IP string"""
+        return f"{(num >> 24) & 255}.{(num >> 16) & 255}.{(num >> 8) & 255}.{num & 255}"
+
+Part 2: Reverse Iterator
+Extend or create a new class that supports reverse iteration through IPv4 addresses. 
+
+Requirements
+Initialize with a starting IPv4 address
+Iterate backwards (decrementing IP addresses)
+Stop at 0.0.0.0 (raise StopIteration afterwards)
+Decide on interface: separate class or parameter to control direction
+Example
+ip = IPV4Iterator("0.0.0.5", reverse=True)
+for i in ip:
+    print(i)
+
+# Output:
+# 0.0.0.5
+# 0.0.0.4
+# 0.0.0.3
+# 0.0.0.2
+# 0.0.0.1
+# 0.0.0.0
+
+Implementation Approach
+You can modify the forward iterator:
+
+class IPV4Iterator:
+    def __init__(self, start_ip: str, reverse: bool = False):
+        self.current = self._ip_to_int(start_ip)
+        self.reverse = reverse
+        self.max_ip = (256 ** 4) - 1  # 255.255.255.255
+        self.min_ip = 0  # 0.0.0.0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.reverse:
+            if self.current < self.min_ip:
+                raise StopIteration
+            result = self._int_to_ip(self.current)
+            self.current -= 1
+        else:
+            if self.current > self.max_ip:
+                raise StopIteration
+            result = self._int_to_ip(self.current)
+            self.current += 1
+
+        return result
+
+    # ... helper methods same as Part 1
+
+Edge Cases
+Starting from 0.0.0.0 in reverse (immediately stop)
+Starting from 255.255.255.255 in reverse
+Octet underflow (e.g., 192.168.1.0 → 192.168.0.255)
+Part 3: Forward/Reverse Iterator with CIDR Notation
+Extend the iterator to support CIDR (Classless Inter-Domain Routing) notation, which specifies a range of IP addresses.
+
+CIDR Background
+CIDR notation: 192.168.1.0/24 
+
+The number after / is the prefix length (number of fixed leading bits)
+/24 means the first 24 bits are fixed, leaving 8 bits for host addresses
+This represents 2^8 = 256 addresses: 192.168.1.0 to 192.168.1.255
+Requirements
+Initialize with IP address in CIDR format (e.g., "192.168.1.0/24")
+Support both forward and reverse iteration
+Only iterate through the IP range defined by the CIDR block
+Raise StopIteration when reaching the boundary of the CIDR range
+Example
+# Forward iteration
+ip_iter = IPV4Iterator("192.168.1.250/29", reverse=False)
+for i in ip_iter:
+    print(i)
+
+# Output (192.168.1.248 - 192.168.1.255, a /29 has 8 addresses):
+# 192.168.1.250
+# 192.168.1.251
+# 192.168.1.252
+# 192.168.1.253
+# 192.168.1.254
+# 192.168.1.255
+
+# Reverse iteration
+ip_iter = IPV4Iterator("192.168.1.5/29", reverse=True)
+for i in ip_iter:
+    print(i)
+
+# Output (iterates down to start of /29 block: 192.168.1.0):
+# 192.168.1.5
+# 192.168.1.4
+# 192.168.1.3
+# 192.168.1.2
+# 192.168.1.1
+# 192.168.1.0
+
+Implementation Approach
+class IPV4Iterator:
+    def __init__(self, ip_cidr: str, reverse: bool = False):
+        self.reverse = reverse
+
+        if '/' in ip_cidr:
+            # CIDR notation provided
+            ip, prefix_str = ip_cidr.split('/')
+            self.prefix_length = int(prefix_str)
+            start_int = self._ip_to_int(ip)
+
+            # Calculate CIDR block boundaries
+            host_bits = 32 - self.prefix_length
+            block_size = 2 ** host_bits
+
+            # Find network address (first IP in CIDR block)
+            network_mask = (0xFFFFFFFF << host_bits) & 0xFFFFFFFF
+            self.network_address = start_int & network_mask
+
+            # Last IP in CIDR block
+            self.broadcast_address = self.network_address + block_size - 1
+
+            # Set current position
+            if self.reverse:
+                self.current = start_int
+                self.limit = self.network_address
+            else:
+                self.current = start_int
+                self.limit = self.broadcast_address
+        else:
+            # No CIDR notation - use full IPv4 range limits (Parts 1 & 2 behavior)
+            self.current = self._ip_to_int(ip_cidr)
+            if self.reverse:
+                self.limit = 0  # 0.0.0.0
+            else:
+                self.limit = (256 ** 4) - 1  # 255.255.255.255
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.reverse:
+            if self.current < self.limit:
+                raise StopIteration
+            result = self._int_to_ip(self.current)
+            self.current -= 1
+        else:
+            if self.current > self.limit:
+                raise StopIteration
+            result = self._int_to_ip(self.current)
+            self.current += 1
+
+        return result
+
+    def _ip_to_int(self, ip: str) -> int:
+        octets = [int(octet) for octet in ip.split('.')]
+        return (octets[0] << 24) + (octets[1] << 16) + (octets[2] << 8) + octets[3]
+
+    def _int_to_ip(self, num: int) -> str:
+        return f"{(num >> 24) & 255}.{(num >> 16) & 255}.{(num >> 8) & 255}.{num & 255}"
+
+Edge Cases and Boundary Handling
+Critical: Properly handle the CIDR block boundaries:
+
+Forward iteration: Stop at broadcast address (last IP in CIDR block)
+Reverse iteration: Stop at network address (first IP in CIDR block)
+Starting IP outside CIDR block: Decide behavior (error or clamp to range)
+Special CIDR prefixes:
+/32: Single IP address
+/31: 2 addresses (used for point-to-point links)
+/24: 256 addresses (common subnet)
+/0: All 4.3 billion IPv4 addresses
+Example Test Cases
+# Test Case 1: /32 (single IP)
+ip = IPV4Iterator("192.168.1.100/32")
+assert list(ip) == ["192.168.1.100"]
+
+# Test Case 2: /31 (2 IPs)
+ip = IPV4Iterator("10.0.0.0/31")
+assert list(ip) == ["10.0.0.0", "10.0.0.1"]
+
+# Test Case 3: /29 forward (8 IPs)
+ip = IPV4Iterator("172.16.0.0/29")
+result = list(ip)
+assert len(result) == 8
+assert result[-1] == "172.16.0.7"
+
+# Test Case 4: /29 reverse
+ip = IPV4Iterator("172.16.0.7/29", reverse=True)
+result = list(ip)
+assert result[0] == "172.16.0.7"
+assert result[-1] == "172.16.0.0"
+
+# Test Case 5: Starting mid-block
+ip = IPV4Iterator("192.168.1.5/29")  # Block is 192.168.1.0-7
+result = list(ip)
+assert result[0] == "192.168.1.5"
+assert result[-1] == "192.168.1.7"  # Stops at block boundary
+
+Part 4: Complexity Follow-up
+Interviewer may ask: "How can you optimize time and space complexity?"
+
+Key Answer
+The integer-based lazy iterator is already asymptotically optimal under the normal iterator contract. 
+
+__next__: O(1) time per address
+Full iteration over N addresses: O(N), which is unavoidable because the iterator must produce N outputs
+Space: O(1), because the iterator stores only the current position, direction, and range bounds
+There is no meaningful asymptotic improvement unless the requirements change. The important optimization is to avoid worse designs, such as materializing the whole CIDR block in memory.
+
+Practical Performance Notes
+Good follow-up discussion points:
+
+Store the current IP as a 32-bit integer rather than mutating four octets or storing strings
+Parse the input IP/CIDR once in __init__
+Precompute the network and broadcast boundaries once
+Convert the integer back to dotted-decimal string only when yielding
+Keep iteration lazy; never build list(all_ips_in_cidr) for large ranges
+If the API changes, batching can reduce function-call overhead, but it does not change total O(N) work
+If callers need "every kth IP" or range skipping, a step parameter changes the output size; it is a different requirement, not an optimization of the same iterator
